@@ -7,8 +7,8 @@
 package org.mule.config.factories;
 
 import org.mule.api.config.PropertyFactory;
+import org.mule.util.NetworkUtils;
 
-import java.net.InetAddress;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -28,7 +28,7 @@ public class HostNameFactory implements PropertyFactory
         // to an interface on the firewall, not on the local machine.
         try
         {
-            return InetAddress.getLocalHost().getHostName();
+            return NetworkUtils.getLocalHost().getHostName();
         }
         catch (Exception e)
         {

@@ -15,13 +15,13 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.FileUtils;
+import org.mule.util.NetworkUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -199,7 +199,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             try
             {
-                domainId = InetAddress.getLocalHost().getHostName();
+                domainId = NetworkUtils.getLocalHost().getHostName();
             }
             catch (UnknownHostException e)
             {

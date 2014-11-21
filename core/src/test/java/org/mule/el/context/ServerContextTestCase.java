@@ -7,12 +7,11 @@
 package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.el.datetime.DateTime;
+import org.mule.util.NetworkUtils;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,7 +22,6 @@ import java.util.TimeZone;
 import javax.xml.bind.DatatypeConverter;
 
 import junit.framework.Assert;
-
 import org.apache.commons.lang.LocaleUtils;
 import org.junit.Test;
 
@@ -37,7 +35,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void host() throws UnknownHostException
     {
-        Assert.assertEquals(InetAddress.getLocalHost().getCanonicalHostName(), evaluate("server.host"));
+        Assert.assertEquals(NetworkUtils.getLocalHost().getCanonicalHostName(), evaluate("server.host"));
     }
 
     @Test
@@ -49,7 +47,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void ip() throws UnknownHostException
     {
-        Assert.assertEquals(InetAddress.getLocalHost().getHostAddress(), evaluate("server.ip"));
+        Assert.assertEquals(NetworkUtils.getLocalHost().getHostAddress(), evaluate("server.ip"));
     }
 
     @Test

@@ -7,6 +7,9 @@
 package org.mule.transport.udp.functional;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.ConfigurableKeyedObjectPool;
+import org.mule.util.NetworkUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,14 +18,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.ConfigurableKeyedObjectPool;
 
 public class UdpDynamicEPTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -57,7 +57,7 @@ public class UdpDynamicEPTestCase extends AbstractServiceAndFlowTestCase
             byte[] bytesToSend = bytesOut.toByteArray();
 
             DatagramPacket outboundPacket = new DatagramPacket(bytesToSend, bytesToSend.length,
-                InetAddress.getLocalHost(), outPort);
+                NetworkUtils.getLocalHost(), outPort);
             socket.send(outboundPacket);
 
             // receive whatever came back

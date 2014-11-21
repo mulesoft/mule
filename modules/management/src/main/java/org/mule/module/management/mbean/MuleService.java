@@ -11,6 +11,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.config.MuleManifest;
 import org.mule.util.IOUtils;
+import org.mule.util.NetworkUtils;
 import org.mule.util.StringMessageUtils;
 
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class MuleService implements MuleServiceMBean
         buildDate = MuleManifest.getBuildDate();
         try
         {
-            InetAddress iad = InetAddress.getLocalHost();
+            InetAddress iad = NetworkUtils.getLocalHost();
             host = iad.getCanonicalHostName();
             ip = iad.getHostAddress();
         }

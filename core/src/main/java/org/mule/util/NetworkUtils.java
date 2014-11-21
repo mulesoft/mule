@@ -6,8 +6,10 @@
  */
 package org.mule.util;
 
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,5 +56,16 @@ public final class NetworkUtils
         }
 
         return isServerReachable;
+    }
+
+    private static InetAddress localHost;
+
+    public static InetAddress getLocalHost() throws UnknownHostException
+    {
+        if (localHost == null)
+        {
+            localHost = InetAddress.getLocalHost();
+        }
+        return localHost;
     }
 }
