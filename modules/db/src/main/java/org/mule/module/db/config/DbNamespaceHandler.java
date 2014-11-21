@@ -83,7 +83,15 @@ public class DbNamespaceHandler extends NamespaceHandlerSupport
         DbConfigDefinitionParser oracleDbConfigFactoryBean = new DbConfigDefinitionParser(OracleConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}}));
-        oracleDbConfigFactoryBean.registerPreProcessor(new CheckRequiredAttributes(new String[][] {{DATA_SOURCE_REF_ATTRIBUTE}, {USER_ATTRIBUTE, PASSWORD_ATTRIBUTE}}));
+        oracleDbConfigFactoryBean.registerPreProcessor(
+                new CheckRequiredAttributes(new String[][] {
+                        {DATA_SOURCE_REF_ATTRIBUTE},
+                        {DATA_SOURCE_REF_ATTRIBUTE, USER_ATTRIBUTE, PASSWORD_ATTRIBUTE},
+                        {URL_ATTRIBUTE},
+                        {USER_ATTRIBUTE, PASSWORD_ATTRIBUTE, URL_ATTRIBUTE},
+                        {USER_ATTRIBUTE, PASSWORD_ATTRIBUTE, HOST_ATTRIBUTE, PORT_ATTRIBUTE}
+                }));
+
         oracleDbConfigFactoryBean.addAlias("instance", "database");
         registerBeanDefinitionParser("oracle-config", oracleDbConfigFactoryBean);
 
