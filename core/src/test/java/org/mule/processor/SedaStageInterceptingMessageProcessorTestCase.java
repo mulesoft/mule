@@ -262,15 +262,12 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         threadingProfile.setThreadWaitTimeout(10);
         threadingProfile.setMuleContext(muleContext);
         // Create queue with capacity of 1, so that for second event queue is already full
-        QueueProfile queueProfile = new QueueProfile(1, (org.mule.api.store.QueueStore<Serializable>) muleContext
-                .getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
-        SedaStageInterceptingMessageProcessor mp = new SedaStageInterceptingMessageProcessor("threadName",
-                                                                                             "queueMame",
-                                                                                             queueProfile,
-                                                                                             queueTimeout,
-                                                                                             threadingProfile,
-                                                                                             queueStatistics,
-                                                                                             muleContext);
+        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+                muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        QueueProfile queueProfile = new QueueProfile(1, queueStore);
+        SedaStageInterceptingMessageProcessor mp;
+        mp = new SedaStageInterceptingMessageProcessor("threadName", "queueMame", queueProfile, queueTimeout,
+                                                       threadingProfile, queueStatistics, muleContext);
         mp.setListener(target);
         mp.initialise();
         // Don't start SedaStageInterceptingMessageProcessor to ensure events queue up and aren't removed from queue
