@@ -37,6 +37,7 @@ import org.mule.util.queue.QueueSession;
 import org.mule.work.MuleWorkManager;
 
 import java.text.MessageFormat;
+import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -109,10 +110,21 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         if (logger.isDebugEnabled())
         {
             logger.debug(MessageFormat.format("{1}: Putting event on queue {2}", queue.getName(),
-                getStageDescription(), event));
+                                              getStageDescription(), event));
         }
-        queue.put(event);
-        fireAsyncScheduledNotification(event);
+        boolean queued = queue.offer(event, threadTimeout);
+        if (queued)
+        {
+            fireAsyncScheduledNotification(event);
+        }
+        else
+        {
+            throw new FailedToQueueEventException(
+                    CoreMessages.createStaticMessage(
+                            String.format("The queue for '%1s' did not accept new event within %2d %3s",
+                                          getStageDescription(), threadTimeout, TimeUnit.MILLISECONDS)),
+                    event);
+        }
     }
 
     protected MuleEvent dequeue() throws Exception
