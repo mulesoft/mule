@@ -15,34 +15,34 @@
 
     <queued-asynchronous-processing-strategy
         name="max2ThreadSmallTimeout" maxThreads="2"
-        poolExhaustedAction="WAIT" threadWaitTimeout="500" />
+        poolExhaustedAction="WAIT" threadWaitTimeout="20" />
 
     <queued-asynchronous-processing-strategy
             name="smallQueue" maxQueueSize="1" maxThreads="1"
-            poolExhaustedAction="RUN" threadWaitTimeout="500" />
+            poolExhaustedAction="RUN" threadWaitTimeout="20" />
 
     <flow name="limitedThreadsFlow" processingStrategy="max2ThreadSmallTimeout">
         <vm:inbound-endpoint address="vm://flow1.in"
             exchange-pattern="one-way" />
-        <test:component waitTime="1000" />
+        <test:component waitTime="50" />
         <vm:outbound-endpoint address="vm://out"
             exchange-pattern="one-way" />
-        <default-exception-strategy>
+        <catch-exception-strategy>
             <vm:outbound-endpoint address="vm://exception"
                 exchange-pattern="one-way" />
-        </default-exception-strategy>
+        </catch-exception-strategy>
     </flow>
 
     <flow name="limitedQueueFlow" processingStrategy="smallQueue">
         <vm:inbound-endpoint address="vm://flow2.in"
                              exchange-pattern="one-way" />
-        <test:component waitTime="1000" />
+        <test:component waitTime="50" />
         <vm:outbound-endpoint address="vm://out"
                               exchange-pattern="one-way" />
-        <default-exception-strategy>
+        <catch-exception-strategy>
             <vm:outbound-endpoint address="vm://exception"
                                   exchange-pattern="one-way" />
-        </default-exception-strategy>
+        </catch-exception-strategy>
     </flow>
 
 </mule>

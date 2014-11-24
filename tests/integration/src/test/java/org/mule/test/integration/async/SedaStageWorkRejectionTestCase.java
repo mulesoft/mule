@@ -35,7 +35,6 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
     {
         FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedThreadsFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
         testThirdMessageSendToExceptionStrategy("vm://flow1.in", flowExecutionListener);
-
     }
 
     @Test
@@ -44,7 +43,6 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
         FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedQueueFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
         testThirdMessageSendToExceptionStrategy("vm://flow2.in", flowExecutionListener);
     }
-
 
     protected void testThirdMessageSendToExceptionStrategy(String inUrl, FlowExecutionListener flowExecutionListener) throws Exception
     {
@@ -63,7 +61,7 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
             assertThat(result, is(notNullValue()));
             assertThat(result.getExceptionPayload(), is(nullValue()));
             assertThat(result.getPayload(), not(instanceOf(NullPayload.class)));
-            assertThat(result.getPayloadAsString(), is(containsString(TEST_MESSAGE)));
+            assertThat(result.getPayloadAsString(), containsString(TEST_MESSAGE));
         }
 
         // Third message doesn't arrive

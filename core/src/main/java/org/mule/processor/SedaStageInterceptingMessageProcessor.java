@@ -119,11 +119,9 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         }
         else
         {
-            throw new FailedToQueueEventException(
-                    CoreMessages.createStaticMessage(
-                            String.format("The queue for '%1s' did not accept new event within %2d %3s",
-                                          getStageDescription(), threadTimeout, TimeUnit.MILLISECONDS)),
-                    event);
+            String message = String.format("The queue for '%1s' did not accept new event within %2d %3s",
+                                           getStageDescription(), threadTimeout, TimeUnit.MILLISECONDS);
+            throw new FailedToQueueEventException(CoreMessages.createStaticMessage(message), event);
         }
     }
 

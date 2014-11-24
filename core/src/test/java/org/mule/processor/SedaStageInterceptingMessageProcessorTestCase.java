@@ -255,19 +255,20 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         }
     }
 
-    @Test (expected = FailedToQueueEventException.class, timeout = 200)
+    @Test(expected = FailedToQueueEventException.class, timeout = 200)
     public void enqueueQueueFullThreadTimeout() throws Exception
     {
-        ThreadingProfile tp = new ChainedThreadingProfile();
-        tp.setThreadWaitTimeout(10);
-        tp.setMuleContext(muleContext);
-        QueueProfile qp = new QueueProfile(1, (org.mule.api.store.QueueStore<Serializable>)
-                muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
+        ThreadingProfile threadingProfile = new ChainedThreadingProfile();
+        threadingProfile.setThreadWaitTimeout(10);
+        threadingProfile.setMuleContext(muleContext);
+        // Create queue with capacity of 1, so that for second event queue is already full
+        QueueProfile queueProfile = new QueueProfile(1, (org.mule.api.store.QueueStore<Serializable>) muleContext
+                .getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
         SedaStageInterceptingMessageProcessor mp = new SedaStageInterceptingMessageProcessor("threadName",
                                                                                              "queueMame",
-                                                                                             qp,
+                                                                                             queueProfile,
                                                                                              queueTimeout,
-                                                                                             tp,
+                                                                                             threadingProfile,
                                                                                              queueStatistics,
                                                                                              muleContext);
         mp.setListener(target);
@@ -277,7 +278,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         // First enqueue is successful as queue as max size of 1 defined.
         mp.enqueue(getTestEvent("foo"));
 
-        // Second enqueue will cause thread to wait until timeout (20ms) and then throw a FailedToQueueEventException.
+        // Second enqueue will cause thread to wait until timeout (10ms) and then throw a FailedToQueueEventException.
         mp.enqueue(getTestEvent("bar"));
     }
 
