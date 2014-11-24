@@ -6,12 +6,8 @@
  */
 package org.mule.processor;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
@@ -19,12 +15,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Initialisable;
@@ -34,6 +30,7 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.service.FailedToQueueEventException;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
@@ -43,6 +40,7 @@ import org.mule.service.Pausable;
 import org.mule.util.concurrent.Latch;
 
 import java.beans.ExceptionListener;
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -255,6 +253,30 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
             assertTrue(mrex.getCause().getClass() == Throwable.class);
             assertEquals("testThrowable", mrex.getCause().getMessage());
         }
+    }
+
+    @Test(expected = FailedToQueueEventException.class, timeout = 200)
+    public void enqueueQueueFullThreadTimeout() throws Exception
+    {
+        ThreadingProfile threadingProfile = new ChainedThreadingProfile();
+        threadingProfile.setThreadWaitTimeout(10);
+        threadingProfile.setMuleContext(muleContext);
+        // Create queue with capacity of 1, so that for second event queue is already full
+        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+                muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        QueueProfile queueProfile = new QueueProfile(1, queueStore);
+        SedaStageInterceptingMessageProcessor mp;
+        mp = new SedaStageInterceptingMessageProcessor("threadName", "queueMame", queueProfile, queueTimeout,
+                                                       threadingProfile, queueStatistics, muleContext);
+        mp.setListener(target);
+        mp.initialise();
+        // Don't start SedaStageInterceptingMessageProcessor to ensure events queue up and aren't removed from queue
+
+        // First enqueue is successful as queue as max size of 1 defined.
+        mp.enqueue(getTestEvent("foo"));
+
+        // Second enqueue will cause thread to wait until timeout (10ms) and then throw a FailedToQueueEventException.
+        mp.enqueue(getTestEvent("bar"));
     }
 
     private WorkEvent getTestWorkEvent()

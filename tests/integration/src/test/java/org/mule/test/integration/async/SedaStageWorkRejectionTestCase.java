@@ -6,23 +6,20 @@
  */
 package org.mule.test.integration.async;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.listener.FlowExecutionListener;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
 {
@@ -34,33 +31,44 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void handleRejectedEventWithExceptionStrategy() throws Exception
+    public void handleWorkRejectedWithExceptionStrategy() throws Exception
     {
-        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("sedaFlowCrash", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedThreadsFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
+        testThirdMessageSendToExceptionStrategy("vm://flow1.in", flowExecutionListener);
+    }
+
+    @Test
+    public void handleQueueFullWithExceptionStrategy() throws Exception
+    {
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedQueueFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
+        testThirdMessageSendToExceptionStrategy("vm://flow2.in", flowExecutionListener);
+    }
+
+    protected void testThirdMessageSendToExceptionStrategy(String inUrl, FlowExecutionListener flowExecutionListener) throws Exception
+    {
         // Send 3 messages
         MuleClient client = muleContext.getClient();
         int nrMessages = 3;
         for (int i = 0; i < nrMessages; i++)
         {
-            client.dispatch("vm://flow.in", "some data " + i, null);
+            client.dispatch(inUrl, TEST_MESSAGE + i, null);
         }
         flowExecutionListener.waitUntilFlowIsComplete();
         // Receive 2 messages
         for (int i = 0; i < 2; i++)
         {
-            MuleMessage result = client.request("vm://flow.out", RECEIVE_TIMEOUT);
-            assertNotNull(result);
-            assertNull(result.getExceptionPayload());
-            assertFalse(result.getPayload() instanceof NullPayload);
-
-            assertTrue(result.getPayloadAsString().contains("some data"));
+            MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+            assertThat(result, is(notNullValue()));
+            assertThat(result.getExceptionPayload(), is(nullValue()));
+            assertThat(result.getPayload(), not(instanceOf(NullPayload.class)));
+            assertThat(result.getPayloadAsString(), containsString(TEST_MESSAGE));
         }
 
         // Third message doesn't arrive
-        assertNull(client.request("vm://flow.out", RECEIVE_TIMEOUT / 5));
+        assertThat(client.request("vm://out", RECEIVE_TIMEOUT / 5), is(nullValue()));
 
-        // Third message was router via exception strategy
-        MuleMessage result = client.request("vm://flow.exception", RECEIVE_TIMEOUT);
-        assertNotNull(result);
+        // Third message was routed via exception strategy
+        MuleMessage result = client.request("vm://exception", RECEIVE_TIMEOUT);
+        assertThat(result, is(notNullValue()));
     }
 }
