@@ -50,12 +50,6 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
     {
         return map.get(key);
     }
-    
-    @Override
-    public void clear() throws ObjectStoreException
-    {
-        this.map.clear();
-    }
 
     @Override
     protected T doRemove(Serializable key)

@@ -122,17 +122,11 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
     {
         return getPartitionObjectStore(partitionName).remove(key.toString());
     }
-    
+
     @Override
     public List<Serializable> allKeys(String partitionName) throws ObjectStoreException
     {
         return getPartitionObjectStore(partitionName).allKeys();
-    }
-    
-    @Override
-    public void clear(String partitionName) throws ObjectStoreException
-    {
-        this.getPartitionObjectStore(partitionName).clear();
     }
 
     private PersistentObjectStorePartition<T> getPartitionObjectStore(String partitionName) throws ObjectStoreException
@@ -239,7 +233,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
     @Override
     public void disposePartition(String partitionName) throws ObjectStoreException
     {
-        clear(partitionName);
+        this.getPartitionObjectStore(partitionName).clear();
     }
 
     @Override

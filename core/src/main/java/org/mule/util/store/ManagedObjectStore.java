@@ -100,12 +100,6 @@ public class ManagedObjectStore<T extends Serializable> implements ListableObjec
     {
         return getStore().remove(key);
     }
-    
-    @Override
-    public void clear() throws ObjectStoreException
-    {
-        this.getStore().clear();
-    }
 
     @Override
     public void open() throws ObjectStoreException

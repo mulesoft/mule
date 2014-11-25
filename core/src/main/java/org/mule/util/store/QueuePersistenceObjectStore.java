@@ -15,7 +15,6 @@ import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
 import org.mule.util.queue.QueueKey;
@@ -80,13 +79,11 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean isPersistent()
     {
         return true;
     }
 
-    @Override
     public void open() throws ObjectStoreException
     {
         initStoreDirectory();
@@ -100,25 +97,6 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         }
     }
 
-    @Override
-    public void clear() throws ObjectStoreException
-    {
-        if (this.storeDirectory == null)
-        {
-            throw new IllegalStateException("ObjectStore cannot be cleared bacause it's not opened");
-        }
-
-        try
-        {
-            FileUtils.cleanDirectory(this.storeDirectory);
-        }
-        catch (IOException e)
-        {
-            throw new ObjectStoreException(
-                MessageFactory.createStaticMessage("Could not clear object store"), e);
-        }
-    }
-
     private void initStoreDirectory() throws ObjectStoreException
     {
         try
@@ -129,10 +107,8 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         }
         catch (MuleRuntimeException mre)
         {
-            // FileUtils throws a MuleRuntimeException if something goes wrong when
-            // creating the
-            // path. To fully conform to the ObjectStore contract we cannot just let
-            // it bubble
+            // FileUtils throws a MuleRuntimeException if something goes wrong when creating the
+            // path. To fully conform to the ObjectStore contract we cannot just let it bubble
             // through but rather catch it and re-throw as ObjectStoreException
             throw new ObjectStoreException(mre);
         }
@@ -144,19 +120,16 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         // synchronized method
         if (!directory.exists() && !directory.mkdirs())
         {
-            Message message = CoreMessages.failedToCreate("queue store store directory "
-                                                          + directory.getAbsolutePath());
+            Message message = CoreMessages.failedToCreate("queue store store directory " + directory.getAbsolutePath());
             throw new ObjectStoreException(message);
         }
     }
 
-    @Override
     public void close() throws ObjectStoreException
     {
         // Nothing to do
     }
 
-    @Override
     public List<Serializable> allKeys() throws ObjectStoreException
     {
         if (storeDirectory == null)
@@ -193,8 +166,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         }
     }
 
-    protected void listStoredFiles(File directory, List<Serializable> keys)
-        throws IOException, ClassNotFoundException
+    protected void listStoredFiles(File directory, List<Serializable> keys) throws IOException, ClassNotFoundException
     {
         File[] files = directory.listFiles();
         if (files == null)
@@ -202,8 +174,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
             return;
         }
 
-        // sort the files so they are in the order in which their ids were generated
-        // in store()
+        // sort the files so they are in the order in which their ids were generated in store()
         Arrays.sort(files);
 
         for (int i = 0; i < files.length; i++)
@@ -289,10 +260,8 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         }
         catch (MuleRuntimeException mre)
         {
-            // FileUtils throws a MuleRuntimeException if something goes wrong when
-            // creating the
-            // path. To fully conform to the ObjectStore contract we cannot just let
-            // it bubble
+            // FileUtils throws a MuleRuntimeException if something goes wrong when creating the
+            // path. To fully conform to the ObjectStore contract we cannot just let it bubble
             // through but rather catch it and re-throw as ObjectStoreException
             throw new ObjectStoreException(mre);
         }
@@ -304,7 +273,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         try
         {
             FileInputStream in = new FileInputStream(file);
-            return (T) SerializationUtils.deserialize(in, muleContext);
+            return (T)SerializationUtils.deserialize(in, muleContext);
         }
         catch (SerializationException se)
         {
@@ -332,8 +301,8 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         {
             if (!file.delete())
             {
-                Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath()
-                                                                   + " failed");
+                Message message =
+                    CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath() + " failed");
                 throw new ObjectStoreException(message);
             }
         }
@@ -343,7 +312,6 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         }
     }
 
-    @Override
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
@@ -355,8 +323,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         for (Serializable key : keys)
         {
             QueueKey qkey = (QueueKey) key;
-            String fileName = storeDirectory + File.separator + qkey.queueName + File.separator + qkey.id
-                              + FILE_EXTENSION;
+            String fileName = storeDirectory + File.separator + qkey.queueName + File.separator + qkey.id + FILE_EXTENSION;
             File file = new File(fileName);
             if (file.length() == 0)
             {

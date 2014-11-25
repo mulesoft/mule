@@ -103,12 +103,6 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     {
         return new ArrayList<Serializable>(getPartition(partitionName).keySet());
     }
-    
-    @Override
-    public void clear(String partitionName) throws ObjectStoreException
-    {
-        this.getPartition(partitionName).clear();
-    }
 
     @Override
     public List<String> allPartitions() throws ObjectStoreException

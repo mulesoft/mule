@@ -126,12 +126,6 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
         {
             return events.remove(key);
         }
-        
-        @Override
-        public synchronized void clear() throws ObjectStoreException
-        {
-            events.clear();
-        }
 
         @Override
         public boolean isPersistent()

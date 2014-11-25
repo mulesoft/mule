@@ -69,12 +69,6 @@ public class QueueStoreAdapter<T extends Serializable> implements QueueStore<T>,
     {
         return store.remove(key);
     }
-    
-    @Override
-    public void clear() throws ObjectStoreException
-    {
-        this.store.clear();
-    }
 
     @Override
     public boolean isPersistent()

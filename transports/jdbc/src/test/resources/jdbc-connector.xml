@@ -39,8 +39,5 @@
                     value="SELECT K, VALUE FROM IDS WHERE K = ?"/>
         <jdbc:query key="deleteIdempotency"
                     value="DELETE FROM IDS WHERE K = ?"/>
-        <jdbc:query key="clearIdempotency"
-                    value="DELETE FROM IDS"/>
-
     </jdbc:connector>
 </mule>

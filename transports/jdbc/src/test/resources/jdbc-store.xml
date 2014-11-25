@@ -22,8 +22,7 @@
                 name="jdbcObjectStore"
                 insertQueryKey="insertIdempotency"
                 selectQueryKey="selectIdempotency"
-                deleteQueryKey="deleteIdempotency"
-                clearQueryKey="clearIdempotency"/>
+                deleteQueryKey="deleteIdempotency"/>
         </idempotent-message-filter>
 
         <vm:outbound-endpoint path="forProcessing" />

@@ -7,11 +7,8 @@
 package org.mule.util.store;
 
 import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
 
 import java.io.Serializable;
-
-import org.junit.Test;
 
 public class TextFileObjectStoreContractTestCase extends AbstractObjectStoreContractTestCase
 {
@@ -26,13 +23,7 @@ public class TextFileObjectStoreContractTestCase extends AbstractObjectStoreCont
         objectStore.setMuleContext(muleContext);
         objectStore.initialise();
     }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void clear() throws ObjectStoreException
-    {
-        super.clear();
-    };
-
+    
     @Override
     protected void doTearDown() throws Exception
     {
@@ -53,3 +44,5 @@ public class TextFileObjectStoreContractTestCase extends AbstractObjectStoreCont
         return "This is the value";
     }
 }
+
+

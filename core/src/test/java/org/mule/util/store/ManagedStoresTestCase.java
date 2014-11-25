@@ -129,12 +129,6 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         store.store("key1", "value1");
         assertEquals("value1", store.retrieve("key1"));
         assertTrue(store.contains("key1"));
-        
-        store.clear();
-        assertFalse(store.contains("key1"));
-        
-        store.store("key1", "value1");
-        
         try
         {
             store.store("key1", "value1");

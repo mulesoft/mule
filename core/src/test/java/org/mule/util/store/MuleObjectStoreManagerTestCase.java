@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -23,6 +24,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.store.PartitionableObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
@@ -76,7 +78,6 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
         storeManager.disposeStore(store);
 
         verify(store.getBaseStore()).disposePartition(TEST_PARTITION_NAME);
-        verify(store, never()).clear();
         verify((Disposable) store).dispose();
     }
 
@@ -221,5 +222,4 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 
         return new PartitionedPersistentObjectStore<Serializable>(muleContext);
     }
-
 }
