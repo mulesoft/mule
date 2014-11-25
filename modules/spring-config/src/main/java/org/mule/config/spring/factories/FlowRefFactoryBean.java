@@ -127,11 +127,15 @@ public class FlowRefFactoryBean
             MessageProcessor referencedFlow = lookupReferencedFlowInApplicationContext(name);
             if (referencedFlow instanceof Initialisable)
             {
-                if(referencedFlow instanceof MessageProcessorChain)
+                if (referencedFlow instanceof FlowConstructAware)
                 {
-                    for(MessageProcessor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors())
+                    ((FlowConstructAware) referencedFlow).setFlowConstruct(flowConstruct);
+                }
+                if (referencedFlow instanceof MessageProcessorChain)
+                {
+                    for (MessageProcessor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors())
                     {
-                        if(processor instanceof FlowConstructAware)
+                        if (processor instanceof FlowConstructAware)
                         {
                             ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
                         }
@@ -139,7 +143,7 @@ public class FlowRefFactoryBean
                 }
                 ((Initialisable) referencedFlow).initialise();
             }
-            if(referencedFlow instanceof Startable)
+            if (referencedFlow instanceof Startable)
             {
                 ((Startable) referencedFlow).start();
             }
