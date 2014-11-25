@@ -62,6 +62,18 @@ import java.util.TimeZone;
 public class ServerContext
 {
 
+    // Get values here to avoid contention in System.getProperty() in runtime
+    private static final String tmpDir = System.getProperty("java.io.tmpdir");
+    private static final String fileSeparator = System.getProperty("file.separator");
+    private static final String osName = System.getProperty("os.name");
+    private static final String osArch = System.getProperty("os.arch");
+    private static final String osVersion = System.getProperty("os.version");
+    private static final String javaVersion = System.getProperty("java.version");
+    private static final String javaVendor = System.getProperty("java.vendor");
+    private static final String userName = System.getProperty("user.name");
+    private static final String userHome = System.getProperty("user.home");
+    private static final String userDir = System.getProperty("user.dir");
+
     public String getHost() throws UnknownHostException
     {
         return NetworkUtils.getLocalHost().getCanonicalHostName();
@@ -84,12 +96,12 @@ public class ServerContext
 
     public String getTmpDir()
     {
-        return System.getProperty("java.io.tmpdir");
+        return tmpDir ;
     }
 
     public String getFileSeparator()
     {
-        return System.getProperty("file.separator");
+        return fileSeparator;
     }
 
     public Map<String, String> getEnv()
@@ -104,42 +116,42 @@ public class ServerContext
 
     public String getOsName()
     {
-        return System.getProperty("os.name");
+        return osName;
     }
 
     public String getOsArch()
     {
-        return System.getProperty("os.arch");
+        return osArch;
     }
 
     public String getOsVersion()
     {
-        return System.getProperty("os.version");
+        return osVersion;
     }
 
     public String getJavaVersion()
     {
-        return System.getProperty("java.version");
+        return javaVersion;
     }
 
     public String getJavaVendor()
     {
-        return System.getProperty("java.vendor");
+        return javaVendor;
     }
 
     public String getUserName()
     {
-        return System.getProperty("user.name");
+        return userName;
     }
 
     public String getUserHome()
     {
-        return System.getProperty("user.home");
+        return userHome;
     }
 
     public String getUserDir()
     {
-        return System.getProperty("user.dir");
+        return userDir;
     }
 
     public DateTime getDateTime()

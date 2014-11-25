@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
 import java.util.List;
 import java.util.ListIterator;
 
@@ -68,12 +70,11 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
      */
     public static String getFullStackTraceWithoutMessages(Throwable throwable)
     {
-        final String newLine = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder();
 
         for (String frame : getStackFrames(throwable))
         {
-            builder.append(frame.replaceAll(":\\s+([\\w\\s]*.*)", "").trim()).append(newLine);
+            builder.append(frame.replaceAll(":\\s+([\\w\\s]*.*)", "").trim()).append(LINE_SEPARATOR);
         }
 
         return builder.toString();

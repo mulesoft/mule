@@ -15,10 +15,12 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.DataTypeFactory;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -28,6 +30,12 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
 
     private MuleContext muleContext = mock(MuleContext.class);
     private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+
+    @Before
+    public void setUp() throws Exception
+    {
+        when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
+    }
 
     @Test
     public void ignoresBadInputIfEnforcementOff() throws TransformerException
