@@ -17,6 +17,7 @@ import org.mule.module.http.internal.domain.HttpProtocol;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
@@ -28,7 +29,6 @@ import java.util.Map;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Request;
-import org.glassfish.grizzly.utils.Charsets;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.IsNull;
@@ -187,7 +187,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
     public void postUriParamEncoded() throws Exception
     {
         final String uriParamValue = "uri param value";
-        final String uriParamValueEncoded = URLEncoder.encode(uriParamValue, Charsets.UTF8_CHARSET.displayName());
+        final String uriParamValueEncoded = URLEncoder.encode(uriParamValue, Charsets.UTF_8.displayName());
         final String url = String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), uriParamValueEncoded);
         Request.Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);

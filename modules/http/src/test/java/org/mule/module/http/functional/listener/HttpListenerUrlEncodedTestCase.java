@@ -20,6 +20,8 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
+import com.google.common.base.Charsets;
+
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
@@ -27,7 +29,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.message.BasicNameValuePair;
-import org.glassfish.grizzly.utils.Charsets;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
@@ -108,7 +109,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue(), Is.is(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
         final String responseContent = IOUtils.toString(httpResponse.getEntity().getContent());
-        assertThat(payloadAsMap, ParamMapMatcher.isEqual(HttpParser.decodeUrlEncodedBody(responseContent, Charsets.UTF8_CHARSET.name()).toCollectionMap()));
+        assertThat(payloadAsMap, ParamMapMatcher.isEqual(HttpParser.decodeUrlEncodedBody(responseContent, Charsets.UTF_8.name()).toCollectionMap()));
     }
 
     private String getListenerUrl()
