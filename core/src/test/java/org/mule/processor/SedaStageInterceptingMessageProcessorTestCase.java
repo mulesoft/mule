@@ -318,6 +318,39 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         mp.enqueue(getTestEvent("bar"));
     }
 
+    @Test
+    public void enqueueQueueSizeZero() throws Exception
+    {
+        // Simple check to ensure a zero queue size doesn't disable queue.
+        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+                muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        createMPAndQueueSingleEvent(new QueueProfile(0, queueStore));
+    }
+
+    @Test
+    public void enqueueQueueSizeMinusOne() throws Exception
+    {
+        // Simple check to ensure a negative queue size doesn't cause an issues.
+        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+                muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        createMPAndQueueSingleEvent(new QueueProfile(-1, queueStore));
+    }
+
+    private void createMPAndQueueSingleEvent(QueueProfile queueProfile) throws Exception
+    {
+        SedaStageInterceptingMessageProcessor mp;
+        mp = new SedaStageInterceptingMessageProcessor("threadName", "queueMame", queueProfile, queueTimeout,
+                                                       muleContext.getDefaultThreadingProfile(), queueStatistics,
+                                                       muleContext);
+        mp.setListener(target);
+        mp.initialise();
+        // Don't start SedaStageInterceptingMessageProcessor to ensure events queue up and aren't removed from queue
+
+        // First enqueue is successful as queue as max size of 1 defined.
+        mp.enqueue(getTestEvent("foo"));
+    }
+
+
     private WorkEvent getTestWorkEvent()
     {
         return new WorkEvent(this, // source
