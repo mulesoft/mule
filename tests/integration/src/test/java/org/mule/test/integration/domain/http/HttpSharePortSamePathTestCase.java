@@ -12,6 +12,9 @@ import static org.junit.Assert.fail;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.ConnectorException;
+import org.mule.config.bootstrap.MuleRegistryBootstrapService;
+import org.mule.config.bootstrap.RegistryBootstrapService;
+import org.mule.config.bootstrap.RegistryBootstrapServiceUtil;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.ApplicationContextBuilder;
 import org.mule.tck.junit4.DomainContextBuilder;
@@ -58,7 +61,10 @@ public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
     @Test
     public void samePathDefinedInTwoAppsWithinSameDomain() throws Exception
     {
-        MuleContext domainContext = new DomainContextBuilder().setDomainConfig(domainConfig).build();
+        RegistryBootstrapService bootstrapService = new MuleRegistryBootstrapService();
+        RegistryBootstrapServiceUtil.configureUsingClassPath(bootstrapService);
+
+        MuleContext domainContext = new DomainContextBuilder().setDomainConfig(domainConfig).setRegistryBootstrapService(bootstrapService).build();
         MuleContext firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {appConfig}).setDomainContext(domainContext).build();
         ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
         try
