@@ -19,6 +19,7 @@ import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     public static final String FIRST_LEVEL_CATCH_ALL = "/*";
     public static final String SECOND_LEVEL_URI_PARAM = "/first-level-path/" + URI_PARAM;
     public static final String SECOND_LEVEL_CATCH_ALL = "/first-level-path/*";
-    public static final String CATCH_ALL_ONLY_SECOND_LEVEL = "/first-level-path/*/";
+    public static final String FOURTH_LEVEL_CATCH_ALL = "/another-first-level-path/second-level-path/third-level-path/*";
     public static final String URI_PARAM_IN_THE_MIDDLE = "/first-level-path/" + URI_PARAM + "/third-level-path";
     public static final String CATCH_ALL_IN_THE_MIDDLE = "/first-level-path/*/third-level-path";
     public static final String CATCH_ALL_IN_THE_MIDDLE_NO_COLLISION = "/another-first-level-path/*/third-level-path";
@@ -173,12 +174,6 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         validateCollision(FIRST_LEVEL_URI_PARAM, FIRST_LEVEL_URI_PARAM);
     }
 
-    @Override
-    protected int getTimeoutSystemProperty()
-    {
-        return 999999;
-    }
-
     @Test
     public void validateCollisionWithSecondLevelCatchAllAndSecondLevelCatchAll()
     {
@@ -260,6 +255,8 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         routePath(FIRST_LEVEL_PATH_UPPER_CASE + PATH_SEPARATOR, FIRST_LEVEL_PATH_UPPER_CASE);
         routePath(SECOND_LEVEL_PATH, SECOND_LEVEL_PATH);
         routePath(SECOND_LEVEL_URI_PARAM.replace(URI_PARAM, "1"), SECOND_LEVEL_URI_PARAM);
+        routePath(FOURTH_LEVEL_CATCH_ALL.replace(WILDCARD_CHARACTER, StringUtils.EMPTY), FOURTH_LEVEL_CATCH_ALL);
+        routePath(FOURTH_LEVEL_CATCH_ALL.replace(WILDCARD_CHARACTER, "foo1/foo2"), FOURTH_LEVEL_CATCH_ALL);
         routePath(URI_PARAM_IN_THE_MIDDLE.replace(URI_PARAM, "1"), URI_PARAM_IN_THE_MIDDLE);
         routePath(URI_PARAM_IN_THE_MIDDLE.replace(URI_PARAM, "1") + ANOTHER_PATH, FIRST_LEVEL_CATCH_ALL);
         routePath(CATCH_ALL_IN_THE_MIDDLE_NO_COLLISION.replace(WILDCARD_CHARACTER, SOME_PATH), CATCH_ALL_IN_THE_MIDDLE_NO_COLLISION);
@@ -303,6 +300,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         requestHandlerPerPath.put(FIRST_LEVEL_PATH_UPPER_CASE, mock(RequestHandler.class));
         requestHandlerPerPath.put(SECOND_LEVEL_PATH, mock(RequestHandler.class));
         requestHandlerPerPath.put(SECOND_LEVEL_URI_PARAM, mock(RequestHandler.class));
+        requestHandlerPerPath.put(FOURTH_LEVEL_CATCH_ALL, mock(RequestHandler.class));
         requestHandlerPerPath.put(URI_PARAM_IN_THE_MIDDLE, mock(RequestHandler.class));
         requestHandlerPerPath.put(CATCH_ALL_IN_THE_MIDDLE_NO_COLLISION, mock(RequestHandler.class));
         requestHandlerPerPath.put(SEVERAL_CATCH_ALL, mock(RequestHandler.class));

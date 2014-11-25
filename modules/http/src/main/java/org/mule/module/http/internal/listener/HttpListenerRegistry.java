@@ -239,6 +239,11 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 PathMap pathMap = currentPathMap.getChildPathMap(currentPath);
                 if (pathMap == null)
                 {
+                    final PathMap catchAllPathMap = currentPathMap.getCatchAllPathMap();
+                    if (catchAllPathMap != null)
+                    {
+                        foundPaths.add(catchAllPathMap);
+                    }
                     pathMap = currentPathMap.getCatchAllCurrentPathMap();
                 }
                 if (i == pathParts.length - 1)
@@ -246,6 +251,11 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                     if (pathMap != null)
                     {
                         foundPaths.push(pathMap);
+                        final PathMap catchAllPathMap = pathMap.getCatchAllPathMap();
+                        if (catchAllPathMap != null)
+                        {
+                            foundPaths.push(catchAllPathMap);
+                        }
                     }
                     else
                     {
