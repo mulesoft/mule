@@ -22,6 +22,7 @@ import org.mule.tck.junit4.ApplicationContextBuilder;
 import org.mule.tck.junit4.DomainContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.util.IOUtils;
 
 import org.hamcrest.core.Is;
 import org.junit.Rule;
@@ -46,7 +47,7 @@ public class  AppAndDomainLifecycleTestCase extends AbstractMuleTestCase
         MuleContext secondAppContext = null;
         try
         {
-            domainContext = new DomainContextBuilder().setRegistryBootstrapService(registryBootstrapService).setDomainConfig("domain/http/trasnsport/http-shared-connector.xml").build();
+            domainContext = new DomainContextBuilder().setRegistryBootstrapService(registryBootstrapService).setDomainConfig("domain/http/transport/http-shared-connector.xml").build();
             firstAppContext = new ApplicationContextBuilder().setRegistryBootstrapService(registryBootstrapService).setApplicationResources(new String[] {"domain/http/transport/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
             ApplicationContextBuilder secondApp = new ApplicationContextBuilder().setRegistryBootstrapService(registryBootstrapService);
             secondAppContext = secondApp.setApplicationResources(new String[] {"domain/http/transport/http-hello-world-app.xml"}).setDomainContext(domainContext).build();
