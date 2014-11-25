@@ -39,7 +39,6 @@ The Mule distribution contains the following directories and files:
                 line
 /conf           Configuration files
 /docs           API documentation (Javadoc) for Mule and its sub-projects
-/examples       Example applications you can run and try building yourself
 /lib/boot       Libraries used by the Java Service Wrapper to boot the server
 /lib/endorsed   Endorsed Java libraries used by Mule
 /lib/mule       Mule libraries
@@ -62,12 +61,13 @@ Running Mule
 Starting with the Examples
 --------------------------
 
-The examples directory provides you with several Mule
-applications , which you can use as templates for creating a Mule project.
+Up-to-date Mule ESB examples can be found in:
 
-All of the examples come pre-built. To test an example, just copy
-its zip file into the applications folder ($MULE_HOME/apps), then
-start Mule. For more information see http://www.mulesoft.org/documentation/display/current/Mule+Examples.
+- MuleSoft documentation - http://www.mulesoft.org/documentation
+- Anypoint Studio - downloadable from http://www.mulesoft.com/platform/mule-studio
+- MuleSoft Library - https://library.mulesoft.com/
+
+From the Library, you can also access the direct URL for the example that you can download using a utility like wget.
 
 
 Using the Command Prompt

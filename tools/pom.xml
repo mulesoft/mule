@@ -21,7 +21,6 @@
         <module>mule-transport-archetype</module>
         <module>mule-project-archetype</module>
         <module>mule-module-archetype</module>
-        <module>mule-example-archetype</module>
         <module>mule-catalog-archetype</module>
         <module>anttasks</module>
     </modules>

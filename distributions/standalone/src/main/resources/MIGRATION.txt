@@ -67,6 +67,7 @@ MULE-8083: JXPath expression evaluator no longer accepts external entities when 
 MULE-7736: From Mule 3.6, SEDA queues used with the 'queued-asynchronous' processing strategy are now bound to four times the maximum number of active threads by default.  This change permits stages to be decoupled as well as peaks in traffic to be handled while avoiding OutOfMemoryException's.  The queue size can be increased in configuration or set to '-1' for 3.5 behaviour (unbound).
 MULE-8004: Examples are no longer included in the distribution. Check the README file in the examples folder for more information
 MULE-7736: From Mule 3.6, SEDA queues used with the 'queued-asynchronous' processing strategy and services are now bound to four times the maximum number of active threads by default.  This change permits stages to be decoupled as well as peaks in traffic to be handled while avoiding OutOfMemoryException's.  The queue size can be increased in configuration or set to '-1' for 3.5 behaviour (unbound).
+MULE-8004: Remove examples from the distribution
 
 Migration changes from 3.4.x to 3.5.x
 
