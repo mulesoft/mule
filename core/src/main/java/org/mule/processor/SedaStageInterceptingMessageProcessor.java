@@ -85,7 +85,8 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     {
         if (queueProfile != null && queueProfile.getMaxOutstandingMessages() == 0)
         {
-            queueProfile.setMaxOutstandingMessages(threadingProfile.getMaxThreadsActive() * 4);
+            queueProfile.setMaxOutstandingMessages(threadingProfile.getMaxThreadsActive() *
+                                                   DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR);
         }
     }
 
