@@ -262,14 +262,6 @@
             <artifactId>xmlunit</artifactId>
         </dependency>
 
-        <!-- include the ant tasks, so users can point to them, in lib/opt -->
-        <dependency>
-            <groupId>org.mule.tools</groupId>
-            <artifactId>mule-tools-anttasks</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-        </dependency>
-
         <!--
             Activemq is a transitive dependency from the errorhandler example.
             Make sure it doesn't end up in the standalone distro.

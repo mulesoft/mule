@@ -84,7 +84,7 @@
 
         <!--
         The entire examples directory is copied over first, then for each example, the contents
-        of the "dist" directory (README.txt, pom.xml, build.xml) are copied over, followed by
+        of the "dist" directory (README.txt, pom.xml) are copied over, followed by
         the executable scripts.
         -->
         <fileSet>
@@ -250,8 +250,6 @@
                 <include>org.mule.modules:mule-module-tomcat</include>
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
-                <!-- Tools -->
-                <include>org.mule.tools:mule-tools-anttasks</include>
                 <!-- Shared libs -->
                 <include>org.mule.common:mule-common</include>
                 <include>org.mule.mvel:mule-mvel2</include>
@@ -334,7 +332,6 @@
                 <exclude>org.mule.examples:mule-example-loanbroker-simple</exclude>
                 <exclude>org.mule.examples:mule-example-scripting</exclude>
                 <exclude>org.mule.examples:mule-example-stockquote</exclude>
-                <exclude>org.mule.tools:mule-tools-anttasks</exclude>
 
                 <!-- mule-tests-functional dependencies -->
                 <exclude>org.apache.ftpserver:ftpserver-core</exclude>
