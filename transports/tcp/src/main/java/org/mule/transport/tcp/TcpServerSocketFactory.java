@@ -7,6 +7,7 @@
 package org.mule.transport.tcp;
 
 import org.mule.transport.tcp.i18n.TcpMessages;
+import org.mule.util.NetworkUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class TcpServerSocketFactory implements SimpleServerSocketFactory
         String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
         InetAddress inetAddress = InetAddress.getByName(host);
 
-        if ((inetAddress.equals(InetAddress.getLocalHost()) || host.trim().equals("localhost")) && TcpPropertyHelper.isBindingLocalhostToAllLocalInterfaces())
+        if ((inetAddress.equals(NetworkUtils.getLocalHost()) || host.trim().equals("localhost")) && TcpPropertyHelper.isBindingLocalhostToAllLocalInterfaces())
         {
             logger.warn(TcpMessages.localhostBoundToAllLocalInterfaces());
             return createServerSocket(uri.getPort(), backlog, reuse);

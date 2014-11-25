@@ -6,21 +6,20 @@
  */
 package org.mule.expression;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
-
-import java.net.InetAddress;
-import java.sql.Timestamp;
-import java.util.Date;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.util.NetworkUtils;
+
+import java.sql.Timestamp;
+import java.util.Date;
+
+import org.junit.Test;
 
 public class FunctionExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
@@ -42,11 +41,11 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleContextTest
 
         o = extractor.evaluate("hostname", message);
         assertNotNull(o);
-        assertEquals(InetAddress.getLocalHost().getHostName(), o);
+        assertEquals(NetworkUtils.getLocalHost().getHostName(), o);
 
         o = extractor.evaluate("ip", message);
         assertNotNull(o);
-        assertEquals(InetAddress.getLocalHost().getHostAddress(), o);
+        assertEquals(NetworkUtils.getLocalHost().getHostAddress(), o);
 
         o = extractor.evaluate("payloadClass", message);
         assertNotNull(o);
@@ -83,11 +82,11 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleContextTest
 
         o = muleContext.getExpressionManager().evaluate("function:hostname", message);
         assertNotNull(o);
-        assertEquals(InetAddress.getLocalHost().getHostName(), o);
+        assertEquals(NetworkUtils.getLocalHost().getHostName(), o);
 
         o = muleContext.getExpressionManager().evaluate("function:ip", message);
         assertNotNull(o);
-        assertEquals(InetAddress.getLocalHost().getHostAddress(), o);
+        assertEquals(NetworkUtils.getLocalHost().getHostAddress(), o);
 
         o = muleContext.getExpressionManager().evaluate("function:payloadClass", message);
         assertNotNull(o);

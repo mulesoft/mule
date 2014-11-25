@@ -71,32 +71,11 @@ public class HttpMessagePropertiesResolver
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY, this.protocol);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REQUEST_URI, this.uri);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS, remoteHostAddress);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_URI_PARAMS, getUriParams(path));
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_URI_PARAMS, HttpParser.decodeUriParams(this.listenerPath, path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, listenerPath);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_SCHEME, scheme);
     }
 
-    private ParameterMap getUriParams(String path)
-    {
-        ParameterMap uriParams = new ParameterMap();
-        if (this.listenerPath.contains("{"))
-        {
-            final String[] requestPathParts = path.split("/");
-            final String[] listenerPathParts = this.listenerPath.split("/");
-            int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
-            //split will return an empty string as first path before /
-            for (int i = 1; i < longerPathSize; i++)
-            {
-                final String listenerPart = listenerPathParts[i];
-                if (listenerPart.startsWith("{") && listenerPart.endsWith("}"))
-                {
-                    String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
-                    String parameterValue = requestPathParts[i];
-                    uriParams.put(parameterName, parameterValue);
-                }
-            }
-        }
-        return uriParams;
-    }
+
 
 }

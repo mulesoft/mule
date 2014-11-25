@@ -44,6 +44,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
+    protected long threadTimeout;
     protected WorkManager workManager;
 
     private MessagingExceptionHandler messagingExceptionHandler;
@@ -58,6 +59,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                                              int shutdownTimeout)
     {
         this.doThreading = threadingProfile.isDoThreading();
+        this.threadTimeout = threadingProfile.getThreadWaitTimeout();
         workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
         workManagerSource = new WorkManagerSource()
         {

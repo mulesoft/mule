@@ -224,6 +224,13 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
         FlowAssert.verify("oneWayRoutesOnly");
     }
 
+    @Test
+    public void setsVariablesAfterRouting() throws Exception
+    {
+        runFlow("setsVariablesAfterRouting");
+        FlowAssert.verify("setsVariablesAfterRouting");
+    }
+
     public static class TestAggregationStrategy implements AggregationStrategy
     {
 

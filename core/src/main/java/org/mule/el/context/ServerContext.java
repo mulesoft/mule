@@ -7,8 +7,8 @@
 package org.mule.el.context;
 
 import org.mule.el.datetime.DateTime;
+import org.mule.util.NetworkUtils;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Locale;
@@ -64,12 +64,12 @@ public class ServerContext
 
     public String getHost() throws UnknownHostException
     {
-        return InetAddress.getLocalHost().getCanonicalHostName();
+        return NetworkUtils.getLocalHost().getCanonicalHostName();
     }
 
     public String getIp() throws UnknownHostException
     {
-        return InetAddress.getLocalHost().getHostAddress();
+        return NetworkUtils.getLocalHost().getHostAddress();
     }
 
     public TimeZone getTimeZone()

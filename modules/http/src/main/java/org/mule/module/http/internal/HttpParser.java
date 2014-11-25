@@ -9,6 +9,7 @@ package org.mule.module.http.internal;
 import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.multipart.HttpPart;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
@@ -34,7 +35,6 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.glassfish.grizzly.utils.Charsets;
 
 public class HttpParser
 {
@@ -124,12 +124,12 @@ public class HttpParser
 
     public static ParameterMap decodeQueryString(String queryString)
     {
-        return decodeUrlEncodedBody(queryString, Charsets.UTF8_CHARSET.name());
+        return decodeUrlEncodedBody(queryString, Charsets.UTF_8.name());
     }
 
     public static String encodeQueryString(Map parameters)
     {
-        return encodeString(Charsets.UTF8_CHARSET.name(), parameters);
+        return encodeString(Charsets.UTF_8.name(), parameters);
     }
 
     public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, String encoding)
@@ -192,6 +192,43 @@ public class HttpParser
 
         body = result.toString();
         return body;
+    }
+
+    /**
+     * Decodes uri params from a request path
+     *
+     * @param pathWithUriParams path with uri param place holders
+     * @param requestPath request path
+     * @return a map with the uri params present in the request path with the values decoded.
+     */
+    public static ParameterMap decodeUriParams(String pathWithUriParams, String requestPath)
+    {
+        try
+        {
+            ParameterMap uriParams = new ParameterMap();
+            if (pathWithUriParams.contains("{"))
+            {
+                final String[] requestPathParts = requestPath.split("/");
+                final String[] listenerPathParts = pathWithUriParams.split("/");
+                int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
+                //split will return an empty string as first path before /
+                for (int i = 1; i < longerPathSize; i++)
+                {
+                    final String listenerPart = listenerPathParts[i];
+                    if (listenerPart.startsWith("{") && listenerPart.endsWith("}"))
+                    {
+                        String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
+                        String parameterValue = requestPathParts[i];
+                        uriParams.put(parameterName, URLDecoder.decode(parameterValue, Charsets.UTF_8.displayName()));
+                    }
+                }
+            }
+            return uriParams;
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
     }
 
     /**

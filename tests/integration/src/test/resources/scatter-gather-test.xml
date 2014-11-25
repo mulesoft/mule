@@ -3,6 +3,7 @@
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -50,7 +51,7 @@
 
     <flow name="customMergeStrategyByRef">
         <scatter-gather>
-            <custom-aggregation-strategy ref="testMergeStrategy"/>
+            <custom-aggregation-strategy ref="testMergeStrategy" doc:name="aggregation strategy"/>
 
             <set-payload value="apple"/>
             <set-payload value="banana"/>
@@ -228,12 +229,34 @@
     </flow>
 
     <flow name="doesThreading">
+
         <scatter-gather>
             <flow-ref name="captureThreadAndWait" />
             <flow-ref name="captureThreadAndWait" />
             <flow-ref name="captureThreadAndWait" />
         </scatter-gather>
+
     </flow>
+
+    <flow name="setsVariablesAfterRouting">
+        <scatter-gather>
+            <set-payload value="data 1"/>
+            <set-payload value="data 2"/>
+        </scatter-gather>
+        <set-variable variableName="foo" value="bar" />
+
+        <flow-ref name="assertFlowVars" />
+
+        <foreach collection="#[payload]">
+            <test:assert expression="#[flowVars.foo.equals('bar')]" count="2" />
+        </foreach>
+
+        <flow-ref name="assertFlowVars" />
+    </flow>
+
+    <sub-flow name="assertFlowVars">
+        <test:assert expression="#[flowVars.foo.equals('bar')]" />
+    </sub-flow>
 
     <flow name="log">
         <vm:inbound-endpoint exchange-pattern="one-way" path="log"/>

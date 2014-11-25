@@ -8,6 +8,7 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
@@ -141,6 +142,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
             // to assure that all property changes
             // are flushed from the worker thread to this one
             response = DefaultMuleEvent.copy(response);
+            OptimizedRequestContext.unsafeSetEvent(response);
         }
 
         return response;

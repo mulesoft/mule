@@ -6,8 +6,11 @@
  */
 package org.mule.test.firewall;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import org.mule.config.factories.HostNameFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.util.NetworkUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -21,9 +24,6 @@ import java.security.SecureRandom;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 
 public class FirewallTestCase extends AbstractMuleTestCase
 {
@@ -47,7 +47,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
     @Test
     public void testLocalHost() throws Exception
     {
-        InetAddress aLocalAddress = InetAddress.getLocalHost();
+        InetAddress aLocalAddress = NetworkUtils.getLocalHost();
         logger.info("Java returns " + addressToString(aLocalAddress) + " as the 'local' address");
         assertNotSame("No external address", LOCALADDR, aLocalAddress.getHostAddress());
         consistentAddress(aLocalAddress.getHostName(), false);
@@ -57,7 +57,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
     @Test
     public void testCanonicalHost() throws Exception
     {
-        InetAddress aLocalAddress = InetAddress.getLocalHost();
+        InetAddress aLocalAddress = NetworkUtils.getLocalHost();
         assertNotSame("No extrernal name", LOCALHOST, aLocalAddress.getCanonicalHostName());
         consistentAddress(aLocalAddress.getCanonicalHostName(), true);
     }
@@ -108,7 +108,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
     {
         for (int i = 0; i < TEST_COUNT; ++i)
         {
-            doTestTcp(InetAddress.getLocalHost(), randomPrivatePort());
+            doTestTcp(NetworkUtils.getLocalHost(), randomPrivatePort());
         }
     }
 
@@ -126,7 +126,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
     {
         for (int i = 0; i < TEST_COUNT; ++i)
         {
-            doTestUdp(InetAddress.getLocalHost(), randomPrivatePort());
+            doTestUdp(NetworkUtils.getLocalHost(), randomPrivatePort());
         }
     }
 
