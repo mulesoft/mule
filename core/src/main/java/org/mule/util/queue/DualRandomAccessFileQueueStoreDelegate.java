@@ -348,5 +348,6 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
     public void dispose()
     {
         doClear();
+        close();
     }
 }
