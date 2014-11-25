@@ -71,7 +71,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     {
         handlerExtender = null;
         stopServer();
-        Response response = Request.Get(getProxyUrl("")).connectTimeout(1000).execute();
+        Response response = Request.Get(getProxyUrl("")).connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
     }
@@ -91,7 +91,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
         Response response = Request.Post(getProxyUrl("test?parameterName=parameterValue"))
                 .bodyString("Some Text", ContentType.DEFAULT_TEXT)
-                .connectTimeout(1000).execute();
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("POST"));
@@ -112,7 +112,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
         Response response = Request.Get(getProxyUrl("test?parameterName=parameterValue"))
                 .version(HttpVersion.HTTP_1_0)
-                .connectTimeout(1000).execute();
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("HTTP/1.0"));
@@ -218,7 +218,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
         Response response = Request.Post(getProxyUrl("test"))
             .bodyString("Some Text", ContentType.DEFAULT_TEXT)
-            .connectTimeout(1000).execute();
+            .connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Some Text"));
@@ -231,7 +231,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
         Response response = Request.Get(getProxyUrl("/test?name=value"))
                 .addHeader("MyCustomHeaderName", "MyCustomHeaderValue")
-                .connectTimeout(1000).execute();
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
 
@@ -252,7 +252,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
     private void assertRequestOk(String url, String expectedResponse) throws IOException
     {
-        Response response = Request.Get(url).connectTimeout(1000).execute();
+        Response response = Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         if(expectedResponse!=null)
