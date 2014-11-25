@@ -6,6 +6,11 @@
  */
 package org.mule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -14,6 +19,7 @@ import org.mule.api.security.Authentication;
 import org.mule.api.security.Credentials;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.transport.SessionHandler;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.security.DefaultMuleAuthentication;
 import org.mule.security.DefaultSecurityContextFactory;
 import org.mule.security.MuleCredentials;
@@ -33,11 +39,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 {
 
@@ -49,7 +50,8 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     public void setUp() throws Exception
     {
         muleContext = Mockito.mock(MuleContext.class);
-        Mockito.when(muleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+        when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
+        when(muleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
     }
 
     @BeforeClass

@@ -459,7 +459,8 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         }
         else if (enc == null)
         {
-            enc = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+            enc = muleContext != null ? muleContext.getConfiguration().getDefaultEncoding() : System.getProperty
+                    (MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
         }
         return enc;
     }

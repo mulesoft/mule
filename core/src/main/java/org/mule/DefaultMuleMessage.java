@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static org.mule.util.SystemUtils.LINE_SEPARATOR;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -1005,28 +1006,27 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         StringBuilder buf = new StringBuilder(120);
-        final String nl = System.getProperty("line.separator");
 
         // format message for multi-line output, single-line is not readable
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append(getClass().getName());
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append("{");
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append("  id=").append(getUniqueId());
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append("  payload=").append(getPayload().getClass().getName());
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append("  correlationId=").append(StringUtils.defaultString(getCorrelationId(), NOT_SET));
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append("  correlationGroup=").append(getCorrelationGroupSize());
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append("  correlationSeq=").append(getCorrelationSequence());
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append("  encoding=").append(getEncoding());
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append("  exceptionPayload=").append(ObjectUtils.defaultIfNull(exceptionPayload, NOT_SET));
-        buf.append(nl);
+        buf.append(LINE_SEPARATOR);
         buf.append(StringMessageUtils.headersToString(this));
         // no new line here, as headersToString() adds one
         buf.append('}');
@@ -1217,7 +1217,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
-            return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+            return muleContext != null ? muleContext.getConfiguration().getDefaultEncoding() : System.getProperty
+                    (MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
         }
     }
 

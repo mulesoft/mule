@@ -6,6 +6,7 @@
  */
 package org.mule.transport;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -74,6 +75,7 @@ import org.mule.util.CollectionUtils;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.ThreadNameHelper;
 
@@ -2411,33 +2413,32 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public String toString()
     {
         final StringBuilder sb = new StringBuilder(120);
-        final String nl = System.getProperty("line.separator");
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         // format message for multi-line output, single-line is not readable
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("{");
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  name=").append(name);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  lifecycle=").append(
                 lifecycleManager == null ? "<not in lifecycle>" : lifecycleManager.getCurrentPhase());
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  this=").append(Integer.toHexString(System.identityHashCode(this)));
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  numberOfConcurrentTransactedReceivers=").append(numberOfConcurrentTransactedReceivers);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  createMultipleTransactedReceivers=").append(createMultipleTransactedReceivers);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  connected=").append(connected);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  supportedProtocols=").append(supportedProtocols);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  serviceOverrides=");
         if (serviceOverrides != null)
         {
             for (Map.Entry<Object, Object> entry : serviceOverrides.entrySet())
             {
-                sb.append(nl);
+                sb.append(LINE_SEPARATOR);
                 sb.append("    ").append(String.format("%s=%s", entry.getKey(), entry.getValue()));
             }
         }
@@ -2445,9 +2446,9 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             sb.append("<none>");
         }
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append('}');
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         return sb.toString();
     }
 
