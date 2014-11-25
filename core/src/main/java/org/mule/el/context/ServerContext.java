@@ -8,6 +8,7 @@ package org.mule.el.context;
 
 import org.mule.el.datetime.DateTime;
 import org.mule.util.NetworkUtils;
+import org.mule.util.SystemUtils;
 
 import java.net.UnknownHostException;
 import java.util.Calendar;
@@ -62,18 +63,6 @@ import java.util.TimeZone;
 public class ServerContext
 {
 
-    // Get values here to avoid contention in System.getProperty() in runtime
-    private static final String tmpDir = System.getProperty("java.io.tmpdir");
-    private static final String fileSeparator = System.getProperty("file.separator");
-    private static final String osName = System.getProperty("os.name");
-    private static final String osArch = System.getProperty("os.arch");
-    private static final String osVersion = System.getProperty("os.version");
-    private static final String javaVersion = System.getProperty("java.version");
-    private static final String javaVendor = System.getProperty("java.vendor");
-    private static final String userName = System.getProperty("user.name");
-    private static final String userHome = System.getProperty("user.home");
-    private static final String userDir = System.getProperty("user.dir");
-
     public String getHost() throws UnknownHostException
     {
         return NetworkUtils.getLocalHost().getCanonicalHostName();
@@ -96,12 +85,12 @@ public class ServerContext
 
     public String getTmpDir()
     {
-        return tmpDir ;
+        return SystemUtils.JAVA_IO_TMPDIR;
     }
 
     public String getFileSeparator()
     {
-        return fileSeparator;
+        return SystemUtils.FILE_SEPARATOR;
     }
 
     public Map<String, String> getEnv()
@@ -116,42 +105,42 @@ public class ServerContext
 
     public String getOsName()
     {
-        return osName;
+        return SystemUtils.OS_NAME;
     }
 
     public String getOsArch()
     {
-        return osArch;
+        return SystemUtils.OS_ARCH;
     }
 
     public String getOsVersion()
     {
-        return osVersion;
+        return SystemUtils.OS_VERSION;
     }
 
     public String getJavaVersion()
     {
-        return javaVersion;
+        return SystemUtils.JAVA_VERSION;
     }
 
     public String getJavaVendor()
     {
-        return javaVendor;
+        return SystemUtils.JAVA_VENDOR;
     }
 
     public String getUserName()
     {
-        return userName;
+        return SystemUtils.USER_NAME;
     }
 
     public String getUserHome()
     {
-        return userHome;
+        return SystemUtils.USER_HOME;
     }
 
     public String getUserDir()
     {
-        return userDir;
+        return SystemUtils.USER_DIR;
     }
 
     public DateTime getDateTime()
