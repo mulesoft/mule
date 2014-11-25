@@ -68,7 +68,7 @@ public class SelectMetadataProvider extends AbstractQueryMetadataProvider
             for (int i = 1; i <= statementMetaData.getColumnCount(); i++)
             {
                 int columnType = statementMetaData.getColumnType(i);
-                recordModels.put(statementMetaData.getColumnName(i), getDataTypeMetadataModel(columnType));
+                recordModels.put(statementMetaData.getColumnLabel(i), getDataTypeMetadataModel(columnType));
             }
         }
         catch (SQLException e)
