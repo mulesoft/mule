@@ -35,6 +35,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
@@ -1217,8 +1218,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
-            return muleContext != null ? muleContext.getConfiguration().getDefaultEncoding() : System.getProperty
-                    (MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+            return SystemUtils.getDefaultEncoding(muleContext);
         }
     }
 
