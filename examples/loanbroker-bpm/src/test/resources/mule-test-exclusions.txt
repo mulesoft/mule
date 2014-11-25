@@ -1,3 +1,0 @@
-#
-# Test cases listed in this file are not run.
-#
