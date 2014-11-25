@@ -230,7 +230,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             }
             if (path.equals(SLASH))
             {
-                foundPaths.add(rootPathMap);
+                foundPaths.push(rootPathMap);
                 return foundPaths;
             }
             for (int i = 1; i < pathParts.length && currentPathMap != null; i++)
@@ -239,11 +239,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 PathMap pathMap = currentPathMap.getChildPathMap(currentPath);
                 if (pathMap == null)
                 {
-                    final PathMap catchAllPathMap = currentPathMap.getCatchAllPathMap();
-                    if (catchAllPathMap != null)
-                    {
-                        foundPaths.add(catchAllPathMap);
-                    }
+                    addCatchAllPathMapIfNotNull(currentPathMap, foundPaths);
                     pathMap = currentPathMap.getCatchAllCurrentPathMap();
                 }
                 if (i == pathParts.length - 1)
@@ -251,24 +247,25 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                     if (pathMap != null)
                     {
                         foundPaths.push(pathMap);
-                        final PathMap catchAllPathMap = pathMap.getCatchAllPathMap();
-                        if (catchAllPathMap != null)
-                        {
-                            foundPaths.push(catchAllPathMap);
-                        }
+                        addCatchAllPathMapIfNotNull(pathMap, foundPaths);
                     }
                     else
                     {
-                        final PathMap catchAllPathMap = currentPathMap.getCatchAllPathMap();
-                        if (catchAllPathMap != null)
-                        {
-                            foundPaths.push(catchAllPathMap);
-                        }
+                        addCatchAllPathMapIfNotNull(currentPathMap, foundPaths);
                     }
                 }
                 currentPathMap = pathMap;
             }
             return foundPaths;
+        }
+
+        private void addCatchAllPathMapIfNotNull(PathMap currentPathMap, Stack<PathMap> foundPaths)
+        {
+            final PathMap catchAllPathMap = currentPathMap.getCatchAllPathMap();
+            if (catchAllPathMap != null)
+            {
+                foundPaths.push(catchAllPathMap);
+            }
         }
 
         private RequestHandlerMatcherPair findRequestHandlerMatcherPair(List<RequestHandlerMatcherPair> requestHandlerMatcherPairs, HttpRequest request)
