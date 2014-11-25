@@ -7,7 +7,6 @@
 package org.mule.module.http.internal.listener;
 
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -15,7 +14,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.ResponseCompletionCallback;
 import org.mule.execution.ThrottlingPhaseTemplate;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
