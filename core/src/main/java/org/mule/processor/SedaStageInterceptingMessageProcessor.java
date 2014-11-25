@@ -50,6 +50,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     implements Work, Lifecycle, Pausable, Resumable
 {
     protected static final String QUEUE_NAME_PREFIX = "seda.queue";
+    protected static int DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR = 4;
 
     protected QueueProfile queueProfile;
     protected int queueTimeout;
@@ -75,6 +76,18 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         this.queueStatistics = queueStatistics;
         this.muleContext = muleContext;
         lifecycleManager = new SedaStageLifecycleManager(queueName, this);
+
+        // If user has not set an explicit queue size set one here, to prevent OutOfMemoryException's.
+        configureDefaultQueueSize(queueProfile, threadingProfile);
+    }
+
+    protected void configureDefaultQueueSize(QueueProfile queueProfile, ThreadingProfile threadingProfile)
+    {
+        if (queueProfile != null && queueProfile.getMaxOutstandingMessages() == 0)
+        {
+            queueProfile.setMaxOutstandingMessages(threadingProfile.getMaxThreadsActive() *
+                                                   DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR);
+        }
     }
 
     @Override
