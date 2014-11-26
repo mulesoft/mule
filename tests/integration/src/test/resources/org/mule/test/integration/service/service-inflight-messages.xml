@@ -38,6 +38,7 @@
                     <vm:outbound-endpoint ref="out" />
                 </pass-through-router>
             </outbound>
+            <queue-profile maxOutstandingMessages="500"/>
         </service>
 
         <service name="TestPersistentQueueService">
