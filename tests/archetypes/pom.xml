@@ -17,7 +17,6 @@
 
     <modules>
         <module>catalog-archetype</module>
-        <module>example-archetype</module>
         <module>module-archetype</module>
         <module>project-archetype</module>
         <module>transport-archetype</module>

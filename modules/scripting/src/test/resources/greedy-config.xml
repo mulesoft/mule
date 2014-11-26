@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+
+    <flow name="greedy">
+        <choice>
+            <when expression="#[flowVars['currency'] == 'USD']">
+                <processor-chain>
+                    <scripting:component>
+                        <scripting:script file="greedy.groovy">
+                            <property key="currency" value="USD"/>
+                        </scripting:script>
+                    </scripting:component>
+                </processor-chain>
+             </when>
+            <when expression="#[flowVars['currency'] == 'GBP']">
+                <processor-chain>
+                    <scripting:component>
+                        <scripting:script file="greedy.py">
+                            <property key="currency" value="GBP"/>
+                        </scripting:script>
+                    </scripting:component>
+                </processor-chain>
+             </when>
+        </choice>
+    </flow>
+</mule>
