@@ -28,7 +28,6 @@ import org.mule.transport.http.HttpPollingConnector;
 import org.mule.transport.http.builder.HttpCookiesDefinitionParser;
 import org.mule.transport.http.builder.HttpHeaderDefinitionParser;
 import org.mule.transport.http.builder.HttpResponseDefinitionParser;
-import org.mule.transport.http.components.HttpResponseBuilder;
 import org.mule.transport.http.components.RestServiceWrapper;
 import org.mule.transport.http.components.StaticResourceMessageProcessor;
 import org.mule.transport.http.filters.HttpBasicAuthenticationFilter;
