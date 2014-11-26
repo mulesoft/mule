@@ -9,8 +9,10 @@ package org.mule.module.db.integration.select;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.isNull;
+import static org.mule.module.db.internal.metadata.SelectMetadataProvider.DUPLICATE_COLUMN_LABEL_ERROR;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.DefaultListMetaDataModel;
@@ -64,5 +66,19 @@ public class SelectJoinOutputMetadataTestCase extends AbstractDbIntegrationTestC
         assertThat(mapDataModel.getKeys().size(), equalTo(2));
         assertThat(mapDataModel.getValueMetaDataModel("NAME"), not(isNull()));
         assertThat(mapDataModel.getValueMetaDataModel("NAME2"), not(isNull()));
+    }
+
+    @Test
+    public void detectsInvalidSelectOutputMetadata() throws Exception
+    {
+        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("joinInvalidMetadata");
+
+        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+        AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
+
+        Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
+        assertThat(outputMetaData.getStatus(), equalTo(Result.Status.FAILURE));
+        assertThat(outputMetaData.get(), nullValue());
+        assertThat(outputMetaData.getMessage(), equalTo(DUPLICATE_COLUMN_LABEL_ERROR));
     }
 }

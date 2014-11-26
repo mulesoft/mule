@@ -30,6 +30,9 @@ import java.util.Map;
  */
 public class SelectMetadataProvider extends AbstractQueryMetadataProvider
 {
+
+    public static final String DUPLICATE_COLUMN_LABEL_ERROR = "Query metadata contains multiple columns with the same label. Define column aliases to resolve this problem";
+
     private final boolean streaming;
 
     public SelectMetadataProvider(DbConfigResolver dbConfigResolver, Query query, boolean streaming)
@@ -70,11 +73,17 @@ public class SelectMetadataProvider extends AbstractQueryMetadataProvider
                 int columnType = statementMetaData.getColumnType(i);
                 recordModels.put(statementMetaData.getColumnLabel(i), getDataTypeMetadataModel(columnType));
             }
+
+            if (statementMetaData.getColumnCount() != recordModels.size())
+            {
+                return new DefaultResult<MetaData>(null, Result.Status.FAILURE, DUPLICATE_COLUMN_LABEL_ERROR);
+            }
         }
         catch (SQLException e)
         {
             return new DefaultResult<MetaData>(null, Result.Status.FAILURE, e.getMessage(), FailureType.UNSPECIFIED, e);
         }
+
 
         DefaultDefinedMapMetaDataModel recordModel = new DefaultDefinedMapMetaDataModel(recordModels);
         DefaultListMetaDataModel listModel = new DefaultListMetaDataModel(recordModel);
