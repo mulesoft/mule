@@ -50,7 +50,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     implements Work, Lifecycle, Pausable, Resumable
 {
     protected static final String QUEUE_NAME_PREFIX = "seda.queue";
-    protected static int DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR = 4;
+    public static int DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR = 4;
 
     protected QueueProfile queueProfile;
     protected int queueTimeout;
