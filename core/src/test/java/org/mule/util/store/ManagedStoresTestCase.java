@@ -69,17 +69,17 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
             new SimpleMemoryObjectStore<String>());
         ObjectStoreManager manager = muleContext.getRegistry().lookupObject(
             MuleProperties.OBJECT_STORE_MANAGER);
-        
-        
+
+
         ObjectStore<String> partition1 = manager.getObjectStore("inMemoryPart1", false);
         ObjectStore<String> partition2 = manager.getObjectStore("inMemoryPart2", false);
-        
+
         partition1.store("key1", "value1");
         partition2.store("key2", "value2");
-        
+
         assertEquals("value1", partition1.retrieve("key1"));
         assertEquals("value2", partition2.retrieve("key2"));
-        
+
         partition1.clear();
         assertEquals("value2", partition2.retrieve("key2"));
     }
@@ -215,11 +215,12 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
     private void testObjectStoreMaxEntries(ListableObjectStore<String> objectStore)
         throws ObjectStoreException, InterruptedException
     {
-        for (int i = 0; i < 100; i++)
-        {
-            objectStore.store("key" + i, "value" + i);
-            assertEquals("value" + i, objectStore.retrieve("key" + i));
-        }
+        storeObjects(objectStore, 0, 90);
+
+        Thread.sleep(2);
+
+        storeObjects(objectStore, 90, 100);
+
         Thread.sleep(2000);
         assertEquals(10, objectStore.allKeys().size());
         for (int i = 90; i < 100; i++)
@@ -227,6 +228,15 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
             assertTrue("Checking that key" + i + " exists", objectStore.contains("key" + i));
         }
 
+    }
+
+    private void storeObjects(ListableObjectStore<String> objectStore, int start, int stop) throws ObjectStoreException
+    {
+        for (int i = start; i < stop; i++)
+        {
+            objectStore.store("key" + i, "value" + i);
+            assertEquals("value" + i, objectStore.retrieve("key" + i));
+        }
     }
 
 }
