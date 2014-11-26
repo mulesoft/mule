@@ -17,6 +17,7 @@ import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.model.seda.SedaService;
+import org.mule.processor.SedaStageInterceptingMessageProcessor;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
@@ -38,7 +39,8 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
     {
         SedaService service = lookupService("serviceDefault");
         QueueProfile queueProfile = service.getQueueProfile();
-        assertEquals(0, queueProfile.getMaxOutstandingMessages());
+        assertEquals(service.getThreadingProfile().getMaxThreadsActive() * SedaStageInterceptingMessageProcessor
+                .DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR, queueProfile.getMaxOutstandingMessages());
         assertObjectStoreIsDefaultMemoryObjectStore(queueProfile.getObjectStore());
     }
     
