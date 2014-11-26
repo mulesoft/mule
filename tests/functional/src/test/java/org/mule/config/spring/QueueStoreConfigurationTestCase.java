@@ -6,9 +6,11 @@
  */
 package org.mule.config.spring;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.store.ListableObjectStore;
@@ -17,6 +19,7 @@ import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.model.seda.SedaService;
+import org.mule.processor.SedaStageInterceptingMessageProcessor;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
@@ -38,7 +41,9 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
     {
         SedaService service = lookupService("serviceDefault");
         QueueProfile queueProfile = service.getQueueProfile();
-        assertEquals(0, queueProfile.getMaxOutstandingMessages());
+        int expectedQueueSize = service.getThreadingProfile().getMaxThreadsActive() *
+                                SedaStageInterceptingMessageProcessor.DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR;
+        assertThat(queueProfile.getMaxOutstandingMessages(), is(equalTo(expectedQueueSize)));
         assertObjectStoreIsDefaultMemoryObjectStore(queueProfile.getObjectStore());
     }
     
