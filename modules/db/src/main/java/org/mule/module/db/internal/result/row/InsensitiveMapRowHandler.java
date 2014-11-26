@@ -45,6 +45,11 @@ public class InsensitiveMapRowHandler implements RowHandler
             }
         }
 
+        if (cols != result.size())
+        {
+            throw new IllegalArgumentException("Record cannot be mapped as it contains multiple columns with the same label. Define column aliases to solve this problem");
+        }
+
         return result;
     }
 }
