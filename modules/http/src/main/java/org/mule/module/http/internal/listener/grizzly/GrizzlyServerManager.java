@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.context.WorkManagerSource;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.HttpServerManager;
@@ -34,8 +35,6 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
-import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
-import org.glassfish.grizzly.utils.ChunkingFilter;
 import org.glassfish.grizzly.utils.DelayedExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +49,7 @@ public class GrizzlyServerManager implements HttpServerManager
     private final TCPNIOTransport transport;
     private final GrizzlyRequestDispatcherFilter requestHandlerFilter;
     private final HttpListenerRegistry httpListenerRegistry;
+    private final WorkManagerSourceExecutorProvider executorProvider;
     private Logger logger = LoggerFactory.getLogger(GrizzlyServerManager.class);
     private Map<ServerAddress, GrizzlyServer> servers = new ConcurrentHashMap<>();
     private ExecutorService idleTimeoutExecutorService;
@@ -65,14 +65,14 @@ public class GrizzlyServerManager implements HttpServerManager
         FilterChainBuilder serverFilterChainBuilder = FilterChainBuilder.stateless();
         serverFilterChainBuilder.add(new TransportFilter());
         serverFilterChainBuilder.add(sslFilterDelegate);
-        serverFilterChainBuilder.add(new ChunkingFilter(1024));
         serverFilterChainBuilder.add(httpServerFilterDelegate);
         serverFilterChainBuilder.add(requestHandlerFilter);
 
         //Initialize Transport
+        executorProvider = new WorkManagerSourceExecutorProvider();
         TCPNIOTransportBuilder transportBuilder = TCPNIOTransportBuilder.newInstance()
                 .setOptimizedForMultiplexing(true)
-                .setIOStrategy(SameThreadIOStrategy.getInstance());
+                .setIOStrategy(new ExecutorPerServerAddressIOStrategy(executorProvider));
 
         configureServerSocketProperties(transportBuilder, serverSocketProperties);
 
@@ -135,7 +135,7 @@ public class GrizzlyServerManager implements HttpServerManager
         return servers.containsKey(serverAddress);
     }
 
-    public Server createSslServerFor(TlsContextFactory tlsContextFactory, final ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException
+    public Server createSslServerFor(TlsContextFactory tlsContextFactory, WorkManagerSource workManagerSource, final ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException
     {
         if (logger.isDebugEnabled())
         {
@@ -147,12 +147,13 @@ public class GrizzlyServerManager implements HttpServerManager
         }
         sslFilterDelegate.addFilterForAddress(serverAddress, createSslFilter(tlsContextFactory));
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
+        executorProvider.addExecutor(serverAddress, workManagerSource);
         final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
     }
 
-    public Server createServerFor(ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException
+    public Server createServerFor(ServerAddress serverAddress, WorkManagerSource workManagerSource, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException
     {
         if (logger.isDebugEnabled())
         {
@@ -163,6 +164,7 @@ public class GrizzlyServerManager implements HttpServerManager
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
+        executorProvider.addExecutor(serverAddress, workManagerSource);
         final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;

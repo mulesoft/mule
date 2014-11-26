@@ -23,14 +23,18 @@ import java.util.Collection;
 
 import javax.servlet.http.Part;
 
+import org.glassfish.grizzly.filterchain.FilterChainContext;
+import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.Protocol;
+import org.glassfish.grizzly.utils.BufferInputStream;
 
 public class GrizzlyHttpRequestAdapter implements HttpRequest
 {
 
-    private final HttpRequestPacket grizzlyRequest;
-    private final InputStream grizzlyContent;
+    private final HttpRequestPacket requestPacket;
+    private final InputStream requestContent;
+    private final FilterChainContext filterChainContext;
     private final int contentLength;
     private HttpProtocol protocol;
     private String uri;
@@ -39,11 +43,18 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     private HttpEntity body;
     private ParameterMap headers;
 
-    public GrizzlyHttpRequestAdapter(HttpRequestPacket request, InputStream content, int contentLength)
+    public GrizzlyHttpRequestAdapter(FilterChainContext filterChainContext, HttpContent httpContent)
     {
-        this.grizzlyRequest = request;
-        this.grizzlyContent = content;
-        this.contentLength = contentLength;
+        this.filterChainContext = filterChainContext;
+        this.requestPacket = (HttpRequestPacket) httpContent.getHttpHeader();
+        this.requestContent = new BufferInputStream(httpContent.getContent());
+        int contentLengthAsInt = 0;
+        String contentLengthAsString = requestPacket.getHeader(HttpHeaders.Names.CONTENT_LENGTH);
+        if (contentLengthAsString != null)
+        {
+            contentLengthAsInt = Integer.parseInt(contentLengthAsString);
+        }
+        this.contentLength = contentLengthAsInt;
     }
 
     @Override
@@ -51,7 +62,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     {
         if (this.protocol == null)
         {
-            this.protocol = grizzlyRequest.getProtocol() == Protocol.HTTP_1_0 ? HttpProtocol.HTTP_1_0 : HttpProtocol.HTTP_1_1;
+            this.protocol = requestPacket.getProtocol() == Protocol.HTTP_1_0 ? HttpProtocol.HTTP_1_0 : HttpProtocol.HTTP_1_1;
         }
         return this.protocol;
     }
@@ -72,7 +83,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     {
         if (this.method == null)
         {
-            this.method = grizzlyRequest.getMethod().getMethodString();
+            this.method = requestPacket.getMethod().getMethodString();
         }
         return this.method;
     }
@@ -110,9 +121,9 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     private void initializeHeaders()
     {
         this.headers = new ParameterMap();
-        for (String grizzlyHeaderName : grizzlyRequest.getHeaders().names())
+        for (String grizzlyHeaderName : requestPacket.getHeaders().names())
         {
-            final Iterable<String> headerValues = grizzlyRequest.getHeaders().values(grizzlyHeaderName);
+            final Iterable<String> headerValues = requestPacket.getHeaders().values(grizzlyHeaderName);
             for (String headerValue : headerValues)
             {
                 this.headers.put(grizzlyHeaderName, headerValue);
@@ -131,16 +142,16 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
                 if (contentTypeValue != null && contentTypeValue.contains("multipart"))
                 {
 
-                    final Collection<Part> parts = HttpParser.parseMultipartContent(grizzlyContent, contentTypeValue);
+                    final Collection<Part> parts = HttpParser.parseMultipartContent(requestContent, contentTypeValue);
                     this.body = new MultipartHttpEntity(parts);
                 }
                 else if (getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
                 {
-                    this.body = new InputStreamHttpEntity(grizzlyContent);
+                    this.body = new InputStreamHttpEntity(new TransferEncodingChunkInputStream(filterChainContext, requestContent));
                 }
                 else if (contentLength > 0)
                 {
-                    this.body = new InputStreamHttpEntity(contentLength, grizzlyContent);
+                    this.body = new InputStreamHttpEntity(contentLength, requestContent);
                 }
                 else
                 {
@@ -160,7 +171,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     {
         if (this.uri == null)
         {
-            this.uri = grizzlyRequest.getRequestURI() + (StringUtils.isEmpty(grizzlyRequest.getQueryString()) ? "" : "?" + grizzlyRequest.getQueryString());
+            this.uri = requestPacket.getRequestURI() + (StringUtils.isEmpty(requestPacket.getQueryString()) ? "" : "?" + requestPacket.getQueryString());
         }
         return this.uri;
     }
@@ -168,17 +179,17 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     @Override
     public InputStreamHttpEntity getInputStreamEntity()
     {
-        if (this.grizzlyContent == null)
+        if (this.requestContent == null)
         {
             return null;
         }
         if (getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
         {
-            return new InputStreamHttpEntity(grizzlyContent);
+            return new InputStreamHttpEntity(new TransferEncodingChunkInputStream(filterChainContext, requestContent));
         }
         if (contentLength > 0)
         {
-            return new InputStreamHttpEntity(contentLength, grizzlyContent);
+            return new InputStreamHttpEntity(contentLength, requestContent);
         }
         return null;
     }

@@ -6,30 +6,33 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static java.lang.String.format;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.http.api.HttpConstants;
+import org.mule.api.MuleEventContext;
 import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;
 
-import org.hamcrest.core.Is;
-import org.junit.Ignore;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore("see MULE-8044")
 public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
 {
 
+    private static final String LARGE_MESSAGE = RandomStringUtils.randomAlphanumeric(100 * 1024);
+
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
+    private String flowReceivedMessage;
 
     @Override
     protected String getConfigFile()
@@ -38,24 +41,27 @@ public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void listenerReceivedChunckedRequest() throws Exception
+    public void listenerReceivedChunkedRequest() throws Exception
     {
-        final HttpRequestOptions requestOptions = newOptions().method(POST.name()).build();
-        muleContext.getClient().send(String.format("http://localhost:%s/", listenPort.getNumber()), new DefaultMuleMessage(new ByteArrayInputStream(getPayload().getBytes()), muleContext), requestOptions);
-        final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
-        assertThat(message.getPayloadAsString(), Is.is(getPayload()));
+        String url = format("http://localhost:%s/", listenPort.getNumber());
+        getFunctionalTestComponent("defaultFlow").setEventCallback(new EventCallback()
+        {
+            @Override
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                flowReceivedMessage = context.getMessageAsString();
+            }
+        });
+        testChunkedRequestContentAndResponse(url);
+        //We check twice to verify that the chunked request is consumed completely. Otherwise second request would fail
+        testChunkedRequestContentAndResponse(url);
     }
 
-    private String getPayload()
+    private void testChunkedRequestContentAndResponse(String url) throws Exception
     {
-        //generate 100kb payload as minimum
-        int numberOfTestMessagesRequired = (1024*100)/TEST_MESSAGE.getBytes().length;
-        final StringBuilder bigPayload = new StringBuilder();
-        for (int i = 0; i < numberOfTestMessagesRequired; i++)
-        {
-            bigPayload.append(TEST_MESSAGE + "\n");
-        }
-        return bigPayload.toString();
+        final HttpRequestOptions requestOptions = newOptions().method(POST.name()).build();
+        muleContext.getClient().send(url, new DefaultMuleMessage(new ByteArrayInputStream(LARGE_MESSAGE.getBytes()), muleContext), requestOptions);
+        assertThat(flowReceivedMessage, is(LARGE_MESSAGE));
     }
 
 }
