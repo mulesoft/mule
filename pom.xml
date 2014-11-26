@@ -108,7 +108,6 @@
         <module>buildtools</module>
         <module>core</module>
         <module>distributions</module>
-        <module>examples</module>
         <module>modules</module>
         <module>patterns</module>
         <module>tools</module>
@@ -1837,9 +1836,6 @@
                     </archive>
                 </configuration>
             </plugin>
-            <!--
-                we are using 'mule' as the packaging type in our examples
-            -->
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
@@ -1931,10 +1927,6 @@
                                     <group>
                                         <title>Tools</title>
                                         <packages>org.mule.tools.*</packages>
-                                    </group>
-                                    <group>
-                                        <title>Examples</title>
-                                        <packages>org.mule.example.*</packages>
                                     </group>
                                 </groups>
                             </configuration>
