@@ -14,11 +14,15 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class HttpRequestSingleParamDefinitionParser extends ChildDefinitionParser
+/**
+ * Bean definition parser for query parameters, URI parameters and headers, for both the request-builder and
+ * the response-builder elements.
+ */
+public class HttpMessageSingleParamDefinitionParser extends ChildDefinitionParser
 {
     private HttpParamType httpParamType;
 
-    public HttpRequestSingleParamDefinitionParser(Class<? extends HttpParam> clazz, HttpParamType httpParamType)
+    public HttpMessageSingleParamDefinitionParser(Class<? extends HttpParam> clazz, HttpParamType httpParamType)
     {
         super("param", clazz);
 
