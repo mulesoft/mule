@@ -64,7 +64,7 @@ MULE-7731: The <jms:caching-connection-factory> has been deprecated.  It can sti
 MULE-7731: org.mule.transport.jms.xa.ConnectionFactoryWrapper has been renamed to org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper.
 MULE-8082: XStream was upgraded from version 1.4.2 to 1.4.7
 MULE-8083: JXPath expression evaluator no longer accepts external entities when payload is not already a Document
-MULE-7736: From Mule 3.6, SEDA queues used with the 'queued-asynchronous' processing strategy are now bound to four times the maximum number of active threads by default.  This change permits stages to be decoupled as well as peaks in traffic to be handled while avoiding OutOfMemoryException's.  The queue size can be increased in configuration or set to '-1' for 3.5 behaviour (unbound).
+MULE-7736: From Mule 3.6, SEDA queues used with the 'queued-asynchronous' processing strategy and services are now bound to four times the maximum number of active threads by default.  This change permits stages to be decoupled as well as peaks in traffic to be handled while avoiding OutOfMemoryException's.  The queue size can be increased in configuration or set to '-1' for 3.5 behaviour (unbound).
 
 
 Migration changes from 3.4.x to 3.5.x
