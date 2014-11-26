@@ -59,7 +59,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         testObjectStoreExpiry(manager.<ObjectStore<String>> getObjectStore("inMemoryExpPart1", false, -1,
             500, 200));
         testObjectStoreMaxEntries(manager.<ListableObjectStore<String>> getObjectStore("inMemoryMaxPart1",
-            false, 10, 10000, 200));
+                                                                                       false, 10, 10000, 200));
     }
 
     @Test
@@ -69,17 +69,17 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
             new SimpleMemoryObjectStore<String>());
         ObjectStoreManager manager = muleContext.getRegistry().lookupObject(
             MuleProperties.OBJECT_STORE_MANAGER);
-        
-        
+
+
         ObjectStore<String> partition1 = manager.getObjectStore("inMemoryPart1", false);
         ObjectStore<String> partition2 = manager.getObjectStore("inMemoryPart2", false);
-        
+
         partition1.store("key1", "value1");
         partition2.store("key2", "value2");
-        
+
         assertEquals("value1", partition1.retrieve("key1"));
         assertEquals("value2", partition2.retrieve("key2"));
-        
+
         partition1.clear();
         assertEquals("value2", partition2.retrieve("key2"));
     }
@@ -102,9 +102,9 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
         testObjectStore(store);
         testObjectStoreExpiry(manager.<ObjectStore<String>> getObjectStore("persistenceExpPart1", true, -1,
-            500, 200));
+                                                                           500, 200));
         testObjectStoreMaxEntries(manager.<ListableObjectStore<String>> getObjectStore("persistenceMaxPart1",
-            true, 10, 10000, 200));
+                                                                                       true, 10, 10000, 200));
     }
 
     @Test
@@ -123,9 +123,9 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         testObjectStore(store);
         testObjectStoreExpiry(manager.<ObjectStore<String>> getObjectStore("inMemoryExpPart2", false, -1,
-            500, 200));
+                                                                           500, 200));
         testObjectStoreMaxEntries(manager.<ListableObjectStore<String>> getObjectStore("inMemoryMaxPart2",
-            false, 10, 10000, 200));
+                                                                                       false, 10, 10000, 200));
     }
 
     @Ignore("MULE-6926")
@@ -215,11 +215,12 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
     private void testObjectStoreMaxEntries(ListableObjectStore<String> objectStore)
         throws ObjectStoreException, InterruptedException
     {
-        for (int i = 0; i < 100; i++)
-        {
-            objectStore.store("key" + i, "value" + i);
-            assertEquals("value" + i, objectStore.retrieve("key" + i));
-        }
+        storeObjects(objectStore, 0, 90);
+
+        ensureMillisecondChanged();
+
+        storeObjects(objectStore, 90, 100);
+
         Thread.sleep(2000);
         assertEquals(10, objectStore.allKeys().size());
         for (int i = 90; i < 100; i++)
@@ -227,6 +228,20 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
             assertTrue("Checking that key" + i + " exists", objectStore.contains("key" + i));
         }
 
+    }
+
+    private void ensureMillisecondChanged() throws InterruptedException
+    {
+        Thread.sleep(2);
+    }
+
+    private void storeObjects(ListableObjectStore<String> objectStore, int start, int stop) throws ObjectStoreException
+    {
+        for (int i = start; i < stop; i++)
+        {
+            objectStore.store("key" + i, "value" + i);
+            assertEquals("value" + i, objectStore.retrieve("key" + i));
+        }
     }
 
 }

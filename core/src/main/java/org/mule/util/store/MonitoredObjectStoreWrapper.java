@@ -96,7 +96,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     @Override
     public void store(Serializable key, T value) throws ObjectStoreException
     {
-        Long time = Long.valueOf(System.nanoTime());
+        Long time = Long.valueOf(System.currentTimeMillis());
         getStore().store(key, new StoredObject<T>(value, time, key));
     }
 
@@ -179,7 +179,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     {
         try
         {
-            final long now = System.nanoTime();
+            final long now = System.currentTimeMillis();
             List<Serializable> keys = allKeys();
             int excess = (allKeys().size() - maxEntries);
 
@@ -205,7 +205,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
             {
                 StoredObject<T> obj = store.retrieve(key);
 
-                if (entryTTL != UNBOUNDED && TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
+                if (entryTTL != UNBOUNDED && now - obj.getTimestamp() >= entryTTL)
                 {
                     remove(key);
                     excess--;
