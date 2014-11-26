@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -200,6 +201,14 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
         verifyOnlyFailureWasCalled(mockException);
+    }
+
+    @Test
+    public void doNotUseWorkManagerWhenForceWorkManagerIsFalse() throws Exception
+    {
+        when(mockContext.forceWorkManagerUsage()).thenReturn(false);
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+        verify(mockWorkManager, never()).scheduleWork(any(Work.class));
     }
 
     private void verifyOnlySuccessfulWasCalled()

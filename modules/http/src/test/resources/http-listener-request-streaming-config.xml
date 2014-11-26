@@ -14,7 +14,6 @@
         <http:listener config-ref="listenerConfig"  path="/"/>
         <object-to-string-transformer/>
         <vm:outbound-endpoint path="out"/>
-        <set-payload value="ok"/>
     </flow>
 
 </mule>

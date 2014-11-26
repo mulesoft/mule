@@ -10,12 +10,14 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
+import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.HttpProtocol;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
@@ -23,6 +25,7 @@ import java.util.Collection;
 
 import javax.servlet.http.Part;
 
+import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.Protocol;
 
@@ -32,6 +35,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     private final HttpRequestPacket grizzlyRequest;
     private final InputStream grizzlyContent;
     private final int contentLength;
+    private final FilterChainContext filterChainContext;
     private HttpProtocol protocol;
     private String uri;
     private String path;
@@ -39,8 +43,9 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     private HttpEntity body;
     private ParameterMap headers;
 
-    public GrizzlyHttpRequestAdapter(HttpRequestPacket request, InputStream content, int contentLength)
+    public GrizzlyHttpRequestAdapter(FilterChainContext filterChainContext, HttpRequestPacket request, InputStream content, int contentLength)
     {
+        this.filterChainContext = filterChainContext;
         this.grizzlyRequest = request;
         this.grizzlyContent = content;
         this.contentLength = contentLength;
@@ -136,7 +141,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
                 }
                 else if (getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
                 {
-                    this.body = new InputStreamHttpEntity(grizzlyContent);
+                    this.body = new InputStreamHttpEntity(new TransferEncodingChunkInputStream(filterChainContext, grizzlyContent));
                 }
                 else if (contentLength > 0)
                 {
@@ -174,7 +179,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
         }
         if (getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
         {
-            return new InputStreamHttpEntity(grizzlyContent);
+            return new InputStreamHttpEntity(new TransferEncodingChunkInputStream(filterChainContext, grizzlyContent));
         }
         if (contentLength > 0)
         {

@@ -12,7 +12,6 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -20,11 +19,9 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import java.io.ByteArrayInputStream;
 
 import org.hamcrest.core.Is;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore("see MULE-8044")
 public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
 {
 
@@ -40,8 +37,16 @@ public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
     @Test
     public void listenerReceivedChunckedRequest() throws Exception
     {
+        String url = String.format("http://localhost:%s/", listenPort.getNumber());
+        testChunkedRequestContentAndResponse(url);
+        //We check twice to verify that the chunked request is consumed completely. Otherwise second request would fail
+        testChunkedRequestContentAndResponse(url);
+    }
+
+    private void testChunkedRequestContentAndResponse(String url) throws Exception
+    {
         final HttpRequestOptions requestOptions = newOptions().method(POST.name()).build();
-        muleContext.getClient().send(String.format("http://localhost:%s/", listenPort.getNumber()), new DefaultMuleMessage(new ByteArrayInputStream(getPayload().getBytes()), muleContext), requestOptions);
+        muleContext.getClient().send(url, new DefaultMuleMessage(new ByteArrayInputStream(getPayload().getBytes()), muleContext), requestOptions);
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.getPayloadAsString(), Is.is(getPayload()));
     }

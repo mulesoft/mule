@@ -55,7 +55,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         {
             contentLengthAsInt = Integer.parseInt(contentLength);
         }
-        final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(request, contentInputStream, contentLengthAsInt);
+        final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(ctx, request, contentInputStream, contentLengthAsInt);
         HttpRequestContext requestContext = new HttpRequestContext(httpRequest, (InetSocketAddress) ctx.getConnection().getPeerAddress(), scheme);
         final RequestHandler requestHandler = requestHandlerProvider.getRequestHandler(hostName, port, httpRequest);
         requestHandler.handleRequest(requestContext, new HttpResponseReadyCallback()

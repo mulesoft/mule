@@ -35,6 +35,13 @@ public class HttpMessageProcessContext implements MessageProcessContext
     }
 
     @Override
+    public boolean forceWorkManagerUsage()
+    {
+        //Since the currently Grizzly is doing the hand-off to another thread for processing we do not force the usage of the work manager.
+        return false;
+    }
+
+    @Override
     public MessageSource getMessageSource()
     {
         return listener;
