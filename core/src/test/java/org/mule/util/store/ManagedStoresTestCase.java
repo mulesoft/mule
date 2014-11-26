@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.store;
 
 import static org.junit.Assert.assertEquals;
@@ -96,9 +97,10 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         assertSame(baseStore,
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         testObjectStore(store);
-        testObjectStoreExpiry(manager.getObjectStore("inMemoryExpPart2", false, -1, 500, 200));
-        testObjectStoreMaxEntries((ListableObjectStore) manager.getObjectStore("inMemoryMaxPart2", false, 10,
-            10000, 200));
+        testObjectStoreExpiry(manager.<ObjectStore<String>> getObjectStore("inMemoryExpPart2", false, -1,
+            500, 200));
+        testObjectStoreMaxEntries(manager.<ListableObjectStore<String>> getObjectStore("inMemoryMaxPart2",
+            false, 10, 10000, 200));
     }
 
     @Test
@@ -179,11 +181,12 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
     private void testObjectStoreMaxEntries(ListableObjectStore objectStore)
         throws ObjectStoreException, InterruptedException
     {
-        for (int i = 0; i < 100; i++)
-        {
-            objectStore.store("key" + i, "value" + i);
-            assertEquals("value" + i, objectStore.retrieve("key" + i));
-        }
+        storeObjects(objectStore, 0, 90);
+
+        ensureMillisecondChanged();
+
+        storeObjects(objectStore, 90, 100);
+
         Thread.sleep(2000);
         assertEquals(10, objectStore.allKeys().size());
         for (int i = 90; i < 100; i++)
@@ -191,6 +194,20 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
             assertTrue("Checking that key" + i + " exists", objectStore.contains("key" + i));
         }
 
+    }
+
+    private void ensureMillisecondChanged() throws InterruptedException
+    {
+        Thread.sleep(2);
+    }
+
+    private void storeObjects(ListableObjectStore<String> objectStore, int start, int stop) throws ObjectStoreException
+    {
+        for (int i = start; i < stop; i++)
+        {
+            objectStore.store("key" + i, "value" + i);
+            assertEquals("value" + i, objectStore.retrieve("key" + i));
+        }
     }
 
 }
