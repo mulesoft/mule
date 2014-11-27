@@ -24,7 +24,7 @@ public class ServerAddress
         {
             this.host = host;
             this.port = port;
-            this.ip = NetworkUtils.getHostIp(host);
+            this.ip = NetworkUtils.getLocalHostIp(host);
         }
         catch (UnknownHostException e)
         {

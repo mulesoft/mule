@@ -21,8 +21,8 @@ public final class NetworkUtils
 {
     private static final Log logger = LogFactory.getLog(NetworkUtils.class);
 
+    private static final Map<String, String> ipPerHost = new ConcurrentHashMap<>();
     private static InetAddress localHost;
-    private static Map<String, String> ipPerHost = new ConcurrentHashMap<>();
 
     private NetworkUtils()
     {
@@ -74,7 +74,10 @@ public final class NetworkUtils
     }
 
     /**
-     * Resolves an IP for a host name.
+     * Resolves a local IP for a host name.
+     *
+     * This method should not be used to resolve external host ips since it has a cache that
+     * can grow indefinitely.
      *
      * For performance reasons returns the ip and not the {@link java.net.InetAddress}
      * since the {@link java.net.InetAddress} performs logic each time it has to resolve the
@@ -84,7 +87,7 @@ public final class NetworkUtils
      * @return the host ip
      * @throws UnknownHostException
      */
-    public static String getHostIp(String host) throws UnknownHostException
+    public static String getLocalHostIp(String host) throws UnknownHostException
     {
         String ip = ipPerHost.get(host);
         if (ip == null)
