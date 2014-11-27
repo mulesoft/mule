@@ -32,6 +32,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
 {
 
     public static final String HTTP_LISTENER_CONNECTION_MANAGER = "_httpListenerConnectionManager";
+    public static final String SERVER_ALREADY_EXISTS_FORMAT = "A server in port(%s) already exists for host(%s) or one overlapping it.";
 
     private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
     private HttpServerManager httpServerManager;
@@ -91,7 +92,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(SERVER_ALREADY_EXISTS_FORMAT, serverAddress.getPort(), serverAddress.getHost())));
         }
     }
 
@@ -110,7 +111,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(SERVER_ALREADY_EXISTS_FORMAT, serverAddress.getPort(), serverAddress.getHost())));
         }
     }
 

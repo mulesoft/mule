@@ -6,12 +6,11 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import org.mule.module.http.internal.listener.ServerAddressMap;
 import org.mule.module.http.internal.listener.ServerAddress;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -31,7 +30,7 @@ import org.glassfish.grizzly.filterchain.NextAction;
 public class GrizzlyAddressDelegateFilter<F extends BaseFilter> extends BaseFilter
 {
 
-    private Map<ServerAddress, F> filters = new HashMap<>();
+    private ServerAddressMap<F> filters = new ServerAddressMap<>();
 
     @Override
     public void onAdded(FilterChain filterChain)
