@@ -77,7 +77,7 @@ public final class NetworkUtils
      * Resolves an IP for a host name.
      *
      * For performance reasons returns the ip and not the {@link java.net.InetAddress}
-     * since the {@link java.net.InetAddress} performs logic each time the it has to resolve the
+     * since the {@link java.net.InetAddress} performs logic each time it has to resolve the
      * host address.
      *
      * @param host the host name
