@@ -34,7 +34,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
     private static final String SLASH = "/";
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Map<ServerAddress, Server> serverAddressToServerMap = new HashMap<>();
+    private final ServerAddressMap<Server> serverAddressToServerMap = new ServerAddressMap<>();
     private final Map<Server, ServerAddressRequestHandlerRegistry> requestHandlerPerServerAddress = new HashMap<>();
 
     public synchronized RequestHandlerManager addRequestHandler(final Server server, final RequestHandler requestHandler, final ListenerRequestMatcher requestMatcher)
