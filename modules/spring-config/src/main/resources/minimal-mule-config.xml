@@ -1,94 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"
-       default-init-method="initialise">
-    <!-- Marker for MULE-4813-->
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <bean name="_muleNotificationManager" class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
 
-    <bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
+    <spring:beans default-init-method="initialise">
+        <!-- Marker for MULE-4813-->
 
-    <mule:mule>
+        <spring:bean name="_muleNotificationManager" class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
 
+        <spring:bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
+
+        <spring:bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
+
+        <spring:bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentQueueStore"/>
+
+        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
+
+        <spring:alias name="_defaultInMemoryObjectStore" alias="_localInMemoryObjectStore" />
+
+        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
+
+        <spring:alias name="_defaultPersistentObjectStore" alias="_localPersistentObjectStore" />
+
+        <spring:bean name="_defaultUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
+
+        <spring:alias name="_defaultUserObjectStore" alias="_localUserObjectStore" />
+
+        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
+
+        <spring:alias name="_defaultTransientUserObjectStore" alias="_localTransientUserObjectStore" />
+
+        <spring:bean name="_muleQueueManager" class="org.mule.util.queue.DelegateQueueManager"/>
+
+        <spring:alias name="_muleQueueManager" alias="_localQueueManager"/>
+
+        <spring:bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" destroy-method="dispose" />
+
+        <spring:alias name="_muleObjectStoreManager" alias="_localObjectStoreManager" />
+
+        <spring:bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
+
+        <spring:bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+            <spring:constructor-arg  ref="_defaultThreadingProfile"/>
+        </spring:bean>
+
+        <spring:bean name="_defaultMessageRequesterThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+            <spring:constructor-arg  ref="_defaultThreadingProfile"/>
+        </spring:bean>
+
+        <spring:bean name="_defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+            <spring:constructor-arg  ref="_defaultThreadingProfile"/>
+        </spring:bean>
+
+        <spring:bean name="_defaultServiceThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+            <spring:constructor-arg  ref="_defaultThreadingProfile"/>
+        </spring:bean>
+
+        <spring:bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
+
+        <spring:bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguageWrapper">
+            <spring:constructor-arg  ref="_muleContext"/>
+        </spring:bean>
+
+        <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
+        the transformers will be available even when using the TransientRegistry only -->
+
+    </spring:beans>
 
         <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.
              Configuration element is required here so that spring creates a MuleConfiguration instance and
              populates it with defaults from schema
         -->
-        <mule:configuration/>
+        <configuration />
 
-        <mule:notifications>
-            <mule:notification event="CONTEXT"/>
-            <mule:notification event="MODEL"/>
-            <mule:notification event="SERVICE"/>
-            <mule:notification event="SECURITY"/>
-            <mule:notification event="MANAGEMENT"/>
-            <mule:notification event="CONNECTION"/>
-            <mule:notification event="REGISTRY"/>
-            <mule:notification event="CUSTOM"/>
-            <mule:notification event="EXCEPTION"/>
-            <mule:notification event="TRANSACTION"/>
-        </mule:notifications>
-
-    </mule:mule>
-
-    <bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
-
-    <bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentQueueStore"/>
-
-    <bean name="_defaultInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
-
-    <alias name="_defaultInMemoryObjectStore" alias="_localInMemoryObjectStore" />
-
-    <bean name="_defaultPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
-
-    <alias name="_defaultPersistentObjectStore" alias="_localPersistentObjectStore" />
-
-    <bean name="_defaultUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
-
-    <alias name="_defaultUserObjectStore" alias="_localUserObjectStore" />
-
-    <bean name="_defaultTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
-
-    <alias name="_defaultTransientUserObjectStore" alias="_localTransientUserObjectStore" />
-
-    <bean name="_muleQueueManager" class="org.mule.util.queue.DelegateQueueManager"/>
-
-    <alias name="_muleQueueManager" alias="_localQueueManager"/>
-
-    <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" destroy-method="dispose" />
-
-    <alias name="_muleObjectStoreManager" alias="_localObjectStoreManager" />
-    
-    <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
-
-    <bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="_defaultThreadingProfile"/>
-    </bean>
-
-    <bean name="_defaultMessageRequesterThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="_defaultThreadingProfile"/>
-    </bean>
-
-    <bean name="_defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="_defaultThreadingProfile"/>
-    </bean>
-
-    <bean name="_defaultServiceThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="_defaultThreadingProfile"/>
-    </bean>
-
-    <bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
-
-    <bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguageWrapper">
-        <constructor-arg ref="_muleContext"/>
-    </bean>
-
-    <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
-    the transformers will be available even when using the TransientRegistry only -->
-
-</beans>
+        <notifications>
+            <notification event="CONTEXT"/>
+            <notification event="MODEL"/>
+            <notification event="SERVICE"/>
+            <notification event="SECURITY"/>
+            <notification event="MANAGEMENT"/>
+            <notification event="CONNECTION"/>
+            <notification event="REGISTRY"/>
+            <notification event="CUSTOM"/>
+            <notification event="EXCEPTION"/>
+            <notification event="TRANSACTION"/>
+        </notifications>
+</mule>
