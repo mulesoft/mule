@@ -26,26 +26,26 @@ public class TransferEncodingChunkInputStream extends InputStream
 {
 
     private final FilterChainContext filterChainContext;
-    private InputStream grizzlyContent;
+    private InputStream chunk;
     private boolean lastPacketReceived;
 
-    public TransferEncodingChunkInputStream(FilterChainContext filterChainContext, InputStream grizzlyContent)
+    public TransferEncodingChunkInputStream(FilterChainContext filterChainContext, InputStream firstChunk)
     {
         this.filterChainContext = filterChainContext;
-        this.grizzlyContent = grizzlyContent;
+        this.chunk = firstChunk;
     }
 
     @Override
     public int read() throws IOException
     {
-        int value = grizzlyContent.read();
+        int value = chunk.read();
         if (value == -1 && !lastPacketReceived)
         {
             ReadResult readResult = filterChainContext.read();
             HttpContent httpContent = (HttpContent) readResult.getMessage();
             lastPacketReceived = httpContent.isLast();
-            grizzlyContent = new BufferInputStream(httpContent.getContent());
-            value = grizzlyContent.read();
+            chunk = new BufferInputStream(httpContent.getContent());
+            value = chunk.read();
         }
         return value;
     }

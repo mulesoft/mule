@@ -11,10 +11,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.transaction.MuleTransactionConfig;
-import org.mule.util.Preconditions;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,70 +34,35 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
     @Override
     public void runPhase(final AsyncResponseFlowProcessingPhaseTemplate template, final MessageProcessContext messageProcessContext, final PhaseResultNotifier phaseResultNotifier)
     {
-        Preconditions.checkArgument(messageProcessContext.supportsAsynchronousProcessing(), String.format("Cannot execute %s if %s does not support asynchronous processing", this.getClass().getName(), messageProcessContext.getClass().getName()));
-        Work flowExecutionWork = new Work()
-        {
-            @Override
-            public void release()
-            {
-            }
-
-            @Override
-            public void run()
-            {
-                try
-                {
-                    try
-                    {
-                        final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
-                        TransactionalErrorHandlingExecutionTemplate transactionTemplate = TransactionalErrorHandlingExecutionTemplate.
-                                createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
-                                                            (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig() : messageProcessContext.getTransactionConfig()),
-                                                            exceptionHandler);
-                        final MuleEvent response = transactionTemplate.execute(new ExecutionCallback<MuleEvent>()
-                        {
-                            @Override
-                            public MuleEvent process() throws Exception
-                            {
-                                MuleEvent muleEvent = template.getMuleEvent();
-                                muleEvent = template.routeEvent(muleEvent);
-                                return muleEvent;
-                            }
-                        });
-                        template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
-                    }
-                    catch (final MessagingException e)
-                    {
-                        template.sendFailureResponseToClient(e, createSendFailureResponseCompletationCallback(phaseResultNotifier));
-                    }
-                }
-                catch (Exception e)
-                {
-                    phaseResultNotifier.phaseFailure(e);
-                }
-            }
-        };
-        if (messageProcessContext.forceWorkManagerUsage())
+        try
         {
             try
             {
-                messageProcessContext.getFlowExecutionWorkManager().scheduleWork(flowExecutionWork);
+                final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
+                TransactionalErrorHandlingExecutionTemplate transactionTemplate = TransactionalErrorHandlingExecutionTemplate.
+                        createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
+                                                    (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig() : messageProcessContext.getTransactionConfig()),
+                                                    exceptionHandler);
+                final MuleEvent response = transactionTemplate.execute(new ExecutionCallback<MuleEvent>()
+                {
+                    @Override
+                    public MuleEvent process() throws Exception
+                    {
+                        MuleEvent muleEvent = template.getMuleEvent();
+                        muleEvent = template.routeEvent(muleEvent);
+                        return muleEvent;
+                    }
+                });
+                template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
             }
-            catch (WorkException e)
+            catch (final MessagingException e)
             {
-                try
-                {
-                    template.afterFailureProcessingFlow(e);
-                }
-                finally
-                {
-                    phaseResultNotifier.phaseFailure(e);
-                }
+                template.sendFailureResponseToClient(e, createSendFailureResponseCompletationCallback(phaseResultNotifier));
             }
         }
-        else
+        catch (Exception e)
         {
-            flowExecutionWork.run();
+            phaseResultNotifier.phaseFailure(e);
         }
     }
 

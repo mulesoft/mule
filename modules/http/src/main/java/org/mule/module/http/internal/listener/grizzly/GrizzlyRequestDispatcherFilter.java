@@ -47,7 +47,6 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         final int port = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getPort();
         final HttpContent httpContent = ctx.getMessage();
         final HttpRequestPacket request = (HttpRequestPacket) httpContent.getHttpHeader();
-        final BufferInputStream contentInputStream = new BufferInputStream(httpContent.getContent());
 
         String contentLength = request.getHeader(HttpHeaders.Names.CONTENT_LENGTH);
         int contentLengthAsInt = 0;
@@ -55,7 +54,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         {
             contentLengthAsInt = Integer.parseInt(contentLength);
         }
-        final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(ctx, request, contentInputStream, contentLengthAsInt);
+        final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(ctx, request, httpContent.getContent(), contentLengthAsInt);
         HttpRequestContext requestContext = new HttpRequestContext(httpRequest, (InetSocketAddress) ctx.getConnection().getPeerAddress(), scheme);
         final RequestHandler requestHandler = requestHandlerProvider.getRequestHandler(hostName, port, httpRequest);
         requestHandler.handleRequest(requestContext, new HttpResponseReadyCallback()

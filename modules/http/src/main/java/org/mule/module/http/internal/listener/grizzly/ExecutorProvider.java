@@ -19,6 +19,6 @@ public interface ExecutorProvider
      * @param serverAddress an HTTP server address
      * @return the executor to use for process HTTP request for the server address
      */
-    Executor getExecutorFor(ServerAddress serverAddress);
+    Executor getExecutor(ServerAddress serverAddress);
 
 }

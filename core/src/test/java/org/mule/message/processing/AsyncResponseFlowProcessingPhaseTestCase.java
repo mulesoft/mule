@@ -64,15 +64,12 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleException mockException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private WorkManager mockWorkManager;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private DefaultMuleEvent mockMuleEvent;
 
 
     @Before
     public void configureExpectedBehaviour() throws Exception
     {
-        when(mockContext.supportsAsynchronousProcessing()).thenReturn(true);
         doAnswer(new Answer()
         {
             @Override
@@ -93,17 +90,6 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
                 return null;
             }
         }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
-        when(mockContext.getFlowExecutionWorkManager()).thenReturn(mockWorkManager);
-        doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                Work work = (Work) invocationOnMock.getArguments()[0];
-                work.run();
-                return null;
-            }
-        }).when(mockWorkManager).scheduleWork(any(Work.class));
         when(mockTemplate.getMuleEvent()).thenReturn(mockMuleEvent);
     }
 
@@ -119,13 +105,6 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     {
         assertThat(phase.compareTo(new ValidationPhase()), is(1));
         assertThat(phase.compareTo(Mockito.mock(MessageProcessPhase.class)), is(0));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void failIfDoesNotSupportAsyncProcessing()
-    {
-        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-        phase.runPhase(mockTemplate, mockContext, mockNotifier);
     }
 
     @Test
@@ -201,14 +180,6 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
         verifyOnlyFailureWasCalled(mockException);
-    }
-
-    @Test
-    public void doNotUseWorkManagerWhenForceWorkManagerIsFalse() throws Exception
-    {
-        when(mockContext.forceWorkManagerUsage()).thenReturn(false);
-        phase.runPhase(mockTemplate, mockContext, mockNotifier);
-        verify(mockWorkManager, never()).scheduleWork(any(Work.class));
     }
 
     private void verifyOnlySuccessfulWasCalled()

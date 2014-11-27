@@ -33,14 +33,6 @@ public interface MessageProcessContext
     boolean supportsAsynchronousProcessing();
 
     /**
-     * The flow processing phase will try execute in the current thread to avoid scheduling another thread
-     * based on this method.
-     *
-     * @return true if the work manager MUST be used to execute the flow processing, false otherwise.
-     */
-    boolean forceWorkManagerUsage();
-
-    /**
      * @return the {@link MessageSource} that retrieve the message. Can not be null
      */
     MessageSource getMessageSource();

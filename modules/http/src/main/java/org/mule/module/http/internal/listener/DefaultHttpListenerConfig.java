@@ -144,6 +144,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         initialised = true;
     }
 
+    //We use a WorkManagerSource since the workManager instance may be recreated during stop/start and it would leave the server with an invalid work manager instance.
     private WorkManagerSource createWorkManagerSource()
     {
         return new WorkManagerSource()

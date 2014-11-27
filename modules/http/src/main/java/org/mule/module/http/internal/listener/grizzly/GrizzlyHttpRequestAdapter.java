@@ -10,14 +10,12 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.HttpProtocol;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
@@ -25,9 +23,11 @@ import java.util.Collection;
 
 import javax.servlet.http.Part;
 
+import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.Protocol;
+import org.glassfish.grizzly.utils.BufferInputStream;
 
 public class GrizzlyHttpRequestAdapter implements HttpRequest
 {
@@ -43,11 +43,11 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     private HttpEntity body;
     private ParameterMap headers;
 
-    public GrizzlyHttpRequestAdapter(FilterChainContext filterChainContext, HttpRequestPacket request, InputStream content, int contentLength)
+    public GrizzlyHttpRequestAdapter(FilterChainContext filterChainContext, HttpRequestPacket request, Buffer content, int contentLength)
     {
         this.filterChainContext = filterChainContext;
         this.grizzlyRequest = request;
-        this.grizzlyContent = content;
+        this.grizzlyContent = new BufferInputStream(content);
         this.contentLength = contentLength;
     }
 

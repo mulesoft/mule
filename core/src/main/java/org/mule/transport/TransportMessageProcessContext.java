@@ -83,12 +83,6 @@ public class TransportMessageProcessContext implements MessageProcessContext
     }
 
     @Override
-    public boolean forceWorkManagerUsage()
-    {
-        return true;
-    }
-
-    @Override
     public WorkManager getFlowExecutionWorkManager()
     {
         return flowExecutionWorkManager;

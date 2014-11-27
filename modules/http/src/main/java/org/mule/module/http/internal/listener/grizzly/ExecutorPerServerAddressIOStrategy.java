@@ -22,7 +22,7 @@ import org.glassfish.grizzly.strategies.AbstractIOStrategy;
 /**
  * Grizzly IO Strategy that will handle each work to an specific {@link java.util.concurrent.Executor}
  * based on the {@link org.mule.module.http.internal.listener.ServerAddress} of a {@link org.glassfish.grizzly.Connection}.
- *
+ * <p/>
  * There's logic from {@link org.glassfish.grizzly.strategies.WorkerThreadIOStrategy} that need to be reused but unfortunately
  * that class cannot be override.
  */
@@ -37,9 +37,6 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
         this.executorProvider = executorProvider;
     }
 
-    /**
-     * Method copied form {@link org.glassfish.grizzly.strategies.WorkerThreadIOStrategy}
-     */
     @Override
     public boolean executeIoEvent(final Connection connection,
                                   final IOEvent ioEvent, final boolean isIoEventEnabled)
@@ -49,21 +46,28 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
         final boolean isReadOrWriteEvent = isReadWrite(ioEvent);
 
         final IOEventLifeCycleListener listener;
-        if (isReadOrWriteEvent) {
-            if (isIoEventEnabled) {
+        if (isReadOrWriteEvent)
+        {
+            if (isIoEventEnabled)
+            {
                 connection.disableIOEvent(ioEvent);
             }
 
             listener = ENABLE_INTEREST_LIFECYCLE_LISTENER;
-        } else {
+        }
+        else
+        {
             listener = null;
         }
 
         final Executor threadPool = getThreadPoolFor(connection, ioEvent);
-        if (threadPool != null) {
+        if (threadPool != null)
+        {
             threadPool.execute(
                     new WorkerThreadRunnable(connection, ioEvent, listener));
-        } else {
+        }
+        else
+        {
             run0(connection, ioEvent, listener);
         }
 
@@ -75,38 +79,37 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
     {
         final String hostName = ((InetSocketAddress) connection.getLocalAddress()).getHostName();
         final int port = ((InetSocketAddress) connection.getLocalAddress()).getPort();
-        return executorProvider.getExecutorFor(new ServerAddress(hostName, port));
+        return executorProvider.getExecutor(new ServerAddress(hostName, port));
     }
 
-    /**
-     * Method copied form {@link org.glassfish.grizzly.strategies.WorkerThreadIOStrategy}
-     */
     private static void run0(final Connection connection,
                              final IOEvent ioEvent,
-                             final IOEventLifeCycleListener lifeCycleListener) {
+                             final IOEventLifeCycleListener lifeCycleListener)
+    {
 
         fireIOEvent(connection, ioEvent, lifeCycleListener, logger);
 
     }
 
-    /**
-     * Class copied form {@link org.glassfish.grizzly.strategies.WorkerThreadIOStrategy}
-     */
-    private static final class WorkerThreadRunnable implements Runnable {
+    private static final class WorkerThreadRunnable implements Runnable
+    {
+
         final Connection connection;
         final IOEvent ioEvent;
         final IOEventLifeCycleListener lifeCycleListener;
 
         private WorkerThreadRunnable(final Connection connection,
                                      final IOEvent ioEvent,
-                                     final IOEventLifeCycleListener lifeCycleListener) {
+                                     final IOEventLifeCycleListener lifeCycleListener)
+        {
             this.connection = connection;
             this.ioEvent = ioEvent;
             this.lifeCycleListener = lifeCycleListener;
         }
 
         @Override
-        public void run() {
+        public void run()
+        {
             run0(connection, ioEvent, lifeCycleListener);
         }
     }
