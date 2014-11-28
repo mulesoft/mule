@@ -6,6 +6,7 @@
  */
 package org.mule.execution;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -102,6 +103,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                     @Override
                     public void execute() throws Exception
                     {
+                        ((DefaultMuleEvent) event).resetAccessControl();
                         exceptionListener.handleException(e, event);
                         phaseResultNotifier.phaseSuccessfully();
                     }
