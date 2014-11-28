@@ -6,8 +6,12 @@
  */
 package org.mule.util;
 
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,7 +19,10 @@ import org.apache.commons.logging.LogFactory;
 public final class NetworkUtils
 {
     private static final Log logger = LogFactory.getLog(NetworkUtils.class);
-    
+
+    private static final Map<String, String> ipPerHost = new ConcurrentHashMap<>();
+    private static InetAddress localHost;
+
     private NetworkUtils()
     {
         // utility class only
@@ -55,4 +62,39 @@ public final class NetworkUtils
 
         return isServerReachable;
     }
+
+    public static InetAddress getLocalHost() throws UnknownHostException
+    {
+        if (localHost == null)
+        {
+            localHost = InetAddress.getLocalHost();
+        }
+        return localHost;
+    }
+
+    /**
+     * Resolves a local IP for a host name.
+     *
+     * This method should not be used to resolve external host ips since it has a cache that
+     * can grow indefinitely.
+     *
+     * For performance reasons returns the ip and not the {@link java.net.InetAddress}
+     * since the {@link java.net.InetAddress} performs logic each time it has to resolve the
+     * host address.
+     *
+     * @param host the host name
+     * @return the host ip
+     * @throws UnknownHostException
+     */
+    public static String getLocalHostIp(String host) throws UnknownHostException
+    {
+        String ip = ipPerHost.get(host);
+        if (ip == null)
+        {
+            ip = InetAddress.getByName(host).getHostAddress();
+            ipPerHost.put(host, ip);
+        }
+        return ip;
+    }
+
 }
