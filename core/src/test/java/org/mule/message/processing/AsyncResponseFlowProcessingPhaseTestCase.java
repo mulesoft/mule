@@ -11,7 +11,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +18,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.WorkManager;
 import org.mule.execution.AsyncResponseFlowProcessingPhase;
 import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.MessageProcessContext;
@@ -30,8 +28,6 @@ import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import javax.resource.spi.work.Work;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -70,6 +66,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     @Before
     public void configureExpectedBehaviour() throws Exception
     {
+        when(mockTemplate.getMuleEvent()).thenReturn(mockMuleEvent);
         doAnswer(new Answer()
         {
             @Override
@@ -154,12 +151,13 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
-                callback.responseSentWithFailure(mockException, (MuleEvent) invocationOnMock.getArguments()[0]);
+                callback.responseSentWithFailure(mockException, mockMuleEvent);
                 return null;
             }
         }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
+        verify(mockMuleEvent).resetAccessControl();
         verifyOnlySuccessfulWasCalled();
     }
 
