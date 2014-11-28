@@ -49,9 +49,12 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             Object value = valueEvaluator.resolveValue(message);
             if (value == null)
             {
-                logger.info(MessageFormat.format(
-                        "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
-                        key, valueEvaluator.getRawValue()));
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(MessageFormat.format(
+                            "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
+                            key, valueEvaluator.getRawValue()));
+                }
             }
             else
             {
