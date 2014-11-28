@@ -621,6 +621,126 @@ public final class TlsConfiguration
     {
         this.keyAlias = keyAlias;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof TlsConfiguration))
+        {
+            return false;
+        }
+
+        TlsConfiguration that = (TlsConfiguration) o;
+
+        if (explicitTrustStoreOnly != that.explicitTrustStoreOnly)
+        {
+            return false;
+        }
+        if (requireClientAuthentication != that.requireClientAuthentication)
+        {
+            return false;
+        }
+        if (clientKeyStoreName != null ? !clientKeyStoreName.equals(that.clientKeyStoreName) : that.clientKeyStoreName != null)
+        {
+            return false;
+        }
+        if (clientKeyStorePassword != null ? !clientKeyStorePassword.equals(that.clientKeyStorePassword) : that.clientKeyStorePassword != null)
+        {
+            return false;
+        }
+        if (clientKeyStoreType != null ? !clientKeyStoreType.equals(that.clientKeyStoreType) : that.clientKeyStoreType != null)
+        {
+            return false;
+        }
+        if (keyAlias != null ? !keyAlias.equals(that.keyAlias) : that.keyAlias != null)
+        {
+            return false;
+        }
+        if (keyManagerAlgorithm != null ? !keyManagerAlgorithm.equals(that.keyManagerAlgorithm) : that.keyManagerAlgorithm != null)
+        {
+            return false;
+        }
+        if (keyManagerFactory != null ? !keyManagerFactory.equals(that.keyManagerFactory) : that.keyManagerFactory != null)
+        {
+            return false;
+        }
+        if (keyPassword != null ? !keyPassword.equals(that.keyPassword) : that.keyPassword != null)
+        {
+            return false;
+        }
+        if (keyStoreName != null ? !keyStoreName.equals(that.keyStoreName) : that.keyStoreName != null)
+        {
+            return false;
+        }
+        if (keyStorePassword != null ? !keyStorePassword.equals(that.keyStorePassword) : that.keyStorePassword != null)
+        {
+            return false;
+        }
+        if (keystoreType != null ? !keystoreType.equals(that.keystoreType) : that.keystoreType != null)
+        {
+            return false;
+        }
+        if (sslType != null ? !sslType.equals(that.sslType) : that.sslType != null)
+        {
+            return false;
+        }
+        if (tlsProperties != null ? !tlsProperties.equals(that.tlsProperties) : that.tlsProperties != null)
+        {
+            return false;
+        }
+        if (trustManagerAlgorithm != null ? !trustManagerAlgorithm.equals(that.trustManagerAlgorithm) : that.trustManagerAlgorithm != null)
+        {
+            return false;
+        }
+        if (trustManagerFactory != null ? !trustManagerFactory.equals(that.trustManagerFactory) : that.trustManagerFactory != null)
+        {
+            return false;
+        }
+        if (trustStoreName != null ? !trustStoreName.equals(that.trustStoreName) : that.trustStoreName != null)
+        {
+            return false;
+        }
+        if (trustStorePassword != null ? !trustStorePassword.equals(that.trustStorePassword) : that.trustStorePassword != null)
+        {
+            return false;
+        }
+        if (trustStoreType != null ? !trustStoreType.equals(that.trustStoreType) : that.trustStoreType != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = sslType != null ? sslType.hashCode() : 0;
+        int hashcodePrimeNumber = 31;
+        result = hashcodePrimeNumber * result + (keyStoreName != null ? keyStoreName.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (keyAlias != null ? keyAlias.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (keyPassword != null ? keyPassword.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (keyStorePassword != null ? keyStorePassword.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (keystoreType != null ? keystoreType.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (keyManagerAlgorithm != null ? keyManagerAlgorithm.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (keyManagerFactory != null ? keyManagerFactory.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (clientKeyStoreName != null ? clientKeyStoreName.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (clientKeyStorePassword != null ? clientKeyStorePassword.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (clientKeyStoreType != null ? clientKeyStoreType.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (trustStoreName != null ? trustStoreName.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (trustStorePassword != null ? trustStorePassword.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (trustStoreType != null ? trustStoreType.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (trustManagerAlgorithm != null ? trustManagerAlgorithm.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (trustManagerFactory != null ? trustManagerFactory.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (explicitTrustStoreOnly ? 1 : 0);
+        result = hashcodePrimeNumber * result + (requireClientAuthentication ? 1 : 0);
+        result = hashcodePrimeNumber * result + (tlsProperties != null ? tlsProperties.hashCode() : 0);
+        return result;
+    }
 }
 
 

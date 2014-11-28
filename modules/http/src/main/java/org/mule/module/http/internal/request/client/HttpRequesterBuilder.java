@@ -16,6 +16,8 @@ import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
+import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.util.ObjectNameHelper;
 
 public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequesterBuilder>
 {
@@ -23,6 +25,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 
     private final DefaultHttpRequester httpRequester;
     private final MuleContext muleContext;
+    private TlsContextFactory tlsContextFactory;
 
     public HttpRequesterBuilder(MuleContext muleContext)
     {
@@ -113,7 +116,18 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 
     public DefaultHttpRequester build() throws MuleException
     {
-        if (httpRequester.getConfig() == null)
+        if (httpRequester.getConfig() != null && tlsContextFactory != null)
+        {
+            throw new IllegalStateException("The request config and the TLS context factory cannot be configured at the same time");
+        }
+        if (tlsContextFactory != null)
+        {
+            DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
+            requesterConfig.setTlsContext(tlsContextFactory);
+            muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"), requesterConfig);
+            httpRequester.setConfig(requesterConfig);
+        }
+        else if (httpRequester.getConfig() == null)
         {
             DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
 
@@ -125,6 +139,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 
             httpRequester.setConfig(requestConfig);
         }
+
         httpRequester.initialise();
         return httpRequester;
     }
@@ -159,6 +174,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
         {
             httpRequester.setResponseTimeout(String.valueOf(operationOptions.getResponseTimeout()));
         }
+        this.tlsContextFactory = operationOptions.getTlsContextFactory();
         return this;
     }
 }

@@ -10,6 +10,7 @@ import org.mule.api.client.AbstractBaseOptionsBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.client.DefaultHttpRequestOptions;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 /**
  * Builder object for {@link org.mule.module.http.api.client.HttpRequestOptions}
@@ -23,6 +24,7 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
     private HttpRequesterConfig requestConfig;
     private boolean disableStatusCodeValidation;
     private boolean disableParseResponse;
+    private TlsContextFactory tlsContextFactory;
 
     private HttpRequestOptionsBuilder()
     {
@@ -98,13 +100,19 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
         return this;
     }
 
+    public HttpRequestOptionsBuilder tlsContextFactory(TlsContextFactory tlsContextFactory)
+    {
+        this.tlsContextFactory = tlsContextFactory;
+        return this;
+    }
+
     /**
      * @return a {@link org.mule.module.http.api.client.HttpRequestOptions} instance
      */
     @Override
     public HttpRequestOptions build()
     {
-        return new DefaultHttpRequestOptions(method, followsRedirect, requestStreamingMode, requestConfig, disableStatusCodeValidation, disableParseResponse, getResponseTimeout());
+        return new DefaultHttpRequestOptions(method, followsRedirect, requestStreamingMode, requestConfig, disableStatusCodeValidation, disableParseResponse, tlsContextFactory, getResponseTimeout());
     }
 
     /**
