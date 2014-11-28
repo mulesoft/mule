@@ -22,10 +22,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.client.SimpleOptionsBuilder;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +41,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
     private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
     private DefaultHttpRequesterConfig mockRequestConfig  = mock(DefaultHttpRequesterConfig.class, Answers.RETURNS_DEEP_STUBS.get());
+    private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class, Answers.RETURNS_DEEP_STUBS.get());
 
     private final HttpConnectorMessageProcessorProvider httpConnectorMessageProcessorProvider = new HttpConnectorMessageProcessorProvider();
 
@@ -122,7 +123,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
     private HttpRequestOptions createFullHttpRequestOptions()
     {
-        return newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse().disableStatusCodeValidation().method(POST.name()).requestConfig(mockRequestConfig).responseTimeout(1000).build();
+        return newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse().disableStatusCodeValidation().method(POST.name()).requestConfig(mockRequestConfig).tlsContextFactory(mockTlsContextFactory).responseTimeout(1000).build();
     }
 
 }

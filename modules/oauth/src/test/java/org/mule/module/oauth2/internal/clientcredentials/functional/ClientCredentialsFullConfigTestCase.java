@@ -14,6 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
 
 import org.mule.construct.Flow;
@@ -27,11 +28,16 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizationTestCase
 {
 
@@ -40,17 +46,30 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
     private static final String RESOURCE_PATH = "/resource";
     private static final String NEW_ACCESS_TOKEN = "abcdefghjkl";
     @Rule
-    public SystemProperty tokenUrl = new SystemProperty("token.url", String.format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
+    public SystemProperty tokenUrl = new SystemProperty("token.url", String.format("%s://localhost:%d" + TOKEN_PATH, getProtocol(), oauthHttpsServerPort.getNumber()));
     @Rule
     public SystemProperty customTokenResponseParameter1Name = new SystemProperty("custom.param.extractor1", "token-resp-param1");
     @Rule
     public SystemProperty customTokenResponseParameter2Name = new SystemProperty("custom.param.extractor2", "token-resp-param2");
 
+    private String configFile;
 
     @Override
     protected String getConfigFile()
     {
-        return "client-credentials/client-credentials-full-config.xml";
+        return configFile;
+    }
+
+    public ClientCredentialsFullConfigTestCase(String configFile)
+    {
+        this.configFile = configFile;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml"},
+                             new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml"});
     }
 
     @Override
@@ -106,5 +125,11 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
 
         wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
                                     .withHeader(HttpHeaders.Names.AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
+    }
+
+    @Override
+    protected String getProtocol()
+    {
+        return HTTPS;
     }
 }

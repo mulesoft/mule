@@ -16,7 +16,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager;
-import org.mule.transport.ssl.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.concurrent.ThreadNameHelper;

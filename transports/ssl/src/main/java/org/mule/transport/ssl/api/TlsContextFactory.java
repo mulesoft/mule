@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.ssl;
+package org.mule.transport.ssl.api;
 
 import org.mule.api.lifecycle.CreateException;
 
