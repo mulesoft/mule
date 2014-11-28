@@ -21,7 +21,7 @@ import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.module.http.internal.request.ProxyConfig;
-import org.mule.transport.ssl.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.StringUtils;
 

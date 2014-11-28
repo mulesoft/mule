@@ -22,6 +22,7 @@ import org.mule.module.oauth2.api.RequestAuthenticationException;
 import org.mule.module.oauth2.internal.AbstractGrantType;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 /**
  * Authorization element for client credentials oauth grant type
@@ -34,6 +35,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     private ClientCredentialsTokenRequestHandler tokenRequestHandler;
     private MuleContext muleContext;
     private TokenManagerConfig tokenManager;
+    private TlsContextFactory tlsContextFactory;
 
     public void setClientId(final String clientId)
     {
@@ -48,6 +50,16 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     public void setTokenRequestHandler(final ClientCredentialsTokenRequestHandler tokenRequestHandler)
     {
         this.tokenRequestHandler = tokenRequestHandler;
+    }
+
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContextFactory;
+    }
+
+    public void setTlsContext(TlsContextFactory tlsContextFactory)
+    {
+        this.tlsContextFactory = tlsContextFactory;
     }
 
     @Override
@@ -75,6 +87,10 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
         }
         tokenRequestHandler.setApplicationCredentials(this);
         tokenRequestHandler.setTokenManager(tokenManager);
+        if (tlsContextFactory != null)
+        {
+            tokenRequestHandler.setTlsContextFactory(tlsContextFactory);
+        }
     }
 
     @Override

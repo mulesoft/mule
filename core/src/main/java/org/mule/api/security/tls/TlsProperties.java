@@ -12,6 +12,7 @@ import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -69,5 +70,39 @@ public class TlsProperties
         {
             logger.warn(String.format("Cannot read file %s, using default configuration", fileName), e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        TlsProperties that = (TlsProperties) o;
+
+        if (!Arrays.equals(enabledCipherSuites, that.enabledCipherSuites))
+        {
+            return false;
+        }
+        if (!Arrays.equals(enabledProtocols, that.enabledProtocols))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = enabledCipherSuites != null ? Arrays.hashCode(enabledCipherSuites) : 0;
+        result = 31 * result + (enabledProtocols != null ? Arrays.hashCode(enabledProtocols) : 0);
+        return result;
     }
 }

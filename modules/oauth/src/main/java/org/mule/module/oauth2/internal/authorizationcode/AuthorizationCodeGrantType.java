@@ -10,7 +10,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.module.oauth2.internal.ApplicationCredentials;
 import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
-import org.mule.transport.ssl.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.util.AttributeEvaluator;
 
 /**
@@ -59,6 +59,6 @@ public interface AuthorizationCodeGrantType extends ApplicationCredentials
     /**
      * @return the tls configuration to use for listening and sending http request
      */
-    TlsContextFactory getTlsContextFactory();
+    TlsContextFactory getTlsContext();
 
 }

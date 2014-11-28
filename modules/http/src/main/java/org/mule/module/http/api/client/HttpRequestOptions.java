@@ -9,6 +9,7 @@ package org.mule.module.http.api.client;
 import org.mule.api.client.OperationOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 /**
  * Options that can be configured for making an HTTP request using {@link org.mule.api.client.MuleClient}
@@ -52,6 +53,11 @@ public interface HttpRequestOptions extends OperationOptions
      * @return true if should not validate the status code
      */
     boolean isStatusCodeValidationDisabled();
+
+    /**
+     * @return the TLS configuration for making the request
+     */
+    TlsContextFactory getTlsContextFactory();
 
 
 }

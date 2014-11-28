@@ -22,7 +22,7 @@ import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.transport.ssl.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.Preconditions;
@@ -198,6 +198,12 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     public String getHost()
     {
         return host;
+    }
+
+    @Override
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContext;
     }
 
     @Override

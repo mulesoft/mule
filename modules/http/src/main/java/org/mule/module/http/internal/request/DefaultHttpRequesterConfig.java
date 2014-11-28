@@ -16,7 +16,7 @@ import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
-import org.mule.transport.ssl.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 
