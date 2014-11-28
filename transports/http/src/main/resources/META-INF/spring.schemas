@@ -8,6 +8,8 @@ http\://www.mulesoft.org/schema/mule/http/3.4/mule-http.xsd=META-INF/mule-http.x
 http\://www.mulesoft.org/schema/mule/https/3.4/mule-https.xsd=META-INF/mule-https.xsd
 http\://www.mulesoft.org/schema/mule/http/3.5/mule-http.xsd=META-INF/mule-http.xsd
 http\://www.mulesoft.org/schema/mule/https/3.5/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/3.6/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.6/mule-https.xsd=META-INF/mule-https.xsd
 http\://www.mulesoft.org/schema/mule/http/current/mule-http.xsd=META-INF/mule-http.xsd
 http\://www.mulesoft.org/schema/mule/https/current/mule-https.xsd=META-INF/mule-https.xsd
 

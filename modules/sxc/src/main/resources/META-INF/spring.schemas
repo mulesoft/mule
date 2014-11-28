@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/sxc/3.2/mule-sxc.xsd=META-INF/mule-sxc.xsd
 http\://www.mulesoft.org/schema/mule/sxc/3.3/mule-sxc.xsd=META-INF/mule-sxc.xsd
 http\://www.mulesoft.org/schema/mule/sxc/3.4/mule-sxc.xsd=META-INF/mule-sxc.xsd
 http\://www.mulesoft.org/schema/mule/sxc/3.5/mule-sxc.xsd=META-INF/mule-sxc.xsd
+http\://www.mulesoft.org/schema/mule/sxc/3.6/mule-sxc.xsd=META-INF/mule-sxc.xsd
 http\://www.mulesoft.org/schema/mule/sxc/current/mule-sxc.xsd=META-INF/mule-sxc.xsd

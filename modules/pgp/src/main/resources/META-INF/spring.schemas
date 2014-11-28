@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/pgp/3.2/mule-pgp.xsd=META-INF/mule-pgp.xsd
 http\://www.mulesoft.org/schema/mule/pgp/3.3/mule-pgp.xsd=META-INF/mule-pgp.xsd
 http\://www.mulesoft.org/schema/mule/pgp/3.4/mule-pgp.xsd=META-INF/mule-pgp.xsd
 http\://www.mulesoft.org/schema/mule/pgp/3.5/mule-pgp.xsd=META-INF/mule-pgp.xsd
+http\://www.mulesoft.org/schema/mule/pgp/3.6/mule-pgp.xsd=META-INF/mule-pgp.xsd
 http\://www.mulesoft.org/schema/mule/pgp/current/mule-pgp.xsd=META-INF/mule-pgp.xsd
