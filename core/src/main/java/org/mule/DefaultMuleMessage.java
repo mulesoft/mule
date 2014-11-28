@@ -469,17 +469,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             }
             else
             {
-                logger.warn("setProperty(key, value) called with null value; removing key: " + key
-                        + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
-                        new Throwable());
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("setProperty(key, value) called with null value; removing key: " + key);
+                }
                 properties.removeProperty(key);
             }
         }
         else
         {
-            logger.warn("setProperty(key, value) ignored because of null key for object: " + value
-                    + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
-                    new Throwable());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("setProperty(key, value) invoked with null key. Ignoring this entry");
+            }
         }
     }
 
