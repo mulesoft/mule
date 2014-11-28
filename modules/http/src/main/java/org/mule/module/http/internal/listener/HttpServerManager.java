@@ -20,7 +20,7 @@ public interface HttpServerManager
 
     /**
      * @param serverAddress address of the server
-     * @return true if there's a server created for that host and port already, false otherwise.
+     * @return true if there's already a server created for that port and either the same host or an overlapping one (0.0.0.0 or any other if the serverAddress host is 0.0.0.0), false otherwise.
      */
     boolean containsServerFor(ServerAddress serverAddress);
 
