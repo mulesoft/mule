@@ -145,7 +145,7 @@
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://www.mulesoft.org</productUrl>
-        <dev.list>dev@mule.codehaus.org</dev.list>
+        <dev.list>mule-esb@mulesoft.com</dev.list>
 
         <!--
              Use the name of an Eclipse Java execution environment, Eclipse will
