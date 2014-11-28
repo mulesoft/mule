@@ -10,7 +10,6 @@ package org.mule.module.http.internal.listener;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -26,12 +25,12 @@ import com.google.common.collect.Iterables;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.ExecutorService;
 
 public class HttpListenerConnectionManager implements Initialisable, Disposable, MuleContextAware
 {
 
     public static final String HTTP_LISTENER_CONNECTION_MANAGER = "_httpListenerConnectionManager";
+    public static final String SERVER_ALREADY_EXISTS_FORMAT = "A server in port(%s) already exists for host(%s) or one overlapping it (0.0.0.0).";
 
     private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
     private HttpServerManager httpServerManager;
@@ -91,7 +90,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(SERVER_ALREADY_EXISTS_FORMAT, serverAddress.getPort(), serverAddress.getHost())));
         }
     }
 
@@ -110,7 +109,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(SERVER_ALREADY_EXISTS_FORMAT, serverAddress.getPort(), serverAddress.getHost())));
         }
     }
 

@@ -9,9 +9,9 @@ package org.mule.module.http.internal.listener.grizzly;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.module.http.internal.listener.ServerAddressMap;
 import org.mule.module.http.internal.listener.ServerAddress;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
@@ -22,7 +22,7 @@ import java.util.concurrent.Executor;
 public class WorkManagerSourceExecutorProvider implements ExecutorProvider
 {
 
-    private Map<ServerAddress, WorkManagerSource> executorPerServerAddress = new ConcurrentHashMap<>();
+    private ServerAddressMap<WorkManagerSource> executorPerServerAddress = new ServerAddressMap<>(new ConcurrentHashMap<ServerAddress, WorkManagerSource>());
 
     /**
      * Adds an {@link java.util.concurrent.Executor} to be used when a request is made to
@@ -41,13 +41,7 @@ public class WorkManagerSourceExecutorProvider implements ExecutorProvider
     {
         try
         {
-            Executor executorService = executorPerServerAddress.get(serverAddress).getWorkManager();
-            if (executorService == null)
-            {
-                //if there's no executor service found for the specific address, we need to check if there's one for all interfaces address.
-                executorService = executorPerServerAddress.get(new ServerAddress("0.0.0.0", serverAddress.getPort())).getWorkManager();
-            }
-            return executorService;
+            return executorPerServerAddress.get(serverAddress).getWorkManager();
         }
         catch (MuleException e)
         {

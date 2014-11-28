@@ -132,7 +132,19 @@ public class GrizzlyServerManager implements HttpServerManager
     @Override
     public boolean containsServerFor(final ServerAddress serverAddress)
     {
-        return servers.containsKey(serverAddress);
+        return servers.containsKey(serverAddress) || containsOverlappingServerFor(serverAddress);
+    }
+
+    private boolean containsOverlappingServerFor(ServerAddress newServerAddress)
+    {
+        for (ServerAddress serverAddress : servers.keySet())
+        {
+            if (serverAddress.overlaps(newServerAddress))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Server createSslServerFor(TlsContextFactory tlsContextFactory, WorkManagerSource workManagerSource, final ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException
@@ -141,7 +153,7 @@ public class GrizzlyServerManager implements HttpServerManager
         {
             logger.debug("Creating https server socket for host %s and path %s", serverAddress.getHost(), serverAddress.getPort());
         }
-        if (servers.containsKey(servers))
+        if (servers.containsKey(serverAddress))
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
@@ -159,7 +171,7 @@ public class GrizzlyServerManager implements HttpServerManager
         {
             logger.debug("Creating http server socket for host %s and path %s", serverAddress.getHost(), serverAddress.getPort());
         }
-        if (servers.containsKey(servers))
+        if (servers.containsKey(serverAddress))
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
