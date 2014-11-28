@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/client/3.2/mule-client.xsd=META-INF/mule-cl
 http\://www.mulesoft.org/schema/mule/client/3.3/mule-client.xsd=META-INF/mule-client.xsd
 http\://www.mulesoft.org/schema/mule/client/3.4/mule-client.xsd=META-INF/mule-client.xsd
 http\://www.mulesoft.org/schema/mule/client/3.5/mule-client.xsd=META-INF/mule-client.xsd
+http\://www.mulesoft.org/schema/mule/client/3.6/mule-client.xsd=META-INF/mule-client.xsd
 http\://www.mulesoft.org/schema/mule/client/current/mule-client.xsd=META-INF/mule-client.xsd

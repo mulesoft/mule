@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/stdio/3.2/mule-stdio.xsd=META-INF/mule-stdi
 http\://www.mulesoft.org/schema/mule/stdio/3.3/mule-stdio.xsd=META-INF/mule-stdio.xsd
 http\://www.mulesoft.org/schema/mule/stdio/3.4/mule-stdio.xsd=META-INF/mule-stdio.xsd
 http\://www.mulesoft.org/schema/mule/stdio/3.5/mule-stdio.xsd=META-INF/mule-stdio.xsd
+http\://www.mulesoft.org/schema/mule/stdio/3.6/mule-stdio.xsd=META-INF/mule-stdio.xsd
 http\://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd=META-INF/mule-stdio.xsd
