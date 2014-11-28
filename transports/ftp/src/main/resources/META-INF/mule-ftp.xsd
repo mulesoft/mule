@@ -10,11 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/file"
-                schemaLocation="http://www.mulesoft.org/schema/mule/file/3.5/mule-file.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/file/3.6/mule-file.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.6/mule.xsd"/>
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.6/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>

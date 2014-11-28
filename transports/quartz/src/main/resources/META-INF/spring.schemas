@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/quartz/3.2/mule-quartz.xsd=META-INF/mule-qu
 http\://www.mulesoft.org/schema/mule/quartz/3.3/mule-quartz.xsd=META-INF/mule-quartz.xsd
 http\://www.mulesoft.org/schema/mule/quartz/3.4/mule-quartz.xsd=META-INF/mule-quartz.xsd
 http\://www.mulesoft.org/schema/mule/quartz/3.5/mule-quartz.xsd=META-INF/mule-quartz.xsd
+http\://www.mulesoft.org/schema/mule/quartz/3.6/mule-quartz.xsd=META-INF/mule-quartz.xsd
 http\://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd=META-INF/mule-quartz.xsd

@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/xmpp/3.2/mule-xmpp.xsd=META-INF/mule-xmpp.x
 http\://www.mulesoft.org/schema/mule/xmpp/3.3/mule-xmpp.xsd=META-INF/mule-xmpp.xsd
 http\://www.mulesoft.org/schema/mule/xmpp/3.4/mule-xmpp.xsd=META-INF/mule-xmpp.xsd
 http\://www.mulesoft.org/schema/mule/xmpp/3.5/mule-xmpp.xsd=META-INF/mule-xmpp.xsd
+http\://www.mulesoft.org/schema/mule/xmpp/3.6/mule-xmpp.xsd=META-INF/mule-xmpp.xsd
 http\://www.mulesoft.org/schema/mule/xmpp/current/mule-xmpp.xsd=META-INF/mule-xmpp.xsd

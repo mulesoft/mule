@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd=META-INF/mule-jdbc.x
 http\://www.mulesoft.org/schema/mule/jdbc/3.3/mule-jdbc.xsd=META-INF/mule-jdbc.xsd
 http\://www.mulesoft.org/schema/mule/jdbc/3.4/mule-jdbc.xsd=META-INF/mule-jdbc.xsd
 http\://www.mulesoft.org/schema/mule/jdbc/3.5/mule-jdbc.xsd=META-INF/mule-jdbc.xsd
+http\://www.mulesoft.org/schema/mule/jdbc/3.6/mule-jdbc.xsd=META-INF/mule-jdbc.xsd
 http\://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd=META-INF/mule-jdbc.xsd
