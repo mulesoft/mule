@@ -79,6 +79,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnection(true);
+        builder.setRemoveQueryParamsOnRedirect(false);
 
         configureTlsContext(builder);
 
