@@ -10,6 +10,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.FileUtils;
 
 import java.io.IOException;
 
@@ -17,6 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,12 +31,19 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+    @Rule
+    public DynamicPort httpsPort = new DynamicPort("httpsPort");
 
     private static final String REDIRECTED = "Redirected.";
     private static final String MOVED = "Moved.";
     private static final String FLOW_VAR_KEY = "redirect";
 
+    private static final String MOVED_URI = "/testPath";
+    private static final String REDIRECT_URI = "/redirect";
+    private static final String REDIRECT_WITH_PARAMS_URI = REDIRECT_URI + "?param1=value1&param2=value2";
+
     private MuleEvent testEvent;
+    private boolean addParams = false;
 
     @Before
     public void setUp() throws Exception
@@ -46,78 +58,137 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
     }
 
     @Override
+    protected Server createServer()
+    {
+        Server server = super.createServer();
+        SslContextFactory sslContextFactory = new SslContextFactory();
+
+        try
+        {
+            sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("serverKeystore", getClass()));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        sslContextFactory.setKeyStorePassword("mulepassword");
+        sslContextFactory.setKeyManagerPassword("mulepassword");
+
+        ServerConnector connector = new ServerConnector(server, sslContextFactory);
+        connector.setPort(httpsPort.getNumber());
+        server.addConnector(connector);
+
+        return server;
+    }
+
+    @Override
     protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        if(baseRequest.getUri().getPath().equals("/redirect"))
+        extractBaseRequestParts(baseRequest);
+        if(baseRequest.getUri().getPath().startsWith("/redirect"))
         {
             response.getWriter().print(REDIRECTED);
         }
         else
         {
-            response.setHeader("Location", String.format("http://localhost:%s/redirect", httpPort.getNumber()));
+            response.setHeader("Location", String.format("http://localhost:%s%s", httpPort.getNumber(), getRedirectUri()));
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             response.getWriter().print(MOVED);
+        }
+    }
+
+    private String getRedirectUri()
+    {
+        if (addParams)
+        {
+            return REDIRECT_WITH_PARAMS_URI;
+        }
+        else
+        {
+            return REDIRECT_URI;
         }
     }
 
     @Test
     public void followRedirectsByDefault() throws Exception
     {
-        testRedirect("default", REDIRECTED);
+        testRedirect("default", REDIRECTED, REDIRECT_URI);
+    }
+
+    @Test
+    public void followRedirectsHttps() throws Exception
+    {
+        testRedirect("followRedirectsHttps", REDIRECTED, REDIRECT_URI);
     }
 
     @Test
     public void followRedirectsTrueInRequestElement() throws Exception
     {
-        testRedirect("followRedirects", REDIRECTED);
+        testRedirect("followRedirects", REDIRECTED, REDIRECT_URI);
     }
 
     @Test
     public void followRedirectsFalseInRequestElement() throws Exception
     {
-        testRedirect("dontFollowRedirects", MOVED);
+        testRedirect("dontFollowRedirects", MOVED, MOVED_URI);
     }
 
     @Test
     public void followRedirectsWithBooleanExpression() throws Exception
     {
-        testRedirectExpression("followRedirectsExpression", MOVED, false);
+        testRedirectExpression("followRedirectsExpression", MOVED, MOVED_URI, false);
     }
 
     @Test
     public void followRedirectsWithStringExpression() throws Exception
     {
-        testRedirectExpression("followRedirectsExpression",MOVED, "false");
+        testRedirectExpression("followRedirectsExpression",MOVED, MOVED_URI, "false");
     }
 
     @Test
     public void followRedirectsFalseInRequestConfigElement() throws Exception
     {
-        testRedirect("fromConfig", MOVED);
+        testRedirect("fromConfig", MOVED, MOVED_URI);
     }
 
     @Test
     public void followRedirectsOverride() throws Exception
     {
-        testRedirect("overrideConfig", REDIRECTED);
+        testRedirect("overrideConfig", REDIRECTED, REDIRECT_URI);
     }
 
     @Test
     public void followRedirectsExpressionInRequestConfigElement() throws Exception
     {
-        testRedirectExpression("fromConfigExpression", MOVED, false);
+        testRedirectExpression("fromConfigExpression", REDIRECTED, REDIRECT_URI, true);
     }
 
-    private void testRedirectExpression(String flowName, String expectedPayload, Object flowVar) throws Exception
+    @Test
+    public void followRedirectsWithParamsByDefault() throws Exception
+    {
+        addParams = true;
+        testRedirect("default", REDIRECTED, REDIRECT_WITH_PARAMS_URI);
+    }
+
+    @Test
+    public void followRedirectsWithParamsHttps() throws Exception
+    {
+        addParams = true;
+        testRedirect("followRedirectsHttps", REDIRECTED, REDIRECT_WITH_PARAMS_URI);
+    }
+
+    private void testRedirectExpression(String flowName, String expectedPayload, String expectedPath, Object flowVar) throws Exception
     {
         testEvent.setFlowVariable(FLOW_VAR_KEY, flowVar);
-        testRedirect(flowName, expectedPayload);
+        testRedirect(flowName, expectedPayload, expectedPath);
     }
 
-    private void testRedirect(String flowName, String expectedPayload) throws Exception
+    private void testRedirect(String flowName, String expectedPayload, String expectedPath) throws Exception
     {
         Flow flow = (Flow) getFlowConstruct(flowName);
         flow.process(testEvent);
         assertThat(testEvent.getMessage().getPayloadAsString(), is(expectedPayload));
+        assertThat(uri, is(expectedPath));
     }
 }
