@@ -30,6 +30,12 @@ import java.util.Collection;
 
 import javax.activation.DataHandler;
 
+/**
+ * Maps an HTTP response into a Mule event. A new message is set in the event with the contents of the response.
+ * The body will be set as payload by default (except that the target attribute is set in the requester, in that case
+ * the enricher expression provided will be used to set the response). Headers are mapped as inbound properties.
+ * The status code is mapped as an inbound property {@code HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY}.
+ */
 public class HttpResponseToMuleEvent
 {
     private DefaultHttpRequester requester;
@@ -46,6 +52,8 @@ public class HttpResponseToMuleEvent
 
     public void convert(MuleEvent muleEvent, HttpResponse response) throws MessagingException
     {
+        muleEvent.setMessage(new DefaultMuleMessage(muleEvent.getMessage().getPayload(), muleContext));
+
         String responseContentType = response.getHeaderValue(HttpHeaders.Names.CONTENT_TYPE.toLowerCase());
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
