@@ -7,9 +7,12 @@
 package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.api.transport.PropertyScope.INBOUND;
 import org.mule.api.MuleEvent;
+import org.mule.construct.Flow;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,6 +80,18 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     {
         runFlow("requestFlow", TEST_MESSAGE);
         assertThat(uri, equalTo("/basePath/requestPath"));
+    }
+
+    @Test
+    public void previousInboundPropertiesAreCleared() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.getMessage().setProperty("TestInboundProperty", "TestValue", INBOUND);
+
+        Flow flow = (Flow) getFlowConstruct("requestFlow");
+        event = flow.process(event);
+
+        assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
     }
 
     @Override

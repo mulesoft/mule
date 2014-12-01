@@ -9,10 +9,18 @@ package org.mule.module.http.functional.requester;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.FileUtils;
+import org.mule.util.CaseInsensitiveMapWrapper;
 import org.mule.util.IOUtils;
 
+import com.google.common.base.Supplier;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
+
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -20,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.EnumerationUtils;
-import org.apache.commons.collections.map.MultiValueMap;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -44,7 +51,16 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     protected String method;
     protected String uri;
-    protected MultiValueMap headers = new MultiValueMap();
+    protected Multimap<String, String> headers =
+            Multimaps.newMultimap(new CaseInsensitiveMapWrapper<Collection<String>>(HashMap.class), new Supplier<Collection<String>>()
+            {
+                @Override
+                public Collection<String> get()
+                {
+                    return Sets.newHashSet();
+                }
+            });
+
     protected String body;
 
     @Before
@@ -154,6 +170,6 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     public String getFirstReceivedHeader(String headerName)
     {
-        return (String) headers.getCollection(headerName).iterator().next();
+        return (String) headers.get(headerName).iterator().next();
     }
 }
