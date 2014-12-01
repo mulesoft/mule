@@ -50,6 +50,9 @@ public class HttpResponseToMuleEvent
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
 
+        // Clear any previous inbound properties
+        muleEvent.getMessage().clearProperties(PropertyScope.INBOUND);
+
         // Map headers in the response as inbound properties
         for (String headerName : response.getHeaderNames())
         {
