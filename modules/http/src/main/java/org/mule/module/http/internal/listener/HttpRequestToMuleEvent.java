@@ -23,6 +23,7 @@ import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import com.google.common.net.MediaType;
 
@@ -35,6 +36,8 @@ import javax.activation.DataHandler;
 
 public class HttpRequestToMuleEvent
 {
+
+    public static final String X_FORWARDED_FOR_HEADER_NAME = "X-Forwarded-For";
 
     public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, String listenerPath)
     {
@@ -60,7 +63,7 @@ public class HttpRequestToMuleEvent
                 .setProtocol(request.getProtocol().asString())
                 .setUri(request.getUri())
                 .setListenerPath(listenerPath)
-                .setRemoteHostAddress(requestContext.getRemoteHostAddress().toString())
+                .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
                 .setScheme(requestContext.getScheme())
                 .addPropertiesTo(inboundProperties);
 
@@ -111,4 +114,10 @@ public class HttpRequestToMuleEvent
         return new DefaultMuleEvent(defaultMuleMessage, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
     }
 
+    private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)
+    {
+        return StringUtils.defaultIfEmpty(
+                requestContext.getRequest().getHeaderValue(X_FORWARDED_FOR_HEADER_NAME),
+                requestContext.getRemoteHostAddress().toString());
+    }
 }

@@ -7,13 +7,14 @@
 package org.mule.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.HttpProtocol;
+import org.mule.module.http.internal.listener.HttpRequestToMuleEvent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -116,7 +117,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         assertThat(retrivedQueryParams.size(), is(1));
         assertThat(retrivedQueryParams.get(QUERY_PARAM_NAME), is(QUERY_PARAM_VALUE));
         assertThat(retrivedQueryParams.getAsList(QUERY_PARAM_NAME).size(), is(2));
-        assertThat(retrivedQueryParams.getAsList(QUERY_PARAM_NAME), Matchers.containsInAnyOrder(new String[]{QUERY_PARAM_VALUE, QUERY_PARAM_SECOND_VALUE}));
+        assertThat(retrivedQueryParams.getAsList(QUERY_PARAM_NAME), Matchers.containsInAnyOrder(new String[] {QUERY_PARAM_VALUE, QUERY_PARAM_SECOND_VALUE}));
     }
 
     @Test
@@ -195,6 +196,22 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         assertThat(uriParams, notNullValue());
         assertThat(uriParams.size(), is(1));
         assertThat(uriParams.get(FIRST_URI_PARAM_NAME), is(uriParamValue));
+    }
+
+    @Test
+    public void xForwardedForHeader() throws Exception
+    {
+        final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+
+        Request.Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
+        final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS), startsWith("/127.0.0.1:"));
+
+        Request.Post(url)
+                .addHeader(HttpRequestToMuleEvent.X_FORWARDED_FOR_HEADER_NAME, "/192.1.2.3:1234")
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
+        final MuleMessage forwardedMessage = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
+        assertThat(forwardedMessage.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS), is("/192.1.2.3:1234"));
     }
 
     public String buildQueryString(Map<String, Object> queryParams) throws UnsupportedEncodingException
