@@ -80,7 +80,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
 
         flow.process(event);
 
-        final Collection<String> values = headers.getCollection("testName1");
+        final Collection<String> values = headers.get("testName1");
         assertThat(values, Matchers.containsInAnyOrder(Arrays.asList("testValue1", "testValueNew").toArray(new String[2])));
         assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
     }

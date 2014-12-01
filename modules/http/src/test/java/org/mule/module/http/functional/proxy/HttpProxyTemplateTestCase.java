@@ -227,7 +227,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
 
-        assertThat(httpResponse.getFirstHeader("MyCustomHeaderName").getValue(), is("MyCustomHeaderValue"));
+        assertThat(getFirstReceivedHeader("MyCustomHeaderName"), is("MyCustomHeaderValue"));
 
         Set<String> lowerCaseHeaderNames = new HashSet<>();
         for(Header header : httpResponse.getAllHeaders())
