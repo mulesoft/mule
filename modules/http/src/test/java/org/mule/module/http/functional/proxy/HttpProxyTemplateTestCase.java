@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.functional.TestInputStream;
 import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
-import org.mule.module.http.internal.listener.HttpRequestToMuleEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 import org.mule.util.concurrent.Latch;
@@ -252,7 +251,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
 
-        assertThat(httpResponse.getFirstHeader(HttpRequestToMuleEvent.X_FORWARDED_FOR_HEADER_NAME).getValue(), startsWith("/127.0.0.1:"));
+        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.X_FORWARDED_FOR).getValue(), startsWith("/127.0.0.1:"));
     }
 
     private void assertRequestOk(String url, String expectedResponse) throws IOException

@@ -6,15 +6,17 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.apache.http.client.fluent.Request.Post;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.HttpProtocol;
-import org.mule.module.http.internal.listener.HttpRequestToMuleEvent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -80,7 +82,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         assertThat(queryParams.size(), is(0));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY), is("GET"));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY), is(HttpProtocol.HTTP_1_1.asString()));
-        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS), is(CoreMatchers.notNullValue()));
+        assertThat(message.<String>getInboundProperty(HTTP_REMOTE_ADDRESS), is(CoreMatchers.notNullValue()));
     }
 
     @Test
@@ -127,7 +129,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
                 .put(QUERY_PARAM_NAME, QUERY_PARAM_VALUE_WITH_SPACES)
                 .build();
         final String url = String.format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
-        Request.Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
+        Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         ParameterMap retrivedQueryParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS);
         assertThat(retrivedQueryParams, IsNull.notNullValue());
@@ -162,7 +164,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
     public void getAllUriParams() throws Exception
     {
         final String url = String.format("http://localhost:%s/%s/%s/%s", listenPort.getNumber(), FIRST_URI_PARAM, SECOND_URI_PARAM_VALUE, THIRD_URI_PARAM_VALUE);
-        Request.Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
+        Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         ParameterMap uriParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS);
         assertThat(uriParams, IsNull.notNullValue());
@@ -176,7 +178,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
     public void getUriParamInTheMiddle() throws Exception
     {
         final String url = String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), FIRST_URI_PARAM);
-        Request.Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
+        Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         ParameterMap uriParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS);
         assertThat(uriParams, IsNull.notNullValue());
@@ -190,7 +192,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         final String uriParamValue = "uri param value";
         final String uriParamValueEncoded = URLEncoder.encode(uriParamValue, Charsets.UTF_8.displayName());
         final String url = String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), uriParamValueEncoded);
-        Request.Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
+        Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         ParameterMap uriParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS);
         assertThat(uriParams, notNullValue());
@@ -203,15 +205,15 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
     {
         final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
 
-        Request.Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
+        Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
-        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS), startsWith("/127.0.0.1:"));
+        assertThat(message.<String>getInboundProperty(HTTP_REMOTE_ADDRESS), startsWith("/127.0.0.1:"));
 
-        Request.Post(url)
-                .addHeader(HttpRequestToMuleEvent.X_FORWARDED_FOR_HEADER_NAME, "/192.1.2.3:1234")
+        Post(url)
+                .addHeader(HttpHeaders.Names.X_FORWARDED_FOR, "/192.1.2.3:1234")
                 .connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage forwardedMessage = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
-        assertThat(forwardedMessage.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS), is("/192.1.2.3:1234"));
+        assertThat(forwardedMessage.<String>getInboundProperty(HTTP_REMOTE_ADDRESS), is("/192.1.2.3:1234"));
     }
 
     public String buildQueryString(Map<String, Object> queryParams) throws UnsupportedEncodingException
