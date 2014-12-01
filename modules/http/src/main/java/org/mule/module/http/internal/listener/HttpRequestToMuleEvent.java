@@ -37,8 +37,6 @@ import javax.activation.DataHandler;
 public class HttpRequestToMuleEvent
 {
 
-    public static final String X_FORWARDED_FOR_HEADER_NAME = "X-Forwarded-For";
-
     public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, String listenerPath)
     {
         final HttpRequest request = requestContext.getRequest();
@@ -117,7 +115,7 @@ public class HttpRequestToMuleEvent
     private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)
     {
         return StringUtils.defaultIfEmpty(
-                requestContext.getRequest().getHeaderValue(X_FORWARDED_FOR_HEADER_NAME),
+                requestContext.getRequest().getHeaderValue(HttpHeaders.Names.X_FORWARDED_FOR),
                 requestContext.getRemoteHostAddress().toString());
     }
 }
