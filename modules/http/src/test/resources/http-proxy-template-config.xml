@@ -17,6 +17,8 @@
         <remove-property propertyName="http.*" />
         <copy-attachments attachmentName="*" />
 
+        <set-property propertyName="X-Forwarded-For" value="#[message.inboundProperties['http.remote.address']]" />
+
         <http:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false" >
             <http:request-builder>
                 <http:query-params expression="#[message.inboundProperties['http.query.params']]" />

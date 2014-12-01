@@ -241,6 +241,18 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         assertThat(lowerCaseHeaderNames.size(), is(httpResponse.getAllHeaders().length));
     }
 
+    @Test
+    public void setXForwardedForHeader() throws Exception
+    {
+        handlerExtender = null;
+
+        Response response = Request.Get(getProxyUrl(""))
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
+        HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+
+        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.X_FORWARDED_FOR).getValue(), startsWith("/127.0.0.1:"));
+    }
 
     private void assertRequestOk(String url, String expectedResponse) throws IOException
     {

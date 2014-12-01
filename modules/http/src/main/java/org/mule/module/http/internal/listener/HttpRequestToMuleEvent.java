@@ -23,6 +23,7 @@ import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import com.google.common.net.MediaType;
 
@@ -60,7 +61,7 @@ public class HttpRequestToMuleEvent
                 .setProtocol(request.getProtocol().asString())
                 .setUri(request.getUri())
                 .setListenerPath(listenerPath)
-                .setRemoteHostAddress(requestContext.getRemoteHostAddress().toString())
+                .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
                 .setScheme(requestContext.getScheme())
                 .addPropertiesTo(inboundProperties);
 
@@ -111,4 +112,10 @@ public class HttpRequestToMuleEvent
         return new DefaultMuleEvent(defaultMuleMessage, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
     }
 
+    private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)
+    {
+        return StringUtils.defaultIfEmpty(
+                requestContext.getRequest().getHeaderValue(HttpHeaders.Names.X_FORWARDED_FOR),
+                requestContext.getRemoteHostAddress().toString());
+    }
 }
