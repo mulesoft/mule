@@ -14,10 +14,10 @@
         <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
     </tls:context>
 
-    <http:request-config name="globalConfig" host="localhost" port="${httpPort}" tlsContext-ref="globalTlsContext" />
+    <http:request-config name="globalConfig" host="localhost" port="${httpsPort}" tlsContext-ref="globalTlsContext" />
 
 
-    <http:request-config name="nestedConfig" host="localhost" port="${httpPort}">
+    <http:request-config name="nestedConfig" host="localhost" port="${httpsPort}">
         <tls:context>
             <tls:trust-store path="trustStore" password="mulepassword"/>
             <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword"/>

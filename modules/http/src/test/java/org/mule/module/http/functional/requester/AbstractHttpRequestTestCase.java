@@ -8,6 +8,7 @@ package org.mule.module.http.functional.requester;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -22,7 +23,9 @@ import org.apache.commons.collections.EnumerationUtils;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,6 +35,8 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
+    @Rule
+    public DynamicPort httpsPort = new DynamicPort("httpsPort");
 
     public static final String DEFAULT_RESPONSE = "<h1>Response</h1>";
 
@@ -58,7 +63,38 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     protected Server createServer()
     {
-        return new Server(httpPort.getNumber());
+        Server server = new Server(httpPort.getNumber());
+        if (enableHttps())
+        {
+            enableHttpsServer(server);
+        }
+        return server;
+    }
+
+    protected boolean enableHttps()
+    {
+        return false;
+    }
+
+    private void enableHttpsServer(Server server)
+    {
+        SslContextFactory sslContextFactory = new SslContextFactory();
+
+        try
+        {
+            sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("serverKeystore", getClass()));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        sslContextFactory.setKeyStorePassword("mulepassword");
+        sslContextFactory.setKeyManagerPassword("mulepassword");
+
+        ServerConnector connector = new ServerConnector(server, sslContextFactory);
+        connector.setPort(httpsPort.getNumber());
+        server.addConnector(connector);
     }
 
     protected AbstractHandler createHandler(Server server)
