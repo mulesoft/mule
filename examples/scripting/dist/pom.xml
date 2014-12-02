@@ -9,7 +9,7 @@
     <description>A simple example that demonstrates Mule's JSR-223 Scripting support.</description>
 
     <properties>
-        <muleVersion>3.3.4-SNAPSHOT</muleVersion>
+        <muleVersion>3.3.5-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>

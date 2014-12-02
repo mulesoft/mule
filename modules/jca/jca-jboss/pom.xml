@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.modules.jca</groupId>
         <artifactId>mule-module-jca-parent</artifactId>
-        <version>3.3.4-SNAPSHOT</version>
+        <version>3.3.5-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-jca-jboss</artifactId>
     <name>JCA Resource Adapter for JBoss</name>
