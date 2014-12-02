@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static org.mule.module.http.internal.HttpParser.normalizePathWithSpaces;
+import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
@@ -89,7 +89,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         public synchronized RequestHandlerManager addRequestHandler(final ListenerRequestMatcher requestMatcher, final RequestHandler requestHandler)
         {
             pathMapSearchCache.invalidateAll();
-            String requestMatcherPath = normalizePathWithSpaces(requestMatcher.getPath());
+            String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
             Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER), "path parameter must start with /");
             validateCollision(requestMatcher);
             PathMap currentPathMap = rootPathMap;
@@ -189,7 +189,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
-            final String path = normalizePathWithSpaces(request.getPath());
+            final String path = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
             Preconditions.checkArgument(path.startsWith(SLASH), "path parameter must start with /");
             Stack<PathMap> foundPaths = findPossibleRequestHandlersFromCache(path);
 

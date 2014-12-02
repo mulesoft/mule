@@ -262,7 +262,7 @@ public class HttpParser
      * @param path path with encoded spaces or raw spaces
      * @return path with only spaces.
      */
-    public static String normalizePathWithSpaces(String path)
+    public static String normalizePathWithSpacesOrEncodedSpaces(String path)
     {
         return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
     }

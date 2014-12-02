@@ -8,7 +8,7 @@ package org.mule.module.http.internal;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.internal.HttpParser.normalizePathWithSpaces;
+import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -23,11 +23,11 @@ public class HttpParserTestCase extends AbstractMuleTestCase
     public void normalizePath()
     {
         String expectedNormalizedPath = " some path";
-        assertThat(normalizePathWithSpaces(expectedNormalizedPath), is(expectedNormalizedPath));
-        assertThat(normalizePathWithSpaces("%20some%20path"), is(expectedNormalizedPath));
-        assertThat(normalizePathWithSpaces("+some+path"), is(expectedNormalizedPath));
-        assertThat(normalizePathWithSpaces("%20some+path"), is(expectedNormalizedPath));
-        assertThat(normalizePathWithSpaces("+some%20path"), is(expectedNormalizedPath));
+        assertThat(normalizePathWithSpacesOrEncodedSpaces(expectedNormalizedPath), is(expectedNormalizedPath));
+        assertThat(normalizePathWithSpacesOrEncodedSpaces("%20some%20path"), is(expectedNormalizedPath));
+        assertThat(normalizePathWithSpacesOrEncodedSpaces("+some+path"), is(expectedNormalizedPath));
+        assertThat(normalizePathWithSpacesOrEncodedSpaces("%20some+path"), is(expectedNormalizedPath));
+        assertThat(normalizePathWithSpacesOrEncodedSpaces("+some%20path"), is(expectedNormalizedPath));
     }
 
 }
