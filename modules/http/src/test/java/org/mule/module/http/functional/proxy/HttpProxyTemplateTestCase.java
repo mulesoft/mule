@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.functional.TestInputStream;
 import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
@@ -227,7 +228,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
 
-        assertThat(httpResponse.getFirstHeader("MyCustomHeaderName").getValue(), is("MyCustomHeaderValue"));
+        assertThat(getFirstReceivedHeader("MyCustomHeaderName"), is("MyCustomHeaderValue"));
 
         Set<String> lowerCaseHeaderNames = new HashSet<>();
         for(Header header : httpResponse.getAllHeaders())
@@ -251,7 +252,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
 
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.X_FORWARDED_FOR).getValue(), startsWith("/127.0.0.1:"));
+        assertThat(getFirstReceivedHeader(X_FORWARDED_FOR), startsWith("/127.0.0.1:"));
     }
 
     private void assertRequestOk(String url, String expectedResponse) throws IOException
