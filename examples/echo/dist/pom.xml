@@ -10,7 +10,7 @@
     <description>This example shows how to add message processing components, in this example Logger and Echo, to a Flow. By doing so, you can perform custom logging in your Mule application. Logging is useful to introspect the current message and create logging events for your specific needs.</description>
 
     <properties>
-        <muleVersion>3.3.4-SNAPSHOT</muleVersion>
+        <muleVersion>3.3.4</muleVersion>
     </properties>
 
     <dependencies>
