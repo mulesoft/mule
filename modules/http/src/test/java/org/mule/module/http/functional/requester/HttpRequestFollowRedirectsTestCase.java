@@ -10,8 +10,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.FileUtils;
 
 import java.io.IOException;
 
@@ -19,9 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,8 +26,6 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    @Rule
-    public DynamicPort httpsPort = new DynamicPort("httpsPort");
 
     private static final String REDIRECTED = "Redirected.";
     private static final String MOVED = "Moved.";
@@ -58,28 +51,9 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
     }
 
     @Override
-    protected Server createServer()
+    protected boolean enableHttps()
     {
-        Server server = super.createServer();
-        SslContextFactory sslContextFactory = new SslContextFactory();
-
-        try
-        {
-            sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("serverKeystore", getClass()));
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        sslContextFactory.setKeyStorePassword("mulepassword");
-        sslContextFactory.setKeyManagerPassword("mulepassword");
-
-        ServerConnector connector = new ServerConnector(server, sslContextFactory);
-        connector.setPort(httpsPort.getNumber());
-        server.addConnector(connector);
-
-        return server;
+        return true;
     }
 
     @Override
