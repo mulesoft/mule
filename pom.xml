@@ -209,8 +209,8 @@
         <jodaTimeVersion>2.5</jodaTimeVersion>
         <jschVersion>0.1.51</jschVersion>
         <junitVersion>4.11</junitVersion>
-        <log4jVersion>2.0.2</log4jVersion>
-        <disruptorVersion>3.2.1</disruptorVersion>
+        <log4jVersion>2.1</log4jVersion>
+        <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.9.5</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
