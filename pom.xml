@@ -1680,22 +1680,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-test-jar</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipExportTests}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
 
             <!-- Global test exclusions -->
             <plugin>
@@ -1754,6 +1738,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipExportTests}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
                 <configuration>
                     <archive>
                         <!--
