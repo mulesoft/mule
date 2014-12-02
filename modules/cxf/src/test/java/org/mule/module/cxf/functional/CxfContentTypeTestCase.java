@@ -8,18 +8,24 @@ package org.mule.module.cxf.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class CxfContentTypeTestCase extends FunctionalTestCase
 {
     private static final String requestPayload =
@@ -35,10 +41,21 @@ public class CxfContentTypeTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Parameterized.Parameter(0)
+    public String configFile;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"cxf-echo-service-conf.xml"},
+                {"cxf-echo-service-conf-httpn.xml"}});
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "cxf-echo-service-conf.xml";
+        return configFile;
     }
 
     @Test
@@ -46,7 +63,7 @@ public class CxfContentTypeTestCase extends FunctionalTestCase
     {
         MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
         MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request);
+        MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         String contentType = received.getInboundProperty("content-type");
         assertNotNull(contentType);
         assertTrue(contentType.contains("charset"));
@@ -62,4 +79,5 @@ public class CxfContentTypeTestCase extends FunctionalTestCase
         assertNotNull(contentType);
         assertTrue(contentType.contains("charset"));
     }
+
 }

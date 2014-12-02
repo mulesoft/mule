@@ -16,26 +16,43 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
+@RunWith(Parameterized.class)
 public class ProxyServiceImportTypesMule7883 extends FunctionalTestCase
 {
 
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
 
+    @Parameterized.Parameter(0)
+    public String config;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"issues/proxy-wsdl-import-conf.xml"},
+                {"issues/proxy-wsdl-import-conf-httpn.xml"}
+        });
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "issues/proxy-wsdl-import-conf.xml";
+        return config;
     }
 
     @Test

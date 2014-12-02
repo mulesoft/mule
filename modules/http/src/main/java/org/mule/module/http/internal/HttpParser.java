@@ -150,18 +150,25 @@ public class HttpParser
             String[] pairs = encodedString.split("&");
             for (String pair : pairs) {
                 int idx = pair.indexOf("=");
-                try
+                if (idx != -1)
                 {
-                    queryParams.put(URLDecoder.decode(pair.substring(0, idx), encoding), URLDecoder.decode(pair.substring(idx + 1), encoding));
+                    addParam(queryParams, pair.substring(0, idx), pair.substring(idx + 1), encoding);
                 }
-                catch (UnsupportedEncodingException e)
+                else
                 {
-                    throw new MuleRuntimeException(e);
+                    addParam(queryParams, pair, null, encoding);
+
                 }
             }
         }
         return queryParams;
     }
+
+    private static void addParam(ParameterMap queryParams, String name, String value, String encoding)
+    {
+        queryParams.put(decode(name, encoding), decode(value, encoding));
+    }
+
 
     public static String encodeString(String encoding, Map parameters)
     {
@@ -208,27 +215,36 @@ public class HttpParser
      */
     public static ParameterMap decodeUriParams(String pathWithUriParams, String requestPath)
     {
-        try
+        ParameterMap uriParams = new ParameterMap();
+        if (pathWithUriParams.contains("{"))
         {
-            ParameterMap uriParams = new ParameterMap();
-            if (pathWithUriParams.contains("{"))
+            final String[] requestPathParts = requestPath.split("/");
+            final String[] listenerPathParts = pathWithUriParams.split("/");
+            int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
+            //split will return an empty string as first path before /
+            for (int i = 1; i < longerPathSize; i++)
             {
-                final String[] requestPathParts = requestPath.split("/");
-                final String[] listenerPathParts = pathWithUriParams.split("/");
-                int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
-                //split will return an empty string as first path before /
-                for (int i = 1; i < longerPathSize; i++)
+                final String listenerPart = listenerPathParts[i];
+                if (listenerPart.startsWith("{") && listenerPart.endsWith("}"))
                 {
-                    final String listenerPart = listenerPathParts[i];
-                    if (listenerPart.startsWith("{") && listenerPart.endsWith("}"))
-                    {
-                        String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
-                        String parameterValue = requestPathParts[i];
-                        uriParams.put(parameterName, URLDecoder.decode(parameterValue, Charsets.UTF_8.displayName()));
-                    }
+                    String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
+                    String parameterValue = requestPathParts[i];
+                    uriParams.put(parameterName, decode(parameterValue, Charsets.UTF_8.displayName()));
                 }
             }
-            return uriParams;
+        }
+        return uriParams;
+    }
+
+    private static String decode(String text, String encoding)
+    {
+        if(text == null)
+        {
+            return null;
+        }
+        try
+        {
+            return URLDecoder.decode(text, encoding);
         }
         catch (UnsupportedEncodingException e)
         {

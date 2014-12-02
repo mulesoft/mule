@@ -6,6 +6,9 @@
  */
 package org.mule.module.cxf;
 
+import static org.mule.module.cxf.HttpRequestPropertyManager.getBasePath;
+import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
+import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
@@ -25,7 +28,6 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -131,8 +132,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         // if http request
-        String requestPath = parseHttpRequestProperty(event.getMessage().getInboundProperty(
-            HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY));
+        String requestPath = parseHttpRequestProperty(getRequestPath(event.getMessage()));
         try
         {
             if (requestPath.indexOf('?') > -1)
@@ -218,11 +218,11 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private String getUri(MuleEvent event)
     {
-        URI epUri = event.getMessageSourceURI();
-        String host = event.getMessage().getInboundProperty("Host", epUri.getHost());
-        String ctx = event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        String scheme = getScheme(event);
+        String host = event.getMessage().getInboundProperty("Host");
+        String ctx = getRequestPath(event.getMessage());
 
-        return epUri.getScheme() + "://" + host + ctx;
+        return scheme + "://" + host + ctx;
     }
 
     protected MuleEvent sendToDestination(MuleEvent event) throws MuleException, IOException
@@ -249,7 +249,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             {
                 m.put(Message.HTTP_REQUEST_METHOD, method);
                 m.put(Message.PATH_INFO, path);
-                Object basePath = muleReqMsg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+                String basePath = getBasePath(muleReqMsg);
                 m.put(Message.BASE_PATH, basePath);
 
                 method = method.toUpperCase();

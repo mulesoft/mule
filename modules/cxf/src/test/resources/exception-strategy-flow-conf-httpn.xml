@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <custom-transformer name="throwsException" class="org.mule.module.cxf.ExceptionStrategyTestCase$CxfTransformerThrowsExceptions"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
+
+    <!-- Test Service -->
+
+    <!-- Jaxws Service with exception thrown by component with default exception strategy -->
+    <flow name="FlowServiceFault">
+        <http:listener path="testServiceWithFault" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.TestServiceFaultImpl"/>
+        <component class="org.mule.module.cxf.TestServiceFaultImpl" />
+        <default-exception-strategy/>
+    </flow>
+
+    <!-- Jaxws Service with exception thrown by transformer with default exception strategy -->
+    <flow name="FlowServiceFaultTransformerException">
+        <http:listener path="testServiceWithException" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+        <transformer ref="throwsException"/>
+        <default-exception-strategy/>
+    </flow>
+
+    <!-- End testing Service -->
+    <!-- Test Client -->
+
+    <flow name="helloFlow">
+        <http:listener path="hello" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+    </flow>
+
+    <flow name="helloFault">
+        <http:listener path="helloFault" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.TestServiceFault"/>
+        <component class="org.mule.module.cxf.TestServiceFaultImpl" />
+    </flow>
+
+    <flow name="FlowWithClientWithFaultDefaultException" processingStrategy="synchronous">
+        <inbound-endpoint address="vm://testClientWithFaultDefaultException" exchange-pattern="request-response"/>
+        <processor-chain>
+            <cxf:jaxws-client serviceClass="org.mule.module.cxf.TestServiceFault" operation="sayHi"/>
+            <http:request path="helloFault" method="POST" config-ref="requestConfig">
+                <http:success-status-code-validator values="0..599"/>
+            </http:request>
+        </processor-chain>
+        <object-to-string-transformer/>
+        <append-string-transformer message="APPEND"/>
+        <transformer ref="throwsException"/>
+        <default-exception-strategy/>
+    </flow>
+
+    <flow name="FlowWithClientAndTransformerExceptionDefaultException" processingStrategy="synchronous">
+        <inbound-endpoint address="vm://testClientTransformerExceptionDefaultException" exchange-pattern="request-response"/>
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <http:request path="hello" method="POST" config-ref="requestConfig"/>
+        <object-to-string-transformer/>
+        <append-string-transformer message="APPEND"/>
+        <transformer ref="throwsException"/>
+        <default-exception-strategy/>
+    </flow>
+
+    <!-- End testing Client -->
+
+    <!-- Test Proxy -->
+
+    <flow name="FlowProxyWithTransformerExceptionDefaultStrategy">
+        <http:listener path="proxyExceptionStrategy" config-ref="listenerConfig"/>
+        <cxf:proxy-service/>
+
+        <transformer ref="throwsException"/>
+
+        <cxf:proxy-client />
+        <http:request path="hello" method="POST" config-ref="requestConfig"/>
+        <default-exception-strategy/>
+    </flow>
+
+    <!-- End testing Proxy -->
+
+</mule>
