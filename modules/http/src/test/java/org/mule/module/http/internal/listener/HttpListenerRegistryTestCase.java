@@ -47,6 +47,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     public static final String ROOT_PATH = PATH_SEPARATOR;
     public static final String FIRST_LEVEL_PATH_LOWER_CASE = "/first-level-path";
     public static final String FIRST_LEVEL_PATH_UPPER_CASE = "/FIRST_LEVEL_PATH";
+    public static final String FIRST_LEVEL_PATH_UPPER_CASE_CATCH_ALL = "/FIRST_LEVEL_PATH/*";
     public static final String SECOND_LEVEL_PATH = "/first-level-path/second-level";
     public static final String FIRST_LEVEL_URI_PARAM = PATH_SEPARATOR + URI_PARAM;
     public static final String FIRST_LEVEL_CATCH_ALL = "/*";
@@ -253,6 +254,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         routePath(FIRST_LEVEL_PATH_LOWER_CASE + PATH_SEPARATOR, FIRST_LEVEL_PATH_LOWER_CASE);
         routePath(FIRST_LEVEL_PATH_UPPER_CASE, FIRST_LEVEL_PATH_UPPER_CASE);
         routePath(FIRST_LEVEL_PATH_UPPER_CASE + PATH_SEPARATOR, FIRST_LEVEL_PATH_UPPER_CASE);
+        routePath(FIRST_LEVEL_PATH_UPPER_CASE + "/somethingElse", FIRST_LEVEL_PATH_UPPER_CASE_CATCH_ALL);
         routePath(SECOND_LEVEL_PATH, SECOND_LEVEL_PATH);
         routePath(SECOND_LEVEL_URI_PARAM.replace(URI_PARAM, "1"), SECOND_LEVEL_URI_PARAM);
         routePath(FOURTH_LEVEL_CATCH_ALL.replace(WILDCARD_CHARACTER, StringUtils.EMPTY), FOURTH_LEVEL_CATCH_ALL);
@@ -298,6 +300,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         requestHandlerPerPath.put(FIRST_LEVEL_CATCH_ALL, mock(RequestHandler.class));
         requestHandlerPerPath.put(FIRST_LEVEL_PATH_LOWER_CASE, mock(RequestHandler.class));
         requestHandlerPerPath.put(FIRST_LEVEL_PATH_UPPER_CASE, mock(RequestHandler.class));
+        requestHandlerPerPath.put(FIRST_LEVEL_PATH_UPPER_CASE_CATCH_ALL, mock(RequestHandler.class));
         requestHandlerPerPath.put(SECOND_LEVEL_PATH, mock(RequestHandler.class));
         requestHandlerPerPath.put(SECOND_LEVEL_URI_PARAM, mock(RequestHandler.class));
         requestHandlerPerPath.put(FOURTH_LEVEL_CATCH_ALL, mock(RequestHandler.class));
