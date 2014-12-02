@@ -6,8 +6,11 @@
  */
 package org.mule.module.http.internal;
 
+import static org.mule.util.StringUtils.WHITE_SPACE;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.multipart.HttpPart;
+import org.mule.util.StringUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -34,10 +37,12 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 
 public class HttpParser
 {
+
+    private static final String SPACE_ENTITY = "%20";
+    private static final String PLUS_SIGN = "\\+";
     private static final String CONTENT_DISPOSITION_PART_HEADER = "Content-Disposition";
     private static final String NAME_ATTRIBUTE = "name";
 
@@ -249,5 +254,16 @@ public class HttpParser
         {
             throw new MuleRuntimeException(e);
         }
+    }
+
+    /**
+     * Normalize a path that may contains spaces, %20 or +.
+     *
+     * @param path path with encoded spaces or raw spaces
+     * @return path with only spaces.
+     */
+    public static String normalizePathWithSpaces(String path)
+    {
+        return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
     }
 }

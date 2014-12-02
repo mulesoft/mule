@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.internal.HttpParser.normalizePathWithSpaces;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.request.HttpRequest;
@@ -87,7 +89,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         public synchronized RequestHandlerManager addRequestHandler(final ListenerRequestMatcher requestMatcher, final RequestHandler requestHandler)
         {
             pathMapSearchCache.invalidateAll();
-            String requestMatcherPath = requestMatcher.getPath();
+            String requestMatcherPath = normalizePathWithSpaces(requestMatcher.getPath());
             Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER), "path parameter must start with /");
             validateCollision(requestMatcher);
             PathMap currentPathMap = rootPathMap;
@@ -187,7 +189,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
-            final String path = request.getPath();
+            final String path = normalizePathWithSpaces(request.getPath());
             Preconditions.checkArgument(path.startsWith(SLASH), "path parameter must start with /");
             Stack<PathMap> foundPaths = findPossibleRequestHandlersFromCache(path);
 
@@ -246,8 +248,8 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 {
                     if (pathMap != null)
                     {
-                        foundPaths.push(pathMap);
                         addCatchAllPathMapIfNotNull(pathMap, foundPaths);
+                        foundPaths.push(pathMap);
                     }
                     else
                     {
@@ -333,11 +335,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
          */
         public PathMap getChildPathMap(final String subPath)
         {
-            if (isCatchAllPath(subPath))
-            {
-                return getCatchAllPathMap();
-            }
-            if (isUriParameter(subPath))
+            if (isCatchAllPath(subPath) || isUriParameter(subPath))
             {
                 return getCatchAllCurrentPathMap();
             }
