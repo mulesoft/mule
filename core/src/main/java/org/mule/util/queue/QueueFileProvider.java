@@ -23,7 +23,7 @@ import java.math.BigInteger;
 public class QueueFileProvider
 {
 
-    public static final String OPEN_FILE_OPTIONS = "rw";
+    public static final String OPEN_FILE_OPTIONS = "rws";
     public static final String UTF_8_ENCODING = "UTF-8";
     private final boolean newFile;
     private File file;
