@@ -238,7 +238,40 @@ public final class ExceptionHelper
         return mappings.getProperty(ERROR_CODE_PROPERTY);
     }
 
+    /**
+     * Maps an exception thrown for a certain protocol to an error.
+     * When there's no specific error for such transport it will return a generic error.
+     * Most likely the returned error is an integer code.
+     *
+     * @param protocol scheme for the transport
+     * @param exception exception mapped to error
+     * @param muleContext the application context
+     * @return the error for exception for the specific protocol
+     */
     public static String getErrorMapping(String protocol, Class exception, MuleContext muleContext)
+    {
+        String code = getTransportErrorMapping(protocol, exception, muleContext);
+        if (code != null)
+        {
+            return code;
+        }
+        code = String.valueOf(getErrorCode(exception));
+        // Finally lookup mapping based on error code and return the Mule error
+        // code if a match is not found
+        return getErrorMappings(protocol, muleContext).getProperty(code, code);
+    }
+
+    /**
+     *
+     * Maps an exception thrown for a certain protocol to an error.
+     * Most likely the returned error is an integer code.
+     *
+     * @param protocol scheme for the transport
+     * @param exception exception mapped to error
+     * @param muleContext the application context
+     * @return the error for exception for the specific protocol
+     */
+    public static String getTransportErrorMapping(String protocol, Class exception, MuleContext muleContext)
     {
         protocol = protocol.toLowerCase();
         Properties mappings = getErrorMappings(protocol, muleContext);
@@ -262,10 +295,7 @@ public final class ExceptionHelper
                 return code;
             }
         }
-        code = String.valueOf(getErrorCode(exception));
-        // Finally lookup mapping based on error code and return the Mule error
-        // code if a match is not found
-        return mappings.getProperty(code, code);
+        return null;
     }
 
     public static String getJavaDocUrl(Class<?> exception)
