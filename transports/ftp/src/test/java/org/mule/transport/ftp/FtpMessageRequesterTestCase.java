@@ -27,6 +27,7 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
 {
     private static final String TEST_FILE_NAME = "test.txt";
     private static final String TEST_FILE_NAME_2 = "_test.txt";
+    private static final String separator = "/";
     public FtpMessageRequesterTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -61,7 +62,7 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         createFileOnFtpServer(TEST_FILE_NAME);
         
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.request(getMuleFtpEndpoint() + '/' + TEST_FILE_NAME, getTimeout());
+        MuleMessage message = client.request(getMuleFtpEndpoint() + separator + TEST_FILE_NAME, getTimeout());
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());
         assertEquals(TEST_FILE_NAME, message.getInboundProperty("originalFilename"));
@@ -78,13 +79,13 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         createFileOnFtpServer(TEST_FILE_NAME_2);
         
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.request(getMuleFtpEndpoint() + '/' + TEST_FILE_NAME, getTimeout());
+        MuleMessage message = client.request(getMuleFtpEndpoint() + separator + TEST_FILE_NAME, getTimeout());
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());
         assertEquals(TEST_FILE_NAME, message.getInboundProperty("originalFilename"));
         
         // retrieve file 2
-        MuleMessage message2 = client.request(getMuleFtpEndpoint() + '/' + TEST_FILE_NAME_2, getTimeout());
+        MuleMessage message2 = client.request(getMuleFtpEndpoint() + separator + TEST_FILE_NAME_2, getTimeout());
         assertNotNull(message2);
         assertEquals(TEST_MESSAGE, message2.getPayloadAsString());
         assertEquals(TEST_FILE_NAME_2, message2.getInboundProperty("originalFilename"));
@@ -102,7 +103,7 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         MuleClient client = muleContext.getClient();
         try{
             
-            MuleMessage message = client.request(getMuleFtpEndpoint() + '/' + TEST_FILE_NAME_2, getTimeout());
+            MuleMessage message = client.request(getMuleFtpEndpoint() + separator + TEST_FILE_NAME_2, getTimeout());
         } catch(Exception e){
             Assert.assertTrue(e instanceof ReceiveException);
         }

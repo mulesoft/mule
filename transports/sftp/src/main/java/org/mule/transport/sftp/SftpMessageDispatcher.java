@@ -106,20 +106,24 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
             // choose appropriate writing mode
             if (sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND))
             {
-                if (event.getMessage().getPayload() instanceof OutputHandler) {
+                if (event.getMessage().getPayload() instanceof OutputHandler)
+                {
                 	client.storeFile(transferFilename, event, (OutputHandler)event.getMessage().getPayload(), SftpClient.WriteMode.APPEND);            	
                 }
-                else {
+                else 
+                {
                     inputStream = generateInputStream(event);
                 	client.storeFile(transferFilename, inputStream, SftpClient.WriteMode.APPEND);
                 }
             }
             else
             {
-                if (event.getMessage().getPayload() instanceof OutputHandler) {
+                if (event.getMessage().getPayload() instanceof OutputHandler) 
+                {
                 	client.storeFile(transferFilename, event, (OutputHandler)event.getMessage().getPayload());            	
                 }
-                else {
+                else 
+                {
                     inputStream = generateInputStream(event);
                     client.storeFile(transferFilename, inputStream);
                 }
@@ -157,7 +161,8 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
                 connector.releaseClient(endpoint, client);
             }
 
-            if (inputStream != null) {
+            if (inputStream != null) 
+            {
             	inputStream.close();
             }
 

@@ -246,10 +246,7 @@ public class SftpClient
     public void deleteFile(String fileName) throws IOException
     {
         // Notify sftp delete file action
-        if (notifier != null)
-        {
-            notifier.notify(SFTP_DELETE_ACTION, currentDirectory + "/" + fileName);
-        }
+    	notifyAction(SFTP_DELETE_ACTION, fileName);
 
         try
         {
@@ -382,10 +379,7 @@ public class SftpClient
         {
 
             // Notify sftp put file action
-            if (notifier != null)
-            {
-                notifier.notify(SFTP_PUT_ACTION, currentDirectory + "/" + fileName);
-            }
+        	notifyAction(SFTP_PUT_ACTION, fileName);
 
             if (logger.isDebugEnabled())
             {
@@ -396,7 +390,6 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            logger.error("Error writing data over SFTP service, error was: " + e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
     }
@@ -408,28 +401,30 @@ public class SftpClient
     
     public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler, WriteMode mode) throws IOException
     {
+    	OutputStream os = null;
         try
         {
 
             // Notify sftp put file action
-            if (notifier != null)
-            {
-                notifier.notify(SFTP_PUT_ACTION, currentDirectory + "/" + fileName);
-            }
-
+        	notifyAction(SFTP_PUT_ACTION, fileName);
+        	
             if (logger.isDebugEnabled())
             {
                 logger.debug("Sending to SFTP service: OutputHandler = " + outputHandler + " , filename = " + fileName);
             }
             
-            OutputStream os = channelSftp.put(fileName, mode.intValue());
+            os = channelSftp.put(fileName, mode.intValue());
             outputHandler.write(event, os);
-            os.close();
         }
         catch (SftpException e)
         {
-            logger.error("Error writing data over SFTP service, error was: " + e.getMessage(), e);
             throw new IOException(e.getMessage());
+        }
+        finally {
+        	if (os != null) 
+        	{
+        		os.close();
+        	}
         }
     }
     
@@ -450,6 +445,13 @@ public class SftpClient
         }
     }
 
+    private void notifyAction(int action, String fileName) {
+        if (notifier != null)
+        {
+            notifier.notify(action, currentDirectory + "/" + fileName);
+        }    	
+    }
+    
     public long getSize(String filename) throws IOException
     {
         try
