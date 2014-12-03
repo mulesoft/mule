@@ -75,6 +75,15 @@
         <echo-component />
     </flow>
 
+    <flow name="httpListenerFlowNestedErrorBuilder">
+        <http:listener config-ref="httpConfig" path="/nestedError">
+            <http:error-response-builder statusCode="200">
+                <http:header headerName="testHeader" value="testValue" />
+            </http:error-response-builder>
+        </http:listener>
+        <test:component throwException="true" />
+    </flow>
+
     <http:response-builder name="globalResponseBuilder">
         <http:header headerName="testHeader" value="testValue" />
     </http:response-builder>
@@ -86,6 +95,15 @@
             </http:response-builder>
         </http:listener>
         <echo-component />
+    </flow>
+
+    <flow name="httpListenerFlowGlobalErrorBuilder">
+        <http:listener config-ref="httpConfig" path="/globalError">
+            <http:error-response-builder statusCode="200">
+                <http:builder ref="globalResponseBuilder" />
+            </http:error-response-builder>
+        </http:listener>
+        <test:component throwException="true" />
     </flow>
 
 

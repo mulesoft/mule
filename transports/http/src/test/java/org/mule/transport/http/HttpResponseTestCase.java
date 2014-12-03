@@ -116,6 +116,18 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/global");
     }
 
+    @Test
+    public void headersAreAddedWithNestedErrorResponseBuilderFromHttpModule() throws Exception
+    {
+        assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/nestedError");
+    }
+
+    @Test
+    public void headersAreAddedWithGlobalErrorResponseBuilderFromHttpModule() throws Exception
+    {
+        assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/globalError");
+    }
+
 
     private void assertHeaderInResponse(String url) throws Exception
     {
