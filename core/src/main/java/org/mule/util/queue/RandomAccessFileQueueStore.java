@@ -7,14 +7,10 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleRuntimeException;
-import org.mule.util.FileUtils;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -271,7 +267,7 @@ class RandomAccessFileQueueStore
         {
             if (getSize() > 0)
             {
-                queueFileProvider.getRandomAccessFile().seek(fileTotalSpace);
+                queueFileProvider.getRandomAccessFile().seek(queueFileProvider.getRandomAccessFile().length());
             }
             long filePointer = queueFileProvider.getRandomAccessFile().getFilePointer();
             int totalBytesRequired = CONTROL_DATA_SIZE + data.length;
