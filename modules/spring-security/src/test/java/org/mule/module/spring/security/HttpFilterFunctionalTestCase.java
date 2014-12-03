@@ -9,6 +9,7 @@ package org.mule.module.spring.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
@@ -22,10 +23,15 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
+@RunWith(Parameterized.class)
+public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 {
+
+    private final String configFile;
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
@@ -33,19 +39,25 @@ public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-filter-test.xml"}
+            {"http-transport-filter-test.xml"},
+            {"http-module-filter-test.xml"}
         });
     }
 
-    public HttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+    public HttpFilterFunctionalTestCase(String configFile)
     {
-        super(variant, configResources);
-
+        this.configFile = configFile;
     }
 
     protected String getUrl()
     {
         return "http://localhost:" + port1.getNumber() + "/authenticate";
+    }
+
+    @Override
+    protected String getConfigFile()
+    {
+        return configFile;
     }
 
     @Test

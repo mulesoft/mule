@@ -8,6 +8,7 @@ package org.mule.module.http.internal.listener;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.MessagingException;
@@ -66,6 +67,7 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase
         MuleEvent testEvent = mock(MuleEvent.class);
         when(testEvent.getMessage()).thenReturn(testMessage);
 
+        when(testEvent.getMuleContext()).thenReturn(mock(MuleContext.class, RETURNS_DEEP_STUBS));
         return testEvent;
     }
 
