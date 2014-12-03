@@ -22,9 +22,9 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
 
     private EmbeddedJettyServer httpServer;
 
-    public ServletHttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+    public ServletHttpFilterFunctionalTestCase(String configResources)
     {
-        super(variant, configResources);
+        super(configResources);
 
     }
 
@@ -32,8 +32,9 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/security/servlet-http-filter-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/security/servlet-http-filter-test-flow.xml"}});
+                {"org/mule/test/integration/security/servlet-http-filter-test-service.xml"},
+                {"org/mule/test/integration/security/servlet-http-filter-test-flow.xml"}
+        });
     }
 
     @Override
