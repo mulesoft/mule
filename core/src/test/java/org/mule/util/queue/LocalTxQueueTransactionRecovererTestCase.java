@@ -11,7 +11,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.DefaultMuleConfiguration;
@@ -23,7 +22,6 @@ import org.mule.util.xa.ResourceManagerException;
 import java.io.Serializable;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -33,11 +31,25 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
 
     public static final String QUEUE_NAME = "inQueue";
     public static final String MESSAGE_CONTENT = "data";
+    private static final int TIMEOUT = 10;
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
-    private DefaultQueueStore inQueue;
 
+    private LocalTxQueueTransactionJournal txLog;
+    private DefaultQueueStore inQueue;
+    private PersistentQueueTransactionContext persistentTransactionContext;
+    private LocalTxQueueTransactionRecoverer queueTransactionRecoverer;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setWorkingDirectory(temporaryFolder.getRoot().getAbsolutePath());
+        txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+        inQueue = new DefaultQueueStore(QUEUE_NAME, muleContext, new DefaultQueueConfiguration(0, true));
+        persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(inQueue));
+        queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createQueueProvider(inQueue));
+    }
 
     @Override
     protected void configureMuleContext(MuleContextBuilder contextBuilder)
@@ -50,43 +62,58 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     @Test
     public void pollAndFailThenRecover() throws Exception
     {
-        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setWorkingDirectory(temporaryFolder.getRoot().getAbsolutePath());
-        LocalTxQueueTransactionJournal txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        inQueue = new DefaultQueueStore(QUEUE_NAME, muleContext, new DefaultQueueConfiguration(0, true));
-        PersistentQueueTransactionContext persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(inQueue));
         MuleEvent testEvent = getTestEvent(MESSAGE_CONTENT);
-        inQueue.offer(testEvent, 0, 10);
+        inQueue.offer(testEvent, 0, TIMEOUT);
         Serializable value = persistentTransactionContext.poll(inQueue, 100000);
-        assertThat(inQueue.poll(10), IsNull.nullValue());
+        assertThat(inQueue.poll(TIMEOUT), nullValue());
         assertThat(value, notNullValue());
         txLog.close();
         txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        LocalTxQueueTransactionRecoverer queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createQueueProvider(inQueue));
+
         queueTransactionRecoverer.recover();
-        Serializable muleEvent = inQueue.poll(10);
+        Serializable muleEvent = inQueue.poll(TIMEOUT);
         assertThat(muleEvent, notNullValue());
         assertThat(testEvent.equals(muleEvent), is(true));
     }
 
     @Test
-    public void failBetweenLogEntryWriteAndRealPoolThenRecover() throws Exception
+    public void pollAndFailThenRecoverWithTwoElements() throws Exception
     {
-        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setWorkingDirectory(temporaryFolder.getRoot().getAbsolutePath());
-        LocalTxQueueTransactionJournal txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        final DefaultQueueStore inQueue = new DefaultQueueStore(QUEUE_NAME, muleContext, new DefaultQueueConfiguration(0, true));
-        PersistentQueueTransactionContext persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(inQueue));
+        final String MESSAGE_CONTENT_2 = MESSAGE_CONTENT + "2";
         MuleEvent testEvent = getTestEvent(MESSAGE_CONTENT);
-        inQueue.offer(testEvent, 0, 10);
-        persistentTransactionContext.poll(inQueue, 10);
+        MuleEvent testEvent2 = getTestEvent(MESSAGE_CONTENT_2);
+
+        inQueue.offer(testEvent, 0, TIMEOUT);
+        inQueue.offer(testEvent2, 0, TIMEOUT);
+        Serializable value = persistentTransactionContext.poll(inQueue, 100000);
+        assertThat(inQueue.getSize(), is(1));
+        assertThat(value, notNullValue());
         txLog.close();
         txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        LocalTxQueueTransactionRecoverer queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createQueueProvider(inQueue));
         queueTransactionRecoverer.recover();
-        Serializable muleEvent = inQueue.poll(10);
+        MuleEvent muleEvent = (MuleEvent) inQueue.poll(TIMEOUT);
+        assertThat(muleEvent, notNullValue());
+        assertThat(muleEvent.getMessage().getPayload().toString(), is(MESSAGE_CONTENT_2)); // recovered element should be last
+
+        muleEvent = (MuleEvent) inQueue.poll(TIMEOUT);
+        assertThat(muleEvent, notNullValue());
+        assertThat(muleEvent.getMessage().getPayload().toString(), is(MESSAGE_CONTENT)); // recovered element
+    }
+
+    @Test
+    public void failBetweenLogEntryWriteAndRealPoolThenRecover() throws Exception
+    {
+        MuleEvent testEvent = getTestEvent(MESSAGE_CONTENT);
+        inQueue.offer(testEvent, 0, TIMEOUT);
+        persistentTransactionContext.poll(inQueue, TIMEOUT);
+        txLog.close();
+        txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+        queueTransactionRecoverer.recover();
+        Serializable muleEvent = inQueue.poll(TIMEOUT);
         assertThat(muleEvent, notNullValue());
         assertThat(testEvent.equals(muleEvent), is(true));
-        muleEvent = inQueue.poll(10);
-        assertThat(muleEvent, IsNull.nullValue());
+        muleEvent = inQueue.poll(TIMEOUT);
+        assertThat(muleEvent, nullValue());
     }
 
     private QueueProvider createQueueProvider(final DefaultQueueStore queue)
@@ -110,30 +137,27 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     @Test
     public void offerAndFailThenRecover() throws Exception
     {
-        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setWorkingDirectory(temporaryFolder.getRoot().getAbsolutePath());
-        LocalTxQueueTransactionJournal txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
         final DefaultQueueStore outQueue = new DefaultQueueStore(QUEUE_NAME, muleContext, new DefaultQueueConfiguration(0, true));
-        PersistentQueueTransactionContext persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(outQueue));
+        persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(outQueue));
         MuleEvent testEvent = getTestEvent(MESSAGE_CONTENT);
-        persistentTransactionContext.offer(outQueue, testEvent, 10);
-        assertThat(outQueue.poll(10), IsNull.nullValue());
+        persistentTransactionContext.offer(outQueue, testEvent, TIMEOUT);
+        assertThat(outQueue.poll(TIMEOUT), nullValue());
         txLog.close();
         txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        LocalTxQueueTransactionRecoverer queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createQueueProvider(outQueue));
+        queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createQueueProvider(outQueue));
         queueTransactionRecoverer.recover();
-        Serializable muleEvent = outQueue.poll(10);
+        Serializable muleEvent = outQueue.poll(TIMEOUT);
         assertThat(muleEvent, nullValue());
     }
 
     @Test
     public void offerAndFailBetweenRealOfferAndCommitThenRecover() throws Exception
     {
-        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setWorkingDirectory(temporaryFolder.getRoot().getAbsolutePath());
-        TestTransactionLogger txLog = new TestTransactionLogger(temporaryFolder.getRoot().getAbsolutePath(), muleContext).failDuringLogCommit();
+        txLog = new TestTransactionLogger(temporaryFolder.getRoot().getAbsolutePath(), muleContext).failDuringLogCommit();
         final DefaultQueueStore outQueue = new DefaultQueueStore(QUEUE_NAME, muleContext, new DefaultQueueConfiguration(0, true));
-        PersistentQueueTransactionContext persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(outQueue));
+        persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(outQueue));
         MuleEvent testEvent = getTestEvent(MESSAGE_CONTENT);
-        persistentTransactionContext.offer(outQueue, testEvent, 10);
+        persistentTransactionContext.offer(outQueue, testEvent, TIMEOUT);
         try
         {
             persistentTransactionContext.doCommit();
@@ -145,9 +169,9 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
         }
         txLog.close();
         txLog = new TestTransactionLogger(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        LocalTxQueueTransactionRecoverer queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createQueueProvider(outQueue));
+        queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createQueueProvider(outQueue));
         queueTransactionRecoverer.recover();
-        Serializable muleEvent = outQueue.poll(10);
+        Serializable muleEvent = outQueue.poll(TIMEOUT);
         assertThat(muleEvent, nullValue());
     }
 
