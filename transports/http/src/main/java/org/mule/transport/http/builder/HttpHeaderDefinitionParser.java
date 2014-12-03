@@ -31,7 +31,7 @@ public class HttpHeaderDefinitionParser extends AbstractParallelDelegatingDefini
         Node parentNode = element.getParentNode();
         String parentContext = parentNode.getLocalName();
 
-        if (parentContext.equals("response-builder"))
+        if (parentContext.equals("response-builder") || parentContext.equals("error-response-builder"))
         {
             String responseBuilderParent = parentNode.getParentNode().getLocalName();
 
