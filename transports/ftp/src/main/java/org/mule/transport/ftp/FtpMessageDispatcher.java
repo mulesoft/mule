@@ -12,6 +12,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.retry.RetryContext;
+import org.mule.api.transport.OutputHandler;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
 
@@ -49,6 +50,10 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
                 IOUtils.copy(is, out);
                 is.close();
             }
+            else if (data instanceof OutputHandler)
+            {
+                ((OutputHandler) data).write(event, out);
+            }           
             else
             {
                 byte[] dataBytes;
