@@ -24,8 +24,6 @@ import org.mule.util.AttributeEvaluator;
 import com.google.common.collect.Lists;
 
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 
@@ -225,18 +223,14 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
         }
         else
         {
-            URI uri;
+            String resolvedPath = replaceUriParams(buildPath(basePath.resolveStringValue(muleEvent),
+                                                             path.resolveStringValue(muleEvent)), muleEvent);
 
-            try
-            {
-                uri = new URI(requestConfig.getScheme(), null, host.resolveStringValue(muleEvent), port.resolveIntegerValue(muleEvent),
-                              replaceUriParams(buildPath(basePath.resolveStringValue(muleEvent), path.resolveStringValue(muleEvent)), muleEvent), null, null);
-            }
-            catch (URISyntaxException e)
-            {
-                throw new MessagingException(CoreMessages.createStaticMessage("Invalid URI for HTTP request"), muleEvent, e);
-            }
-            return uri.toString();
+            // Encode spaces to generate a valid HTTP request.
+            resolvedPath = resolvedPath.replaceAll(" ", "%20");
+
+            return String.format("%s://%s:%s%s", requestConfig.getScheme(), host.resolveStringValue(muleEvent),
+                                 port.resolveIntegerValue(muleEvent), resolvedPath);
         }
 
     }
