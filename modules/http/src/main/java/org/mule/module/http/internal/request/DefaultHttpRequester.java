@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.util.AttributeEvaluator;
@@ -227,7 +228,7 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
                                                              path.resolveStringValue(muleEvent)), muleEvent);
 
             // Encode spaces to generate a valid HTTP request.
-            resolvedPath = resolvedPath.replaceAll(" ", "%20");
+            resolvedPath = HttpParser.encodeSpaces(resolvedPath);
 
             return String.format("%s://%s:%s%s", requestConfig.getScheme(), host.resolveStringValue(muleEvent),
                                  port.resolveIntegerValue(muleEvent), resolvedPath);
