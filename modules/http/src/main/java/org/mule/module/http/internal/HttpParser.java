@@ -266,4 +266,15 @@ public class HttpParser
     {
         return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
     }
+
+    /**
+     * Encodes spaces in a path, replacing them by %20.
+     *
+     * @param path Path that may contain spaces
+     * @return The path with all spaces replaced by %20.
+     */
+    public static String encodeSpaces(String path)
+    {
+        return path.replace(WHITE_SPACE, SPACE_ENTITY);
+    }
 }
