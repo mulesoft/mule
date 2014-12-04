@@ -9,7 +9,7 @@ import groovy.transform.Field
 
 @Field String GET_PLUGIN = "org.apache.maven.plugins:maven-dependency-plugin:2.8:get"
 @Field long FIVE_MINUTES = 300000
-@FIELD int INVALID_ARGUMENTS = 1
+@Field int INVALID_ARGUMENTS = 1
 @Field String help = '\nDeploys to a remote Maven repository Mule CE and EE artifacts including distributions, poms, jars, test jars, javadoc jars and source jars.\n'
 @Field String ceRepoId
 @Field String ceRepoUrl
