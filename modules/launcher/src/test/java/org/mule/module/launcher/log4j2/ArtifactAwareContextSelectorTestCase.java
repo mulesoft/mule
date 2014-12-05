@@ -56,7 +56,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
     public void classLoaderToContext()
     {
         MuleLoggerContext context = (MuleLoggerContext) selector.getContext(EMPTY, classLoader, true);
-        assertThat(context, is(selector.getContext(EMPTY, classLoader, true)));
+        assertThat(context, is(sameInstance(selector.getContext(EMPTY, classLoader, true))));
 
         classLoader = mock(CompositeApplicationClassLoader.class, RETURNS_DEEP_STUBS);
         when(classLoader.getArtifactName()).thenReturn(getClass().getName());

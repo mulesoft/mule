@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.status.StatusLogger;
@@ -225,9 +226,10 @@ final class ArtifactAwareContextSelector implements ContextSelector
 
         private LoggerContext getLoggerContext(final ClassLoader classLoader)
         {
+            LoggerContext ctx;
             try
             {
-                return contexts.get(computeKey(classLoader), new Callable<LoggerContext>()
+                ctx = contexts.get(computeKey(classLoader), new Callable<LoggerContext>()
                 {
                     @Override
                     public LoggerContext call() throws Exception
@@ -241,6 +243,13 @@ final class ArtifactAwareContextSelector implements ContextSelector
                 throw new MuleRuntimeException(
                         MessageFactory.createStaticMessage("Could not init logger context "), e);
             }
+
+            if (ctx.getState() == LifeCycle.State.INITIALIZED)
+            {
+                ctx.start();
+            }
+
+            return ctx;
         }
 
         private void remove(ClassLoader classLoader)
