@@ -674,6 +674,11 @@
                 <artifactId>jcl-over-slf4j</artifactId>
                 <version>${slf4jVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-jul</artifactId>
+                <version>${log4jVersion}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
