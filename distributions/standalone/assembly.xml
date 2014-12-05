@@ -102,6 +102,7 @@
                 <include>org.apache.logging.log4j:log4j-slf4j-impl</include>
                 <include>org.apache.logging.log4j:log4j-1.2-api</include>
                 <include>org.apache.logging.log4j:log4j-jcl</include>
+                <include>org.apache.logging.log4j:log4j-jul</include>
                 <include>org.slf4j:jcl-over-slf4j</include>
                 <include>com.lmax:disruptor</include>
             </includes>
@@ -268,6 +269,7 @@
                 <exclude>org.apache.logging.log4j:log4j-slf4j-impl</exclude>
                 <exclude>org.apache.logging.log4j:log4j-1.2-api</exclude>
                 <exclude>org.apache.logging.log4j:log4j-jcl</exclude>
+                <exclude>org.apache.logging.log4j:log4j-jul</exclude>
                 <exclude>org.slf4j:jcl-over-slf4j</exclude>
                 <exclude>commons-logging:commons-logging</exclude>
                 <exclude>com.lmax:disruptor</exclude>

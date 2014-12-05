@@ -103,6 +103,9 @@ WRAPPER_CONF="${MULE_BASE}/conf/wrapper.conf"
 # add XML compatibility jars
 MULE_ENDORSED=-M-Djava.endorsed.dirs="${MULE_HOME}/lib/endorsed"
 
+# redirect JUL logs to log4j2
+JUL_LOG_MANAGER=-M-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager
+
 MULE_OPTS="wrapper.working.dir=\"$STARTUP_DIR\" \
            wrapper.app.parameter.1=$2 \
            wrapper.app.parameter.2=$3 \
@@ -624,7 +627,7 @@ dump() {
 
 checkAdditionalJvmParams() {
     # The string passed to eval must handle spaces in paths correctly.
-    "$MULE_HOME/bin/launcher" \"$MULE_HOME/bin/additional.groovy\" \"$WRAPPER_CONF\" \"$JPDA_OPTS\" \"$MULE_ENDORSED\" $@
+    "$MULE_HOME/bin/launcher" \"$MULE_HOME/bin/additional.groovy\" \"$WRAPPER_CONF\" \"$JPDA_OPTS\" \"$MULE_ENDORSED\" \"$JUL_LOG_MANAGER\" $@
     EXIT_STATUS=$?
 
     if [ "$EXIT_STATUS" -ne "0" ] ; then        
