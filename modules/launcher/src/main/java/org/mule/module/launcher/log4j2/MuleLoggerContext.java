@@ -103,24 +103,6 @@ class MuleLoggerContext extends LoggerContext
         };
     }
 
-    /**
-     * Remove when {@link https://issues.apache.org/jira/browse/LOG4J2-891} is fixed
-     */
-    @Override
-    public boolean equals(Object obj)
-    {
-        return this == obj;
-    }
-
-    /**
-     * Remove when {@link https://issues.apache.org/jira/browse/LOG4J2-891} is fixed
-     */
-    @Override
-    public int hashCode()
-    {
-        return System.identityHashCode(this);
-    }
-
     protected URI getConfigFile()
     {
         return configFile;
