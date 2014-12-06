@@ -6,6 +6,8 @@
  */
 package org.mule.transport.sftp;
 
+import com.jcraft.jsch.SftpATTRS;
+import org.apache.commons.collections.comparators.ReverseComparator;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -23,7 +25,7 @@ import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.lock.LockFactory;
 
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -34,6 +36,8 @@ import java.util.concurrent.locks.Lock;
  */
 public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 {
+    public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
+    public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
 
     private SftpReceiverRequesterUtil sftpRRUtil = null;
     private LockFactory lockFactory;
@@ -85,6 +89,14 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                     logger.debug("Polling. " + files.length + " files found at " + endpoint.getEndpointURI()
                                  + ":" + Arrays.toString(files));
                 }
+
+                final Comparator<Map.Entry<String, SftpATTRS>> comparator = getComparator();
+                if (comparator != null)
+                {
+                    sftpRRUtil.sort(files, comparator);
+                }
+
+
                 for (String file : files)
                 {
                     if (getLifecycleState().isStopping())
@@ -121,6 +133,25 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
+    }
+
+    private Comparator<Map.Entry<String, SftpATTRS>> getComparator() throws Exception {
+
+            Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
+            if (comparatorClassName != null)
+            {
+                Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
+                boolean reverse = false;
+                if (reverseProperty != null)
+                {
+                    reverse = Boolean.valueOf((String) reverseProperty);
+                }
+
+                Class<?> clazz = Class.forName(comparatorClassName.toString());
+                Comparator<?> comparator = (Comparator<?>)clazz.newInstance();
+                return reverse ? new ReverseComparator(comparator) : comparator;
+            }
+            return null;
     }
 
     @Override
