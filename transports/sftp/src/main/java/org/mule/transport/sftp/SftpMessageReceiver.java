@@ -6,6 +6,18 @@
  */
 package org.mule.transport.sftp;
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import com.jcraft.jsch.SftpATTRS;
+>>>>>>> 797ec72... SFTP supports comparator and reverse
+=======
+import com.jcraft.jsch.SftpATTRS;
+>>>>>>> 12a456f... SFTP supports comparator and reverse
+=======
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+import org.apache.commons.collections.comparators.ReverseComparator;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -23,7 +35,29 @@ import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.lock.LockFactory;
 
 import java.io.InputStream;
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+=======
+import java.util.*;
+>>>>>>> 797ec72... SFTP supports comparator and reverse
+=======
+import java.util.*;
+>>>>>>> 12a456f... SFTP supports comparator and reverse
+=======
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+<<<<<<< HEAD
+import java.util.Map;
+>>>>>>> 0a6b968... apply codestyle
+=======
+import java.util.List;
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -32,8 +66,21 @@ import java.util.concurrent.locks.Lock;
  * using jsch. This receiver produces an InputStream payload, which can be
  * materialized in a MessageDispatcher or Component.
  */
+<<<<<<< HEAD
+<<<<<<< HEAD
+public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
+=======
 public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 {
+<<<<<<< HEAD
+>>>>>>> 797ec72... SFTP supports comparator and reverse
+=======
+>>>>>>> 12a456f... SFTP supports comparator and reverse
+=======
+public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
+>>>>>>> 0a6b968... apply codestyle
+    public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
+    public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
 
     private SftpReceiverRequesterUtil sftpRRUtil = null;
     private LockFactory lockFactory;
@@ -42,8 +89,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     public SftpMessageReceiver(SftpConnector connector,
                                FlowConstruct flow,
                                InboundEndpoint endpoint,
-                               long frequency) throws CreateException
-    {
+                               long frequency) throws CreateException {
         super(connector, flow, endpoint);
 
         this.setFrequency(frequency);
@@ -51,104 +97,205 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         sftpRRUtil = createSftpReceiverRequesterUtil(endpoint);
     }
 
-    protected SftpReceiverRequesterUtil createSftpReceiverRequesterUtil(InboundEndpoint endpoint)
-    {
+    protected SftpReceiverRequesterUtil createSftpReceiverRequesterUtil(InboundEndpoint endpoint) {
         return new SftpReceiverRequesterUtil(endpoint);
     }
 
-    public SftpMessageReceiver(SftpConnector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException
-    {
+    public SftpMessageReceiver(SftpConnector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException {
         this(connector, flow, endpoint, DEFAULT_POLL_FREQUENCY);
     }
 
-    public void poll() throws Exception
-    {
-        if (logger.isDebugEnabled())
-        {
+    public void poll() throws Exception {
+        if (logger.isDebugEnabled()) {
             logger.debug("Polling. Called at endpoint " + endpoint.getEndpointURI());
         }
-        try
-        {
+        try {
+<<<<<<< HEAD
+<<<<<<< HEAD
+            List<FileDescriptor> files = sftpRRUtil.getAvailableFiles(false);
+
+            if (files.isEmpty()) {
+=======
             String[] files = sftpRRUtil.getAvailableFiles(false);
 
-            if (files.length == 0)
-            {
-                if (logger.isDebugEnabled())
-                {
+            if (files.length == 0) {
+>>>>>>> 0a6b968... apply codestyle
+=======
+            List<FileDescriptor> files = sftpRRUtil.getAvailableFiles(false);
+
+            if (files.isEmpty()) {
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+                if (logger.isDebugEnabled()) {
                     logger.debug("Polling. No matching files found at endpoint " + endpoint.getEndpointURI());
                 }
-            }
-            else
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Polling. " + files.length + " files found at " + endpoint.getEndpointURI()
-                                 + ":" + Arrays.toString(files));
+            } else {
+                if (logger.isDebugEnabled()) {
+<<<<<<< HEAD
+<<<<<<< HEAD
+                    logger.debug("Polling. " + files.size() + " files found at " + endpoint.getEndpointURI()
+                            + ":" + Arrays.toString(files.toArray()));
                 }
+
+                final Comparator<FileDescriptor> comparator = getComparator();
+                if (comparator != null) {
+                    Collections.sort(files, comparator);
+                }
+
+<<<<<<< HEAD
+
+                for (final FileDescriptor file : files) {
+                    if (getLifecycleState().isStopping()) {
+=======
+                final Comparator<Map.Entry<String, SftpATTRS>> comparator = getComparator();
+                if (comparator != null)
+                {
+                    sftpRRUtil.sort(files, comparator);
+=======
+                    logger.debug("Polling. " + files.length + " files found at " + endpoint.getEndpointURI()
+                            + ":" + Arrays.toString(files));
+>>>>>>> 0a6b968... apply codestyle
+                }
+
+<<<<<<< HEAD
+=======
+                final Comparator<Map.Entry<String, SftpATTRS>> comparator = getComparator();
+=======
+                    logger.debug("Polling. " + files.size() + " files found at " + endpoint.getEndpointURI()
+                            + ":" + Arrays.toString(files.toArray()));
+                }
+
+                final Comparator<FileDescriptor> comparator = getComparator();
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+                if (comparator != null) {
+                    Collections.sort(files, comparator);
+                }
+
+>>>>>>> 12a456f... SFTP supports comparator and reverse
+
+<<<<<<< HEAD
+<<<<<<< HEAD
                 for (String file : files)
                 {
                     if (getLifecycleState().isStopping())
                     {
+>>>>>>> 797ec72... SFTP supports comparator and reverse
+=======
+                for (String file : files) {
+=======
+                for (final FileDescriptor file : files) {
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+                    if (getLifecycleState().isStopping()) {
+>>>>>>> 0a6b968... apply codestyle
                         break;
                     }
                     Lock fileLock = lockFactory.createLock(connector.getName() + file);
-                    if (fileLock.tryLock(10, TimeUnit.MILLISECONDS))
-                    {
-                        try
-                        {
+                    if (fileLock.tryLock(10, TimeUnit.MILLISECONDS)) {
+                        try {
+<<<<<<< HEAD
+<<<<<<< HEAD
+                            routeFile(file.getFilename());
+=======
                             routeFile(file);
-                        }
-                        catch (Exception e)
-                        {
+>>>>>>> 0a6b968... apply codestyle
+=======
+                            routeFile(file.getFilename());
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+                        } catch (Exception e) {
                             fileLock.unlock();
                         }
                     }
                 }
-                if (logger.isDebugEnabled())
-                {
+                if (logger.isDebugEnabled()) {
+<<<<<<< HEAD
+<<<<<<< HEAD
+                    logger.debug("Polling. Routed all " + files.size() + " files found at "
+=======
                     logger.debug("Polling. Routed all " + files.length + " files found at "
-                                 + endpoint.getEndpointURI());
+>>>>>>> 0a6b968... apply codestyle
+=======
+                    logger.debug("Polling. Routed all " + files.size() + " files found at "
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+                            + endpoint.getEndpointURI());
                 }
             }
-        }
-        catch (MessagingException e)
-        {
+        } catch (MessagingException e) {
             //Already handled by TransactionTemplate
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error in poll", e);
             getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
     }
 
-    @Override
-    protected void doInitialise() throws InitialisationException
-    {
-        this.lockFactory = getEndpoint().getMuleContext().getLockFactory();
-        boolean synchronousProcessing = false;
-        if (getFlowConstruct() instanceof Flow)
-        {
-            synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+    private Comparator<FileDescriptor> getComparator() throws Exception {
+
+        Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
+        if (comparatorClassName != null) {
+            Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
+            boolean reverse = false;
+            if (reverseProperty != null) {
+                reverse = Boolean.valueOf((String) reverseProperty);
+            }
+
+            Class<?> clazz = Class.forName(comparatorClassName.toString());
+            Comparator<?> comparator = (Comparator<?>) clazz.newInstance();
+            return reverse ? new ReverseComparator(comparator) : comparator;
         }
-        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.sftp.singlepollinstance","false")) || !synchronousProcessing;
+        return null;
+=======
+=======
+>>>>>>> 12a456f... SFTP supports comparator and reverse
+    private Comparator<Map.Entry<String, SftpATTRS>> getComparator() throws Exception {
+=======
+    private Comparator<FileDescriptor> getComparator() throws Exception {
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+
+        Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
+        if (comparatorClassName != null) {
+            Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
+            boolean reverse = false;
+            if (reverseProperty != null) {
+                reverse = Boolean.valueOf((String) reverseProperty);
+            }
+<<<<<<< HEAD
+            return null;
+<<<<<<< HEAD
+>>>>>>> 797ec72... SFTP supports comparator and reverse
+=======
+>>>>>>> 12a456f... SFTP supports comparator and reverse
+=======
+
+            Class<?> clazz = Class.forName(comparatorClassName.toString());
+            Comparator<?> comparator = (Comparator<?>) clazz.newInstance();
+            return reverse ? new ReverseComparator(comparator) : comparator;
+        }
+        return null;
+>>>>>>> 0a6b968... apply codestyle
     }
 
     @Override
-    protected boolean pollOnPrimaryInstanceOnly()
-    {
+    protected void doInitialise() throws InitialisationException {
+        this.lockFactory = getEndpoint().getMuleContext().getLockFactory();
+        boolean synchronousProcessing = false;
+        if (getFlowConstruct() instanceof Flow) {
+            synchronousProcessing = ((Flow) getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
+        }
+        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.sftp.singlepollinstance", "false")) || !synchronousProcessing;
+    }
+
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly() {
         return poolOnPrimaryInstanceOnly;
     }
 
-    protected void routeFile(final String path) throws Exception
-    {
+    protected void routeFile(final String path) throws Exception {
         ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-        executionTemplate.execute(new ExecutionCallback<MuleEvent>()
-        {
+        executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
             @Override
-            public MuleEvent process() throws Exception
-            {
+            public MuleEvent process() throws Exception {
                 // A bit tricky initialization of the notifier in this case since we don't
                 // have access to the message yet...
                 SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),
@@ -156,8 +303,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
                 InputStream inputStream = sftpRRUtil.retrieveFile(path, notifier);
 
-                if (logger.isDebugEnabled())
-                {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Routing file: " + path);
                 }
 
@@ -170,8 +316,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                 notifier.setMessage(message);
                 routeMessage(message);
 
-                if (logger.isDebugEnabled())
-                {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Routed file: " + path);
                 }
                 return null;
@@ -182,31 +327,27 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     /**
      * SFTP-35
      */
-    @Override 
+    @Override
     protected MuleMessage handleUnacceptedFilter(MuleMessage message) {
         logger.debug("the filter said no, now trying to close the payload stream");
         try {
             final SftpInputStream payload = (SftpInputStream) message.getPayload();
             payload.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.debug("unable to close payload stream", e);
         }
         return super.handleUnacceptedFilter(message);
     }
 
-    public void doConnect() throws Exception
-    {
+    public void doConnect() throws Exception {
         // no op
     }
 
-    public void doDisconnect() throws Exception
-    {
+    public void doDisconnect() throws Exception {
         // no op
     }
 
-    protected void doDispose()
-    {
+    protected void doDispose() {
         // no op
     }
 }

@@ -13,6 +13,7 @@ import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * <code>SftpMessageRequester</code> polls files on request (e.g. from a
@@ -36,11 +37,11 @@ public class SftpMessageRequester extends AbstractMessageRequester
     @Override
     protected MuleMessage doRequest(long timeout) throws Exception
     {
-        String[] files = sftpRRUtil.getAvailableFiles(true);
+        final List<FileDescriptor> files = sftpRRUtil.getAvailableFiles(true);
 
-        if (files.length == 0) return null;
+        if (files.isEmpty()) return null;
 
-        String path = files[0];
+        String path = files.get(0).getFilename();
         // TODO. ML FIX. Can't we figure out the current service (for logging/audit
         // purpose)???
         SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),

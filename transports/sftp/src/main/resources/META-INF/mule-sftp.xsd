@@ -252,6 +252,21 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="comparator" type="mule:substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Sorts incoming files using the specified comparator, such as comparator="org.mule.transport.sftp.comparator.OlderFirstComparator". The class must implement the java.util.Comparator interface.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="reverseOrder" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Whether the comparator order should be reversed. Default is false.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="outboundAttributes">

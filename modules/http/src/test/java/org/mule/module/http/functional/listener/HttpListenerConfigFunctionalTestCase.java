@@ -12,18 +12,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.internal.listener.NoListenerRequestHandler.RESOURCE_NOT_FOUND;
 import static org.mule.module.http.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -46,7 +40,6 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
     private static final int TIMEOUT = 1000;
-    private static final HttpRequestOptions GET_OPTIONS = HttpRequestOptionsBuilder.newOptions().method(HttpConstants.Methods.GET.name()).responseTimeout(TIMEOUT).disableStatusCodeValidation().build();
 
     @Rule
     public DynamicPort fullConfigPort = new DynamicPort("fullConfigPort");
@@ -54,8 +47,6 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     public DynamicPort emptyConfigPort = new DynamicPort("emptyConfigPort");
     @Rule
     public DynamicPort noListenerConfigPort = new DynamicPort("noListenerConfigPort");
-    @Rule
-    public DynamicPort slashConfigPort = new DynamicPort("slashConfigPort");
     @Rule
     public SystemProperty path = new SystemProperty("path","path");
     @Rule
@@ -100,27 +91,9 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     @Test
     public void noListenerConfig() throws Exception
     {
-        final String url = String.format("http://localhost:%s/noListener", noListenerConfigPort.getNumber());
+        final String url = String.format("http://localhost:%s", noListenerConfigPort.getNumber());
         final HttpResponse httpResponse = callAndAssertStatus(url, SC_NOT_FOUND);
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(RESOURCE_NOT_FOUND));
-    }
-
-    @Test
-    public void useSlashInPathAndBasePath() throws Exception
-    {
-        String baseUrl = String.format("http://localhost:%s/", slashConfigPort.getNumber());
-        assertThat(callAndAssertStatusWithMuleClient(baseUrl + "/", SC_OK), is("1"));
-        assertThat(callAndAssertStatusWithMuleClient(baseUrl + "//", SC_OK), is("2"));
-        assertThat(callAndAssertStatusWithMuleClient(baseUrl + "///", SC_OK), is("3"));
-
-        callAndAssertStatusWithMuleClient(baseUrl + "////", SC_NOT_FOUND);
-    }
-
-    private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception
-    {
-        MuleMessage response = muleContext.getClient().send(url, new DefaultMuleMessage("", muleContext), GET_OPTIONS);
-        assertThat((Integer) response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), is(expectedStatus));
-        return IOUtils.toString((InputStream) response.getPayload());
     }
 
     private HttpResponse callAndAssertStatus(String url, int expectedStatus) throws IOException

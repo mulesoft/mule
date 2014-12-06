@@ -295,35 +295,98 @@ public class SftpClient
         return listDirectory(".", false, true);
     }
 
-    public String[] listDirectories(String path) throws IOException
+    private String[] listDirectory(final String path, boolean includeFiles, boolean includeDirectories)
+            throws IOException
     {
-        return listDirectory(path, false, true);
+        final List<String> ret = new ArrayList<>();
+<<<<<<< HEAD
+<<<<<<< HEAD
+        for (final FileDescriptor desc : getFileDescriptorsFromDirectory(path, includeFiles, includeDirectories)) {
+=======
+        for (final FtpFileDescriptor desc : getFileDescriptorsFromDirectory(path, includeFiles, includeDirectories)) {
+>>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
+=======
+        for (final FileDescriptor desc : getFileDescriptorsFromDirectory(path, includeFiles, includeDirectories)) {
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+            ret.add(desc.getFilename());
+        }
+        return ret.toArray(new String[ret.size()]);
     }
 
-    private String[] listDirectory(String path, boolean includeFiles, boolean includeDirectories)
+<<<<<<< HEAD
+<<<<<<< HEAD
+    public FileDescriptor[] getFileDescriptors() throws IOException
+=======
+    public FtpFileDescriptor[] getFileDescriptors() throws IOException
+>>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
+=======
+    public FileDescriptor[] getFileDescriptors() throws IOException
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+    {
+        return getFileDescriptors(".");
+    }
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+    public FileDescriptor[] getFileDescriptors(String path) throws IOException
+=======
+    public FtpFileDescriptor[] getFileDescriptors(String path) throws IOException
+>>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
+=======
+    public FileDescriptor[] getFileDescriptors(String path) throws IOException
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+    {
+        return getFileDescriptorsFromDirectory(path, true, false);
+    }
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+    private FileDescriptor[] getFileDescriptorsFromDirectory(final String path, boolean includeFiles, boolean includeDirectories)
+=======
+    private FtpFileDescriptor[] getFileDescriptorsFromDirectory(final String path, boolean includeFiles, boolean includeDirectories)
+>>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
+=======
+    private FileDescriptor[] getFileDescriptorsFromDirectory(final String path, boolean includeFiles, boolean includeDirectories)
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
             throws IOException
     {
         try
         {
-            Vector<LsEntry> entries = channelSftp.ls(path);
+            final Vector<LsEntry> entries = channelSftp.ls(path);
             if (entries != null)
             {
-                List<String> ret = new ArrayList<String>();
+<<<<<<< HEAD
+<<<<<<< HEAD
+                final List<FileDescriptor> ret = new ArrayList<>();
                 for (LsEntry entry : entries)
                 {
-                    if (includeFiles && !entry.getAttrs().isDir())
+                    final FileDescriptor fileDescriptor = new FileDescriptor(entry.getFilename(), entry.getAttrs());
+=======
+                final List<FtpFileDescriptor> ret = new ArrayList<>();
+                for (LsEntry entry : entries)
+                {
+                    final FtpFileDescriptor fileDescriptor = new FtpFileDescriptor(entry.getFilename(), entry.getAttrs());
+>>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
+=======
+                final List<FileDescriptor> ret = new ArrayList<>();
+                for (LsEntry entry : entries)
+                {
+                    final FileDescriptor fileDescriptor = new FileDescriptor(entry.getFilename(), entry.getAttrs());
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+                    if (includeFile(includeFiles, includeDirectories, fileDescriptor))
                     {
-                        ret.add(entry.getFilename());
-                    }
-                    if (includeDirectories && entry.getAttrs().isDir())
-                    {
-                        if (!entry.getFilename().equals(".") && !entry.getFilename().equals(".."))
-                        {
-                            ret.add(entry.getFilename());
-                        }
+                        ret.add(fileDescriptor);
                     }
                 }
-                return ret.toArray(new String[ret.size()]);
+<<<<<<< HEAD
+<<<<<<< HEAD
+                return ret.toArray(new FileDescriptor[ret.size()]);
+=======
+                return ret.toArray(new FtpFileDescriptor[ret.size()]);
+>>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
+=======
+                return ret.toArray(new FileDescriptor[ret.size()]);
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
             }
         }
         catch (SftpException e)
@@ -333,10 +396,28 @@ public class SftpClient
         return null;
     }
 
-    // public boolean logout()
-    // {
-    // return true;
-    // }
+<<<<<<< HEAD
+<<<<<<< HEAD
+    private boolean includeFile(boolean includeFiles, boolean includeDirectories, final FileDescriptor fileDesc) {
+        if (includeFiles && !fileDesc.getAttrs().isDir())
+            return true;
+        if (includeDirectories && fileDesc.getAttrs().isDir() && !fileDesc.getFilename().equals(".") && !fileDesc.getFilename().equals("..")) {
+=======
+    private boolean includeFile(boolean includeFiles, boolean includeDirectories, final FtpFileDescriptor fileDesc) {
+        if (includeFiles && !fileDesc.getDescriptor().isDir())
+            return true;
+        if (includeDirectories && fileDesc.getDescriptor().isDir() && !fileDesc.getFilename().equals(".") && !fileDesc.getFilename().equals("..")) {
+>>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
+=======
+    private boolean includeFile(boolean includeFiles, boolean includeDirectories, final FileDescriptor fileDesc) {
+        if (includeFiles && !fileDesc.getAttrs().isDir())
+            return true;
+        if (includeDirectories && fileDesc.getAttrs().isDir() && !fileDesc.getFilename().equals(".") && !fileDesc.getFilename().equals("..")) {
+>>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
+            return true;
+        }
+        return false;
+    }
 
     public InputStream retrieveFile(String fileName) throws IOException
     {
@@ -463,6 +544,23 @@ public class SftpClient
         catch (SftpException e)
         {
             throw new IOException(e.getMessage() + " (" + currentDirectory + "/" + filename + ")");
+        }
+    }
+
+    /**
+     * @param filename File name
+     * @return Attributes of the file
+     * @throws IOException If an error occurs
+     */
+    public SftpATTRS getAttr(String filename) throws IOException
+    {
+        try
+        {
+            return channelSftp.stat("./" + filename);
+        }
+        catch (SftpException e)
+        {
+            throw new IOException(e.getMessage());
         }
     }
 
