@@ -468,6 +468,23 @@ public class SftpClient
 
     /**
      * @param filename File name
+     * @return Attributes of the file
+     * @throws IOException If an error occurs
+     */
+    public SftpATTRS getAttr(String filename) throws IOException
+    {
+        try
+        {
+            return channelSftp.stat("./" + filename);
+        }
+        catch (SftpException e)
+        {
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    /**
+     * @param filename File name
      * @return Number of seconds since the file was written to
      * @throws IOException If an error occurs
      */

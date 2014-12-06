@@ -6,6 +6,7 @@
  */
 package org.mule.transport.sftp;
 
+import com.jcraft.jsch.SftpATTRS;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.FileUtils;
@@ -14,8 +15,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -141,6 +141,36 @@ public class SftpReceiverRequesterUtil
                 connector.releaseClient(endpoint, client);
             }
         }
+    }
+
+    // sort a set of files by a comparator that gets access to to file-attributes
+    public void sort(final String[] files, Comparator<Map.Entry<String, SftpATTRS>> comparator) throws Exception {
+
+        SftpClient client = null;
+
+        try
+        {
+            client = connector.createSftpClient(endpoint);
+
+            final List<Map.Entry<String, SftpATTRS>> fileDescriptors = new ArrayList<Map.Entry<String, SftpATTRS>>(files.length);
+            for (final String filename : files)
+            {
+                fileDescriptors.add(new java.util.AbstractMap.SimpleEntry<String, SftpATTRS>(filename, client.getAttr(filename)));
+            }
+            Collections.sort(fileDescriptors, comparator);
+            int i = 0;
+            for (final Map.Entry<String, SftpATTRS> descriptor : fileDescriptors) {
+                files[i++] = descriptor.getKey();
+            }
+        }
+        finally
+        {
+            if (client != null)
+            {
+                connector.releaseClient(endpoint, client);
+            }
+        }
+
     }
 
     public InputStream retrieveFile(String fileName, SftpNotifier notifier) throws Exception
