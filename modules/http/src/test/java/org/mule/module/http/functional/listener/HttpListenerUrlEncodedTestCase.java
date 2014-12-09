@@ -6,9 +6,11 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
@@ -28,6 +30,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsInstanceOf;
@@ -71,6 +74,17 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         assertThat(payloadAsMap.get(PARAM_2_NAME), Is.is(PARAM_2_VALUE));
 
         compareParameterMaps(response, payloadAsMap);
+    }
+
+    @Test
+    public void invalidUrlEncodedParamsReturnInvalidRequestStatusCode() throws Exception
+    {
+        final Response response = Request.Post(getListenerUrl())
+                .body(new StringEntity("Invalid url encoded content"))
+                .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
+                .execute();
+
+        assertThat(response.returnResponse().getStatusLine().getStatusCode(), equalTo(400));
     }
 
     @Test

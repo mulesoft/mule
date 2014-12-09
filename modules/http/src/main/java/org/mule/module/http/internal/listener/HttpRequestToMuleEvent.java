@@ -37,7 +37,7 @@ import javax.activation.DataHandler;
 public class HttpRequestToMuleEvent
 {
 
-    public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, String listenerPath)
+    public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, String listenerPath) throws HttpRequestParsingException
     {
         final HttpRequest request = requestContext.getRequest();
         final Collection<String> headerNames = request.getHeaderNames();
@@ -86,7 +86,14 @@ public class HttpRequestToMuleEvent
                         outboundProperties.put(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
                         if ((mediaType.type() + "/" + mediaType.subtype()).equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
                         {
-                            payload = HttpParser.decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), encoding);
+                            try
+                            {
+                                payload = HttpParser.decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), encoding);
+                            }
+                            catch (IllegalArgumentException e)
+                            {
+                                throw new HttpRequestParsingException("Cannot decode x-www-form-urlencoded payload", e);
+                            }
                         }
                         else if (entity instanceof InputStreamHttpEntity)
                         {
