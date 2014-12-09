@@ -33,7 +33,7 @@ import org.junit.rules.ExpectedException;
 public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
 {
 
-    public static final String TEST_HOST = "localhost";
+    public static final String TEST_IP = "127.0.0.1";
     public static final String URI_PARAM = "{uri-param}";
     public static final int TEST_PORT = 10000;
     public static final String ANOTHER_PATH = "/another-path";
@@ -71,7 +71,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     public final RequestHandler methodPathCatchAllGetRequestHandler = mock(RequestHandler.class);
     public final RequestHandler methodPathCatchAllPostRequestHandler = mock(RequestHandler.class);
 
-    private final ServerAddress testServerAddres = new ServerAddress(TEST_HOST, TEST_PORT);
+    private final ServerAddress testServerAddress = new ServerAddress(TEST_IP, TEST_PORT);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -84,7 +84,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     public void createMockTestServer()
     {
         this.testServer = mock(Server.class);
-        when(testServer.getServerAddress()).thenReturn(testServerAddres);
+        when(testServer.getServerAddress()).thenReturn(testServerAddress);
     }
 
 
@@ -276,14 +276,14 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
 
     private void routePath(String requestPath, String listenerPath)
     {
-        assertThat(httpListenerRegistry.getRequestHandler(TEST_HOST, TEST_PORT, createMockRequestWithPath(requestPath)), is(requestHandlerPerPath.get(listenerPath)));
+        assertThat(httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath(requestPath)), is(requestHandlerPerPath.get(listenerPath)));
     }
 
     private void routePath(String requestPath, String requestMethod,  RequestHandler expectedRequestHandler)
     {
         final HttpRequest mockRequest = createMockRequestWithPath(requestPath);
         when(mockRequest.getMethod()).thenReturn(requestMethod);
-        assertThat(httpListenerRegistry.getRequestHandler(TEST_HOST, TEST_PORT, mockRequest), is(expectedRequestHandler));
+        assertThat(httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, mockRequest), is(expectedRequestHandler));
     }
 
     private HttpRequest createMockRequestWithPath(String path)
