@@ -150,6 +150,12 @@ public class HttpParser
             String[] pairs = encodedString.split("&");
             for (String pair : pairs) {
                 int idx = pair.indexOf("=");
+
+                if (idx == -1)
+                {
+                    throw new IllegalArgumentException("Invalid URL encoded string");
+                }
+
                 try
                 {
                     queryParams.put(URLDecoder.decode(pair.substring(0, idx), encoding), URLDecoder.decode(pair.substring(idx + 1), encoding));
