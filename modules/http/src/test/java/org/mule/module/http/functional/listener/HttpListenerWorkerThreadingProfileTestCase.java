@@ -9,7 +9,6 @@ package org.mule.module.http.functional.listener;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -25,9 +24,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.apache.http.conn.HttpHostConnectException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -56,7 +55,7 @@ public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCa
     public void useMaxThreadsActiveThreadingProfile() throws Exception
     {
         sendRequestUntilNoMoreWorkers();
-        expectedException.expect(HttpHostConnectException.class);
+        expectedException.expect(NoHttpResponseException.class);
         try
         {
             Request.Get(String.format("http://localhost:%s", listenPort.getNumber())).connectTimeout(100).socketTimeout(100).execute();
