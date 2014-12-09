@@ -19,11 +19,11 @@ public interface RequestHandlerProvider
     /**
      * Retrieves a RequestHandler to handle the http request
      *
-     * @param host host in which the http request was made
+     * @param ip ip address in which the http request was made
      * @param port port in which the http request was made
      * @param request the http request content
      * @return a handler for the request
      */
-    RequestHandler getRequestHandler(String host, int port, HttpRequest request);
+    RequestHandler getRequestHandler(String ip, int port, HttpRequest request);
 
 }

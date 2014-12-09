@@ -52,13 +52,13 @@ public class HttpListenerRegistry implements RequestHandlerProvider
     }
 
     @Override
-    public RequestHandler getRequestHandler(String host, int port, final HttpRequest request)
+    public RequestHandler getRequestHandler(String ip, int port, final HttpRequest request)
     {
         if (logger.isDebugEnabled())
         {
             logger.debug("Looking RequestHandler for request: " + request.getPath());
         }
-        final Server server = serverAddressToServerMap.get(new ServerAddress(host, port));
+        final Server server = serverAddressToServerMap.get(new ServerAddress(ip, port));
         if ((!server.isStopping() && !server.isStopped()))
         {
             final ServerAddressRequestHandlerRegistry serverAddressRequestHandlerRegistry = requestHandlerPerServerAddress.get( server);
