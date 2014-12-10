@@ -36,7 +36,6 @@ import com.ning.http.client.SSLEngineFactory;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
-import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
 import java.io.IOException;
 import java.net.URI;
@@ -71,7 +70,10 @@ public class GrizzlyHttpClient implements HttpClient
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
 
-    public GrizzlyHttpClient(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties, int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout)
+    private String threadNamePrefix;
+
+    public GrizzlyHttpClient(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
+                             int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
@@ -79,6 +81,7 @@ public class GrizzlyHttpClient implements HttpClient
         this.maxConnections = maxConnections;
         this.usePersistentConnections = usePersistentConnections;
         this.connectionIdleTimeout = connectionIdleTimeout;
+        this.threadNamePrefix = threadNamePrefix;
     }
 
     @Override
@@ -88,11 +91,11 @@ public class GrizzlyHttpClient implements HttpClient
         builder.setAllowPoolingConnection(true);
         builder.setRemoveQueryParamsOnRedirect(false);
 
+        configureTransport(builder);
+
         configureTlsContext(builder);
 
         configureProxy(builder);
-
-        configureClientSocketProperties(builder);
 
         configureConnections(builder);
 
@@ -156,15 +159,20 @@ public class GrizzlyHttpClient implements HttpClient
             builder.setProxyServer(proxyServer);
         }
     }
-    private void configureClientSocketProperties(AsyncHttpClientConfig.Builder builder)
+
+    private void configureTransport(AsyncHttpClientConfig.Builder builder)
     {
+        GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
+        CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
+        compositeTransportCustomizer.addTransportCustomizer(new SameThreadIOStrategyTransportCustomizer(threadNamePrefix));
+
         if (clientSocketProperties != null)
         {
-            GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
-            TransportCustomizer customizer = new SocketConfigTransportCustomizer(clientSocketProperties);
-            providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, customizer);
-            builder.setAsyncHttpClientProviderConfig(providerConfig);
+            compositeTransportCustomizer.addTransportCustomizer(new SocketConfigTransportCustomizer(clientSocketProperties));
         }
+
+        providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, compositeTransportCustomizer);
+        builder.setAsyncHttpClientProviderConfig(providerConfig);
     }
 
     private void configureConnections(AsyncHttpClientConfig.Builder builder) throws InitialisationException

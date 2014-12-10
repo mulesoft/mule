@@ -6,7 +6,9 @@
  */
 package org.mule.module.http.internal.request;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -19,9 +21,10 @@ import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 
-public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable
+public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
 {
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
@@ -42,6 +45,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     private RamlApiConfiguration apiConfiguration;
     private ProxyConfig proxyConfig;
 
+    private MuleContext muleContext;
     private HttpClient httpClient;
 
     private int maxConnections = UNLIMITED_CONNECTIONS;
@@ -53,7 +57,8 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     {
         verifyConnectionsParameters();
 
-        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties, maxConnections, usePersistentConnections, connectionIdleTimeout);
+        String threadNamePrefix = String.format("%s%s", ThreadNameHelper.getPrefix(muleContext), name);
+        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties, maxConnections, usePersistentConnections, connectionIdleTimeout, threadNamePrefix);
 
         httpClient.initialise();
     }
@@ -266,4 +271,9 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 }
