@@ -2281,7 +2281,7 @@
                 <xsd:attribute name="maxQueueSize" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines the maximum number of messages that can be queued.
+                            Defines the maximum number of messages that can be queued or '-1' for unlimited.  From 3.6 the default value used is four times the value of the 'maxThreads' attribute, previously the default value was '-1' (unlimited).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

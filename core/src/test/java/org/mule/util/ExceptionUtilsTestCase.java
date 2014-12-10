@@ -6,6 +6,7 @@
  */
 package org.mule.util;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -84,14 +85,13 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase
     {
         final String mainMessage = "main message 112312 [][] ''' ... sdfsd blah";
         final String causeMessage = "cause message 2342998n  fwefoskjdcas  sdcasdhfsadjgsadkgasd \t\nsdfsllki";
-        final String lineSeparator = System.getProperty("line.separator");
 
         Exception e = new RuntimeException(mainMessage, new RuntimeException(causeMessage));
         String withoutMessage = getFullStackTraceWithoutMessages(e);
         String fullStackTrace = getFullStackTrace(e);
 
-        String[] linesWithoutMessage = withoutMessage.split(lineSeparator);
-        String[] lines = fullStackTrace.split(lineSeparator);
+        String[] linesWithoutMessage = withoutMessage.split(LINE_SEPARATOR);
+        String[] lines = fullStackTrace.split(LINE_SEPARATOR);
 
         assertEquals(lines.length, linesWithoutMessage.length);
 

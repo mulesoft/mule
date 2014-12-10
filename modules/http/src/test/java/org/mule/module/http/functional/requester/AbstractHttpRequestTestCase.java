@@ -8,10 +8,19 @@ package org.mule.module.http.functional.requester;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.FileUtils;
+import org.mule.util.CaseInsensitiveMapWrapper;
 import org.mule.util.IOUtils;
 
+import com.google.common.base.Supplier;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
+
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -19,10 +28,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.EnumerationUtils;
-import org.apache.commons.collections.map.MultiValueMap;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,6 +42,8 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
+    @Rule
+    public DynamicPort httpsPort = new DynamicPort("httpsPort");
 
     public static final String DEFAULT_RESPONSE = "<h1>Response</h1>";
 
@@ -39,7 +51,16 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     protected String method;
     protected String uri;
-    protected MultiValueMap headers = new MultiValueMap();
+    protected Multimap<String, String> headers =
+            Multimaps.newMultimap(new CaseInsensitiveMapWrapper<Collection<String>>(HashMap.class), new Supplier<Collection<String>>()
+            {
+                @Override
+                public Collection<String> get()
+                {
+                    return Sets.newHashSet();
+                }
+            });
+
     protected String body;
 
     @Before
@@ -58,7 +79,38 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     protected Server createServer()
     {
-        return new Server(httpPort.getNumber());
+        Server server = new Server(httpPort.getNumber());
+        if (enableHttps())
+        {
+            enableHttpsServer(server);
+        }
+        return server;
+    }
+
+    protected boolean enableHttps()
+    {
+        return false;
+    }
+
+    private void enableHttpsServer(Server server)
+    {
+        SslContextFactory sslContextFactory = new SslContextFactory();
+
+        try
+        {
+            sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("serverKeystore", getClass()));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        sslContextFactory.setKeyStorePassword("mulepassword");
+        sslContextFactory.setKeyManagerPassword("mulepassword");
+
+        ServerConnector connector = new ServerConnector(server, sslContextFactory);
+        connector.setPort(httpsPort.getNumber());
+        server.addConnector(connector);
     }
 
     protected AbstractHandler createHandler(Server server)
@@ -118,6 +170,6 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     public String getFirstReceivedHeader(String headerName)
     {
-        return (String) headers.getCollection(headerName).iterator().next();
+        return (String) headers.get(headerName).iterator().next();
     }
 }

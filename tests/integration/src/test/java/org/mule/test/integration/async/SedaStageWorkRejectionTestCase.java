@@ -33,14 +33,14 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
     @Test
     public void handleWorkRejectedWithExceptionStrategy() throws Exception
     {
-        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedThreadsFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedThreadsFlow", muleContext).setNumberOfExecutionsRequired(3);
         testThirdMessageSendToExceptionStrategy("vm://flow1.in", flowExecutionListener);
     }
 
     @Test
     public void handleQueueFullWithExceptionStrategy() throws Exception
     {
-        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedQueueFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedQueueFlow", muleContext).setNumberOfExecutionsRequired(3);
         testThirdMessageSendToExceptionStrategy("vm://flow2.in", flowExecutionListener);
     }
 

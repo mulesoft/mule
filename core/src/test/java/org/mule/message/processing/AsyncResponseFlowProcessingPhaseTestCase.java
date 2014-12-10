@@ -18,7 +18,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.WorkManager;
 import org.mule.execution.AsyncResponseFlowProcessingPhase;
 import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.MessageProcessContext;
@@ -29,8 +28,6 @@ import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import javax.resource.spi.work.Work;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,15 +60,13 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleException mockException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private WorkManager mockWorkManager;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private DefaultMuleEvent mockMuleEvent;
 
 
     @Before
     public void configureExpectedBehaviour() throws Exception
     {
-        when(mockContext.supportsAsynchronousProcessing()).thenReturn(true);
+        when(mockTemplate.getMuleEvent()).thenReturn(mockMuleEvent);
         doAnswer(new Answer()
         {
             @Override
@@ -92,17 +87,6 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
                 return null;
             }
         }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
-        when(mockContext.getFlowExecutionWorkManager()).thenReturn(mockWorkManager);
-        doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                Work work = (Work) invocationOnMock.getArguments()[0];
-                work.run();
-                return null;
-            }
-        }).when(mockWorkManager).scheduleWork(any(Work.class));
         when(mockTemplate.getMuleEvent()).thenReturn(mockMuleEvent);
     }
 
@@ -118,13 +102,6 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     {
         assertThat(phase.compareTo(new ValidationPhase()), is(1));
         assertThat(phase.compareTo(Mockito.mock(MessageProcessPhase.class)), is(0));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void failIfDoesNotSupportAsyncProcessing()
-    {
-        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-        phase.runPhase(mockTemplate, mockContext, mockNotifier);
     }
 
     @Test
@@ -174,12 +151,13 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
-                callback.responseSentWithFailure(mockException, (MuleEvent) invocationOnMock.getArguments()[0]);
+                callback.responseSentWithFailure(mockException, mockMuleEvent);
                 return null;
             }
         }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
+        verify(mockMuleEvent).resetAccessControl();
         verifyOnlySuccessfulWasCalled();
     }
 

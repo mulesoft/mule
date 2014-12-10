@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/udp/3.2/mule-udp.xsd=META-INF/mule-udp.xsd
 http\://www.mulesoft.org/schema/mule/udp/3.3/mule-udp.xsd=META-INF/mule-udp.xsd
 http\://www.mulesoft.org/schema/mule/udp/3.4/mule-udp.xsd=META-INF/mule-udp.xsd
 http\://www.mulesoft.org/schema/mule/udp/3.5/mule-udp.xsd=META-INF/mule-udp.xsd
+http\://www.mulesoft.org/schema/mule/udp/3.6/mule-udp.xsd=META-INF/mule-udp.xsd
 http\://www.mulesoft.org/schema/mule/udp/current/mule-udp.xsd=META-INF/mule-udp.xsd

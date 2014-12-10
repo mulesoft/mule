@@ -50,4 +50,22 @@ public class InsensitiveMapRowHandlerTestCase extends AbstractMuleTestCase
 
         TestRecordUtil.assertRecord(new Record(record), new Record(new Field(COLUMN_LABEL, COLUMN_VALUE)));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void detectColumnLabelDuplication() throws Exception
+    {
+
+        List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
+        columns.add(new ColumnMetadata(COLUMN_NAME, COLUMN_LABEL, 1));
+        columns.add(new ColumnMetadata(COLUMN_NAME, COLUMN_LABEL, 2));
+
+        ResultSetBuilder resultSetBuilder = new ResultSetBuilder(columns);
+        resultSetBuilder.with(Collections.<String, Object>emptyMap());
+        ResultSet build = resultSetBuilder.build();
+        build.next();
+
+        InsensitiveMapRowHandler rowHandler = new InsensitiveMapRowHandler();
+
+        rowHandler.process(build);
+    }
 }

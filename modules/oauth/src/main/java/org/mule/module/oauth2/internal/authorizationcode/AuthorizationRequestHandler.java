@@ -93,9 +93,9 @@ public class AuthorizationRequestHandler implements MuleContextAware
             httpListenerBuilder.setUrl(new URL(localAuthorizationUrl))
                     .setSuccessStatusCode(REDIRECT_STATUS_CODE)
                     .setFlow(flow);
-            if (oauthConfig.getTlsContextFactory() != null)
+            if (oauthConfig.getTlsContext() != null)
             {
-                httpListenerBuilder.setTlsContextFactory(oauthConfig.getTlsContextFactory());
+                httpListenerBuilder.setTlsContextFactory(oauthConfig.getTlsContext());
             }
             this.listener = httpListenerBuilder.build();
             this.listener.initialise();

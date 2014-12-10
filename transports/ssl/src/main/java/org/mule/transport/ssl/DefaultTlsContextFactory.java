@@ -9,6 +9,7 @@ package org.mule.transport.ssl;
 
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -160,5 +161,33 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     public boolean isKeyStoreConfigured()
     {
         return tlsConfiguration.getKeyStore() != null;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof DefaultTlsContextFactory))
+        {
+            return false;
+        }
+
+        DefaultTlsContextFactory that = (DefaultTlsContextFactory) o;
+
+        if (!tlsConfiguration.equals(that.tlsConfiguration))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return tlsConfiguration.hashCode();
     }
 }

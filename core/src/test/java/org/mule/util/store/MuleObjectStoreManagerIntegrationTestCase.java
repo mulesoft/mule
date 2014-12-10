@@ -86,7 +86,11 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
         final int maxEntries = 5;
         final ObjectStore os = objectStoreFactory.createObjectStore("myOs", 5, 0, expirationInterval);
 
-        for (int i = 0; i < maxEntries +1; i++)
+        os.store(0, 0);
+        ensureMilisecondChanged();
+
+
+        for (int i = 1; i < maxEntries +1; i++)
         {
             os.store(i, i);
         }
@@ -152,9 +156,13 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
         int entryTTL = 10000;
         ListableObjectStore os = objectStoreFactory.createObjectStore("myOs", maxEntries, entryTTL,100);
 
-        for (int i = 0; i < maxEntries; i++)
+        os.store(0, 0);
+
+        ensureMilisecondChanged();
+
+        for (int i = 1; i < maxEntries; i++)
         {
-            os.store(i,i);
+            os.store(i, i);
         }
 
         os.store(OBJECT_KEY, OBJECT_KEY_VALUE_1);
@@ -171,6 +179,11 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
         assertThat(os.contains(OBJECT_KEY), is(true));
     }
 
+    private void ensureMilisecondChanged() throws InterruptedException
+    {
+        Thread.sleep(2);
+    }
+
     @Test
     public void onlySizeBoundedObjectStore() throws Exception
     {
@@ -179,12 +192,16 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
 
         final ListableObjectStore os = objectStoreFactory.createObjectStore("myOs", maxEntries, entryTTL, 1000);
 
-        for (int i = 0; i < maxEntries + 1; i++)
+        os.store(0, 0);
+
+        ensureMilisecondChanged();
+
+        for (int i = 1; i < maxEntries + 1; i++)
         {
             os.store(i, i);
         }
 
-        PollingProber prober = new PollingProber(5000000, 1000);
+        PollingProber prober = new PollingProber(5000, 1000);
         prober.check(new JUnitProbe()
         {
             @Override

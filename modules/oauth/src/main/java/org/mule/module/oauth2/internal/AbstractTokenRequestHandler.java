@@ -12,9 +12,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 public abstract class AbstractTokenRequestHandler implements MuleContextAware
 {
@@ -22,7 +22,8 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware
     private MuleContext muleContext;
     private String refreshTokenWhen = OAuthConstants.DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION;
     private String tokenUrl;
-    private HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();
+    private HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();;
+    private TlsContextFactory tlsContextFactory;
 
     /**
      * @param refreshTokenWhen expression to use to determine if the response from a request to the API requires a new token
@@ -51,6 +52,11 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware
     public void setTokenUrl(String tokenUrl)
     {
         this.tokenUrl = tokenUrl;
+    }
+
+    public void setTlsContextFactory(final TlsContextFactory tlsContextFactory)
+    {
+        httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).build();
     }
 
     protected MuleEvent invokeTokenUrl(final MuleEvent event) throws MuleException

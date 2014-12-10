@@ -3,4 +3,5 @@ http\://www.mulesoft.org/schema/mule/bpm/3.2/mule-bpm.xsd=META-INF/mule-bpm.xsd
 http\://www.mulesoft.org/schema/mule/bpm/3.3/mule-bpm.xsd=META-INF/mule-bpm.xsd
 http\://www.mulesoft.org/schema/mule/bpm/3.4/mule-bpm.xsd=META-INF/mule-bpm.xsd
 http\://www.mulesoft.org/schema/mule/bpm/3.5/mule-bpm.xsd=META-INF/mule-bpm.xsd
+http\://www.mulesoft.org/schema/mule/bpm/3.6/mule-bpm.xsd=META-INF/mule-bpm.xsd
 http\://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd=META-INF/mule-bpm.xsd

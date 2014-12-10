@@ -90,6 +90,7 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
      */
     public void setOauthConfig(AuthorizationCodeGrantType oauthConfig)
     {
+        this.setTlsContextFactory(oauthConfig.getTlsContext());
         this.oauthConfig = oauthConfig;
     }
 
@@ -115,9 +116,9 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
                     .setSuccessStatusCode("#[flowVars['statusCode']]")
                     .setUrl(new URL(getOauthConfig().getRedirectionUrl()))
                     .setFlow(redirectUrlFlow);
-            if (getOauthConfig().getTlsContextFactory() != null)
+            if (getOauthConfig().getTlsContext() != null)
             {
-                httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContextFactory());
+                httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContext());
             }
             this.redirectUrlListener = httpListenerBuilder.build();
             this.redirectUrlListener.initialise();

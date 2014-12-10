@@ -7,14 +7,10 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleRuntimeException;
-import org.mule.util.FileUtils;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -311,6 +307,14 @@ class RandomAccessFileQueueStore
         }
         catch (EOFException e)
         {
+            try
+            {
+                fileTotalSpace = queueFileProvider.getRandomAccessFile().length();
+            }
+            catch (IOException ioe)
+            {
+                throw new MuleRuntimeException(e);
+            }
             if (logger.isDebugEnabled())
             {
                 logger.debug(e);
@@ -318,11 +322,6 @@ class RandomAccessFileQueueStore
         }
         catch (Exception e)
         {
-            logger.warn(e.getMessage());
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(e);
-            }
             throw new MuleRuntimeException(e);
         }
     }

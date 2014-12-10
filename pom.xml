@@ -108,7 +108,6 @@
         <module>buildtools</module>
         <module>core</module>
         <module>distributions</module>
-        <module>examples</module>
         <module>modules</module>
         <module>transports</module>
         <module>tests</module>
@@ -143,6 +142,7 @@
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://www.mulesoft.org</productUrl>
+        <dev.list>mule-esb@mulesoft.com</dev.list>
 
         <!--
              Use the name of an Eclipse Java execution environment, Eclipse will
@@ -206,8 +206,8 @@
         <jodaTimeVersion>2.5</jodaTimeVersion>
         <jschVersion>0.1.51</jschVersion>
         <junitVersion>4.11</junitVersion>
-        <log4jVersion>2.0.2</log4jVersion>
-        <disruptorVersion>3.2.1</disruptorVersion>
+        <log4jVersion>2.1</log4jVersion>
+        <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.9.5</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
@@ -675,6 +675,11 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
                 <version>${slf4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-jul</artifactId>
+                <version>${log4jVersion}</version>
             </dependency>
 
             <dependency>
@@ -1502,7 +1507,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.8</version>
+                    <version>2.9</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1632,6 +1637,11 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.3.1</version>
+                </plugin>
+                <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.6</version>
@@ -1699,22 +1709,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-test-jar</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipExportTests}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
 
             <!-- Global test exclusions -->
             <plugin>
@@ -1759,6 +1753,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipExportTests}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
                 <configuration>
                     <archive>
                         <!--
@@ -1792,9 +1797,6 @@
                     </archive>
                 </configuration>
             </plugin>
-            <!--
-                we are using 'mule' as the packaging type in our examples
-            -->
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
@@ -1886,10 +1888,6 @@
                                     <group>
                                         <title>Tools</title>
                                         <packages>org.mule.tools.*</packages>
-                                    </group>
-                                    <group>
-                                        <title>Examples</title>
-                                        <packages>org.mule.example.*</packages>
                                     </group>
                                 </groups>
                             </configuration>

@@ -10,6 +10,7 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
@@ -55,11 +56,11 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
     public void classLoaderToContext()
     {
         MuleLoggerContext context = (MuleLoggerContext) selector.getContext(EMPTY, classLoader, true);
-        assertThat(context, is(selector.getContext(EMPTY, classLoader, true)));
+        assertThat(context, is(sameInstance(selector.getContext(EMPTY, classLoader, true))));
 
         classLoader = mock(CompositeApplicationClassLoader.class, RETURNS_DEEP_STUBS);
         when(classLoader.getArtifactName()).thenReturn(getClass().getName());
-        assertThat(context, not(selector.getContext(EMPTY, classLoader, true)));
+        assertThat(context, not(sameInstance(selector.getContext(EMPTY, classLoader, true))));
     }
 
     @Test

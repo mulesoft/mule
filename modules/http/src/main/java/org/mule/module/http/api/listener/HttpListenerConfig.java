@@ -9,6 +9,7 @@ package org.mule.module.http.api.listener;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 public interface HttpListenerConfig extends Startable, Stoppable
 {
@@ -42,4 +43,8 @@ public interface HttpListenerConfig extends Startable, Stoppable
      */
     public String getHost();
 
+    /**
+     * @return TLS context for this config, or null if TLS is not enabled
+     */
+    TlsContextFactory getTlsContext();
 }

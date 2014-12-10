@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.functional.TestInputStream;
 import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
@@ -21,14 +21,12 @@ import org.mule.util.concurrent.Latch;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,6 +65,16 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     }
 
     @Test
+    public void failIfTargetServiceIsDown() throws Exception
+    {
+        handlerExtender = null;
+        stopServer();
+        Response response = Request.Get(getProxyUrl("")).connectTimeout(RECEIVE_TIMEOUT).execute();
+        HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
+    }
+
+    @Test
     public void proxyMethod() throws Exception
     {
         handlerExtender = new EchoRequestHandlerExtender()
@@ -81,7 +89,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
         Response response = Request.Post(getProxyUrl("test?parameterName=parameterValue"))
                 .bodyString("Some Text", ContentType.DEFAULT_TEXT)
-                .connectTimeout(1000).execute();
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("POST"));
@@ -102,7 +110,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
         Response response = Request.Get(getProxyUrl("test?parameterName=parameterValue"))
                 .version(HttpVersion.HTTP_1_0)
-                .connectTimeout(1000).execute();
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("HTTP/1.0"));
@@ -122,7 +130,6 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         assertRequestOk(getProxyUrl("test?parameterName=parameterValue"), "HTTP/1.1");
     }
 
-    @Ignore // TODO: MULE-8038 - See why listener is still receiving requests after this point
     @Test
     public void proxyStreaming() throws Exception
     {
@@ -130,32 +137,28 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         consumeAllRequest = false;
         handlerExtender = new RequestHandlerExtender()
         {
-            AtomicBoolean handled = new AtomicBoolean(false);
             @Override
             public void handleRequest(org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
             {
-                if( !handled.getAndSet(true) )
-                {
-                    extractHeadersFromBaseRequest(baseRequest);
+                extractHeadersFromBaseRequest(baseRequest);
 
-                    latch.release();
-                    IOUtils.toString(baseRequest.getInputStream());
+                latch.release();
+                IOUtils.toString(baseRequest.getInputStream());
 
-                    response.setContentType(request.getContentType());
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().print("OK");
-                }
+                response.setContentType(request.getContentType());
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().print("OK");
             }
         };
 
         AsyncHttpClientConfig.Builder configBuilder = new AsyncHttpClientConfig.Builder();
         AsyncHttpClientConfig config = configBuilder.build();
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config), config);
-        RequestBuilder requestBuilder = new RequestBuilder();
-        requestBuilder.setMethod("POST");
-        requestBuilder.setUrl(getProxyUrl("test?parameterName=parameterValue"));
-        requestBuilder.setBody(new InputStreamBodyGenerator(new TestInputStream(latch)));
-        ListenableFuture<com.ning.http.client.Response> future = asyncHttpClient.executeRequest(requestBuilder.build());
+
+        AsyncHttpClient.BoundRequestBuilder boundRequestBuilder = asyncHttpClient.preparePost(getProxyUrl("test?parameterName=parameterValue"));
+        boundRequestBuilder.setBody(new InputStreamBodyGenerator(new TestInputStream(latch)));
+        ListenableFuture<com.ning.http.client.Response> future = boundRequestBuilder.execute();
+
         com.ning.http.client.Response response = future.get();
         assertThat(response.getStatusCode(), is(200));
         response.getHeaders();
@@ -208,7 +211,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
         Response response = Request.Post(getProxyUrl("test"))
             .bodyString("Some Text", ContentType.DEFAULT_TEXT)
-            .connectTimeout(1000).execute();
+            .connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Some Text"));
@@ -221,11 +224,11 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 
         Response response = Request.Get(getProxyUrl("/test?name=value"))
                 .addHeader("MyCustomHeaderName", "MyCustomHeaderValue")
-                .connectTimeout(1000).execute();
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
 
-        assertThat(httpResponse.getFirstHeader("MyCustomHeaderName").getValue(), is("MyCustomHeaderValue"));
+        assertThat(getFirstReceivedHeader("MyCustomHeaderName"), is("MyCustomHeaderValue"));
 
         Set<String> lowerCaseHeaderNames = new HashSet<>();
         for(Header header : httpResponse.getAllHeaders())
@@ -239,10 +242,22 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         assertThat(lowerCaseHeaderNames.size(), is(httpResponse.getAllHeaders().length));
     }
 
+    @Test
+    public void setXForwardedForHeader() throws Exception
+    {
+        handlerExtender = null;
+
+        Response response = Request.Get(getProxyUrl(""))
+                .connectTimeout(RECEIVE_TIMEOUT).execute();
+        HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+
+        assertThat(getFirstReceivedHeader(X_FORWARDED_FOR), startsWith("/127.0.0.1:"));
+    }
 
     private void assertRequestOk(String url, String expectedResponse) throws IOException
     {
-        Response response = Request.Get(url).connectTimeout(1000).execute();
+        Response response = Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         if(expectedResponse!=null)

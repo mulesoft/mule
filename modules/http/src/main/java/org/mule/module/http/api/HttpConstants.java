@@ -45,4 +45,5 @@ public abstract class HttpConstants
         public static final String HTTP_STATUS_PROPERTY = RequestProperties.HTTP_STATUS_PROPERTY;
     }
 
+    public static final String ALL_INTERFACES_IP = "0.0.0.0";
 }

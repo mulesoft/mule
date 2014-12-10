@@ -42,15 +42,15 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("builder", new ChildDefinitionParser("builder", HttpMessageBuilderRef.class));
 
-        registerBeanDefinitionParser("query-param", new HttpRequestSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.QUERY_PARAM));
-        registerBeanDefinitionParser("query-params", new HttpRequestSingleParamDefinitionParser(HttpMapParam.class, HttpParamType.QUERY_PARAM));
+        registerBeanDefinitionParser("query-param", new HttpMessageSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.QUERY_PARAM));
+        registerBeanDefinitionParser("query-params", new HttpMessageSingleParamDefinitionParser(HttpMapParam.class, HttpParamType.QUERY_PARAM));
 
-        registerBeanDefinitionParser("uri-param", new HttpRequestSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.URI_PARAM));
-        registerBeanDefinitionParser("uri-params", new HttpRequestSingleParamDefinitionParser(HttpMapParam.class, HttpParamType.URI_PARAM));
+        registerBeanDefinitionParser("uri-param", new HttpMessageSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.URI_PARAM));
+        registerBeanDefinitionParser("uri-params", new HttpMessageSingleParamDefinitionParser(HttpMapParam.class, HttpParamType.URI_PARAM));
 
         // No bean definition parser is registered for the "header" element because it already exists in the HTTP transport.
         // The HttpNamespaceHandler from the transport will register parsers both for the new and the old header element.
-        registerBeanDefinitionParser("headers", new HttpRequestSingleParamDefinitionParser(HttpMapParam.class, HttpParamType.HEADER));
+        registerBeanDefinitionParser("headers", new HttpMessageSingleParamDefinitionParser(HttpMapParam.class, HttpParamType.HEADER));
 
         registerBeanDefinitionParser("request-config", new HttpRequestConfigDefinitionParser());
 

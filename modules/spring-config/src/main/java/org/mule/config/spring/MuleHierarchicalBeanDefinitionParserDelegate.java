@@ -9,12 +9,15 @@ package org.mule.config.spring;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.util.StringUtils;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -51,14 +54,16 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     public static final String MULE_NO_REGISTRATION = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
     public static final String MULE_POST_CHILDREN = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_POST_CHILDREN";
     private DefaultBeanDefinitionDocumentReader spring;
+    private final List<ElementValidator> elementValidators;
 
     protected static final Log logger = LogFactory.getLog(MuleHierarchicalBeanDefinitionParserDelegate.class);
 
     public MuleHierarchicalBeanDefinitionParserDelegate(XmlReaderContext readerContext,
-                                                        DefaultBeanDefinitionDocumentReader spring)
+                                                        DefaultBeanDefinitionDocumentReader spring, ElementValidator... elementValidators)
     {
         super(readerContext);
         this.spring = spring;
+        this.elementValidators = ArrayUtils.isEmpty(elementValidators) ? ImmutableList.<ElementValidator>of() : ImmutableList.copyOf(elementValidators);
     }
 
     public BeanDefinition parseCustomElement(Element element, BeanDefinition parent)
@@ -67,6 +72,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             logger.debug("parsing: " + SpringXMLUtils.elementToString(element));
         }
+
+        validate(element);
+
         if (SpringXMLUtils.isBeansNamespace(element))
         {
             return handleSpringElements(element, parent);
@@ -143,6 +151,14 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             }
 
             return finalChild;
+        }
+    }
+
+    private void validate(Element element)
+    {
+        for (ElementValidator validator : elementValidators)
+        {
+            validator.validate(element);
         }
     }
 

@@ -10,6 +10,7 @@ package org.mule.module.http.internal.request.client;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.MessageExchangePattern.ONE_WAY;
@@ -22,10 +23,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.client.SimpleOptionsBuilder;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
     private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
     private DefaultHttpRequesterConfig mockRequestConfig  = mock(DefaultHttpRequesterConfig.class, Answers.RETURNS_DEEP_STUBS.get());
+    private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class, Answers.RETURNS_DEEP_STUBS.get());
 
     private final HttpConnectorMessageProcessorProvider httpConnectorMessageProcessorProvider = new HttpConnectorMessageProcessorProvider();
 
@@ -73,9 +75,30 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
     }
 
     @Test
-    public void sameConfigReturnsSameInstanceUsingCompleteHttpOptions() throws Exception
+    public void sameConfigReturnsSameInstanceUsingCompleteHttpOptionsWithConfig() throws Exception
     {
-        HttpRequestOptions requestOptions = createFullHttpRequestOptions();
+        HttpRequestOptions options =  newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse()
+                .disableStatusCodeValidation().method(POST.name()).requestConfig(mockRequestConfig).responseTimeout(1000).build();
+
+        assertSameConfigReturnsSameInstance(options);
+    }
+
+    @Test
+    public void sameConfigReturnsSameInstanceUsingCompleteHttpOptionsWithTlsContext() throws Exception
+    {
+        // When specifying a tlsContextFactory instead of a requestConfig, the requester builder creates a new config with an
+        // auto generated unique name. Before doing this, it looks for the generated name in the registry to check that is hasn't
+        // been used yet. We need the following line so that the auto generated name is used.
+        when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
+
+        HttpRequestOptions options = newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse()
+                .disableStatusCodeValidation().method(POST.name()).tlsContextFactory(mockTlsContextFactory).responseTimeout(1000).build();
+
+        assertSameConfigReturnsSameInstance(options);
+    }
+
+    private void assertSameConfigReturnsSameInstance(HttpRequestOptions requestOptions) throws Exception
+    {
         final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, requestOptions, REQUEST_RESPONSE);
         assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, requestOptions, REQUEST_RESPONSE), is(messageProcessor));
     }
@@ -118,11 +141,6 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
     public void doNotAllowNullExchangePattern() throws Exception
     {
         httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), null);
-    }
-
-    private HttpRequestOptions createFullHttpRequestOptions()
-    {
-        return newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse().disableStatusCodeValidation().method(POST.name()).requestConfig(mockRequestConfig).responseTimeout(1000).build();
     }
 
 }

@@ -37,7 +37,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -65,14 +64,12 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     }
 
     @Test
-    @Ignore  // TODO MULE-8041: Fix HttpListenerAttachmentsTestCase
     public void receiveOnlyAttachmentsAndReturnOnlyAttachments() throws Exception
     {
         processAttachmentRequestAndResponse(formDataPath.getValue(), HttpHeaders.Values.MULTIPART_FORM_DATA);
     }
 
     @Test
-    @Ignore  // TODO MULE-8041: Fix HttpListenerAttachmentsTestCase
     public void receiveOnlyAttachmentsAndReturnOnlyAttachmentsWithMultipartMixedResponse() throws Exception
     {
         processAttachmentRequestAndResponse(mixedPath.getValue(), "multipart/mixed");

@@ -3,6 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:http="http://www.mulesoft.org/schema/mule/http"
+            xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
             targetNamespace="http://www.mulesoft.org/schema/mule/oauth2"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -12,6 +13,8 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.6/mule.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-current.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/tls"
+                schemaLocation="http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
                 schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"/>
 
@@ -39,6 +42,13 @@
         <xsd:complexContent>
             <xsd:extension base="http:abstractHttpRequestAuthenticationProvider">
                 <xsd:sequence>
+                    <xsd:element ref="tls:context" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                TLS config that will be used to receive incoming HTTP request and do HTTP request during the OAuth dance.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="authorization-request" type="authorizationRequestType">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -113,22 +123,10 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="requestConfig" type="xsd:string" use="optional">
+                <xsd:attribute name="tlsContext-ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            References an HTTP request-config element. This allows to define trusted certificates when
-                            using SSL in the OAuth dance.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="listenerConfig" type="xsd:string" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            References and HTTP listener-config element. This allows to define the keystore and
-                            truststore to
-                            use when using HTTPS in the OAuth dance for the localAuthenticationUrl of the
-                            authoriation-request element
-                            or when listening on the redirectUrl to process the OAuth callback.
+                            References a TLS config that will be used to receive incoming HTTP request and do HTTP request during the OAuth dance.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -140,6 +138,13 @@
         <xsd:complexContent>
             <xsd:extension base="http:abstractHttpRequestAuthenticationProvider">
                 <xsd:sequence>
+                    <xsd:element ref="tls:context" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                TLS config that will be used to do the HTTP request during the OAuth dance.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="token-request" type="clientCredentialsTokenRequestType" minOccurs="0"
                                  maxOccurs="1">
                         <xsd:annotation>
@@ -169,6 +174,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The token manager configuration to use for this grant type.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="tlsContext-ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            References a TLS config that will be used to receive incoming HTTP request and do HTTP request during the OAuth dance.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

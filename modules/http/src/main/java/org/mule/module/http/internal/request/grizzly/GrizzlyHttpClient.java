@@ -21,7 +21,7 @@ import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.module.http.internal.request.ProxyConfig;
-import org.mule.transport.ssl.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.StringUtils;
 
@@ -39,6 +39,8 @@ import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -48,10 +50,15 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.servlet.http.Part;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GrizzlyHttpClient implements HttpClient
 {
 
     private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
+
+    private static final Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
 
     private final TlsContextFactory tlsContextFactory;
     private final ProxyConfig proxyConfig;
@@ -79,6 +86,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnection(true);
+        builder.setRemoveQueryParamsOnRedirect(false);
 
         configureTlsContext(builder);
 
@@ -178,7 +186,7 @@ public class GrizzlyHttpClient implements HttpClient
         RequestBuilder builder = new RequestBuilder();
 
         builder.setMethod(request.getMethod());
-        builder.setUrl(request.getUri().toString());
+        builder.setUrl(encodePath(request.getUri()));
         builder.setFollowRedirects(followRedirects);
 
         for (String headerName : request.getHeaderNames())
@@ -272,6 +280,30 @@ public class GrizzlyHttpClient implements HttpClient
 
         return responseBuilder.build();
 
+    }
+
+    /**
+     * Encodes the path of a URI, keeping the query parameters unmodified. This is required because Grizzly decodes
+     * the path of the request URI when creating the HTTP request.
+     */
+    private String encodePath(String uri)
+    {
+        URI originalUri = URI.create(uri);
+
+        try
+        {
+            URI encodedUri = new URI(originalUri.getScheme(), originalUri.getUserInfo(), originalUri.getHost(),
+                                 originalUri.getPort(), originalUri.getRawPath(), originalUri.getQuery(), originalUri.getFragment());
+
+            return encodedUri.toString();
+        }
+        catch (URISyntaxException e)
+        {
+            // Log that the URI could not be encoded. Keep the previous value (un-encoded) and let Grizzly fail
+            // accordingly, as the URI is not valid.
+            logger.warn("Could not encode request URI", e);
+            return uri;
+        }
     }
 
     @Override

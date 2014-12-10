@@ -6,8 +6,11 @@
  */
 package org.mule.module.http.internal;
 
+import static org.mule.util.StringUtils.WHITE_SPACE;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.multipart.HttpPart;
+import org.mule.util.StringUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -34,10 +37,12 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 
 public class HttpParser
 {
+
+    private static final String SPACE_ENTITY = "%20";
+    private static final String PLUS_SIGN = "\\+";
     private static final String CONTENT_DISPOSITION_PART_HEADER = "Content-Disposition";
     private static final String NAME_ATTRIBUTE = "name";
 
@@ -145,6 +150,12 @@ public class HttpParser
             String[] pairs = encodedString.split("&");
             for (String pair : pairs) {
                 int idx = pair.indexOf("=");
+
+                if (idx == -1)
+                {
+                    throw new IllegalArgumentException("Invalid URL encoded string");
+                }
+
                 try
                 {
                     queryParams.put(URLDecoder.decode(pair.substring(0, idx), encoding), URLDecoder.decode(pair.substring(idx + 1), encoding));
@@ -249,5 +260,27 @@ public class HttpParser
         {
             throw new MuleRuntimeException(e);
         }
+    }
+
+    /**
+     * Normalize a path that may contains spaces, %20 or +.
+     *
+     * @param path path with encoded spaces or raw spaces
+     * @return path with only spaces.
+     */
+    public static String normalizePathWithSpacesOrEncodedSpaces(String path)
+    {
+        return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
+    }
+
+    /**
+     * Encodes spaces in a path, replacing them by %20.
+     *
+     * @param path Path that may contain spaces
+     * @return The path with all spaces replaced by %20.
+     */
+    public static String encodeSpaces(String path)
+    {
+        return path.replaceAll(WHITE_SPACE, SPACE_ENTITY);
     }
 }

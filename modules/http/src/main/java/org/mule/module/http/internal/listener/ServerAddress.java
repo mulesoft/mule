@@ -7,8 +7,10 @@
 package org.mule.module.http.internal.listener;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.util.NetworkUtils;
+import org.mule.module.http.api.HttpConstants;
 
-import java.net.InetAddress;
+
 import java.net.UnknownHostException;
 
 public class ServerAddress
@@ -24,7 +26,7 @@ public class ServerAddress
         {
             this.host = host;
             this.port = port;
-            this.ip = InetAddress.getByName(host).getHostAddress();
+            this.ip = NetworkUtils.getLocalHostIp(host);
         }
         catch (UnknownHostException e)
         {
@@ -45,6 +47,17 @@ public class ServerAddress
     public String getIp()
     {
         return ip;
+    }
+
+    public boolean overlaps(ServerAddress serverAddress)
+    {
+        return (port == serverAddress.getPort()) &&
+               (isAllInterfaces() || serverAddress.isAllInterfaces());
+    }
+
+    public boolean isAllInterfaces()
+    {
+        return host.equals(HttpConstants.ALL_INTERFACES_IP);
     }
 
     @Override

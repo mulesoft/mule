@@ -94,6 +94,13 @@ public class HttpRequestPathsTestCase extends AbstractHttpRequestTestCase
         assertRequestUri("requestWithBasePath", "basePath/", "/testPath", "/basePath/testPath");
     }
 
+    @Test
+    public void customPathWithSpaceAndEncodedCharacter() throws Exception
+    {
+        // Spaces should be replaced by "%20", but any other encoded character must not be modified.
+        assertRequestUri("requestWithBasePath", "base Path%25", "test Path%25?k1=v%25&k2=v2", "/base%20Path%25/test%20Path%25?k1=v%25&k2=v2");
+    }
+
 
 
 

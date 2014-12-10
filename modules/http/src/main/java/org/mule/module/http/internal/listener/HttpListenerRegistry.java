@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.request.HttpRequest;
@@ -34,7 +36,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
     private static final String SLASH = "/";
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Map<ServerAddress, Server> serverAddressToServerMap = new HashMap<>();
+    private final ServerAddressMap<Server> serverAddressToServerMap = new ServerAddressMap<>();
     private final Map<Server, ServerAddressRequestHandlerRegistry> requestHandlerPerServerAddress = new HashMap<>();
 
     public synchronized RequestHandlerManager addRequestHandler(final Server server, final RequestHandler requestHandler, final ListenerRequestMatcher requestMatcher)
@@ -87,7 +89,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         public synchronized RequestHandlerManager addRequestHandler(final ListenerRequestMatcher requestMatcher, final RequestHandler requestHandler)
         {
             pathMapSearchCache.invalidateAll();
-            String requestMatcherPath = requestMatcher.getPath();
+            String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
             Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER), "path parameter must start with /");
             validateCollision(requestMatcher);
             PathMap currentPathMap = rootPathMap;
@@ -187,7 +189,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
-            final String path = request.getPath();
+            final String path = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
             Preconditions.checkArgument(path.startsWith(SLASH), "path parameter must start with /");
             Stack<PathMap> foundPaths = findPossibleRequestHandlersFromCache(path);
 
@@ -230,7 +232,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             }
             if (path.equals(SLASH))
             {
-                foundPaths.add(rootPathMap);
+                foundPaths.push(rootPathMap);
                 return foundPaths;
             }
             for (int i = 1; i < pathParts.length && currentPathMap != null; i++)
@@ -239,26 +241,33 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 PathMap pathMap = currentPathMap.getChildPathMap(currentPath);
                 if (pathMap == null)
                 {
+                    addCatchAllPathMapIfNotNull(currentPathMap, foundPaths);
                     pathMap = currentPathMap.getCatchAllCurrentPathMap();
                 }
                 if (i == pathParts.length - 1)
                 {
                     if (pathMap != null)
                     {
+                        addCatchAllPathMapIfNotNull(pathMap, foundPaths);
                         foundPaths.push(pathMap);
                     }
                     else
                     {
-                        final PathMap catchAllPathMap = currentPathMap.getCatchAllPathMap();
-                        if (catchAllPathMap != null)
-                        {
-                            foundPaths.push(catchAllPathMap);
-                        }
+                        addCatchAllPathMapIfNotNull(currentPathMap, foundPaths);
                     }
                 }
                 currentPathMap = pathMap;
             }
             return foundPaths;
+        }
+
+        private void addCatchAllPathMapIfNotNull(PathMap currentPathMap, Stack<PathMap> foundPaths)
+        {
+            final PathMap catchAllPathMap = currentPathMap.getCatchAllPathMap();
+            if (catchAllPathMap != null)
+            {
+                foundPaths.push(catchAllPathMap);
+            }
         }
 
         private RequestHandlerMatcherPair findRequestHandlerMatcherPair(List<RequestHandlerMatcherPair> requestHandlerMatcherPairs, HttpRequest request)
@@ -326,11 +335,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
          */
         public PathMap getChildPathMap(final String subPath)
         {
-            if (isCatchAllPath(subPath))
-            {
-                return getCatchAllPathMap();
-            }
-            if (isUriParameter(subPath))
+            if (isCatchAllPath(subPath) || isUriParameter(subPath))
             {
                 return getCatchAllCurrentPathMap();
             }

@@ -310,6 +310,10 @@ public abstract class HttpHeaders
          * {@value "WWW-Authenticate"}
          */
         public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
+        /**
+         * {@value "X-Forwarded-For"}
+         */
+        public static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
         private Names()
         {

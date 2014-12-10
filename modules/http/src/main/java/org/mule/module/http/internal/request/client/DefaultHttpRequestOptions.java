@@ -9,6 +9,7 @@ package org.mule.module.http.internal.request.client;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 /**
  * Default implementation for {@link org.mule.module.http.api.client.HttpRequestOptions}
@@ -23,8 +24,9 @@ public class DefaultHttpRequestOptions implements HttpRequestOptions
     private final boolean disableStatusCodeValidation;
     private final boolean disableParseResponse;
     private final Long responseTimeout;
+    private final TlsContextFactory tlsContextFactory;
 
-    public DefaultHttpRequestOptions(String method, Boolean followsRedirect, HttpStreamingType requestStreamingMode, HttpRequesterConfig requestConfig, boolean disableStatusCodeValidation, boolean disableParseResponse, Long responseTimeout)
+    public DefaultHttpRequestOptions(String method, Boolean followsRedirect, HttpStreamingType requestStreamingMode, HttpRequesterConfig requestConfig, boolean disableStatusCodeValidation, boolean disableParseResponse, TlsContextFactory tlsContextFactory, Long responseTimeout)
     {
         this.method = method;
         this.followsRedirect = followsRedirect;
@@ -32,6 +34,7 @@ public class DefaultHttpRequestOptions implements HttpRequestOptions
         this.requestConfig = requestConfig;
         this.disableStatusCodeValidation = disableStatusCodeValidation;
         this.disableParseResponse = disableParseResponse;
+        this.tlsContextFactory = tlsContextFactory;
         this.responseTimeout = responseTimeout;
     }
 
@@ -78,6 +81,12 @@ public class DefaultHttpRequestOptions implements HttpRequestOptions
     }
 
     @Override
+    public TlsContextFactory getTlsContextFactory()
+    {
+        return tlsContextFactory;
+    }
+
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -116,6 +125,16 @@ public class DefaultHttpRequestOptions implements HttpRequestOptions
             return false;
         }
 
+        if (tlsContextFactory == null ? that.tlsContextFactory != null : !tlsContextFactory.equals(that.tlsContextFactory))
+        {
+            return false;
+        }
+
+        if (disableParseResponse != that.isParseResponseDisabled())
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -127,6 +146,7 @@ public class DefaultHttpRequestOptions implements HttpRequestOptions
         result = hashcodePrimerNumber * result + (followsRedirect != null ? followsRedirect.hashCode() : 0);
         result = hashcodePrimerNumber * result + (requestStreamingMode != null ? requestStreamingMode.hashCode() : 0);
         result = hashcodePrimerNumber * result + (requestConfig != null ? requestConfig.hashCode() : 0);
+        result = hashcodePrimerNumber * result + (tlsContextFactory != null ? tlsContextFactory.hashCode() : 0);
         result = hashcodePrimerNumber * result + (disableStatusCodeValidation ? 1 : 0);
         result = hashcodePrimerNumber * result + (disableParseResponse ? 1 : 0);
         return result;

@@ -60,4 +60,51 @@
         <echo-component/>
     </flow>
 
+
+    <!-- Flow that uses the header element inside the response-builder element of the HTTP module to check
+         that there is no conflict with the header of the response-builder of the transport when parsing. -->
+
+    <http:listener-config name="httpConfig" host="localhost" port="${port2}" />
+
+    <flow name="httpListenerFlowNestedBuilder">
+        <http:listener config-ref="httpConfig" path="/nested">
+            <http:response-builder>
+                <http:header headerName="testHeader" value="testValue" />
+            </http:response-builder>
+        </http:listener>
+        <echo-component />
+    </flow>
+
+    <flow name="httpListenerFlowNestedErrorBuilder">
+        <http:listener config-ref="httpConfig" path="/nestedError">
+            <http:error-response-builder statusCode="200">
+                <http:header headerName="testHeader" value="testValue" />
+            </http:error-response-builder>
+        </http:listener>
+        <test:component throwException="true" />
+    </flow>
+
+    <http:response-builder name="globalResponseBuilder">
+        <http:header headerName="testHeader" value="testValue" />
+    </http:response-builder>
+
+    <flow name="httpListenerFlowGlobalBuilder">
+        <http:listener config-ref="httpConfig" path="/global">
+            <http:response-builder>
+                <http:builder ref="globalResponseBuilder" />
+            </http:response-builder>
+        </http:listener>
+        <echo-component />
+    </flow>
+
+    <flow name="httpListenerFlowGlobalErrorBuilder">
+        <http:listener config-ref="httpConfig" path="/globalError">
+            <http:error-response-builder statusCode="200">
+                <http:builder ref="globalResponseBuilder" />
+            </http:error-response-builder>
+        </http:listener>
+        <test:component throwException="true" />
+    </flow>
+
+
 </mule>

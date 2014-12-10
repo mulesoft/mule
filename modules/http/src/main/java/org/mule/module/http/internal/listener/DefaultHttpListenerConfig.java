@@ -12,6 +12,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
@@ -21,7 +22,7 @@ import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.transport.ssl.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.Preconditions;
@@ -37,8 +38,6 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
     public static final int DEFAULT_MAX_THREADS = 128;
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    public static final String HTTP_EMPTY_CONFIG_ID = "_httpEmptyListenerConfig";
-    public static final String HTTP_SSL_EMPTY_LISTENER_CONFIG = "_httpSslEmptyListenerConfig";
 
     public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
 
@@ -136,13 +135,26 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
         if (tlsContext == null)
         {
-            server = connectionManager.createServer(new ServerAddress(host, port), usePersistentConnections, connectionIdleTimeout);
+            server = connectionManager.createServer(new ServerAddress(host, port), createWorkManagerSource(), usePersistentConnections, connectionIdleTimeout);
         }
         else
         {
-            server = connectionManager.createSslServer(new ServerAddress(host, port), tlsContext, usePersistentConnections, connectionIdleTimeout);
+            server = connectionManager.createSslServer(new ServerAddress(host, port), createWorkManagerSource(), tlsContext, usePersistentConnections, connectionIdleTimeout);
         }
         initialised = true;
+    }
+
+    //We use a WorkManagerSource since the workManager instance may be recreated during stop/start and it would leave the server with an invalid work manager instance.
+    private WorkManagerSource createWorkManagerSource()
+    {
+        return new WorkManagerSource()
+        {
+            @Override
+            public WorkManager getWorkManager() throws MuleException
+            {
+                return workManager;
+            }
+        };
     }
 
     private void verifyConnectionsParameters() throws InitialisationException
@@ -186,6 +198,12 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     public String getHost()
     {
         return host;
+    }
+
+    @Override
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContext;
     }
 
     @Override

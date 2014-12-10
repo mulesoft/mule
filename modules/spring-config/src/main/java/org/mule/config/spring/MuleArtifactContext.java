@@ -115,11 +115,16 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     {
         XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
         //hook in our custom hierarchical reader
-        beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
+        beanDefinitionReader.setDocumentReaderClass(getBeanDefinitionDocumentReaderClass());
         //add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
 
         return beanDefinitionReader;
+    }
+
+    protected Class<? extends MuleBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass()
+    {
+        return MuleBeanDefinitionDocumentReader.class;
     }
 
     @Override

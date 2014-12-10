@@ -64,6 +64,6 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
             assertEquals("test Received", msg.getPayload());
         }
 
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+        latch.await();
     }
 }

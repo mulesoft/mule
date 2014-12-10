@@ -12,6 +12,9 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -19,22 +22,40 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 {
-
+    private final String configFile;
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-    
-    @Override
-    protected String getConfigFile()
+
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "http-filter-test.xml";
+        return Arrays.asList(new Object[][]{
+            {"http-transport-filter-test.xml"},
+            {"http-module-filter-test.xml"}
+        });
+    }
+
+    public HttpFilterFunctionalTestCase(String configFile)
+    {
+        this.configFile = configFile;
     }
 
     protected String getUrl()
     {
         return "http://localhost:" + port1.getNumber() + "/authenticate";
+    }
+
+    @Override
+    protected String getConfigFile()
+    {
+        return configFile;
     }
 
     @Test

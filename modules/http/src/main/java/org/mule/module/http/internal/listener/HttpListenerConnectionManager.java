@@ -10,12 +10,13 @@ package org.mule.module.http.internal.listener;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager;
-import org.mule.transport.ssl.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.concurrent.ThreadNameHelper;
@@ -29,6 +30,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
 {
 
     public static final String HTTP_LISTENER_CONNECTION_MANAGER = "_httpListenerConnectionManager";
+    public static final String SERVER_ALREADY_EXISTS_FORMAT = "A server in port(%s) already exists for host(%s) or one overlapping it (0.0.0.0).";
 
     private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
     private HttpServerManager httpServerManager;
@@ -73,13 +75,13 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         this.muleContext = muleContext;
     }
 
-    public Server createServer(ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout)
+    public Server createServer(ServerAddress serverAddress, WorkManagerSource workManagerSource, boolean usePersistentConnections, int connectionIdleTimeout)
     {
         if (!httpServerManager.containsServerFor(serverAddress))
         {
             try
             {
-                return httpServerManager.createServerFor(serverAddress, usePersistentConnections, connectionIdleTimeout);
+                return httpServerManager.createServerFor(serverAddress, workManagerSource, usePersistentConnections, connectionIdleTimeout);
             }
             catch (IOException e)
             {
@@ -88,17 +90,17 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(SERVER_ALREADY_EXISTS_FORMAT, serverAddress.getPort(), serverAddress.getHost())));
         }
     }
 
-    public Server createSslServer(ServerAddress serverAddress, TlsContextFactory tlsContext, boolean usePersistentConnections, int connectionIdleTimeout)
+    public Server createSslServer(ServerAddress serverAddress, WorkManagerSource workManagerSource, TlsContextFactory tlsContext, boolean usePersistentConnections, int connectionIdleTimeout)
     {
         if (!httpServerManager.containsServerFor(serverAddress))
         {
             try
             {
-                return httpServerManager.createSslServerFor(tlsContext, serverAddress, usePersistentConnections, connectionIdleTimeout);
+                return httpServerManager.createSslServerFor(tlsContext, workManagerSource, serverAddress, usePersistentConnections, connectionIdleTimeout);
             }
             catch (IOException e)
             {
@@ -107,7 +109,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(SERVER_ALREADY_EXISTS_FORMAT, serverAddress.getPort(), serverAddress.getHost())));
         }
     }
 
