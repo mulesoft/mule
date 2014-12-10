@@ -123,8 +123,10 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
         if (tlsContextFactory != null)
         {
             DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
+            requesterConfig.setName(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"));
+            requesterConfig.setMuleContext(muleContext);
             requesterConfig.setTlsContext(tlsContextFactory);
-            muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"), requesterConfig);
+            muleContext.getRegistry().registerObject(requesterConfig.getName(), requesterConfig);
             httpRequester.setConfig(requesterConfig);
         }
         else if (httpRequester.getConfig() == null)
@@ -134,7 +136,9 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
             if (requestConfig == null)
             {
                 requestConfig = new DefaultHttpRequesterConfig();
-                muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
+                requestConfig.setName(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
+                requestConfig.setMuleContext(muleContext);
+                muleContext.getRegistry().registerObject(requestConfig.getName(), requestConfig);
             }
 
             httpRequester.setConfig(requestConfig);
