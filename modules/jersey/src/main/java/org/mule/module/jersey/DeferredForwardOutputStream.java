@@ -27,52 +27,25 @@ import java.util.List;
 public class DeferredForwardOutputStream extends OutputStream
 {
 
-    private interface DeferredWrite
+    private class DeferredWrite
     {
 
-        void write(OutputStream outputStream) throws IOException;
-    }
+        private final byte[] buffer;
 
-    private class BufferedDeferredWrite implements DeferredWrite
-    {
-
-        private final byte[] buf;
-        private final int off;
-        private final int len;
-
-        private BufferedDeferredWrite(byte[] buf, int off, int len)
+        public DeferredWrite(byte[] buffer)
         {
-            this.buf = buf;
-            this.off = off;
-            this.len = len;
+            this.buffer = buffer;
         }
 
-        @Override
-        public void write(OutputStream outputStream) throws IOException
+        void write(OutputStream outputStream) throws IOException
         {
-            outputStream.write(buf, off, len);
-        }
-    }
-
-    private class ByteDeferredWrite implements DeferredWrite
-    {
-
-        private final int b;
-
-        private ByteDeferredWrite(int b)
-        {
-            this.b = b;
-        }
-
-        @Override
-        public void write(OutputStream outputStream) throws IOException
-        {
-            outputStream.write(b);
+            outputStream.write(buffer);
         }
     }
 
     private OutputStream delegate;
     private final List<DeferredWrite> deferredWrites = new LinkedList<>();
+    private boolean closeRequested = false;
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException
@@ -99,7 +72,9 @@ public class DeferredForwardOutputStream extends OutputStream
             }
             else
             {
-                deferredWrites.add(new BufferedDeferredWrite(b, off, len));
+                byte[] buffer = new byte[len];
+                System.arraycopy(b, off, buffer, 0, len);
+                deferredWrites.add(new DeferredWrite(buffer));
             }
         }
     }
@@ -113,7 +88,7 @@ public class DeferredForwardOutputStream extends OutputStream
         }
         else
         {
-            deferredWrites.add(new ByteDeferredWrite(b));
+            deferredWrites.add(new DeferredWrite(new byte[] {(byte) b}));
         }
     }
 
@@ -128,10 +103,28 @@ public class DeferredForwardOutputStream extends OutputStream
             {
                 deferred.write(delegate);
             }
+
+            if (closeRequested)
+            {
+                close();
+            }
         }
         finally
         {
             deferredWrites.clear();
+        }
+    }
+
+    @Override
+    public synchronized void close() throws IOException
+    {
+        if (delegate != null)
+        {
+            delegate.close();
+        }
+        else
+        {
+            closeRequested = true;
         }
     }
 }
