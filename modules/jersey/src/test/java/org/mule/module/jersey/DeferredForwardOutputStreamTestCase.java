@@ -6,6 +6,9 @@
  */
 package org.mule.module.jersey;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -15,10 +18,12 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.OutputStream;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -52,7 +57,12 @@ public class DeferredForwardOutputStreamTestCase extends AbstractMuleTestCase
 
         outputStream.setDelegate(delegate);
 
-        verify(delegate, times(2)).write(buffer, off, len);
+        ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
+        verify(delegate, times(2)).write(captor.capture());
+        byte[] captured = captor.getValue();
+        assertThat(captured.length, is(len));
+        assertThat(ArrayUtils.isEquals(buffer, captured), is(true));
+        verifyClose();
     }
 
     @Test
@@ -60,11 +70,12 @@ public class DeferredForwardOutputStreamTestCase extends AbstractMuleTestCase
     {
         outputStream.write(buffer, off, len);
         outputStream.setDelegate(delegate);
-        verify(delegate).write(buffer, off, len);
+        verifyDeferredDelegation(delegate, buffer, len);
 
         reset(delegate);
         outputStream.write(buffer, off, len);
-        verify(delegate).write(buffer, off, len);
+        verifyDelegation(delegate, buffer, off, len);
+        verifyClose();
     }
 
     @Test
@@ -76,6 +87,7 @@ public class DeferredForwardOutputStreamTestCase extends AbstractMuleTestCase
         outputStream.write(buffer, off, len);
 
         verify(delegate, times(2)).write(buffer, off, len);
+        verifyClose();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -106,5 +118,29 @@ public class DeferredForwardOutputStreamTestCase extends AbstractMuleTestCase
 
         outputStream.write(buffer, off, len);
         verify(delegate, never()).write(buffer, off, len);
+    }
+
+    private void verifyDeferredDelegation(OutputStream delegate, byte[] buffer, int len) throws Exception
+    {
+        ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
+        verify(delegate).write(captor.capture());
+        byte[] captured = captor.getValue();
+        assertThat(captured.length, is(len));
+        assertThat(ArrayUtils.isEquals(buffer, captured), is(true));
+    }
+
+    private void verifyDelegation(OutputStream delegate, byte[] buffer, int off, int len) throws Exception
+    {
+        ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
+        verify(delegate).write(captor.capture(), eq(off), eq(len));
+        byte[] captured = captor.getValue();
+        assertThat(captured.length, is(len));
+        assertThat(ArrayUtils.isEquals(buffer, captured), is(true));
+    }
+
+    private void verifyClose() throws Exception
+    {
+        outputStream.close();
+        verify(delegate).close();
     }
 }
