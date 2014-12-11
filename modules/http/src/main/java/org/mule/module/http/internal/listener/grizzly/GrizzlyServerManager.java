@@ -151,7 +151,7 @@ public class GrizzlyServerManager implements HttpServerManager
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Creating https server socket for host %s and path %s", serverAddress.getHost(), serverAddress.getPort());
+            logger.debug("Creating https server socket for ip %s and path %s", serverAddress.getIp(), serverAddress.getPort());
         }
         if (servers.containsKey(serverAddress))
         {
@@ -169,7 +169,7 @@ public class GrizzlyServerManager implements HttpServerManager
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Creating http server socket for host %s and path %s", serverAddress.getHost(), serverAddress.getPort());
+            logger.debug("Creating http server socket for ip %s and path %s", serverAddress.getIp(), serverAddress.getPort());
         }
         if (servers.containsKey(serverAddress))
         {

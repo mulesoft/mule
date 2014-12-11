@@ -143,8 +143,8 @@ public class GrizzlyAddressDelegateFilter<F extends BaseFilter> extends BaseFilt
     {
         final InetSocketAddress inetAddress = (InetSocketAddress) connection.getLocalAddress();
         final int port = inetAddress.getPort();
-        final String host = inetAddress.getHostName();
-        return filters.get(new ServerAddress(host, port));
+        final String ip = inetAddress.getAddress().getHostAddress();
+        return filters.get(new ServerAddress(ip, port));
     }
 
     /**

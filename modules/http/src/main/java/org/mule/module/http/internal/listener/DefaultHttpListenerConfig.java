@@ -25,10 +25,12 @@ import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
+import org.mule.util.NetworkUtils;
 import org.mule.util.Preconditions;
 import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,13 +135,25 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
         verifyConnectionsParameters();
 
+
+        ServerAddress serverAddress;
+
+        try
+        {
+            serverAddress = createServerAddress();
+        }
+        catch (UnknownHostException e)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("Cannot resolve host %s", host), e, this);
+        }
+
         if (tlsContext == null)
         {
-            server = connectionManager.createServer(new ServerAddress(host, port), createWorkManagerSource(), usePersistentConnections, connectionIdleTimeout);
+            server = connectionManager.createServer(serverAddress, createWorkManagerSource(), usePersistentConnections, connectionIdleTimeout);
         }
         else
         {
-            server = connectionManager.createSslServer(new ServerAddress(host, port), createWorkManagerSource(), tlsContext, usePersistentConnections, connectionIdleTimeout);
+            server = connectionManager.createSslServer(serverAddress, createWorkManagerSource(), tlsContext, usePersistentConnections, connectionIdleTimeout);
         }
         initialised = true;
     }
@@ -173,6 +187,14 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             ((MuleContextAware) workManager).setMuleContext(muleContext);
         }
         return workManager;
+    }
+
+    /**
+     * Creates the server address object with the IP and port that this config should bind to.
+     */
+    private ServerAddress createServerAddress() throws UnknownHostException
+    {
+        return new ServerAddress(NetworkUtils.getLocalHostIp(host), port);
     }
 
     public void setMuleContext(final MuleContext muleContext)
