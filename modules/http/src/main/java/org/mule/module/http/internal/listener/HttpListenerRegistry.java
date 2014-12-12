@@ -15,14 +15,17 @@ import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
 
+import com.google.common.base.Joiner;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.slf4j.Logger;
@@ -65,10 +68,10 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             {
                 return serverAddressRequestHandlerRegistry.findRequestHandler(request);
             }
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("No RequestHandler found for request: " + request.getPath());
-            }
+        }
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("No RequestHandler found for request: " + request.getPath());
         }
         return NoListenerRequestHandler.getInstance();
     }
@@ -79,6 +82,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         private PathMap serverRequestHandler;
         private PathMap rootPathMap = new PathMap();
         private PathMap catchAllPathMap = new PathMap();
+        private Set<String> paths = new HashSet<>();
         private LoadingCache<String, Stack<PathMap>> pathMapSearchCache = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, Stack<PathMap>>() {
             public Stack<PathMap> load(String path) {
                 return findPossibleRequestHandlers(path);
@@ -91,6 +95,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
             Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER), "path parameter must start with /");
             validateCollision(requestMatcher);
+            paths.add(requestMatcherPath);
             PathMap currentPathMap = rootPathMap;
             final RequestHandlerMatcherPair addedRequestHandlerMatcherPair;
             final PathMap requestHandlerOwner;
@@ -204,6 +209,11 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             }
             if (requestHandlerMatcherPair == null)
             {
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn("No listener found for request: " + request.getPath());
+                    logger.warn("Available listeners are: [{}]", Joiner.on(", ").join(this.paths));
+                }
                 return NoListenerRequestHandler.getInstance();
             }
             if (!requestHandlerMatcherPair.isRunning())

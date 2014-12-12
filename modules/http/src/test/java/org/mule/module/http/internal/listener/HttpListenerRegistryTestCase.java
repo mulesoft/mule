@@ -6,17 +6,17 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.domain.request.HttpRequest;
+import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
-import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.StringUtils;
@@ -272,6 +272,15 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         routePath(METHOD_PATH_URI_PARAM.replace(URI_PARAM, SOME_OTHER_PATH), POST_METHOD, methodPathUriParamPostRequestHandler);
         routePath(METHOD_PATH_WILDCARD.replace(WILDCARD_CHARACTER, SOME_PATH), GET_METHOD, methodPathWildcardGetRequestHandler);
         routePath(METHOD_PATH_WILDCARD.replace(WILDCARD_CHARACTER, SOME_PATH), POST_METHOD, methodPathWildcardPostRequestHandler);
+    }
+
+    @Test
+    public void noPathFound()
+    {
+        httpListenerRegistry = new HttpListenerRegistry();
+        httpListenerRegistry.addRequestHandler(testServer, mock(RequestHandler.class), new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), ROOT_PATH));
+        RequestHandler requestHandler = httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath(ANOTHER_PATH));
+        assertThat(requestHandler, is(instanceOf(NoListenerRequestHandler.class)));
     }
 
     private void routePath(String requestPath, String listenerPath)
