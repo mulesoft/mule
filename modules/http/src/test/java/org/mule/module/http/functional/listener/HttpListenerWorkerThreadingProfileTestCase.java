@@ -58,7 +58,7 @@ public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCa
         expectedException.expect(NoHttpResponseException.class);
         try
         {
-            Request.Get(String.format("http://localhost:%s", listenPort.getNumber())).connectTimeout(100).socketTimeout(100).execute();
+            Request.Get(String.format("http://localhost:%s", listenPort.getNumber())).execute();
         }
         finally
         {
