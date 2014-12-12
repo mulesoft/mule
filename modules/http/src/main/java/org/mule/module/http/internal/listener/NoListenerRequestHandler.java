@@ -25,7 +25,7 @@ public class NoListenerRequestHandler implements RequestHandler
 {
 
     public static final int RESOURCE_NOT_FOUND_STATUS_CODE = 404;
-    private static final String RESOURCE_NOT_FOUND = "Resource not found.";
+    public static final String RESOURCE_NOT_FOUND = "Resource not found.";
 
     private Logger logger = LoggerFactory.getLogger(NoListenerRequestHandler.class);
 

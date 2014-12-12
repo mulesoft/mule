@@ -15,6 +15,7 @@ import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
 
+import com.google.common.base.Joiner;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -211,7 +212,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 if (logger.isWarnEnabled())
                 {
                     logger.warn("No listener found for request: " + request.getPath());
-                    logger.warn("Available listeners are: " + paths);
+                    logger.warn("Available listeners are: [{}]", Joiner.on(", ").join(this.paths));
                 }
                 return NoListenerRequestHandler.getInstance();
             }
