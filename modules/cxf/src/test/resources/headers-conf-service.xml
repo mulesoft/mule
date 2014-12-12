@@ -22,7 +22,7 @@
                     <cxf:simple-service serviceClass="org.mule.tck.functional.Receiveable"/>
                 </inbound-endpoint>
             </inbound>
-            <test:component appendString=" Received" />
+            <test:component appendString=" Received" enableNotifications="true"/>
         </service>
     </model>
 </mule>

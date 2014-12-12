@@ -8,7 +8,6 @@ package org.mule.module.cxf.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -21,20 +20,37 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class CxfClientExceptionStrategyTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Parameterized.Parameter(0)
+    public String config;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"cxf-client-exception-strategy-flow.xml"},
+                {"cxf-client-exception-strategy-flow-httpn.xml"}
+        });
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "cxf-client-exception-strategy-flow.xml";
+        return config;
     }
 
     @Test

@@ -19,7 +19,7 @@
                           exchange-pattern="request-response">
             <cxf:simple-service serviceClass="org.mule.tck.functional.Receiveable"/>
         </inbound-endpoint>
-        <test:component appendString=" Received"/>
+        <test:component appendString=" Received" enableNotifications="true"/>
     </flow>
     
 </mule>

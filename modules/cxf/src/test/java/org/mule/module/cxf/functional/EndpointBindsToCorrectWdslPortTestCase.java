@@ -32,6 +32,8 @@ import org.junit.runners.Parameterized.Parameters;
 public class EndpointBindsToCorrectWdslPortTestCase extends AbstractServiceAndFlowTestCase
 {
 
+    private static final String FLOW_HTTPN = "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow-httpn.xml";
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -43,21 +45,31 @@ public class EndpointBindsToCorrectWdslPortTestCase extends AbstractServiceAndFl
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.SERVICE, "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-service.xml"},
+                {ConfigVariant.FLOW, "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow.xml"},
+                {ConfigVariant.FLOW, FLOW_HTTPN}
         });
-    }      
+    }
 
     @Test
     public void testThatTheCorrectSoapPortIsChosen() throws Exception
     {
-        DefaultInboundEndpoint inboundEndpoint;
-        
+        FlowConfiguringMessageProcessor wrapper;
+
         if (variant.equals(ConfigVariant.FLOW))
         {
             final Flow flow = muleContext.getRegistry().lookupObject("CXFProxyService");
-            inboundEndpoint = (DefaultInboundEndpoint) flow.getMessageSource();                        
+            if (FLOW_HTTPN.equals(configResources))
+            {
+                wrapper = (FlowConfiguringMessageProcessor) flow.getMessageProcessors().get(0);
+            }
+            else
+            {
+                DefaultInboundEndpoint inboundEndpoint = (DefaultInboundEndpoint) flow.getMessageSource();
+                List<MessageProcessor> processors = inboundEndpoint.getMessageProcessors();
+                wrapper = (FlowConfiguringMessageProcessor) processors.get(0);
+            }
         }
         else
         {
@@ -65,18 +77,18 @@ public class EndpointBindsToCorrectWdslPortTestCase extends AbstractServiceAndFl
             ServiceCompositeMessageSource messageSource = (ServiceCompositeMessageSource) service.getMessageSource();
 
             List<InboundEndpoint> endpoints = messageSource.getEndpoints();
-            inboundEndpoint = (DefaultInboundEndpoint) endpoints.get(0);            
-        }               
-        
-        List<MessageProcessor> processors = inboundEndpoint.getMessageProcessors();
-        FlowConfiguringMessageProcessor wrapper = (FlowConfiguringMessageProcessor) processors.get(0);
+            DefaultInboundEndpoint inboundEndpoint = (DefaultInboundEndpoint) endpoints.get(0);
+            List<MessageProcessor> processors = inboundEndpoint.getMessageProcessors();
+            wrapper = (FlowConfiguringMessageProcessor) processors.get(0);
+        }
+
         CxfInboundMessageProcessor cxfProcessor = (CxfInboundMessageProcessor) wrapper.getWrappedMessageProcessor();
         Server server = cxfProcessor.getServer();
         EndpointInfo endpointInfo = server.getEndpoint().getEndpointInfo();
 
         assertEquals(
-            "The local part of the endpoing name must be the one supplied as the endpointName parameter on the cxf:inbound-endpoint",
-            "ListsSoap", endpointInfo.getName().getLocalPart());
+                "The local part of the endpoing name must be the one supplied as the endpointName parameter on the cxf:inbound-endpoint",
+                "ListsSoap", endpointInfo.getName().getLocalPart());
     }
 
 }

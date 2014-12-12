@@ -6,37 +6,52 @@
  */
 package org.mule.module.cxf;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.context.notification.EndpointMessageNotification;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.FunctionalTestNotification;
+import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase implements EndpointMessageNotificationListener
+public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase implements FunctionalTestNotificationListener
 {
-    protected String endpointAddress = null;
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+
+    private static final String REQUEST_PAYLOAD =
+        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+            "<soap:Body>\n" +
+            "<ns1:onReceive xmlns:ns1=\"http://functional.tck.mule.org/\">\n" +
+            "    <ns1:arg0 xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xsd:string\">Test String</ns1:arg0>\n" +
+            "</ns1:onReceive>\n" +
+            "</soap:Body>\n" +
+            "</soap:Envelope>";
+
+    private static final String SOAP_RESPONSE = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns1:onReceiveResponse xmlns:ns1=\"http://functional.tck.mule.org/\"><ns1:return xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xsd:string\">Test String Received</ns1:return></ns1:onReceiveResponse></soap:Body></soap:Envelope>";
+
     private List<MuleMessage> notificationMsgList = new ArrayList<MuleMessage>();
-    private CountDownLatch latch = null;
+    private Latch latch = new Latch();
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
@@ -51,17 +66,15 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "headers-conf-service.xml"},
-            {ConfigVariant.FLOW, "headers-conf-flow.xml"}
+            {ConfigVariant.FLOW, "headers-conf-flow.xml"},
+            {ConfigVariant.FLOW, "headers-conf-flow-httpn.xml"}
         });
     }
 
     @Override
     protected void doSetUp() throws Exception
     {
-        latch = new CountDownLatch(2);
         muleContext.registerListener(this);
-        endpointAddress = ((InboundEndpoint) muleContext.getRegistry()
-                        .lookupObject("cxfInbound")).getAddress() + "?method=onReceive";
     }
 
     @Override
@@ -73,48 +86,44 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
     @Test
     public void testCxf() throws Exception
     {
-        Object payload = new Object[]{"Test String"};
+        String endpointAddress = "http://localhost:" + dynamicPort.getValue() + "/services/TestComponent";
+
         String myProperty = "myProperty";
 
-        HashMap<String, Object> props = new HashMap<String, Object>();
+        HashMap<String, Object> props = new HashMap<>();
         props.put(MuleProperties.MULE_USER_PROPERTY, "alan");
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "onReceive");
         props.put(myProperty, myProperty);
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage reply = client.send("cxf:" + endpointAddress, payload, props);
+        MuleMessage reply = muleContext.getClient().send(
+                String.format(endpointAddress),
+                new DefaultMuleMessage(REQUEST_PAYLOAD, props, muleContext), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals("Test String Received", reply.getPayloadAsString());
+        assertEquals(SOAP_RESPONSE, reply.getPayloadAsString());
 
-        // make sure all notifications have trickled in
-        Thread.sleep(3000);
+        latch.await(3000, SECONDS);
 
-        // make sure we received the notifications on cxf
-        assertEquals(2, notificationMsgList.size());
+        assertEquals(1, notificationMsgList.size());
 
         // MULE_USER should be allowed in
-        assertEquals("alan", notificationMsgList.get(0).getOutboundProperty(MuleProperties.MULE_USER_PROPERTY));
+        assertEquals("alan", notificationMsgList.get(0).getInboundProperty(MuleProperties.MULE_USER_PROPERTY));
 
         // mule properties should be removed
-        assertNull(notificationMsgList.get(0).getOutboundProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
+        assertNull(notificationMsgList.get(0).getInboundProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
 
         // custom properties should be allowed in
-        assertEquals(myProperty, notificationMsgList.get(0).getOutboundProperty(myProperty));
+        assertEquals(myProperty, notificationMsgList.get(0).getInboundProperty(myProperty));
     }
 
     @Override
     public void onNotification(ServerNotification notification)
     {
-        if (notification instanceof EndpointMessageNotification)
+        if (notification instanceof FunctionalTestNotification)
         {
-            String uri = ((EndpointMessageNotification) notification).getEndpoint();
-            if (endpointAddress.equals(uri))
-            {
-                notificationMsgList.add((MuleMessage) notification.getSource());
-                latch.countDown();
-            }
+            notificationMsgList.add(((FunctionalTestNotification) notification).getEventContext().getMessage());
+            latch.release();
         }
         else
         {

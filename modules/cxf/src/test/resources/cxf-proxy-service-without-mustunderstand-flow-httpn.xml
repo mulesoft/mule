@@ -1,0 +1,30 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+
+    <flow name="proxyflow">
+        <http:listener path="/proxy-envelope" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service payload="envelope"/>
+
+        <cxf:proxy-client payload="envelope"/>
+        <http:request config-ref="requestConfig" path="/service" method="POST" />
+    </flow>
+
+    <flow name="serviceflow">
+        <http:listener path="/service" config-ref="listenerConfig" allowedMethods="POST" />
+        <logger level="INFO"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.Greeter">
+            <cxf:ws-security>
+                <cxf:ws-config>
+                    <cxf:property key="action" value="UsernameToken"/>
+                    <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.PasswordCallback"/>
+                </cxf:ws-config>
+            </cxf:ws-security>
+        </cxf:jaxws-service>
+        <component class="org.mule.module.cxf.GreeterService"/>
+    </flow>
+</mule>

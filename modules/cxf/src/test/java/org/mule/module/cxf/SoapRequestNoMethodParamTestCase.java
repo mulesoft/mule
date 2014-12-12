@@ -8,11 +8,11 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -25,6 +25,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class SoapRequestNoMethodParamTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+
     private static final String request = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body><receive xmlns=\"http://www.muleumo.org\"><src xmlns=\"http://www.muleumo.org\">Test String</src></receive></soap:Body></soap:Envelope>";
     private static final String response = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns1:receiveResponse xmlns:ns1=\"http://services.testmodels.tck.mule.org/\"><ns1:return>Received: null</ns1:return></ns1:receiveResponse></soap:Body></soap:Envelope>";
 
@@ -41,17 +44,15 @@ public class SoapRequestNoMethodParamTestCase extends AbstractServiceAndFlowTest
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "soap-request-conf-service.xml"},
-            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"}});
+            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"},
+            {ConfigVariant.FLOW, "soap-request-conf-flow-httpn.xml"}
+        });
     }
 
     @Test
     public void testCXFSoapRequest() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage msg = client.send(
-            ((InboundEndpoint) muleContext.getRegistry().lookupObject("httpInbound")).getAddress(),
-            new DefaultMuleMessage(request, muleContext));
+        MuleMessage msg = muleContext.getClient().send("http://localhost:" + port1.getValue() + "/services/TestComponent", new DefaultMuleMessage(request, muleContext), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(msg);
         assertNotNull(msg.getPayload());

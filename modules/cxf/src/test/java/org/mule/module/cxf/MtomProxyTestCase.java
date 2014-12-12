@@ -23,7 +23,8 @@ public class MtomProxyTestCase extends MtomTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{            
-            {ConfigVariant.FLOW, "mtom-proxy-conf.xml"}
+            {ConfigVariant.FLOW, "mtom-proxy-conf.xml"},
+            {ConfigVariant.FLOW, "mtom-proxy-conf-httpn.xml"}
         });
     }          
 }

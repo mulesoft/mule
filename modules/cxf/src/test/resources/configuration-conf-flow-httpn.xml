@@ -1,0 +1,41 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <cxf:configuration name="cxf" configurationLocation="cxf-config.xml"/>
+    
+    <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+  
+    <spring:bean id="foo3" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+
+    <http:listener-config name="listenerConfig" host="localhost" port="63081"/>
+    <http:request-config name="requestConfig" host="localhost" port="63081" />
+
+    <flow name="secureProxy">
+        <description>
+            Secure Proxy using Spring Security
+              </description>
+        <http:listener path="/proxy-envelope" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service payload="envelope">
+            <cxf:inInterceptors>
+                <spring:ref bean="foo1"/>
+                <spring:ref bean="foo3"/>
+            </cxf:inInterceptors>
+        </cxf:proxy-service>
+
+        <cxf:proxy-client payload="envelope">
+            <cxf:outInterceptors>
+                <spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            </cxf:outInterceptors>
+        </cxf:proxy-client>
+        <http:request config-ref="requestConfig" path="/echo" method="POST" />
+    </flow>
+
+</mule>

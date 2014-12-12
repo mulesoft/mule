@@ -6,9 +6,14 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeThat;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -21,6 +26,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
@@ -41,6 +47,7 @@ import org.junit.runners.Parameterized;
 
 public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
+
     private static final String requestPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
             "           xmlns:hi=\"http://example.cxf.module.mule.org/\">\n" +
@@ -61,6 +68,9 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
             "</soap:Body>\n" +
             "</soap:Envelope>";
 
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+    private static final String EXCEPTION_STRATEGY_FLOW_CONF_HTTPN_XML = "exception-strategy-flow-conf-httpn.xml";
+
     private CountDownLatch latch;
 
     @Rule
@@ -76,7 +86,8 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][] {
                 {ConfigVariant.SERVICE, "exception-strategy-service-conf.xml"},
-                {ConfigVariant.FLOW, "exception-strategy-flow-conf.xml"}
+                {ConfigVariant.FLOW, "exception-strategy-flow-conf.xml"},
+                {ConfigVariant.FLOW, EXCEPTION_STRATEGY_FLOW_CONF_HTTPN_XML}
         });
     }
 
@@ -93,10 +104,10 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
                 latch.countDown();
             }
         });
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
-        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString());
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }
 
@@ -113,10 +124,10 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
                 latch.countDown();
             }
         });
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
-        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString());
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }
 
@@ -147,6 +158,8 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testServerClientProxyDefaultException() throws Exception
     {
+        //TODO: test once MULE-8132 is fixed by removing this next line
+        assumeThat(configResources, is(not(equalTo(EXCEPTION_STRATEGY_FLOW_CONF_HTTPN_XML))));
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         muleContext.registerListener(new ExceptionNotificationListener()
@@ -157,7 +170,7 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
                 latch.countDown();
             }
         });
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy", requestPayload, null);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy", new DefaultMuleMessage(requestPayload, muleContext), HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
         assertTrue(response.getExceptionPayload() != null);
