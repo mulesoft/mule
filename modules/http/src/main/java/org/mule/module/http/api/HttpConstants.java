@@ -46,4 +46,5 @@ public abstract class HttpConstants
     }
 
     public static final String ALL_INTERFACES_IP = "0.0.0.0";
+    public static final String COOKIE = "Cookie";
 }
