@@ -10,6 +10,8 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.internal.listener.NoListenerRequestHandler.RESOURCE_NOT_FOUND;
+import static org.mule.module.http.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -38,7 +40,6 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
     private static final int TIMEOUT = 1000;
-    public static final String RESOURCE_NOT_FOUND = "Resource not found.";
 
     @Rule
     public DynamicPort fullConfigPort = new DynamicPort("fullConfigPort");
@@ -92,7 +93,7 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     {
         final Response response = Request.Get(url).connectTimeout(TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(expectedStatus));
+        assertThat(httpResponse, hasStatusCode(expectedStatus));
         return httpResponse;
     }
 
