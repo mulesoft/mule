@@ -43,7 +43,8 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "soap-request-conf-service.xml"},
-            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"}
+            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"},
+            {ConfigVariant.FLOW, "soap-request-conf-flow-httpn.xml"}
         });
     }
 

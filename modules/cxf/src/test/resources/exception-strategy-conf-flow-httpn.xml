@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+
+    <flow name="CxfWithExceptionStrategy">
+        <http:listener path="/services/CxfWithExceptionStrategy" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.module.cxf.testmodels.TestCxfComponent"/>
+
+        <component class="org.mule.module.cxf.testmodels.TestCxfComponent"/>
+        <custom-exception-strategy class="org.mule.module.cxf.CxfComponentExceptionStrategy"/>
+    </flow>
+
+    <flow name="CxfWithDefaultExceptionStrategy">
+        <http:listener path="/services/CxfWithDefaultExceptionStrategy" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.module.cxf.testmodels.TestCxfComponent"/>
+        <component class="org.mule.module.cxf.testmodels.TestCxfComponent"/>
+    </flow>
+
+</mule>

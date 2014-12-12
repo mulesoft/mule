@@ -25,6 +25,7 @@ import org.mule.util.StringUtils;
 import com.google.common.base.Charsets;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -84,7 +85,11 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
                 .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
                 .execute();
 
-        assertThat(response.returnResponse().getStatusLine().getStatusCode(), equalTo(400));
+        final HttpResponse httpResponse = response.returnResponse();
+
+        assertThat(httpResponse.getStatusLine().getStatusCode(), equalTo(200));
+
+        assertThat(URLDecoder.decode(IOUtils.toString(httpResponse.getEntity().getContent()), Charsets.UTF_8.name()), is("Invalid url encoded content"));
     }
 
     @Test

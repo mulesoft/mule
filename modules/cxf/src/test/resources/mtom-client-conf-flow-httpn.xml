@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:cxf-core="http://cxf.apache.org/core"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:c="http://cxf.apache.org/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <description>
+      Show how to use MTOM with CXF and Mule.
+    </description>
+
+    <quartz:endpoint name="quartz.in" 
+                     jobName="eventTimer" 
+                     repeatInterval="1000" 
+                     repeatCount="0" 
+                     startDelay="1000">
+        <quartz:event-generator-job/>
+    </quartz:endpoint>
+
+    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+
+    <!-- A service which is triggered by quartz. -->
+    <flow name="addEmployee">
+        <inbound-endpoint ref="quartz.in"/>
+        <component class="org.mule.module.cxf.employee.EmployeeMessageGenerator">
+        </component>
+        <cxf:jaxws-client clientClass="org.mule.example.employee.EmployeeDirectory_Service"
+                          operation="addEmployee" port="EmployeeDirectoryPort" wsdlLocation="classpath:employeeDirectory.wsdl"
+                          mtomEnabled="true">
+            <cxf:outInterceptors>
+                <spring:bean class="org.mule.module.cxf.employee.AttachmentVerifyInterceptor"/>
+            </cxf:outInterceptors>
+        </cxf:jaxws-client>
+        <http:request config-ref="requestConfig" path="/services/employeeDirectory" method="POST" />
+    </flow>
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+
+    <flow name="employeeDirectoryService">
+        <http:listener path="/services/employeeDirectory" config-ref="listenerConfig" allowedMethods="POST" parseRequest="false" />
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.employee.EmployeeDirectoryImpl"
+                           mtomEnabled="true"/>
+        <component>
+            <singleton-object class="org.mule.module.cxf.employee.EmployeeDirectoryImpl"/>
+        </component>
+    </flow>
+    
+</mule>
