@@ -7,7 +7,6 @@
 package org.mule.module.http.internal.listener;
 
 import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.request.HttpRequest;
@@ -59,7 +58,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             logger.debug("Looking RequestHandler for request: " + request.getPath());
         }
         final Server server = serverAddressToServerMap.get(new ServerAddress(ip, port));
-        if ((!server.isStopping() && !server.isStopped()))
+        if (server != null && !server.isStopping() && !server.isStopped())
         {
             final ServerAddressRequestHandlerRegistry serverAddressRequestHandlerRegistry = requestHandlerPerServerAddress.get( server);
             if (serverAddressRequestHandlerRegistry != null)

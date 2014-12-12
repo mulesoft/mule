@@ -8,7 +8,6 @@ package org.mule.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -38,6 +37,8 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     public DynamicPort fullConfigPort = new DynamicPort("fullConfigPort");
     @Rule
     public DynamicPort emptyConfigPort = new DynamicPort("emptyConfigPort");
+    @Rule
+    public DynamicPort noListenerConfigPort = new DynamicPort("noListenerConfigPort");
     @Rule
     public SystemProperty path = new SystemProperty("path","path");
     @Rule
@@ -73,6 +74,14 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
         final String url = String.format("http://%s:%s/%s/%s", nonLocalhostIp.getValue(), fullConfigPort.getNumber(), basePath.getValue(), path.getValue());
         final Response response = Request.Get(url).connectTimeout(1000).execute();
         assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+    }
+
+    @Test
+    public void noListenerConfig() throws Exception
+    {
+        final String url = String.format("http://localhost:%s", noListenerConfigPort.getNumber());
+        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(404));
     }
 
     private String getNonLocalhostIp()

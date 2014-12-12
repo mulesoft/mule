@@ -11,6 +11,8 @@
 
     <http:listener-config name="nonLocalHostConfig" host="${nonLocalhostIp}" port="${fullConfigPort}" basePath="${basePath}"/>
 
+    <http:listener-config name="noListenerConfig" host="localhost" port="${noListenerConfigPort}"/>
+
     <flow name="emptyListenerConfigFlow">
         <http:listener path="${path}" config-ref="emptyConfig" />
         <echo-component/>
