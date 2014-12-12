@@ -10,10 +10,13 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.runners.Parameterized.Parameter;
+import static org.junit.runners.Parameterized.Parameters;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -25,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -34,9 +39,14 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class GZIPEncodingTestCase extends FunctionalTestCase
 {
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
+
     private static final String GZIP = "gzip";
 
     @Rule
@@ -47,6 +57,18 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
 
     private String getAllRequest;
     private String getAllResponse;
+
+    @Parameter(0)
+    public String configFile;
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"gzip-encoding-conf.xml"},
+                {"gzip-encoding-conf-httpn.xml"}
+        });
+    }
 
     @Before
     public void doSetUp() throws Exception
@@ -59,13 +81,13 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "gzip-encoding-conf.xml";
+        return configFile;
     }
 
     @Test
     public void proxyWithGZIPResponse() throws Exception
     {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(getAllRequest, muleContext));
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(getAllRequest, muleContext), HTTP_REQUEST_OPTIONS);
         validateResponse(response);
     }
 
@@ -74,7 +96,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(HttpConstants.HEADER_CONTENT_ENCODING, "gzip,deflate");
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(gzip(getAllRequest), properties, muleContext));
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(gzip(getAllRequest), properties, muleContext), HTTP_REQUEST_OPTIONS);
         validateResponse(response);
     }
 

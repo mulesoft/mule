@@ -45,7 +45,8 @@ public class WsdlCallTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "wsdl-conf-service.xml"},
-            {ConfigVariant.FLOW, "wsdl-conf-flow.xml"}
+            {ConfigVariant.FLOW, "wsdl-conf-flow.xml"},
+            {ConfigVariant.FLOW, "wsdl-conf-flow-httpn.xml"}
         });
     }
 

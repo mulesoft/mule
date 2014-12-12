@@ -9,6 +9,10 @@ package org.mule.module.cxf.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.IOUtils;
+import org.mule.util.SystemUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -24,10 +28,6 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
-import org.mule.util.SystemUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -51,7 +51,9 @@ public class ProxyServiceServingWsdlMule4092TestCase extends AbstractServiceAndF
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "issues/proxy-service-serving-wsdl-mule4092-service.xml"},
-            {ConfigVariant.FLOW, "issues/proxy-service-serving-wsdl-mule4092-flow.xml"}});
+            {ConfigVariant.FLOW, "issues/proxy-service-serving-wsdl-mule4092-flow.xml"},
+            {ConfigVariant.FLOW, "issues/proxy-service-serving-wsdl-mule4092-flow-httpn.xml"}
+        });
     }
 
     @Override

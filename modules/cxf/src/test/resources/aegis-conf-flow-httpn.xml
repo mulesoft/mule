@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"
+               >
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+
+    <flow name="greeterService">
+        <http:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
+        <component>
+            <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+        </component>
+    </flow>
+
+    <flow name="PopulateData">
+        <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
+
+        <cxf:simple-client serviceClass="org.apache.hello_world_soap_http.Greeter" operation="greetMe">
+            <!-- Aegis will use file resources/org/apache/hello_world_soap_http/Greeter.aegis.xml to configure the call
+                to the webservice. -->
+            <cxf:aegis-databinding>
+                <spring:property name="configuration">
+                    <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions" />
+                </spring:property>
+            </cxf:aegis-databinding>
+        </cxf:simple-client>
+        <http:request config-ref="requestConfig" path="/services/greeter" method="POST" />
+    </flow>
+    
+</mule>
+

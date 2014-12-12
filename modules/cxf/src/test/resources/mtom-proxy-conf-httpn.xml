@@ -1,0 +1,29 @@
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:cxf-core="http://cxf.apache.org/core"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="httpConfig" host="localhost" port="${port1}"/>
+
+    <flow name="router">
+        <http:listener config-ref="httpConfig" path="services/mtom" parseRequest="false"/>
+        <cxf:proxy-service mtomEnabled="true" />
+        <cxf:proxy-client mtomEnabled="true" />
+        <outbound-endpoint address="http://localhost:${port1}/services/mtom2"
+                           exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="mycomponent">
+        <http:listener config-ref="httpConfig" path="services/mtom2" parseRequest="false"/>
+        <cxf:jaxws-service mtomEnabled="true" serviceClass="org.mule.module.cxf.testmodels.TestMtomImpl" />
+        <component>
+            <singleton-object class="org.mule.module.cxf.testmodels.TestMtomImpl" />
+        </component>
+    </flow>
+</mule>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+       xmlns:spring-sec="http://www.mulesoft.org/schema/mule/spring-security"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
+        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        ">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port2}">
+        <tls:context>
+            <tls:trust-store path="trustStore" password="mulepassword"/>
+            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        </tls:context>
+    </http:listener-config>
+
+    <spring:beans>
+        <sec:authentication-manager alias="authenticationManager">
+            <sec:authentication-provider>
+                <sec:user-service id="userService">
+                    <sec:user name="admin" password="admin" authorities="ROLE_ADMIN" />
+                </sec:user-service>
+            </sec:authentication-provider>
+        </sec:authentication-manager>
+    </spring:beans>
+    
+    <spring-sec:security-manager>
+        <spring-sec:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+    </spring-sec:security-manager>
+    
+    <flow name="secure">
+        <http:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST" />
+        <spring-sec:http-security-filter realm="mule-realm"/>
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
+
+        <echo-component/>
+    </flow>
+    
+</mule>
