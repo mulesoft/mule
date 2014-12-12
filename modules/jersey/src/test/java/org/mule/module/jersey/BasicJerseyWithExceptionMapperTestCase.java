@@ -22,10 +22,10 @@ public class BasicJerseyWithExceptionMapperTestCase extends BasicJerseyTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "basic-exception-mapper-conf-service.xml"},
-            {ConfigVariant.FLOW, "basic-exception-mapper-conf-flow.xml"},
-            {ConfigVariant.FLOW, "basic-exception-mapper-http-connector-conf-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.SERVICE, "basic-exception-mapper-conf-service.xml"},
+                {ConfigVariant.FLOW, "basic-exception-mapper-conf-flow.xml"},
+                {ConfigVariant.FLOW, "basic-exception-mapper-http-connector-conf-flow.xml"}
         });
     }      
     

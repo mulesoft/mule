@@ -15,6 +15,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.component.AbstractComponent;
+import org.mule.component.BindingUtils;
 import org.mule.module.jersey.exception.FallbackErrorMapper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -39,7 +40,6 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 
-import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.jackson1.Jackson1Feature;
 import org.glassfish.jersey.server.ApplicationHandler;
@@ -112,13 +112,12 @@ public class JerseyResourcesComponent extends AbstractComponent
             throw new IllegalStateException("There must be at least one component in the Jersey resources.");
         }
 
-        initializeResources(resources);
         initializeOtherResources(exceptionMappers, resources);
         initializeOtherResources(contextResolvers, resources);
 
-        application = createApplication(resources);
         try
         {
+            application = createApplication(resources);
             ServerRuntime serverRuntime = ClassUtils.getFieldValue(application, "runtime", false);
             backgroundScheduler = ClassUtils.getFieldValue(serverRuntime, "backgroundScheduler", false);
         }
@@ -128,21 +127,14 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
     }
 
-    protected void initializeResources(Set<Class<?>> resources) throws InitialisationException
+    protected void initializeResources(ResourceConfig config) throws Exception
     {
         // Initialize the Jersey resources using the components
         for (JavaComponent component : components)
         {
-            Class<?> c;
-            try
-            {
-                c = component.getObjectType();
-                resources.add(c);
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(e, this);
-            }
+            Object resource = component.getObjectFactory().getInstance(muleContext);
+            BindingUtils.configureBinding(component, resource);
+            config.register(resource);
         }
     }
 
@@ -154,7 +146,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
     }
 
-    protected ApplicationHandler createApplication(final Set<Class<?>> resources)
+    protected ApplicationHandler createApplication(final Set<Class<?>> resources) throws Exception
     {
         if (!properties.containsKey(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED))
         {
@@ -162,6 +154,8 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
 
         resourceConfig = new ResourceConfig();
+
+        initializeResources(resourceConfig);
 
         for (String pkg : packages)
         {
@@ -177,7 +171,7 @@ public class JerseyResourcesComponent extends AbstractComponent
             resourceConfig.register(new FallbackErrorMapper());
         }
 
-        return new ApplicationHandler(resourceConfig, getComponentProvider());
+        return new ApplicationHandler(resourceConfig);
     }
 
     @Override
@@ -237,11 +231,6 @@ public class JerseyResourcesComponent extends AbstractComponent
     private InputStream getInputStream(MuleMessage message) throws TransformerException
     {
         return message.getPayload(InputStream.class);
-    }
-
-    protected Binder getComponentProvider()
-    {
-        return new MuleComponentBinder(muleContext, components);
     }
 
     private ContainerRequest buildRequest(MuleEvent event) throws URISyntaxException
