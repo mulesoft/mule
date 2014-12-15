@@ -33,6 +33,7 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import com.ning.http.client.SSLEngineFactory;
+import com.ning.http.client.extra.ThrottleRequestFilter;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
@@ -66,18 +67,20 @@ public class GrizzlyHttpClient implements HttpClient
     private int maxConnections;
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
+    private int maxConnectionWaitTime;
 
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
 
-    public GrizzlyHttpClient(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties, int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout)
+    public GrizzlyHttpClient(GrizzlyHttpClientConfiguration config)
     {
-        this.tlsContextFactory = tlsContextFactory;
-        this.proxyConfig = proxyConfig;
-        this.clientSocketProperties = clientSocketProperties;
-        this.maxConnections = maxConnections;
-        this.usePersistentConnections = usePersistentConnections;
-        this.connectionIdleTimeout = connectionIdleTimeout;
+        this.tlsContextFactory = config.getTlsContextFactory();
+        this.proxyConfig = config.getProxyConfig();
+        this.clientSocketProperties = config.getClientSocketProperties();
+        this.maxConnections = config.getMaxConnections();
+        this.usePersistentConnections = config.isUsePersistentConnections();
+        this.connectionIdleTimeout = config.getConnectionIdleTimeout();
+        this.maxConnectionWaitTime = config.getMaxConnectionWaitTime();
     }
 
     @Override
@@ -173,6 +176,11 @@ public class GrizzlyHttpClient implements HttpClient
 
     private void configureConnections(AsyncHttpClientConfig.Builder builder) throws InitialisationException
     {
+        if (maxConnections > 0)
+        {
+            builder.addRequestFilter(new ThrottleRequestFilter(maxConnections, maxConnectionWaitTime));
+        }
+
         builder.setMaximumConnectionsTotal(maxConnections);
         builder.setMaximumConnectionsPerHost(maxConnections);
 
