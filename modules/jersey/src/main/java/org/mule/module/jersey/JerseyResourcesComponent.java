@@ -16,6 +16,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.component.AbstractComponent;
 import org.mule.component.BindingUtils;
+import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.jersey.exception.FallbackErrorMapper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -208,23 +209,34 @@ public class JerseyResourcesComponent extends AbstractComponent
     {
         for (Object prop : message.getInboundPropertyNames())
         {
-            if (prop.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
+            if (HttpConnector.HTTP_COOKIES_PROPERTY.equals(prop) || HttpHeaders.Names.COOKIE.equals(prop))
             {
-                org.apache.commons.httpclient.Cookie[] apacheCookies = message.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
-                for (org.apache.commons.httpclient.Cookie apacheCookie : apacheCookies)
+                Object cookies = message.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+                if (cookies instanceof org.apache.commons.httpclient.Cookie[])
                 {
-                    Cookie cookie = new Cookie(apacheCookie.getName(), apacheCookie.getValue());
-                    request.header(HttpConstants.HEADER_COOKIE, cookie);
+                    for (org.apache.commons.httpclient.Cookie apacheCookie : (org.apache.commons.httpclient.Cookie[]) cookies)
+                    {
+                        Cookie cookie = new Cookie(apacheCookie.getName(), apacheCookie.getValue());
+                        request.header(HttpConstants.HEADER_COOKIE, cookie);
+                    }
+                }
+                else
+                {
+                    addHeader(request, prop, cookies);
                 }
             }
             else
             {
-                Object property = message.getInboundProperty(prop.toString());
-                if (property != null)
-                {
-                    request.header(prop.toString(), property.toString());
-                }
+                addHeader(request, prop, message.getInboundProperty(prop.toString()));
             }
+        }
+    }
+
+    private void addHeader(ContainerRequest request, Object prop, Object property)
+    {
+        if (property != null)
+        {
+            request.header(prop.toString(), property.toString());
         }
     }
 
