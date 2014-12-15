@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -18,6 +20,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,7 +58,10 @@ public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCa
     public void useMaxThreadsActiveThreadingProfile() throws Exception
     {
         sendRequestUntilNoMoreWorkers();
-        expectedException.expect(NoHttpResponseException.class);
+        // Due to differences in buffer sizes, the exception that is caused client side may be one of two different
+        // exceptions.
+        expectedException.expect(anyOf(instanceOf(NoHttpResponseException.class), instanceOf(SocketException
+                                                                                                     .class)));
         try
         {
             Request.Get(String.format("http://localhost:%s", listenPort.getNumber())).execute();
