@@ -6,25 +6,20 @@
  */
 package org.mule.el.context;
 
-import static org.junit.Assert.assertEquals;
-
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.mule.el.datetime.DateTime;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.xml.bind.DatatypeConverter;
 
-import junit.framework.Assert;
-
-import org.apache.commons.lang.LocaleUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ServerContextTestCase extends AbstractELTestCase
@@ -229,7 +224,10 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTime()
     {
-        Assert.assertEquals(DateTime.class, evaluate("server.dateTime").getClass());
+        DateTime serverTime = (DateTime) evaluate("server.dateTime");
+        long diff = new Date().getTime() - serverTime.toDate().getTime();
+        assertTrue("server.dateTime is not returning the current time", diff < DEFAULT_TEST_TIMEOUT_SECS * 1000L);
+        assertThat(evaluate("server.dateTime"), instanceOf(DateTime.class));
     }
 
     @Test
@@ -237,173 +235,4 @@ public class ServerContextTestCase extends AbstractELTestCase
     {
         assertFinalProperty("server.dateTime='1'");
     }
-
-    @Test
-    public void dateTimeMilliSeconds()
-    {
-        Assert.assertTrue(((Long) evaluate("server.dateTime.milliSeconds")) < 1000);
-    }
-
-    @Test
-    public void dateTimeIsBefore()
-    {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, 1);
-        MuleMessage message = new DefaultMuleMessage(new DateTime(cal), muleContext);
-        Assert.assertTrue((Boolean) evaluate("server.dateTime.isBefore(payload)", message));
-
-    }
-
-    @Test
-    public void dateTimeIsAfter()
-    {
-        MuleMessage message = new DefaultMuleMessage(new DateTime(Calendar.getInstance()), muleContext);
-        Assert.assertTrue((Boolean) evaluate("server.dateTime.isAfter(payload)", message));
-
-    }
-
-    @Test
-    public void dateTimeFormat()
-    {
-        Assert.assertEquals(new SimpleDateFormat("EEE, MMM d, yyyy").format(new Date()),
-            evaluate("server.dateTime.format('EEE, MMM d, yyyy')"));
-        Assert.assertEquals(
-            new SimpleDateFormat("EEE, MMM d, yyyy", LocaleUtils.toLocale("en_US")).format(new Date()),
-            evaluate("server.dateTime.withLocale('en_US').format('EEE, MMM d, yyyy')"));
-    }
-
-    @Test
-    public void dateTimeZone()
-    {
-        Assert.assertEquals(TimeZone.getDefault().getDisplayName(), evaluate("server.dateTime.timeZone"));
-    }
-
-    @Test
-    public void dateTimeAddSeconds()
-    {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.SECOND) + 1) % 60,
-            evaluate("(int) server.dateTime.plusSeconds(1).format('s')"));
-    }
-
-    @Test
-    public void dateTimeAddMinutes()
-    {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.MINUTE) + 1) % 60,
-            evaluate("server.dateTime.plusMinutes(1).minutes"));
-    }
-
-    @Test
-    public void dateTimeAddHours()
-    {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1) % 24,
-            evaluate("server.dateTime.plusHours(1).hours"));
-    }
-
-    @Test
-    public void dateTimeAddDays()
-    {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % 365) + 1,
-            evaluate("(int) server.dateTime.plusDays(1).dayOfYear"));
-    }
-
-    @Test
-    public void dateTimeAddWeeks()
-    {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) % 52) + 1,
-            evaluate("(int) server.dateTime.plusWeeks(1).weekOfYear"));
-    }
-
-    @Test
-    public void dateTimeAddMonths()
-    {
-        Assert.assertEquals(((Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 1) % 12) + 1,
-            evaluate("(int) server.dateTime.plusMonths(1).month"));
-    }
-
-    @Test
-    public void dateTimeAddYears()
-    {
-        Assert.assertEquals(Calendar.getInstance(Locale.US).get(Calendar.YEAR) + 1,
-            evaluate("(int) server.dateTime.plusYears(1).format('yyyy')"));
-    }
-
-    @Test
-    public void dateTimeWithTimeZone()
-    {
-        assertEquals("Central European Time", evaluate("server.dateTime.withTimeZone('CET').timeZone"));
-    }
-
-    @Test
-    public void dateTimeWithLocale()
-    {
-        assertEquals(new SimpleDateFormat("E").format(new Date()),
-            evaluate("server.dateTime.withLocale('en_US').format('E')"));
-        assertEquals(new SimpleDateFormat("E", LocaleUtils.toLocale("es_AR")).format(new Date()),
-            evaluate("server.dateTime.withLocale('es_AR').format('E')"));
-    }
-
-    @Test
-    public void dateTimeSeconds()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.SECOND), evaluate("server.dateTime.seconds"));
-    }
-
-    @Test
-    public void dateTimeMinutes()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.MINUTE), evaluate("server.dateTime.minutes"));
-    }
-
-    @Test
-    public void dateTimeHour()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), evaluate("server.dateTime.hours"));
-    }
-
-    @Test
-    public void dateTimeDayOfWeek()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.DAY_OF_WEEK), evaluate("server.dateTime.dayOfWeek"));
-    }
-
-    @Test
-    public void dateTimeDayOfMonth()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
-            evaluate("server.dateTime.dayOfMonth"));
-    }
-
-    @Test
-    public void dateTimeDayOfYear()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.DAY_OF_YEAR), evaluate("server.dateTime.dayOfYear"));
-    }
-
-    @Test
-    public void dateTimeWeekOfMonth()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.WEEK_OF_MONTH),
-            evaluate("server.dateTime.weekOfMonth"));
-    }
-
-    @Test
-    public void dateTimeWeekOfYear()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.WEEK_OF_YEAR),
-            evaluate("server.dateTime.weekOfYear"));
-    }
-
-    @Test
-    public void dateTimeMonthOfYear()
-    {
-        assertEquals(Calendar.getInstance().get(Calendar.MONTH) + 1, evaluate("server.dateTime.month"));
-    }
-
-    @Test
-    public void dateTimeToString()
-    {
-        assertEquals(DatatypeConverter.printDateTime(Calendar.getInstance()).substring(0, 18),
-            ((String) evaluate("server.dateTime").toString()).substring(0, 18));
-    }
-
 }
