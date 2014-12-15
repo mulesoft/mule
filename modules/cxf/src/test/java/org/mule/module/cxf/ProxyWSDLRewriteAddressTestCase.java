@@ -8,43 +8,67 @@
 package org.mule.module.cxf;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.runners.Parameterized.*;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
+@RunWith(Parameterized.class)
 public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
 {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
 
     private static final String SINGLE_PORT = "StockQuoteSoap";
     private static final String SERVICE_LOCATION = "http://www.webservicex.net/stockquote.asmx";
 
+    @Parameter
+    public String configFile;
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"proxy-wsdl-rewrite-address-conf.xml"},
+                {"proxy-wsdl-rewrite-address-conf-httpn.xml"}
+        });
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "proxy-wsdl-rewrite-address-conf.xml";
+        return configFile;
     }
 
     @Test
     public void testProxyWSDLRewriteSinglePort() throws Exception
     {
         String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/single";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext), HTTP_REQUEST_OPTIONS);
         for(Element port : getPorts(getWsdl(response)))
         {
             String location = getLocation(port);
@@ -65,7 +89,7 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
     public void testProxyWSDLRewriteAllPorts() throws Exception
     {
         String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/all";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext), HTTP_REQUEST_OPTIONS);
         for(Element port : getPorts(getWsdl(response)))
         {
             assertEquals(proxyAddress, getLocation(port));

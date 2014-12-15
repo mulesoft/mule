@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+
+    <flow name="proxy-gzip">
+        <http:listener path="/proxy" config-ref="listenerConfig2" allowedMethods="POST" />
+        <cxf:proxy-service payload="body" service="ArtistRegistryWebServicesService"
+                           namespace="http://example.cxf.module.mule.org/"
+                           port="ArtistRegistryWebServicesPort"
+                           wsdlLocation="artistregistry.wsdl" >
+            <cxf:features>
+                    <spring:bean class="org.mule.module.cxf.feature.ProxyGZIPFeature"/>
+            </cxf:features>
+        </cxf:proxy-service>
+        <flow-ref name="copy-properties"/>
+        <cxf:proxy-client payload="body">
+            <cxf:features>
+                <spring:bean class="org.mule.module.cxf.feature.ProxyGZIPFeature"/>
+            </cxf:features>
+        </cxf:proxy-client>
+        <http:request config-ref="requestConfig" path="/artistRegistry" method="POST" />
+        <flow-ref name="copy-properties"/>
+    </flow>
+
+    <flow name="gzip-service">
+        <http:listener path="/artistRegistry" config-ref="listenerConfig1" allowedMethods="POST" />
+        <response>
+            <object-to-byte-array-transformer />
+            <gzip-compress-transformer/>
+            <set-property propertyName="Content-Encoding" value="gzip" />
+        </response>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.artistregistry.ArtistRegistryWebServices">
+            <cxf:inInterceptors>
+                <spring:bean class="org.mule.module.cxf.support.ProxyGZIPInInterceptor"/>
+            </cxf:inInterceptors>
+        </cxf:jaxws-service>
+        <component class="org.mule.module.cxf.testmodels.artistregistry.ArtistRegistry"/>
+
+    </flow>
+
+    <sub-flow name="copy-properties">
+        <copy-properties propertyName="*" />
+        <remove-property propertyName="Content-Length"/>
+    </sub-flow>
+
+</mule>

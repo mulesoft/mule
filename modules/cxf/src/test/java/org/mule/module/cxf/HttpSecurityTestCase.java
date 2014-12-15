@@ -6,8 +6,11 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assume.assumeThat;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -31,6 +34,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    private static final String HTTP_SECURITY_CONF_FLOW_HTTPN_XML = "http-security-conf-flow-httpn.xml";
+
     private static String soapRequest =
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
            "<soapenv:Header/>" +
@@ -57,7 +63,8 @@ public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "http-security-conf-service.xml"},
-            {ConfigVariant.FLOW, "http-security-conf-flow.xml"}
+            {ConfigVariant.FLOW, "http-security-conf-flow.xml"},
+            {ConfigVariant.FLOW, HTTP_SECURITY_CONF_FLOW_HTTPN_XML}
         });
     }
 
@@ -93,6 +100,8 @@ public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testBasicAuthWithCxfClient() throws Exception
     {
+        assumeThat(configResources, is(not(equalTo(HTTP_SECURITY_CONF_FLOW_HTTPN_XML)))); // New http module doesn't support urls like "cxf:*"
+
         MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send("cxf:http://admin:admin@localhost:" + dynamicPort1.getNumber() + "/services/Echo?method=echo", new DefaultMuleMessage("Hello", muleContext));

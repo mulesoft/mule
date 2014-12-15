@@ -17,22 +17,39 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.xml.ws.Holder;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class HolderTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Parameterized.Parameter(0)
+    public String config;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"holder-conf.xml"},
+                {"holder-conf-httpn.xml"}
+        });
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "holder-conf.xml";
+        return config;
     }
 
     @Test

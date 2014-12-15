@@ -6,8 +6,10 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -55,7 +57,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractServiceAndFlow
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "http-security-filter-test-service.xml"},
-            {ConfigVariant.FLOW, "http-security-filter-test-flow.xml"}
+            {ConfigVariant.FLOW, "http-security-filter-test-flow.xml"},
+            {ConfigVariant.FLOW, "http-security-filter-test-flow-httpn.xml"}
         });
     }      
  
@@ -84,11 +87,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractServiceAndFlow
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals(
-                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:" + dynamicPort1.getNumber() + "/services/Echo. Message payload is of type: "
-                                + "String", get.getResponseBodyAsString());
+            assertThat(get.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
+                                                                 + "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
@@ -112,11 +112,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractServiceAndFlow
         {
             int status = client.executeMethod(post);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals(
-                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:" + dynamicPort1.getNumber() + "/services/Echo. Message payload is of type: "
-                                + "ContentLengthInputStream",   post.getResponseBodyAsString());
+            assertThat(post.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
+                                                                 + "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
@@ -169,7 +166,7 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractServiceAndFlow
     @Test
     public void testAuthenticationAuthorisedWithHandshakeGet() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 200);
+         doGet(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 200);
     }
 
     @Test

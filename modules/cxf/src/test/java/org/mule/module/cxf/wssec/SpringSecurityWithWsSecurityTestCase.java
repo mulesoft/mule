@@ -6,15 +6,15 @@
  */
 package org.mule.module.cxf.wssec;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.security.SecurityContext;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.runners.Parameterized.Parameters;
 import org.junit.Ignore;
+import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("MULE-6926: flaky test")
 public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
@@ -29,7 +29,8 @@ public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-service.xml, org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow.xml, org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"}
+            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow.xml, org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow-httpn.xml, org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"}
         });
     }
     
