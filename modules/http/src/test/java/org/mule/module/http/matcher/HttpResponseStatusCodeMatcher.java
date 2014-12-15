@@ -34,6 +34,12 @@ public class HttpResponseStatusCodeMatcher extends TypeSafeMatcher<HttpResponse>
         description.appendText("a response with status code ").appendValue(statusCode);
     }
 
+    @Override
+    protected void describeMismatchSafely(HttpResponse response, Description mismatchDescription)
+    {
+        mismatchDescription.appendText("got a response with status code ").appendValue(response.getStatusLine().getStatusCode());
+    }
+
     @Factory
     public static Matcher<HttpResponse> hasStatusCode(int statusCode)
     {
