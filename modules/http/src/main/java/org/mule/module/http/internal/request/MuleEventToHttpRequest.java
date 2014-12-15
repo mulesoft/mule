@@ -11,6 +11,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.api.requester.HttpStreamingType;
@@ -22,6 +23,7 @@ import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.transport.NullPayload;
+import org.mule.util.ArrayUtils;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.StringUtils;
 
@@ -33,6 +35,8 @@ import java.io.InputStream;
 import java.util.Map;
 
 import javax.activation.DataHandler;
+
+import org.apache.commons.httpclient.Cookie;
 
 
 public class MuleEventToHttpRequest
@@ -64,12 +68,41 @@ public class MuleEventToHttpRequest
 
         for (String outboundProperty : event.getMessage().getOutboundPropertyNames())
         {
-            builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
+            Object property = event.getMessage().getOutboundProperty(outboundProperty);
+
+            if (property instanceof Cookie[])
+            {
+                String cookiesAsText = parseCookies((Cookie[]) property);
+                if (cookiesAsText != null)
+                {
+                    builder.addHeader(HttpConstants.COOKIE, cookiesAsText);
+                }
+            }
+            else
+            {
+                builder.addHeader(outboundProperty, property.toString());
+            }
         }
 
         builder.setEntity(createRequestEntity(builder, event, resolvedMethod));
 
         return builder;
+    }
+
+    private String parseCookies(Cookie[] cookies)
+    {
+        if (ArrayUtils.isEmpty(cookies))
+        {
+            return null;
+        }
+
+        StringBuilder header = new StringBuilder();
+        for (Cookie cookie : cookies)
+        {
+            header.append(cookie.getName()).append('=').append(cookie.getValue());
+        }
+
+        return header.toString();
     }
 
 

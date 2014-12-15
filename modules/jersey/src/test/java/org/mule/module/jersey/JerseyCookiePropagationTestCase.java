@@ -11,10 +11,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -27,13 +26,10 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.mule.DefaultMuleMessage;
 
 @RunWith(Parameterized.class)
 public class JerseyCookiePropagationTestCase extends FunctionalTestCase
@@ -69,7 +65,6 @@ public class JerseyCookiePropagationTestCase extends FunctionalTestCase
         return configFile;
     }
 
-    @Ignore("See MULE-8070")
     @Test
     public void testJerseyCookiePropagation() throws Exception
     {
