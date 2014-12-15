@@ -28,6 +28,7 @@ import org.mule.util.StringUtils;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.PerRequestConfig;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
 import com.ning.http.client.RequestBuilder;
@@ -175,6 +176,11 @@ public class GrizzlyHttpClient implements HttpClient
 
     private void configureConnections(AsyncHttpClientConfig.Builder builder) throws InitialisationException
     {
+        if (maxConnections > 0)
+        {
+            builder.addRequestFilter(new CustomTimeoutThrottleRequestFilter(maxConnections));
+        }
+
         builder.setMaximumConnectionsTotal(maxConnections);
         builder.setMaximumConnectionsPerHost(maxConnections);
 
@@ -255,6 +261,10 @@ public class GrizzlyHttpClient implements HttpClient
                 }
             }
         }
+
+        // Set the response timeout in the request, this value is read by {@code CustomTimeoutThrottleRequestFilter}
+        // if the maxConnections attribute is configured in the requester.
+        builder.setPerRequestConfig(new PerRequestConfig(null, responseTimeout));
 
         ListenableFuture<Response> future = asyncHttpClient.executeRequest(builder.build());
         Response response = null;
