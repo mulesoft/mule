@@ -16,6 +16,7 @@ import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
+import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClientConfiguration;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
@@ -25,6 +26,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
 {
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
+    private static final int MAX_CONNECTION_WAIT_TIME = 30 * 1000;
 
     private String name;
     private String host;
@@ -53,7 +55,17 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     {
         verifyConnectionsParameters();
 
-        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties, maxConnections, usePersistentConnections, connectionIdleTimeout);
+        GrizzlyHttpClientConfiguration configuration = new GrizzlyHttpClientConfiguration.Builder()
+                .setTlsContextFactory(tlsContext)
+                .setProxyConfig(proxyConfig)
+                .setClientSocketProperties(clientSocketProperties)
+                .setMaxConnections(maxConnections)
+                .setUsePersistentConnections(usePersistentConnections)
+                .setConnectionIdleTimeout(connectionIdleTimeout)
+                .setMaxConnectionWaitTime(MAX_CONNECTION_WAIT_TIME)
+                .build();
+
+        httpClient = new GrizzlyHttpClient(configuration);
 
         httpClient.initialise();
     }
