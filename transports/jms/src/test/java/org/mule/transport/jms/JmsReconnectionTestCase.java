@@ -50,8 +50,8 @@ public class JmsReconnectionTestCase extends AbstractBrokerFunctionalTestCase
     @Override
     protected void stopBroker() throws Exception
     {
-        super.stopBroker();
         connection.close();
+        super.stopBroker();
     }
 
     @Test
