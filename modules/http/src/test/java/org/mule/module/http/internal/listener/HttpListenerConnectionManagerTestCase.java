@@ -61,6 +61,14 @@ public class HttpListenerConnectionManagerTestCase extends AbstractMuleTestCase
         connectionManager.createServer(new ServerAddress(firstIp, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
         expectedException.expect(MuleRuntimeException.class);
         expectedException.expectMessage(String.format(HttpListenerConnectionManager.SERVER_ALREADY_EXISTS_FORMAT, PORT, secondIp));
-        connectionManager.createServer(new ServerAddress(secondIp, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
+
+        try
+        {
+            connectionManager.createServer(new ServerAddress(secondIp, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
+        }
+        finally
+        {
+            connectionManager.dispose();
+        }
     }
 }
