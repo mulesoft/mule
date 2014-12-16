@@ -35,6 +35,7 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.grizzly.utils.DelayedExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,8 @@ public class GrizzlyServerManager implements HttpServerManager
 {
 
     private static final int MAX_KEEP_ALIVE_REQUESTS = -1;
-    private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = "HttpIdleConnectionCloser";
+    private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
+    private static final String LISTENER_WORKER_THREAD_NAME_SUFFIX = ".worker";
     private final GrizzlyAddressDelegateFilter<SSLFilter> sslFilterDelegate;
     private final GrizzlyAddressDelegateFilter<HttpServerFilter> httpServerFilterDelegate;
     private final TCPNIOTransport transport;
@@ -55,7 +57,7 @@ public class GrizzlyServerManager implements HttpServerManager
     private ExecutorService idleTimeoutExecutorService;
     private DelayedExecutor idleTimeoutDelayedExecutor;
 
-    public GrizzlyServerManager(final String appName, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
+    public GrizzlyServerManager(String threadNamePrefix, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
     {
         this.httpListenerRegistry = httpListenerRegistry;
         requestHandlerFilter = new GrizzlyRequestDispatcherFilter(httpListenerRegistry);
@@ -80,11 +82,19 @@ public class GrizzlyServerManager implements HttpServerManager
 
         transport.setNIOChannelDistributor(new RoundRobinConnectionDistributor(transport, true, true));
 
+        transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + LISTENER_WORKER_THREAD_NAME_SUFFIX);
+
+        // No kernel thread pool config is set in the transport at this point. Need to set one to define the pool name.
+        transport.setKernelThreadPoolConfig(ThreadPoolConfig.defaultConfig()
+                                                    .setCorePoolSize(transport.getSelectorRunnersCount())
+                                                    .setMaxPoolSize(transport.getSelectorRunnersCount())
+                                                    .setPoolName(threadNamePrefix));
+
         // Set filterchain as a Transport Processor
         transport.setProcessor(serverFilterChainBuilder.build());
         transport.start();
 
-        idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(appName + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
+        idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(threadNamePrefix + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
         idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
         idleTimeoutDelayedExecutor.start();
     }

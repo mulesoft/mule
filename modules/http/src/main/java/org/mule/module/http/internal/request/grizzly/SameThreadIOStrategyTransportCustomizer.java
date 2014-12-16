@@ -19,11 +19,22 @@ import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
  */
 public class SameThreadIOStrategyTransportCustomizer implements TransportCustomizer
 {
+    private static final String REQUESTER_WORKER_THREAD_NAME_SUFFIX = ".worker";
+
+    private final String threadNamePrefix;
+
+    public SameThreadIOStrategyTransportCustomizer(String threadNamePrefix)
+    {
+        this.threadNamePrefix = threadNamePrefix;
+    }
 
     @Override
     public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder)
     {
         transport.setIOStrategy(SameThreadIOStrategy.getInstance());
         transport.setWorkerThreadPoolConfig(WorkerThreadIOStrategy.getInstance().createDefaultWorkerPoolConfig(transport));
+
+        transport.getKernelThreadPoolConfig().setPoolName(threadNamePrefix);
+        transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + REQUESTER_WORKER_THREAD_NAME_SUFFIX);
     }
 }

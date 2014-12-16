@@ -6,7 +6,9 @@
  */
 package org.mule.module.http.internal.request;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -16,15 +18,18 @@ import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
+import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClientConfiguration;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 
-public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable
+public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
 {
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
+    private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
 
     private String name;
     private String host;
@@ -48,12 +53,26 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
 
+    private MuleContext muleContext;
+
     @Override
     public void initialise() throws InitialisationException
     {
         verifyConnectionsParameters();
 
-        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties, maxConnections, usePersistentConnections, connectionIdleTimeout);
+        String threadNamePrefix = String.format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), name);
+
+        GrizzlyHttpClientConfiguration configuration = new GrizzlyHttpClientConfiguration.Builder()
+                .setTlsContextFactory(tlsContext)
+                .setProxyConfig(proxyConfig)
+                .setClientSocketProperties(clientSocketProperties)
+                .setMaxConnections(maxConnections)
+                .setUsePersistentConnections(usePersistentConnections)
+                .setConnectionIdleTimeout(connectionIdleTimeout)
+                .setThreadNamePrefix(threadNamePrefix)
+                .build();
+
+        httpClient = new GrizzlyHttpClient(configuration);
 
         httpClient.initialise();
     }
@@ -266,4 +285,9 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 }
