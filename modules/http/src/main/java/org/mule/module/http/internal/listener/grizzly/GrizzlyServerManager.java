@@ -56,6 +56,7 @@ public class GrizzlyServerManager implements HttpServerManager
     private Map<ServerAddress, GrizzlyServer> servers = new ConcurrentHashMap<>();
     private ExecutorService idleTimeoutExecutorService;
     private DelayedExecutor idleTimeoutDelayedExecutor;
+    private boolean transportStarted;
 
     public GrizzlyServerManager(String threadNamePrefix, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
     {
@@ -92,11 +93,10 @@ public class GrizzlyServerManager implements HttpServerManager
 
         // Set filterchain as a Transport Processor
         transport.setProcessor(serverFilterChainBuilder.build());
-        transport.start();
 
         idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(threadNamePrefix + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
         idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
-        idleTimeoutDelayedExecutor.start();
+
     }
 
     private void configureServerSocketProperties(TCPNIOTransportBuilder transportBuilder, TcpServerSocketProperties serverSocketProperties)
@@ -139,6 +139,21 @@ public class GrizzlyServerManager implements HttpServerManager
         }
     }
 
+    /**
+     * Starts the transport and the {@code idleTimeoutExecutorService} if not started. This is because
+     * they should be started lazily when the first server is registered (otherwise there will be Grizzly
+     * threads even if there is no listener-config in the app).
+     */
+    private void startTransportIfNotStarted() throws IOException
+    {
+        if (!transportStarted)
+        {
+            transportStarted = true;
+            transport.start();
+            idleTimeoutDelayedExecutor.start();
+        }
+    }
+
     @Override
     public boolean containsServerFor(final ServerAddress serverAddress)
     {
@@ -167,6 +182,7 @@ public class GrizzlyServerManager implements HttpServerManager
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
+        startTransportIfNotStarted();
         sslFilterDelegate.addFilterForAddress(serverAddress, createSslFilter(tlsContextFactory));
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
@@ -185,6 +201,7 @@ public class GrizzlyServerManager implements HttpServerManager
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
+        startTransportIfNotStarted();
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
         final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
@@ -195,10 +212,13 @@ public class GrizzlyServerManager implements HttpServerManager
     @Override
     public void dispose()
     {
-        transport.shutdown();
-        servers.clear();
-        idleTimeoutDelayedExecutor.destroy();
-        idleTimeoutExecutorService.shutdown();
+        if (transportStarted)
+        {
+            transport.shutdown();
+            servers.clear();
+            idleTimeoutDelayedExecutor.destroy();
+            idleTimeoutExecutorService.shutdown();
+        }
     }
 
     private SSLFilter createSslFilter(final TlsContextFactory tlsContextFactory)
