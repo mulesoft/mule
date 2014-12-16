@@ -51,6 +51,7 @@ public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTes
     private DefaultHttpRequesterConfig createRequesterConfig()
     {
         DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
+        requesterConfig.setMuleContext(mockMuleContext);
         requesterConfig.setName("TestConfig");
         return requesterConfig;
     }

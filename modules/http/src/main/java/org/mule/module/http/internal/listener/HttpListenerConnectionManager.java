@@ -31,6 +31,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
 
     public static final String HTTP_LISTENER_CONNECTION_MANAGER = "_httpListenerConnectionManager";
     public static final String SERVER_ALREADY_EXISTS_FORMAT = "A server in port(%s) already exists for ip(%s) or one overlapping it (0.0.0.0).";
+    private static final String LISTENER_THREAD_NAME_PREFIX = "http.listener";
 
     private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
     private HttpServerManager httpServerManager;
@@ -52,9 +53,10 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
             throw new InitialisationException(CoreMessages.createStaticMessage("Only one global TCP server socket properties bean should be defined in the config"), this);
         }
 
+        String threadNamePrefix = ThreadNameHelper.getPrefix(muleContext) + LISTENER_THREAD_NAME_PREFIX;
         try
         {
-            httpServerManager = new GrizzlyServerManager(ThreadNameHelper.getPrefix(muleContext), httpListenerRegistry, tcpServerSocketProperties);
+            httpServerManager = new GrizzlyServerManager(threadNamePrefix, httpListenerRegistry, tcpServerSocketProperties);
         }
         catch (IOException e)
         {

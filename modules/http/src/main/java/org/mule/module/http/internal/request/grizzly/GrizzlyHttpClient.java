@@ -66,18 +66,20 @@ public class GrizzlyHttpClient implements HttpClient
     private int maxConnections;
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
+    private String threadNamePrefix;
 
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
 
-    public GrizzlyHttpClient(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties, int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout)
+    public GrizzlyHttpClient(GrizzlyHttpClientConfiguration config)
     {
-        this.tlsContextFactory = tlsContextFactory;
-        this.proxyConfig = proxyConfig;
-        this.clientSocketProperties = clientSocketProperties;
-        this.maxConnections = maxConnections;
-        this.usePersistentConnections = usePersistentConnections;
-        this.connectionIdleTimeout = connectionIdleTimeout;
+        this.tlsContextFactory = config.getTlsContextFactory();
+        this.proxyConfig = config.getProxyConfig();
+        this.clientSocketProperties = config.getClientSocketProperties();
+        this.maxConnections = config.getMaxConnections();
+        this.usePersistentConnections = config.isUsePersistentConnections();
+        this.connectionIdleTimeout = config.getConnectionIdleTimeout();
+        this.threadNamePrefix = config.getThreadNamePrefix();
     }
 
     @Override
@@ -160,7 +162,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
         CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
-        compositeTransportCustomizer.addTransportCustomizer(new SameThreadIOStrategyTransportCustomizer());
+        compositeTransportCustomizer.addTransportCustomizer(new SameThreadIOStrategyTransportCustomizer(threadNamePrefix));
 
         if (clientSocketProperties != null)
         {
