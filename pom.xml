@@ -1540,6 +1540,8 @@
                         <source>1.7</source>
                         <target>1.7</target>
                         <proc>none</proc>
+                        <!-- Slightly faster builds, see https://jira.codehaus.org/browse/MCOMPILER-209 -->
+                        <useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
                 </plugin>
                 <plugin>
