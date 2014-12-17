@@ -7,7 +7,9 @@
 package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -21,10 +23,12 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
+import org.mockito.Matchers;
 
 public class RoundRobinTestCase extends AbstractMuleContextTestCase
 {
@@ -65,6 +69,25 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         {
             assertEquals(NUMBER_OF_MESSAGES, route.getCount());
         }
+    }
+
+    @Test
+    public void usesRoutesInOrder() throws Exception
+    {
+        RoundRobin roundRobin = new RoundRobin();
+        List<MessageProcessor> routes = new ArrayList<>(2);
+        MessageProcessor route1 = mock(MessageProcessor.class, "route1");
+        routes.add(route1);
+        MessageProcessor route2 = mock(MessageProcessor.class, "route2");
+        routes.add(route2);
+        roundRobin.setRoutes(new ArrayList<>(routes));
+
+        DefaultMuleMessage message = new DefaultMuleMessage(Collections.singletonList(TEST_MESSAGE), muleContext);
+
+        roundRobin.process(new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, null, (MuleSession) null));
+
+        verify(route2, never()).process(Matchers.<MuleEvent>any());
+        verify(route1).process(Matchers.<MuleEvent>any());
     }
 
     class TestDriver implements Runnable
