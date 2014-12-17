@@ -7,7 +7,10 @@
 package org.mule.module.http.functional.requester;
 
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.util.concurrent.Latch;
 
@@ -21,6 +24,7 @@ import org.junit.Test;
 
 public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCase
 {
+    private static final int SMALL_RESPONSE_TIMEOUT = 1;
 
     private Latch messageArrived = new Latch();
     private Latch messageHold = new Latch();
@@ -39,12 +43,15 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
         messageArrived.await();
         try
         {
-            flow.process(getTestEvent(TEST_MESSAGE));
+            // Process an event with a very small timeout, this should fail because there is already one
+            // active connection, and maxConnections=1
+            flow.process(createEvent(SMALL_RESPONSE_TIMEOUT));
             fail("Max connections should be reached.");
         }
         catch(MessagingException e)
         {
             // Expected
+            assertThat(e.getCause(), instanceOf(IOException.class));
         }
         messageHold.release();
         t1.join();
@@ -59,7 +66,7 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
             {
                 try
                 {
-                    flow.process(getTestEvent(TEST_MESSAGE));
+                    flow.process(createEvent(RECEIVE_TIMEOUT));
                 }
                 catch (Exception e)
                 {
@@ -69,6 +76,13 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
         });
         thread.start();
         return thread;
+    }
+
+    private MuleEvent createEvent(int timeout) throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.setTimeout(timeout);
+        return event;
     }
 
     @Override
@@ -87,5 +101,3 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
     }
 
 }
-
-
