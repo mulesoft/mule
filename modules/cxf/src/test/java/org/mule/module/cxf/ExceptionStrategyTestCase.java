@@ -6,15 +6,10 @@
  */
 package org.mule.module.cxf;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -158,8 +153,6 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testServerClientProxyDefaultException() throws Exception
     {
-        //TODO: test once MULE-8132 is fixed by removing this next line
-        assumeThat(configResources, is(not(equalTo(EXCEPTION_STRATEGY_FLOW_CONF_HTTPN_XML))));
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         muleContext.registerListener(new ExceptionNotificationListener()
@@ -173,8 +166,12 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy", new DefaultMuleMessage(requestPayload, muleContext), HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
-        assertTrue(response.getExceptionPayload() != null);
-        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+
+        if (configResources != EXCEPTION_STRATEGY_FLOW_CONF_HTTPN_XML)
+        {
+            assertTrue(response.getExceptionPayload() != null);
+        }
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString());
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }
 
