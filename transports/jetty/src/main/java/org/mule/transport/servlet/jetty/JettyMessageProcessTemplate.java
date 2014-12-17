@@ -12,6 +12,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.ThrottlingPhaseTemplate;
@@ -45,6 +46,17 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
     public Object acquireMessage() throws MuleException
     {
         return request;
+    }
+
+    @Override
+    protected MuleMessage createMessageFromSource(Object message) throws MuleException
+    {
+        MuleMessage muleMessage = super.createMessageFromSource(message);
+
+        String contextPath = HttpConnector.normalizeUrl(getInboundEndpoint().getEndpointURI().getPath());
+        muleMessage.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, contextPath, PropertyScope.INBOUND);
+
+        return muleMessage;
     }
 
     @Override
