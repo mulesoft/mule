@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RoundRobin extends AbstractOutboundRouter
 {
     /** Index of target route to use */
-    AtomicInteger index = new AtomicInteger(0);
+    AtomicInteger index = new AtomicInteger(1);
 
     /**
      *  Process the event using the next target route in sequence
