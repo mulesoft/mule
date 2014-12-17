@@ -32,7 +32,6 @@ public class JettyMuleMessageFactory extends ServletMuleMessageFactory
         message.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, requestUriWithParameters, PropertyScope.INBOUND);
         message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, requestUriWithoutParameters, PropertyScope.INBOUND);
         message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, request.getRemoteAddr(), PropertyScope.INBOUND);
-        message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, requestUriWithoutParameters, PropertyScope.INBOUND);
         message.setProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY, request.getRequestURL().toString(), PropertyScope.INBOUND);
         message.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod(), PropertyScope.INBOUND);
     }
