@@ -1426,6 +1426,8 @@
                         <maxmem>512m</maxmem>
                         <source>1.6</source>
                         <target>1.6</target>
+                        <!-- Slightly faster builds, see https://jira.codehaus.org/browse/MCOMPILER-209 -->
+                        <useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
                 </plugin>
                 <plugin>
