@@ -11,7 +11,7 @@ import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.internal.listener.NoListenerRequestHandler.RESOURCE_NOT_FOUND;
-import static org.mule.module.http.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
+import static org.mule.tck.matchers.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
