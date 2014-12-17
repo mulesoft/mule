@@ -75,12 +75,12 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
     public void usesFirstRouteOnFirstRequest() throws Exception
     {
         RoundRobin roundRobin = new RoundRobin();
-        List<MessageProcessor> routes = new ArrayList<>(2);
+        List<MessageProcessor> routes = new ArrayList<MessageProcessor>(2);
         MessageProcessor route1 = mock(MessageProcessor.class, "route1");
         routes.add(route1);
         MessageProcessor route2 = mock(MessageProcessor.class, "route2");
         routes.add(route2);
-        roundRobin.setRoutes(new ArrayList<>(routes));
+        roundRobin.setRoutes(new ArrayList<MessageProcessor>(routes));
 
         DefaultMuleMessage message = new DefaultMuleMessage(Collections.singletonList(TEST_MESSAGE), muleContext);
 
