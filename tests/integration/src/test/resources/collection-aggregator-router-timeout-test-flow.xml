@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
@@ -18,8 +16,8 @@
         <collection-splitter/>
         <!-- round-robin is critical here, otherwise 'aggregator' endpoint is never hit. -->
         <round-robin>
-            <vm:outbound-endpoint path="lostInTime" exchange-pattern="one-way"/>
             <vm:outbound-endpoint path="aggregator" exchange-pattern="one-way"/>
+            <vm:outbound-endpoint path="lostInTime" exchange-pattern="one-way"/>
         </round-robin>
     </flow>
 
