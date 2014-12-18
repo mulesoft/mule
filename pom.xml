@@ -192,6 +192,7 @@
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
+        <httpClientVersion>4.3.5</httpClientVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
         <jackson2Version>2.4.3</jackson2Version>
         <jerseyVersion>2.11</jerseyVersion>
@@ -1255,6 +1256,12 @@
                         <artifactId>jta</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpClientVersion}</version>
             </dependency>
 
             <dependency>
