@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.matcher;
+
+package org.mule.tck.matchers;
 
 import static org.junit.Assert.assertThat;
-
 import org.mule.module.http.internal.ParameterMap;
 
 import java.util.Collection;
