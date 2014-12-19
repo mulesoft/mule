@@ -37,6 +37,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     public static final String X_RATE_LIMIT_REMAINING_HEADER = "X-RateLimit-Remaining";
     public static final String X_RATE_LIMIT_RESET_HEADER = "X-RateLimit-Reset";
     private static final int INTERNAL_SERVER_ERROR_STATUS_CODE = 500;
+    private static final int OK_STATUS_CODE = 200;
 
     private static final Logger logger = getLogger(HttpMessageProcessorTemplate.class);
     private MuleEvent sourceMuleEvent;
@@ -84,7 +85,17 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
         {
             final org.mule.module.http.internal.domain.response.HttpResponseBuilder responseBuilder = new org.mule.module.http.internal.domain.response.HttpResponseBuilder();
             addThrottlingHeaders(responseBuilder);
-            final HttpResponse httpResponse = this.responseBuilder.build(responseBuilder, muleEvent);
+            final HttpResponse httpResponse;
+
+            if (muleEvent == null)
+            {
+                // If the event was filtered, return an empty response with status code 200 OK.
+                httpResponse = responseBuilder.setStatusCode(OK_STATUS_CODE).build();
+            }
+            else
+            {
+                httpResponse = this.responseBuilder.build(responseBuilder, muleEvent);
+            }
             responseReadyCallback.responseReady(httpResponse, getResponseFailureCallback(responseCompletationCallback, muleEvent));
         }
         catch (Exception e)
