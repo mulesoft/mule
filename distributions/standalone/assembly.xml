@@ -252,6 +252,8 @@
                 <!-- mule-tests-functional dependencies -->
                 <exclude>org.apache.ftpserver:ftpserver-core</exclude>
                 <exclude>org.apache.ftpserver:ftplet-api</exclude>
+                <exclude>org.apache.httpcomponents:httpclient</exclude>
+                <exclude>org.apache.httpcomponents:httpcore</exclude>
                 <exclude>org.apache.sshd:sshd-core</exclude>
                 <exclude>org.apache.mina:mina-core</exclude>
 
