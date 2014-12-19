@@ -330,7 +330,7 @@ public class JerseyResourcesComponent extends AbstractComponent
 
         if ("servlet".equals(scheme))
         {
-            scheme = org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+            scheme = org.mule.module.http.api.HttpConstants.Protocols.HTTP.getScheme();
         }
 
         return scheme;

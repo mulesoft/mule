@@ -16,7 +16,7 @@
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd">
 
-    <http:listener-config name="httpsConfig" host="localhost" port="${port2}">
+    <http:listener-config name="httpsConfig" protocol="HTTPS" host="localhost" port="${port2}">
         <tls:context>
             <tls:trust-store path="trustStore" password="mulepassword"/>
             <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword"/>

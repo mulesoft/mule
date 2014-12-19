@@ -8,6 +8,10 @@
 
     <http:request-config name="requestConfig" host="localhost" port="${httpPort}" basePath="basePath" />
 
+    <http:request-config name="requestConfigHttp" host="localhost" />
+
+    <http:request-config name="requestConfigHttps" protocol="HTTPS" host="localhost" />
+
     <flow name="requestFlow">
         <http:request config-ref="requestConfig" method="POST" path="requestPath" />
     </flow>
