@@ -16,20 +16,21 @@ import org.glassfish.grizzly.utils.BufferInputStream;
 
 /**
  * {@link java.io.InputStream} to be used when the HTTP request
- * has Transfer-Encoding: chunked.
+ * has Transfer-Encoding: chunked or the content is not fully provided because the
+ * message is too large.
  *
  * This {@link java.io.InputStream} implementation does a blocking read
  * over the HTTP connection to read the next chunk when there is no more
  * data available.
  */
-public class TransferEncodingChunkInputStream extends InputStream
+public class BlockingTransferInputStream extends InputStream
 {
 
     private final FilterChainContext filterChainContext;
     private InputStream chunk;
     private boolean lastPacketReceived;
 
-    public TransferEncodingChunkInputStream(FilterChainContext filterChainContext, InputStream firstChunk)
+    public BlockingTransferInputStream(FilterChainContext filterChainContext, InputStream firstChunk)
     {
         this.filterChainContext = filterChainContext;
         this.chunk = firstChunk;

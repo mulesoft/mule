@@ -36,6 +36,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     private final InputStream requestContent;
     private final FilterChainContext filterChainContext;
     private final int contentLength;
+    private final boolean isTransferEncodingChunked;
     private HttpProtocol protocol;
     private String uri;
     private String path;
@@ -47,7 +48,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     {
         this.filterChainContext = filterChainContext;
         this.requestPacket = (HttpRequestPacket) httpContent.getHttpHeader();
-        this.requestContent = new BufferInputStream(httpContent.getContent());
+        isTransferEncodingChunked = httpContent.getHttpHeader().isChunked();
         int contentLengthAsInt = 0;
         String contentLengthAsString = requestPacket.getHeader(HttpHeaders.Names.CONTENT_LENGTH);
         if (contentLengthAsString != null)
@@ -55,6 +56,13 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
             contentLengthAsInt = Integer.parseInt(contentLengthAsString);
         }
         this.contentLength = contentLengthAsInt;
+        InputStream contentInputStream = new BufferInputStream(httpContent.getContent());
+        boolean contentIsIncomplete = !httpContent.isLast();
+        if (contentIsIncomplete)
+        {
+            contentInputStream = new BlockingTransferInputStream(filterChainContext, contentInputStream);
+        }
+        this.requestContent = contentInputStream;
     }
 
     @Override
@@ -141,21 +149,23 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
                 final String contentTypeValue = getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
                 if (contentTypeValue != null && contentTypeValue.contains("multipart"))
                 {
-
                     final Collection<Part> parts = HttpParser.parseMultipartContent(requestContent, contentTypeValue);
                     this.body = new MultipartHttpEntity(parts);
                 }
-                else if (getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
-                {
-                    this.body = new InputStreamHttpEntity(new TransferEncodingChunkInputStream(filterChainContext, requestContent));
-                }
-                else if (contentLength > 0)
-                {
-                    this.body = new InputStreamHttpEntity(contentLength, requestContent);
-                }
                 else
                 {
-                    this.body = new EmptyHttpEntity();
+                    if (isTransferEncodingChunked)
+                    {
+                        this.body = new InputStreamHttpEntity(requestContent);
+                    }
+                    else if (contentLength > 0)
+                    {
+                        this.body = new InputStreamHttpEntity(contentLength, requestContent);
+                    }
+                    else
+                    {
+                        this.body = new EmptyHttpEntity();
+                    }
                 }
             }
             return this.body;
@@ -183,9 +193,9 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
         {
             return null;
         }
-        if (getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
+        if (isTransferEncodingChunked)
         {
-            return new InputStreamHttpEntity(new TransferEncodingChunkInputStream(filterChainContext, requestContent));
+            return new InputStreamHttpEntity(requestContent);
         }
         if (contentLength > 0)
         {
