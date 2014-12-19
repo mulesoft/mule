@@ -270,6 +270,8 @@
 /mule-standalone-${productVersion}/lib/opt/hk2-api-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/hk2-locator-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/hk2-utils-2.3.0-b05.jar
+/mule-standalone-${productVersion}/lib/opt/httpclient-4.3.5.jar
+/mule-standalone-${productVersion}/lib/opt/httpcore-4.3.2.jar
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-2.4.3.jar
