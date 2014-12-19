@@ -17,7 +17,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.domain.response.HttpResponse;

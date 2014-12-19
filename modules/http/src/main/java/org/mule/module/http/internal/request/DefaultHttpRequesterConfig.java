@@ -37,7 +37,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
 
-    private HttpConstants.Protocols protocol = HttpConstants.Protocols.HTTP;
+    private HttpConstants.Protocols protocol = HTTP;
     private String name;
     private String host;
     private String port;
