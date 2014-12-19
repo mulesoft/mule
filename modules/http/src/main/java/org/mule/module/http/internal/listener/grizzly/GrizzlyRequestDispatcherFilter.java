@@ -40,7 +40,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
     @Override
     public NextAction handleRead(final FilterChainContext ctx) throws IOException
     {
-        final String scheme = (ctx.getAttributes().getAttribute(HttpConstants.Protocols.HTTPS) == null) ? HttpConstants.Protocols.HTTP : HttpConstants.Protocols.HTTPS;
+        final String scheme = (ctx.getAttributes().getAttribute(HttpConstants.Protocols.HTTPS.getScheme()) == null) ? HttpConstants.Protocols.HTTP.getScheme() : HttpConstants.Protocols.HTTPS.getScheme();
         final String ip = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getAddress().getHostAddress();
         final int port = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getPort();
         final HttpContent httpContent = ctx.getMessage();

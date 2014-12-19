@@ -126,7 +126,16 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="host" type="xsd:string">
+                <xsd:attribute name="protocol" type="httpProtocol" default="HTTP">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the
+                            HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the
+                            user needs to configure at least the keystore in the tls:context child element of this listener-config.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="host" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Host where the requests will be sent.
@@ -136,7 +145,8 @@
                 <xsd:attribute name="port" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Port where the requests will be sent.
+                            Port where the requests will be received. If the protocol attribute is HTTP (default) then the default value is 80, if the protocol
+                            attribute is HTTPS then the default value is 443.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -562,7 +572,16 @@
                 </xsd:sequence>
 
                 <xsd:attributeGroup ref="commonRequestAttributes" />
-
+                <xsd:attribute name="protocol" type="httpProtocol" default="HTTP">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the
+                            HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the
+                            user can customize the tls/ssl configuration by defining the tls:context child element of this listener-config.
+                            If not tls:context is defined then the default JVM certificates are going to be used to establish communication.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -645,7 +664,8 @@
         <xsd:attribute name="port" type="mule:substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
-                    Port where the requests will be sent.
+                    Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the protocol
+                    attribute is HTTPS then the default value is 443.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -894,5 +914,24 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:simpleType name="httpProtocol">
+        <xsd:restriction base="mule:substitutableName">
+            <xsd:enumeration value="HTTP">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Plain HTTP protocol with no encryption (HTTPS / SSL/ TLS) configured
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="HTTPS">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        HTTP protocol used with encryption (HTTPS / SSL / TLS).
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
 
 </xsd:schema>

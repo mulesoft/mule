@@ -6,10 +6,12 @@
  */
 package org.mule.module.http.internal.request.client;
 
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.NULL_VALIDATOR;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequestOperationConfig;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
@@ -124,6 +126,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
         {
             DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
             requesterConfig.setTlsContext(tlsContextFactory);
+            requesterConfig.setProtocol(HTTPS);
             muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"), requesterConfig);
             httpRequester.setConfig(requesterConfig);
         }

@@ -16,10 +16,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.module.oauth2.asserter.AuthorizationRequestAsserter;
@@ -27,8 +28,8 @@ import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.module.oauth2.internal.OAuthConstants;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.NullPayload;
-import org.mule.transport.ssl.DefaultTlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactoryBuilder;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.common.collect.ImmutableMap;
@@ -93,7 +94,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
     {
         wireMockRule.stubFor(get(urlMatching(AUTHORIZE_PATH + ".*")).willReturn(aResponse().withStatus(200)));
 
-        HttpRequestOptions options =  HttpRequestOptionsBuilder.newOptions()
+        HttpRequestOptions options =  newOptions()
                 .enableFollowsRedirect()
                 .tlsContextFactory((TlsContextFactory) muleContext.getRegistry().get("tlsContext"))
                 .build();
@@ -135,7 +136,9 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
                 .put(OAuthConstants.CODE_PARAMETER, AUTHENTICATION_CODE)
                 .put(OAuthConstants.STATE_PARAMETER, state.getValue()).build();
 
-        muleContext.getClient().send(redirectUrl.getValue() + "?" + HttpParser.encodeQueryString(redirectUrlQueryParams), new DefaultMuleMessage(NullPayload.getInstance(), muleContext), HttpRequestOptionsBuilder.newOptions().tlsContextFactory(new DefaultTlsContextFactory()).build());
+        TlsContextFactory defaultTlsContextFactory = new TlsContextFactoryBuilder(muleContext).buildDefault();
+        muleContext.getClient().send(redirectUrl.getValue() + "?" + HttpParser.encodeQueryString(redirectUrlQueryParams),
+                new DefaultMuleMessage(NullPayload.getInstance(), muleContext), newOptions().tlsContextFactory(defaultTlsContextFactory).build());
 
         verifyRequestDoneToTokenUrlForAuthorizationCode();
 
@@ -151,6 +154,6 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
     @Override
     protected String getProtocol()
     {
-        return HTTPS;
+        return HTTPS.getScheme();
     }
 }
