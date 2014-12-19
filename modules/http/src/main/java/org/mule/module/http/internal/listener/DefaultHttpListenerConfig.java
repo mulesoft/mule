@@ -6,6 +6,10 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static java.lang.String.format;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -18,6 +22,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.listener.async.RequestHandler;
@@ -43,9 +48,10 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
     public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
 
+    private HttpConstants.Protocols protocol = HttpConstants.Protocols.HTTP;
     private String name;
     private String host;
-    private int port;
+    private Integer port;
     private String basePath;
     private Boolean parseRequest;
     private MuleContext muleContext;
@@ -69,6 +75,11 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public void setProtocol(HttpConstants.Protocols protocol)
+    {
+        this.protocol = protocol;
     }
 
     public void setHost(String host)
@@ -128,6 +139,21 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
             workerThreadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
         }
+
+        if (port == null)
+        {
+            port = protocol.getDefaultPort();
+        }
+
+        if (protocol.equals(HTTP) && tlsContext != null)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("TlsContext cannot be configured with protocol HTTP. " +
+                      "If you defined a tls:context element in your listener-config then you must set protocol=\"HTTPS\""), this);
+        }
+        if (protocol.equals(HTTPS) && tlsContext == null)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("Configured protocol is HTTPS but there's no TlsContext configured"), this);
+        }
         if (tlsContext != null && !tlsContext.isKeyStoreConfigured())
         {
             throw new InitialisationException(CoreMessages.createStaticMessage("KeyStore must be configured for server side SSL"), this);
@@ -181,7 +207,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
     private WorkManager createWorkManager()
     {
-        final WorkManager workManager = workerThreadingProfile.createWorkManager(String.format("%s%s.%s", ThreadNameHelper.getPrefix(muleContext), name, "worker"), muleContext.getConfiguration().getShutdownTimeout());
+        final WorkManager workManager = workerThreadingProfile.createWorkManager(format("%s%s.%s", ThreadNameHelper.getPrefix(muleContext), name, "worker"), muleContext.getConfiguration().getShutdownTimeout());
         if (workManager instanceof MuleContextAware)
         {
             ((MuleContextAware) workManager).setMuleContext(muleContext);

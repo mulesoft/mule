@@ -135,7 +135,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     public void sendFailureResponseToClient(MessagingException messagingException, ResponseCompletionCallback responseCompletationCallback) throws MuleException
     {
         //For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
-        String exceptionStatusCode = ExceptionHelper.getTransportErrorMapping(HTTP, messagingException.getClass(), sourceMuleEvent.getMuleContext());
+        String exceptionStatusCode = ExceptionHelper.getTransportErrorMapping(HTTP.getScheme(), messagingException.getClass(), sourceMuleEvent.getMuleContext());
         Integer statusCodeFromException = exceptionStatusCode != null ? Integer.valueOf(exceptionStatusCode) : INTERNAL_SERVER_ERROR_STATUS_CODE;
         final org.mule.module.http.internal.domain.response.HttpResponseBuilder failureResponseBuilder = new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
                 .setStatusCode(statusCodeFromException)

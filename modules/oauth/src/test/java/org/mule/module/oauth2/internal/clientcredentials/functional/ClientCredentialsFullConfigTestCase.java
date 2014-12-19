@@ -130,6 +130,6 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
     @Override
     protected String getProtocol()
     {
-        return HTTPS;
+        return HTTPS.getScheme();
     }
 }

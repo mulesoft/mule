@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.api.listener;
 
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -168,8 +170,9 @@ public class HttpListenerBuilder
     public HttpListenerBuilder setTlsContextFactory(final TlsContextFactory tlsContextFactory)
     {
         Preconditions.checkState(httpListenerConfig == null, "You already set a listener config. You cannot specify a tls context factory");
-        Preconditions.checkState(protocol == null || protocol.equals(HttpConstants.Protocols.HTTPS), "You cannot set a tls context factory with protocol http");
+        Preconditions.checkState(protocol == null || protocol.equalsIgnoreCase(HTTPS.getScheme()), "You cannot set a tls context factory with protocol http");
         this.tlsContextFactory = tlsContextFactory;
+        this.protocol = HTTPS.getScheme();
         return this;
     }
 
@@ -190,7 +193,7 @@ public class HttpListenerBuilder
         {
             Preconditions.checkState(flow != null, "You must configure a flow");
             resolveListenerConfig();
-            if (protocol != null && protocol.toLowerCase().equals(HttpConstants.Protocols.HTTPS))
+            if (protocol != null && protocol.toLowerCase().equals(HTTPS.getScheme()))
             {
                 if (httpListenerConfig == null)
                 {
@@ -242,8 +245,8 @@ public class HttpListenerBuilder
             {
                 if (listenerConfig.getHost().equals(this.host) &&
                         listenerConfig.getPort() == this.port &&
-                        (protocol == null || (protocol.equals(HttpConstants.Protocols.HTTPS) && listenerConfig.hasTlsConfig()) ||
-                         (protocol.equals(HttpConstants.Protocols.HTTP) && !listenerConfig.hasTlsConfig())))
+                        (protocol == null || (protocol.equalsIgnoreCase(HTTPS.getScheme()) && listenerConfig.hasTlsConfig()) ||
+                         (protocol.equalsIgnoreCase(HttpConstants.Protocols.HTTP.getScheme()) && !listenerConfig.hasTlsConfig())))
                 {
                     if (tlsContextFactory != null && !tlsContextFactory.equals(listenerConfig.getTlsContext()))
                     {
@@ -258,7 +261,7 @@ public class HttpListenerBuilder
                 HttpListenerConfigBuilder httpListenerConfigBuilder = new HttpListenerConfigBuilder(muleContext)
                         .setHost(host)
                         .setPort(port);
-                if (protocol != null && protocol.equals(HttpConstants.Protocols.HTTPS))
+                if (protocol != null && protocol.equalsIgnoreCase(HTTPS.getScheme()))
                 {
                     if (tlsContextFactory == null)
                     {

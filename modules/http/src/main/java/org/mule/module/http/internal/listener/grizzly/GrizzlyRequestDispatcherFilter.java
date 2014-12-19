@@ -6,6 +6,9 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
@@ -40,7 +43,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
     @Override
     public NextAction handleRead(final FilterChainContext ctx) throws IOException
     {
-        final String scheme = (ctx.getAttributes().getAttribute(HttpConstants.Protocols.HTTPS) == null) ? HttpConstants.Protocols.HTTP : HttpConstants.Protocols.HTTPS;
+        final String scheme = (ctx.getAttributes().getAttribute(HTTPS.getScheme()) == null) ? HTTP.getScheme() : HTTPS.getScheme();
         final String ip = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getAddress().getHostAddress();
         final int port = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getPort();
         final HttpContent httpContent = ctx.getMessage();
