@@ -8,17 +8,17 @@ package org.mule.test.integration.security;
 
 import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
-import static org.mule.tck.matchers.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.matchers.HttpResponseHeaderMatcher;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
+import org.apache.http.Header;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -65,8 +65,10 @@ public class HttpListenerAuthenticationTestCase extends FunctionalTestCase
         CredentialsProvider credsProvider = getCredentialsProvider(VALID_USER, INVALID_PASSWORD);
         getHttpResponse(credsProvider);
 
-        assertThat(httpResponse, hasStatusCode(SC_UNAUTHORIZED));
-        assertThat(httpResponse, HttpResponseHeaderMatcher.header(WWW_AUTHENTICATE, is(BASIC_REALM_MULE_REALM)));
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_UNAUTHORIZED));
+        Header authHeader = httpResponse.getFirstHeader(WWW_AUTHENTICATE);
+        assertThat(authHeader, is(notNullValue()));
+        assertThat(authHeader.getValue(), is(BASIC_REALM_MULE_REALM));
     }
 
     @Test
@@ -75,7 +77,7 @@ public class HttpListenerAuthenticationTestCase extends FunctionalTestCase
         CredentialsProvider credsProvider = getCredentialsProvider(VALID_USER, VALID_PASSWORD);
         getHttpResponse(credsProvider);
 
-        assertThat(httpResponse, hasStatusCode(SC_OK));
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_OK));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(EXPECTED_PAYLOAD));
     }
 
