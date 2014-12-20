@@ -15,7 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.http.matcher.ParamMapMatcher;
+import org.mule.tck.matchers.ParamMapMatcher;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
