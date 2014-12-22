@@ -7,8 +7,9 @@
 package org.mule.transport.xmpp;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-
 import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.FromMatchesFilter;
@@ -31,7 +32,7 @@ public class XmppChatConversation extends AbstractXmppConversation
     @Override
     protected void doConnect()
     {
-        chat = connection.getChatManager().createChat(recipient, null);
+        chat = ChatManager.getInstanceFor(connection).createChat(recipient, null);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class XmppChatConversation extends AbstractXmppConversation
         // thread id would then prevent the PacketCollector to see incoming chat messages.
         // We create our own PacketFilter here which matches only our chat partner's JID and
         // the message type, just in case.
-        PacketFilter recipientFilter = new FromMatchesFilter(recipient);
+        PacketFilter recipientFilter = FromMatchesFilter.create(recipient);
         PacketFilter messageTypeFilter = new MessageTypeFilter(Message.Type.chat);
         return new AndFilter(recipientFilter, messageTypeFilter);
     }
@@ -56,7 +57,7 @@ public class XmppChatConversation extends AbstractXmppConversation
     }
 
     @Override
-    public void dispatch(Message message) throws XMPPException
+    public void dispatch(Message message) throws XMPPException, NotConnectedException
     {
         message.setType(Message.Type.chat);
         chat.sendMessage(message);

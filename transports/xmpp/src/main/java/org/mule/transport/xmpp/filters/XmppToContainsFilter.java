@@ -7,7 +7,7 @@
 package org.mule.transport.xmpp.filters;
 
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.ToContainsFilter;
+import org.jivesoftware.smack.packet.Packet;
 
 /**
  * <code>XmppToContainsFilter</code> is an Xmpp ToContainsfilter adapter.
@@ -27,6 +27,17 @@ public class XmppToContainsFilter extends XmppFromContainsFilter
     @Override
     protected PacketFilter createFilter()
     {
-        return new ToContainsFilter(pattern);
+        return new PacketFilter() {
+
+            @Override
+            public boolean accept(Packet packet) {
+                String to = packet.getTo();
+                if (to == null) {
+                    return false;
+                }
+                return to.contains(pattern);
+            }
+
+        };
     }
 }

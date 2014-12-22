@@ -6,16 +6,21 @@
  */
 package org.mule.transport.xmpp;
 
+import java.io.IOException;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.AbstractConnector;
-
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 
 /**
  * <code>XmppConnector</code> represents a connection to a Jabber server.
@@ -41,7 +46,7 @@ public class XmppConnector extends AbstractConnector
     private String resource;
     private boolean createAccount = false;
     
-    private XMPPConnection connection;
+    private XMPPTCPConnection connection;
     private XmppConversationFactory conversationFactory = new XmppConversationFactory();
     
     public XmppConnector(MuleContext context)
@@ -125,10 +130,10 @@ public class XmppConnector extends AbstractConnector
         // no need to load the roster (this is not an interactive app)
         connectionConfig.setRosterLoadedAtLogin(false);
         
-        connection = new XMPPConnection(connectionConfig);
+        connection = new XMPPTCPConnection(connectionConfig);
     }
 
-    protected void connectToJabberServer() throws XMPPException
+    protected void connectToJabberServer() throws XMPPException, SmackException, IOException
     {
         connection.connect();
         
@@ -147,11 +152,11 @@ public class XmppConnector extends AbstractConnector
         }
     }
 
-    private void createAccount()
+    private void createAccount() throws NoResponseException, NotConnectedException
     {
         try
         {
-            AccountManager accountManager = new AccountManager(connection);
+            AccountManager accountManager = AccountManager.getInstance(connection);
             accountManager.createAccount(user, password);
         }
         catch (XMPPException ex)

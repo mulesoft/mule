@@ -17,17 +17,20 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 public class JabberClient implements PacketListener, MessageListener
@@ -41,7 +44,7 @@ public class JabberClient implements PacketListener, MessageListener
     private String replyPayload = "Reply";
     private boolean autoreply = false;
 
-    private XMPPConnection connection;
+    private XMPPTCPConnection connection;
     private Map<String, Chat> chats;
     private MultiUserChat groupchat = null;
     private List<Message> replies;
@@ -75,7 +78,7 @@ public class JabberClient implements PacketListener, MessageListener
         // no roster required
         connectionConfig.setRosterLoadedAtLogin(false);
         
-        connection = new XMPPConnection(connectionConfig);
+        connection = new XMPPTCPConnection(connectionConfig);
         connection.connect();
         if (logger.isDebugEnabled())
         {
@@ -122,17 +125,23 @@ public class JabberClient implements PacketListener, MessageListener
         }
         if (groupchat != null)
         {
-            groupchat.leave();
+            try {
+                groupchat.leave();
+            } catch (NotConnectedException e) {
+            }
         }
         
         chats = null;
-        connection.disconnect();
+        try {
+            connection.disconnect();
+        } catch (NotConnectedException e) {
+        }
     }
 
     //
     // Jabber listeners
     //
-    public void processPacket(Packet packet)
+    public void processPacket(Packet packet) throws NotConnectedException
     {
         if (logger.isDebugEnabled())
         {
@@ -165,7 +174,7 @@ public class JabberClient implements PacketListener, MessageListener
         }
     }
 
-    private void sendAutoreply(Packet packet)
+    private void sendAutoreply(Packet packet) throws NotConnectedException
     {
         if (autoreply)
         {
@@ -185,7 +194,7 @@ public class JabberClient implements PacketListener, MessageListener
         }
     }
 
-    public void sendMessage(String recipient, String payload)
+    public void sendMessage(String recipient, String payload) throws NotConnectedException
     {
         if (logger.isDebugEnabled())
         {
@@ -196,7 +205,7 @@ public class JabberClient implements PacketListener, MessageListener
         connection.sendPacket(message);
     }
 
-    public void sendChatMessage(String recipient, String payload) throws XMPPException
+    public void sendChatMessage(String recipient, String payload) throws XMPPException, NotConnectedException
     {
         if (logger.isDebugEnabled())
         {
@@ -213,7 +222,7 @@ public class JabberClient implements PacketListener, MessageListener
         Chat chat = chats.get(recipient);
         if (chat == null)
         {
-            chat = connection.getChatManager().createChat(recipient, this);
+            chat = ChatManager.getInstanceFor(connection).createChat(recipient, this);
             chats.put(recipient, chat);
         }
         return chat;
@@ -243,13 +252,13 @@ public class JabberClient implements PacketListener, MessageListener
         return packetCollector.nextResult(timeout);
     }
 
-    public void joinGroupchat(String chatroom) throws XMPPException
+    public void joinGroupchat(String chatroom) throws XMPPException, NoResponseException, NotConnectedException
     {
         groupchat = new MultiUserChat(connection, chatroom);
         groupchat.join(UUID.getUUID().toString());
     }
 
-    public void sendGroupchatMessage(String text) throws XMPPException
+    public void sendGroupchatMessage(String text) throws XMPPException, NotConnectedException
     {
         groupchat.sendMessage(text);
     }

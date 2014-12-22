@@ -7,7 +7,7 @@
 package org.mule.transport.xmpp;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.FromMatchesFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -27,12 +27,13 @@ public class XmppMessageConversation extends AbstractXmppConversation
     @Override
     protected PacketFilter createPacketFilter()
     {
-        PacketFilter recipientFilter = new FromMatchesFilter(recipient);
+        PacketFilter recipientFilter = FromMatchesFilter.create(recipient);
         PacketFilter messageTypeFilter = new MessageTypeFilter(Message.Type.normal);
         return new AndFilter(recipientFilter, messageTypeFilter);
     }
-    
-    public void dispatch(Message message)
+
+    @Override
+    public void dispatch(Message message) throws NotConnectedException
     {
         message.setType(Message.Type.normal);
         message.setTo(recipient);
