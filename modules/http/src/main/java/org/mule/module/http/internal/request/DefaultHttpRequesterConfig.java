@@ -194,6 +194,11 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         this.authentication = authentication;
     }
 
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContext;
+    }
+
     public void setTlsContext(TlsContextFactory tlsContext)
     {
         this.tlsContext = tlsContext;

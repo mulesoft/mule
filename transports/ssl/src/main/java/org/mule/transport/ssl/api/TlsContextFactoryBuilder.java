@@ -35,10 +35,10 @@ public class TlsContextFactoryBuilder
             TlsContextFactory tlsContextFactory = muleContext.getRegistry().get(DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY);
             if (tlsContextFactory == null)
             {
-                DefaultTlsContextFactory defaultTlsContextFactory = new DefaultTlsContextFactory();
+                tlsContextFactory = new DefaultTlsContextFactory();
                 try
                 {
-                    muleContext.getRegistry().registerObject(DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY, defaultTlsContextFactory);
+                    muleContext.getRegistry().registerObject(DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY, tlsContextFactory);
                 }
                 catch (RegistrationException e)
                 {
