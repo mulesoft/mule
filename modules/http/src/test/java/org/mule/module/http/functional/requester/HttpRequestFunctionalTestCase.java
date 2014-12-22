@@ -7,6 +7,7 @@
 package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -18,6 +19,7 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,6 +57,13 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     {
         HttpRequesterConfig httpRequesterConfig = muleContext.getRegistry().get(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME);
         assertThat(httpRequesterConfig.getPort(), is(String.valueOf(HTTPS.getDefaultPort())));
+    }
+
+    @Test
+    public void requestConfigDefaultTlsContextHttps()
+    {
+        DefaultHttpRequesterConfig httpRequesterConfig = muleContext.getRegistry().get(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME);
+        assertThat(httpRequesterConfig.getTlsContext(), notNullValue());
     }
 
     @Test
