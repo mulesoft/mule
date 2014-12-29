@@ -56,7 +56,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
 
     private File partitionDirectory;
     private String partitionName;
-    private BidiMap realKeyToUUIDIndex;
+    private final BidiMap realKeyToUUIDIndex = new TreeBidiMap();
 
     PersistentObjectStorePartition(MuleContext muleContext, String partitionName, File partitionDirectory)
     {
@@ -101,14 +101,22 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     public List<Serializable> allKeys() throws ObjectStoreException
     {
         assureLoaded();
-        return Collections.unmodifiableList(new ArrayList<Serializable>(realKeyToUUIDIndex.keySet()));
+
+        synchronized (realKeyToUUIDIndex)
+        {
+            return Collections.unmodifiableList(new ArrayList<Serializable>(realKeyToUUIDIndex.keySet()));
+        }
     }
 
     @Override
     public boolean contains(Serializable key) throws ObjectStoreException
     {
         assureLoaded();
-        return realKeyToUUIDIndex.containsKey(key);
+
+        synchronized (realKeyToUUIDIndex)
+        {
+            return realKeyToUUIDIndex.containsKey(key);
+        }
     }
 
     @Override
@@ -116,13 +124,16 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     {
         assureLoaded();
 
-        if (realKeyToUUIDIndex.containsKey(key))
+        synchronized (realKeyToUUIDIndex)
         {
-            throw new ObjectAlreadyExistsException();
+            if (realKeyToUUIDIndex.containsKey(key))
+            {
+                throw new ObjectAlreadyExistsException();
+            }
+            File newFile = createFileToStoreObject();
+            realKeyToUUIDIndex.put(key, newFile.getName());
+            serialize(newFile, new StoreValue<T>(key, value));
         }
-        File newFile = createFileToStoreObject();
-        realKeyToUUIDIndex.put(key, newFile.getName());
-        serialize(newFile, new StoreValue<T>(key, value));
     }
 
     @Override
@@ -130,14 +141,17 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     {
         assureLoaded();
 
-        if (!realKeyToUUIDIndex.containsKey(key))
+        synchronized (realKeyToUUIDIndex)
         {
-            String message = "Key does not exist: " + key;
-            throw new ObjectDoesNotExistException(CoreMessages.createStaticMessage(message));
+            if (!realKeyToUUIDIndex.containsKey(key))
+            {
+                String message = "Key does not exist: " + key;
+                throw new ObjectDoesNotExistException(CoreMessages.createStaticMessage(message));
+            }
+            String filename = (String) realKeyToUUIDIndex.get(key);
+            File file = getValueFile(filename);
+            return deserialize(file).getValue();
         }
-        String filename = (String) realKeyToUUIDIndex.get(key);
-        File file = getValueFile(filename);
-        return deserialize(file).getValue();
     }
 
     @Override
@@ -145,9 +159,12 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     {
         assureLoaded();
 
-        T value = retrieve(key);
-        deleteStoreFile(getValueFile((String) realKeyToUUIDIndex.get(key)));
-        return value;
+        synchronized (realKeyToUUIDIndex)
+        {
+            T value = retrieve(key);
+            deleteStoreFile(getValueFile((String) realKeyToUUIDIndex.get(key)));
+            return value;
+        }
     }
 
     @Override
@@ -160,37 +177,40 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     {
         assureLoaded();
 
-        File[] files = listValuesFiles();
-        Arrays.sort(files, new Comparator<File>()
+        synchronized (realKeyToUUIDIndex)
         {
-            public int compare(File f1, File f2)
+            File[] files = listValuesFiles();
+            Arrays.sort(files, new Comparator<File>()
             {
-                int result = Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
-                if (result == 0)
+                public int compare(File f1, File f2)
                 {
-                    result = f1.getName().compareTo(f2.getName());
+                    int result = Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+                    if (result == 0)
+                    {
+                        result = f1.getName().compareTo(f2.getName());
+                    }
+                    return result;
                 }
-                return result;
-            }
-        });
-        int startIndex = trimToMaxSize(files, maxEntries);
+            });
+            int startIndex = trimToMaxSize(files, maxEntries);
 
-        if (entryTTL == UNBOUNDED)
-        {
-            return;
-        }
-
-        final long now = System.currentTimeMillis();
-        for (int i = startIndex; i < files.length; i++)
-        {
-            Long lastModified = files[i].lastModified();
-            if ((now - lastModified) >= entryTTL)
+            if (entryTTL == UNBOUNDED)
             {
-                deleteStoreFile(files[i]);
+                return;
             }
-            else
+
+            final long now = System.currentTimeMillis();
+            for (int i = startIndex; i < files.length; i++)
             {
-                break;
+                Long lastModified = files[i].lastModified();
+                if ((now - lastModified) >= entryTTL)
+                {
+                    deleteStoreFile(files[i]);
+                }
+                else
+                {
+                    break;
+                }
             }
         }
     }
@@ -219,7 +239,6 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
         try
         {
             File[] files = listValuesFiles();
-            realKeyToUUIDIndex = new TreeBidiMap();
             for (int i = 0; i < files.length; i++)
             {
                 File file = files[i];
@@ -424,17 +443,17 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
 
     public void clear() throws ObjectStoreException
     {
-        try
+        synchronized (realKeyToUUIDIndex)
         {
-            FileUtils.cleanDirectory(this.partitionDirectory);
-        }
-        catch (IOException e)
-        {
-            throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear ObjectStore"), e);
-        }
+            try
+            {
+                FileUtils.cleanDirectory(this.partitionDirectory);
+            }
+            catch (IOException e)
+            {
+                throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear ObjectStore"), e);
+            }
 
-        if (realKeyToUUIDIndex != null)
-        {
             realKeyToUUIDIndex.clear();
         }
     }
