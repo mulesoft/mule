@@ -1659,6 +1659,8 @@
                             <exclude>**/*.css</exclude>
                             <exclude>**/build-number.txt</exclude>
 
+                            <exclude>**/AsyncCompletionHandler.java</exclude>
+                            <exclude>**/AsyncCompletionHandlerBase.java</exclude>
                             <exclude>**/BndMojo.java</exclude>
                             <exclude>**/BobberArchetype.java</exclude>
                             <exclude>**/BobberArchetypeMojo.java</exclude>
