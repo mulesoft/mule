@@ -7,11 +7,21 @@
 package org.mule.module.ws.consumer;
 
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mule.api.config.MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY;
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.endpoint.DefaultEndpointFactory;
+import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transport.http.HttpConnector;
 
 import org.junit.Test;
 
@@ -66,6 +76,22 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
         wsConsumer.initialise();
     }
 
+    @Test
+    public void outboundEndpointIsDisposed() throws Exception
+    {
+        TestEndpointFactory endpointFactory = new TestEndpointFactory();
+        muleContext.getRegistry().registerObject(OBJECT_MULE_ENDPOINT_FACTORY, endpointFactory);
+
+        WSConsumer wsConsumer = createConsumer();
+        wsConsumer.getConfig().setConnector(new HttpConnector(muleContext));
+        wsConsumer.initialise();
+
+        verify((Disposable) endpointFactory.getCreatedEndpoint(), never()).dispose();
+
+        wsConsumer.dispose();
+
+        verify((Disposable) endpointFactory.getCreatedEndpoint()).dispose();
+    }
 
     private WSConsumer createConsumer()
     {
@@ -83,5 +109,24 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
         wsConsumer.setMuleContext(muleContext);
 
         return wsConsumer;
+    }
+
+    class TestEndpointFactory extends DefaultEndpointFactory
+    {
+
+        private DefaultOutboundEndpoint createdEndpoint;
+
+        @Override
+        public OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
+        {
+            createdEndpoint = mock(DefaultOutboundEndpoint.class);
+            return createdEndpoint;
+        }
+
+        public DefaultOutboundEndpoint getCreatedEndpoint()
+        {
+            return createdEndpoint;
+        }
+
     }
 }
