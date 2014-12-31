@@ -508,6 +508,12 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
         // this.messageProcessors.clear();
         // Don't clear this, since it changes the hash code, which can foul up shutdown processing
         // when objects have been keyed by endpoint, e.g. dispatchers
+
+        if (this.messageProcessorChain instanceof Disposable)
+        {
+            ((Disposable) this.messageProcessorChain).dispose();
+        }
+
         this.messageProcessorChain = null;
     }
 
