@@ -48,7 +48,7 @@ public class QueryStatementFactory implements ConfigurableStatementFactory
 
         if (queryTemplate.getType().equals(QueryType.STORE_PROCEDURE_CALL))
         {
-            result = connection.prepareCall(queryTemplate.getSqlText(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            result = connection.prepareCall(queryTemplate.getSqlText(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         }
         else
         {
