@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -63,7 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware
+public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable
 {
 
     public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
@@ -436,5 +437,14 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     public void setMtomEnabled(boolean mtomEnabled)
     {
         this.mtomEnabled = mtomEnabled;
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (messageProcessor instanceof Disposable)
+        {
+            ((Disposable) messageProcessor).dispose();
+        }
     }
 }

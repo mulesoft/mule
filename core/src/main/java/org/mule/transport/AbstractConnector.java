@@ -27,6 +27,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
@@ -2607,7 +2608,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
-    class DispatcherMessageProcessor implements MessageProcessor
+    class DispatcherMessageProcessor implements MessageProcessor, Disposable
     {
         private OutboundNotificationMessageProcessor notificationMessageProcessor;
         private OutboundEndpoint endpoint;
@@ -2666,5 +2667,20 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             return ObjectUtils.toString(this);
         }
+
+        @Override
+        public void dispose()
+        {
+            try
+            {
+                dispatchers.clear(endpoint);
+            }
+            catch (Exception e)
+            {
+                logger.warn("Can not clear dispatchers cache for endpoint: " + endpoint);
+            }
+        }
+
     }
+
 }

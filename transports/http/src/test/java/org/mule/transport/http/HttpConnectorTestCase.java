@@ -6,6 +6,9 @@
  */
 package org.mule.transport.http;
 
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -20,8 +23,10 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
+import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
@@ -326,6 +331,28 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
                     assertEquals(0, httpConnector.getDispatchers().getNumIdle());
                 }
             });
+    }
+
+    @Test
+    public void dispatchersAreRemoved() throws Exception
+    {
+        DefaultOutboundEndpoint endpoint = (DefaultOutboundEndpoint) muleContext.getEndpointFactory().getOutboundEndpoint("http://localhost:8080");
+        HttpConnector httpConnector = (HttpConnector) endpoint.getConnector();
+        httpConnector.start();
+
+        MessageDispatcher initialDispatcher = httpConnector.borrowDispatcher(endpoint);
+        httpConnector.returnDispatcher(endpoint, initialDispatcher);
+
+        MessageDispatcher shouldBeSameDispatcher = httpConnector.borrowDispatcher(endpoint);
+        assertThat(shouldBeSameDispatcher, is(sameInstance(initialDispatcher)));
+        httpConnector.returnDispatcher(endpoint, shouldBeSameDispatcher);
+
+        endpoint.getMessageProcessorChain(null);
+        endpoint.dispose();
+
+        MessageDispatcher shouldBeANewDispatcher = httpConnector.borrowDispatcher(endpoint);
+        assertThat(shouldBeANewDispatcher, not(sameInstance(initialDispatcher)));
+        httpConnector.returnDispatcher(endpoint, shouldBeANewDispatcher);
     }
 
 }
