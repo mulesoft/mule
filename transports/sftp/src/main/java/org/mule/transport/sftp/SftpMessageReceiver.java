@@ -25,7 +25,9 @@ import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.lock.LockFactory;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -34,8 +36,7 @@ import java.util.concurrent.locks.Lock;
  * using jsch. This receiver produces an InputStream payload, which can be
  * materialized in a MessageDispatcher or Component.
  */
-public class SftpMessageReceiver extends AbstractPollingMessageReceiver
-{
+public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
 
@@ -46,8 +47,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     public SftpMessageReceiver(SftpConnector connector,
                                FlowConstruct flow,
                                InboundEndpoint endpoint,
-                               long frequency) throws CreateException
-    {
+                               long frequency) throws CreateException {
         super(connector, flow, endpoint);
 
         this.setFrequency(frequency);
@@ -55,80 +55,58 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         sftpRRUtil = createSftpReceiverRequesterUtil(endpoint);
     }
 
-    protected SftpReceiverRequesterUtil createSftpReceiverRequesterUtil(InboundEndpoint endpoint)
-    {
+    protected SftpReceiverRequesterUtil createSftpReceiverRequesterUtil(InboundEndpoint endpoint) {
         return new SftpReceiverRequesterUtil(endpoint);
     }
 
-    public SftpMessageReceiver(SftpConnector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException
-    {
+    public SftpMessageReceiver(SftpConnector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException {
         this(connector, flow, endpoint, DEFAULT_POLL_FREQUENCY);
     }
 
-    public void poll() throws Exception
-    {
-        if (logger.isDebugEnabled())
-        {
+    public void poll() throws Exception {
+        if (logger.isDebugEnabled()) {
             logger.debug("Polling. Called at endpoint " + endpoint.getEndpointURI());
         }
-        try
-        {
+        try {
             String[] files = sftpRRUtil.getAvailableFiles(false);
 
-            if (files.length == 0)
-            {
-                if (logger.isDebugEnabled())
-                {
+            if (files.length == 0) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Polling. No matching files found at endpoint " + endpoint.getEndpointURI());
                 }
-            }
-            else
-            {
-                if (logger.isDebugEnabled())
-                {
+            } else {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Polling. " + files.length + " files found at " + endpoint.getEndpointURI()
-                                 + ":" + Arrays.toString(files));
+                            + ":" + Arrays.toString(files));
                 }
 
                 final Comparator<Map.Entry<String, SftpATTRS>> comparator = getComparator();
-                if (comparator != null)
-                {
+                if (comparator != null) {
                     sftpRRUtil.sort(files, comparator);
                 }
 
 
-                for (String file : files)
-                {
-                    if (getLifecycleState().isStopping())
-                    {
+                for (String file : files) {
+                    if (getLifecycleState().isStopping()) {
                         break;
                     }
                     Lock fileLock = lockFactory.createLock(connector.getName() + file);
-                    if (fileLock.tryLock(10, TimeUnit.MILLISECONDS))
-                    {
-                        try
-                        {
+                    if (fileLock.tryLock(10, TimeUnit.MILLISECONDS)) {
+                        try {
                             routeFile(file);
-                        }
-                        catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             fileLock.unlock();
                         }
                     }
                 }
-                if (logger.isDebugEnabled())
-                {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Polling. Routed all " + files.length + " files found at "
-                                 + endpoint.getEndpointURI());
+                            + endpoint.getEndpointURI());
                 }
             }
-        }
-        catch (MessagingException e)
-        {
+        } catch (MessagingException e) {
             //Already handled by TransactionTemplate
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error in poll", e);
             getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             throw e;
@@ -137,49 +115,41 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
     private Comparator<Map.Entry<String, SftpATTRS>> getComparator() throws Exception {
 
-            Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
-            if (comparatorClassName != null)
-            {
-                Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
-                boolean reverse = false;
-                if (reverseProperty != null)
-                {
-                    reverse = Boolean.valueOf((String) reverseProperty);
-                }
-
-                Class<?> clazz = Class.forName(comparatorClassName.toString());
-                Comparator<?> comparator = (Comparator<?>)clazz.newInstance();
-                return reverse ? new ReverseComparator(comparator) : comparator;
+        Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
+        if (comparatorClassName != null) {
+            Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
+            boolean reverse = false;
+            if (reverseProperty != null) {
+                reverse = Boolean.valueOf((String) reverseProperty);
             }
-            return null;
+
+            Class<?> clazz = Class.forName(comparatorClassName.toString());
+            Comparator<?> comparator = (Comparator<?>) clazz.newInstance();
+            return reverse ? new ReverseComparator(comparator) : comparator;
+        }
+        return null;
     }
 
     @Override
-    protected void doInitialise() throws InitialisationException
-    {
+    protected void doInitialise() throws InitialisationException {
         this.lockFactory = getEndpoint().getMuleContext().getLockFactory();
         boolean synchronousProcessing = false;
-        if (getFlowConstruct() instanceof Flow)
-        {
-            synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
+        if (getFlowConstruct() instanceof Flow) {
+            synchronousProcessing = ((Flow) getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
         }
-        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.sftp.singlepollinstance","false")) || !synchronousProcessing;
+        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.sftp.singlepollinstance", "false")) || !synchronousProcessing;
     }
 
     @Override
-    protected boolean pollOnPrimaryInstanceOnly()
-    {
+    protected boolean pollOnPrimaryInstanceOnly() {
         return poolOnPrimaryInstanceOnly;
     }
 
-    protected void routeFile(final String path) throws Exception
-    {
+    protected void routeFile(final String path) throws Exception {
         ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-        executionTemplate.execute(new ExecutionCallback<MuleEvent>()
-        {
+        executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
             @Override
-            public MuleEvent process() throws Exception
-            {
+            public MuleEvent process() throws Exception {
                 // A bit tricky initialization of the notifier in this case since we don't
                 // have access to the message yet...
                 SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),
@@ -187,8 +157,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
                 InputStream inputStream = sftpRRUtil.retrieveFile(path, notifier);
 
-                if (logger.isDebugEnabled())
-                {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Routing file: " + path);
                 }
 
@@ -201,8 +170,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                 notifier.setMessage(message);
                 routeMessage(message);
 
-                if (logger.isDebugEnabled())
-                {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Routed file: " + path);
                 }
                 return null;
@@ -213,31 +181,27 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     /**
      * SFTP-35
      */
-    @Override 
+    @Override
     protected MuleMessage handleUnacceptedFilter(MuleMessage message) {
         logger.debug("the filter said no, now trying to close the payload stream");
         try {
             final SftpInputStream payload = (SftpInputStream) message.getPayload();
             payload.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.debug("unable to close payload stream", e);
         }
         return super.handleUnacceptedFilter(message);
     }
 
-    public void doConnect() throws Exception
-    {
+    public void doConnect() throws Exception {
         // no op
     }
 
-    public void doDisconnect() throws Exception
-    {
+    public void doDisconnect() throws Exception {
         // no op
     }
 
-    protected void doDispose()
-    {
+    protected void doDispose() {
         // no op
     }
 }

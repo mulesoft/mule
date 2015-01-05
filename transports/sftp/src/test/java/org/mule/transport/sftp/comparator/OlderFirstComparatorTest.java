@@ -7,14 +7,16 @@
 package org.mule.transport.sftp.comparator;
 
 import com.jcraft.jsch.SftpATTRS;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
-
-import static org.junit.Assert.*;
 
 import java.util.AbstractMap;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by christianlangmann on 06/12/14.
@@ -28,15 +30,15 @@ public class OlderFirstComparatorTest {
 
     final private static OlderFirstComparator comparator = new OlderFirstComparator();
 
-    @BeforeClass
-    public static void Setup() {
+    @Before
+    public void Setup() {
         when(OLD_ATTR.getMTime()).thenReturn(1000);
         when(NEW_ATTR.getMTime()).thenReturn(2000);
     }
 
     @Test
     public void testOlder() {
-        assertEquals((long)comparator.compare(OLD_FILE, NEW_FILE), -1L);
+        assertEquals((long) comparator.compare(OLD_FILE, NEW_FILE), -1L);
     }
 
     @Test
@@ -49,22 +51,22 @@ public class OlderFirstComparatorTest {
         assertEquals(comparator.compare(OLD_FILE, OLD_FILE), 0L);
     }
 
-    @Test(expected=Exception.class)
+    @Test(expected = Exception.class)
     public void testParam1Null() {
         comparator.compare(null, OLD_FILE);
     }
 
-    @Test(expected=Exception.class)
+    @Test(expected = Exception.class)
     public void testParam2Null() {
         comparator.compare(OLD_FILE, null);
     }
 
-    @Test(expected=Exception.class)
+    @Test(expected = Exception.class)
     public void testInvalidParam1() {
         comparator.compare(OLD_ATTR, OLD_FILE);
     }
 
-    @Test(expected=Exception.class)
+    @Test(expected = Exception.class)
     public void testInvalidParam2() {
         comparator.compare(OLD_FILE, OLD_ATTR);
     }
