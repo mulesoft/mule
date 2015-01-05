@@ -23,6 +23,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.MessageDispatcherUtils;
+import org.mule.transport.http.config.HttpNamespaceHandler;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
@@ -56,6 +57,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
 import org.apache.commons.lang.BooleanUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -164,6 +166,8 @@ public class HttpConnector extends TcpConnector
 
     static
     {
+        LoggerFactory.getLogger(HttpConnector.class).warn(HttpNamespaceHandler.HTTP_TRANSPORT_DEPRECATION_MESSAGE);
+
         Set<String> props = new HashSet<String>();
         props.add(HTTP_CONTEXT_PATH_PROPERTY);
         props.add(HTTP_GET_BODY_PARAM_PROPERTY);
