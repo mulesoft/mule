@@ -41,7 +41,7 @@ public class TransformerTrackerLifecycleTestCase extends AbstractServiceAndFlowT
 
         muleContext.dispose();
 
-        assertEquals("[setProperty, setMuleContext, setMuleContext, initialise, start, stop]",
+        assertEquals("[setProperty, setMuleContext, setMuleContext, initialise, start, stop, dispose]",
             ltt.getTracker().toString());
     }
 }
