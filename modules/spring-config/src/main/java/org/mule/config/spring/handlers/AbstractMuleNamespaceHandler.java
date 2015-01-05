@@ -368,4 +368,11 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
                 parser,
                 String.format("Schema warning: Use of element <%s> is deprecated.  %s.", elementName, message)));
     }
+
+    protected MuleDefinitionParserConfiguration registerDeprecatedMuleBeanDefinitionParser(String name, MuleDefinitionParser parser, String message)
+    {
+        registerDeprecatedBeanDefinitionParser(name, parser, message);
+        return parser;
+    }
+
 }
