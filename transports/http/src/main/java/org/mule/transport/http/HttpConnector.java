@@ -23,10 +23,12 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.MessageDispatcherUtils;
+import org.mule.transport.http.config.HttpNamespaceHandler;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.util.MapUtils;
+import org.mule.util.OneTimeWarning;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -56,6 +58,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
 import org.apache.commons.lang.BooleanUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -162,6 +165,8 @@ public class HttpConnector extends TcpConnector
 
     protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
 
+    private static OneTimeWarning deprecationWarning = new OneTimeWarning(LoggerFactory.getLogger(HttpConnector.class), HttpNamespaceHandler.HTTP_TRANSPORT_DEPRECATION_MESSAGE);
+
     static
     {
         Set<String> props = new HashSet<String>();
@@ -219,6 +224,7 @@ public class HttpConnector extends TcpConnector
     public HttpConnector(MuleContext context)
     {
         super(context);
+        deprecationWarning.warn();
         singleDispatcherPerEndpoint = BooleanUtils.toBoolean(System.getProperty(SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY));
         
     }
