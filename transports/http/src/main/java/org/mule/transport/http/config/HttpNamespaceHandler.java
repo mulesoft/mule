@@ -51,6 +51,7 @@ public class HttpNamespaceHandler extends org.mule.module.http.internal.config.H
 {
     public static final String HTTP_TRANSPORT_DEPRECATION_MESSAGE = "HTTP transport is deprecated and will be removed in Mule 4.0. Use HTTP module instead.";
 
+    @Override
     public void init()
     {
         registerStandardTransportEndpoints(HttpConnector.HTTP, URIBuilder.SOCKET_ATTRIBUTES)
@@ -93,19 +94,17 @@ public class HttpNamespaceHandler extends org.mule.module.http.internal.config.H
 
     protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser)
     {
-        super.registerDeprecatedBeanDefinitionParser(elementName, parser, HTTP_TRANSPORT_DEPRECATION_MESSAGE);
+        registerDeprecatedBeanDefinitionParser(elementName, parser, HTTP_TRANSPORT_DEPRECATION_MESSAGE);
     }
 
     protected MuleDefinitionParserConfiguration registerDeprecatedMuleBeanDefinitionParser(String elementName, MuleDefinitionParser parser)
     {
-        return super.registerDeprecatedMuleBeanDefinitionParser(elementName, parser, HTTP_TRANSPORT_DEPRECATION_MESSAGE);
+        return registerDeprecatedMuleBeanDefinitionParser(elementName, parser, HTTP_TRANSPORT_DEPRECATION_MESSAGE);
     }
 
     protected MuleDefinitionParserConfiguration registerDeprecatedConnectorDefinitionParser(Class connectorClass)
     {
-        MuleOrphanDefinitionParser parser = new MuleOrphanDefinitionParser(connectorClass, true);
-        registerDeprecatedBeanDefinitionParser("connector", parser, HTTP_TRANSPORT_DEPRECATION_MESSAGE);
-        return parser;
+        return registerDeprecatedConnectorDefinitionParser(connectorClass, HTTP_TRANSPORT_DEPRECATION_MESSAGE);
     }
 
 }

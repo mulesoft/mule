@@ -375,4 +375,11 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         return parser;
     }
 
+    protected MuleDefinitionParserConfiguration registerDeprecatedConnectorDefinitionParser(Class connectorClass, String message)
+    {
+        MuleOrphanDefinitionParser parser = new MuleOrphanDefinitionParser(connectorClass, true);
+        registerDeprecatedBeanDefinitionParser("connector", parser, message);
+        return parser;
+    }
+
 }

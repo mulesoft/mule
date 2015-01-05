@@ -24,6 +24,7 @@ import org.mule.transport.http.components.StaticResourceMessageProcessor;
  */
 public class HttpsNamespaceHandler extends HttpNamespaceHandler
 {
+    @Override
     public void init()
     {
         registerStandardTransportEndpoints(HttpsConnector.HTTPS, URIBuilder.SOCKET_ATTRIBUTES)
