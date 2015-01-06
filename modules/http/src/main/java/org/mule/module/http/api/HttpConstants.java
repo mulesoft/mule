@@ -60,6 +60,7 @@ public abstract class HttpConstants
     public static final class ResponseProperties
     {
         public static final String HTTP_STATUS_PROPERTY = RequestProperties.HTTP_STATUS_PROPERTY;
+        public static final String HTTP_REASON_PROPERTY = RequestProperties.HTTP_PREFIX + "reason";
     }
 
     public static final String ALL_INTERFACES_IP = "0.0.0.0";

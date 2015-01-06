@@ -284,6 +284,7 @@ public class GrizzlyHttpClient implements HttpClient
 
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
         responseBuilder.setStatusCode(response.getStatusCode());
+        responseBuilder.setReasonPhrase(response.getStatusText());
         responseBuilder.setEntity(new InputStreamHttpEntity(response.getResponseBodyAsStream()));
 
         for (String header : response.getHeaders().keySet())
