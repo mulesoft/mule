@@ -32,6 +32,7 @@ import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.NetworkUtils;
 import org.mule.util.Preconditions;
+import org.mule.util.StringUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
@@ -272,6 +273,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             throw new DefaultMuleException(e);
         }
         started = true;
+        logger.info("Listening for requests on " + listenerUrl());
     }
 
     @Override
@@ -303,7 +305,13 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             }
             server.stop();
             started = false;
+            logger.info("Stopped listener on " + listenerUrl());
         }
+    }
+
+    private String listenerUrl()
+    {
+        return String.format("%s://%s:%d%s", protocol.getScheme(), getHost(), getPort(), StringUtils.defaultString(basePath));
     }
 
     public String getName()
