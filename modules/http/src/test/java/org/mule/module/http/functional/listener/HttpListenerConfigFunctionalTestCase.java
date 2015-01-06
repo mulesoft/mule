@@ -75,6 +75,13 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void fullConfigWrongPath() throws Exception
+    {
+        final String url = String.format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), path.getValue()+"2");
+        callAndAssertStatus(url, SC_NOT_FOUND);
+    }
+
+    @Test
     public void listenerConfigOverridesListenerConfig() throws Exception
     {
         final String url = String.format("http://%s:%s/%s/%s", nonLocalhostIp.getValue(), fullConfigPort.getNumber(), basePath.getValue(), path.getValue());
