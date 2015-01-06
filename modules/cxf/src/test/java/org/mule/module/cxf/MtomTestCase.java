@@ -8,7 +8,6 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -48,7 +47,8 @@ public class MtomTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "mtom-conf-service.xml"},
-            {ConfigVariant.FLOW, "mtom-conf-flow.xml"}
+            {ConfigVariant.FLOW, "mtom-conf-flow.xml"},
+            {ConfigVariant.FLOW, "mtom-conf-flow-httpn.xml"}
         });
     }      
 

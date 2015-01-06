@@ -14,7 +14,7 @@
 
     <http:request-config name="withFollowRedirectsExpression" host="localhost" port="${httpPort}" followRedirects="#[redirect]"/>
 
-    <http:request-config name="httpsConfig" host="localhost" port="${httpsPort}">
+    <http:request-config name="httpsConfig" protocol="HTTPS" host="localhost" port="${httpsPort}">
         <tls:context>
             <tls:trust-store path="trustStore" password="mulepassword"/>
             <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword"/>

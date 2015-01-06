@@ -7,12 +7,19 @@
 package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.api.transport.PropertyScope.INBOUND;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,8 +33,11 @@ import org.junit.Test;
 
 public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
 {
+
     private static final String TEST_HEADER_NAME = "TestHeaderName";
     private static final String TEST_HEADER_VALUE = "TestHeaderValue";
+    private static final String DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME = "requestConfigHttp";
+    private static final String DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME = "requestConfigHttps";
 
     @Override
     protected String getConfigFile()
@@ -35,6 +45,26 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
         return "http-request-functional-config.xml";
     }
 
+    @Test
+    public void requestConfigDefaultPortHttp()
+    {
+        HttpRequesterConfig httpRequesterConfig = muleContext.getRegistry().get(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME);
+        assertThat(httpRequesterConfig.getPort(), is(String.valueOf(HTTP.getDefaultPort())));
+    }
+
+    @Test
+    public void requestConfigDefaultPortHttps()
+    {
+        HttpRequesterConfig httpRequesterConfig = muleContext.getRegistry().get(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME);
+        assertThat(httpRequesterConfig.getPort(), is(String.valueOf(HTTPS.getDefaultPort())));
+    }
+
+    @Test
+    public void requestConfigDefaultTlsContextHttps()
+    {
+        DefaultHttpRequesterConfig httpRequesterConfig = muleContext.getRegistry().get(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME);
+        assertThat(httpRequesterConfig.getTlsContext(), notNullValue());
+    }
 
     @Test
     public void payloadIsSentAsRequestBody() throws Exception

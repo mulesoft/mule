@@ -19,11 +19,12 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.MessageProcessingManager;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerConfig;
-import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.RequestHandler;
+import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
@@ -31,8 +32,16 @@ import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DefaultHttpListener implements HttpListener, Initialisable, MuleContextAware, FlowConstructAware
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultHttpListener.class);
+
+    private static final int INTERNAL_SERVER_ERROR_STATUS_CODE = 500;
+    private static final int BAD_REQUEST_STATUS_CODE = 400;
 
     private String path;
     private String allowedMethods;
@@ -108,14 +117,48 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
             @Override
             public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
             {
-                final HttpMessageProcessorTemplate httpMessageProcessorTemplate = new HttpMessageProcessorTemplate(createEvent(requestContext, path), messageProcessor, responseCallback, responseBuilder, errorResponseBuilder);
-                final HttpMessageProcessContext messageProcessContext = new HttpMessageProcessContext(DefaultHttpListener.this, flowConstruct, config.getWorkManager(), muleContext.getExecutionClassLoader());
-                messageProcessingManager.processMessage(httpMessageProcessorTemplate, messageProcessContext);
+                try
+                {
+                    final HttpMessageProcessorTemplate httpMessageProcessorTemplate = new HttpMessageProcessorTemplate(createEvent(requestContext, path), messageProcessor, responseCallback, responseBuilder, errorResponseBuilder);
+                    final HttpMessageProcessContext messageProcessContext = new HttpMessageProcessContext(DefaultHttpListener.this, flowConstruct, config.getWorkManager(), muleContext.getExecutionClassLoader());
+                    messageProcessingManager.processMessage(httpMessageProcessorTemplate, messageProcessContext);
+                }
+                catch (HttpRequestParsingException e)
+                {
+                    sendErrorResponse(BAD_REQUEST_STATUS_CODE, responseCallback);
+                }
+                catch (RuntimeException e)
+                {
+                    sendErrorResponse(INTERNAL_SERVER_ERROR_STATUS_CODE, responseCallback);
+                }
+            }
+
+            private void sendErrorResponse(final int statusCode, HttpResponseReadyCallback responseCallback)
+            {
+                responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
+                                                       .setStatusCode(statusCode)
+                                                       .build(), new ResponseStatusCallback()
+                {
+                    @Override
+                    public void responseSendFailure(Throwable exception)
+                    {
+                        logger.warn("Error while sending {} response {}", statusCode, exception.getMessage());
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Exception thrown", exception);
+                        }
+                    }
+
+                    @Override
+                    public void responseSendSuccessfully()
+                    {
+                    }
+                });
             }
         };
     }
 
-    private MuleEvent createEvent(HttpRequestContext requestContext, String listenerPath)
+    private MuleEvent createEvent(HttpRequestContext requestContext, String listenerPath) throws HttpRequestParsingException
     {
         return HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, parseRequest, listenerPath);
     }

@@ -415,7 +415,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         MuleMessage message = transportResponse.getMessage();
 
-        String httpStatusCode = message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
+        Object httpStatusCode = message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
         if(isProxy() && httpStatusCode != null)
         {
             message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, httpStatusCode);

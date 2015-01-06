@@ -13,7 +13,9 @@ import com.ning.http.client.providers.grizzly.TransportCustomizer;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 
-
+/**
+ * Transport customizer that configures socket properties.
+ */
 public class SocketConfigTransportCustomizer implements TransportCustomizer
 {
     private final TcpClientSocketProperties clientSocketProperties;

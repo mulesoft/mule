@@ -6,8 +6,10 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.domain.response.HttpResponse;
@@ -24,7 +26,6 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
-import org.glassfish.grizzly.utils.BufferInputStream;
 
 /**
  * Grizzly filter that dispatches the request to the right request handler
@@ -42,15 +43,15 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
     @Override
     public NextAction handleRead(final FilterChainContext ctx) throws IOException
     {
-        final String scheme = (ctx.getAttributes().getAttribute(HttpConstants.Protocols.HTTPS) == null) ? HttpConstants.Protocols.HTTP : HttpConstants.Protocols.HTTPS;
-        final String hostName = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getHostName();
+        final String scheme = (ctx.getAttributes().getAttribute(HTTPS.getScheme()) == null) ? HTTP.getScheme() : HTTPS.getScheme();
+        final String ip = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getAddress().getHostAddress();
         final int port = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getPort();
         final HttpContent httpContent = ctx.getMessage();
         final HttpRequestPacket request = (HttpRequestPacket) httpContent.getHttpHeader();
 
         final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(ctx, httpContent);
         HttpRequestContext requestContext = new HttpRequestContext(httpRequest, (InetSocketAddress) ctx.getConnection().getPeerAddress(), scheme);
-        final RequestHandler requestHandler = requestHandlerProvider.getRequestHandler(hostName, port, httpRequest);
+        final RequestHandler requestHandler = requestHandlerProvider.getRequestHandler(ip, port, httpRequest);
         requestHandler.handleRequest(requestContext, new HttpResponseReadyCallback()
         {
             @Override

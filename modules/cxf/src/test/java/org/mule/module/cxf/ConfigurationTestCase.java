@@ -8,8 +8,6 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.module.cxf.config.ProxyServiceFactoryBean;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -37,7 +35,8 @@ public class ConfigurationTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "configuration-conf-service.xml"},
-            {ConfigVariant.FLOW, "configuration-conf-flow.xml"}
+            {ConfigVariant.FLOW, "configuration-conf-flow.xml"},
+            {ConfigVariant.FLOW, "configuration-conf-flow-httpn.xml"}
         });
     }      
     
@@ -63,8 +62,8 @@ public class ConfigurationTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSpringRefs() throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getRegistry().get("clientEndpoint");
-        FlowConfiguringMessageProcessor processor = (FlowConfiguringMessageProcessor) endpoint.getMessageProcessors().get(0);
+        FlowConfiguringMessageProcessor processor =
+            muleContext.getRegistry().lookupObjects(FlowConfiguringMessageProcessor.class).iterator().next();
         List<Interceptor<? extends Message>> inInterceptors =
             ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
         assertEquals(muleContext.getRegistry().get("foo1"), inInterceptors.get(0));

@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.module.http.api.HttpConstants;
@@ -35,6 +37,7 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.grizzly.utils.DelayedExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +46,8 @@ public class GrizzlyServerManager implements HttpServerManager
 {
 
     private static final int MAX_KEEP_ALIVE_REQUESTS = -1;
-    private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = "HttpIdleConnectionCloser";
+    private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
+    private static final String LISTENER_WORKER_THREAD_NAME_SUFFIX = ".worker";
     private final GrizzlyAddressDelegateFilter<SSLFilter> sslFilterDelegate;
     private final GrizzlyAddressDelegateFilter<HttpServerFilter> httpServerFilterDelegate;
     private final TCPNIOTransport transport;
@@ -54,8 +58,9 @@ public class GrizzlyServerManager implements HttpServerManager
     private Map<ServerAddress, GrizzlyServer> servers = new ConcurrentHashMap<>();
     private ExecutorService idleTimeoutExecutorService;
     private DelayedExecutor idleTimeoutDelayedExecutor;
+    private boolean transportStarted;
 
-    public GrizzlyServerManager(final String appName, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
+    public GrizzlyServerManager(String threadNamePrefix, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
     {
         this.httpListenerRegistry = httpListenerRegistry;
         requestHandlerFilter = new GrizzlyRequestDispatcherFilter(httpListenerRegistry);
@@ -80,13 +85,20 @@ public class GrizzlyServerManager implements HttpServerManager
 
         transport.setNIOChannelDistributor(new RoundRobinConnectionDistributor(transport, true, true));
 
+        transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + LISTENER_WORKER_THREAD_NAME_SUFFIX);
+
+        // No kernel thread pool config is set in the transport at this point. Need to set one to define the pool name.
+        transport.setKernelThreadPoolConfig(ThreadPoolConfig.defaultConfig()
+                                                    .setCorePoolSize(transport.getSelectorRunnersCount())
+                                                    .setMaxPoolSize(transport.getSelectorRunnersCount())
+                                                    .setPoolName(threadNamePrefix));
+
         // Set filterchain as a Transport Processor
         transport.setProcessor(serverFilterChainBuilder.build());
-        transport.start();
 
-        idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(appName + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
+        idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(threadNamePrefix + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
         idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
-        idleTimeoutDelayedExecutor.start();
+
     }
 
     private void configureServerSocketProperties(TCPNIOTransportBuilder transportBuilder, TcpServerSocketProperties serverSocketProperties)
@@ -129,6 +141,21 @@ public class GrizzlyServerManager implements HttpServerManager
         }
     }
 
+    /**
+     * Starts the transport and the {@code idleTimeoutExecutorService} if not started. This is because
+     * they should be started lazily when the first server is registered (otherwise there will be Grizzly
+     * threads even if there is no listener-config in the app).
+     */
+    private void startTransportIfNotStarted() throws IOException
+    {
+        if (!transportStarted)
+        {
+            transportStarted = true;
+            transport.start();
+            idleTimeoutDelayedExecutor.start();
+        }
+    }
+
     @Override
     public boolean containsServerFor(final ServerAddress serverAddress)
     {
@@ -151,12 +178,13 @@ public class GrizzlyServerManager implements HttpServerManager
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Creating https server socket for host %s and path %s", serverAddress.getHost(), serverAddress.getPort());
+            logger.debug("Creating https server socket for ip %s and path %s", serverAddress.getIp(), serverAddress.getPort());
         }
         if (servers.containsKey(serverAddress))
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
+        startTransportIfNotStarted();
         sslFilterDelegate.addFilterForAddress(serverAddress, createSslFilter(tlsContextFactory));
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
@@ -169,12 +197,13 @@ public class GrizzlyServerManager implements HttpServerManager
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Creating http server socket for host %s and path %s", serverAddress.getHost(), serverAddress.getPort());
+            logger.debug("Creating http server socket for ip %s and path %s", serverAddress.getIp(), serverAddress.getPort());
         }
         if (servers.containsKey(serverAddress))
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
+        startTransportIfNotStarted();
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
         final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
@@ -185,10 +214,13 @@ public class GrizzlyServerManager implements HttpServerManager
     @Override
     public void dispose()
     {
-        transport.shutdown();
-        servers.clear();
-        idleTimeoutDelayedExecutor.destroy();
-        idleTimeoutExecutorService.shutdown();
+        if (transportStarted)
+        {
+            transport.shutdown();
+            servers.clear();
+            idleTimeoutDelayedExecutor.destroy();
+            idleTimeoutExecutorService.shutdown();
+        }
     }
 
     private SSLFilter createSslFilter(final TlsContextFactory tlsContextFactory)
@@ -211,7 +243,7 @@ public class GrizzlyServerManager implements HttpServerManager
                 @Override
                 public NextAction handleRead(FilterChainContext ctx) throws IOException
                 {
-                    ctx.getAttributes().setAttribute(HttpConstants.Protocols.HTTPS, true);
+                    ctx.getAttributes().setAttribute(HTTPS.getScheme(), true);
                     return super.handleRead(ctx);
                 }
             };

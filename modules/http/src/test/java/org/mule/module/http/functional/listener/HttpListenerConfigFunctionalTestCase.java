@@ -6,13 +6,18 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.module.http.internal.listener.NoListenerRequestHandler.RESOURCE_NOT_FOUND;
+import static org.mule.module.http.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.util.IOUtils;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -20,6 +25,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
@@ -33,11 +39,14 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    private static final int TIMEOUT = 1000;
 
     @Rule
     public DynamicPort fullConfigPort = new DynamicPort("fullConfigPort");
     @Rule
     public DynamicPort emptyConfigPort = new DynamicPort("emptyConfigPort");
+    @Rule
+    public DynamicPort noListenerConfigPort = new DynamicPort("noListenerConfigPort");
     @Rule
     public SystemProperty path = new SystemProperty("path","path");
     @Rule
@@ -55,24 +64,37 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     public void emptyConfig() throws Exception
     {
         final String url = String.format("http://localhost:%s/%s", emptyConfigPort.getNumber(), path.getValue());
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
-        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+        callAndAssertStatus(url, SC_OK);
     }
 
     @Test
     public void fullConfig() throws Exception
     {
         final String url = String.format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), path.getValue());
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
-        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+        callAndAssertStatus(url, SC_OK);
     }
 
     @Test
     public void listenerConfigOverridesListenerConfig() throws Exception
     {
         final String url = String.format("http://%s:%s/%s/%s", nonLocalhostIp.getValue(), fullConfigPort.getNumber(), basePath.getValue(), path.getValue());
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
-        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+        callAndAssertStatus(url, SC_OK);
+    }
+
+    @Test
+    public void noListenerConfig() throws Exception
+    {
+        final String url = String.format("http://localhost:%s", noListenerConfigPort.getNumber());
+        final HttpResponse httpResponse = callAndAssertStatus(url, SC_NOT_FOUND);
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(RESOURCE_NOT_FOUND));
+    }
+
+    private HttpResponse callAndAssertStatus(String url, int expectedStatus) throws IOException
+    {
+        final Response response = Request.Get(url).connectTimeout(TIMEOUT).execute();
+        HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse, hasStatusCode(expectedStatus));
+        return httpResponse;
     }
 
     private String getNonLocalhostIp()

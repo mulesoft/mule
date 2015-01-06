@@ -10,6 +10,7 @@ import org.mule.module.http.internal.listener.ServerAddress;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.EnumSet;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
@@ -28,6 +29,9 @@ import org.glassfish.grizzly.strategies.AbstractIOStrategy;
  */
 public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
 {
+
+    private final static EnumSet<IOEvent> WORKER_THREAD_EVENT_SET =
+            EnumSet.of(IOEvent.READ, IOEvent.CLOSED);
 
     private static final Logger logger = Grizzly.logger(ExecutorPerServerAddressIOStrategy.class);
     private final ExecutorProvider executorProvider;
@@ -77,9 +81,17 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
     @Override
     public Executor getThreadPoolFor(Connection connection, IOEvent ioEvent)
     {
-        final String hostName = ((InetSocketAddress) connection.getLocalAddress()).getHostName();
-        final int port = ((InetSocketAddress) connection.getLocalAddress()).getPort();
-        return executorProvider.getExecutor(new ServerAddress(hostName, port));
+        if (WORKER_THREAD_EVENT_SET.contains(ioEvent))
+        {
+            final String ip = ((InetSocketAddress) connection.getLocalAddress()).getAddress().getHostAddress();
+            final int port = ((InetSocketAddress) connection.getLocalAddress()).getPort();
+            return executorProvider.getExecutor(new ServerAddress(ip, port));
+        }
+        else
+        {
+            // Run other types of IOEvent in selector thread.
+            return null;
+        }
     }
 
     private static void run0(final Connection connection,

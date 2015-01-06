@@ -153,8 +153,7 @@ public class MuleEventToHttpRequest
             {
                 try
                 {
-                    byte[] body = muleEvent.getMessage().getPayloadAsBytes();
-                    return new InputStreamHttpEntity(new ByteArrayInputStream(body));
+                    return new InputStreamHttpEntity(new ByteArrayInputStream(muleEvent.getMessage().getPayloadAsBytes()));
                 }
                 catch (Exception e)
                 {
@@ -165,14 +164,13 @@ public class MuleEventToHttpRequest
         }
         else
         {
-            String body;
             String contentType = requestBuilder.getHeaders().get(HttpHeaders.Names.CONTENT_TYPE);
 
             if (contentType == null || contentType.equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
-                    body = HttpParser.encodeString(muleEvent.getEncoding(), (Map) payload);
+                    String body = HttpParser.encodeString(muleEvent.getEncoding(), (Map) payload);
                     requestBuilder.addHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED);
                     return new ByteArrayHttpEntity(body.getBytes());
                 }
@@ -180,18 +178,13 @@ public class MuleEventToHttpRequest
 
             try
             {
-                body = muleEvent.getMessage().getPayloadAsString();
+                return new ByteArrayHttpEntity(muleEvent.getMessage().getPayloadAsBytes());
             }
             catch (Exception e)
             {
                 throw new MessagingException(muleEvent, e);
             }
-
-            return new ByteArrayHttpEntity(body.getBytes());
         }
-
-
-
     }
 
     protected MultipartHttpEntity createMultiPart(final MuleMessage msg) throws IOException

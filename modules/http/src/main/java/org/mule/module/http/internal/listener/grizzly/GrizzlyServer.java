@@ -38,7 +38,7 @@ public class GrizzlyServer implements Server
     @Override
     public synchronized void start() throws IOException
     {
-        serverConnection = transport.bind(serverAddress.getHost(), serverAddress.getPort());
+        serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
         stopped = false;
     }
 

@@ -45,6 +45,7 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
     public static final String PATH = "somePath";
     public static final int PORT = 1000;
     public static final String HOST = "localhost";
+    public static final String IP = "127.0.0.1";
 
     private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
     private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
@@ -153,7 +154,7 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
                 .setPort(PORT)
                 .setPath(PATH).build();
 
-        verify(mockListenerConnectionManager).createServer(eq(new ServerAddress(HOST, PORT)), any(WorkManagerSource.class), eq(true), eq(DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT));
+        verify(mockListenerConnectionManager).createServer(eq(new ServerAddress(IP, PORT)), any(WorkManagerSource.class), eq(true), eq(DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT));
     }
 
     @Test
@@ -172,7 +173,7 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
                 .setPort(PORT)
                 .setPath(PATH).build();
 
-        verify(mockListenerConnectionManager).createSslServer(eq(new ServerAddress(HOST, PORT)), any(WorkManagerSource.class), eq(mockTlsContextFactory), eq(true), eq(DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT));
+        verify(mockListenerConnectionManager).createSslServer(eq(new ServerAddress(IP, PORT)), any(WorkManagerSource.class), eq(mockTlsContextFactory), eq(true), eq(DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT));
     }
 
     @Test

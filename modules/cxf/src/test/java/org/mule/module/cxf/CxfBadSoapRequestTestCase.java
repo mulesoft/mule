@@ -8,10 +8,11 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -33,6 +34,8 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+
     public CxfBadSoapRequestTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -43,7 +46,8 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "soap-request-conf-service.xml"},
-            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"}
+            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"},
+            {ConfigVariant.FLOW, "soap-request-conf-flow-httpn.xml"}
         });
     }
 
@@ -60,7 +64,7 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
                              + "</soap:Body>" + "</soap:Envelope>";
 
         MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent", new DefaultMuleMessage(
-            soapRequest, muleContext));
+            soapRequest, muleContext), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

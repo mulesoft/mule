@@ -28,6 +28,7 @@ import org.mule.util.StringUtils;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.PerRequestConfig;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
 import com.ning.http.client.RequestBuilder;
@@ -36,7 +37,6 @@ import com.ning.http.client.SSLEngineFactory;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
-import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
 import java.io.IOException;
 import java.net.URI;
@@ -67,18 +67,20 @@ public class GrizzlyHttpClient implements HttpClient
     private int maxConnections;
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
+    private String threadNamePrefix;
 
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
 
-    public GrizzlyHttpClient(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties, int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout)
+    public GrizzlyHttpClient(GrizzlyHttpClientConfiguration config)
     {
-        this.tlsContextFactory = tlsContextFactory;
-        this.proxyConfig = proxyConfig;
-        this.clientSocketProperties = clientSocketProperties;
-        this.maxConnections = maxConnections;
-        this.usePersistentConnections = usePersistentConnections;
-        this.connectionIdleTimeout = connectionIdleTimeout;
+        this.tlsContextFactory = config.getTlsContextFactory();
+        this.proxyConfig = config.getProxyConfig();
+        this.clientSocketProperties = config.getClientSocketProperties();
+        this.maxConnections = config.getMaxConnections();
+        this.usePersistentConnections = config.isUsePersistentConnections();
+        this.connectionIdleTimeout = config.getConnectionIdleTimeout();
+        this.threadNamePrefix = config.getThreadNamePrefix();
     }
 
     @Override
@@ -88,11 +90,11 @@ public class GrizzlyHttpClient implements HttpClient
         builder.setAllowPoolingConnection(true);
         builder.setRemoveQueryParamsOnRedirect(false);
 
+        configureTransport(builder);
+
         configureTlsContext(builder);
 
         configureProxy(builder);
-
-        configureClientSocketProperties(builder);
 
         configureConnections(builder);
 
@@ -156,19 +158,29 @@ public class GrizzlyHttpClient implements HttpClient
             builder.setProxyServer(proxyServer);
         }
     }
-    private void configureClientSocketProperties(AsyncHttpClientConfig.Builder builder)
+
+    private void configureTransport(AsyncHttpClientConfig.Builder builder)
     {
+        GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
+        CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
+        compositeTransportCustomizer.addTransportCustomizer(new SameThreadIOStrategyTransportCustomizer(threadNamePrefix));
+
         if (clientSocketProperties != null)
         {
-            GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
-            TransportCustomizer customizer = new SocketConfigTransportCustomizer(clientSocketProperties);
-            providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, customizer);
-            builder.setAsyncHttpClientProviderConfig(providerConfig);
+            compositeTransportCustomizer.addTransportCustomizer(new SocketConfigTransportCustomizer(clientSocketProperties));
         }
+
+        providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, compositeTransportCustomizer);
+        builder.setAsyncHttpClientProviderConfig(providerConfig);
     }
 
     private void configureConnections(AsyncHttpClientConfig.Builder builder) throws InitialisationException
     {
+        if (maxConnections > 0)
+        {
+            builder.addRequestFilter(new CustomTimeoutThrottleRequestFilter(maxConnections));
+        }
+
         builder.setMaximumConnectionsTotal(maxConnections);
         builder.setMaximumConnectionsPerHost(maxConnections);
 
@@ -249,6 +261,10 @@ public class GrizzlyHttpClient implements HttpClient
                 }
             }
         }
+
+        // Set the response timeout in the request, this value is read by {@code CustomTimeoutThrottleRequestFilter}
+        // if the maxConnections attribute is configured in the requester.
+        builder.setPerRequestConfig(new PerRequestConfig(null, responseTimeout));
 
         ListenableFuture<Response> future = asyncHttpClient.executeRequest(builder.build());
         Response response = null;

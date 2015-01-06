@@ -7,21 +7,26 @@
 package org.mule.module.cxf.functional;
 
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.cxf.example.HelloWorld;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.jws.WebService;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
 {
     public static final String ERROR_MESSAGE = "Changos!!!";
@@ -39,18 +44,30 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Parameterized.Parameter
+    public String configFile;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"unwraps-component-exception-config.xml"},
+                {"unwraps-component-exception-config-httpn.xml"}
+        });
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "unwraps-component-exception-config.xml";
+        return configFile;
     }
 
     @Test
     public void testReceivesComponentExceptionMessage() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Object>) null, muleContext);
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request);
+
+        MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
 
         assertTrue("Component exception was not managed", received.getPayloadAsString().contains(ERROR_MESSAGE));
     }

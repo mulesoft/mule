@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+           http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
+
+    <custom-transformer class="org.mule.module.cxf.functional.CxfClientExceptionStrategyTestCase$ThrowExceptionTransformer"
+                        name="throwException"/>
+
+    <flow name="helloService">
+        <http:listener path="hello" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+    </flow>
+
+    <flow name="helloServiceClient" processingStrategy="synchronous">
+        <inbound-endpoint address="vm://helloClient" />
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <http:request path="hello" method="POST" config-ref="requestConfig"/>
+
+        <object-to-string-transformer/>
+        <append-string-transformer message="APPEND"/>
+        <transformer ref="throwException"/>
+
+        <default-exception-strategy>
+            <vm:outbound-endpoint path="out"/>
+        </default-exception-strategy>
+    </flow>
+
+</mule>

@@ -1,0 +1,58 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
+
+    <flow name="clientFlow">
+        <cxf:jaxws-client
+                clientClass="org.apache.hello_world_soap_http.SOAPService"
+                port="SoapPort"
+                wsdlLocation="classpath:/wsdl/hello_world.wsdl">
+            <cxf:inInterceptors>
+                <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            </cxf:inInterceptors>
+            <cxf:outInterceptors>
+                <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            </cxf:outInterceptors>
+        </cxf:jaxws-client>
+        <http:request path="services/greeter" method="POST" config-ref="requestConfig"/>
+    </flow>
+
+    <flow name="greeterService">
+        <http:listener path="services/greeter" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl"/>
+        <component>
+            <singleton-object
+                    class="org.apache.hello_world_soap_http.GreeterImpl" />
+        </component>
+        <message-properties-transformer>
+            <add-message-property key="FOO"
+                                  value="#[header:INBOUND:FOO]" />
+        </message-properties-transformer>
+        <outbound-endpoint address="vm://test"
+                           exchange-pattern="request-response" />
+    </flow>
+
+    <model name="TestCxfModel">
+
+
+
+        <custom-service name="testService" class="org.mule.tck.testmodels.mule.TestSedaService">
+            <inbound>
+                <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
+            </inbound>
+            <test:component appendString=" Received"/>
+        </custom-service>
+    </model>
+</mule>
