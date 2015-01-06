@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.request.grizzly;
 
+import org.mule.module.http.internal.multipart.HttpPart;
+
 import com.ning.http.multipart.FilePart;
 import com.ning.http.multipart.PartSource;
 
@@ -39,6 +41,10 @@ public class PartWrapper extends FilePart {
         @Override
         public String getFileName()
         {
+            if (part instanceof HttpPart)
+            {
+                return ((HttpPart) part).getFileName();
+            }
             return part.getName();
         }
 

@@ -103,6 +103,10 @@ public abstract class HttpHeaders
          */
         public static final String CONTENT_ENCODING = "Content-Encoding";
         /**
+         * {@value "Content-Disposition"}
+         */
+        public static final String CONTENT_DISPOSITION = "Content-Disposition";
+        /**
          * {@value "Content-Language"}
          */
         public static final String CONTENT_LANGUAGE = "Content-Language";
