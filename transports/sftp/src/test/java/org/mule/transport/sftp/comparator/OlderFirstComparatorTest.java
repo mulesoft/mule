@@ -10,6 +10,7 @@ import com.jcraft.jsch.SftpATTRS;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mule.transport.sftp.FileDescriptor;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -25,8 +26,8 @@ public class OlderFirstComparatorTest {
 
     private static final SftpATTRS OLD_ATTR = mock(SftpATTRS.class);
     private static final SftpATTRS NEW_ATTR = mock(SftpATTRS.class);
-    private static final Map.Entry<String, SftpATTRS> OLD_FILE = new AbstractMap.SimpleEntry("file1", OLD_ATTR);
-    private static final Map.Entry<String, SftpATTRS> NEW_FILE = new AbstractMap.SimpleEntry("file2", NEW_ATTR);
+    private static final FileDescriptor OLD_FILE = new FileDescriptor("file1", OLD_ATTR);
+    private static final FileDescriptor NEW_FILE = new FileDescriptor("file2", NEW_ATTR);
 
     final private static OlderFirstComparator comparator = new OlderFirstComparator();
 

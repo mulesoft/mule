@@ -6,10 +6,9 @@
  */
 package org.mule.transport.sftp.comparator;
 
-import com.jcraft.jsch.SftpATTRS;
+import org.mule.transport.sftp.FileDescriptor;
 import org.mule.util.ClassUtils;
 
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.Map;
@@ -22,12 +21,12 @@ public class OlderFirstComparator implements Comparator
 {
     public int compare(Object o1, Object o2)
     {
-        if (o1 instanceof Map.Entry && o2 instanceof Map.Entry)
+        if (o1 instanceof FileDescriptor && o2 instanceof FileDescriptor)
         {
-            Map.Entry<String, SftpATTRS> f = (Map.Entry<String, SftpATTRS>) o1;
-            Map.Entry<String, SftpATTRS> f1 = (Map.Entry<String, SftpATTRS>) o2;
-            boolean fileNewer = f.getValue().getMTime() > f1.getValue().getMTime();
-            boolean fileOlder = f.getValue().getMTime() < f1.getValue().getMTime();
+            final FileDescriptor f = (FileDescriptor) o1;
+            final FileDescriptor f1 = (FileDescriptor) o2;
+            boolean fileNewer = f.getAttrs().getMTime() > f1.getAttrs().getMTime();
+            boolean fileOlder = f.getAttrs().getMTime() < f1.getAttrs().getMTime();
             if (!fileNewer && !fileOlder)
             {
                 return 0;
@@ -43,7 +42,7 @@ public class OlderFirstComparator implements Comparator
 
         }
         throw new IllegalArgumentException(MessageFormat.format(
-                "Expected Map.Entry<String, SftpATTRS> instance, but was {0} and {1}",
+                "Expected FileDescriptor instance, but was {0} and {1}",
                 ClassUtils.getShortClassName(o1, "<null>"),
                 ClassUtils.getShortClassName(o2, "<null")));
     }

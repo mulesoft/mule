@@ -8,24 +8,25 @@ package org.mule.transport.sftp;
 
 import com.jcraft.jsch.SftpATTRS;
 
-/**
+/** Describing a file by it's filename and it's attributes.
+ *
  * Created by christianlangmann on 06/01/15.
  */
-public class FtpFileDescriptor {
+public class FileDescriptor {
     private final String filename;
 
-    private final SftpATTRS descriptor;
+    private final SftpATTRS attrs;
 
-    public FtpFileDescriptor(final String filename, final SftpATTRS descriptor) {
+    public FileDescriptor(final String filename, final SftpATTRS descriptor) {
         this.filename = filename;
-        this.descriptor = descriptor;
+        this.attrs = descriptor;
     }
 
     public String getFilename() {
         return filename;
     }
 
-    public SftpATTRS getDescriptor() {
-        return descriptor;
+    public SftpATTRS getAttrs() {
+        return attrs;
     }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.transport.sftp;
 
-import com.jcraft.jsch.SftpATTRS;
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -26,8 +25,9 @@ import org.mule.util.lock.LockFactory;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -68,39 +68,39 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
             logger.debug("Polling. Called at endpoint " + endpoint.getEndpointURI());
         }
         try {
-            String[] files = sftpRRUtil.getAvailableFiles(false);
+            List<FileDescriptor> files = sftpRRUtil.getAvailableFiles(false);
 
-            if (files.length == 0) {
+            if (files.isEmpty()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Polling. No matching files found at endpoint " + endpoint.getEndpointURI());
                 }
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Polling. " + files.length + " files found at " + endpoint.getEndpointURI()
-                            + ":" + Arrays.toString(files));
+                    logger.debug("Polling. " + files.size() + " files found at " + endpoint.getEndpointURI()
+                            + ":" + Arrays.toString(files.toArray()));
                 }
 
-                final Comparator<Map.Entry<String, SftpATTRS>> comparator = getComparator();
+                final Comparator<FileDescriptor> comparator = getComparator();
                 if (comparator != null) {
-                    sftpRRUtil.sort(files, comparator);
+                    Collections.sort(files, comparator);
                 }
 
 
-                for (String file : files) {
+                for (final FileDescriptor file : files) {
                     if (getLifecycleState().isStopping()) {
                         break;
                     }
                     Lock fileLock = lockFactory.createLock(connector.getName() + file);
                     if (fileLock.tryLock(10, TimeUnit.MILLISECONDS)) {
                         try {
-                            routeFile(file);
+                            routeFile(file.getFilename());
                         } catch (Exception e) {
                             fileLock.unlock();
                         }
                     }
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Polling. Routed all " + files.length + " files found at "
+                    logger.debug("Polling. Routed all " + files.size() + " files found at "
                             + endpoint.getEndpointURI());
                 }
             }
@@ -113,7 +113,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
         }
     }
 
-    private Comparator<Map.Entry<String, SftpATTRS>> getComparator() throws Exception {
+    private Comparator<FileDescriptor> getComparator() throws Exception {
 
         Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
         if (comparatorClassName != null) {

@@ -6,7 +6,6 @@
  */
 package org.mule.transport.sftp;
 
-import com.jcraft.jsch.SftpATTRS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -18,10 +17,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Contains reusable methods not directly related to usage of the jsch sftp library
@@ -36,12 +32,17 @@ public class SftpReceiverRequesterUtil {
     private final ImmutableEndpoint endpoint;
     private final FilenameFilter filenameFilter;
     private final SftpUtil sftpUtil;
+    private final long fileAge;
+    private final boolean checkFileAge;
+    private final long sizeCheckDelayMs;
 
     public SftpReceiverRequesterUtil(ImmutableEndpoint endpoint) {
         this.endpoint = endpoint;
         this.connector = (SftpConnector) endpoint.getConnector();
 
         sftpUtil = new SftpUtil(endpoint);
+        // Get size check parameter
+        sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
 
         if (endpoint.getFilter() instanceof FilenameFilter) {
             this.filenameFilter = (FilenameFilter) endpoint.getFilter();
@@ -49,10 +50,20 @@ public class SftpReceiverRequesterUtil {
             this.filenameFilter = null;
         }
 
+        // Override the value from the Endpoint?
+        if (endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE) != null) {
+            checkFileAge = true;
+            fileAge = Long.valueOf((String) endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE));
+        } else {
+            fileAge = connector.getFileAge();
+            checkFileAge = connector.getCheckFileAge();
+        }
+        logger.debug("fileAge : " + fileAge);
+
     }
 
     // Get files in directory configured on the endpoint
-    public String[] getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception {
+    public List<FileDescriptor> getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception {
         // This sftp client instance is only for checking available files. This
         // instance cannot be shared
         // with clients that retrieve files because of thread safety
@@ -66,27 +77,13 @@ public class SftpReceiverRequesterUtil {
         try {
             client = connector.createSftpClient(endpoint);
 
-            long fileAge = connector.getFileAge();
-            boolean checkFileAge = connector.getCheckFileAge();
-
-            // Override the value from the Endpoint?
-            if (endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE) != null) {
-                checkFileAge = true;
-                fileAge = Long.valueOf((String) endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE));
-            }
-
-            logger.debug("fileAge : " + fileAge);
-
-            // Get size check parameter
-            long sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
-
-            final FtpFileDescriptor[] files = client.getFileDescriptors();
+            final FileDescriptor[] files = client.getFileDescriptors();
 
             // Only return files that have completely been written and match
             // fileExtension
-            List<String> completedFiles = new ArrayList<String>(files.length);
+            final List<FileDescriptor> completedFiles = new ArrayList<>(files.length);
 
-            for (FtpFileDescriptor fileDesc : files) {
+            for (final FileDescriptor fileDesc : files) {
 
                 final String file = fileDesc.getFilename();
                 // Skip if no match.
@@ -100,27 +97,14 @@ public class SftpReceiverRequesterUtil {
                     continue;
                 }
 
-                if (checkFileAge || sizeCheckDelayMs >= 0) {
-                    // See if the file is still growing (either by age or size),
-                    // leave it alone if it is
-                    if (canProcessFile(file, client, fileAge, sizeCheckDelayMs)) {
-                        // logger.debug("marking file [" + files[i] +
-                        // "] as in transit.");
-                        // client.rename(files[i], files[i] + ".transtit");
-                        // completedFiles.add( files[i] + ".transtit" );
-                        completedFiles.add(file);
-                        if (onlyGetTheFirstOne) {
-                            break;
-                        }
-                    }
-                } else {
-                    completedFiles.add(file);
+                if (isFileCompleted(file, client)) {
+                    completedFiles.add(fileDesc);
                     if (onlyGetTheFirstOne) {
                         break;
                     }
                 }
             }
-            return completedFiles.toArray(new String[completedFiles.size()]);
+            return completedFiles;
         } finally {
             if (client != null) {
                 connector.releaseClient(endpoint, client);
@@ -128,29 +112,13 @@ public class SftpReceiverRequesterUtil {
         }
     }
 
-    // sort a set of files by a comparator that gets access to to file-attributes
-    public void sort(final String[] files, Comparator<Map.Entry<String, SftpATTRS>> comparator) throws Exception {
-
-        SftpClient client = null;
-
-        try {
-            client = connector.createSftpClient(endpoint);
-
-            final List<Map.Entry<String, SftpATTRS>> fileDescriptors = new ArrayList<Map.Entry<String, SftpATTRS>>(files.length);
-            for (final String filename : files) {
-                fileDescriptors.add(new java.util.AbstractMap.SimpleEntry<String, SftpATTRS>(filename, client.getAttr(filename)));
-            }
-            Collections.sort(fileDescriptors, comparator);
-            int i = 0;
-            for (final Map.Entry<String, SftpATTRS> descriptor : fileDescriptors) {
-                files[i++] = descriptor.getKey();
-            }
-        } finally {
-            if (client != null) {
-                connector.releaseClient(endpoint, client);
-            }
+    private boolean isFileCompleted(final String file, SftpClient client) throws Exception {
+        if (checkFileAge || sizeCheckDelayMs >= 0) {
+            // See if the file is still growing (either by age or size),
+            // leave it alone if it is
+            return canProcessFile(file, client, fileAge, sizeCheckDelayMs);
         }
-
+        return true;
     }
 
     public InputStream retrieveFile(String fileName, SftpNotifier notifier) throws Exception {
@@ -294,7 +262,7 @@ public class SftpReceiverRequesterUtil {
      * Note! This assumes that the time on both servers are synchronized!
      *
      * @param fileName         The file to check
-     * @param client           instance of StftClient
+     * @param client           instance of SftpClient
      * @param fileAge          How old the file should be to be considered "old" and not
      *                         changed
      * @param sizeCheckDelayMs Wait time (in ms) between size-checks to determine if
@@ -308,11 +276,8 @@ public class SftpReceiverRequesterUtil {
             return false;
         }
 
-        if (sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs)) {
-            return false;
-        }
+        return !(sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs));
 
-        return true;
     }
 
     private boolean isSizeModified(String fileName, SftpClient client, long sizeCheckDelayMs) throws IOException, InterruptedException {
