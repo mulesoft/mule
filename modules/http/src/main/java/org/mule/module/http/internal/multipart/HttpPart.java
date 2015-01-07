@@ -25,13 +25,20 @@ public class HttpPart implements Part
 
     private final byte[] content;
     private final String contentType;
-    private final String name;
+    private final String partName;
+    private final String fileName;
     private final int size;
     private Map<String, Object> headers = new HashMap<>();
 
-    public HttpPart(String name, byte[] content, String contentType, int size)
+    public HttpPart(String partName, byte[] content, String contentType, int size)
     {
-        this.name = name;
+        this(partName, null, content, contentType, size);
+    }
+
+    public HttpPart(String partName, String fileName, byte[] content, String contentType, int size)
+    {
+        this.partName = partName;
+        this.fileName = fileName;
         this.content = content;
         this.contentType = contentType;
         this.size = size;
@@ -108,7 +115,7 @@ public class HttpPart implements Part
     @Override
     public String getName()
     {
-        return name;
+        return partName;
     }
 
     @Override
@@ -122,4 +129,10 @@ public class HttpPart implements Part
     {
         throw new UnsupportedOperationException();
     }
+
+    public String getFileName()
+    {
+        return fileName;
+    }
+
 }

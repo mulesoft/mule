@@ -95,7 +95,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
             Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER), "path parameter must start with /");
             validateCollision(requestMatcher);
-            paths.add(requestMatcherPath);
+            paths.add( getMethodAndPath(requestMatcher.getMethodRequestMatcher().getMethodsList(), requestMatcherPath) );
             PathMap currentPathMap = rootPathMap;
             final RequestHandlerMatcherPair addedRequestHandlerMatcherPair;
             final PathMap requestHandlerOwner;
@@ -209,10 +209,10 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             }
             if (requestHandlerMatcherPair == null)
             {
-                if (logger.isWarnEnabled())
+                if (logger.isInfoEnabled())
                 {
-                    logger.warn("No listener found for request: " + request.getPath());
-                    logger.warn("Available listeners are: [{}]", Joiner.on(", ").join(this.paths));
+                    logger.info("No listener found for request: " + getMethodAndPath(request.getMethod(), request.getPath()));
+                    logger.info("Available listeners are: [{}]", Joiner.on(", ").join(this.paths));
                 }
                 return NoListenerRequestHandler.getInstance();
             }
@@ -221,6 +221,11 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 return ServiceTemporarilyUnavailableListenerRequestHandler.getInstance();
             }
             return requestHandlerMatcherPair.getRequestHandler();
+        }
+
+        private String getMethodAndPath(String method, String path)
+        {
+            return "(" + method + ")" + path;
         }
 
         private Stack<PathMap> findPossibleRequestHandlersFromCache(String path)

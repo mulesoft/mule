@@ -71,7 +71,12 @@ public class MethodRequestMatcher implements RequestMatcher
     public String toString()
     {
         return "MethodRequestMatcher{" +
-               "methods=" + Arrays.toString(methods.toArray()) +
+               "methods=" + getMethodsList() +
                '}';
+    }
+
+    public String getMethodsList()
+    {
+        return methods.isEmpty() ? "*" : Arrays.toString(methods.toArray());
     }
 }
