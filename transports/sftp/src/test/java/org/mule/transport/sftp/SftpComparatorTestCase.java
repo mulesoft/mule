@@ -33,8 +33,9 @@ public class SftpComparatorTestCase extends AbstractSftpTestCase {
 
     private static final long TIMEOUT = 30000;
 
-    public static final String SFTP_CONNECTOR_NAME = "sftpConnector";
-    public static final String FILE_NAMES[] = {"file01", "file02"};
+    private static final String SFTP_CONNECTOR_NAME = "sftpConnector";
+    private static final String FILE_NAMES[] = {"file01", "file02"};
+    private static final String SFTP_HOST = "localhost";
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
@@ -64,8 +65,6 @@ public class SftpComparatorTestCase extends AbstractSftpTestCase {
     {
         return "mule-sftp-comparator-config-flow.xml";
     }
-
-    public static String SFTP_HOST = "localhost";
 
     @Test
     public void testComparator() throws Exception

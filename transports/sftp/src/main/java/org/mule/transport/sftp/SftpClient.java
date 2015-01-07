@@ -295,35 +295,44 @@ public class SftpClient
         return listDirectory(".", false, true);
     }
 
-    public String[] listDirectories(String path) throws IOException
+    private String[] listDirectory(final String path, boolean includeFiles, boolean includeDirectories)
+            throws IOException
     {
-        return listDirectory(path, false, true);
+        final List<String> ret = new ArrayList<>();
+        for (final FtpFileDescriptor desc : getFileDescriptorsFromDirectory(path, includeFiles, includeDirectories)) {
+            ret.add(desc.getFilename());
+        }
+        return ret.toArray(new String[ret.size()]);
     }
 
-    private String[] listDirectory(String path, boolean includeFiles, boolean includeDirectories)
+    public FtpFileDescriptor[] getFileDescriptors() throws IOException
+    {
+        return getFileDescriptors(".");
+    }
+
+    public FtpFileDescriptor[] getFileDescriptors(String path) throws IOException
+    {
+        return getFileDescriptorsFromDirectory(path, true, false);
+    }
+
+    private FtpFileDescriptor[] getFileDescriptorsFromDirectory(final String path, boolean includeFiles, boolean includeDirectories)
             throws IOException
     {
         try
         {
-            Vector<LsEntry> entries = channelSftp.ls(path);
+            final Vector<LsEntry> entries = channelSftp.ls(path);
             if (entries != null)
             {
-                List<String> ret = new ArrayList<String>();
+                final List<FtpFileDescriptor> ret = new ArrayList<>();
                 for (LsEntry entry : entries)
                 {
-                    if (includeFiles && !entry.getAttrs().isDir())
+                    final FtpFileDescriptor fileDescriptor = new FtpFileDescriptor(entry.getFilename(), entry.getAttrs());
+                    if (includeFile(includeFiles, includeDirectories, fileDescriptor))
                     {
-                        ret.add(entry.getFilename());
-                    }
-                    if (includeDirectories && entry.getAttrs().isDir())
-                    {
-                        if (!entry.getFilename().equals(".") && !entry.getFilename().equals(".."))
-                        {
-                            ret.add(entry.getFilename());
-                        }
+                        ret.add(fileDescriptor);
                     }
                 }
-                return ret.toArray(new String[ret.size()]);
+                return ret.toArray(new FtpFileDescriptor[ret.size()]);
             }
         }
         catch (SftpException e)
@@ -333,10 +342,14 @@ public class SftpClient
         return null;
     }
 
-    // public boolean logout()
-    // {
-    // return true;
-    // }
+    private boolean includeFile(boolean includeFiles, boolean includeDirectories, final FtpFileDescriptor fileDesc) {
+        if (includeFiles && !fileDesc.getDescriptor().isDir())
+            return true;
+        if (includeDirectories && fileDesc.getDescriptor().isDir() && !fileDesc.getFilename().equals(".") && !fileDesc.getFilename().equals("..")) {
+            return true;
+        }
+        return false;
+    }
 
     public InputStream retrieveFile(String fileName) throws IOException
     {

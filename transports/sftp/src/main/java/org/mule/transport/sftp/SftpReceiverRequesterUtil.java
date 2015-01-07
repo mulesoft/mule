@@ -80,13 +80,15 @@ public class SftpReceiverRequesterUtil {
             // Get size check parameter
             long sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
 
-            String[] files = client.listFiles();
+            final FtpFileDescriptor[] files = client.getFileDescriptors();
 
             // Only return files that have completely been written and match
             // fileExtension
             List<String> completedFiles = new ArrayList<String>(files.length);
 
-            for (String file : files) {
+            for (FtpFileDescriptor fileDesc : files) {
+
+                final String file = fileDesc.getFilename();
                 // Skip if no match.
                 // Note, Mule also uses this filter. We use the filter here because
                 // we don't want to
