@@ -6,11 +6,19 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration>
+        <expression-language>
+            <import class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
+        </expression-language>
+    </configuration>
+
     <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
     <flow name="defaultFlow">
         <http:listener config-ref="listenerConfig" path="/default"/>
-        <expression-component>'do nothing'</expression-component>
+        <expression-component>
+            payload = new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())
+        </expression-component>
     </flow>
 
     <flow name="withHeaderTransferEncodingFlow">
@@ -19,7 +27,9 @@
                 <http:header headerName="Transfer-Encoding" value="chunked"/>
             </http:response-builder>
         </http:listener>
-        <expression-component>'do nothing'</expression-component>
+        <expression-component>
+            payload = new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())
+        </expression-component>
     </flow>
 
     <flow name="withHeaderTransferEncodingAndStringPayload">
@@ -28,24 +38,32 @@
                 <http:header headerName="Transfer-Encoding" value="chunked"/>
             </http:response-builder>
         </http:listener>
-        <expression-component>payload = 'a message'</expression-component>
+        <expression-component>
+            payload = HttpListenerResponseStreamingTestCase.TEST_BODY
+        </expression-component>
     </flow>
 
     <flow name="withOutboundPropertyTransferEncodingAndStringPayload">
         <http:listener config-ref="listenerConfig" path="/withOutboundPropertyTransferEncodingAndStringPayload"/>
         <set-property propertyName="Transfer-Encoding" value="chunked"/>
-        <expression-component>payload = 'a message'</expression-component>
+        <expression-component>
+            payload = HttpListenerResponseStreamingTestCase.TEST_BODY
+        </expression-component>
     </flow>
 
     <flow name="neverStreamWithInputStreamPayload">
         <http:listener config-ref="listenerConfig" path="/neverStreamWithInputStreamPayload" responseStreamingMode="NEVER"/>
-        <expression-component>'do nothing'</expression-component>
+        <expression-component>
+            payload = new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())
+        </expression-component>
     </flow>
 
     <flow name="neverStreamWithOutboundPropertyAndInputStreamPayload">
         <http:listener config-ref="listenerConfig" path="/neverStreamWithOutboundPropertyAndInputStreamPayload" responseStreamingMode="NEVER"/>
         <set-property propertyName="Transfer-Encoding" value="chunked"/>
-        <expression-component>'do nothing'</expression-component>
+        <expression-component>
+            payload = new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())
+        </expression-component>
     </flow>
 
     <flow name="neverStreamWithHeaderTransferEncodingAndInputStreamPayload">
@@ -54,12 +72,16 @@
                 <http:header headerName="Transfer-Encoding" value="chunked"/>
             </http:response-builder>
         </http:listener>
-        <expression-component>'do nothing'</expression-component>
+        <expression-component>
+            payload = new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())
+        </expression-component>
     </flow>
 
     <flow name="alwaysStreamWithStringPayload">
         <http:listener config-ref="listenerConfig" path="/alwaysStreamWithStringPayload" responseStreamingMode="ALWAYS"/>
-        <expression-component>payload = 'a message'</expression-component>
+        <expression-component>
+            payload = HttpListenerResponseStreamingTestCase.TEST_BODY
+        </expression-component>
     </flow>
 
 </mule>

@@ -7,10 +7,8 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.HttpServerManager;
 import org.mule.module.http.internal.listener.Server;
@@ -32,6 +30,7 @@ import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.HttpServerFilter;
 import org.glassfish.grizzly.http.KeepAlive;
+import org.glassfish.grizzly.memory.PooledMemoryManager;
 import org.glassfish.grizzly.nio.RoundRobinConnectionDistributor;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
@@ -77,6 +76,7 @@ public class GrizzlyServerManager implements HttpServerManager
         executorProvider = new WorkManagerSourceExecutorProvider();
         TCPNIOTransportBuilder transportBuilder = TCPNIOTransportBuilder.newInstance()
                 .setOptimizedForMultiplexing(true)
+                .setMemoryManager(new PooledMemoryManager(false))
                 .setIOStrategy(new ExecutorPerServerAddressIOStrategy(executorProvider));
 
         configureServerSocketProperties(transportBuilder, serverSocketProperties);

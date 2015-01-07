@@ -10,31 +10,25 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
 {
 
-    public static final String TEST_BODY = "a message";
+    public static final String TEST_BODY = RandomStringUtils.randomAlphanumeric(100 * 1024);
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
 
@@ -118,7 +112,7 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
 
     private void testResponseIsChunked(String url) throws IOException
     {
-        final Response response = Request.Post(url).connectTimeout(1000).socketTimeout(1000).bodyByteArray(TEST_BODY.getBytes()).execute();
+        final Response response = Request.Get(url).connectTimeout(1000).socketTimeout(1000).execute();
         final HttpResponse httpResponse = response.returnResponse();
         final Header transferEncodingHeader = httpResponse.getFirstHeader(HttpHeaders.Names.TRANSFER_ENCODING);
         final Header contentLengthHeader = httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH);
