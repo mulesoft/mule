@@ -10,24 +10,17 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -83,14 +76,14 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
     public void neverStreamWithOutboundPropertyAndInputStreamPayload() throws Exception
     {
         final String url = getUrl("neverStreamWithOutboundPropertyAndInputStreamPayload");
-        testResponseIsChunked(url);
+        testResponseIsNotChunked(url);
     }
 
     @Test
     public void neverStreamWithHeaderTransferEncodingAndInputStreamPayload() throws Exception
     {
         final String url = getUrl("neverStreamWithHeaderTransferEncodingAndInputStreamPayload");
-        testResponseIsChunked(url);
+        testResponseIsNotChunked(url);
     }
 
     @Test
