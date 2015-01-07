@@ -8,6 +8,7 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.HttpConstants;
@@ -22,6 +23,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class ProxySoapVersionTestCase extends FunctionalTestCase
@@ -61,10 +64,10 @@ public class ProxySoapVersionTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
     
-    @Parameterized.Parameter
+    @Parameter
     public String config;
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

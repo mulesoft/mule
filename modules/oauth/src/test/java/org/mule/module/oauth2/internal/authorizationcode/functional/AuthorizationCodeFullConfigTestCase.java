@@ -42,6 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizationTestCase
@@ -82,7 +83,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
         this.configFile = configFile;
     }
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[] {"authorization-code/authorization-code-full-config-tls-global.xml"},

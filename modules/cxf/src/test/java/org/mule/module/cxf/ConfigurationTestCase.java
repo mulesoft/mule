@@ -8,7 +8,6 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.module.cxf.config.ProxyServiceFactoryBean;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -24,12 +23,14 @@ import org.apache.cxf.message.Message;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class ConfigurationTestCase extends FunctionalTestCase
 {
 
-    @Parameterized.Parameter
+    @Parameter
     public String config;
     
     @Override
@@ -38,7 +39,7 @@ public class ConfigurationTestCase extends FunctionalTestCase
         return config;
     }
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

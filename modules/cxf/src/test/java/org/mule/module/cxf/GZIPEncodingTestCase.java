@@ -58,7 +58,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     private String getAllRequest;
     private String getAllResponse;
 
-    @Parameter(0)
+    @Parameter
     public String configFile;
 
     @Parameters

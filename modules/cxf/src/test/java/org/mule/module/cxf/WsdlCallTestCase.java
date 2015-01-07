@@ -23,8 +23,12 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class WsdlCallTestCase extends FunctionalTestCase
 {
     @Rule
@@ -33,12 +37,12 @@ public class WsdlCallTestCase extends FunctionalTestCase
     @Rule
     public final DynamicPort httpPort = new DynamicPort("httpPort");
     
-    @Parameterized.Parameter
+    @Parameter
     public String config;
 
     private EmbeddedJettyServer httpServer;
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

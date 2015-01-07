@@ -8,6 +8,10 @@
     	http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/current/mule-jersey.xsd
     	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
     <http:listener-config host="localhost" port="${httpPort}" name="httpConfig" />
 
     <spring:bean id="jerseyComponent" class="org.mule.module.jersey.HelloWorldCookieResource" />

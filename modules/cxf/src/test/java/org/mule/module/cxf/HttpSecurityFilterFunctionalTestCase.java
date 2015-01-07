@@ -28,6 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
@@ -48,10 +50,10 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
     
-    @Parameterized.Parameter
+    @Parameter
     public String config;
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
@@ -66,7 +68,6 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         return config;
     }
  
-    
     /**
      * By putting this test method that uses https first we can test MULE-4558
      * 

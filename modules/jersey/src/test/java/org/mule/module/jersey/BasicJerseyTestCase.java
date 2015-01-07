@@ -10,17 +10,15 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 

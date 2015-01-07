@@ -39,7 +39,7 @@ public class DatabindingTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameter(0)
+    @Parameter
     public String configFile;
 
     @Parameters

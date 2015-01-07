@@ -29,6 +29,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class CxfBadSoapRequestTestCase extends FunctionalTestCase
@@ -39,13 +41,16 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Parameter
+    public String config;
+
     @Override
     protected String getConfigFile()
     {
-        return "soap-request-conf-flow.xml";
+        return config;
     }
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

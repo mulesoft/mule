@@ -26,6 +26,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -37,10 +39,10 @@ public class ProxyServiceImportTypesMule7883 extends FunctionalTestCase
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter(0)
+    @Parameter
     public String config;
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

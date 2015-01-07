@@ -9,15 +9,16 @@ package org.mule.module.cxf.wssec;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 public class SpringSecurityProxyTestCase extends UsernameTokenProxyTestCase
 {
 
-    @Parameterized.Parameter
+    @Parameter
     public String[] configFiles;
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

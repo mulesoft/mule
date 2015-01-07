@@ -23,6 +23,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase
@@ -36,10 +38,10 @@ public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
     
-    @Parameterized.Parameter
+    @Parameter
     public String config;
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

@@ -6,9 +6,13 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeThat;
 import static org.mule.module.http.api.HttpConstants.Methods;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
@@ -36,6 +40,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class CxfBasicTestCase extends FunctionalTestCase
@@ -49,13 +55,16 @@ public class CxfBasicTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Parameter
+    public String config;
+
     @Override
     protected String getConfigFile()
     {
-        return "basic-conf-flow.xml";
+        return config;
     }
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
@@ -98,7 +107,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
     public void testEchoServiceEncoding() throws Exception
     {
         // New http module does not support uris like cxf:http://...
-        assumeThat(configResources, is(not(equalTo(BASIC_CONF_NEW_HTTP_FLOW_XML))));
+        assumeThat(config, is(not(equalTo(BASIC_CONF_NEW_HTTP_FLOW_XML))));
 
         MuleClient client = muleContext.getClient();
         String message = LocaleMessageHandler.getString("test-data",

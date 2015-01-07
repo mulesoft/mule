@@ -9,22 +9,26 @@ package org.mule.module.cxf.wssec;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class CertificateTokenTestCase extends UsernameTokenTestCase
 {
 
-    @Parameterized.Parameters
+    @Parameter
+    public String[] configFiles;
+
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {new String[] {"org/mule/module/cxf/wssec/cxf-secure-service-flow.xml, org/mule/module/cxf/wssec/certificate-token-conf.xml"}},
-                {new String[] {"org/mule/module/cxf/wssec/cxf-secure-service-flow-httpn.xml, org/mule/module/cxf/wssec/certificate-token-conf.xml"}}
+                {new String[] {"org/mule/module/cxf/wssec/cxf-secure-service-flow.xml", "org/mule/module/cxf/wssec/certificate-token-conf.xml"}},
+                {new String[] {"org/mule/module/cxf/wssec/cxf-secure-service-flow-httpn.xml", "org/mule/module/cxf/wssec/certificate-token-conf.xml"}}
         });
     }
-
-    @Parameterized.Parameter
-    public String[] configFiles;
 
     @Override
     protected String[] getConfigFiles()

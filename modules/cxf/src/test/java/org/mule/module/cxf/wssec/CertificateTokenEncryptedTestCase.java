@@ -9,12 +9,12 @@ package org.mule.module.cxf.wssec;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 public class CertificateTokenEncryptedTestCase extends CertificateTokenTestCase
 {
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

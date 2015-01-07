@@ -25,8 +25,12 @@ import java.util.Collection;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class UsernameTokenProxyTestCase extends FunctionalTestCase
 {
 
@@ -35,10 +39,10 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter
+    @Parameter
     public String[] configFiles;
     
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

@@ -39,12 +39,11 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
 {
 
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+    private static final String SINGLE_PORT = "StockQuoteSoap";
+    private static final String SERVICE_LOCATION = "http://www.webservicex.net/stockquote.asmx";
 
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
-
-    private static final String SINGLE_PORT = "StockQuoteSoap";
-    private static final String SERVICE_LOCATION = "http://www.webservicex.net/stockquote.asmx";
 
     @Parameter
     public String configFile;

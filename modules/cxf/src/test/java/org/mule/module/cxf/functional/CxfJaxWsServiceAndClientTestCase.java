@@ -24,16 +24,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase
 {
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
-
-    @Parameterized.Parameter(0)
-    public String config;
-
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
 
     private static final String REQUEST_PAYLOAD =
@@ -59,7 +55,13 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase
                 "</soap:Body>" +
             "</soap:Envelope>";
 
-    @Parameterized.Parameters
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
+
+    @Parameter
+    public String config;
+
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

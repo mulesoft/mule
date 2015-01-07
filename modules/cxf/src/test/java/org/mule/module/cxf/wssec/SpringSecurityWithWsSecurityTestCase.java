@@ -8,21 +8,20 @@ package org.mule.module.cxf.wssec;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.security.SecurityContext;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Ignore;
-import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("MULE-6926: flaky test")
 public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
 {
 
-    @Parameterized.Parameter
+    @Parameter
     public String[] configFiles;
     
     @Parameters

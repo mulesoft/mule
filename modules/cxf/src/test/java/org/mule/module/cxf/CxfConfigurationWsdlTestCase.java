@@ -22,6 +22,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class CxfConfigurationWsdlTestCase extends org.mule.tck.junit4.FunctionalTestCase
@@ -29,10 +31,10 @@ public class CxfConfigurationWsdlTestCase extends org.mule.tck.junit4.Functional
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Parameterized.Parameter(0)
+    @Parameter
     public String config;
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

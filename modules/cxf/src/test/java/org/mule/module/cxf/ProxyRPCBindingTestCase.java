@@ -25,6 +25,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class ProxyRPCBindingTestCase extends FunctionalTestCase
@@ -40,10 +42,10 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase
     private String getAllRequest;
     private String getAllResponse;
 
-    @Parameterized.Parameter(0)
+    @Parameter
     public String config;
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

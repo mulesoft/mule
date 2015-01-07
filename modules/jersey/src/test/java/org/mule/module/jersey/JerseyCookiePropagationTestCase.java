@@ -30,6 +30,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class JerseyCookiePropagationTestCase extends FunctionalTestCase
@@ -40,13 +42,13 @@ public class JerseyCookiePropagationTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    Parameterized.Parameter
+    @Parameter(value = 0)
+    public boolean useOldTransport;
+
+    @Parameter(value = 1)
     public String config;
-    
-    Parameterized.Parameter
-    public String useOldTransport;
-    
-    @Parameterized.Parameters
+
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

@@ -9,15 +9,16 @@ package org.mule.module.jersey;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 public class BasicJerseyWithExceptionMapperTestCase extends BasicJerseyTestCase
 {
 
-    @Parameterized.Parameter
+    @Parameter
     public String config;
     
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

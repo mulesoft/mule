@@ -13,6 +13,8 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.config.bootstrap.MuleRegistryBootstrapService;
+import org.mule.config.bootstrap.RegistryBootstrapServiceUtil;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.ApplicationContextBuilder;
@@ -74,8 +76,12 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
+        registryBootstrapService = new MuleRegistryBootstrapService();
+        RegistryBootstrapServiceUtil.configureUsingClassPath(registryBootstrapService);
+
         ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder();
-        applicationContextBuilder.setApplicationResources(new String[]{serverConfig});
+        applicationContextBuilder.setApplicationResources(new String[] {serverConfig});
+        applicationContextBuilder.setRegistryBootstrapService(registryBootstrapService);
         mockServerContext = applicationContextBuilder.build();
         super.doSetUpBeforeMuleContextCreation();
     }

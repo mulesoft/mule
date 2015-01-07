@@ -10,6 +10,7 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -19,6 +20,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.exception.TemplateMessagingExceptionStrategy;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
@@ -34,6 +36,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 
 @RunWith(Parameterized.class)
@@ -59,11 +63,12 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
             "</soap:Body>\n" +
             "</soap:Envelope>";
 
+    public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter
+    @Parameter
     public String config;
             
     @Override
@@ -72,7 +77,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         return config;
     }
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {

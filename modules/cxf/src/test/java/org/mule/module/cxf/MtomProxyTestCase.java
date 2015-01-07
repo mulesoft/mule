@@ -10,14 +10,13 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Ignore;
-import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("Broken on removing services")
 public class MtomProxyTestCase extends MtomTestCase
 {
 
-    
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
