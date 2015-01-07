@@ -1665,6 +1665,12 @@
                             <exclude>**/*.css</exclude>
                             <exclude>**/build-number.txt</exclude>
     
+
+                            <exclude>**/AsyncCompletionHandler.java</exclude>
+                            <exclude>**/AsyncCompletionHandlerBase.java</exclude>
+                            <exclude>**/BndMojo.java</exclude>
+                            <exclude>**/BobberArchetype.java</exclude>
+                            <exclude>**/BobberArchetypeMojo.java</exclude>
                             <exclude>**/DummySSLServerSocketFactory.java</exclude>
                             <exclude>**/MultipartConfiguration.java</exclude>
     
@@ -1714,6 +1720,20 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <!-- Delete code coverage database when 'mvn clean' is executed -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${coberturaVersion}</version>
+                <executions>
+                    <execution>
+                        <id>clean</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!--
                  Needed for checkstyle to find the license header file from the classpath.

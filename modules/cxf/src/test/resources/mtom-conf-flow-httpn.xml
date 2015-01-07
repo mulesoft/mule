@@ -1,0 +1,22 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <!-- Initialize a static instance so we can use it with our client -->
+    <cxf:configuration name="_cxfConnector" initializeStaticBusInstance="false"/>
+    <http:listener-config name="httpConfig" host="localhost" port="${port1}"/>
+
+    <flow name="mycomponent">
+        <http:listener config-ref="httpConfig" path="services/mtom" parseRequest="false"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.TestMtomImpl" mtomEnabled="true"/>
+        <component>
+            <singleton-object class="org.mule.module.cxf.testmodels.TestMtomImpl"/>
+        </component>
+    </flow>
+
+</mule>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:cxf-core="http://cxf.apache.org/core"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+
+    <flow name="TestComponent">
+        <http:listener path="/services/TestComponent" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.tck.testmodels.services.ITestComponent" />
+        <component class="org.mule.tck.testmodels.services.TestComponent" />
+    </flow>
+
+</mule>

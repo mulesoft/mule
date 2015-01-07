@@ -13,6 +13,8 @@ import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.module.cxf.config.ProxyServiceFactoryBean;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.Bus;
@@ -20,16 +22,31 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class ConfigurationTestCase extends FunctionalTestCase
 {
 
+    @Parameterized.Parameter
+    public String config;
+    
     @Override
     protected String getConfigFile()
     {
-        return "configuration-conf-flow.xml";
+        return config;
     }
 
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"configuration-conf-flow.xml"},
+                {"configuration-conf-flow-httpn.xml"}
+        });
+    }      
+    
     @Test
     public void testBusConfiguration() throws Exception
     {
@@ -52,8 +69,8 @@ public class ConfigurationTestCase extends FunctionalTestCase
     @Test
     public void testSpringRefs() throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getRegistry().get("clientEndpoint");
-        FlowConfiguringMessageProcessor processor = (FlowConfiguringMessageProcessor) endpoint.getMessageProcessors().get(0);
+        FlowConfiguringMessageProcessor processor =
+            muleContext.getRegistry().lookupObjects(FlowConfiguringMessageProcessor.class).iterator().next();
         List<Interceptor<? extends Message>> inInterceptors =
             ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
         assertEquals(muleContext.getRegistry().get("foo1"), inInterceptors.get(0));

@@ -61,7 +61,7 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
         {
             return false;
         }
-        return url.startsWith(HTTP) || url.startsWith(HTTPS);
+        return url.startsWith(HTTP.getScheme()) || url.startsWith(HTTPS.getScheme());
     }
 
     @Override

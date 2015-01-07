@@ -83,9 +83,9 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
     {
         if (WORKER_THREAD_EVENT_SET.contains(ioEvent))
         {
-            final String hostName = ((InetSocketAddress) connection.getLocalAddress()).getHostName();
+            final String ip = ((InetSocketAddress) connection.getLocalAddress()).getAddress().getHostAddress();
             final int port = ((InetSocketAddress) connection.getLocalAddress()).getPort();
-            return executorProvider.getExecutor(new ServerAddress(hostName, port));
+            return executorProvider.getExecutor(new ServerAddress(ip, port));
         }
         else
         {

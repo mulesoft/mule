@@ -6,26 +6,38 @@
  */
 package org.mule.module.http.internal.request;
 
+import static java.lang.String.format;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
+import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClientConfiguration;
 import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactoryBuilder;
 import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 
-public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable
+public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
 {
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
+    private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
 
+    private HttpConstants.Protocols protocol = HTTP;
     private String name;
     private String host;
     private String port;
@@ -48,12 +60,42 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
 
+    private MuleContext muleContext;
+
     @Override
     public void initialise() throws InitialisationException
     {
         verifyConnectionsParameters();
 
-        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties, maxConnections, usePersistentConnections, connectionIdleTimeout);
+        if (port == null)
+        {
+            port = String.valueOf(protocol.getDefaultPort());
+        }
+
+        if (protocol.equals(HTTP) && tlsContext != null)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("TlsContext cannot be configured with protocol HTTP, " +
+                   "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
+        }
+
+        if (protocol.equals(HTTPS) && tlsContext == null)
+        {
+            tlsContext = new TlsContextFactoryBuilder(muleContext).buildDefault();
+        }
+
+        String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), name);
+
+        GrizzlyHttpClientConfiguration configuration = new GrizzlyHttpClientConfiguration.Builder()
+                .setTlsContextFactory(tlsContext)
+                .setProxyConfig(proxyConfig)
+                .setClientSocketProperties(clientSocketProperties)
+                .setMaxConnections(maxConnections)
+                .setUsePersistentConnections(usePersistentConnections)
+                .setConnectionIdleTimeout(connectionIdleTimeout)
+                .setThreadNamePrefix(threadNamePrefix)
+                .build();
+
+        httpClient = new GrizzlyHttpClient(configuration);
 
         httpClient.initialise();
     }
@@ -150,6 +192,11 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     public void setAuthentication(HttpAuthentication authentication)
     {
         this.authentication = authentication;
+    }
+
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContext;
     }
 
     public void setTlsContext(TlsContextFactory tlsContext)
@@ -266,4 +313,14 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
+    public void setProtocol(HttpConstants.Protocols protocol)
+    {
+        this.protocol = protocol;
+    }
 }

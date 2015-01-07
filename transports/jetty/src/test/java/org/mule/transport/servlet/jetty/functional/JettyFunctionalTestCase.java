@@ -56,10 +56,10 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
             {
                 MuleMessage msg = context.getMessage();
                 assertEquals(HttpConstants.METHOD_POST, msg.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY));
-                assertEquals("/normal?param1=value1", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-                assertEquals("/normal", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
+                assertEquals("/normal/extrapath?param1=value1", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+                assertEquals("/normal/extrapath", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
                 assertEquals("/normal", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
-                assertEquals("http://localhost:" + dynamicPort.getValue() + "/normal", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY));
+                assertEquals("http://localhost:" + dynamicPort.getValue() + "/normal/extrapath", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY));
                 assertNotNull(msg.getInboundProperty(HttpConnector.HTTP_QUERY_PARAMS));
                 assertNotNull(msg.getInboundProperty(HttpConnector.HTTP_HEADERS));
             }
@@ -68,7 +68,7 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
         testComponent.setEventCallback(callback);
 
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/normal?param1=value1", new DefaultMuleMessage(TEST_MESSAGE, muleContext), newOptions().method(POST.name()).build());
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/normal/extrapath?param1=value1", new DefaultMuleMessage(TEST_MESSAGE, muleContext), newOptions().method(POST.name()).build());
         assertEquals(200, response.getInboundProperty("http.status"));
         assertEquals(TEST_MESSAGE + " received", IOUtils.toString((InputStream) response.getPayload()));
     }

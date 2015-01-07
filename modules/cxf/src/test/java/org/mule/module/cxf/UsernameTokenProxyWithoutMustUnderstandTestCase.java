@@ -6,36 +6,61 @@
  */
 package org.mule.module.cxf;
 
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.runners.Parameterized.Parameter;
+import static org.junit.runners.Parameterized.Parameters;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.module.cxf.wssec.ClientPasswordCallback;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
-import static org.junit.Assert.*;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalTestCase
 {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+
     @Rule
     public final DynamicPort httpPortProxy = new DynamicPort("port1");
+
+    private String request;
+    private String response;
+
+    @Parameter
+    public String configFile;
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"cxf-proxy-service-without-mustunderstand-flow.xml"},
+                {"cxf-proxy-service-without-mustunderstand-flow-httpn.xml"}
+        });
+    }
 
     @Override
     protected String getConfigFile()
     {
-        return "cxf-proxy-service-without-mustunderstand-flow.xml";
+        return configFile;
     }
-
-    String request;
-    String response;
 
     @Before
     public void doSetUp() throws Exception
@@ -58,10 +83,6 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalT
 
     protected MuleMessage sendRequest(String url,String payload) throws MuleException
     {
-        MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("http.method", "POST");
-        MuleMessage replyMessage = client.send(url, payload, props);
-        return replyMessage;
+        return muleContext.getClient().send(url, new DefaultMuleMessage(payload, muleContext), HTTP_REQUEST_OPTIONS);
     }
 }

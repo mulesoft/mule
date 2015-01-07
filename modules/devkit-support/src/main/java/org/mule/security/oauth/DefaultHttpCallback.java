@@ -7,6 +7,9 @@
 
 package org.mule.security.oauth;
 
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -640,7 +643,7 @@ public class DefaultHttpCallback implements HttpCallback
         @Override
         public String getScheme()
         {
-            return listenerConfig.hasTlsConfig() ? HttpConstants.Protocols.HTTPS : HttpConstants.Protocols.HTTP;
+            return listenerConfig.hasTlsConfig() ? HTTPS.getScheme() : HTTP.getScheme();
         }
 
         @Override

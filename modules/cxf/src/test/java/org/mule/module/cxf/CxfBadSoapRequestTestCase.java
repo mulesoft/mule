@@ -8,14 +8,18 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -23,9 +27,15 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class CxfBadSoapRequestTestCase extends FunctionalTestCase
 {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+    
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -33,6 +43,15 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
     protected String getConfigFile()
     {
         return "soap-request-conf-flow.xml";
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"soap-request-conf-flow.xml"},
+                {"soap-request-conf-flow-httpn.xml"}
+        });
     }
 
     @Test
@@ -48,7 +67,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
                              + "</soap:Body>" + "</soap:Envelope>";
 
         MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent", new DefaultMuleMessage(
-            soapRequest, muleContext));
+            soapRequest, muleContext), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

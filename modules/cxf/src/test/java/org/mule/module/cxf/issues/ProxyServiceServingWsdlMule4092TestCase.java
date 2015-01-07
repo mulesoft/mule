@@ -17,6 +17,8 @@ import org.mule.util.SystemUtils;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,11 +27,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+@RunWith(Parameterized.class)
 public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
 {
 
@@ -37,11 +43,23 @@ public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
+    
+    @Parameterized.Parameter
+    public String config;
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"issues/proxy-service-serving-wsdl-mule4092-flow.xml"},
+                {"issues/proxy-service-serving-wsdl-mule4092-flow-httpn.xml"}
+        });
+    }
+    
     @Override
     protected String getConfigFile()
     {
-        return "issues/proxy-service-serving-wsdl-mule4092-flow.xml";
+        return config;
     }
 
     @Override

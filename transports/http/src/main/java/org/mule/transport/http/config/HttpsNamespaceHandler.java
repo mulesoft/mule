@@ -6,7 +6,6 @@
  */
 package org.mule.transport.http.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
@@ -23,24 +22,25 @@ import org.mule.transport.http.components.StaticResourceMessageProcessor;
 /**
  * Reigsters a Bean Definition Parser for handling <code><https:connector></code> elements.
  */
-public class HttpsNamespaceHandler extends AbstractMuleNamespaceHandler
+public class HttpsNamespaceHandler extends HttpNamespaceHandler
 {
+    @Override
     public void init()
     {
         registerStandardTransportEndpoints(HttpsConnector.HTTPS, URIBuilder.SOCKET_ATTRIBUTES)
             .addAlias("contentType", HttpConstants.HEADER_CONTENT_TYPE)
             .addAlias("method", HttpConnector.HTTP_METHOD_PROPERTY);
-        
-        registerConnectorDefinitionParser(HttpsConnector.class);
-        registerBeanDefinitionParser("polling-connector", new MuleOrphanDefinitionParser(HttpsPollingConnector.class, true));
 
-        registerBeanDefinitionParser("tls-key-store", new KeyStoreDefinitionParser());
-        registerBeanDefinitionParser("tls-client", new ClientKeyStoreDefinitionParser());
-        registerBeanDefinitionParser("tls-server", new TrustStoreDefinitionParser());
-        registerBeanDefinitionParser("tls-protocol-handler", new ProtocolHandlerDefinitionParser());
+        registerDeprecatedConnectorDefinitionParser(HttpsConnector.class);
+        registerDeprecatedBeanDefinitionParser("polling-connector", new MuleOrphanDefinitionParser(HttpsPollingConnector.class, true));
 
-        registerMuleBeanDefinitionParser("static-resource-handler",
-                new MessageProcessorDefinitionParser(StaticResourceMessageProcessor.class));
+        registerDeprecatedBeanDefinitionParser("tls-key-store", new KeyStoreDefinitionParser());
+        registerDeprecatedBeanDefinitionParser("tls-client", new ClientKeyStoreDefinitionParser());
+        registerDeprecatedBeanDefinitionParser("tls-server", new TrustStoreDefinitionParser());
+        registerDeprecatedBeanDefinitionParser("tls-protocol-handler", new ProtocolHandlerDefinitionParser());
+
+        registerDeprecatedMuleBeanDefinitionParser("static-resource-handler",
+                                                   new MessageProcessorDefinitionParser(StaticResourceMessageProcessor.class));
     }
 
 }

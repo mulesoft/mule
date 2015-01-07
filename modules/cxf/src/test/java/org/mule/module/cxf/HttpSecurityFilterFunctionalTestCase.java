@@ -6,11 +6,16 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -21,7 +26,10 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
 {
     private static String soapRequest = 
@@ -39,13 +47,26 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    
+    @Parameterized.Parameter
+    public String config;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"http-security-filter-test-flow.xml"},
+                {"http-security-filter-test-flow-httpn.xml"}
+        });
+    }
 
     @Override
     protected String getConfigFile()
     {
-        return "http-security-filter-test-flow.xml";
+        return config;
     }
-
+ 
+    
     /**
      * By putting this test method that uses https first we can test MULE-4558
      * 
@@ -70,11 +91,8 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals(
-                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:" + dynamicPort1.getNumber() + "/services/Echo. Message payload is of type: "
-                                + "String", get.getResponseBodyAsString());
+            assertThat(get.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
+                                                                 + "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
@@ -98,11 +116,8 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(post);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals(
-                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:" + dynamicPort1.getNumber() + "/services/Echo. Message payload is of type: "
-                                + "ContentLengthInputStream",   post.getResponseBodyAsString());
+            assertThat(post.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
+                                                                  + "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
@@ -155,7 +170,7 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testAuthenticationAuthorisedWithHandshakeGet() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 200);
+         doGet(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 200);
     }
 
     @Test

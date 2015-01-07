@@ -8,22 +8,21 @@
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-
     <tls:context name="globalTlsContext" >
         <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
         <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
     </tls:context>
 
-    <http:listener-config name="globalConfig" host="localhost" port="${port1}" tlsContext-ref="globalTlsContext" />
+    <http:listener-config name="globalConfig" protocol="HTTPS" host="localhost" port="${port1}" tlsContext-ref="globalTlsContext" />
 
-    <http:listener-config name="nestedConfig" host="localhost" port="${port2}">
+    <http:listener-config name="nestedConfig" protocol="HTTPS" host="localhost" port="${port2}">
         <tls:context>
             <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
             <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
         </tls:context>
     </http:listener-config>
 
-    <http:request-config name="clientGlobalConfig" host="localhost" port="${port}" tlsContext-ref="globalTlsContext" />
+    <http:request-config name="clientGlobalConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="globalTlsContext" />
 
     <flow name="testFlowGlobalContext">
         <http:listener config-ref="globalConfig" path="/" allowedMethods="GET"/>

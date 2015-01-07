@@ -14,6 +14,8 @@ import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -21,6 +23,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 public class WsdlCallTestCase extends FunctionalTestCase
 {
@@ -29,13 +32,25 @@ public class WsdlCallTestCase extends FunctionalTestCase
 
     @Rule
     public final DynamicPort httpPort = new DynamicPort("httpPort");
+    
+    @Parameterized.Parameter
+    public String config;
 
     private EmbeddedJettyServer httpServer;
 
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"wsdl-conf-flow.xml"},
+                {"wsdl-conf-flow-httpn.xml"}
+        });
+    }
+    
     @Override
     protected String getConfigFile()
     {
-        return "wsdl-conf-flow.xml";
+        return config;
     }
 
     @Override

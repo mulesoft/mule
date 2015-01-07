@@ -8,35 +8,56 @@ package org.mule.module.cxf.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.QName;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class ProxyMule6829TestCase extends FunctionalTestCase
 {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Parameterized.Parameter
+    public String configFile;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"proxy-mule-6829.xml"},
+                {"proxy-mule-6829-httpn.xml"}
+        });
+    }
 
     @Override
     protected String getConfigFile()
     {
-        return "proxy-mule-6829.xml";
+        return configFile;
     }
 
     private static class TestCxfEventCallback implements EventCallback
@@ -148,8 +169,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
         MuleMessage msg = new DefaultMuleMessage(msgString, muleContext);
         msg.setProperty("soapAction", soapAction, PropertyScope.OUTBOUND);
 
-        MuleClient client = muleContext.getClient();
-        return client.send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg);
+        return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
     }
 
     private MuleMessage executeSoap12Call(String msgString, String soapAction) throws MuleException
@@ -158,8 +178,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
         String contentType = "application/soap+xml;charset=UTF-8;action=\"" + soapAction + "\"";
         msg.setProperty("Content-Type", contentType, PropertyScope.OUTBOUND);
 
-        MuleClient client = muleContext.getClient();
-        return client.send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg);
+        return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
     }
 }
 

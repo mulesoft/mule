@@ -6,17 +6,17 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.domain.request.HttpRequest;
+import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
-import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.StringUtils;
@@ -33,7 +33,7 @@ import org.junit.rules.ExpectedException;
 public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
 {
 
-    public static final String TEST_HOST = "localhost";
+    public static final String TEST_IP = "127.0.0.1";
     public static final String URI_PARAM = "{uri-param}";
     public static final int TEST_PORT = 10000;
     public static final String ANOTHER_PATH = "/another-path";
@@ -71,7 +71,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     public final RequestHandler methodPathCatchAllGetRequestHandler = mock(RequestHandler.class);
     public final RequestHandler methodPathCatchAllPostRequestHandler = mock(RequestHandler.class);
 
-    private final ServerAddress testServerAddres = new ServerAddress(TEST_HOST, TEST_PORT);
+    private final ServerAddress testServerAddress = new ServerAddress(TEST_IP, TEST_PORT);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -84,7 +84,7 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
     public void createMockTestServer()
     {
         this.testServer = mock(Server.class);
-        when(testServer.getServerAddress()).thenReturn(testServerAddres);
+        when(testServer.getServerAddress()).thenReturn(testServerAddress);
     }
 
 
@@ -274,16 +274,25 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         routePath(METHOD_PATH_WILDCARD.replace(WILDCARD_CHARACTER, SOME_PATH), POST_METHOD, methodPathWildcardPostRequestHandler);
     }
 
+    @Test
+    public void noPathFound()
+    {
+        httpListenerRegistry = new HttpListenerRegistry();
+        httpListenerRegistry.addRequestHandler(testServer, mock(RequestHandler.class), new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), ROOT_PATH));
+        RequestHandler requestHandler = httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath(ANOTHER_PATH));
+        assertThat(requestHandler, is(instanceOf(NoListenerRequestHandler.class)));
+    }
+
     private void routePath(String requestPath, String listenerPath)
     {
-        assertThat(httpListenerRegistry.getRequestHandler(TEST_HOST, TEST_PORT, createMockRequestWithPath(requestPath)), is(requestHandlerPerPath.get(listenerPath)));
+        assertThat(httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath(requestPath)), is(requestHandlerPerPath.get(listenerPath)));
     }
 
     private void routePath(String requestPath, String requestMethod,  RequestHandler expectedRequestHandler)
     {
         final HttpRequest mockRequest = createMockRequestWithPath(requestPath);
         when(mockRequest.getMethod()).thenReturn(requestMethod);
-        assertThat(httpListenerRegistry.getRequestHandler(TEST_HOST, TEST_PORT, mockRequest), is(expectedRequestHandler));
+        assertThat(httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, mockRequest), is(expectedRequestHandler));
     }
 
     private HttpRequest createMockRequestWithPath(String path)

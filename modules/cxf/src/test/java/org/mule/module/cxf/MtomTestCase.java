@@ -15,6 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -26,11 +28,12 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.TestMtomService;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-@Ignore("Broken on removing services")
+@RunWith(Parameterized.class)
 public class MtomTestCase extends FunctionalTestCase
 {
     @Rule
@@ -41,6 +44,15 @@ public class MtomTestCase extends FunctionalTestCase
     {
         return "mtom-conf-flow.xml";
     }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"mtom-conf-flow.xml"},
+                {"mtom-conf-flow-httpn.xml"}
+        });
+    }      
 
     @Test
     public void testEchoService() throws Exception

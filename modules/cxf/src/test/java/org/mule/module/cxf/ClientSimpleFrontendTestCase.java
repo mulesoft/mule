@@ -13,18 +13,36 @@ import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class ClientSimpleFrontendTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
+    
+    @Parameterized.Parameter
+    public String config;
 
     @Override
     protected String getConfigFile()
     {
-        return "aegis-conf-flow.xml";
+        return config;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"aegis-conf-flow.xml"},
+                {"aegis-conf-flow-httpn.xml"}
+        });
     }
 
     @Test

@@ -137,7 +137,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
                     logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
                 }
                 setUnauthenticated(event);
-                throw new UnauthorisedException(CoreMessages.authFailedForUser(username), e);
+                throw new UnauthorisedException(CoreMessages.authFailedForUser(username), event, e);
             }
 
             // Authentication success

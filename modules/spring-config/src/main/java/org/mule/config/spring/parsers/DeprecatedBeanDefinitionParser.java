@@ -6,7 +6,8 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.slf4j.Logger;
+import org.mule.util.OneTimeWarning;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -19,22 +20,20 @@ import org.w3c.dom.Element;
 public class DeprecatedBeanDefinitionParser implements BeanDefinitionParser
 {
 
-    private final Logger logger;
+    private final OneTimeWarning oneTimeWarning;
 
     private final BeanDefinitionParser delegate;
-    private final String deprecationMessage;
 
     public DeprecatedBeanDefinitionParser(BeanDefinitionParser delegate, String deprecationMessage)
     {
         this.delegate = delegate;
-        this.deprecationMessage = deprecationMessage;
-        this.logger = LoggerFactory.getLogger(delegate.getClass());
+        this.oneTimeWarning = new OneTimeWarning(LoggerFactory.getLogger(delegate.getClass()), deprecationMessage);
     }
 
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext)
     {
-        logger.warn(deprecationMessage);
+        oneTimeWarning.warn();
         return delegate.parse(element, parserContext);
     }
 }

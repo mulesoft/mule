@@ -6,14 +6,20 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assume.assumeThat;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -23,10 +29,14 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 
 public class HttpSecurityTestCase extends FunctionalTestCase
 {
+
+    private static final String HTTP_SECURITY_CONF_FLOW_HTTPN_XML = "http-security-conf-flow-httpn.xml";
+
     private static String soapRequest =
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
            "<soapenv:Header/>" +
@@ -42,11 +52,23 @@ public class HttpSecurityTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    
+    @Parameterized.Parameter
+    public String config;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"http-security-conf-flow.xml"},
+                {HTTP_SECURITY_CONF_FLOW_HTTPN_XML}
+        });
+    }
 
     @Override
     protected String getConfigFile()
     {
-        return "http-security-conf-flow.xml";
+        return config;
     }
 
     /**
@@ -81,6 +103,8 @@ public class HttpSecurityTestCase extends FunctionalTestCase
     @Test
     public void testBasicAuthWithCxfClient() throws Exception
     {
+        assumeThat(config, is(not(equalTo(HTTP_SECURITY_CONF_FLOW_HTTPN_XML)))); // New http module doesn't support urls like "cxf:*"
+
         MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send("cxf:http://admin:admin@localhost:" + dynamicPort1.getNumber() + "/services/Echo?method=echo", new DefaultMuleMessage("Hello", muleContext));

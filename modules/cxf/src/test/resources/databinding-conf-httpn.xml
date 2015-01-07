@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+
+    <flow name="aegis">
+        <http:listener path="/services/aegis" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+            <cxf:aegis-databinding/>
+        </cxf:simple-service>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
+    <flow name="jaxb">
+        <http:listener path="/services/jaxb" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+            <cxf:jaxb-databinding/>
+        </cxf:simple-service>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
+    <flow name="jibx">
+        <http:listener path="/services/jibx" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+            <cxf:jibx-databinding/>
+        </cxf:simple-service>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
+    <flow name="source">
+        <http:listener path="/services/source" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+            <cxf:source-databinding/>
+        </cxf:simple-service>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
+    <flow name="stax">
+        <http:listener path="/services/stax" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+            <cxf:stax-databinding/>
+        </cxf:simple-service>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+    
+    <flow name="custom">
+        <http:listener path="/services/custom" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+            <cxf:custom-databinding class="org.apache.cxf.aegis.databinding.AegisDatabinding"/>
+        </cxf:simple-service>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
+</mule>
+

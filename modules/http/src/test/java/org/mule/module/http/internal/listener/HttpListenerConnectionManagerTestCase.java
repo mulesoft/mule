@@ -49,7 +49,7 @@ public class HttpListenerConnectionManagerTestCase extends AbstractMuleTestCase
         testInitialization(SPECIFIC_IP, HttpConstants.ALL_INTERFACES_IP);
     }
 
-    private void testInitialization(String firstHost, String secondHost) throws MuleException
+    private void testInitialization(String firstIp, String secondIp) throws MuleException
     {
         final HttpListenerConnectionManager connectionManager = new HttpListenerConnectionManager();
         final MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
@@ -58,9 +58,17 @@ public class HttpListenerConnectionManagerTestCase extends AbstractMuleTestCase
         when(mockMuleContext.getRegistry().lookupObject(TcpServerSocketProperties.class)).thenReturn(mock(TcpServerSocketProperties.class));
 
         connectionManager.initialise();
-        connectionManager.createServer(new ServerAddress(firstHost, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
+        connectionManager.createServer(new ServerAddress(firstIp, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
         expectedException.expect(MuleRuntimeException.class);
-        expectedException.expectMessage(String.format(HttpListenerConnectionManager.SERVER_ALREADY_EXISTS_FORMAT, PORT, secondHost));
-        connectionManager.createServer(new ServerAddress(secondHost, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
+        expectedException.expectMessage(String.format(HttpListenerConnectionManager.SERVER_ALREADY_EXISTS_FORMAT, PORT, secondIp));
+
+        try
+        {
+            connectionManager.createServer(new ServerAddress(secondIp, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
+        }
+        finally
+        {
+            connectionManager.dispose();
+        }
     }
 }

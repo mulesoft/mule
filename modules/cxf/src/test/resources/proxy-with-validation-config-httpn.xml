@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+        xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+
+    <flow name="testFlow">
+        <http:listener path="*" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service service="WebService2"
+                           wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
+                           validationEnabled="true" payload="envelope"/>
+
+        <echo-component/>
+    </flow>
+</mule>

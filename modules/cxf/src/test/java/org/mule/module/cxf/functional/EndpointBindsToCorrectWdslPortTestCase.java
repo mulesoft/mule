@@ -15,18 +15,37 @@ import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class EndpointBindsToCorrectWdslPortTestCase extends FunctionalTestCase
 {
 
+    private static final String FLOW_HTTPN = "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow-httpn.xml";
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Parameterized.Parameter
+    public String config;
+    
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow.xml"},
+                {FLOW_HTTPN}
+        });
+    }
 
     @Override
     protected String getConfigFile()
@@ -38,12 +57,21 @@ public class EndpointBindsToCorrectWdslPortTestCase extends FunctionalTestCase
     public void testThatTheCorrectSoapPortIsChosen() throws Exception
     {
         DefaultInboundEndpoint inboundEndpoint;
+        FlowConfiguringMessageProcessor wrapper;
 
-        final Flow flow = muleContext.getRegistry().lookupObject("CXFProxyService");
-        inboundEndpoint = (DefaultInboundEndpoint) flow.getMessageSource();
+            final Flow flow = muleContext.getRegistry().lookupObject("CXFProxyService");
+            if (FLOW_HTTPN.equals(config))
+            {
+                wrapper = (FlowConfiguringMessageProcessor) flow.getMessageProcessors().get(0);
+            }
+            else
+            {
+                DefaultInboundEndpoint inboundEndpoint = (DefaultInboundEndpoint) flow.getMessageSource();
+                List<MessageProcessor> processors = inboundEndpoint.getMessageProcessors();
+                wrapper = (FlowConfiguringMessageProcessor) processors.get(0);
+            }
 
-        List<MessageProcessor> processors = inboundEndpoint.getMessageProcessors();
-        FlowConfiguringMessageProcessor wrapper = (FlowConfiguringMessageProcessor) processors.get(0);
+
         CxfInboundMessageProcessor cxfProcessor = (CxfInboundMessageProcessor) wrapper.getWrappedMessageProcessor();
         Server server = cxfProcessor.getServer();
         EndpointInfo endpointInfo = server.getEndpoint().getEndpointInfo();

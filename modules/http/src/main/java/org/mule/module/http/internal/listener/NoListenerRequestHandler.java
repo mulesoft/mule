@@ -6,11 +6,14 @@
  */
 package org.mule.module.http.internal.listener;
 
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+
+import java.io.ByteArrayInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +25,7 @@ public class NoListenerRequestHandler implements RequestHandler
 {
 
     public static final int RESOURCE_NOT_FOUND_STATUS_CODE = 404;
+    public static final String RESOURCE_NOT_FOUND = "Resource not found.";
 
     private Logger logger = LoggerFactory.getLogger(NoListenerRequestHandler.class);
 
@@ -43,6 +47,7 @@ public class NoListenerRequestHandler implements RequestHandler
         responseCallback.responseReady(new HttpResponseBuilder()
                                                .setStatusCode(RESOURCE_NOT_FOUND_STATUS_CODE)
                                                .setReasonPhrase("No listener for endpoint: " + requestContext.getRequest().getUri())
+                                               .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(RESOURCE_NOT_FOUND.getBytes())))
                                                .build(), new ResponseStatusCallback()
         {
             @Override

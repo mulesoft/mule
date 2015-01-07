@@ -11,20 +11,35 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.security.SecurityContext;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Ignore;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("MULE-6926: flaky test")
 public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
 {
 
+    @Parameterized.Parameter
+    public String[] configFiles;
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+                {new String[] {"org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow.xml", "org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"}},
+                {new String[] {"org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow-httpn.xml", "org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"}}
+        });
+    }
+
     @Override
     protected String[] getConfigFiles()
     {
-        return new String[] {
-                "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow.xml",
-                "org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"
-        };
+        return configFiles;
     }
+    
 
     @Override
     @Ignore("MULE-6926: flaky test")
