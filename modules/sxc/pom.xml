@@ -61,9 +61,24 @@
 
         <dependency>
             <groupId>com.envoisolutions.sxc</groupId>
+            <artifactId>sxc-core</artifactId>
+            <version>${sxcVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>stax</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.envoisolutions.sxc</groupId>
             <artifactId>sxc-xpath</artifactId>
             <version>${sxcVersion}</version>
             <exclusions>
+                <exclusion>
+                    <groupId>com.envoisolutions.sxc</groupId>
+                    <artifactId>sxc-core</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>stax</groupId>
                     <artifactId>stax-api</artifactId>
@@ -76,16 +91,9 @@
             <version>${sxcVersion}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>stax</groupId>
-                    <artifactId>stax-api</artifactId>
+                    <groupId>com.envoisolutions.sxc</groupId>
+                    <artifactId>sxc-core</artifactId>
                 </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.envoisolutions.sxc</groupId>
-            <artifactId>sxc-core</artifactId>
-            <version>${sxcVersion}</version>
-            <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
                     <artifactId>stax-api</artifactId>
