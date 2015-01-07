@@ -164,6 +164,10 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             }
             httpResponseHeaderBuilder.removeHeader(HttpHeaders.Names.CONTENT_LENGTH);
         }
+        else if(responseStreaming.equals(HttpStreamingType.NEVER))
+        {
+            httpResponseHeaderBuilder.removeHeader(HttpHeaders.Names.TRANSFER_ENCODING);
+        }
 
         if (httpResponseHeaderBuilder.getTransferEncoding() == null && httpResponseHeaderBuilder.getContentLength() == null)
         {
