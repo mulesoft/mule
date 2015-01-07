@@ -6,8 +6,12 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
@@ -65,7 +69,13 @@ public class ResponseCompletionHandler
                 throw new MuleRuntimeException(CoreMessages.createStaticMessage("At this point only a ByteArray entity is allowed"));
             }
         }
-        return HttpContent.builder(httpResponsePacket).content(grizzlyBuffer).build();
+        HttpContent.Builder contentBuilder = HttpContent.builder(httpResponsePacket);
+        //For some reason, grizzly tries to send Transfer-Encoding: chunk even if the content-length is set.
+        if (httpResponse.getHeaderValue(CONTENT_LENGTH.toLowerCase()) != null)
+        {
+            contentBuilder.last(true);
+        }
+        return contentBuilder.content(grizzlyBuffer).build();
     }
 
     /**

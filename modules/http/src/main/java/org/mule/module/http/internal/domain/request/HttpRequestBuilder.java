@@ -45,6 +45,12 @@ public class HttpRequestBuilder
         return this;
     }
 
+    public HttpRequestBuilder removeHeader(String headerName)
+    {
+        this.headers.remove(headerName);
+        return this;
+    }
+
     // TODO: MULE-8045 Refactor MuleEventToHttpRequest so that this is getter is not needed.
     public ParameterMap getHeaders()
     {
