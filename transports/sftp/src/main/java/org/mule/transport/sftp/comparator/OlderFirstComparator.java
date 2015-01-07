@@ -11,32 +11,23 @@ import org.mule.util.ClassUtils;
 
 import java.text.MessageFormat;
 import java.util.Comparator;
-import java.util.Map;
 
 /**
  * <p><code>OlderComparatorComparator</code> is a {@link Comparator} of SFTP-files
  * which is capable of comparing files for equality based on their modification dates.</p>
  */
-public class OlderFirstComparator implements Comparator
-{
-    public int compare(Object o1, Object o2)
-    {
-        if (o1 instanceof FileDescriptor && o2 instanceof FileDescriptor)
-        {
+public class OlderFirstComparator implements Comparator {
+    public int compare(Object o1, Object o2) {
+        if (o1 instanceof FileDescriptor && o2 instanceof FileDescriptor) {
             final FileDescriptor f = (FileDescriptor) o1;
             final FileDescriptor f1 = (FileDescriptor) o2;
             boolean fileNewer = f.getAttrs().getMTime() > f1.getAttrs().getMTime();
             boolean fileOlder = f.getAttrs().getMTime() < f1.getAttrs().getMTime();
-            if (!fileNewer && !fileOlder)
-            {
+            if (!fileNewer && !fileOlder) {
                 return 0;
-            }
-            else if (fileNewer)
-            {
+            } else if (fileNewer) {
                 return 1;
-            }
-            else
-            {
+            } else {
                 return -1;
             }
 

@@ -8,12 +8,8 @@ package org.mule.transport.sftp.comparator;
 
 import com.jcraft.jsch.SftpATTRS;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.transport.sftp.FileDescriptor;
-
-import java.util.AbstractMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -24,12 +20,12 @@ import static org.mockito.Mockito.when;
  */
 public class OlderFirstComparatorTest {
 
-    private static final SftpATTRS OLD_ATTR = mock(SftpATTRS.class);
-    private static final SftpATTRS NEW_ATTR = mock(SftpATTRS.class);
-    private static final FileDescriptor OLD_FILE = new FileDescriptor("file1", OLD_ATTR);
-    private static final FileDescriptor NEW_FILE = new FileDescriptor("file2", NEW_ATTR);
+    private final SftpATTRS OLD_ATTR = mock(SftpATTRS.class);
+    private final SftpATTRS NEW_ATTR = mock(SftpATTRS.class);
+    private final FileDescriptor OLD_FILE = new FileDescriptor("file1", OLD_ATTR);
+    private final FileDescriptor NEW_FILE = new FileDescriptor("file2", NEW_ATTR);
 
-    final private static OlderFirstComparator comparator = new OlderFirstComparator();
+    final private OlderFirstComparator comparator = new OlderFirstComparator();
 
     @Before
     public void Setup() {
