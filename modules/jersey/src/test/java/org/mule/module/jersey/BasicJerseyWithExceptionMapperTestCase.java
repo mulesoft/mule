@@ -9,9 +9,12 @@ package org.mule.module.jersey;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class BasicJerseyWithExceptionMapperTestCase extends BasicJerseyTestCase
 {
 
