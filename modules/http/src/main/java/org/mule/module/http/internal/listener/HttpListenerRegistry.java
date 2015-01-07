@@ -120,7 +120,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             }
             else
             {
-                final String[] pathParts = requestMatcherPath.split(SLASH);
+                final String[] pathParts = splitPath(requestMatcherPath);
                 int insertionLevel = getPathPartsSize(requestMatcherPath);
                 for (int i = 1; i < insertionLevel - 1; i++)
                 {
@@ -236,7 +236,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         private Stack<PathMap> findPossibleRequestHandlers(String path)
         {
             PathMap currentPathMap = rootPathMap;
-            final String[] pathParts = path.split(SLASH);
+            final String[] pathParts = splitPath(path);
             Stack<PathMap> foundPaths = new Stack<>();
             foundPaths.add(catchAllPathMap);
             if (path.equals(WILDCARD_CHARACTER))
@@ -304,7 +304,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
     private String getLastPathPortion(String possibleCollisionRequestMatcherPath)
     {
-        final String[] parts = possibleCollisionRequestMatcherPath.split(SLASH);
+        final String[] parts = splitPath(possibleCollisionRequestMatcherPath);
         if (parts.length == 0)
         {
             return StringUtils.EMPTY;
@@ -319,9 +319,19 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
     private int getPathPartsSize(String path)
     {
-        int pathSize = path.split(SLASH).length - 1;
+        int pathSize = splitPath(path).length - 1;
         pathSize += (path.endsWith(SLASH) ? 1 : 0);
         return pathSize;
+    }
+
+    private String[] splitPath(String path)
+    {
+        if (path.endsWith(SLASH) )
+        {
+            // Remove the last slash
+            path = path.substring(0, path.length()-1);
+        }
+        return path.split(SLASH, -1);
     }
 
     public class PathMap
