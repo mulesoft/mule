@@ -7,20 +7,16 @@
 package org.mule.config.builders;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.config.ConfigResource;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Configures Mule from a configuration resource or comma seperated list of configuration resources by
@@ -30,6 +26,7 @@ import java.util.Properties;
 public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder implements DomainMuleContextAwareConfigurationBuilder
 {
     private MuleContext domainContext;
+    private ConfigurationBuilderService configurationBuilderService = new MuleConfigurationBuilderService();
 
     public AutoConfigurationBuilder(String resource) throws ConfigurationException
     {
@@ -71,33 +68,13 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
         try
         {
-            Properties props = new Properties();
-            props.load(ClassUtils.getResource("configuration-builders.properties", this.getClass()).openStream());
-
             for (Map.Entry<String, List<ConfigResource>> e : configsMap.entrySet())
             {
                 String extension = e.getKey();
                 List<ConfigResource> configs = e.getValue();
 
-                String className = (String) props.get(extension);
+                ConfigurationBuilder cb = configurationBuilderService.createConfigurationBuilder(extension, domainContext, configs);
 
-                if (className == null || !ClassUtils.isClassOnPath(className, this.getClass()))
-                {
-                    throw new ConfigurationException(
-                        CoreMessages.configurationBuilderNoMatching(createConfigResourcesString()));
-                }
-
-                ConfigResource[] constructorArg = new ConfigResource[configs.size()];
-                System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
-                ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[] {constructorArg});
-                if (domainContext != null && cb instanceof DomainMuleContextAwareConfigurationBuilder)
-                {
-                    ((DomainMuleContextAwareConfigurationBuilder) cb).setDomainContext(domainContext);
-                }
-                else if (domainContext != null)
-                {
-                    throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("ConfigurationBuilder %s does not support domain context", cb.getClass().getCanonicalName())));
-                }
                 cb.configure(muleContext);
             }
         }
@@ -115,5 +92,10 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
     public void setDomainContext(MuleContext domainContext)
     {
         this.domainContext  = domainContext;
+    }
+
+    public void setConfigurationBuilderService(ConfigurationBuilderService configurationBuilderService)
+    {
+        this.configurationBuilderService = configurationBuilderService;
     }
 }

@@ -32,7 +32,9 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.bootstrap.MuleRegistryBootstrapService;
 import org.mule.config.bootstrap.RegistryBootstrapService;
 import org.mule.config.bootstrap.RegistryBootstrapServiceUtil;
+import org.mule.config.builders.ConfigurationBuilderService;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
+import org.mule.config.builders.MuleConfigurationBuilderService;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextBuilder;
@@ -130,6 +132,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 
     protected TransportDescriptorService transportDescriptorService;
 
+    protected ConfigurationBuilderService configurationBuilderService;
+
     protected boolean isDisposeContextPerClass()
     {
         return disposeContextPerClass;
@@ -226,8 +230,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 
             transportDescriptorService = createTransportDescriptorService();
 
+            configurationBuilderService = createConfigurationBuilderService();
+
             DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
             muleContextFactory.setTransportDescriptorService(transportDescriptorService);
+            muleContextFactory.setConfigurationBuilderService(configurationBuilderService);
             List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
             //If the annotations module is on the classpath, add the annotations config builder to the list
@@ -255,6 +262,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             }
         }
         return context;
+    }
+
+    private ConfigurationBuilderService createConfigurationBuilderService()
+    {
+        return new MuleConfigurationBuilderService();
     }
 
     protected RegistryBootstrapService createRegistryBootstrapService()
