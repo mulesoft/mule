@@ -34,6 +34,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
+import org.mule.api.registry.TransportDescriptorService;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
@@ -169,6 +170,7 @@ public class DefaultMuleContext implements MuleContext
 
     private QueueManager queueManager;
     private RegistryBootstrapService registryBootstrapService;
+    private TransportDescriptorService transportDescriptorService;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -941,6 +943,16 @@ public class DefaultMuleContext implements MuleContext
     public void setRegistryBootstrapService(RegistryBootstrapService registryBootstrapService)
     {
         this.registryBootstrapService = registryBootstrapService;
+    }
+
+    public TransportDescriptorService getTransportDescriptorService()
+    {
+        return transportDescriptorService;
+    }
+
+    public void setTransportDescriptorService(TransportDescriptorService transportDescriptorService)
+    {
+        this.transportDescriptorService = transportDescriptorService;
     }
 
     @Override

@@ -22,7 +22,9 @@ import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.registry.MuleTransportDescriptorService;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.TransportDescriptorService;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -126,6 +128,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 
     protected RegistryBootstrapService registryBootstrapService;
 
+    protected TransportDescriptorService transportDescriptorService;
+
     protected boolean isDisposeContextPerClass()
     {
         return disposeContextPerClass;
@@ -220,7 +224,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             registryBootstrapService = createRegistryBootstrapService();
             configureRegistryBootstrapService(registryBootstrapService);
 
+            transportDescriptorService = createTransportDescriptorService();
+
             DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+            muleContextFactory.setTransportDescriptorService(transportDescriptorService);
             List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
             //If the annotations module is on the classpath, add the annotations config builder to the list
@@ -239,6 +246,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             muleConfiguration.setWorkingDirectory(workingDirectory);
             contextBuilder.setMuleConfiguration(muleConfiguration);
             contextBuilder.setRegistryBootstrapService(registryBootstrapService);
+            contextBuilder.setTransportDescriptorService(transportDescriptorService);
             configureMuleContext(contextBuilder);
             context = muleContextFactory.createMuleContext(builders, contextBuilder);
             if (!isGracefulShutdown())
@@ -259,6 +267,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         RegistryBootstrapServiceUtil.configureUsingClassPath(registryBootstrapService);
     }
 
+    protected MuleTransportDescriptorService createTransportDescriptorService()
+    {
+        return new MuleTransportDescriptorService();
+    }
 
     //This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
     //creating the MuleContext.
