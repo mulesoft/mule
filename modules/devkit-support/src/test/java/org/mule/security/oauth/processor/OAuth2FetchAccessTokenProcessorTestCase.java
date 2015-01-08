@@ -11,9 +11,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -29,7 +32,10 @@ import org.mule.security.oauth.OAuthProperties;
 import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 import org.mule.tck.size.SmallTest;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
 import org.junit.Before;
@@ -118,8 +124,24 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     @Test
     public void stateRestored() throws Exception
     {
+        final AtomicReference<HashMap<String, String>> parameters = new AtomicReference<>();
+        MuleMessage mockMessage = mock(MuleMessage.class);
+        when(restoredEvent.getMessage()).thenReturn(mockMessage);
+        when(mockMessage.getInboundProperty(HTTP_QUERY_PARAMS)).thenReturn(restoredParameters);
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                if (invocationOnMock.getArguments()[0].equals(HTTP_QUERY_PARAMS))
+                {
+                    parameters.set((HashMap) invocationOnMock.getArguments()[1]);
+                }
+                return null;
+            }
+        }).when(mockMessage).setProperty(anyString(), any(Map.class), any(PropertyScope.class));
         adapterWithUrlUsingConfigAsId();
-        assertThat(restoredParameters.get("state"), equalTo(state));
+        assertThat(parameters.get().get("state"), equalTo(state));
     }
 
     @Test

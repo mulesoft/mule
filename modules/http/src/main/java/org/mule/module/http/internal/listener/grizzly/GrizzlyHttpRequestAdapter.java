@@ -123,7 +123,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
         {
             initializeHeaders();
         }
-        return this.headers.getAsList(headerName.toLowerCase());
+        return this.headers.getAll(headerName.toLowerCase());
     }
 
     private void initializeHeaders()
@@ -137,6 +137,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
                 this.headers.put(grizzlyHeaderName, headerValue);
             }
         }
+        this.headers = this.headers.toImmutableParameterMap();
     }
 
     @Override

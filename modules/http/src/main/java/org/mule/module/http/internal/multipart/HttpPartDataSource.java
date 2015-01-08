@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.multipart;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.servlet.http.Part;
 
 public class HttpPartDataSource implements DataSource
@@ -113,7 +115,13 @@ public class HttpPartDataSource implements DataSource
             else
             {
                 byte[] data = IOUtils.toByteArray(dataHandlerPart.getInputStream());
-                httpParts.add(new HttpPart(partName, data, dataHandlerPart.getContentType(), data.length));
+                String fileName = null;
+
+                if (dataHandlerPart.getDataSource() instanceof FileDataSource || dataHandlerPart.getDataSource() instanceof ByteArrayDataSource)
+                {
+                    fileName = dataHandlerPart.getDataSource().getName();
+                }
+                httpParts.add(new HttpPart(partName, fileName, data, dataHandlerPart.getContentType(), data.length));
             }
         }
         return httpParts;

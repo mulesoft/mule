@@ -7,6 +7,7 @@
 package org.mule;
 
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -123,15 +124,12 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         try
         {
             context = muleContextFactory.createMuleContext("log4j2-test.xml");
+            fail("Able to create a context from XML file");
         }
         catch (ConfigurationException e)
         {
-            assertEquals(
-                    "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
-                    + "Check you have configuration module on your classpath and are using correct file extension. "
-                    + "(org.mule.api.config.ConfigurationException)", e.getMessage());
+          // Expected
         }
-        assertNull(context);
     }
 
     @Test
@@ -145,16 +143,12 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         try
         {
             context = muleContextFactory.createMuleContext("log4j2-test.xml", properties);
+            fail("Able to create a context from XML file");
         }
         catch (ConfigurationException e)
         {
-            assertEquals(
-                    "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
-                    + "Check you have configuration module on your classpath and are using correct file extension. "
-                    + "(org.mule.api.config.ConfigurationException)", e.getMessage());
+            // Expected
         }
-
-        assertNull(context);
     }
 
     @Test

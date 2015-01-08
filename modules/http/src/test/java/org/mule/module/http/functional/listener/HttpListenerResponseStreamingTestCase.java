@@ -10,31 +10,27 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.module.http.api.HttpHeaders;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
 {
 
-    public static final String TEST_BODY = "a message";
+    public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100*1024);
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
 
@@ -44,68 +40,185 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
         return "http-listener-response-streaming-config.xml";
     }
 
+    // AUTO - String
+
     @Test
-    public void byDefaultInputStreamPayloadDoesStreaming() throws Exception
+    public void string() throws Exception
     {
-        final String url = getUrl("default");
-        testResponseIsChunked(url);
+        final String url = getUrl("string");
+        testResponseIsContentLengthEncoding(url);
     }
 
     @Test
-    public void withTransferEncodingAndinputStreamPayloadDoesStreaming() throws Exception
+    public void stringWithContentLengthHeader() throws Exception
     {
-        final String url = getUrl("withHeaderTransferEncoding");
-        testResponseIsChunked(url);
+        final String url = getUrl("stringWithContentLengthHeader");
+        testResponseIsContentLengthEncoding(url);
     }
 
     @Test
-    public void withTransferEncodingAndStringPayloadDoesStreaming() throws Exception
+    public void stringWithContentLengthOutboundProperty() throws Exception
     {
-        final String url = getUrl("withHeaderTransferEncodingAndStringPayload");
-        testResponseIsChunked(url);
+        final String url = getUrl("stringWithContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
     }
 
     @Test
-    public void withOutboundPropertyTransferEncodingAndStringPayload() throws Exception
+    public void stringWithTransferEncoding() throws Exception
     {
-        final String url = getUrl("withOutboundPropertyTransferEncodingAndStringPayload");
-        testResponseIsChunked(url);
+        final String url = getUrl("stringWithTransferEncoding");
+        testResponseIsChunkedEncoding(url);
     }
 
     @Test
-    public void neverStreamWithInputStreamPayload() throws Exception
+    public void stringWithTransferEncodingOutboundProperty() throws Exception
     {
-        final String url = getUrl("neverStreamWithInputStreamPayload");
-        testResponseIsNotChunked(url);
+        final String url = getUrl("stringWithTransferEncodingOutboundProperty");
+        testResponseIsChunkedEncoding(url);
+    }
+
+    // AUTO  - InputStream
+
+    @Test
+    public void inputStream() throws Exception
+    {
+        final String url = getUrl("inputStream");
+        testResponseIsChunkedEncoding(url);
     }
 
     @Test
-    public void neverStreamWithOutboundPropertyAndInputStreamPayload() throws Exception
+    public void inputStreamWithContentLengthHeader() throws Exception
     {
-        final String url = getUrl("neverStreamWithOutboundPropertyAndInputStreamPayload");
-        testResponseIsChunked(url);
+        final String url = getUrl("inputStreamWithContentLengthHeader");
+        testResponseIsContentLengthEncoding(url);
     }
 
     @Test
-    public void neverStreamWithHeaderTransferEncodingAndInputStreamPayload() throws Exception
+    public void inputStreamWithContentLengthOutboundProperty() throws Exception
     {
-        final String url = getUrl("neverStreamWithHeaderTransferEncodingAndInputStreamPayload");
-        testResponseIsChunked(url);
+        final String url = getUrl("inputStreamWithContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
     }
 
     @Test
-    public void alwaysStreamWithStringPayload() throws Exception
+    public void inputStreamWithTransferEncoding() throws Exception
     {
-        final String url = getUrl("alwaysStreamWithStringPayload");
-        testResponseIsChunked(url);
+        final String url = getUrl("inputStreamWithTransferEncoding");
+        testResponseIsChunkedEncoding(url);
     }
 
-    private void testResponseIsNotChunked(String url) throws IOException
+    @Test
+    public void inputStreamWithTransferEncodingOutboundProperty() throws Exception
     {
-        final Response response = Request.Post(url).connectTimeout(1000).socketTimeout(1000).bodyByteArray(TEST_BODY.getBytes()).execute();
+        final String url = getUrl("inputStreamWithTransferEncodingOutboundProperty");
+        testResponseIsChunkedEncoding(url);
+    }
+
+    @Test
+    public void inputStreamWithTransferEncodingAndContentLength() throws Exception
+    {
+        final String url = getUrl("inputStreamWithTransferEncodingAndContentLength");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    // NEVER - String
+
+    @Test
+    public void neverString() throws Exception
+    {
+        final String url = getUrl("neverString");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void neverStringTransferEncodingHeader() throws Exception
+    {
+        final String url = getUrl("neverStringTransferEncodingHeader");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void neverStringTransferEncodingOutboundProperty() throws Exception
+    {
+        final String url = getUrl("neverStringTransferEncodingOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    // NEVER - InputStream
+
+    @Test
+    public void neverInputStream() throws Exception
+    {
+        final String url = getUrl("neverInputStream");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void neverInputStreamTransferEncodingHeader() throws Exception
+    {
+        final String url = getUrl("neverInputStreamTransferEncodingHeader");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void neverInputStreamTransferEncodingOutboundProperty() throws Exception
+    {
+        final String url = getUrl("neverInputStreamTransferEncodingOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    // ALWAYS - String
+
+    @Test
+    public void alwaysString() throws Exception
+    {
+        final String url = getUrl("alwaysString");
+        testResponseIsChunkedEncoding(url);
+    }
+
+    @Test
+    public void alwaysStringContentLengthHeader() throws Exception
+    {
+        final String url = getUrl("alwaysStringContentLengthHeader");
+        testResponseIsChunkedEncoding(url);
+    }
+
+    @Test
+    public void alwaysStringContentLengthOutboundProperty() throws Exception
+    {
+        final String url = getUrl("alwaysStringContentLengthOutboundProperty");
+        testResponseIsChunkedEncoding(url);
+    }
+
+    // ALWAYS - InputStream
+
+    @Test
+    public void alwaysInputStream() throws Exception
+    {
+        final String url = getUrl("alwaysInputStream");
+        testResponseIsChunkedEncoding(url);
+    }
+
+    @Test
+    public void alwaysInputStreamContentLengthHeader() throws Exception
+    {
+        final String url = getUrl("alwaysInputStreamContentLengthHeader");
+        testResponseIsChunkedEncoding(url);
+    }
+
+    @Test
+    public void alwaysInputStreamContentLengthOutboundProperty() throws Exception
+    {
+        final String url = getUrl("alwaysInputStreamContentLengthOutboundProperty");
+        testResponseIsChunkedEncoding(url);
+    }
+
+    private void testResponseIsContentLengthEncoding(String url) throws IOException
+    {
+        final Response response = Request.Get(url).connectTimeout(1000).socketTimeout(1000).execute();
         final HttpResponse httpResponse = response.returnResponse();
-        final Header transferEncodingHeader = httpResponse.getFirstHeader(HttpHeaders.Names.TRANSFER_ENCODING);
-        final Header contentLengthHeader = httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH);
+        final Header transferEncodingHeader = httpResponse.getFirstHeader(TRANSFER_ENCODING);
+        final Header contentLengthHeader = httpResponse.getFirstHeader(CONTENT_LENGTH);
         assertThat(contentLengthHeader, notNullValue());
         assertThat(transferEncodingHeader, nullValue());
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_BODY));
@@ -116,15 +229,15 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
         return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
     }
 
-    private void testResponseIsChunked(String url) throws IOException
+    private void testResponseIsChunkedEncoding(String url) throws IOException
     {
         final Response response = Request.Post(url).connectTimeout(1000).socketTimeout(1000).bodyByteArray(TEST_BODY.getBytes()).execute();
         final HttpResponse httpResponse = response.returnResponse();
-        final Header transferEncodingHeader = httpResponse.getFirstHeader(HttpHeaders.Names.TRANSFER_ENCODING);
-        final Header contentLengthHeader = httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH);
+        final Header transferEncodingHeader = httpResponse.getFirstHeader(TRANSFER_ENCODING);
+        final Header contentLengthHeader = httpResponse.getFirstHeader(CONTENT_LENGTH);
         assertThat(contentLengthHeader, nullValue());
         assertThat(transferEncodingHeader, notNullValue());
-        assertThat(transferEncodingHeader.getValue(), is(HttpHeaders.Values.CHUNKED));
+        assertThat(transferEncodingHeader.getValue(), is(CHUNKED));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(TEST_BODY));
     }
 

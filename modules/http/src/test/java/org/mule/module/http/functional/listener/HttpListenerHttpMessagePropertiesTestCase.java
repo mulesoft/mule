@@ -117,9 +117,9 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         ParameterMap retrivedQueryParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS);
         assertThat(retrivedQueryParams, IsNull.notNullValue());
         assertThat(retrivedQueryParams.size(), is(1));
-        assertThat(retrivedQueryParams.get(QUERY_PARAM_NAME), is(QUERY_PARAM_VALUE));
-        assertThat(retrivedQueryParams.getAsList(QUERY_PARAM_NAME).size(), is(2));
-        assertThat(retrivedQueryParams.getAsList(QUERY_PARAM_NAME), Matchers.containsInAnyOrder(new String[] {QUERY_PARAM_VALUE, QUERY_PARAM_SECOND_VALUE}));
+        assertThat(retrivedQueryParams.get(QUERY_PARAM_NAME), is(QUERY_PARAM_SECOND_VALUE));
+        assertThat(retrivedQueryParams.getAll(QUERY_PARAM_NAME).size(), is(2));
+        assertThat(retrivedQueryParams.getAll(QUERY_PARAM_NAME), Matchers.containsInAnyOrder(new String[] {QUERY_PARAM_VALUE, QUERY_PARAM_SECOND_VALUE}));
     }
 
     @Test

@@ -23,7 +23,7 @@ import org.hamcrest.core.Is;
 public class ParamMapMatcher
 {
 
-    public static Matcher<ParameterMap> isEqual(final Map<String, Collection<Object>> parameters)
+    public static Matcher<ParameterMap> isEqual(final Map<String, ? extends List<String>> parameters)
     {
         return new BaseMatcher<ParameterMap>()
         {
@@ -35,8 +35,8 @@ public class ParamMapMatcher
                 for (String key : parameters.keySet())
                 {
                     assertThat(parameterMap.keySet(), Matchers.containsInAnyOrder(parameters.keySet().toArray(new String[parameterMap.size()])));
-                    final Collection<Object> parameterKeyValues = parameters.get(key);
-                    final List<String> parameterMapValues = parameterMap.getAsList(key);
+                    final List<String> parameterKeyValues = parameters.get(key);
+                    final List<String> parameterMapValues = parameterMap.getAll(key);
                     assertThat(parameterMapValues, Matchers.containsInAnyOrder(parameterKeyValues.toArray(new String[parameterKeyValues.size()])));
                 }
                 return true;
