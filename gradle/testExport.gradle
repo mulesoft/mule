@@ -24,6 +24,7 @@ subprojects {
 
     // TODO: Remove this once no module exports test classes
     task testJar(type: Jar) {
+        description = 'Assembles a jar archive containing test classes'
         onlyIf { exportTests }
         from project.sourceSets.test.output
         classifier = 'tests'

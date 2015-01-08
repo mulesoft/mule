@@ -5,105 +5,10 @@
  * LICENSE.txt file.
  */
 
-apply plugin: 'signing'
+// Deployer configuration - either nexus or a local folder based on available properties
 
-signing {
-    sign configurations.archives
-}
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            pom.name = project.name
-            pom.project {
-                url "http://www.mulesoft.org"
-                inceptionYear '2003'
-
-                organization {
-                    name 'Mulesoft, Inc.'
-                    url "http://www.mulesoft.com"
-                }
-
-                mailingLists {
-                    mailingList {
-                        name 'developers'
-                        post 'mule-esb@mulesoft.com'
-                    }
-                }
-
-                scm {
-                    url "http://github.com/mulesoft/mule"
-                    connection "scm:git:git://github.com/mulesoft/mule.git"
-                    developerConnection "scm:git:git@github.com:mulesoft/mule.git"
-                }
-                licenses {
-                    license {
-                        name 'CPAL v1.0'
-                        url 'http://www.mulesoft.com/CPAL'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'rrinaudo'
-                        name 'Ramiro Rinaudo'
-                        email 'ramiro.rinaudo@mulesoft.com'
-                        roles {
-                            role 'Project Manager'
-                        }
-                    }
-                    developer {
-                        id 'pabad'
-                        name 'Pablo Abad'
-                    }
-                    developer {
-                        id 'dfeist'
-                        name 'Daniel Feist'
-                    }
-                    developer {
-                        id 'afelisatti'
-                        name 'Ana Felisatti'
-                    }
-                    developer {
-                        id 'andresgregoire'
-                        name 'Andres Gregoire'
-                    }
-                    developer {
-                        id 'LucianoGandini'
-                        name 'Luciano Gandini'
-                    }
-                    developer {
-                        id 'marianogonzalez'
-                        name 'Mariano Gonzalez'
-                    }
-                    developer {
-                        id 'pablokraan'
-                        name 'Pablo Kraan'
-                    }
-                    developer {
-                        id 'pablolagreca'
-                        name 'Pablo La Greca'
-                    }
-                    developer {
-                        id 'marcosnc'
-                        name 'Marcos Nunez Cortes'
-                    }
-                    developer {
-                        id 'vromero'
-                        name 'Victor Romero'
-                    }
-                    developer {
-                        id 'asequeira'
-                        name 'Alejandro Sequeira'
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Upload to nexus or local filesystem depending on credentials availability
 if (hasProperty("nexusUser")) {
     configurations {
         deployerJars
@@ -113,27 +18,104 @@ if (hasProperty("nexusUser")) {
         deployerJars "org.apache.maven.wagon:wagon-http:2.2"
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                configuration = configurations.deployerJars
+    ext.deployerRepoConfig = {
+        configuration = configurations.deployerJars
 
-                repository(url: "https://repository-master.mulesoft.org/nexus/content/repositories/releases") {
-                    authentication(userName: nexusUser, password: nexusPassword)
-                }
-                snapshotRepository(url: "https://repository-master.mulesoft.org/nexus/content/repositories/snapshots") {
-                    authentication(userName: nexusUser, password: nexusPassword)
-                }
-            }
+        repository(url: "https://repository-master.mulesoft.org/nexus/content/repositories/releases") {
+            authentication(userName: nexusUser, password: nexusPassword)
+        }
+        snapshotRepository(url: "https://repository-master.mulesoft.org/nexus/content/repositories/snapshots") {
+            authentication(userName: nexusUser, password: nexusPassword)
         }
     }
 }
 else {
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "file://${rootProject.buildDir}/releases")
-                snapshotRepository(url: "file://${rootProject.buildDir}/snapshots")
+    ext.deployerRepoConfig = {
+        repository(url: "file://${rootProject.buildDir}/releases")
+        snapshotRepository(url: "file://${rootProject.buildDir}/snapshots")
+    }
+}
+
+ext.deployerPomConfig = {
+    pom.project {
+        url "http://www.mulesoft.org"
+        inceptionYear '2003'
+
+        organization {
+            name 'Mulesoft, Inc.'
+            url "http://www.mulesoft.com"
+        }
+
+        mailingLists {
+            mailingList {
+                name 'developers'
+                post 'mule-esb@mulesoft.com'
+            }
+        }
+
+        scm {
+            url "http://github.com/mulesoft/mule"
+            connection "scm:git:git://github.com/mulesoft/mule.git"
+            developerConnection "scm:git:git@github.com:mulesoft/mule.git"
+        }
+        licenses {
+            license {
+                name 'CPAL v1.0'
+                url 'http://www.mulesoft.com/CPAL'
+            }
+        }
+        developers {
+            developer {
+                id 'rrinaudo'
+                name 'Ramiro Rinaudo'
+                email 'ramiro.rinaudo@mulesoft.com'
+                roles {
+                    role 'Project Manager'
+                }
+            }
+            developer {
+                id 'pabad'
+                name 'Pablo Abad'
+            }
+            developer {
+                id 'dfeist'
+                name 'Daniel Feist'
+            }
+            developer {
+                id 'afelisatti'
+                name 'Ana Felisatti'
+            }
+            developer {
+                id 'andresgregoire'
+                name 'Andres Gregoire'
+            }
+            developer {
+                id 'LucianoGandini'
+                name 'Luciano Gandini'
+            }
+            developer {
+                id 'marianogonzalez'
+                name 'Mariano Gonzalez'
+            }
+            developer {
+                id 'pablokraan'
+                name 'Pablo Kraan'
+            }
+            developer {
+                id 'pablolagreca'
+                name 'Pablo La Greca'
+            }
+            developer {
+                id 'marcosnc'
+                name 'Marcos Nunez Cortes'
+            }
+            developer {
+                id 'vromero'
+                name 'Victor Romero'
+            }
+            developer {
+                id 'asequeira'
+                name 'Alejandro Sequeira'
             }
         }
     }

@@ -5,7 +5,11 @@
  * LICENSE.txt file.
  */
 
+// Publish configuration for java artifacts (jar+source+javadoc)
+
 apply plugin: 'java'
+apply plugin: 'signing'
+apply from: "$rootDir/gradle/publish.gradle"
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
@@ -23,4 +27,25 @@ artifacts {
     archives sourcesJar
 }
 
-apply from: 'publish.gradle'
+signing {
+    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> if(isReleaseVersion) { signing.signPom(deployment) }}
+
+            pom.name = project.name
+        }
+        mavenDeployer deployerRepoConfig
+        mavenDeployer deployerPomConfig
+    }
+}
+
+install {
+    repositories {
+        mavenInstaller deployerPomConfig
+    }
+}

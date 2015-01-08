@@ -4,8 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-apply plugin: 'distribution'
+
+// Distribution assembly and publication
+
 apply plugin: 'maven'
+apply plugin: 'distribution'
+apply plugin: 'signing'
+apply from: 'gradle/publish.gradle'
+apply from: 'gradle/verifyContents.gradle'
 
 ext {
     // TODO: Move to a top level folder when maven builds are deleted
@@ -60,7 +66,7 @@ dependencies {
 
 distributions {
     main {
-        baseName = 'standalone'
+        baseName = 'mule-standalone'
         contents {
             def muleMask = ["mule*.jar"]
             def userMask = ["junit*.jar", "xmlunit*.jar", "mule-tests-functional*.jar"]
@@ -117,15 +123,67 @@ distributions {
 
         }
     }
+
+    // Distribution containing build scripts reusable by other projects
+    build {
+        baseName = "build"
+        contents {
+            into('gradle') {
+                from "$rootDir/gradle"
+                exclude 'wrapper/'
+            }
+        }
+    }
 }
 
+tasks.withType(Tar) {
+    compression = Compression.GZIP
+}
+
+
 configurations {
-    archives
+    distribution
 }
 
 artifacts {
-    archives distZip
-    archives distTar
+    distribution distZip
+    distribution distTar
+    distribution buildDistZip
 }
 
-apply from: 'gradle/publish.gradle'
+// Upload the build distribution, containing build artifacts, with a different classifier
+buildDistZip { classifier="build" }
+
+verifyContents('distVerify') {
+    whitelist = file("distributions/standalone/assembly-whitelist2.txt")
+    projectOutputFolder = file("$buildDir/install/standalone")
+    dependsOn("installDist")
+}
+
+distZip { dependsOn distVerify }
+distTar { dependsOn distVerify }
+
+
+signing {
+    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadDistribution") }
+    sign configurations.distribution
+}
+
+uploadDistribution.repositories {
+    mavenDeployer deployerRepoConfig
+    mavenDeployer deployerPomConfig
+    mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> if(isReleaseVersion) { signing.signPom(deployment) }}
+        pom.groupId = "org.mule.distributions"
+    }
+}
+
+task install(type: Upload) {
+    configuration = configurations.distribution
+    repositories {
+        mavenInstaller {
+            pom.groupId = "org.mule.distributions"
+        }
+        mavenInstaller deployerPomConfig
+    }
+}

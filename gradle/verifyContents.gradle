@@ -5,10 +5,16 @@
  * LICENSE.txt file.
  */
 
-task distVerify(type: ContentsVerifierTask) {
-    whitelist = file("distributions/standalone/assembly-whitelist2.txt")
-    projectOutputFolder = file("$buildDir/install/standalone")
-    dependsOn("installDist")
+// Not the best syntax, but works without having to create an independent plugin
+// Used like this to create verification tasks:
+// verifyContents(<task name>) {
+//    whitelist = file(<path to a whitelist file>)
+//    projectOutputFolder = file(<path to verify>)
+//    dependsOn(<task that builds the path>)
+// }
+
+ext.verifyContents = { String name, Closure action ->
+    task([type: ContentsVerifierTask], name, action)
 }
 
 class ContentsVerifierTask extends DefaultTask
