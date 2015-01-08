@@ -19,6 +19,7 @@ import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -29,7 +30,7 @@ import org.junit.Test;
 public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
 {
 
-    public static final String TEST_BODY = "a message";
+    public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100*1024);
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
 
