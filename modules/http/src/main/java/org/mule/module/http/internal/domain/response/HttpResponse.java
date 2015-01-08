@@ -11,10 +11,12 @@ import org.mule.module.http.internal.domain.HttpMessage;
 public interface HttpResponse extends HttpMessage
 {
 
-    void setStatusCode(int statusCode);
-
     int getStatusCode();
 
+    void setStatusCode(int statusCode);
+
     String getReasonPhrase();
+
+    void setReasonPhrase(String reasonPhrase);
 
 }

@@ -57,19 +57,27 @@ public class DefaultHttpResponse implements HttpResponse
     }
 
     @Override
-    public void setStatusCode(int statusCode)
-    {
-        this.responseStatus.setStatusCode(statusCode);
-    }
-
     public int getStatusCode()
     {
         return this.responseStatus.getStatusCode();
     }
 
+    @Override
+    public void setStatusCode(int statusCode)
+    {
+        this.responseStatus.setStatusCode(statusCode);
+    }
+
+    @Override
     public String getReasonPhrase()
     {
         return this.responseStatus.getReasonPhrase();
+    }
+
+    @Override
+    public void setReasonPhrase(String reasonPhrase)
+    {
+        this.responseStatus.setReasonPhrase(reasonPhrase);
     }
 
 }

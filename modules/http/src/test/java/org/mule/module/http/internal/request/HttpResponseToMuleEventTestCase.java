@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.transport.PropertyScope.INBOUND;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -45,6 +46,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
         builder.setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
         builder.addHeader("TestHeader", "TestValue");
         builder.setStatusCode(200);
+        builder.setReasonPhrase("OK");
         httpResponse = builder.build();
         event = getTestEvent(null);
     }
@@ -77,6 +79,13 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     {
         httpResponseToMuleEvent.convert(event, httpResponse);
         assertThat((Integer) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(200));
+    }
+
+    @Test
+    public void responsePhraseIsSetAsInboundProperty() throws MessagingException
+    {
+        httpResponseToMuleEvent.convert(event, httpResponse);
+        assertThat((String) event.getMessage().getInboundProperty(HTTP_REASON_PROPERTY), equalTo("OK"));
     }
 
 }
