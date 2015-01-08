@@ -10,22 +10,20 @@
 
     <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
 
-    <flow name="streamingDefault">
-        <vm:inbound-endpoint path="streamingDefaultIn" />
+    <flow name="streamingAuto">
         <http:request config-ref="requestConfig"  method="POST" path="path" />
-        <vm:outbound-endpoint path="streamingDefaultOut" />
     </flow>
 
-    <flow name="streamingTrue">
-        <vm:inbound-endpoint path="streamingTrueIn" />
+    <flow name="streamingAlways">
+        <vm:inbound-endpoint path="streamingAlwaysIn" />
         <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS" />
-        <vm:outbound-endpoint path="streamingTrueOut" />
+        <vm:outbound-endpoint path="streamingAlwaysOut" />
     </flow>
 
-    <flow name="streamingFalse">
-        <vm:inbound-endpoint path="streamingFalseIn" />
+    <flow name="streamingNever">
+        <vm:inbound-endpoint path="streamingNeverIn" />
         <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER" />
-        <vm:outbound-endpoint path="streamingFalseOut" />
+        <vm:outbound-endpoint path="streamingNeverOut" />
     </flow>
 
 
