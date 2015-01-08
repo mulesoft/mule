@@ -6,28 +6,40 @@
  */
 package org.mule.module.http.internal;
 
+import static java.util.Collections.unmodifiableMap;
+
+import org.mule.module.http.api.HttpParameters;
+
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ParameterMap implements Map<String, Object>, Serializable
+public class ParameterMap implements HttpParameters, Serializable
 {
 
-    private final Map paramsMap;
+    private final Map<String, LinkedList<String>> paramsMap;
 
     public ParameterMap(final Map paramsMap)
     {
-        this.paramsMap = Collections.unmodifiableMap(paramsMap);
+        this.paramsMap = unmodifiableMap(paramsMap);
     }
 
     public ParameterMap()
     {
         this.paramsMap = new LinkedHashMap();
+    }
+
+    public ParameterMap toImmutableParameterMap()
+    {
+        return new ParameterMap(this.paramsMap);
     }
 
     @Override
@@ -60,50 +72,58 @@ public class ParameterMap implements Map<String, Object>, Serializable
         final Object value = paramsMap.get(key);
         if (value != null)
         {
-            return ((List<String>)value).get(0);
+            LinkedList<String> values = (LinkedList<String>) value;
+            return values.getLast();
         }
         return null;
     }
 
-    public List<String> getAsList(Object key)
+    public List<String> getAll(String key)
     {
-        return paramsMap.containsKey(key) ? Collections.unmodifiableList((List<? extends String>) paramsMap.get(key)) : Collections.<String>emptyList();
+        return paramsMap.containsKey(key) ? Collections.unmodifiableList(paramsMap.get(key)) : Collections.<String>emptyList();
     }
 
     @Override
-    public Object put(String key, Object value)
+    public String put(String key, String value)
     {
-        List<Object> previousValue = (List<Object>) paramsMap.get(key);
-        List<Object> newValue = previousValue;
+        LinkedList<String> previousValue = paramsMap.get(key);
+        LinkedList<String> newValue = previousValue;
         if (previousValue != null)
         {
-            previousValue = new ArrayList<>(previousValue);
+            previousValue = new LinkedList<>(previousValue);
         }
         else
         {
-            newValue = new ArrayList<>();
+            newValue = new LinkedList<>();
         }
         newValue.add(value);
         paramsMap.put(key, newValue);
-        return previousValue;
+        if (previousValue == null || previousValue.isEmpty())
+        {
+            return null;
+        }
+        return previousValue.getFirst();
     }
 
-    public ParameterMap putAndReturn(String key, Object value)
+    public String remove(Object key)
     {
-        put(key, value);
-        return this;
+        Collection<String> values = paramsMap.remove(key);
+        if (values != null)
+        {
+            return values.iterator().next();
+        }
+        return null;
     }
 
     @Override
-    public Object remove(Object key)
+    public void putAll(Map<? extends String, ? extends String> aMap)
     {
-        return paramsMap.remove(key);
-    }
-
-    @Override
-    public void putAll(Map<? extends String, ?> m)
-    {
-        paramsMap.putAll(m);
+        for (String key : aMap.keySet())
+        {
+            LinkedList<String> values = new LinkedList<>();
+            values.add(aMap.get(key));
+            paramsMap.put(key, values);
+        }
     }
 
     @Override
@@ -119,15 +139,25 @@ public class ParameterMap implements Map<String, Object>, Serializable
     }
 
     @Override
-    public Collection<Object> values()
+    public Collection<String> values()
     {
-        return paramsMap.values();
+        ArrayList<String> values = new ArrayList<>();
+        for (String key : paramsMap.keySet())
+        {
+            values.add(paramsMap.get(key).getLast());
+        }
+        return values;
     }
 
     @Override
-    public Set<Entry<String,Object>> entrySet()
+    public Set<Entry<String,String>> entrySet()
     {
-        return paramsMap.entrySet();
+        HashSet<Entry<String, String>> entries = new HashSet<>();
+        for (String key : paramsMap.keySet())
+        {
+            entries.add(new AbstractMap.SimpleEntry<>(key, paramsMap.get(key).getLast()));
+        }
+        return entries;
     }
 
     @Override
@@ -142,8 +172,8 @@ public class ParameterMap implements Map<String, Object>, Serializable
         return paramsMap.hashCode();
     }
 
-    public Map<String, Collection<Object>> toCollectionMap()
+    public Map<String, ? extends List<String>> toListValuesMap()
     {
-        return Collections.unmodifiableMap(paramsMap);
+        return unmodifiableMap(paramsMap);
     }
 }
