@@ -28,6 +28,7 @@ import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.registry.TransformerResolver;
+import org.mule.api.registry.TransportServiceDescriptorFactory;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
@@ -468,7 +469,15 @@ public class MuleRegistryHelper implements MuleRegistry
         {
             if (sd == null)
             {
-                sd = createServiceDescriptor(type, name, overrides);
+                if (TransportServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE.equals(type.getName()))
+                {
+                    sd = muleContext.getTransportDescriptorService().getDescriptor(name, muleContext, overrides);
+                }
+                else
+                {
+                    sd =  createServiceDescriptor(type, name, overrides);
+                }
+
                 try
                 {
                     registry.registerObject(key, sd, ServiceDescriptor.class);
@@ -484,7 +493,7 @@ public class MuleRegistryHelper implements MuleRegistry
 
     protected ServiceDescriptor createServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
     {
-        //Stripe off and use the meta-scheme if present
+        // Strips off and use the meta-scheme if present
         String scheme = name;
         if (name.contains(":"))
         {

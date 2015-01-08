@@ -28,6 +28,8 @@ import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.registry.MuleTransportDescriptorService;
+import org.mule.api.registry.TransportDescriptorService;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ImmutableThreadingProfile;
@@ -91,6 +93,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected RegistryBootstrapService registryBootstrapService;
 
+    protected TransportDescriptorService transportDescriptorService = new MuleTransportDescriptorService();
+
     /**
      * {@inheritDoc}
      */
@@ -111,6 +115,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
         muleContext.setRegistryBootstrapService(registryBootstrapService);
+        muleContext.setTransportDescriptorService(transportDescriptorService);
 
         return muleContext;
     }
@@ -244,6 +249,11 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public void setRegistryBootstrapService(RegistryBootstrapService registryBootstrapService)
     {
         this.registryBootstrapService = registryBootstrapService;
+    }
+
+    public void setTransportDescriptorService(TransportDescriptorService transportDescriptorService)
+    {
+        this.transportDescriptorService = transportDescriptorService;
     }
 
     protected DefaultMuleConfiguration createMuleConfiguration()

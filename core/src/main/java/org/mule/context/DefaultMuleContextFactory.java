@@ -14,6 +14,8 @@ import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.context.notification.MuleContextListener;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.MuleTransportDescriptorService;
+import org.mule.api.registry.TransportDescriptorService;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.bootstrap.MuleRegistryBootstrapService;
 import org.mule.config.bootstrap.RegistryBootstrapService;
@@ -41,6 +43,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     private List<MuleContextListener> listeners = new LinkedList<MuleContextListener>();
 
     private RegistryBootstrapService registryBootstrapService = new MuleRegistryBootstrapService();
+    private TransportDescriptorService transportDescriptorService = new MuleTransportDescriptorService();
 
     /**
      * Use default ConfigurationBuilder, default MuleContextBuilder
@@ -50,6 +53,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         // Configure with defaults needed for a feasible/startable MuleContext
         DefaultMuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder();
         muleContextBuilder.setRegistryBootstrapService(registryBootstrapService);
+        muleContextBuilder.setTransportDescriptorService(transportDescriptorService);
 
         return createMuleContext(new DefaultsConfigurationBuilder(), muleContextBuilder);
     }
@@ -290,6 +294,11 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     public void setRegistryBootstrapService(RegistryBootstrapService registryBootstrapService)
     {
         this.registryBootstrapService = registryBootstrapService;
+    }
+
+    public void setTransportDescriptorService(TransportDescriptorService transportDescriptorService)
+    {
+        this.transportDescriptorService = transportDescriptorService;
     }
 
     private abstract class ContextConfigurator

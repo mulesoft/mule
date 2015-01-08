@@ -25,6 +25,7 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
+import org.mule.api.registry.TransportDescriptorService;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
@@ -341,5 +342,10 @@ public interface MuleContext extends Lifecycle
      */
     RegistryBootstrapService getRegistryBootstrapService();
 
+    /**
+     * @return {@link org.mule.api.registry.TransportDescriptorService} used to create {@link org.mule.transport.service.TransportServiceDescriptor}
+     * for this {@link org.mule.api.MuleContext}
+     */
+    TransportDescriptorService getTransportDescriptorService();
 }
 
