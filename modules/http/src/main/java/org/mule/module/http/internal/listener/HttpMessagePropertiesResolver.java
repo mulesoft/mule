@@ -65,7 +65,7 @@ public class HttpMessagePropertiesResolver
         final String path = HttpParser.extractPath(uri);
         final String rawQueryString = HttpParser.extractQueryParams(uri);
         final ParameterMap queryParams = HttpParser.decodeQueryString(rawQueryString);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS, queryParams == null ? Collections.emptyMap() : queryParams);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS, queryParams == null ? Collections.emptyMap() : queryParams.toImmutableParameterMap());
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_STRING, rawQueryString);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY, path);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY, this.protocol);
