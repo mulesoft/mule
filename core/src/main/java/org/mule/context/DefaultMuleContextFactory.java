@@ -20,7 +20,9 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.bootstrap.MuleRegistryBootstrapService;
 import org.mule.config.bootstrap.RegistryBootstrapService;
 import org.mule.config.builders.AutoConfigurationBuilder;
+import org.mule.config.builders.ConfigurationBuilderService;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
+import org.mule.config.builders.MuleConfigurationBuilderService;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 
 import java.util.LinkedList;
@@ -44,6 +46,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
 
     private RegistryBootstrapService registryBootstrapService = new MuleRegistryBootstrapService();
     private TransportDescriptorService transportDescriptorService = new MuleTransportDescriptorService();
+    private ConfigurationBuilderService configurationBuilderService = new MuleConfigurationBuilderService();
 
     /**
      * Use default ConfigurationBuilder, default MuleContextBuilder
@@ -160,7 +163,9 @@ public class DefaultMuleContextFactory implements MuleContextFactory
 
                 // Automatically resolve Configuration to be used and delegate configuration
                 // to it.
-                new AutoConfigurationBuilder(configResources).configure(muleContext);
+                AutoConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder(configResources);
+                configurationBuilder.setConfigurationBuilderService(configurationBuilderService);
+                configurationBuilder.configure(muleContext);
 
                 notifyMuleContextConfiguration(muleContext);
             }
@@ -299,6 +304,11 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     public void setTransportDescriptorService(TransportDescriptorService transportDescriptorService)
     {
         this.transportDescriptorService = transportDescriptorService;
+    }
+
+    public void setConfigurationBuilderService(ConfigurationBuilderService configurationBuilderService)
+    {
+        this.configurationBuilderService = configurationBuilderService;
     }
 
     private abstract class ContextConfigurator
