@@ -6,6 +6,8 @@
  */
 package org.mule.security.oauth.processor;
 
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -15,7 +17,7 @@ import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.http.internal.ParameterMap;
+import org.mule.module.http.api.HttpParameters;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
@@ -23,6 +25,7 @@ import org.mule.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -173,7 +176,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
     private InboundPropertiesDelegate getPropertiesDelegate(MuleEvent event)
     {
         Object parameters = event.getMessage().getInboundProperty("http.query.params");
-        return parameters instanceof ParameterMap ? new HttpConnectorDelegate((ParameterMap) parameters) : new OldHttpTransport(event);
+        return parameters instanceof HttpParameters ? new HttpConnectorDelegate(event) : new OldHttpTransport(event);
     }
 
     private interface InboundPropertiesDelegate
@@ -186,11 +189,13 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
     private class HttpConnectorDelegate implements InboundPropertiesDelegate
     {
-        private final ParameterMap parameters;
+        private final HashMap<String, String> parameters;
 
-        private HttpConnectorDelegate(ParameterMap parameters)
+        private HttpConnectorDelegate(MuleEvent event)
         {
-            this.parameters = parameters;
+            //Query parameters are immutable so we copy them and change the query parameters map.
+            this.parameters = new HashMap(((HttpParameters) event.getMessage().getInboundProperty(HTTP_QUERY_PARAMS)));
+            event.getMessage().setProperty(HTTP_QUERY_PARAMS, this.parameters, PropertyScope.INBOUND);
         }
 
         @Override
