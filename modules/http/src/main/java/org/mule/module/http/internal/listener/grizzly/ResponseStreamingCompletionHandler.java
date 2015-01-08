@@ -59,10 +59,10 @@ public class ResponseStreamingCompletionHandler
 
     public void sendInputStreamChunk() throws IOException
     {
-        final Buffer buffer = memoryManager.allocate(1024);
+        final Buffer buffer = memoryManager.allocate(8 * 1024);
 
-        final byte[] bufferByteArray = buffer.toByteBuffer().array();
-        final int offset = buffer.toByteBuffer().arrayOffset();
+        final byte[] bufferByteArray = buffer.array();
+        final int offset = buffer.arrayOffset();
         final int length = buffer.remaining();
 
         int bytesRead = inputStream.read(bufferByteArray, offset, length);
