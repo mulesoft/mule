@@ -213,7 +213,7 @@ public class GrizzlyHttpClient implements HttpClient
 
         for (String queryParamName : defaultHttpRequest.getQueryParams().keySet())
         {
-            for (String queryParamValue : defaultHttpRequest.getQueryParams().getAsList(queryParamName))
+            for (String queryParamValue : defaultHttpRequest.getQueryParams().getAll(queryParamName))
             {
                 builder.addQueryParameter(queryParamName, queryParamValue);
             }

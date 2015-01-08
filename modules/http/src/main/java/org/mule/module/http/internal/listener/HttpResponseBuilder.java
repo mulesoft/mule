@@ -88,7 +88,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         ParameterMap resolvedHeaders = resolveParams(event, HttpParamType.HEADER);
         for (String name : resolvedHeaders.keySet())
         {
-            final Collection<String> paramValues = resolvedHeaders.getAsList(name);
+            final Collection<String> paramValues = resolvedHeaders.getAll(name);
             for (String value : paramValues)
             {
                 httpResponseHeaderBuilder.addHeader(name, value);
@@ -129,7 +129,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 {
                     warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
                 }
-                httpEntity = createUrlEncodedEntity(event, (Map<String, Object>) payload);
+                httpEntity = createUrlEncodedEntity(event, (Map) payload);
             }
             else if (payload instanceof InputStream)
             {
@@ -224,16 +224,16 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
     }
 
-    private HttpEntity createUrlEncodedEntity(MuleEvent event, Map<String, Object> payload)
+    private HttpEntity createUrlEncodedEntity(MuleEvent event, Map payload)
     {
-        final Map<String, Object> mapPayload = payload;
+        final Map mapPayload = payload;
         HttpEntity entity = new EmptyHttpEntity();
         if (!mapPayload.isEmpty())
         {
             String encodedBody;
             if (mapPayload instanceof ParameterMap)
             {
-                encodedBody = HttpParser.encodeString(event.getEncoding(), ((ParameterMap) mapPayload).toCollectionMap());
+                encodedBody = HttpParser.encodeString(event.getEncoding(), ((ParameterMap) mapPayload).toListValuesMap());
             }
             else
             {

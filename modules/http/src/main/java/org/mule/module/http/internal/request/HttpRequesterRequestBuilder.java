@@ -34,7 +34,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder
         {
             // If more than one value has been defined for a URI param, use the last one (to allow overrides)
 
-            List<String> uriParamValues = uriParamMap.getAsList(uriParamName);
+            List<String> uriParamValues = uriParamMap.getAll(uriParamName);
             String uriParamValue = uriParamValues.get(uriParamValues.size() - 1);
 
             path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);

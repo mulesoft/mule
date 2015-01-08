@@ -104,9 +104,9 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
         assertThat(payloadAsMap.size(), is(2));
         assertThat(payloadAsMap.get(PARAM_1_NAME), Is.<Object>is(PARAM_1_VALUE));
-        assertThat(payloadAsMap.getAsList(PARAM_2_NAME).size(), Is.is(2));
-        assertThat(payloadAsMap.getAsList(PARAM_2_NAME).get(0), Is.is(PARAM_2_VALUE_1));
-        assertThat(payloadAsMap.getAsList(PARAM_2_NAME).get(1), Is.is(PARAM_2_VALUE_2));
+        assertThat(payloadAsMap.getAll(PARAM_2_NAME).size(), Is.is(2));
+        assertThat(payloadAsMap.getAll(PARAM_2_NAME).get(0), Is.is(PARAM_2_VALUE_1));
+        assertThat(payloadAsMap.getAll(PARAM_2_NAME).get(1), Is.is(PARAM_2_VALUE_2));
 
         compareParameterMaps(response, payloadAsMap);
     }
@@ -128,7 +128,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue(), Is.is(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
         final String responseContent = IOUtils.toString(httpResponse.getEntity().getContent());
-        assertThat(payloadAsMap, ParamMapMatcher.isEqual(HttpParser.decodeUrlEncodedBody(responseContent, Charsets.UTF_8.name()).toCollectionMap()));
+        assertThat(payloadAsMap, ParamMapMatcher.isEqual(HttpParser.decodeUrlEncodedBody(responseContent, Charsets.UTF_8.name()).toListValuesMap()));
     }
 
     private String getListenerUrl()
