@@ -31,7 +31,7 @@ class MessageVariableResolverFactory extends MVELExpressionLanguageContext
             addFinalVariable("message", new MessageContext(message));
 
             // We need payload top-level for compatibility with payload expression evaluator without ':'
-            addVariable("payload", message.getPayload(), new VariableAssignmentCallback()
+            addVariable("payload", new MessageContext(message).getPayload(), new VariableAssignmentCallback()
             {
                 @Override
                 public void assignValue(String name, Object value, Object newValue)
