@@ -156,6 +156,7 @@ public class MessageContextTestCase extends AbstractELTestCase
         MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
         Mockito.when(mockMessage.getPayload()).thenReturn(NullPayload.getInstance());
         assertEquals(true, evaluate("message.payload == null", mockMessage));
+        assertEquals(true, evaluate("payload == null", mockMessage));
         assertEquals(false, evaluate("message.payload is NullPayload", mockMessage));
         assertEquals(true, evaluate("message.payload == empty", mockMessage));
     }

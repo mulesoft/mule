@@ -74,7 +74,8 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
             }
             else if (PAYLOAD.equals(name))
             {
-                return new MuleVariableResolver<Object>(PAYLOAD, muleMessage.getPayload(), null,
+                return new MuleVariableResolver<Object>(PAYLOAD, new MessageContext(
+                        muleMessage).getPayload(), null,
                     new VariableAssignmentCallback<Object>()
                     {
                         @Override
