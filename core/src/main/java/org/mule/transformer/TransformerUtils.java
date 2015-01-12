@@ -20,6 +20,7 @@ import org.mule.transport.NullPayload;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -245,5 +246,21 @@ public class TransformerUtils
 
             return null;
         }
+    }
+
+    public static String generateTransformerName(Class<? extends Transformer> transformerClass, DataType returnType)
+    {
+        String transformerName = ClassUtils.getSimpleName(transformerClass);
+        int i = transformerName.indexOf("To");
+        if (i > 0 && returnType != null)
+        {
+            String target = ClassUtils.getSimpleName(returnType.getType());
+            if (target.equals("byte[]"))
+            {
+                target = "byteArray";
+            }
+            transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
+        }
+        return transformerName;
     }
 }

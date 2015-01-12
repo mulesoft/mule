@@ -15,13 +15,21 @@ import java.util.Collection;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class LifecycleUtils
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleUtils.class);
+
+    public static void initialiseIfNeeded(Object object) throws InitialisationException
+    {
+        initialiseIfNeeded(object, null);
+    }
+
     public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException
     {
-        if (object instanceof MuleContextAware)
+        if (muleContext != null && object instanceof MuleContextAware)
         {
             ((MuleContextAware) object).setMuleContext(muleContext);
         }
@@ -44,6 +52,14 @@ public abstract class LifecycleUtils
         }
     }
 
+    public static void startIfNeeded(Object object) throws MuleException
+    {
+        if (object instanceof Startable)
+        {
+            ((Startable) object).start();
+        }
+    }
+
     public static void startIfNeeded(Collection<? extends Object> objects) throws MuleException
     {
         doApplyPhase(Startable.PHASE_NAME, objects, null);
@@ -57,6 +73,11 @@ public abstract class LifecycleUtils
     public static void stopIfNeeded(Object object) throws MuleException
     {
         doApplyPhase(Stoppable.PHASE_NAME, Arrays.asList(object), null);
+    }
+
+    public static void disposeIfNeeded(Object object)
+    {
+        disposeIfNeeded(object, LOGGER);
     }
 
     public static void disposeIfNeeded(Object object, Logger logger)

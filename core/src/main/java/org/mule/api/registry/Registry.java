@@ -9,7 +9,6 @@ package org.mule.api.registry;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.transport.Connector;
 
 import java.util.Collection;
 import java.util.Map;
@@ -88,7 +87,9 @@ public interface Registry extends Initialisable, Disposable
      * @param value the object to store in the registry. This is a non-null value
      * @param metadata an implementation specific argument that can be passed into the method
      * @throws RegistrationException if an object with the same key already exists
+     * @deprecated as of 3.7.0. Use {@link #registerObject(String, Object)} instead
      */
+    @Deprecated
     void registerObject(String key, Object value, Object metadata) throws RegistrationException;
 
     /**
@@ -103,21 +104,26 @@ public interface Registry extends Initialisable, Disposable
      * to the object when it is removed.
      *
      * @param key the name or key of the object to remove from the registry
-     * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because 
-     * the object's lifecycle threw an exception
+     * @return the unregistered object or {@code null} if no object was registered under that key
+     * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
+     *                               the object's lifecycle threw an exception
      */
-    void unregisterObject(String key) throws RegistrationException;
+    Object unregisterObject(String key) throws RegistrationException;
 
     /**
      * Will remove an object by name from the registry. By default the registry must apply all remaining lifecycle phases
      * to the object when it is removed.
      *
-     * @param key the name or key of the object to remove from the registry
+     * @param key      the name or key of the object to remove from the registry
      * @param metadata an implementation specific argument that can be passed into the method
      * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
-     * the object's lifecycle threw an exception
+     *                               the object's lifecycle threw an exception
+     * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
+     *                               the object's lifecycle threw an exception
+     * @deprecated as of 3.7.0. Use {@link #unregisterObject(String)} instead
      */
-    void unregisterObject(String key, Object metadata) throws RegistrationException;
+    @Deprecated
+    Object unregisterObject(String key, Object metadata) throws RegistrationException;
 
     // /////////////////////////////////////////////////////////////////////////
     // Registry Metadata

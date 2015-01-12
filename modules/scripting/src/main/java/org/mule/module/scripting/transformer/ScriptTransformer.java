@@ -7,12 +7,14 @@
 package org.mule.module.scripting.transformer;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.transformer.AbstractMessageTransformer;
 
-import javax.script.ScriptException;
 import javax.script.Bindings;
+import javax.script.ScriptException;
 
 /**
  * Runs a script to perform transformation on an object.
@@ -20,6 +22,20 @@ import javax.script.Bindings;
 public class ScriptTransformer extends AbstractMessageTransformer
 {
     private Scriptable script;
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        LifecycleUtils.initialiseIfNeeded(script, muleContext);
+    }
+
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+        LifecycleUtils.disposeIfNeeded(script);
+    }
 
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException

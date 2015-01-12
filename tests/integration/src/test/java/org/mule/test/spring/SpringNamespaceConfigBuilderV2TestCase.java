@@ -10,16 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.AbstractConfigBuilderTestCase;
@@ -58,12 +54,6 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
             "org/mule/test/spring/config2/test-xml-mule2-config-split.xml",
             "org/mule/test/spring/config2/test-xml-mule2-config-split-properties.xml"
         };
-    }
-
-    @Override
-    public ConfigurationBuilder getBuilder() throws ConfigurationException
-    {
-        return new SpringXmlConfigurationBuilder(getConfigFiles());
     }
 
     @Test

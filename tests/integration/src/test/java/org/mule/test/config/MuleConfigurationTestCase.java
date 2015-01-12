@@ -6,6 +6,9 @@
  */
 package org.mule.test.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleConfiguration;
@@ -19,10 +22,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class MuleConfigurationTestCase extends AbstractMuleTestCase
 {
@@ -132,7 +131,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
     @Test
     public void testConfigureAfterInitFails() throws Exception
     {
-        muleContext = new DefaultMuleContextFactory().createMuleContext();        
+        muleContext = new DefaultMuleContextFactory().createMuleContext();
 
         DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
         
@@ -168,7 +167,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
     @Test
     public void testConfigureAfterStartFails() throws Exception
     {
-        muleContext = new DefaultMuleContextFactory().createMuleContext();        
+        muleContext = new DefaultMuleContextFactory().createMuleContext();
         muleContext.start();
 
         DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());

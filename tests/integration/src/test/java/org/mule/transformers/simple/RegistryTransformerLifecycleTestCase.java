@@ -42,7 +42,7 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
             .lookupTransformer("lifecycle");
         assertNotNull(transformer);
         muleContext.dispose();
-        assertNoLifecycle(transformer);
+        assertInitialise(transformer);
     }
 
     @Test
@@ -86,9 +86,9 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
         assertEquals("[setProperty, initialise, dispose]", transformer.getTracker().toString());
     }
 
-    private void assertNoLifecycle(TransformerLifecycleTracker transformer)
+    private void assertInitialise(TransformerLifecycleTracker transformer)
     {
-        assertEquals("[setProperty]", transformer.getTracker().toString());
+        assertEquals("[setProperty, initialise]", transformer.getTracker().toString());
     }
 
     public static class TransformerLifecycleTracker extends AbstractTransformer implements Disposable

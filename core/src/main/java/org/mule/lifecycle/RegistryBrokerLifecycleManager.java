@@ -15,12 +15,17 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.Registry;
+import org.mule.api.registry.RegistryBroker;
 import org.mule.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.registry.AbstractRegistryBroker;
 
+/**
+ * @deprecated as of 3.7.0 since {@link RegistryBroker} also is
+ */
+@Deprecated
 public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager
 {
 
@@ -32,13 +37,12 @@ public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager
     @Override
     protected void registerPhases()
     {
-        RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
-        registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(),
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
+        LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
+        registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), emptyCallback);
         registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
         registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
-        registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(),
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), emptyCallback);
     }
 
     public void fireInitialisePhase(LifecycleCallback<AbstractRegistryBroker> callback)

@@ -11,10 +11,10 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
-import org.mule.api.registry.Registry;
 import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -38,7 +38,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected boolean useDefaultConfigResource = true;
     protected boolean useMinimalConfigResource = false;
 
-    protected Registry registry;
+    protected SpringRegistry registry;
 
     protected ApplicationContext domainContext;
     protected ApplicationContext parentContext;
@@ -95,7 +95,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         registry.dispose();
         if (muleContext != null)
         {
-        	muleContext.removeRegistry(registry);
+            muleContext.removeRegistry(registry);
         }
         registry = null;
         configured = false;
@@ -108,7 +108,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
 
     protected void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext)
-        throws Exception
+            throws Exception
     {
         if (parentContext != null && domainContext != null)
         {
@@ -132,6 +132,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // some beans may try to look up other beans via the Registry during
         // preInstantiateSingletons().
         muleContext.addRegistry(registry);
+
         registry.initialise();
     }
 

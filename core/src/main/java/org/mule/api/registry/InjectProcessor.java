@@ -8,7 +8,10 @@ package org.mule.api.registry;
 
 /**
  * An object processor that will get called during the inject phase
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
+@Deprecated
 public interface InjectProcessor extends ObjectProcessor
 {
 

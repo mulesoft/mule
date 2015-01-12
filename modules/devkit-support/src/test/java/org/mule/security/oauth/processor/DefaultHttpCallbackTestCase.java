@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.config.DefaultMuleConfiguration;
+import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.security.oauth.DefaultHttpCallback;
@@ -108,13 +108,7 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     @Test
     public void withNewHttpConnector() throws Exception
     {
-        DefaultHttpListenerConfig config = new DefaultHttpListenerConfig();
-        config.setPort(localPort.getNumber());
-        config.setHost("localhost");
-        config.setMuleContext(muleContext);
-        config.initialise();
-        config.start();
-
+        HttpListenerConfig config = createListenerConfig();
         callback = createCallback(config);
         sendCallbackRequest();
     }
@@ -129,15 +123,23 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     @Test
     public void withNewHttpConnectorByDefault() throws Exception
     {
+        createListenerConfig();
+
+        callback = createCallback(null);
+        sendCallbackRequest();
+    }
+
+    private HttpListenerConfig createListenerConfig() throws MuleException
+    {
         DefaultHttpListenerConfig listenerConfig = new DefaultHttpListenerConfig();
         listenerConfig.setPort(localPort.getNumber());
         listenerConfig.setHost("localhost");
         listenerConfig.setMuleContext(muleContext);
         muleContext.getRegistry().registerObject("callbackConfig", listenerConfig);
+
         listenerConfig.start();
 
-        callback = createCallback(null);
-        sendCallbackRequest();
+        return listenerConfig;
     }
 
     @Test

@@ -30,7 +30,7 @@ public class SubFlowTestCase extends FunctionalTestCase
         MuleMessage result = client.send("vm://ProcessorChainViaProcessorRef", "", null);
         assertEquals("1xyz2", result.getPayloadAsString());
 
-        assertEquals("[setMuleContext, initialise, setService, setMuleContext, initialise, start]",
+        assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
             result.getInboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
         assertEquals(muleContext.getRegistry().lookupFlowConstruct("ProcessorChainViaProcessorRef"),
             result.getInboundProperty(LifecycleTrackerProcessor.FLOW_CONSRUCT_PROPERTY));
@@ -44,7 +44,7 @@ public class SubFlowTestCase extends FunctionalTestCase
 
         assertEquals("1xyz2", result.getPayloadAsString());
 
-        assertEquals("[setMuleContext, initialise, setService, setMuleContext, initialise, start]",
+        assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
             result.getInboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
         assertEquals(muleContext.getRegistry().lookupFlowConstruct("ProcessorChainViaFlowRef"),
             result.getInboundProperty(LifecycleTrackerProcessor.FLOW_CONSRUCT_PROPERTY));
@@ -57,7 +57,7 @@ public class SubFlowTestCase extends FunctionalTestCase
         MuleMessage result = client.send("vm://SubFlowViaProcessorRef", "", null);
         assertEquals("1xyz2", result.getPayloadAsString());
 
-        assertEquals("[setMuleContext, initialise, setService, setMuleContext, initialise, start]",
+        assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
             result.getInboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
         assertEquals(muleContext.getRegistry().lookupFlowConstruct("SubFlowViaProcessorRef"),
             result.getInboundProperty(LifecycleTrackerProcessor.FLOW_CONSRUCT_PROPERTY));
@@ -71,7 +71,7 @@ public class SubFlowTestCase extends FunctionalTestCase
 
         assertEquals("1xyz2", result.getPayloadAsString());
 
-        assertEquals("[setMuleContext, initialise, setService, setMuleContext, initialise, start]",
+        assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
             result.getInboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
         assertEquals(muleContext.getRegistry().lookupFlowConstruct("SubFlowViaFlowRef"),
             result.getInboundProperty(LifecycleTrackerProcessor.FLOW_CONSRUCT_PROPERTY));

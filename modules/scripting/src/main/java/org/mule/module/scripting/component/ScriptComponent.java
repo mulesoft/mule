@@ -10,6 +10,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.InterfaceBinding;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.component.AbstractComponent;
 import org.mule.component.BindingInvocationHandler;
 import org.mule.util.ClassUtils;
@@ -23,12 +24,18 @@ import java.util.Map;
 
 import javax.script.Bindings;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A Script service backed by a JSR-223 compliant script engine such as
  * Groovy, JavaScript, or Rhino.
  */
 public class ScriptComponent extends AbstractComponent
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptComponent.class);
+
     protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
 
     private Scriptable script;
@@ -38,7 +45,7 @@ public class ScriptComponent extends AbstractComponent
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        script.setMuleContext(muleContext);
+        LifecycleUtils.initialiseIfNeeded(script, muleContext);
         super.doInitialise();
         try
         {
@@ -48,6 +55,12 @@ public class ScriptComponent extends AbstractComponent
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    @Override
+    protected void doDispose()
+    {
+        LifecycleUtils.disposeIfNeeded(script, LOGGER);
     }
 
     @Override

@@ -15,8 +15,12 @@ import org.mule.tck.probe.Prober;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractQuartzStatefulTestCase extends FunctionalTestCase
 {
+    private final static Logger LOGGER = LoggerFactory.getLogger(AbstractQuartzStatefulTestCase.class);
 
     protected void assertOnlyOneThreadWaiting(final List<String> messages, CountDownLatch latch)
     {
@@ -41,7 +45,10 @@ public abstract class AbstractQuartzStatefulTestCase extends FunctionalTestCase
                 @Override
                 public String describeFailure()
                 {
-                    return "Did not receive the expected number of messages";
+                    final String msg = String.format("Was expecting more than %d messages but only got %d", count, messages.size());
+                    LOGGER.error(msg);
+
+                    return String.format(msg);
                 }
             });
 

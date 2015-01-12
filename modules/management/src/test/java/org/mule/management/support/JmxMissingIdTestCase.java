@@ -6,6 +6,8 @@
  */
 package org.mule.management.support;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.DefaultMuleConfiguration;
@@ -15,9 +17,6 @@ import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class JmxMissingIdTestCase extends AbstractMuleTestCase
 {

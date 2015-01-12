@@ -123,28 +123,6 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Test that the same bean from the TransientRegistry will have precedence over the 1st appContext
-     */
-    @Test
-    public void testTransientRegistryPrecedence() throws Exception
-    {
-        context = new DefaultMuleContextFactory().createMuleContext();
-
-        context.getRegistry().registerObject("orange", new Orange(12, 5.5, "Tutti Frutti"));
-
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
-        ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(context);
-
-        context.start();
-
-        Object orange = context.getRegistry().lookupObject("orange");
-        assertNotNull(orange);
-        assertTrue(orange instanceof Orange);
-        assertEquals("Tutti Frutti", ((Orange) orange).getBrand());
-    }
-
-    /**
      * Test that an existing appContext can be used as a parent AppContext for Mule
      */
     @Test

@@ -596,17 +596,23 @@ public final class MuleTestUtils
     }
 
     @Deprecated
-    public static Service getTestService(String name,
+    public static synchronized Service getTestService(String name,
                                          Class<?> clazz,
                                          Map props,
                                          MuleContext context,
                                          boolean initialize) throws Exception
     {
+        Service service = context.getRegistry().get(name);
+        if (service != null)
+        {
+            return service;
+        }
+
         final SedaModel model = new SedaModel();
         model.setMuleContext(context);
         context.getRegistry().applyLifecycle(model);
 
-        final Service service = new SedaService(context);
+        service = new SedaService(context);
         service.setName(name);
         final SingletonObjectFactory of = new SingletonObjectFactory(clazz, props);
         of.initialise();

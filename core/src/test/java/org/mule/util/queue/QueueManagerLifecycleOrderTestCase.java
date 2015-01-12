@@ -8,7 +8,6 @@ package org.mule.util.queue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -19,7 +18,6 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.security.MuleSecurityManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.util.ArrayList;
 import java.util.List;

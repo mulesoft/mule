@@ -6,11 +6,13 @@
  */
 package org.mule.endpoint;
 
+import static org.mule.util.ObjectNameHelper.getEndpointNameFor;
 import org.mule.MessageExchangePattern;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.NamedObject;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
@@ -23,6 +25,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.CloneableMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -105,6 +108,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     // not included in equality/hash
     protected String registryId = null;
     protected MuleContext muleContext;
+    protected ObjectNameHelper objectNameHelper;
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -196,7 +200,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
 
         checkInboundExchangePattern();
 
-        // Filters on inbound endpoints need to throw exceptions in case the reciever needs to reject the message 
+        // Filters on inbound endpoints need to throw exceptions in case the receiver needs to reject the message
         for (MessageProcessor mp :messageProcessors)
         {
             if (mp instanceof MessageFilter)
@@ -297,22 +301,51 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     }
 
     
-    protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI)
-        throws TransportFactoryException
+    protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
     {
         List<MessageProcessor> tempProcessors = new LinkedList<MessageProcessor>(messageProcessors);
         tempProcessors.addAll(getTransformersFromUri(endpointURI));
         tempProcessors.addAll(transformers);
+
+        registerMessageProcessors(endpointURI, tempProcessors);
+
         return tempProcessors;
     }
 
-    protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI)
-        throws TransportFactoryException
+    private void registerMessageProcessors(EndpointURI endpointURI, List<MessageProcessor> tempProcessors) throws TransportFactoryException
+    {
+        for (MessageProcessor messageProcessor : tempProcessors)
+        {
+            registerMessageProcessor(messageProcessor, endpointURI);
+        }
+    }
+
+    private void registerMessageProcessor(MessageProcessor messageProcessor, EndpointURI uri) throws TransportFactoryException {
+        try
+        {
+            registerComponent(messageProcessor, uri);
+        }
+        catch (RegistrationException e)
+        {
+            throw new TransportFactoryException(e);
+        }
+    }
+
+    private void registerComponent(Object component, EndpointURI uri) throws RegistrationException
+    {
+        String name = component instanceof NamedObject ? ((NamedObject) component).getName() + "-" : "";
+        name += objectNameHelper.getUniqueName(getEndpointNameFor(uri));
+        muleContext.getRegistry().registerObject(name, component);
+    }
+
+    protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
     {
         List<MessageProcessor> tempResponseProcessors = new LinkedList<MessageProcessor>(
             responseMessageProcessors);
         tempResponseProcessors.addAll(getResponseTransformersFromUri(endpointURI));
         tempResponseProcessors.addAll(responseTransformers);
+
+        registerMessageProcessors(endpointURI, tempResponseProcessors);
         return tempResponseProcessors;
     }
 
@@ -846,6 +879,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        objectNameHelper = new ObjectNameHelper(muleContext);
     }
 
     public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)

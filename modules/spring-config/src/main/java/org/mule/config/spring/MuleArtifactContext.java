@@ -6,19 +6,40 @@
  */
 package org.mule.config.spring;
 
+import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+import static org.springframework.context.annotation.AnnotationConfigUtils.COMMON_ANNOTATION_PROCESSOR_BEAN_NAME;
+import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
+import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
 import org.mule.config.ConfigResource;
+import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor;
+import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
+import org.mule.config.spring.processors.FilteringCommonAnnotationBeanPostProcessor;
+import org.mule.config.spring.processors.LifecycleStatePostProcessor;
+import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
+import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -28,13 +49,13 @@ import org.springframework.core.io.UrlResource;
  * <code>MuleArtifactContext</code> is a simple extension application context
  * that allows resources to be loaded from the Classpath of file system using the
  * MuleBeanDefinitionReader.
- *
  */
 public class MuleArtifactContext extends AbstractXmlApplicationContext
 {
     private MuleContext muleContext;
     private Resource[] springResources;
     private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<MuleContext>();
+
     /**
      * Parses configuration files creating a spring ApplicationContext which is used
      * as a parent registry using the SpringRegistry registry implementation to wraps
@@ -58,10 +79,35 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory)
     {
         super.prepareBeanFactory(beanFactory);
-        beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
-        beanFactory.addBeanPostProcessor(new ExpressionEvaluatorPostProcessor(muleContext));
-        beanFactory.addBeanPostProcessor(new GlobalNamePostProcessor());
-        beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
+
+        registerEditors(beanFactory);
+
+        addBeanPostProcessors(beanFactory,
+                              new MuleContextPostProcessor(muleContext),
+                              new ExpressionEvaluatorPostProcessor(muleContext),
+                              new GlobalNamePostProcessor(),
+                              new ExpressionEnricherPostProcessor(muleContext),
+                              new AnnotatedTransformerObjectPostProcessor(muleContext),
+                              new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
+                              new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
+        );
+
+        beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
+    }
+
+    private void registerEditors(ConfigurableListableBeanFactory beanFactory)
+    {
+        MulePropertyEditorRegistrar registrar = new MulePropertyEditorRegistrar();
+        registrar.setMuleContext(muleContext);
+        beanFactory.addPropertyEditorRegistrar(registrar);
+    }
+
+    private void addBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, BeanPostProcessor... processors)
+    {
+        for (BeanPostProcessor processor : processors)
+        {
+            beanFactory.addBeanPostProcessor(processor);
+        }
     }
 
     private static Resource[] convert(ConfigResource[] resources)
@@ -70,7 +116,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         for (int i = 0; i < resources.length; i++)
         {
             ConfigResource resource = resources[i];
-            if(resource.getUrl()!=null)
+            if (resource.getUrl() != null)
             {
                 configResources[i] = new UrlResource(resource.getUrl());
             }
@@ -98,7 +144,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
         BeanDefinitionReader beanDefinitionReader = createBeanDefinitionReader(beanFactory);
-
         // Communicate mule context to parsers
         try
         {
@@ -118,8 +163,41 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         beanDefinitionReader.setDocumentReaderClass(getBeanDefinitionDocumentReaderClass());
         //add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
+        registerAnnotationConfigProcessors(beanDefinitionReader.getRegistry(), null);
 
         return beanDefinitionReader;
+    }
+
+    private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)
+    {
+        registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME, ConfigurationClassPostProcessor.class, source);
+        registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, AutowiredAnnotationBeanPostProcessor.class, source);
+        registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME, RequiredAnnotationBeanPostProcessor.class, source);
+        registerJsr250PostProcessors(registry, source);
+    }
+
+    private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source) {
+        RootBeanDefinition beanDefinition = new RootBeanDefinition(type);
+        beanDefinition.setSource(source);
+        registerPostProcessor(registry, beanDefinition, key);
+    }
+
+    private void registerJsr250PostProcessors(BeanDefinitionRegistry registry, Object source)
+    {
+        RootBeanDefinition def = new RootBeanDefinition(FilteringCommonAnnotationBeanPostProcessor.class);
+        ConstructorArgumentValues arguments = new ConstructorArgumentValues();
+        Set<String> filteredPackages = new HashSet<>();
+        filteredPackages.add("org.apache.cxf");
+        arguments.addGenericArgumentValue(filteredPackages);
+        def.setConstructorArgumentValues(arguments);
+        def.setSource(source);
+        registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME);
+    }
+
+    private void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName)
+    {
+        definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+        registry.registerBeanDefinition(beanName, definition);
     }
 
     protected Class<? extends MuleBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass()
@@ -135,7 +213,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         if (getParent() != null)
         {
             //Copy over all processors
-            AbstractBeanFactory beanFactory = (AbstractBeanFactory)getParent().getAutowireCapableBeanFactory();
+            AbstractBeanFactory beanFactory = (AbstractBeanFactory) getParent().getAutowireCapableBeanFactory();
             bf.copyConfigurationFrom(beanFactory);
         }
         return bf;
