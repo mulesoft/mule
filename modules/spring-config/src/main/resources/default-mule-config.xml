@@ -9,7 +9,7 @@
 
     <model name="_muleSystemModel"/>
 
-    <spring:beans default-init-method="initialise">
+    <spring:beans>
         <!-- Marker for MULE-4813-->
 
         <spring:bean name="_muleAnnotationsProcessor" class="org.mule.config.spring.processors.DecoratingFlowAnnotationsBeanProcessor"/>

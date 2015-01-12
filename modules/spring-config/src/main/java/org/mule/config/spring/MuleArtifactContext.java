@@ -9,11 +9,15 @@ package org.mule.config.spring;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.ConfigResource;
+import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
+import org.mule.config.spring.processors.LifecyclePostProcessor;
+import org.mule.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
@@ -58,10 +62,25 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory)
     {
         super.prepareBeanFactory(beanFactory);
-        beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
-        beanFactory.addBeanPostProcessor(new ExpressionEvaluatorPostProcessor(muleContext));
-        beanFactory.addBeanPostProcessor(new GlobalNamePostProcessor());
+
+        addBeanPostProcessors(beanFactory,
+                              new MuleContextPostProcessor(muleContext),
+                              new ExpressionEvaluatorPostProcessor(muleContext),
+                              new GlobalNamePostProcessor(),
+                              new ExpressionEnricherPostProcessor(muleContext),
+                              new ExpressionEvaluatorPostProcessor(muleContext),
+                              new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
+                              new LifecyclePostProcessor());
+
         beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
+    }
+
+    private void addBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, BeanPostProcessor... processors)
+    {
+        for (BeanPostProcessor processor : processors)
+        {
+            beanFactory.addBeanPostProcessor(processor);
+        }
     }
 
     private static Resource[] convert(ConfigResource[] resources)

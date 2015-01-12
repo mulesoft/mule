@@ -13,6 +13,7 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.registry.Registry;
 import org.mule.config.ConfigResource;
+import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
 import org.springframework.context.ApplicationContext;
@@ -132,6 +133,10 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // some beans may try to look up other beans via the Registry during
         // preInstantiateSingletons().
         muleContext.addRegistry(registry);
+
+        SimpleRegistryBootstrap bootstrap = new SimpleRegistryBootstrap();
+        bootstrap.setMuleContext(muleContext);
+        //bootstrap.initialise();
         registry.initialise();
     }
 
