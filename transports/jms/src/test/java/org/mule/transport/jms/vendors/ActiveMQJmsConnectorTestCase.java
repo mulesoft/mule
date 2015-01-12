@@ -27,6 +27,10 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 
 public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 {
+
+    private static String USERNAME = "username";
+    private static String PASSWORD = "password";
+
     @Override
     protected String getConfigFile()
     {
@@ -105,4 +109,23 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
+
+    /**
+     * See MULE-8221
+     */
+    @Test
+    public void testActiveMqConnectorWithUsernameAndPassword() throws Exception
+    {
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnectorWithUsernameAndPassword");
+
+        assertTrue(c instanceof ActiveMQJmsConnector);
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+
+        assertEquals(USERNAME, c.getUsername());
+        assertEquals(PASSWORD, c.getPassword());
+        assertTrue(c.isCacheJmsSessions());
+        assertEquals("1.1", c.getSpecification());
+    }
+
 }
