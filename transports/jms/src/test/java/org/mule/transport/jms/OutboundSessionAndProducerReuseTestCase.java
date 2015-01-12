@@ -63,6 +63,9 @@ import org.springframework.jms.connection.SingleConnectionFactory;
 public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContextTestCase
 {
 
+    private static String USERNAME = "username";
+    private static String PASSWORD = "password";
+
     private JmsConnector connector;
     @Mock
     private ConnectionFactory connectionFactory;
@@ -70,7 +73,6 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     private Connection connection;
     @Mock
     private Queue queue;
-
 
     private ExceptionListener connectionExceptionListener;
     private String connectionClientId;
@@ -84,6 +86,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
         super.doSetUp();
 
         when(connectionFactory.createConnection()).thenReturn(connection);
+        when(connectionFactory.createConnection(anyString(), anyString())).thenReturn(connection);
         setupMockSession();
 
         connector = new JmsConnector(muleContext);
@@ -342,5 +345,30 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
         verify(connection, times(1)).createSession(anyBoolean(), anyInt());
 
         assertTrue(messageSentLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void usernamePasswordConfiguredViaCachingConnectionFactory() throws Exception
+    {
+        Jms11Support jms11Support = mock(Jms11Support.class);
+        connector.setJmsSupport(jms11Support);
+        connector.setUsername(USERNAME);
+        connector.setPassword(PASSWORD);
+        connector.initialise();
+        connector.connect();
+        verify(jms11Support, times(1)).createConnection(connector.getConnectionFactory());
+    }
+
+    @Test
+    public void usernamePasswordNoCaching() throws Exception
+    {
+        Jms11Support jms11Support = mock(Jms11Support.class);
+        connector.setJmsSupport(jms11Support);
+        connector.setCacheJmsSessions(false);
+        connector.setUsername(USERNAME);
+        connector.setPassword(PASSWORD);
+        connector.initialise();
+        connector.connect();
+        verify(jms11Support, times(1)).createConnection(connectionFactory, USERNAME, PASSWORD);
     }
 }
