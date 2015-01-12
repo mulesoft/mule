@@ -211,6 +211,7 @@
         <junitVersion>4.11</junitVersion>
         <log4jVersion>2.1</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
+        <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
         <mockitoVersion>1.9.5</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
@@ -1729,6 +1730,25 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>${maven.buildnumber.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
+                    <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
+                    <shortRevisionLength>8</shortRevisionLength>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
@@ -2021,14 +2041,6 @@
         <!-- C.I. staged build profiles -->
         <profile>
             <id>compile</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>buildnumber-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>true</skipDistributions>
@@ -2151,26 +2163,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>buildnumber-maven-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>create</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- never touch vcs -->
-                            <doCheck>false</doCheck>
-                            <doUpdate>false</doUpdate>
-                            <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
-                            <shortRevisionLength>8</shortRevisionLength>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
