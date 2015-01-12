@@ -6,8 +6,8 @@
  */
 package org.mule.api.annotations;
 
-import org.mule.api.annotations.meta.Channel;
-import org.mule.api.annotations.meta.ChannelType;
+import org.mule.annotations.api.annotations.meta.Channel;
+import org.mule.annotations.api.annotations.meta.ChannelType;
 import org.mule.transport.quartz.config.ScheduleConfigBuilder;
 
 import java.lang.annotation.Documented;

@@ -85,7 +85,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     /**
      * If the annotations module is on the classpath, also enable annotations config builder
      */
-    public static final String CLASSNAME_ANNOTATIONS_CONFIG_BUILDER = "org.mule.config.AnnotationsConfigurationBuilder";
+    public static final String CLASSNAME_ANNOTATIONS_CONFIG_BUILDER = "org.mule.annotations.config.AnnotationsConfigurationBuilder";
 
     /**
      * The context used to run this test. Context will be created per class

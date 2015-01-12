@@ -49,7 +49,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         super.doSetUp();
         muleMessage  = createMessage(null, null);
         //These should really be in core, but the @Transformer annotation is not in core
-        muleContext.getRegistry().registerObject("dataHandlerTransformers", new DataHandlerTransformer());
+        muleContext.getRegistry().registerObject("dataHandlerTransformers", new org.mule.annotations.annotations.param.DataHandlerTransformer());
     }
 
     protected MuleMessage createMessage(Map<String, Object> headers, Map<String, DataHandler> attachments) throws Exception

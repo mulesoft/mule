@@ -7,8 +7,8 @@
 package org.mule.module.json.config;
 
 import org.mule.api.annotations.expression.JsonPath;
-import org.mule.api.annotations.meta.Evaluator;
-import org.mule.api.expression.ExpressionAnnotationParser;
+import org.mule.annotations.api.annotations.meta.Evaluator;
+import org.mule.annotations.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 

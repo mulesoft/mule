@@ -12,7 +12,7 @@
 
     <flow name="attachments1">
         <inbound-endpoint address="vm://attachment?method=processAttachments" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.OutboundAttachmentsAnnotationComponent"/>
     </flow>
 
     <flow name="attachments2">
@@ -24,12 +24,12 @@
                 </scripting:script>
             </scripting:transformer>
         </inbound-endpoint>
-        <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.OutboundAttachmentsAnnotationComponent"/>
     </flow>
 
     <flow name="attachments3">
         <inbound-endpoint address="vm://invalid?method=invalidParamType" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.OutboundAttachmentsAnnotationComponent"/>
     </flow>
 
 </mule>

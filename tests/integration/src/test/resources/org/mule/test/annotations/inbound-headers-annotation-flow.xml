@@ -10,128 +10,128 @@
 
     <flow name="headers1">
         <inbound-endpoint address="vm://header?method=processHeader" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers2">
         <inbound-endpoint address="vm://headers?method=processHeaders" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers3">
         <inbound-endpoint address="vm://headersOptional?method=processHeadersOptional"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers4">
         <inbound-endpoint address="vm://headersUnmodifiable?method=processUnmodifiableHeaders"
                           exchange-pattern="request-response"/>
-         <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+         <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers5">
         <inbound-endpoint address="vm://singleHeaderMap?method=processSingleMapHeader"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers6">
         <inbound-endpoint address="vm://headersList?method=processHeadersList" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers7">
         <inbound-endpoint address="vm://headersListOptional?method=processHeadersListOptional"
                           exchange-pattern="request-response"/>
-         <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+         <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers8">
          <inbound-endpoint address="vm://headersListUnmodifiable?method=processUnmodifiableHeadersList"
                            exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers9">
         <inbound-endpoint address="vm://singleHeaderList?method=processSingleHeaderList"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers10">
         <inbound-endpoint address="vm://headersAll?method=processHeadersAll" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers11">
         <inbound-endpoint address="vm://headersListAll?method=processHeadersListAll" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers12">
         <inbound-endpoint address="vm://headersWildcard?method=processHeadersWildcard"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers13">
         <inbound-endpoint address="vm://headersListWildcard?method=processHeadersListWildcard"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers14">
         <inbound-endpoint address="vm://headersMultiWildcard?method=processHeadersMultiWildcard"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers15">
         <inbound-endpoint address="vm://headersListMultiWildcard?method=processHeadersListMultiWildcard"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers16">
         <inbound-endpoint address="vm://headersWithGenerics?method=processHeadersWithGenerics"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers17">
 
         <inbound-endpoint address="vm://headersListWithGenerics?method=processHeadersListWithGenerics"
                           exchange-pattern="request-response"/>
-         <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+         <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers18">
         <inbound-endpoint address="vm://headerWithType?method=processHeaderWithType" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers19">
         <inbound-endpoint address="vm://headerWithBaseType?method=processHeaderWithBaseType"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers20">
         <inbound-endpoint address="vm://headerOptional?method=processHeaderOptional" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers21">
         <inbound-endpoint address="vm://headersAllOptional?method=processHeadersAllOptional"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers22">
         <inbound-endpoint address="vm://headersListAllOptional?method=processHeadersListAllOptional"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.InboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.InboundHeadersAnnotationComponent"/>
     </flow>
 
 </mule>

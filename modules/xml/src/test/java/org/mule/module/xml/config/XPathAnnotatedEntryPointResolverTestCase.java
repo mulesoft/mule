@@ -11,7 +11,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.model.InvocationResult;
 import org.mule.api.transport.PropertyScope;
-import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
+import org.mule.annotations.resolvers.AnnotatedEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;

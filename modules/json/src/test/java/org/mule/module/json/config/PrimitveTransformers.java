@@ -6,8 +6,8 @@
  */
 package org.mule.module.json.config;
 
-import org.mule.api.annotations.ContainsTransformerMethods;
-import org.mule.api.annotations.Transformer;
+import org.mule.annotations.api.annotations.ContainsTransformerMethods;
+import org.mule.annotations.api.annotations.Transformer;
 
 /**
  * Provides transformer for converting from primitive class types and Strings.

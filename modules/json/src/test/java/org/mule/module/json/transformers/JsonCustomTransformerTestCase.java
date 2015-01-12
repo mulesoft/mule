@@ -9,10 +9,10 @@ package org.mule.module.json.transformers;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.annotations.ContainsTransformerMethods;
+import org.mule.annotations.api.annotations.ContainsTransformerMethods;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
-import org.mule.config.transformer.AnnotatedTransformerProxy;
+import org.mule.annotations.config.transformer.AnnotatedTransformerProxy;
 import org.mule.json.model.EmailAddress;
 import org.mule.json.model.Item;
 import org.mule.json.model.Person;
@@ -148,7 +148,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
 
         public static final String RESULT = "I am a league";
 
-        @org.mule.api.annotations.Transformer
+        @org.mule.annotations.api.annotations.Transformer
         public String convert(League payload)
         {
             return RESULT;

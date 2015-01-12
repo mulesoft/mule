@@ -10,13 +10,13 @@
 
     <flow name="mixed1">
         <inbound-endpoint address="vm://allAnnotated?method=processAllAnnotated" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
+        <component class="org.mule.annotations.annotations.param.MixedAnnotationsComponent"/>
     </flow>
 
     <flow name="mixed2">
         <inbound-endpoint address="vm://someAnnotated?method=processPayloadNotAnnotated"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
+        <component class="org.mule.annotations.annotations.param.MixedAnnotationsComponent"/>
     </flow>
 
 </mule>

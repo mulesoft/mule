@@ -7,8 +7,8 @@
 package org.mule.module.json.transformers;
 
 
-import org.mule.api.annotations.ContainsTransformerMethods;
-import org.mule.api.annotations.Transformer;
+import org.mule.annotations.api.annotations.ContainsTransformerMethods;
+import org.mule.annotations.api.annotations.Transformer;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import org.codehaus.jackson.map.ObjectMapper;
