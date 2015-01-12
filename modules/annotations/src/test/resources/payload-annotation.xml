@@ -10,19 +10,19 @@
 
     <flow name="payload1">
         <inbound-endpoint address="vm://payload1?method=processNoTransformString" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.PayloadAnnotationComponent"/>
     </flow>
 
     <flow name="payload2">
         <inbound-endpoint address="vm://payload2?method=processAutoTransformString"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.PayloadAnnotationComponent"/>
     </flow>
 
     <flow name="payload3">
         <inbound-endpoint address="vm://payload3?method=processFailedAutoTransformString"
                           exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.PayloadAnnotationComponent"/>
     </flow>
 
 </mule>

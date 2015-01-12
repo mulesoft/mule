@@ -19,7 +19,7 @@
             exchange-pattern="request-response" />
 
         <component
-            class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent" />
+            class="org.mule.annotations.annotations.param.OutboundHeadersAnnotationComponent" />
     </flow>
 
     <flow name="headers2">
@@ -34,7 +34,7 @@
         </inbound-endpoint>
 
         <component
-            class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent" />
+            class="org.mule.annotations.annotations.param.OutboundHeadersAnnotationComponent" />
     </flow>
 
     <flow name="headers3">
@@ -43,7 +43,7 @@
             exchange-pattern="request-response" />
 
         <component
-            class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent" />
+            class="org.mule.annotations.annotations.param.OutboundHeadersAnnotationComponent" />
     </flow>
 
 

@@ -79,7 +79,7 @@ public class MuleServer implements Runnable
     /**
      * If the annotations module is on the classpath, also enable annotations config builder
      */
-    public static final String CLASSNAME_ANNOTATIONS_CONFIG_BUILDER = "org.mule.config.AnnotationsConfigurationBuilder";
+    public static final String CLASSNAME_ANNOTATIONS_CONFIG_BUILDER = "org.mule.annotations.config.AnnotationsConfigurationBuilder";
 
     /**
      * logger used by this class

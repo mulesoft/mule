@@ -6,7 +6,7 @@
  */
 package org.mule.module.atom.event;
 
-import org.mule.api.annotations.param.Payload;
+import org.mule.annotations.api.annotations.param.Payload;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

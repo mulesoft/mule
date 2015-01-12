@@ -10,7 +10,7 @@
 
     <flow name="headers1">
         <inbound-endpoint address="vm://header?method=processHeaders" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.OutboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers2">
@@ -19,12 +19,12 @@
                 <add-message-property key="foo" value="changeme"/>
             </message-properties-transformer>
         </inbound-endpoint>
-        <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.OutboundHeadersAnnotationComponent"/>
     </flow>
 
     <flow name="headers3">
         <inbound-endpoint address="vm://invalid?method=invalidParamType" exchange-pattern="request-response"/>
-        <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
+        <component class="org.mule.annotations.annotations.param.OutboundHeadersAnnotationComponent"/>
     </flow>
 
 </mule>

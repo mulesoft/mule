@@ -6,10 +6,10 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.annotations.ContainsTransformerMethods;
-import org.mule.api.annotations.Transformer;
-import org.mule.api.annotations.param.InboundHeaders;
-import org.mule.api.annotations.param.Payload;
+import org.mule.annotations.api.annotations.ContainsTransformerMethods;
+import org.mule.annotations.api.annotations.Transformer;
+import org.mule.annotations.api.annotations.param.InboundHeaders;
+import org.mule.annotations.api.annotations.param.Payload;
 import org.mule.json.model.EmailAddress;
 import org.mule.json.model.Item;
 import org.mule.json.model.Person;

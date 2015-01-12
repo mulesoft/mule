@@ -16,7 +16,7 @@
             exchange-pattern="request-response" />
 
         <component
-            class="org.mule.api.annotations.param.PayloadAnnotationComponent" />
+            class="org.mule.annotations.annotations.param.PayloadAnnotationComponent" />
     </flow>
 
     <flow name="payload2">
@@ -26,7 +26,7 @@
             exchange-pattern="request-response" />
 
         <component
-            class="org.mule.api.annotations.param.PayloadAnnotationComponent" />
+            class="org.mule.annotations.annotations.param.PayloadAnnotationComponent" />
     </flow>
 
     <flow name="payload3">
@@ -36,7 +36,7 @@
             exchange-pattern="request-response" />
 
         <component
-            class="org.mule.api.annotations.param.PayloadAnnotationComponent" />
+            class="org.mule.annotations.annotations.param.PayloadAnnotationComponent" />
     </flow>
 
 

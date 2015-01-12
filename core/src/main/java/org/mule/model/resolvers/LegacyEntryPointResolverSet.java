@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
 {
-    private static final String ANNOTATED_ENTRYPOINT_RESOLVER_CLASS = "org.mule.impl.model.resolvers.AnnotatedEntryPointResolver";
+    private static final String ANNOTATED_ENTRYPOINT_RESOLVER_CLASS = "org.mule.annotations.resolvers.AnnotatedEntryPointResolver";
     private static final Log logger = LogFactory.getLog(LegacyEntryPointResolverSet.class);
 
     public LegacyEntryPointResolverSet()
