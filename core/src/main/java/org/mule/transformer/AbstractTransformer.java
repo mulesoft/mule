@@ -384,7 +384,8 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
 
     public final Object transform(Object src) throws TransformerException
     {
-        return transform(src, getEncoding(src));
+        String enc = encoding != null ? encoding : getEncoding(src);
+        return transform(src, enc);
     }
 
     public Object transform(Object src, String enc) throws TransformerException
