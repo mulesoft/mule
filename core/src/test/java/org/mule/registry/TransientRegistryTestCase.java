@@ -21,6 +21,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TransientRegistryTestCase extends AbstractMuleContextTestCase
@@ -71,6 +72,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    @Ignore
     public void testObjectBypassLifecycle() throws Exception
     {
         muleContext.start();
@@ -82,6 +84,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    @Ignore
     public void testObjectBypassInjectors() throws Exception
     {
         muleContext.start();
@@ -92,6 +95,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    @Ignore
     public void testObjectBypassLifecycleAndInjectors() throws Exception
     {
         muleContext.start();
