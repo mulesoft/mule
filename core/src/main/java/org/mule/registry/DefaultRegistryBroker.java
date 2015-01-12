@@ -21,8 +21,8 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
     public DefaultRegistryBroker(MuleContext context)
     {
         super(context);
-        transientRegistry = new TransientRegistry(context);
-        registries.add(0, transientRegistry);
+        //transientRegistry = new TransientRegistry(context);
+        //registries.add(0, transientRegistry);
     }
 
     TransientRegistry getTransientRegistry()
@@ -32,7 +32,8 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
 
     public void addRegistry(Registry registry)
     {
-        registries.add(1, registry);
+        //registries.add(1, registry);
+        registries.add(registry);
     }
 
     public void removeRegistry(Registry registry)

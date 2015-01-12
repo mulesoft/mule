@@ -247,6 +247,7 @@ public class TransientRegistry extends AbstractRegistry
             }
         }
         return theObject;
+
     }
 
     /**
@@ -312,7 +313,8 @@ public class TransientRegistry extends AbstractRegistry
 
     protected boolean hasFlag(Object metaData, int flag)
     {
-        return !(metaData == null || !(metaData instanceof Integer)) && ((Integer) metaData & flag) != 0;
+        //return !(metaData == null || !(metaData instanceof Integer)) && ((Integer) metaData & flag) != 0;
+        return false;
     }
 
     /**

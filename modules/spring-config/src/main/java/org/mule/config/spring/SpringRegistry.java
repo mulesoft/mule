@@ -37,45 +37,43 @@ public class SpringRegistry extends AbstractRegistry
     public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
 
     protected ApplicationContext applicationContext;
+    private boolean readOnly;
 
     //This is used to track the Spring context lifecycle since there is no way to confirm the
     //lifecycle phase from the application context
     protected AtomicBoolean springContextInitialised = new AtomicBoolean(false);
 
-    public SpringRegistry(MuleContext muleContext)
-    {
-        super(REGISTRY_ID, muleContext);
-    }
-
-    public SpringRegistry(String id, MuleContext muleContext)
-    {
-        super(id, muleContext);
-    }
-
     public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext)
     {
         super(REGISTRY_ID, muleContext);
-        this.applicationContext = applicationContext;
+        setApplicationContext(applicationContext);
     }
 
     public SpringRegistry(String id, ApplicationContext applicationContext, MuleContext muleContext)
     {
         super(id, muleContext);
         this.applicationContext = applicationContext;
+        readOnly = applicationContext instanceof ConfigurableApplicationContext;
     }
 
     public SpringRegistry(ConfigurableApplicationContext applicationContext, ApplicationContext parentContext, MuleContext muleContext)
     {
         super(REGISTRY_ID, muleContext);
         applicationContext.setParent(parentContext);
-        this.applicationContext = applicationContext;
+        setApplicationContext(applicationContext);
     }
 
     public SpringRegistry(String id, ConfigurableApplicationContext applicationContext, ApplicationContext parentContext, MuleContext muleContext)
     {
         super(id, muleContext);
         applicationContext.setParent(parentContext);
+        setApplicationContext(applicationContext);
+    }
+
+    private void setApplicationContext(ApplicationContext applicationContext)
+    {
         this.applicationContext = applicationContext;
+        readOnly = applicationContext instanceof ConfigurableApplicationContext;
     }
 
     @Override
@@ -83,7 +81,7 @@ public class SpringRegistry extends AbstractRegistry
     {
         if (applicationContext instanceof ConfigurableApplicationContext)
         {
-                ((ConfigurableApplicationContext) applicationContext).refresh();
+            ((ConfigurableApplicationContext) applicationContext).refresh();
         }
         //This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the application context
         springContextInitialised.set(true);
@@ -254,7 +252,7 @@ public class SpringRegistry extends AbstractRegistry
     @Override
     public boolean isReadOnly()
     {
-        return true;
+        return readOnly;
     }
 
     @Override
