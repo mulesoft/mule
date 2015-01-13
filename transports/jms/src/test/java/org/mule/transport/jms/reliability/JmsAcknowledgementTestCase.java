@@ -161,5 +161,6 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
         // Delivery failed so message should be back on the queue
         Message msg = readMessageFromQueue("sanity");
         assertNotNull(msg);
+        msg.acknowledge();
     }
 }

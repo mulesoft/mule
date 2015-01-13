@@ -31,7 +31,6 @@
         <module>extensions-support</module>
         <module>launcher</module>
         <module>client</module>
-        <module>guice</module>
         <module>http</module>
         <module>jaas</module>
         <module>jboss-transactions</module>
