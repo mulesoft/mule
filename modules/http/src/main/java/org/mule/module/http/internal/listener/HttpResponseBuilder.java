@@ -6,6 +6,11 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.module.http.api.requester.HttpStreamingType.ALWAYS;
+import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -51,7 +56,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     private String statusCode;
     private String reasonPhrase;
     private boolean disablePropertiesAsHeaders = false;
-    private HttpStreamingType responseStreaming = HttpStreamingType.AUTO;
+    private HttpStreamingType responseStreaming = AUTO;
     private boolean multipartEntityWithNoMultipartContentyTypeWarned;
     private boolean mapPayloadButNoUrlEncodedContentyTypeWarned;
     private AttributeEvaluator statusCodeEvaluator;
@@ -88,7 +93,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         ParameterMap resolvedHeaders = resolveParams(event, HttpParamType.HEADER);
         for (String name : resolvedHeaders.keySet())
         {
-            final Collection<String> paramValues = resolvedHeaders.getAsList(name);
+            final Collection<String> paramValues = resolvedHeaders.getAll(name);
             for (String value : paramValues)
             {
                 httpResponseHeaderBuilder.addHeader(name, value);
@@ -96,7 +101,8 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         }
 
         final String configuredContentType = httpResponseHeaderBuilder.getContentType();
-        final String configuredTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
+        final String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
+        final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
 
         HttpEntity httpEntity;
 
@@ -117,6 +123,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             final Object payload = event.getMessage().getPayload();
             if (payload == NullPayload.getInstance())
             {
+                setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
                 httpEntity = new EmptyHttpEntity();
             }
             else if (payload instanceof Map)
@@ -129,55 +136,42 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 {
                     warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
                 }
-                httpEntity = createUrlEncodedEntity(event, (Map<String, Object>) payload);
+                httpEntity = createUrlEncodedEntity(event, (Map) payload);
             }
             else if (payload instanceof InputStream)
             {
-                if (responseStreaming == HttpStreamingType.AUTO)
+                if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
                 {
-                    if (configuredTransferEncoding == null)
-                    {
-                        httpResponseHeaderBuilder.addHeader(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Values.CHUNKED);
-                    }
-                    httpResponseHeaderBuilder.removeHeader(HttpHeaders.Names.CONTENT_LENGTH);
+                    setupChunkedEncoding(httpResponseHeaderBuilder);
+                    httpEntity = new InputStreamHttpEntity((InputStream) payload);
                 }
-                httpEntity = new InputStreamHttpEntity((InputStream) payload);
+                else
+                {
+                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStream) payload)));
+                    setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                    httpEntity = byteArrayHttpEntity;
+                }
             }
             else
             {
                 try
                 {
-                    httpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
+                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
+                    if (responseStreaming == ALWAYS || (responseStreaming == AUTO && CHUNKED.equals(existingTransferEncoding)))
+                    {
+                        setupChunkedEncoding(httpResponseHeaderBuilder);
+                    }
+                    else
+                    {
+                        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                    }
+                    httpEntity = byteArrayHttpEntity;
                 }
                 catch (Exception e)
                 {
                     throw new RuntimeException(e);
                 }
             }
-        }
-
-        if (responseStreaming.equals(HttpStreamingType.ALWAYS))
-        {
-            if (httpResponseHeaderBuilder.getTransferEncoding() == null)
-            {
-                httpResponseHeaderBuilder.addHeader(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Values.CHUNKED);
-            }
-            httpResponseHeaderBuilder.removeHeader(HttpHeaders.Names.CONTENT_LENGTH);
-        }
-
-        if (httpResponseHeaderBuilder.getTransferEncoding() == null && httpResponseHeaderBuilder.getContentLength() == null)
-        {
-            int calculatedContentLenght = 0;
-            if (httpEntity instanceof ByteArrayHttpEntity)
-            {
-                calculatedContentLenght = ((ByteArrayHttpEntity) httpEntity).getContent().length;
-            }
-            else if (httpEntity instanceof InputStreamHttpEntity)
-            {
-                httpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStreamHttpEntity) httpEntity).getInputStream()));
-                calculatedContentLenght = ((ByteArrayHttpEntity)httpEntity).getContent().length;
-            }
-            httpResponseHeaderBuilder.addContentLenght(String.valueOf(calculatedContentLenght));
         }
 
         Collection<String> headerNames = httpResponseHeaderBuilder.getHeaderNames();
@@ -203,6 +197,26 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         return httpResponseBuilder.build();
     }
 
+    private void setupContentLengthEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, int contentLength)
+    {
+        if (httpResponseHeaderBuilder.getTransferEncoding() != null)
+        {
+            logger.debug("Content-Length encoding is being used so the 'Transfer-Encoding' header has been removed");
+            httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
+        }
+        httpResponseHeaderBuilder.addContentLenght(String.valueOf(contentLength));
+    }
+
+    private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder)
+    {
+        if (httpResponseHeaderBuilder.getContentLength() != null)
+        {
+            logger.debug("Chunked encoding is being used so the 'Content-Length' header has been removed");
+            httpResponseHeaderBuilder.removeHeader(CONTENT_LENGTH);
+        }
+        httpResponseHeaderBuilder.addHeader(TRANSFER_ENCODING, CHUNKED);
+    }
+
     private Integer resolveStatusCode(MuleEvent event)
     {
         if (statusCode != null)
@@ -224,16 +238,16 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
     }
 
-    private HttpEntity createUrlEncodedEntity(MuleEvent event, Map<String, Object> payload)
+    private HttpEntity createUrlEncodedEntity(MuleEvent event, Map payload)
     {
-        final Map<String, Object> mapPayload = payload;
+        final Map mapPayload = payload;
         HttpEntity entity = new EmptyHttpEntity();
         if (!mapPayload.isEmpty())
         {
             String encodedBody;
             if (mapPayload instanceof ParameterMap)
             {
-                encodedBody = HttpParser.encodeString(event.getEncoding(), ((ParameterMap) mapPayload).toCollectionMap());
+                encodedBody = HttpParser.encodeString(event.getEncoding(), ((ParameterMap) mapPayload).toListValuesMap());
             }
             else
             {

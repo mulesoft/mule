@@ -77,7 +77,7 @@ public class DefaultHttpRequest implements HttpRequest
     @Override
     public Collection<String> getHeaderValues(String headerName)
     {
-        return headers.getAsList(headerName);
+        return headers.getAll(headerName);
     }
 
     @Override

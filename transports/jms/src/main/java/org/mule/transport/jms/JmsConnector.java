@@ -432,7 +432,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
         Connection connection;
 
-        if (username != null)
+        if (!cacheJmsSessions && username != null)
         {
             connection = jmsSupport.createConnection(connectionFactory, username, password);
         }

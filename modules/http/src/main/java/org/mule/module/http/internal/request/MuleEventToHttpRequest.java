@@ -6,14 +6,16 @@
  */
 package org.mule.module.http.internal.request;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
@@ -34,9 +36,14 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class MuleEventToHttpRequest
 {
+    private static final Logger logger = LoggerFactory.getLogger(MuleEventToHttpRequest.class);
+
     private DefaultHttpRequester requester;
     private MuleContext muleContext;
 
@@ -202,14 +209,30 @@ public class MuleEventToHttpRequest
 
     private boolean doStreaming(HttpRequestBuilder requestBuilder, MuleEvent event) throws MessagingException
     {
-        String transferEncodingHeader = requestBuilder.getHeaders().get(HttpHeaders.Names.TRANSFER_ENCODING);
+        String transferEncodingHeader = requestBuilder.getHeaders().get(TRANSFER_ENCODING);
+        String contentLengthHeader = requestBuilder.getHeaders().get(CONTENT_LENGTH);
+
         HttpStreamingType requestStreamingMode = resolveStreamingType(event);
 
         Object payload = event.getMessage().getPayload();
 
         if (requestStreamingMode == HttpStreamingType.AUTO)
         {
-            if (transferEncodingHeader == null || !transferEncodingHeader.equalsIgnoreCase(HttpHeaders.Values.CHUNKED))
+            if (contentLengthHeader != null)
+            {
+                if (transferEncodingHeader != null)
+                {
+                    requestBuilder.removeHeader(TRANSFER_ENCODING);
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Cannot send both Transfer-Encoding and Content-Length headers. Transfer-Encoding will not be sent.");
+                    }
+                }
+                return false;
+            }
+
+            if (transferEncodingHeader == null || !transferEncodingHeader.equalsIgnoreCase(CHUNKED))
             {
                 return payload instanceof InputStream;
             }
@@ -220,21 +243,39 @@ public class MuleEventToHttpRequest
         }
         else if (requestStreamingMode == HttpStreamingType.ALWAYS)
         {
-            if (transferEncodingHeader != null && !transferEncodingHeader.equalsIgnoreCase(HttpHeaders.Values.CHUNKED))
+            if (contentLengthHeader != null)
             {
-                throw new MessagingException(CoreMessages.createStaticMessage("Cannot set Transfer-Encoding header with a " +
-                                                                              "value different than 'chunked' when using " +
-                                                                              "requestStreaming=ALWAYS"), event);
+                requestBuilder.removeHeader(CONTENT_LENGTH);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Content-Length header will not be sent, as the configured requestStreamingMode is ALWAYS");
+                }
+            }
+
+            if (transferEncodingHeader != null && !transferEncodingHeader.equalsIgnoreCase(CHUNKED))
+            {
+                requestBuilder.removeHeader(TRANSFER_ENCODING);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Transfer-Encoding header will be sent with value 'chunked' instead of {}, as the configured " +
+                                 "requestStreamingMode is NEVER", transferEncodingHeader);
+                }
+
             }
             return true;
         }
         else
         {
-            if (transferEncodingHeader != null && transferEncodingHeader.equalsIgnoreCase(HttpHeaders.Values.CHUNKED))
+            if (transferEncodingHeader != null)
             {
-                throw new MessagingException(CoreMessages.createStaticMessage("Cannot set Transfer-Encoding header with " +
-                                                                              "value 'chunked' when using requestStreaming=" +
-                                                                              "NEVER"), event);
+                requestBuilder.removeHeader(TRANSFER_ENCODING);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Transfer-Encoding header will not be sent, as the configured requestStreamingMode is NEVER");
+                }
             }
             return false;
         }

@@ -14,6 +14,9 @@
     
     <jms:activemq-connector name="activeMqJmsConnector"/>
 
+    <jms:activemq-connector name="activeMqJmsConnectorWithUsernameAndPassword" specification="1.1" username="username"
+                            password="password"/>
+
     <jms:activemq-connector name="customActiveMqJmsConnector"
                             acknowledgementMode="DUPS_OK_ACKNOWLEDGE"
                             clientId="myClient"

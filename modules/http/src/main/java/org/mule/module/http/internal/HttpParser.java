@@ -177,7 +177,7 @@ public class HttpParser
         StringBuilder result = new StringBuilder();
         for (Map.Entry<?,?> entry : (Set<Map.Entry<?,?>>)((parameters).entrySet()))
         {
-            String paramName = (String) entry.getKey();
+            String paramName = entry.getKey().toString();
             Object paramValue = entry.getValue();
 
             Iterable paramValues = paramValue instanceof Iterable ? (Iterable) paramValue : Arrays.asList(paramValue);

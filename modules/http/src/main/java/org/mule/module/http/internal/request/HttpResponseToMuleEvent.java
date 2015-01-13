@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request;
 
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
@@ -128,6 +129,7 @@ public class HttpResponseToMuleEvent
         }
 
         properties.put(HTTP_STATUS_PROPERTY, response.getStatusCode());
+        properties.put(HTTP_REASON_PROPERTY, response.getReasonPhrase());
 
         return properties;
     }
