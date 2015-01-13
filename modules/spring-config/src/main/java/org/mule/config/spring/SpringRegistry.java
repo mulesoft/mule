@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -37,7 +39,10 @@ public class SpringRegistry extends AbstractRegistry
     public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
 
     protected ApplicationContext applicationContext;
+
     private boolean readOnly;
+
+    private RegistrationDelegate registrationDelegate;
 
     //This is used to track the Spring context lifecycle since there is no way to confirm the
     //lifecycle phase from the application context
@@ -52,8 +57,7 @@ public class SpringRegistry extends AbstractRegistry
     public SpringRegistry(String id, ApplicationContext applicationContext, MuleContext muleContext)
     {
         super(id, muleContext);
-        this.applicationContext = applicationContext;
-        readOnly = applicationContext instanceof ConfigurableApplicationContext;
+        setApplicationContext(applicationContext);
     }
 
     public SpringRegistry(ConfigurableApplicationContext applicationContext, ApplicationContext parentContext, MuleContext muleContext)
@@ -73,7 +77,16 @@ public class SpringRegistry extends AbstractRegistry
     private void setApplicationContext(ApplicationContext applicationContext)
     {
         this.applicationContext = applicationContext;
-        readOnly = applicationContext instanceof ConfigurableApplicationContext;
+        if (applicationContext instanceof ConfigurableApplicationContext)
+        {
+            readOnly = false;
+            registrationDelegate = new ConfigurableRegistrationDelegate((ConfigurableApplicationContext) applicationContext);
+        }
+        else
+        {
+            readOnly = true;
+            registrationDelegate = new ReadOnlyRegistrationDelegate();
+        }
     }
 
     @Override
@@ -210,39 +223,139 @@ public class SpringRegistry extends AbstractRegistry
         }
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    // Registry is read-only
-    ////////////////////////////////////////////////////////////////////////////////////
-
     @Override
     public void registerObject(String key, Object value) throws RegistrationException
     {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        registrationDelegate.registerObject(key, value);
     }
 
     @Override
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        registrationDelegate.registerObject(key, value, metadata);
     }
 
     @Override
     public void registerObjects(Map<String, Object> objects) throws RegistrationException
     {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        registrationDelegate.registerObjects(objects);
     }
 
     @Override
     public void unregisterObject(String key)
     {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        registrationDelegate.unregisterObject(key);
     }
 
     @Override
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
         throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+    }
+
+    private interface RegistrationDelegate {
+
+        void registerObject(String key, Object value) throws RegistrationException;
+
+        void registerObject(String key, Object value, Object metadata) throws RegistrationException;
+
+        void registerObjects(Map<String, Object> objects) throws RegistrationException;
+
+        void unregisterObject(String key);
+
+        void unregisterObject(String key, Object metadata) throws RegistrationException;
+    }
+
+    private class ConfigurableRegistrationDelegate implements RegistrationDelegate {
+
+        private final ConfigurableApplicationContext applicationContext;
+
+        private ConfigurableRegistrationDelegate(ConfigurableApplicationContext applicationContext)
+        {
+            this.applicationContext = applicationContext;
+        }
+
+        @Override
+        public void registerObject(String key, Object value) throws RegistrationException
+        {
+            doRegisterObject(key, value);
+        }
+
+        @Override
+        public void registerObject(String key, Object value, Object metadata) throws RegistrationException
+        {
+            registerObject(key, value);
+        }
+
+        @Override
+        public void registerObjects(Map<String, Object> objects) throws RegistrationException
+        {
+            if (objects == null || objects.isEmpty()) {
+                return;
+            }
+
+            for (Map.Entry<String, Object> entry : objects.entrySet()) {
+                registerObject(entry.getKey(), entry.getValue());
+            }
+        }
+
+        @Override
+        public void unregisterObject(String key)
+        {
+            ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
+        }
+
+        @Override
+        public void unregisterObject(String key, Object metadata) throws RegistrationException
+        {
+            unregisterObject(key);
+        }
+
+        private void doRegisterObject(String key, Object value) {
+            ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
+            beanFactory.registerSingleton(key, value);
+            beanFactory.initializeBean(value, key);
+        }
+    }
+
+    private class ReadOnlyRegistrationDelegate implements RegistrationDelegate {
+
+        @Override
+        public void registerObject(String key, Object value) throws RegistrationException
+        {
+            throwException();
+        }
+
+        @Override
+        public void registerObject(String key, Object value, Object metadata) throws RegistrationException
+        {
+            throwException();
+        }
+
+        @Override
+        public void registerObjects(Map<String, Object> objects) throws RegistrationException
+        {
+            throwException();
+        }
+
+        @Override
+        public void unregisterObject(String key)
+        {
+            throwException();
+        }
+
+        @Override
+        public void unregisterObject(String key, Object metadata) throws RegistrationException
+        {
+            throwException();
+        }
+
+        private void throwException()
+        {
+            throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        }
+
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////

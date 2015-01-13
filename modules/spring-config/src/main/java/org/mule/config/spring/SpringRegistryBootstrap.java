@@ -13,21 +13,22 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Converter;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.util.StreamCloser;
 import org.mule.config.bootstrap.BootstrapException;
 import org.mule.config.bootstrap.BootstrapObjectFactory;
 import org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer;
 import org.mule.config.bootstrap.RegistryBootstrapDiscoverer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
@@ -42,8 +43,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 /**
  * This object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry.
@@ -91,14 +96,16 @@ import org.apache.commons.logging.LogFactory;
 public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
 {
 
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
     public String SINGLE_TX = ".singletx.";
 
-    private ArtifactType supportedArtifactType = ArtifactType.APP;
     private final RegistryBootstrapDiscoverer discoverer;
+    private final BeanDefinitionRegistry beanDefinitionRegistry;
+
+    private ArtifactType supportedArtifactType = ArtifactType.APP;
     protected MuleContext context;
 
     public enum ArtifactType
@@ -135,9 +142,9 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
      * Creates a default SimpleRegistryBootstrap using a {@link ClassPathRegistryBootstrapDiscoverer}
      * in order to get the Properties resources from the class path.
      */
-    public SpringRegistryBootstrap()
+    public SpringRegistryBootstrap(BeanDefinitionRegistry beanDefinitionRegistry)
     {
-        this(new ClassPathRegistryBootstrapDiscoverer());
+        this(new ClassPathRegistryBootstrapDiscoverer(), beanDefinitionRegistry);
     }
 
     /**
@@ -145,9 +152,10 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
      * resources to be used.
      * @param discoverer
      */
-    public SpringRegistryBootstrap(RegistryBootstrapDiscoverer discoverer)
+    public SpringRegistryBootstrap(RegistryBootstrapDiscoverer discoverer, BeanDefinitionRegistry beanDefinitionRegistry)
     {
         this.discoverer = discoverer;
+        this.beanDefinitionRegistry = beanDefinitionRegistry;
     }
 
     /**
@@ -281,7 +289,13 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
                 optional = p.containsKey("optional");
             }
 
-            final String transClass = (x == -1 ? transString : transString.substring(0, x));
+            final Class<? extends Transformer> transformerClass = getClass(x == -1 ? transString : transString.substring(0, x));
+
+            if (!DiscoverableTransformer.class.isAssignableFrom(transformerClass))
+            {
+                throw new RegistrationException(CoreMessages.transformerNotImplementDiscoverable(transformerClass));
+            }
+
             try
             {
                 String mime = null;
@@ -299,49 +313,48 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
                     }
                     else
                     {
-                        returnClass = ClassUtils.loadClass(returnClassString, getClass());
+                        returnClass = getClass(returnClassString);
                     }
                 }
-                Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass);
-                if (!(trans instanceof DiscoverableTransformer))
-                {
-                    throw new RegistrationException(CoreMessages.transformerNotImplementDiscoverable(trans));
-                }
+
+                GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+                beanDefinition.setBeanClass(transformerClass);
+
+                MutablePropertyValues properties = new MutablePropertyValues();
+
+                DataType returnType = null;
+
                 if (returnClass != null)
                 {
-                    trans.setReturnDataType(DataTypeFactory.create(returnClass, mime));
+                    returnType = DataTypeFactory.create(returnClass, mime);
+                    properties.addPropertyValue("returnDataType", returnType);
                 }
-                if (name != null)
-                {
-                    trans.setName(name);
-                }
-                else
+
+                if (name == null)
                 {
                     //This will generate a default name for the transformer
-                    name = trans.getName();
                     //We then prefix the name to ensure there is less chance of conflict if the user registers
                     // the transformer with the same name
-                    trans.setName("_" + name);
+                    name = "_" + TransformerUtils.generateTransformerName(transformerClass, returnType);
                 }
-                registry.registerTransformer(trans);
-            }
-            catch (InvocationTargetException itex)
-            {
-                Throwable cause = ExceptionUtils.getCause(itex);
-                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional transformer: " + transClass);
+
+                properties.addPropertyValue("name", name);
+                beanDefinition.setPropertyValues(properties);
+
+                beanDefinitionRegistry.registerBeanDefinition(name, beanDefinition);
+
             }
             catch (NoClassDefFoundError ncdfe)
             {
-                throwExceptionIfNotOptional( optional, ncdfe, "Ignoring optional transformer: " + transClass);
+                throwExceptionIfNotOptional( optional, ncdfe, "Ignoring optional transformer: " + transformerClass);
 
             }
             catch (ClassNotFoundException cnfe)
             {
-                throwExceptionIfNotOptional( optional, cnfe, "Ignoring optional transformer: " + transClass);
+                throwExceptionIfNotOptional( optional, cnfe, "Ignoring optional transformer: " + transformerClass);
             }
 
             name = null;
-            returnClass = null;
         }
     }
 
@@ -403,22 +416,19 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
                 return;
             }
 
-            Object o = ClassUtils.instanciateClass(className);
-            Class<?> meta = Object.class;
+            Class<?> clazz = getClass(className);
+            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
 
-            if (o instanceof ObjectProcessor)
-            {
-                meta = ObjectProcessor.class;
+            if (BootstrapObjectFactory.class.isAssignableFrom(clazz)) {
+                beanDefinition.setBeanClass(BootstrapObjectFactoryBean.class);
+                ConstructorArgumentValues arguments = new ConstructorArgumentValues();
+                arguments.addGenericArgumentValue(ClassUtils.instanciateClass(className));
+                beanDefinition.setConstructorArgumentValues(arguments);
+            } else {
+                beanDefinition.setBeanClass(clazz);
             }
-            else if (o instanceof StreamCloser)
-            {
-                meta = StreamCloser.class;
-            }
-            else if (o instanceof BootstrapObjectFactory)
-            {
-                o = ((BootstrapObjectFactory)o).create();
-            }
-            registry.registerObject(key, o, meta);
+
+            beanDefinitionRegistry.registerBeanDefinition(key, beanDefinition);
         }
         catch (InvocationTargetException itex)
         {
@@ -433,6 +443,11 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
         {
             throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional object: " + className);
         }
+    }
+
+    private Class getClass(String className) throws ClassNotFoundException
+    {
+        return ClassUtils.loadClass(className, getClass());
     }
 
     private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception
