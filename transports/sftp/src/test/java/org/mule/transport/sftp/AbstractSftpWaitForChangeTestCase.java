@@ -19,6 +19,7 @@ import org.mule.tck.probe.Prober;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
@@ -31,7 +32,7 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
 
     private static CountDownLatch pollingLatch;
     private static boolean pollingInvoked;
-    private static String[] availableFiles;
+    private static List<FileDescriptor> availableFiles;
 
 
     @Override
@@ -56,7 +57,7 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
     {
         pollingLatch.countDown();
 
-        Prober prober = new PollingProber(RECEIVE_TIMEOUT, 50);
+        final Prober prober = new PollingProber(RECEIVE_TIMEOUT, 50);
         prober.check(new Probe()
         {
             public boolean isSatisfied()
@@ -71,8 +72,8 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
         });
 
         assertNotNull("Polling did not return any result", availableFiles);
-        assertEquals(1, availableFiles.length);
-        assertEquals(FILE2_NAME, availableFiles[0]);
+        assertEquals(1, availableFiles.size());
+        assertEquals(FILE2_NAME, availableFiles.get(0).getFilename());
     }
 
     public static class TestSftpMessageReceiver extends SftpMessageReceiver
@@ -125,7 +126,7 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
         }
 
         @Override
-        public String[] getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception
+        public List<FileDescriptor> getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception
         {
             pollingLatch.await();
 
