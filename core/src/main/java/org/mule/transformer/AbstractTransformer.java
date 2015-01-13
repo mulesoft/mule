@@ -27,7 +27,6 @@ import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 
 import java.io.InputStream;
@@ -508,18 +507,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
 
     protected String generateTransformerName()
     {
-        String transformerName = ClassUtils.getSimpleName(this.getClass());
-        int i = transformerName.indexOf("To");
-        if (i > 0 && returnType != null)
-        {
-            String target = ClassUtils.getSimpleName(returnType.getType());
-            if (target.equals("byte[]"))
-            {
-                target = "byteArray";
-            }
-            transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
-        }
-        return transformerName;
+        return TransformerUtils.generateTransformerName(getClass(), returnType);
     }
 
     @Deprecated

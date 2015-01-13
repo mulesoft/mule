@@ -11,11 +11,11 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
-import org.mule.api.registry.Registry;
 import org.mule.config.ConfigResource;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -39,7 +39,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected boolean useDefaultConfigResource = true;
     protected boolean useMinimalConfigResource = false;
 
-    protected Registry registry;
+    protected SpringRegistry registry;
 
     protected ApplicationContext domainContext;
     protected ApplicationContext parentContext;
@@ -134,10 +134,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // preInstantiateSingletons().
         muleContext.addRegistry(registry);
 
+        registry.initialise();
+
         SimpleRegistryBootstrap bootstrap = new SimpleRegistryBootstrap();
         bootstrap.setMuleContext(muleContext);
-        //bootstrap.initialise();
-        registry.initialise();
+        bootstrap.initialise();
     }
 
     private void createRegistryWithParentContext(MuleContext muleContext, ApplicationContext applicationContext, ApplicationContext parentContext) throws ConfigurationException
