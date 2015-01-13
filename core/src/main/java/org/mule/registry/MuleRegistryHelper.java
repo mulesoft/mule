@@ -528,7 +528,7 @@ public class MuleRegistryHelper implements MuleRegistry
         String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
         // TODO If we want these descriptors loaded form Spring we need to change the key mechanism
         // and the scope, and then deal with circular reference issues.
-        ServiceDescriptor sd = (ServiceDescriptor) registry.lookupObject(key);
+        ServiceDescriptor sd = registry.lookupObject(key);
 
         synchronized (this)
         {

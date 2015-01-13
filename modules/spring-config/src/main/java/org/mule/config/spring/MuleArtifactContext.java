@@ -10,7 +10,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.ConfigResource;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
-import org.mule.config.spring.processors.LifecyclePostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.util.IOUtils;
 
@@ -69,8 +68,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                               new GlobalNamePostProcessor(),
                               new ExpressionEnricherPostProcessor(muleContext),
                               new ExpressionEvaluatorPostProcessor(muleContext),
-                              new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
-                              new LifecyclePostProcessor());
+                              new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
+        );
 
         beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
     }
