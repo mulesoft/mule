@@ -6,15 +6,13 @@
  */
 package org.mule.config.spring;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.Registry;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Converter;
@@ -93,7 +91,7 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
  * {@link MuleContextAware} and lifecycle interfaces such as {@link Initialisable}.
  */
-public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
+public class SpringRegistryBootstrap implements MuleContextAware
 {
 
     protected final transient Logger logger = LoggerFactory.getLogger(getClass());
@@ -134,7 +132,7 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
                     return artifactType;
                 }
             }
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("No artifact type found for value: " + artifactTypeAsString));
+            throw new MuleRuntimeException(createStaticMessage("No artifact type found for value: " + artifactTypeAsString));
         }
     }
 
@@ -166,18 +164,9 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
         this.context = context;
     }
 
-    /** {@inheritDoc} */
-    public void initialise() throws InitialisationException
+    public void boot() throws BootstrapException
     {
-        List<Properties> bootstraps;
-        try
-        {
-            bootstraps = discoverer.discover();
-        }
-        catch (BootstrapException e)
-        {
-            throw new InitialisationException(e, this);
-        }
+        List<Properties> bootstraps = discoverer.discover();
 
         // Merge and process properties
         int objectCounter = 1;
@@ -210,7 +199,7 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
                         String transactionResource = bootstrap.getProperty(transactionResourceKey);
                         if (transactionResource == null)
                         {
-                            throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Theres no transaction resource specified for transaction factory %s",key)),this);
+                            throw new BootstrapException(createStaticMessage(String.format("There's no transaction resource specified for transaction factory %s", key)));
                         }
                         singleTransactionFactories.put((String) entry.getValue(),transactionResource);
                     }
@@ -224,15 +213,15 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
 
         try
         {
-            registerUnnamedObjects(unnamedObjects, context.getRegistry());
+            registerUnnamedObjects(unnamedObjects);
             registerTransformers((MuleRegistryHelper) context.getRegistry());
-            registerTransformers(transformers, context.getRegistry());
-            registerObjects(namedObjects, context.getRegistry());
+            registerTransformers(transformers);
+            registerObjects(namedObjects);
             registerTransactionFactories(singleTransactionFactories, context);
         }
         catch (Exception e1)
         {
-            throw new InitialisationException(e1, this);
+            throw new BootstrapException(createStaticMessage("Exception found registering bootstrap objects"), e1);
         }
     }
 
@@ -267,7 +256,7 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerTransformers(Properties props, MuleRegistry registry) throws Exception
+    private void registerTransformers(Properties props) throws Exception
     {
         String transString;
         String name = null;
@@ -367,26 +356,26 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerObjects(Properties props, Registry registry) throws Exception
+    private void registerObjects(Properties props) throws Exception
     {
         for (Entry<Object, Object> entry : props.entrySet())
         {
-            registerObject((String)entry.getKey(), (String)entry.getValue(), registry);
+            registerObject((String)entry.getKey(), (String)entry.getValue());
         }
         props.clear();
     }
 
-    private void registerUnnamedObjects(Properties props, Registry registry) throws Exception
+    private void registerUnnamedObjects(Properties props) throws Exception
     {
         for (Entry<Object, Object> entry : props.entrySet())
         {
             final String key = String.format("%s#%s", entry.getKey(), UUID.getUUID());
-            registerObject(key, (String) entry.getValue(), registry);
+            registerObject(key, (String) entry.getValue());
         }
         props.clear();
     }
 
-    private void registerObject(String key, String value, Registry registry) throws Exception
+    private void registerObject(String key, String value) throws Exception
     {
         ArtifactType artifactTypeParameterValue = ArtifactType.APP;
 
@@ -419,12 +408,15 @@ public class SpringRegistryBootstrap implements Initialisable, MuleContextAware
             Class<?> clazz = getClass(className);
             GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
 
-            if (BootstrapObjectFactory.class.isAssignableFrom(clazz)) {
+            if (BootstrapObjectFactory.class.isAssignableFrom(clazz))
+            {
                 beanDefinition.setBeanClass(BootstrapObjectFactoryBean.class);
                 ConstructorArgumentValues arguments = new ConstructorArgumentValues();
                 arguments.addGenericArgumentValue(ClassUtils.instanciateClass(className));
                 beanDefinition.setConstructorArgumentValues(arguments);
-            } else {
+            }
+            else
+            {
                 beanDefinition.setBeanClass(clazz);
             }
 

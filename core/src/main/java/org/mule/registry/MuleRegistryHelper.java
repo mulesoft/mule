@@ -21,6 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.AbstractServiceDescriptor;
+import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ResolverException;
@@ -725,30 +726,61 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object applyProcessors(Object object) throws MuleException
     {
-        return registry.getTransientRegistry().applyProcessors(object, null);
+        return applyProcessors(object, null);
+    }
+
+    @Override
+    public Object applyProcessors(Object object, Object metadata)
+    {
+        InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
+        if (initialisingRegistry != null)
+        {
+            return initialisingRegistry.applyProcessors(object, metadata);
+        }
+
+        return object;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object applyProcessors(Object object, int flags) throws MuleException
     {
-        return registry.getTransientRegistry().applyProcessors(object, flags);
+        InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
+        if (initialisingRegistry != null)
+        {
+            return initialisingRegistry.applyProcessors(object, flags);
+        }
+
+        return object;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object applyLifecycle(Object object) throws MuleException
     {
-        return registry.getTransientRegistry().applyLifecycle(object);
+        return applyLifecycle(object, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Object applyLifecycle(Object object, String phase) throws MuleException
     {
-        return registry.getTransientRegistry().applyLifecycle(object, phase);
+        InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
+        if (initialisingRegistry != null)
+        {
+            return initialisingRegistry.applyLifecycle(object, phase);
+        }
+
+        return object;
     }
 
     ////////////////////////////////////////////////////////////////////////////
