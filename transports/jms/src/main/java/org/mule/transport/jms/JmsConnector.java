@@ -472,13 +472,25 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 @Override
                 public void onNotification(ClusterNodeNotification notification)
                 {
+                    // Notification thread is bound to the MuleContainerSystemClassLoader, save it 
+                    // so we can restore it later
+                    ClassLoader notificationClassLoader = Thread.currentThread().getContextClassLoader();
                     try
                     {
+                        // The connection should use instead the ApplicationClassloader
+                        Thread.currentThread().setContextClassLoader(muleContext.getExecutionClassLoader());
+                        
                         JmsConnector.this.connect();
                     }
                     catch (Exception e)
                     {
                         throw new MuleRuntimeException(e);
+                    }
+                    finally 
+                    {
+                        // Restore the notification original class loader so we don't interfere in any later
+                        // usage of this thread
+                        Thread.currentThread().setContextClassLoader(notificationClassLoader);
                     }
                 }
             });
