@@ -12,25 +12,9 @@
 
     <sftp:connector name="sftpConnector" pollingFrequency="1000"
                     autoDelete="false">
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     </sftp:connector>
     <sftp:connector name="sftpConnectorRev" pollingFrequency="1000"
                     autoDelete="false">
-=======
-        <!--<custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"
-            /> -->
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
-        <!--<custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"
-            /> -->
->>>>>>> 12a456f... SFTP supports comparator and reverse
-=======
-    </sftp:connector>
-    <sftp:connector name="sftpConnectorRev" pollingFrequency="1000"
-                    autoDelete="false">
->>>>>>> 2ba8afd... Adjust tests so that order and reverse-order is tested
     </sftp:connector>
 
     <configuration>
@@ -38,11 +22,6 @@
     </configuration>
 
     <flow name="receiving">
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2ba8afd... Adjust tests so that order and reverse-order is tested
         <composite-source>
             <sftp:inbound-endpoint name="inboundEndpoint"
                                    connector-ref="sftpConnector"
@@ -65,26 +44,6 @@
                                    comparator="org.mule.transport.sftp.comparator.OlderFirstComparator"
                                    reverseOrder="true"/>
         </composite-source>
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 12a456f... SFTP supports comparator and reverse
-        <sftp:inbound-endpoint name="inboundEndpoint"
-                               connector-ref="sftpConnector"
-                               autoDelete="true"
-                               path="~/inbound/"
-                               host="${SFTP_HOST}"
-                               user="${USER1_NAME}"
-                               password="${USER1_PASSWORD}"
-                               port="${SFTP_PORT}"
-                               comparator="org.mule.transport.sftp.comparator.OlderFirstComparator"
-                               reverseOrder="true"/>
-<<<<<<< HEAD
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
->>>>>>> 12a456f... SFTP supports comparator and reverse
-=======
->>>>>>> 2ba8afd... Adjust tests so that order and reverse-order is tested
         <component>
             <singleton-object
                     class="org.mule.tck.functional.FunctionalTestComponent" />

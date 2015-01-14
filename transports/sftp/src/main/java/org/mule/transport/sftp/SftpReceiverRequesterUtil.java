@@ -6,25 +6,8 @@
  */
 package org.mule.transport.sftp;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-=======
-import com.jcraft.jsch.SftpATTRS;
-<<<<<<< HEAD
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
-import com.jcraft.jsch.SftpATTRS;
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
->>>>>>> 12a456f... SFTP supports comparator and reverse
-=======
-=======
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
->>>>>>> 0a6b968... apply codestyle
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.FileUtils;
@@ -33,22 +16,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-<<<<<<< HEAD
-import java.util.*;
-<<<<<<< HEAD
-=======
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
->>>>>>> 12a456f... SFTP supports comparator and reverse
-=======
 import java.util.ArrayList;
 import java.util.List;
-<<<<<<< HEAD
-import java.util.Map;
->>>>>>> 0a6b968... apply codestyle
-=======
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
 
 /**
  * Contains reusable methods not directly related to usage of the jsch sftp library
@@ -94,15 +63,7 @@ public class SftpReceiverRequesterUtil {
     }
 
     // Get files in directory configured on the endpoint
-<<<<<<< HEAD
-<<<<<<< HEAD
     public List<FileDescriptor> getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception {
-=======
-    public String[] getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception {
->>>>>>> 0a6b968... apply codestyle
-=======
-    public List<FileDescriptor> getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception {
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
         // This sftp client instance is only for checking available files. This
         // instance cannot be shared
         // with clients that retrieve files because of thread safety
@@ -116,55 +77,15 @@ public class SftpReceiverRequesterUtil {
         try {
             client = connector.createSftpClient(endpoint);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
             final FileDescriptor[] files = client.getFileDescriptors();
-=======
-            long fileAge = connector.getFileAge();
-            boolean checkFileAge = connector.getCheckFileAge();
-
-            // Override the value from the Endpoint?
-            if (endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE) != null) {
-                checkFileAge = true;
-                fileAge = Long.valueOf((String) endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE));
-            }
-
-            logger.debug("fileAge : " + fileAge);
-
-            // Get size check parameter
-            long sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
-
-<<<<<<< HEAD
-            String[] files = client.listFiles();
->>>>>>> 0a6b968... apply codestyle
-=======
-            final FtpFileDescriptor[] files = client.getFileDescriptors();
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
-=======
-            final FileDescriptor[] files = client.getFileDescriptors();
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
 
             // Only return files that have completely been written and match
             // fileExtension
             final List<FileDescriptor> completedFiles = new ArrayList<>(files.length);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
             for (final FileDescriptor fileDesc : files) {
 
-<<<<<<< HEAD
                 final String file = fileDesc.getFilename();
-=======
-            for (String file : files) {
->>>>>>> 0a6b968... apply codestyle
-=======
-            for (FtpFileDescriptor fileDesc : files) {
-=======
-            for (final FileDescriptor fileDesc : files) {
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-
-                final String file = fileDesc.getFilename();
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
                 // Skip if no match.
                 // Note, Mule also uses this filter. We use the filter here because
                 // we don't want to
@@ -176,90 +97,16 @@ public class SftpReceiverRequesterUtil {
                     continue;
                 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
                 if (isFileCompleted(file, client)) {
                     completedFiles.add(fileDesc);
-=======
-                if (checkFileAge || sizeCheckDelayMs >= 0) {
-                    // See if the file is still growing (either by age or size),
-                    // leave it alone if it is
-                    if (canProcessFile(file, client, fileAge, sizeCheckDelayMs)) {
-                        // logger.debug("marking file [" + files[i] +
-                        // "] as in transit.");
-                        // client.rename(files[i], files[i] + ".transtit");
-                        // completedFiles.add( files[i] + ".transtit" );
-                        completedFiles.add(file);
-                        if (onlyGetTheFirstOne) {
-                            break;
-                        }
-                    }
-                } else {
-                    completedFiles.add(file);
->>>>>>> 0a6b968... apply codestyle
-=======
-                if (isFileCompleted(file, client)) {
-                    completedFiles.add(fileDesc);
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
                     if (onlyGetTheFirstOne) {
                         break;
                     }
                 }
             }
-<<<<<<< HEAD
-<<<<<<< HEAD
             return completedFiles;
         } finally {
             if (client != null) {
-                connector.releaseClient(endpoint, client);
-            }
-        }
-    }
-
-<<<<<<< HEAD
-    private boolean isFileCompleted(final String file, SftpClient client) throws Exception {
-        if (checkFileAge || sizeCheckDelayMs >= 0) {
-            // See if the file is still growing (either by age or size),
-            // leave it alone if it is
-            return canProcessFile(file, client, fileAge, sizeCheckDelayMs);
-        }
-        return true;
-    }
-
-    public InputStream retrieveFile(String fileName, SftpNotifier notifier) throws Exception {
-=======
-    // sort a set of files by a comparator that gets access to to file-attributes
-    public void sort(final String[] files, Comparator<Map.Entry<String, SftpATTRS>> comparator) throws Exception {
-
-        SftpClient client = null;
-
-        try
-        {
-            client = connector.createSftpClient(endpoint);
-
-            final List<Map.Entry<String, SftpATTRS>> fileDescriptors = new ArrayList<Map.Entry<String, SftpATTRS>>(files.length);
-            for (final String filename : files)
-            {
-                fileDescriptors.add(new java.util.AbstractMap.SimpleEntry<String, SftpATTRS>(filename, client.getAttr(filename)));
-            }
-            Collections.sort(fileDescriptors, comparator);
-            int i = 0;
-            for (final Map.Entry<String, SftpATTRS> descriptor : fileDescriptors) {
-                files[i++] = descriptor.getKey();
-            }
-        }
-        finally
-        {
-            if (client != null)
-            {
-=======
-            return completedFiles.toArray(new String[completedFiles.size()]);
-=======
-            return completedFiles;
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-        } finally {
-            if (client != null) {
->>>>>>> 0a6b968... apply codestyle
                 connector.releaseClient(endpoint, client);
             }
         }
@@ -275,13 +122,7 @@ public class SftpReceiverRequesterUtil {
         return true;
     }
 
-<<<<<<< HEAD
-    public InputStream retrieveFile(String fileName, SftpNotifier notifier) throws Exception
-    {
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
     public InputStream retrieveFile(String fileName, SftpNotifier notifier) throws Exception {
->>>>>>> 0a6b968... apply codestyle
         // Getting a new SFTP client dedicated to the SftpInputStream below
         SftpClient client = connector.createSftpClient(endpoint, notifier);
 
@@ -422,15 +263,7 @@ public class SftpReceiverRequesterUtil {
      * Note! This assumes that the time on both servers are synchronized!
      *
      * @param fileName         The file to check
-<<<<<<< HEAD
-<<<<<<< HEAD
      * @param client           instance of SftpClient
-=======
-     * @param client           instance of StftClient
->>>>>>> 0a6b968... apply codestyle
-=======
-     * @param client           instance of SftpClient
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
      * @param fileAge          How old the file should be to be considered "old" and not
      *                         changed
      * @param sizeCheckDelayMs Wait time (in ms) between size-checks to determine if
@@ -444,18 +277,7 @@ public class SftpReceiverRequesterUtil {
             return false;
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         return !(sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs));
-=======
-        if (sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs)) {
-            return false;
-        }
->>>>>>> 0a6b968... apply codestyle
-=======
-        return !(sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs));
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-
     }
 
     private boolean isSizeModified(String fileName, SftpClient client, long sizeCheckDelayMs) throws IOException, InterruptedException {

@@ -6,17 +6,6 @@
  */
 package org.mule.transport.sftp;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import com.jcraft.jsch.SftpATTRS;
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
-import com.jcraft.jsch.SftpATTRS;
->>>>>>> 12a456f... SFTP supports comparator and reverse
-=======
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -35,29 +24,10 @@ import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.lock.LockFactory;
 
 import java.io.InputStream;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-=======
-import java.util.*;
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
-import java.util.*;
->>>>>>> 12a456f... SFTP supports comparator and reverse
-=======
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-<<<<<<< HEAD
-import java.util.Map;
->>>>>>> 0a6b968... apply codestyle
-=======
-import java.util.List;
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -66,19 +36,7 @@ import java.util.concurrent.locks.Lock;
  * using jsch. This receiver produces an InputStream payload, which can be
  * materialized in a MessageDispatcher or Component.
  */
-<<<<<<< HEAD
-<<<<<<< HEAD
 public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
-=======
-public class SftpMessageReceiver extends AbstractPollingMessageReceiver
-{
-<<<<<<< HEAD
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
->>>>>>> 12a456f... SFTP supports comparator and reverse
-=======
-public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
->>>>>>> 0a6b968... apply codestyle
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
 
@@ -110,28 +68,14 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
             logger.debug("Polling. Called at endpoint " + endpoint.getEndpointURI());
         }
         try {
-<<<<<<< HEAD
-<<<<<<< HEAD
             List<FileDescriptor> files = sftpRRUtil.getAvailableFiles(false);
 
             if (files.isEmpty()) {
-=======
-            String[] files = sftpRRUtil.getAvailableFiles(false);
-
-            if (files.length == 0) {
->>>>>>> 0a6b968... apply codestyle
-=======
-            List<FileDescriptor> files = sftpRRUtil.getAvailableFiles(false);
-
-            if (files.isEmpty()) {
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
                 if (logger.isDebugEnabled()) {
                     logger.debug("Polling. No matching files found at endpoint " + endpoint.getEndpointURI());
                 }
             } else {
                 if (logger.isDebugEnabled()) {
-<<<<<<< HEAD
-<<<<<<< HEAD
                     logger.debug("Polling. " + files.size() + " files found at " + endpoint.getEndpointURI()
                             + ":" + Arrays.toString(files.toArray()));
                 }
@@ -141,80 +85,21 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
                     Collections.sort(files, comparator);
                 }
 
-<<<<<<< HEAD
-
                 for (final FileDescriptor file : files) {
                     if (getLifecycleState().isStopping()) {
-=======
-                final Comparator<Map.Entry<String, SftpATTRS>> comparator = getComparator();
-                if (comparator != null)
-                {
-                    sftpRRUtil.sort(files, comparator);
-=======
-                    logger.debug("Polling. " + files.length + " files found at " + endpoint.getEndpointURI()
-                            + ":" + Arrays.toString(files));
->>>>>>> 0a6b968... apply codestyle
-                }
-
-<<<<<<< HEAD
-=======
-                final Comparator<Map.Entry<String, SftpATTRS>> comparator = getComparator();
-=======
-                    logger.debug("Polling. " + files.size() + " files found at " + endpoint.getEndpointURI()
-                            + ":" + Arrays.toString(files.toArray()));
-                }
-
-                final Comparator<FileDescriptor> comparator = getComparator();
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-                if (comparator != null) {
-                    Collections.sort(files, comparator);
-                }
-
->>>>>>> 12a456f... SFTP supports comparator and reverse
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-                for (String file : files)
-                {
-                    if (getLifecycleState().isStopping())
-                    {
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
-                for (String file : files) {
-=======
-                for (final FileDescriptor file : files) {
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-                    if (getLifecycleState().isStopping()) {
->>>>>>> 0a6b968... apply codestyle
                         break;
                     }
                     Lock fileLock = lockFactory.createLock(connector.getName() + file);
                     if (fileLock.tryLock(10, TimeUnit.MILLISECONDS)) {
                         try {
-<<<<<<< HEAD
-<<<<<<< HEAD
                             routeFile(file.getFilename());
-=======
-                            routeFile(file);
->>>>>>> 0a6b968... apply codestyle
-=======
-                            routeFile(file.getFilename());
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
                         } catch (Exception e) {
                             fileLock.unlock();
                         }
                     }
                 }
                 if (logger.isDebugEnabled()) {
-<<<<<<< HEAD
-<<<<<<< HEAD
                     logger.debug("Polling. Routed all " + files.size() + " files found at "
-=======
-                    logger.debug("Polling. Routed all " + files.length + " files found at "
->>>>>>> 0a6b968... apply codestyle
-=======
-                    logger.debug("Polling. Routed all " + files.size() + " files found at "
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
                             + endpoint.getEndpointURI());
                 }
             }
@@ -227,9 +112,6 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
         }
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     private Comparator<FileDescriptor> getComparator() throws Exception {
 
         Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
@@ -239,41 +121,11 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
             if (reverseProperty != null) {
                 reverse = Boolean.valueOf((String) reverseProperty);
             }
-
             Class<?> clazz = Class.forName(comparatorClassName.toString());
             Comparator<?> comparator = (Comparator<?>) clazz.newInstance();
             return reverse ? new ReverseComparator(comparator) : comparator;
         }
         return null;
-=======
-=======
->>>>>>> 12a456f... SFTP supports comparator and reverse
-    private Comparator<Map.Entry<String, SftpATTRS>> getComparator() throws Exception {
-=======
-    private Comparator<FileDescriptor> getComparator() throws Exception {
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-
-        Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
-        if (comparatorClassName != null) {
-            Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
-            boolean reverse = false;
-            if (reverseProperty != null) {
-                reverse = Boolean.valueOf((String) reverseProperty);
-            }
-<<<<<<< HEAD
-            return null;
-<<<<<<< HEAD
->>>>>>> 797ec72... SFTP supports comparator and reverse
-=======
->>>>>>> 12a456f... SFTP supports comparator and reverse
-=======
-
-            Class<?> clazz = Class.forName(comparatorClassName.toString());
-            Comparator<?> comparator = (Comparator<?>) clazz.newInstance();
-            return reverse ? new ReverseComparator(comparator) : comparator;
-        }
-        return null;
->>>>>>> 0a6b968... apply codestyle
     }
 
     @Override

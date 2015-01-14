@@ -6,25 +6,15 @@
  */
 package org.mule.transport.sftp;
 
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
-
+import com.jcraft.jsch.*;
+import com.jcraft.jsch.ChannelSftp.LsEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.StringUtils;
-
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.ChannelSftp.LsEntry;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpATTRS;
-import com.jcraft.jsch.SftpException;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,16 +25,14 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.*;
 
 /**
  * <code>SftpClient</code> Wrapper around jsch sftp library. Provides access to basic
  * sftp commands.
  */
 
-public class SftpClient
-{
+public class SftpClient {
 
     public static final String CHANNEL_SFTP = "sftp";
     public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
@@ -72,34 +60,27 @@ public class SftpClient
 
     private String preferredAuthenticationMethods;
 
-    public SftpClient(String host)
-    {
+    public SftpClient(String host) {
         this(host, null);
     }
 
-    public SftpClient(String host, SftpNotifier notifier)
-    {
+    public SftpClient(String host, SftpNotifier notifier) {
         this.host = host;
         this.notifier = notifier;
 
         jsch = new JSch();
     }
 
-    public void changeWorkingDirectory(String wd) throws IOException
-    {
+    public void changeWorkingDirectory(String wd) throws IOException {
         currentDirectory = wd;
 
-        try
-        {
+        try {
             wd = getAbsolutePath(wd);
-            if (logger.isDebugEnabled())
-            {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Attempting to cwd to: " + wd);
             }
             channelSftp.cd(wd);
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             String message = "Error '" + e.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
             logger.error(message);
             throw new IOException(message);
@@ -113,10 +94,8 @@ public class SftpClient
      * @param path relative path
      * @return Absolute path
      */
-    public String getAbsolutePath(String path)
-    {
-        if (path.startsWith("/~"))
-        {
+    public String getAbsolutePath(String path) {
+        if (path.startsWith("/~")) {
             return home + path.substring(2, path.length());
         }
 
@@ -124,14 +103,11 @@ public class SftpClient
         return path;
     }
 
-    public void login(String user, String password) throws IOException
-    {
-        try
-        {
+    public void login(String user, String password) throws IOException {
+        try {
             Properties hash = new Properties();
             hash.put(STRICT_HOST_KEY_CHECKING, "no");
-            if (!StringUtils.isEmpty(preferredAuthenticationMethods))
-            {
+            if (!StringUtils.isEmpty(preferredAuthenticationMethods)) {
                 hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
             }
 
@@ -146,40 +122,27 @@ public class SftpClient
 
             channelSftp = (ChannelSftp) channel;
             setHome(channelSftp.pwd());
-        }
-        catch (JSchException e)
-        {
-            logAndThrowLoginError(user, e);
-        }
-        catch (SftpException e)
-        {
+        } catch (JSchException | SftpException e) {
             logAndThrowLoginError(user, e);
         }
     }
 
-    public void login(String user, String identityFile, String passphrase) throws IOException
-    {
+    public void login(String user, String identityFile, String passphrase) throws IOException {
         // Lets first check that the identityFile exist
-        if (!new File(identityFile).exists())
-        {
+        if (!new File(identityFile).exists()) {
             throw new IOException("IdentityFile '" + identityFile + "' not found");
         }
 
-        try
-        {
-            if (passphrase == null || "".equals(passphrase))
-            {
+        try {
+            if (passphrase == null || "".equals(passphrase)) {
                 jsch.addIdentity(new File(identityFile).getAbsolutePath());
-            }
-            else
-            {
+            } else {
                 jsch.addIdentity(new File(identityFile).getAbsolutePath(), passphrase);
             }
 
             Properties hash = new Properties();
             hash.put(STRICT_HOST_KEY_CHECKING, "no");
-            if (!StringUtils.isEmpty(preferredAuthenticationMethods))
-            {
+            if (!StringUtils.isEmpty(preferredAuthenticationMethods)) {
                 hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
             }
 
@@ -193,49 +156,35 @@ public class SftpClient
 
             channelSftp = (ChannelSftp) channel;
             setHome(channelSftp.pwd());
-        }
-        catch (JSchException e)
-        {
-            logAndThrowLoginError(user, e);
-        }
-        catch (SftpException e)
-        {
+        } catch (JSchException | SftpException e) {
             logAndThrowLoginError(user, e);
         }
     }
 
-    private void logAndThrowLoginError(String user, Exception e) throws IOException
-    {
+    private void logAndThrowLoginError(String user, Exception e) throws IOException {
         logger.error("Error during login to " + user + "@" + host, e);
         throw new IOException("Error during login to " + user + "@" + host + ": " + e.getMessage());
     }
 
-    public void setPort(int port)
-    {
+    public void setPort(int port) {
         this.port = port;
     }
 
-    public void rename(String filename, String dest) throws IOException
-    {
+    public void rename(String filename, String dest) throws IOException {
         // Notify sftp rename file action
-        if (notifier != null)
-        {
+        if (notifier != null) {
             notifier.notify(SFTP_RENAME_ACTION, "from: " + currentDirectory + "/" + filename + " - to: "
-                                                + dest);
+                    + dest);
         }
 
         String absolutePath = getAbsolutePath(dest);
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
+        try {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Will try to rename " + currentDirectory + "/" + filename + " to "
-                             + absolutePath);
+                        + absolutePath);
             }
             channelSftp.rename(filename, absolutePath);
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             throw new IOException(e.getMessage());
             // throw new IOException("Error occured when renaming " +
             // currentDirectory + "/" + filename + " to " + absolutePath +
@@ -243,197 +192,99 @@ public class SftpClient
         }
     }
 
-    public void deleteFile(String fileName) throws IOException
-    {
+    public void deleteFile(String fileName) throws IOException {
         // Notify sftp delete file action
-    	notifyAction(SFTP_DELETE_ACTION, fileName);
+        notifyAction(SFTP_DELETE_ACTION, fileName);
 
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
+        try {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Will try to delete " + fileName);
             }
             channelSftp.rm(fileName);
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             throw new IOException(e);
         }
     }
 
-    public void disconnect()
-    {
-        if (channelSftp != null)
-        {
+    public void disconnect() {
+        if (channelSftp != null) {
             channelSftp.disconnect();
         }
-        if ((session != null) && session.isConnected())
-        {
+        if ((session != null) && session.isConnected()) {
             session.disconnect();
         }
     }
 
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return (channelSftp != null) && channelSftp.isConnected() && !channelSftp.isClosed()
-               && (session != null) && session.isConnected();
+                && (session != null) && session.isConnected();
     }
 
-    public String[] listFiles() throws IOException
-    {
+    public String[] listFiles() throws IOException {
         return listFiles(".");
     }
 
-    public String[] listFiles(String path) throws IOException
-    {
+    public String[] listFiles(String path) throws IOException {
         return listDirectory(path, true, false);
     }
 
-    public String[] listDirectories() throws IOException
-    {
+    public String[] listDirectories() throws IOException {
         return listDirectory(".", false, true);
     }
 
     private String[] listDirectory(final String path, boolean includeFiles, boolean includeDirectories)
-            throws IOException
-    {
+            throws IOException {
         final List<String> ret = new ArrayList<>();
-<<<<<<< HEAD
-<<<<<<< HEAD
         for (final FileDescriptor desc : getFileDescriptorsFromDirectory(path, includeFiles, includeDirectories)) {
-=======
-        for (final FtpFileDescriptor desc : getFileDescriptorsFromDirectory(path, includeFiles, includeDirectories)) {
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
-=======
-        for (final FileDescriptor desc : getFileDescriptorsFromDirectory(path, includeFiles, includeDirectories)) {
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
             ret.add(desc.getFilename());
         }
         return ret.toArray(new String[ret.size()]);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public FileDescriptor[] getFileDescriptors() throws IOException
-=======
-    public FtpFileDescriptor[] getFileDescriptors() throws IOException
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
-=======
-    public FileDescriptor[] getFileDescriptors() throws IOException
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-    {
+    public FileDescriptor[] getFileDescriptors() throws IOException {
         return getFileDescriptors(".");
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public FileDescriptor[] getFileDescriptors(String path) throws IOException
-=======
-    public FtpFileDescriptor[] getFileDescriptors(String path) throws IOException
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
-=======
-    public FileDescriptor[] getFileDescriptors(String path) throws IOException
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-    {
+    public FileDescriptor[] getFileDescriptors(String path) throws IOException {
         return getFileDescriptorsFromDirectory(path, true, false);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private FileDescriptor[] getFileDescriptorsFromDirectory(final String path, boolean includeFiles, boolean includeDirectories)
-=======
-    private FtpFileDescriptor[] getFileDescriptorsFromDirectory(final String path, boolean includeFiles, boolean includeDirectories)
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
-=======
-    private FileDescriptor[] getFileDescriptorsFromDirectory(final String path, boolean includeFiles, boolean includeDirectories)
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-            throws IOException
-    {
-        try
-        {
+            throws IOException {
+        try {
             final Vector<LsEntry> entries = channelSftp.ls(path);
-            if (entries != null)
-            {
-<<<<<<< HEAD
-<<<<<<< HEAD
+            if (entries != null) {
                 final List<FileDescriptor> ret = new ArrayList<>();
-                for (LsEntry entry : entries)
-                {
+                for (LsEntry entry : entries) {
                     final FileDescriptor fileDescriptor = new FileDescriptor(entry.getFilename(), entry.getAttrs());
-=======
-                final List<FtpFileDescriptor> ret = new ArrayList<>();
-                for (LsEntry entry : entries)
-                {
-                    final FtpFileDescriptor fileDescriptor = new FtpFileDescriptor(entry.getFilename(), entry.getAttrs());
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
-=======
-                final List<FileDescriptor> ret = new ArrayList<>();
-                for (LsEntry entry : entries)
-                {
-                    final FileDescriptor fileDescriptor = new FileDescriptor(entry.getFilename(), entry.getAttrs());
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-                    if (includeFile(includeFiles, includeDirectories, fileDescriptor))
-                    {
+                    if (includeFile(includeFiles, includeDirectories, fileDescriptor)) {
                         ret.add(fileDescriptor);
                     }
                 }
-<<<<<<< HEAD
-<<<<<<< HEAD
                 return ret.toArray(new FileDescriptor[ret.size()]);
-=======
-                return ret.toArray(new FtpFileDescriptor[ret.size()]);
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
-=======
-                return ret.toArray(new FileDescriptor[ret.size()]);
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
             }
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             throw new IOException(e.getMessage(), e);
         }
         return null;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private boolean includeFile(boolean includeFiles, boolean includeDirectories, final FileDescriptor fileDesc) {
         if (includeFiles && !fileDesc.getAttrs().isDir())
             return true;
-        if (includeDirectories && fileDesc.getAttrs().isDir() && !fileDesc.getFilename().equals(".") && !fileDesc.getFilename().equals("..")) {
-=======
-    private boolean includeFile(boolean includeFiles, boolean includeDirectories, final FtpFileDescriptor fileDesc) {
-        if (includeFiles && !fileDesc.getDescriptor().isDir())
-            return true;
-        if (includeDirectories && fileDesc.getDescriptor().isDir() && !fileDesc.getFilename().equals(".") && !fileDesc.getFilename().equals("..")) {
->>>>>>> 2e049a2... Introduce FileDescriptor for collecting SFTP-Files
-=======
-    private boolean includeFile(boolean includeFiles, boolean includeDirectories, final FileDescriptor fileDesc) {
-        if (includeFiles && !fileDesc.getAttrs().isDir())
-            return true;
-        if (includeDirectories && fileDesc.getAttrs().isDir() && !fileDesc.getFilename().equals(".") && !fileDesc.getFilename().equals("..")) {
->>>>>>> 1684346... switch from String filename to FileDescriptor, containing all available file-information
-            return true;
-        }
-        return false;
+        return includeDirectories && fileDesc.getAttrs().isDir() && !fileDesc.getFilename().equals(".") && !fileDesc.getFilename().equals("..");
     }
 
-    public InputStream retrieveFile(String fileName) throws IOException
-    {
+    public InputStream retrieveFile(String fileName) throws IOException {
         // Notify sftp get file action
         long size = getSize(fileName);
-        if (notifier != null)
-        {
+        if (notifier != null) {
             notifier.notify(SFTP_GET_ACTION, currentDirectory + "/" + fileName, size);
         }
 
-        try
-        {
+        try {
             return channelSftp.get(fileName);
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             throw new IOException(e.getMessage() + ".  Filename is " + fileName);
         }
     }
@@ -449,118 +300,75 @@ public class SftpClient
     // }
     // }
 
-    public void storeFile(String fileName, InputStream stream) throws IOException
-    {
+    public void storeFile(String fileName, InputStream stream) throws IOException {
         storeFile(fileName, stream, WriteMode.OVERWRITE);
     }
 
-    public void storeFile(String fileName, InputStream stream, WriteMode mode) throws IOException
-    {
-        try
-        {
-
-            // Notify sftp put file action
-        	notifyAction(SFTP_PUT_ACTION, fileName);
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Sending to SFTP service: Stream = " + stream + " , filename = " + fileName);
-            }
-
-            channelSftp.put(stream, fileName, mode.intValue());
-        }
-        catch (SftpException e)
-        {
-            throw new IOException(e.getMessage());
-        }
-    }
-
-    public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler) throws IOException
-    {
-    	storeFile(fileName, event, outputHandler, WriteMode.OVERWRITE);
-    }
-
-    public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler, WriteMode mode) throws IOException
-    {
-        OutputStream os = null;
-        try
-        {
+    public void storeFile(String fileName, InputStream stream, WriteMode mode) throws IOException {
+        try {
 
             // Notify sftp put file action
             notifyAction(SFTP_PUT_ACTION, fileName);
 
-            if (logger.isDebugEnabled())
-            {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Sending to SFTP service: Stream = " + stream + " , filename = " + fileName);
+            }
+
+            channelSftp.put(stream, fileName, mode.intValue());
+        } catch (SftpException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler) throws IOException {
+        storeFile(fileName, event, outputHandler, WriteMode.OVERWRITE);
+    }
+
+    public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler, WriteMode mode) throws IOException {
+        OutputStream os = null;
+        try {
+
+            // Notify sftp put file action
+            notifyAction(SFTP_PUT_ACTION, fileName);
+
+            if (logger.isDebugEnabled()) {
                 logger.debug("Sending to SFTP service: OutputHandler = " + outputHandler + " , filename = " + fileName);
             }
 
             os = channelSftp.put(fileName, mode.intValue());
             outputHandler.write(event, os);
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             throw new IOException(e.getMessage());
-        }
-        finally
-        {
-            if (os != null)
-            {
+        } finally {
+            if (os != null) {
                 os.close();
             }
         }
     }
-    
-    public void storeFile(String fileNameLocal, String fileNameRemote) throws IOException
-    {
+
+    public void storeFile(String fileNameLocal, String fileNameRemote) throws IOException {
         storeFile(fileNameLocal, fileNameRemote, WriteMode.OVERWRITE);
     }
 
-    public void storeFile(String fileNameLocal, String fileNameRemote, WriteMode mode) throws IOException
-    {
-        try
-        {
+    public void storeFile(String fileNameLocal, String fileNameRemote, WriteMode mode) throws IOException {
+        try {
             channelSftp.put(fileNameLocal, fileNameRemote, mode.intValue());
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             throw new IOException(e.getMessage());
         }
     }
 
-    private void notifyAction(int action, String fileName)
-    {
-        if (notifier != null)
-        {
+    private void notifyAction(int action, String fileName) {
+        if (notifier != null) {
             notifier.notify(action, currentDirectory + "/" + fileName);
         }
     }
-    
-    public long getSize(String filename) throws IOException
-    {
-        try
-        {
-            return channelSftp.stat(filename).getSize();
-        }
-        catch (SftpException e)
-        {
-            throw new IOException(e.getMessage() + " (" + currentDirectory + "/" + filename + ")");
-        }
-    }
 
-    /**
-     * @param filename File name
-     * @return Attributes of the file
-     * @throws IOException If an error occurs
-     */
-    public SftpATTRS getAttr(String filename) throws IOException
-    {
-        try
-        {
-            return channelSftp.stat("./" + filename);
-        }
-        catch (SftpException e)
-        {
-            throw new IOException(e.getMessage());
+    public long getSize(String filename) throws IOException {
+        try {
+            return channelSftp.stat(filename).getSize();
+        } catch (SftpException e) {
+            throw new IOException(e.getMessage() + " (" + currentDirectory + "/" + filename + ")");
         }
     }
 
@@ -569,15 +377,11 @@ public class SftpClient
      * @return Number of seconds since the file was written to
      * @throws IOException If an error occurs
      */
-    public long getLastModifiedTime(String filename) throws IOException
-    {
-        try
-        {
+    public long getLastModifiedTime(String filename) throws IOException {
+        try {
             SftpATTRS attrs = channelSftp.stat("./" + filename);
             return attrs.getMTime() * 1000L;
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             throw new IOException(e.getMessage());
         }
     }
@@ -588,40 +392,30 @@ public class SftpClient
      * @param directoryName The directory name
      * @throws IOException If an error occurs
      */
-    public void mkdir(String directoryName) throws IOException
-    {
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
+    public void mkdir(String directoryName) throws IOException {
+        try {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Will try to create directory " + directoryName);
             }
             channelSftp.mkdir(directoryName);
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             // Don't throw e.getmessage since we only get "2: No such file"..
             throw new IOException("Could not create the directory '" + directoryName + "', caused by: "
-                                  + e.getMessage());
+                    + e.getMessage());
             // throw new IOException("Could not create the directory '" +
             // directoryName + "' in '" + currentDirectory + "', caused by: " +
             // e.getMessage());
         }
     }
 
-    public void deleteDirectory(String path) throws IOException
-    {
+    public void deleteDirectory(String path) throws IOException {
         path = getAbsolutePath(path);
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
+        try {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Will try to delete directory " + path);
             }
             channelSftp.rmdir(path);
-        }
-        catch (SftpException e)
-        {
+        } catch (SftpException e) {
             throw new IOException(e.getMessage());
         }
     }
@@ -631,22 +425,21 @@ public class SftpClient
      *
      * @param home The path to home
      */
-    void setHome(String home)
-    {
+    void setHome(String home) {
         this.home = home;
     }
 
     /**
      * @return the ChannelSftp - useful for some tests
      */
-    public ChannelSftp getChannelSftp()
-    {
+    public ChannelSftp getChannelSftp() {
         return channelSftp;
     }
 
     /**
-     * Creates the directory if it not already exists. TODO: check if the SftpUtil &
-     * SftpClient methods can be merged Note, this method is synchronized because it
+     * Creates the directory if it not already exists.
+     * TODO: check if the SftpUtil & SftpClient methods can be merged
+     * Note, this method is synchronized because it
      * in rare cases can be called from two threads at the same time and thus cause
      * an error.
      *
@@ -654,43 +447,34 @@ public class SftpClient
      * @param newDir
      * @throws IOException
      */
-    public void createSftpDirIfNotExists(ImmutableEndpoint endpoint, String newDir) throws IOException
-    {
+    public void createSftpDirIfNotExists(ImmutableEndpoint endpoint, String newDir) throws IOException {
         String newDirAbs = endpoint.getEndpointURI().getPath() + "/" + newDir;
 
         String currDir = currentDirectory;
 
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("CHANGE DIR FROM " + currentDirectory + " TO " + newDirAbs);
         }
 
         // We need to have a synchronized block if two++ threads tries to
         // create the same directory at the same time
-        synchronized (lock)
-        {
+        synchronized (lock) {
             // Try to change directory to the new dir, if it fails - create it
-            try
-            {
+            try {
                 // This method will throw an exception if the directory does not
                 // exist.
                 changeWorkingDirectory(newDirAbs);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 logger.info("Got an exception when trying to change the working directory to the new dir. "
-                            + "Will try to create the directory " + newDirAbs);
+                        + "Will try to create the directory " + newDirAbs);
                 changeWorkingDirectory(endpoint.getEndpointURI().getPath());
                 mkdir(newDir);
 
                 // Now it should exist!
                 changeWorkingDirectory(newDirAbs);
-            }
-            finally
-            {
+            } finally {
                 changeWorkingDirectory(currDir);
-                if (logger.isDebugEnabled())
-                {
+                if (logger.isDebugEnabled()) {
                     logger.debug("DIR IS NOW BACK TO " + currentDirectory);
                 }
             }
@@ -698,93 +482,73 @@ public class SftpClient
     }
 
     public String duplicateHandling(String destDir, String filename, String duplicateHandling)
-            throws IOException
-    {
-        if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO))
-        {
+            throws IOException {
+        if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO)) {
             filename = createUniqueName(destDir, filename);
-        }
-        else if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_THROW_EXCEPTION))
-        {
-            if (fileAlreadyExists(destDir, filename))
-            {
+        } else if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_THROW_EXCEPTION)) {
+            if (fileAlreadyExists(destDir, filename)) {
                 throw new IOException("File already exists: " + filename);
             }
         }
         return filename;
     }
 
-    private boolean fileAlreadyExists(String destDir, String filename) throws IOException
-    {
+    private boolean fileAlreadyExists(String destDir, String filename) throws IOException {
         logger.warn("listing files for: " + destDir + "/" + filename);
         String[] files = listFiles(destDir);
-        for (String file : files)
-        {
-            if (file.equals(filename))
-            {
+        for (String file : files) {
+            if (file.equals(filename)) {
                 return true;
             }
         }
         return false;
     }
 
-    private String createUniqueName(String dir, String path) throws IOException
-    {
+    private String createUniqueName(String dir, String path) throws IOException {
         int fileIdx = 1;
 
         String filename;
         String fileType;
         int fileTypeIdx = path.lastIndexOf('.');
-        if (fileTypeIdx == -1)
-        {
+        if (fileTypeIdx == -1) {
             // No file type/extension found
             filename = path;
             fileType = "";
-        }
-        else
-        {
+        } else {
             fileType = path.substring(fileTypeIdx); // Let the fileType include the
             // leading '.'
             filename = path.substring(0, fileTypeIdx);
         }
 
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("Create a unique name for: " + path + " (" + dir + " - " + filename + " - "
-                         + fileType + ")");
+                    + fileType + ")");
         }
 
         String uniqueFilename = filename;
         String[] existingFiles = listFiles(getAbsolutePath(dir));
 
-        while (existsFile(existingFiles, uniqueFilename, fileType))
-        {
+        while (existsFile(existingFiles, uniqueFilename, fileType)) {
             uniqueFilename = filename + '_' + fileIdx++;
         }
 
         uniqueFilename = uniqueFilename + fileType;
-        if (!path.equals(uniqueFilename) && logger.isInfoEnabled())
-        {
+        if (!path.equals(uniqueFilename) && logger.isInfoEnabled()) {
             logger.info("A file with the original filename (" + dir + "/" + path
-                        + ") already exists, new name: " + uniqueFilename);
+                    + ") already exists, new name: " + uniqueFilename);
         }
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("Unique name returned: " + uniqueFilename);
         }
         return uniqueFilename;
     }
 
-    private boolean existsFile(String[] files, String filename, String fileType)
-    {
+    private boolean existsFile(String[] files, String filename, String fileType) {
         boolean existsFile = false;
         filename += fileType;
-        for (String file : files)
-        {
-            if (file.equals(filename))
-            {
-                if (logger.isDebugEnabled())
-                {
+        for (String file : files) {
+            if (file.equals(filename)) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Found existing file: " + file);
                 }
                 existsFile = true;
@@ -793,66 +557,53 @@ public class SftpClient
         return existsFile;
     }
 
-    public void chmod(String path, int permissions) throws SftpException
-    {
+    public void chmod(String path, int permissions) throws SftpException {
         path = getAbsolutePath(path);
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("Will try to chmod directory '" + path + "' to permission " + permissions);
         }
         channelSftp.chmod(permissions, path);
     }
 
-    public void setNotifier(SftpNotifier notifier)
-    {
+    public void setNotifier(SftpNotifier notifier) {
         this.notifier = notifier;
     }
 
-    public String getHost()
-    {
+    public String getHost() {
         return host;
     }
 
-    public void recursivelyDeleteDirectory(String dir) throws IOException
-    {
+    public void recursivelyDeleteDirectory(String dir) throws IOException {
         this.changeWorkingDirectory(dir);
         String[] directories = this.listDirectories();
         String[] files = this.listFiles();
-        for (int i = 0; i < directories.length; i++)
-        {
-            recursivelyDeleteDirectory(directories[i]);
+        for (String directory : directories) {
+            recursivelyDeleteDirectory(directory);
         }
-        for (int i = 0; i < files.length; i++)
-        {
+        for (int i = 0; i < files.length; i++) {
             deleteFile(files[i]);
         }
         this.changeWorkingDirectory("..");
         this.deleteDirectory(dir);
     }
 
-    public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
-    {
+    public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods) {
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
     }
 
-    public enum WriteMode
-    {
-        APPEND
-                {
-                    @Override
-                    public int intValue()
-                    {
-                        return ChannelSftp.APPEND;
-                    }
-                },
-        OVERWRITE
-                {
-                    @Override
-                    public int intValue()
-                    {
-                        return ChannelSftp.OVERWRITE;
-                    }
-                };
+    public enum WriteMode {
+        APPEND {
+            @Override
+            public int intValue() {
+                return ChannelSftp.APPEND;
+            }
+        },
+        OVERWRITE {
+            @Override
+            public int intValue() {
+                return ChannelSftp.OVERWRITE;
+            }
+        };
 
         public abstract int intValue();
     }
