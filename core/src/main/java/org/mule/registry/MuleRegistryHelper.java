@@ -529,10 +529,10 @@ public class MuleRegistryHelper implements MuleRegistry
         String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
         // TODO If we want these descriptors loaded form Spring we need to change the key mechanism
         // and the scope, and then deal with circular reference issues.
-        ServiceDescriptor sd = registry.lookupObject(key);
 
         synchronized (this)
         {
+            ServiceDescriptor sd = registry.lookupObject(key);
             if (sd == null)
             {
                 sd = createServiceDescriptor(type, name, overrides);
@@ -545,8 +545,8 @@ public class MuleRegistryHelper implements MuleRegistry
                     throw new ServiceException(e.getI18nMessage(), e);
                 }
             }
+            return sd;
         }
-        return sd;
     }
 
     protected ServiceDescriptor createServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
