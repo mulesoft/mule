@@ -276,7 +276,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         {
             if (Initialisable.class.isAssignableFrom(beanClass))
             {
-                //builder.setInitMethodName(Initialisable.PHASE_NAME);
+                builder.setInitMethodName(Initialisable.PHASE_NAME);
             }
 
             if (Disposable.class.isAssignableFrom(beanClass))

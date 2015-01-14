@@ -114,10 +114,11 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
     public <T> T lookupObject(String key)
     {
         Object obj = null;
-        Iterator it = getRegistries().iterator();
+        Iterator<Registry> it = getRegistries().iterator();
         while (obj == null && it.hasNext())
         {
-            obj = ((Registry) it.next()).lookupObject(key);
+            Registry registry = it.next();
+            obj = registry.lookupObject(key);
         }
         return (T) obj;
     }
