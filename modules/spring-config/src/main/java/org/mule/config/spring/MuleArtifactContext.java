@@ -7,10 +7,13 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.ConfigResource;
+import org.mule.config.bootstrap.BootstrapException;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
+import org.mule.config.spring.util.InitialisingBeanDefintionRegistry;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractXmlApplicationContext;
@@ -31,13 +35,14 @@ import org.springframework.core.io.UrlResource;
  * <code>MuleArtifactContext</code> is a simple extension application context
  * that allows resources to be loaded from the Classpath of file system using the
  * MuleBeanDefinitionReader.
- *
  */
 public class MuleArtifactContext extends AbstractXmlApplicationContext
 {
+
     private MuleContext muleContext;
     private Resource[] springResources;
     private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<MuleContext>();
+
     /**
      * Parses configuration files creating a spring ApplicationContext which is used
      * as a parent registry using the SpringRegistry registry implementation to wraps
@@ -67,11 +72,28 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                               new ExpressionEvaluatorPostProcessor(muleContext),
                               new GlobalNamePostProcessor(),
                               new ExpressionEnricherPostProcessor(muleContext),
-                              new ExpressionEvaluatorPostProcessor(muleContext),
+                              new NotificationListenersPostProcessor(muleContext),
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
         );
 
         beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
+
+        SpringRegistryBootstrap bootstrap = new SpringRegistryBootstrap(new InitialisingBeanDefintionRegistry((BeanDefinitionRegistry) beanFactory));
+        initialiseBootstrap(bootstrap);
+
+        try
+        {
+            bootstrap.boot();
+        }
+        catch (BootstrapException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
+
+    protected void initialiseBootstrap(SpringRegistryBootstrap bootstrap)
+    {
+        bootstrap.setMuleContext(muleContext);
     }
 
     private void addBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, BeanPostProcessor... processors)
@@ -88,7 +110,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         for (int i = 0; i < resources.length; i++)
         {
             ConfigResource resource = resources[i];
-            if(resource.getUrl()!=null)
+            if (resource.getUrl() != null)
             {
                 configResources[i] = new UrlResource(resource.getUrl());
             }
@@ -153,7 +175,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         if (getParent() != null)
         {
             //Copy over all processors
-            AbstractBeanFactory beanFactory = (AbstractBeanFactory)getParent().getAutowireCapableBeanFactory();
+            AbstractBeanFactory beanFactory = (AbstractBeanFactory) getParent().getAutowireCapableBeanFactory();
             bf.copyConfigurationFrom(beanFactory);
         }
         return bf;

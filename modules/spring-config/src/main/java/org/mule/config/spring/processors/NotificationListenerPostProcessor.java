@@ -7,16 +7,17 @@
 package org.mule.config.spring.processors;
 
 import org.mule.api.MuleContext;
-import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.api.context.notification.ServerNotificationListener;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-public final class ExpressionEvaluatorPostProcessor implements BeanPostProcessor
+public class NotificationListenerPostProcessor implements BeanPostProcessor
 {
+
     private final MuleContext muleContext;
 
-    public ExpressionEvaluatorPostProcessor(MuleContext muleContext)
+    public NotificationListenerPostProcessor(MuleContext muleContext)
     {
         this.muleContext = muleContext;
     }
@@ -24,9 +25,9 @@ public final class ExpressionEvaluatorPostProcessor implements BeanPostProcessor
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
     {
-        if(bean instanceof ExpressionEvaluator)
+        if (bean instanceof ServerNotificationListener)
         {
-            muleContext.getExpressionManager().registerEvaluator((ExpressionEvaluator) bean);
+            muleContext.getNotificationManager().addListener((ServerNotificationListener) bean);
         }
 
         return bean;

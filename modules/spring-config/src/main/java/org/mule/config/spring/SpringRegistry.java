@@ -6,12 +6,17 @@
  */
 package org.mule.config.spring;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.RegistryLifecycleManager;
+import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
 import org.mule.util.StringUtils;
 
@@ -23,13 +28,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class SpringRegistry extends AbstractRegistry
+public class SpringRegistry extends AbstractRegistry implements InitialisingRegistry
 {
+
     public static final String REGISTRY_ID = "org.mule.Registry.Spring";
 
     /**
@@ -111,7 +116,7 @@ public class SpringRegistry extends AbstractRegistry
         }
 
         if (applicationContext instanceof ConfigurableApplicationContext
-                && ((ConfigurableApplicationContext) applicationContext).isActive())
+            && ((ConfigurableApplicationContext) applicationContext).isActive())
         {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
@@ -233,6 +238,25 @@ public class SpringRegistry extends AbstractRegistry
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
         registrationDelegate.registerObject(key, value, metadata);
+
+        try
+        {
+            if (getLifecycleManager().getCurrentPhase().equals(NotInLifecyclePhase.PHASE_NAME))
+            {
+                if (value instanceof Initialisable)
+                {
+                    ((Initialisable) value).initialise();
+                }
+            }
+            else
+            {
+                applyLifecycle(value);
+            }
+        }
+        catch (MuleException e)
+        {
+            throw new RegistrationException(e);
+        }
     }
 
     @Override
@@ -250,10 +274,52 @@ public class SpringRegistry extends AbstractRegistry
     @Override
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        registrationDelegate.unregisterObject(key, metadata);
     }
 
-    private interface RegistrationDelegate {
+    /**
+     * Will fire any lifecycle methods according to the current lifecycle without actually
+     * registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects.
+     *
+     * @param object the object to process
+     * @return the same object with lifecycle methods called (if it has any)
+     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
+     */
+    @Override
+    public Object applyLifecycle(Object object) throws MuleException
+    {
+        getLifecycleManager().applyCompletedPhases(object);
+        return object;
+    }
+
+    @Override
+    public Object applyLifecycle(Object object, String phase) throws MuleException
+    {
+        if (phase == null)
+        {
+            getLifecycleManager().applyCompletedPhases(object);
+        }
+        else
+        {
+            getLifecycleManager().applyPhase(object, NotInLifecyclePhase.PHASE_NAME, phase);
+        }
+        return object;
+    }
+
+    @Override
+    public Object applyProcessors(Object object, Object metadata)
+    {
+        return initialiseObject((ConfigurableApplicationContext) applicationContext, EMPTY, object);
+    }
+
+    private Object initialiseObject(ConfigurableApplicationContext applicationContext, String key, Object object)
+    {
+        return applicationContext.getBeanFactory().initializeBean(object, key);
+    }
+
+    private interface RegistrationDelegate
+    {
 
         void registerObject(String key, Object value) throws RegistrationException;
 
@@ -266,7 +332,8 @@ public class SpringRegistry extends AbstractRegistry
         void unregisterObject(String key, Object metadata) throws RegistrationException;
     }
 
-    private class ConfigurableRegistrationDelegate implements RegistrationDelegate {
+    private class ConfigurableRegistrationDelegate implements RegistrationDelegate
+    {
 
         private final ConfigurableApplicationContext applicationContext;
 
@@ -290,11 +357,13 @@ public class SpringRegistry extends AbstractRegistry
         @Override
         public void registerObjects(Map<String, Object> objects) throws RegistrationException
         {
-            if (objects == null || objects.isEmpty()) {
+            if (objects == null || objects.isEmpty())
+            {
                 return;
             }
 
-            for (Map.Entry<String, Object> entry : objects.entrySet()) {
+            for (Map.Entry<String, Object> entry : objects.entrySet())
+            {
                 registerObject(entry.getKey(), entry.getValue());
             }
         }
@@ -311,14 +380,15 @@ public class SpringRegistry extends AbstractRegistry
             unregisterObject(key);
         }
 
-        private void doRegisterObject(String key, Object value) {
-            ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
-            beanFactory.registerSingleton(key, value);
-            beanFactory.initializeBean(value, key);
+        private void doRegisterObject(String key, Object value)
+        {
+            value = initialiseObject(applicationContext, key, value);
+            applicationContext.getBeanFactory().registerSingleton(key, value);
         }
     }
 
-    private class ReadOnlyRegistrationDelegate implements RegistrationDelegate {
+    private class ReadOnlyRegistrationDelegate implements RegistrationDelegate
+    {
 
         @Override
         public void registerObject(String key, Object value) throws RegistrationException

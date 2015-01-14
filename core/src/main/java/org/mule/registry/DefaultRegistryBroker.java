@@ -7,42 +7,58 @@
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
+import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.Registry;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {
-    private TransientRegistry transientRegistry;
-    private List<Registry> registries = new CopyOnWriteArrayList<Registry>();
+    private final List<Registry> registries = new CopyOnWriteArrayList<>();
+    private final AtomicReference<InitialisingRegistry> initialisingRegistry = new AtomicReference<>(null);
 
     public DefaultRegistryBroker(MuleContext context)
     {
         super(context);
-        //transientRegistry = new TransientRegistry(context);
-        //registries.add(0, transientRegistry);
-    }
-
-    TransientRegistry getTransientRegistry()
-    {
-        return transientRegistry;
     }
 
     public void addRegistry(Registry registry)
     {
-        //registries.add(1, registry);
         registries.add(registry);
     }
 
     public void removeRegistry(Registry registry)
     {
         registries.remove(registry);
+        if (registry instanceof InitialisingRegistry)
+        {
+            initialisingRegistry.compareAndSet((InitialisingRegistry) registry, null);
+        }
     }
 
     protected Collection<Registry> getRegistries()
     {
         return registries;
+    }
+
+    protected InitialisingRegistry getInitialisingRegistry()
+    {
+        InitialisingRegistry initialising = initialisingRegistry.get();
+        if (initialising == null)
+        {
+            for (Registry registry : registries)
+            {
+                if (registry instanceof InitialisingRegistry)
+                {
+                    initialising = (InitialisingRegistry) registry;
+                    return initialisingRegistry.compareAndSet(null, initialising) ? initialising : initialisingRegistry.get();
+                }
+            }
+        }
+
+        return initialising;
     }
 }

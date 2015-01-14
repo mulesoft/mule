@@ -56,15 +56,13 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
 
     protected void registerPhases()
     {
-        RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
+        //RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
+        EmptyLifecycleCallback<AbstractRegistryBroker> callback = new EmptyLifecycleCallback<>();
 
-        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE,
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, callback);
         registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), callback);
-        registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(),
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
-        registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(),
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
+        registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
         registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), callback);
     }
 

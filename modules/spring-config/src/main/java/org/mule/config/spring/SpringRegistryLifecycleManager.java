@@ -17,7 +17,6 @@ import org.mule.api.registry.Registry;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
-import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
@@ -33,9 +32,8 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
     protected void registerPhases()
     {
         registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE,
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
-        //registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase());
-        registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase());
+                      new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase());
         registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(),
             new EmptyLifecycleCallback<AbstractRegistryBroker>());
         registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(),
@@ -68,7 +66,12 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
         @Override
         public void applyLifecycle(Object o) throws LifecycleException
         {
-            // Spring starts initialised, do nothing here
+            // Spring starts initialised, don't do anything unless the context
+            // is already started and this is an object being registered on the fly
+            if (getCurrentPhase() != NotInLifecyclePhase.PHASE_NAME)
+            {
+                super.applyLifecycle(o);
+            }
         }
     }
 
