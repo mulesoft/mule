@@ -10,6 +10,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -18,8 +20,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.transaction.Transaction;
+import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
@@ -199,8 +206,88 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         JmsConnector connector = createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class));
         assertThat(connector.getConnectionFactory(), instanceOf(DefaultXAConnectionFactoryWrapper.class));
     }
+    
+    @Test
+    public void changesClassLoaderOnNotification() throws Exception
+    {
+        /**
+         * Fetches a ClusterNodeNotificationListener added to a mock mule context
+         */
+        class NotificationAnswer implements Answer 
+        {
+            ClusterNodeNotificationListener listener;
+            
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable 
+            {
+                listener = (ClusterNodeNotificationListener) invocation.getArguments()[0];
+                return null;
+            }
+            
+            public ClusterNodeNotificationListener getListener()
+            {
+                return listener;
+            }
+        };
+
+        /**
+         * Validates the classloader used in connector's connect is the app classloader
+         */
+        class ConnectClassLoaderCheckAnswer implements Answer
+        {
+            ClassLoader expectedClassLoader;
+            
+            public ConnectClassLoaderCheckAnswer(ClassLoader expectedClassLoader)
+            {
+                  this.expectedClassLoader = expectedClassLoader;
+            }
+            
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                ClassLoader connectClassLoader = Thread.currentThread().getContextClassLoader();
+                assertThat(connectClassLoader, is(expectedClassLoader));
+                return null;
+            }
+        };
+
+        /**
+         * On testing the muleContext.getExecutionClassLoader wont be different than the test thread.
+         * This is used to check the class loader is effectively changed when performing the connection 
+         */
+        ClassLoader expectedClassLoader = new ClassLoader() 
+        {
+            String thismakesme = "different";
+        };
+        
+        NotificationAnswer notificationAnswer = new NotificationAnswer();
+        MuleContext muleContextSpy = spy(muleContext);
+        doReturn(false).when(muleContextSpy).isPrimaryPollingInstance();
+        doReturn(expectedClassLoader).when(muleContextSpy).getExecutionClassLoader();
+        doAnswer(notificationAnswer).when(muleContextSpy).registerListener(any(ClusterNodeNotificationListener.class));
+        
+        JmsConnector connectorSpy = spy(createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class),
+                muleContextSpy));
+        connectorSpy.setClientId("MyClientId");
+        connectorSpy.initialise();
+        connectorSpy.connect();
+
+        // Next time we connect is called will be checked to be using expectedClassLoader
+        doAnswer(new ConnectClassLoaderCheckAnswer(expectedClassLoader)).when(connectorSpy).connect();
+
+        ClassLoader preNotificationClassLoader = Thread.currentThread().getContextClassLoader();
+        notificationAnswer.getListener().onNotification(mock(ClusterNodeNotification.class));
+        ClassLoader afterNotificationClassLoader = Thread.currentThread().getContextClassLoader();
+
+        assertThat(preNotificationClassLoader, is(afterNotificationClassLoader));
+    }
 
     private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory) throws JMSException, MuleException
+    {
+        return createConnectionFactoryWhenGettingConnection(mockConnectionFactory, muleContext);
+    }
+    
+    private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory, MuleContext muleContext) throws JMSException, MuleException
     {
         final Connection connection = mock(Connection.class);
 
