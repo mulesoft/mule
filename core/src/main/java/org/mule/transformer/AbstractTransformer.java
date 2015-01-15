@@ -367,7 +367,8 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     @Override
     public final Object transform(Object src) throws TransformerException
     {
-        return transform(src, getEncoding(src));
+        String enc = encoding != null ? encoding : getEncoding(src);
+        return transform(src, enc);
     }
 
     @Override
