@@ -74,10 +74,10 @@ public class MuleServerTestCase extends AbstractMuleTestCase
     public void testMuleServerBuilerArg() throws Exception
     {
         MuleServer muleServer = new MuleServer(new String[]{"-builder",
-            "org.mule.config.spring.SpringXmlConfigurationBuilder"});
+            "org.mule.module.springconfig.SpringXmlConfigurationBuilder"});
         assertEquals(ClassUtils.getResource("mule-config.xml", MuleServer.class).toString(),
             muleServer.getConfigurationResources());
-        assertEquals("org.mule.config.spring.SpringXmlConfigurationBuilder", MuleServer.getConfigBuilderClassName());
+        assertEquals("org.mule.module.springconfig.SpringXmlConfigurationBuilder", MuleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
 
@@ -87,7 +87,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         MuleServer muleServer = new MuleServer(new String[]{"-builder", "spring"});
         assertEquals(ClassUtils.getResource("mule-config.xml", MuleServer.class).toString(),
             muleServer.getConfigurationResources());
-        assertEquals("org.mule.config.spring.SpringXmlConfigurationBuilder", MuleServer.getConfigBuilderClassName());
+        assertEquals("org.mule.module.springconfig.SpringXmlConfigurationBuilder", MuleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
 

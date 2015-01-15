@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.endpoint;
+package org.mule.module.springconfig.parsers.endpoint;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,7 +20,7 @@ import org.junit.Test;
 
 /**
  * This really tests the handling of multiple references in
- * {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}
+ * {@link org.mule.module.springconfig.parsers.assembly.DefaultBeanAssembler}
  */
 public class MultipleTransformerRefsTestCase  extends AbstractEndpointTestCase
 {

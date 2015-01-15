@@ -18,7 +18,7 @@ import org.mule.api.schedule.Schedulers;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
-import org.mule.config.spring.factories.WatermarkFactoryBean;
+import org.mule.module.springconfig.factories.WatermarkFactoryBean;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

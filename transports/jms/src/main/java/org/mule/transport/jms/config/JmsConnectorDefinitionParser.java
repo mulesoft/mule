@@ -6,7 +6,7 @@
  */
 package org.mule.transport.jms.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.transport.jms.JmsConnector;
 
 import javax.jms.Session;

@@ -9,15 +9,15 @@
     <bean id="_muleCustomEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
         <property name="propertyEditorRegistrars">
             <list>
-                <bean class="org.mule.config.spring.editors.MulePropertyEditorRegistrar"/>
+                <bean class="org.mule.module.springconfig.editors.MulePropertyEditorRegistrar"/>
             </list>
         </property>
     </bean>
     
-    <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.processors.MuleObjectNameProcessor"/>
+    <bean name="_muleObjectNameProcessor" class="org.mule.module.springconfig.processors.MuleObjectNameProcessor"/>
     
     <bean name="_mulePropertyPlaceholderProcessor"
-        class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
+        class="org.mule.module.springconfig.processors.PropertyPlaceholderProcessor">
         <property name="factories">
             <map>
                 <entry key="hostname">
@@ -29,6 +29,6 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
-    <bean name="_muleParentContextPropertyPlaceholderProcessor" class="org.mule.config.spring.processors.ParentContextPropertyPlaceholderProcessor"/>
+    <bean name="_muleParentContextPropertyPlaceholderProcessor" class="org.mule.module.springconfig.processors.ParentContextPropertyPlaceholderProcessor"/>
 
 </beans>

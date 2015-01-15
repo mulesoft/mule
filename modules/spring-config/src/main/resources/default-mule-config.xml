@@ -10,7 +10,7 @@
     <spring:beans default-init-method="initialise">
         <!-- Marker for MULE-4813-->
 
-        <spring:bean name="_muleTransformerAnnotationProcessor" class="org.mule.config.spring.processors.TransformerAnnotatedBeanProcessor"/>
+        <spring:bean name="_muleTransformerAnnotationProcessor" class="org.mule.module.springconfig.processors.TransformerAnnotatedBeanProcessor"/>
 
         <spring:bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 

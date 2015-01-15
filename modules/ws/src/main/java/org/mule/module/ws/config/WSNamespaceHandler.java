@@ -6,10 +6,10 @@
  */
 package org.mule.module.ws.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.OrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.ws.consumer.WSConsumer;
 import org.mule.module.ws.consumer.WSConsumerConfig;
 import org.mule.module.ws.security.WSSecurity;

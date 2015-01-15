@@ -6,11 +6,11 @@
  */
 package org.mule.module.json.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.OrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.FilterDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.module.json.transformers.JsonSchemaValidationFilter;
 import org.mule.module.json.transformers.JsonToObject;

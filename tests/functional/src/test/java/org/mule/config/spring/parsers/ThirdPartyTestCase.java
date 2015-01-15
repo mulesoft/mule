@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.module.springconfig.parsers;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.config.spring.parsers.beans.ThirdPartyContainer;
+import org.mule.module.springconfig.parsers.beans.ThirdPartyContainer;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;

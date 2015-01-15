@@ -15,7 +15,7 @@ import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFac
 import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.PROPERTY_USER_DIR;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.module.springconfig.SpringXmlConfigurationBuilder;
 import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
 import org.mule.tck.AbstractTxThreadAssociationTestCase;
 

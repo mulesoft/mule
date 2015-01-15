@@ -6,9 +6,9 @@
  */
 package org.mule.transport.jms.config;
 
-import org.mule.config.spring.parsers.delegate.AbstractFirstResultSerialDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
+import org.mule.module.springconfig.parsers.delegate.AbstractFirstResultSerialDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ParentDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.ObjectFactoryWrapper;
 
 /**
  * We want to set the connection factory as a pojo factory and then add attributes (username and

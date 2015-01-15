@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.config;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 import org.mule.module.http.internal.HttpParam;
 import org.mule.module.http.internal.HttpParamType;
 

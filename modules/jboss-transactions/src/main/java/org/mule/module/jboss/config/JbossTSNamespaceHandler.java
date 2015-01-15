@@ -6,8 +6,8 @@
  */
 package org.mule.module.jboss.config;
 
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

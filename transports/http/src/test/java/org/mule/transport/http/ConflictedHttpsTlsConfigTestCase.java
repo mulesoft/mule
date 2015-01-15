@@ -9,7 +9,7 @@ package org.mule.transport.http;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleContext;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.module.springconfig.parsers.processors.CheckExclusiveAttributes;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashSet;

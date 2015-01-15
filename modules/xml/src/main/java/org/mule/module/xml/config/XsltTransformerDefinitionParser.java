@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.config;
 
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.xml.transformer.XsltTransformer;
 
 public class XsltTransformerDefinitionParser extends MessageProcessorDefinitionParser

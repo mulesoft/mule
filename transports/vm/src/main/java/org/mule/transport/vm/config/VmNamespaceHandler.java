@@ -6,10 +6,10 @@
  */
 package org.mule.transport.vm.config;
 
-import org.mule.config.spring.factories.QueueProfileFactoryBean;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
+import org.mule.module.springconfig.factories.QueueProfileFactoryBean;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.TransactionDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.vm.VMConnector;
 import org.mule.transport.vm.VMTransactionFactory;

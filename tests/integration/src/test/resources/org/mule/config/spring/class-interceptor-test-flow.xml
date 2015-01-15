@@ -7,7 +7,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-    <spring:bean name="advice" class="org.mule.config.spring.FunctionalTestAdvice"/>
+    <spring:bean name="advice" class="org.mule.module.springconfig.FunctionalTestAdvice"/>
     <spring:bean name="pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
         <!-- we must name the correct interface below, FunctionalTestComponent itself does not work -->
         <spring:property name="pattern" value="org.mule.api.lifecycle.Callable.onCall"/>

@@ -24,7 +24,7 @@ public class ApplicationDescriptor
      * Required to support the '-config spring' shortcut. Don't use a class object so
      * the core doesn't depend on mule-module-spring.
      */
-    public static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
+    public static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.module.springconfig.SpringXmlConfigurationBuilder";
 
 
     private String appName;

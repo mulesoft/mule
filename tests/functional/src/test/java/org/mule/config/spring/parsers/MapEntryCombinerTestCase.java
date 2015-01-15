@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.module.springconfig.parsers;
 
-import org.mule.config.spring.parsers.beans.OrphanBean;
+import org.mule.module.springconfig.parsers.beans.OrphanBean;
 
 import org.junit.Test;
 
 /**
  * This constructs a <em>temporary</em> bean whose contents are injected into a parent map by
- * {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}.  Since this occurs
+ * {@link org.mule.module.springconfig.parsers.assembly.DefaultBeanAssembler}.  Since this occurs
  * <em>before</em> child elements are processed this will <em>cannot</em> handle nested elements.
  */
 public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase

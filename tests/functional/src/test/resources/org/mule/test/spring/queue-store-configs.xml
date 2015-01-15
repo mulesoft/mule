@@ -40,7 +40,7 @@
         <echo-component/>
     </flow>
     <queued-asynchronous-processing-strategy name="serviceExplicitObjectStorePS">
-        <custom-queue-store class="org.mule.config.spring.QueueStoreConfigurationTestCase$TestQueueStore"/>
+        <custom-queue-store class="org.mule.module.springconfig.QueueStoreConfigurationTestCase$TestQueueStore"/>
     </queued-asynchronous-processing-strategy>
 
     <flow name="flowDefault">

@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 
 

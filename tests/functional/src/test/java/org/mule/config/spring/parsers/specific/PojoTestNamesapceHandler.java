@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific;
+package org.mule.module.springconfig.parsers.specific;
 
-import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
+import org.mule.module.springconfig.handlers.AbstractPojoNamespaceHandler;
 
 public class PojoTestNamesapceHandler extends AbstractPojoNamespaceHandler
 {

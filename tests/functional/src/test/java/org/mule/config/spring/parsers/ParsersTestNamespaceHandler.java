@@ -4,29 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.module.springconfig.parsers;
 
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.beans.ChildBean;
-import org.mule.config.spring.parsers.beans.OrphanBean;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
-import org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator;
-import org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
+import org.mule.module.springconfig.factories.InboundEndpointFactoryBean;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.beans.ChildBean;
+import org.mule.module.springconfig.parsers.beans.OrphanBean;
+import org.mule.module.springconfig.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildMapDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildSingletonMapDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.InheritDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.MapDefinitionParserMutator;
+import org.mule.module.springconfig.parsers.delegate.SingleParentFamilyDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.NamedDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.OrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ParentDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 /**
