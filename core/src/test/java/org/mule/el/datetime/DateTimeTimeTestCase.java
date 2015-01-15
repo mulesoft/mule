@@ -6,12 +6,10 @@
  */
 package org.mule.el.datetime;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.mule.api.el.datetime.Time;
@@ -29,7 +27,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import junit.framework.Assert;
 
 import org.junit.Test;
 
