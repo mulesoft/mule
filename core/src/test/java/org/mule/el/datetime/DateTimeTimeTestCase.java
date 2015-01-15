@@ -6,9 +6,14 @@
  */
 package org.mule.el.datetime;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.mule.api.el.datetime.Time;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -31,47 +36,50 @@ import org.junit.Test;
 @SmallTest
 public class DateTimeTimeTestCase extends AbstractMuleTestCase
 {
+    public static final int TWO_DAYS_IN_SECONDS = 172800;
+    public static final int TWO_DAYS_IN_MINUTES = 2880;
+    public static final int TWO_DAYS_IN_HOURS = 48;
+    protected volatile Calendar calendarNow;
+    protected volatile DateTime now;
+    protected volatile DateTime before;
+    protected volatile DateTime after;
+    
+    @Before
+    public void setup()
+    {
+        calendarNow = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        
+        GregorianCalendar calendarBefore = ((GregorianCalendar) calendarNow.clone());
+        calendarBefore.add(Calendar.MILLISECOND, -10);
 
-    protected Time now = new DateTime().withTimeZone("UTC").getTime();
+        GregorianCalendar calendarAfter = ((GregorianCalendar) calendarNow.clone());
+        calendarAfter.add(Calendar.MILLISECOND, +10);
+        
+        before = new DateTime(calendarBefore).withTimeZone("UTC");
+        now = new DateTime((GregorianCalendar) calendarNow.clone()).withTimeZone("UTC");
+        after = new DateTime(calendarAfter).withTimeZone("UTC");
+    }
 
     @Test
     public void milliSeconds()
     {
-        Assert.assertTrue(now.getMilliSeconds() < 1000);
+        assertThat(now.getMilliSeconds(), is((long) calendarNow.get(Calendar.MILLISECOND)));
     }
 
     @Test
     public void isBefore()
-    {System.out.println(now.getHours());
-        if (now.getHours() == 23)
-        {
-            Assert.assertTrue((Boolean) now.isAfter(new DateTime().changeTimeZone("UTC")
-                .plusHours(1)
-                .getTime()));
-        }
-        else
-        {
-            Assert.assertTrue((Boolean) now.isBefore(new DateTime().changeTimeZone("UTC")
-                .plusHours(1)
-                .getTime()));
-        }
+    {
+        assertThat(before.isBefore(now), is(true));
+        assertThat(before.isBefore(after), is(true));
+        assertThat(now.isBefore(after), is(true));
     }
 
     @Test
     public void isAfter()
     {
-        if (now.getHours() == 0)
-        {
-            Assert.assertTrue((Boolean) now.isBefore(new DateTime().withTimeZone("UTC")
-                .plusHours(-1)
-                .getTime()));
-        }
-        else
-        {
-            Assert.assertTrue((Boolean) now.isAfter(new DateTime().withTimeZone("UTC")
-                .plusHours(-1)
-                .getTime()));
-        }
+        assertThat(after.isAfter(before), is(true));
+        assertThat(after.isAfter(now), is(true));
+        assertThat(now.isAfter(before), is(true));
     }
 
     @Test
@@ -79,117 +87,115 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     {
         SimpleDateFormat df = new SimpleDateFormat("hh:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Assert.assertEquals(df.format(now.toDate()), now.format("hh:mm:ss"));
+        assertThat(now.format("hh:mm:ss"), is(df.format(calendarNow.getTime())));
     }
 
     @Test
     public void timeZone()
     {
-        Assert.assertEquals(TimeZone.getTimeZone("UTC").getDisplayName(), now.getTimeZone());
+        assertThat(now.getTimeZone(), is(TimeZone.getTimeZone("UTC").getDisplayName()));
     }
 
     @Test
     public void plusSeconds()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.SECOND) + 1) % 60, now.plusSeconds(1)
-            .getSeconds());
+        assertThat(now.plusSeconds(1).getSeconds(), is((calendarNow.get(Calendar.SECOND) + 1) % 60));
     }
 
     @Test
-    public void plusSecondsRollover()
+    public void plusSecondsShouldKeepSameDayInRollover()
     {
-        Assert.assertEquals(1, now.plusHours(172800).toCalendar().get(Calendar.DAY_OF_YEAR));
+        assertSameDay(now.getTime(), now.getTime().plusSeconds(TWO_DAYS_IN_SECONDS));
     }
-
+    
     @Test
     public void plusMinutes()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.MINUTE) + 1) % 60, now.plusMinutes(1)
-            .getMinutes());
+        assertThat(now.getTime().plusMinutes(1).getMinutes(), is((calendarNow.get(Calendar.MINUTE) + 1) % 60));
     }
 
     @Test
-    public void plusMinutesRollover()
+    public void plusMinutesShouldKeepSameDayInRollover()
     {
-        Assert.assertEquals(1, now.plusHours(2880).toCalendar().get(Calendar.DAY_OF_YEAR));
+        assertSameDay(now.getTime(), now.getTime().plusMinutes(TWO_DAYS_IN_MINUTES));
     }
 
     @Test
     public void plusHours()
     {
-        Assert.assertEquals(
-            (Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.HOUR_OF_DAY) + 1) % 24,
-            now.plusHours(1).getHours());
+        assertThat(now.getTime().plusHours(1).getHours(), is((calendarNow.get(Calendar.HOUR_OF_DAY) + 1) % 24));
     }
 
     @Test
-    public void plusHoursRollover()
+    public void plusHoursShouldKeepSameDayInRollover() {
+        assertSameDay(now.getTime(), now.getTime().plusHours(TWO_DAYS_IN_HOURS));
+    }
+
+    private void assertSameDay(Time a, Time b)
     {
-        Assert.assertEquals(1, now.plusHours(48).toCalendar().get(Calendar.DAY_OF_YEAR));
+        assertThat(a.toCalendar().get(Calendar.DAY_OF_YEAR), is(b.toCalendar().get(Calendar.DAY_OF_YEAR)));
     }
 
     @Test
-    public void withTimeZone()
-    {
+    public void withTimeZone() {
         int hour = now.getHours();
-        assertEquals(hour, now.withTimeZone("GMT-03:00").getHours());
+        assertThat(now.withTimeZone("GMT-03:00").getHours(), is(hour));
     }
 
     @Test
     public void changeTimeZone()
     {
         int hour = now.getHours();
-        assertEquals((hour + 24 - 3) % 24, now.changeTimeZone("GMT-03:00").getHours());
+        assertThat(now.changeTimeZone("GMT-03:00").getHours(), is((hour + 24 - 3) % 24));
     }
 
     @Test
     public void changeTimeZoneRollover()
     {
-        Assert.assertEquals(1, now.plusHours(48).toCalendar().get(Calendar.DAY_OF_YEAR));
+        assertThat(now.getTime().plusHours(48).toCalendar().get(Calendar.DAY_OF_YEAR), is(1));
     }
 
     @Test
     public void seconds()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.SECOND), now.getSeconds());
+        assertThat(now.getSeconds(), is(calendarNow.get(Calendar.SECOND)));
     }
 
     @Test
     public void minutes()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.MINUTE), now.getMinutes());
+        assertThat(now.getMinutes(), is(calendarNow.get(Calendar.MINUTE)));
     }
 
     @Test
     public void hourOfDay()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.HOUR_OF_DAY),
-            now.getHours());
+        assertThat(now.getHours(), is(calendarNow.get(Calendar.HOUR_OF_DAY)));
     }
 
     @Test
     public void testToString()
     {
-        assertEquals(DatatypeConverter.printTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")))
-            .substring(0, 8), now.withTimeZone("UTC").toString().substring(0, 8));
+        assertThat(now.getTime().withTimeZone("UTC").toString().substring(0, 8),
+                is(DatatypeConverter.printTime(Calendar.getInstance(TimeZone.getTimeZone("UTC"))).substring(0, 8)));
     }
 
     @Test
     public void toDate()
     {
-        assertEquals(Date.class, now.toDate().getClass());
+        assertThat(now.toDate(), is(instanceOf(Date.class)));
     }
 
     @Test
     public void toCalendar()
     {
-        assertEquals(GregorianCalendar.class, now.toCalendar().getClass());
+        assertThat(now.toCalendar(), is(instanceOf(GregorianCalendar.class)));
     }
 
     @Test
     public void toXMLCalendar() throws DatatypeConfigurationException
     {
-        assertTrue(now.toXMLCalendar() instanceof XMLGregorianCalendar);
+        assertThat(now.toXMLCalendar(), is(instanceOf(XMLGregorianCalendar.class)));
     }
 
     @Test
