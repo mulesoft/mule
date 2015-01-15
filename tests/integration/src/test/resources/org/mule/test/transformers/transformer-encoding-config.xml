@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="base64decode">
+        <vm:inbound-endpoint path="base64decode" exchange-pattern="request-response"/>
+        <base64-decoder-transformer encoding="UTF-16LE" returnClass="java.lang.String" />
+    </flow>
+
+    <flow name="base64decode2">
+        <vm:inbound-endpoint path="base64decode2" exchange-pattern="request-response"/>
+        <set-property value="UTF-16LE" propertyName="MULE_ENCODING"/>
+        <base64-decoder-transformer returnClass="java.lang.String" />
+    </flow>
+
+</mule>
