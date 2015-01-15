@@ -9,8 +9,8 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.ConfigResource;
-import org.mule.config.spring.MuleArtifactContext;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.module.springconfig.MuleArtifactContext;
+import org.mule.module.springconfig.SpringXmlConfigurationBuilder;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,7 +42,7 @@ import org.springframework.web.context.support.ServletContextResource;
  * <li> Classpath resources should be in the webapp classpath and should not start
  * with '/'.
  * 
- * @see org.mule.config.spring.SpringXmlConfigurationBuilder
+ * @see org.mule.module.springconfig.SpringXmlConfigurationBuilder
  */
 public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder
 {    

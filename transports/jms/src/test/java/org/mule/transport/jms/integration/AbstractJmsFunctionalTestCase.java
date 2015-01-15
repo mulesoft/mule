@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.Transaction;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.module.springconfig.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
@@ -229,7 +229,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * This creates a {@link org.mule.config.spring.SpringXmlConfigurationBuilder} as expected but also figures out
+     * This creates a {@link org.mule.module.springconfig.SpringXmlConfigurationBuilder} as expected but also figures out
      * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding
      * class which implements {@link #getConfigFile()}).
      *

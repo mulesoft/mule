@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.module.springconfig.parsers;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.config.spring.parsers.beans.ChildBean;
-import org.mule.config.spring.parsers.beans.OrphanBean;
+import org.mule.module.springconfig.parsers.beans.ChildBean;
+import org.mule.module.springconfig.parsers.beans.OrphanBean;
 
 import org.junit.Test;
 

@@ -6,11 +6,11 @@
  */
 package org.mule.transport.ssl.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.specific.tls.ClientKeyStoreDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.KeyStoreDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.ProtocolHandlerDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.TrustStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.ssl.SslConnector;
 

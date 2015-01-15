@@ -6,7 +6,7 @@
  */
 package org.mule.transport.jdbc.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
 
 import java.sql.Connection;
 import java.util.Map;

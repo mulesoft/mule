@@ -74,7 +74,7 @@ public class MuleServer implements Runnable
      * the core doesn't depend on mule-module-spring.
      * for Mule 2.x
      */
-    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
+    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.module.springconfig.SpringXmlConfigurationBuilder";
 
     /**
      * If the annotations module is on the classpath, also enable annotations config builder

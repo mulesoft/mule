@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.config.processor;
 
-import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.module.springconfig.parsers.AbstractHierarchicalDefinitionParser;
+import org.mule.module.springconfig.parsers.assembly.BeanAssembler;
 import org.mule.module.db.internal.config.resolver.database.DefaultDbConfigResolverFactoryBean;
 import org.mule.module.db.internal.domain.statement.QueryStatementFactory;
 import org.mule.module.db.internal.resolver.database.StaticDbConfigResolver;

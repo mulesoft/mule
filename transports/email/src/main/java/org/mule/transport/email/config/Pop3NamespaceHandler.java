@@ -6,8 +6,8 @@
  */
 package org.mule.transport.email.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.MuleDefinitionParserConfiguration;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.email.Pop3Connector;
 

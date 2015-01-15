@@ -6,8 +6,8 @@
  */
 package org.mule.transport.http.builder;
 
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.AutoIdUtils;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 
 import org.w3c.dom.Element;
 

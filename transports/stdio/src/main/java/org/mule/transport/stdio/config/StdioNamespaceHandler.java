@@ -6,7 +6,7 @@
  */
 package org.mule.transport.stdio.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.stdio.PromptStdioConnector;
 import org.mule.transport.stdio.StdioConnector;

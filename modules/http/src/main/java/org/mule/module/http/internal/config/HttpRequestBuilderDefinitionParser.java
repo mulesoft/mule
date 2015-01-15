@@ -6,9 +6,9 @@
  */
 package org.mule.module.http.internal.config;
 
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.module.http.internal.request.HttpRequesterRequestBuilder;
 
 public class HttpRequestBuilderDefinitionParser extends ParentContextDefinitionParser

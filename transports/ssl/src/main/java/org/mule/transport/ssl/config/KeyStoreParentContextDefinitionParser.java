@@ -6,8 +6,8 @@
  */
 package org.mule.transport.ssl.config;
 
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.KeyStoreDefinitionParser;
 
 
 public class KeyStoreParentContextDefinitionParser extends ParentContextDefinitionParser

@@ -10,7 +10,7 @@ org.mule.test.firewall.FirewallTestCase
 
 # Test appears to be incorrectly written. Disabling because the correct behavior is unclear. 
 # Java 6 passes (but probably shouldn't). Java 7 fails (but probably should pass)
-org.mule.config.spring.parsers.specific.MethodInvokerDefinitionParserTestCase
+org.mule.module.springconfig.parsers.specific.MethodInvokerDefinitionParserTestCase
 
 ##########################################################################
 # The following tests will fail if run off-line

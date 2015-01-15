@@ -6,9 +6,9 @@
  */
 package org.mule.module.scripting.config;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.generic.OptionalChildDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
+import org.mule.module.springconfig.parsers.assembly.BeanAssembler;
+import org.mule.module.springconfig.parsers.generic.OptionalChildDefinitionParser;
+import org.mule.module.springconfig.parsers.processors.CheckRequiredAttributes;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.util.StringUtils;
 

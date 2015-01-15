@@ -7,7 +7,7 @@
 
 package org.mule.module.db.config;
 
-import static org.mule.config.spring.handlers.AbstractMuleNamespaceHandler.IgnoredDefinitionParser;
+import static org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler.IgnoredDefinitionParser;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.DATABASE_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.DATA_SOURCE_REF_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.DRIVER_ATTRIBUTE;
@@ -19,9 +19,9 @@ import static org.mule.module.db.internal.config.domain.database.DbConfigDefinit
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.URL_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.USER_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.USE_XA_TRANSACTIONS_ATTRIBUTE;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributeAndText;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
+import org.mule.module.springconfig.parsers.processors.CheckExclusiveAttributeAndText;
+import org.mule.module.springconfig.parsers.processors.CheckExclusiveAttributes;
+import org.mule.module.springconfig.parsers.processors.CheckRequiredAttributes;
 import org.mule.module.db.internal.config.domain.connection.PoolingProfileBeanDefinitionParser;
 import org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser;
 import org.mule.module.db.internal.config.domain.database.DbConfigFactoryBean;

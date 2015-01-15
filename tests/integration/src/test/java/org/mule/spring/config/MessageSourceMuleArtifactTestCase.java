@@ -12,7 +12,7 @@ import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.Testable;
 import org.mule.common.config.XmlConfigurationCallback;
-import org.mule.config.spring.SpringXmlConfigurationMuleArtifactFactory;
+import org.mule.module.springconfig.SpringXmlConfigurationMuleArtifactFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;

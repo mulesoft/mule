@@ -6,10 +6,10 @@
  */
 package org.mule.transport.http.builder;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser;
+import org.mule.module.springconfig.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.module.springconfig.parsers.MuleDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.AbstractParallelDelegatingDefinitionParser;
 import org.mule.module.http.internal.HttpParamType;
 import org.mule.module.http.internal.HttpSingleParam;
 import org.mule.module.http.internal.config.HttpMessageSingleParamDefinitionParser;

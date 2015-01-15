@@ -6,19 +6,19 @@
  */
 package org.mule.transport.quartz.config;
 
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.DataObjectDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.EndpointPropertyElementDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.module.springconfig.factories.InboundEndpointFactoryBean;
+import org.mule.module.springconfig.factories.OutboundEndpointFactoryBean;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.MuleDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildMapDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildSingletonMapDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ParentDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.DataObjectDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.EndpointPropertyElementDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.EndpointRefParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.jobs.CustomJobConfig;

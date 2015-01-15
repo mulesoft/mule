@@ -6,8 +6,8 @@
  */
 package org.mule.transport.servlet.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.servlet.ServletConnector;
 import org.mule.transport.servlet.transformers.HttpRequestToByteArray;

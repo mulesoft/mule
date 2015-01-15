@@ -9,7 +9,7 @@ package org.mule.tck.config;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.component.DefaultJavaComponent;
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.ComponentDefinitionParser;
 import org.mule.object.AbstractObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;

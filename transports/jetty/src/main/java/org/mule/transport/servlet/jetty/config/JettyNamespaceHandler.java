@@ -6,8 +6,8 @@
  */
 package org.mule.transport.servlet.jetty.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 import org.mule.transport.servlet.jetty.JettyHttpConnector;
 import org.mule.transport.servlet.jetty.WebappsConfiguration;
 

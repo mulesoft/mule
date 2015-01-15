@@ -6,7 +6,7 @@
  */
 package org.mule.module.scripting.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.module.scripting.component.GroovyRefreshableBeanBuilder;
 
 import org.w3c.dom.Element;

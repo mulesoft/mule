@@ -7,12 +7,12 @@
 package org.mule.module.oauth2.internal.config;
 
 
-import org.mule.config.spring.handlers.MuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.GenericChildMapDefinitionParser;
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.handlers.MuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.collection.GenericChildMapDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.oauth2.internal.ParameterExtractor;
 import org.mule.module.oauth2.internal.authorizationcode.AuthorizationRequestHandler;
 import org.mule.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler;

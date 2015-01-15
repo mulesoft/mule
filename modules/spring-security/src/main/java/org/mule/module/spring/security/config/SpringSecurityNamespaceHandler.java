@@ -6,9 +6,9 @@
  */
 package org.mule.module.spring.security.config;
 
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.module.spring.security.AuthorizationFilter;
 import org.mule.module.spring.security.SpringProviderAdapter;
 import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter;

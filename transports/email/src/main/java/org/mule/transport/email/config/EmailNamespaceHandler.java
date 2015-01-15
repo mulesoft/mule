@@ -6,10 +6,10 @@
  */
 package org.mule.transport.email.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.assembly.configuration.SimplePropertyConfiguration;
+import org.mule.module.springconfig.parsers.assembly.configuration.ValueMap;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.transport.email.transformers.EmailMessageToString;
 import org.mule.transport.email.transformers.MimeMessageToRfc822ByteArray;
 import org.mule.transport.email.transformers.ObjectToMimeMessage;
