@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.config.domain.param;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.module.springconfig.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.AutoIdUtils;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.DynamicDbType;
 import org.mule.module.db.internal.domain.type.UnknownDbType;

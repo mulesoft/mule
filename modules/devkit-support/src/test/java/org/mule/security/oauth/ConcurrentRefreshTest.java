@@ -12,7 +12,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.devkit.ProcessInterceptor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.module.springconfig.SpringXmlConfigurationBuilder;
 import org.mule.security.oauth.callback.ProcessCallback;
 import org.mule.security.oauth.process.RefreshTokenProcessInterceptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

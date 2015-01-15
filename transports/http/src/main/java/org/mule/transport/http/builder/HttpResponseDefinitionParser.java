@@ -6,7 +6,7 @@
  */
 package org.mule.transport.http.builder;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 
 import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

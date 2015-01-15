@@ -7,19 +7,19 @@
 package org.mule.transport.http.config;
 
 
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.generic.TextDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.module.springconfig.parsers.MuleDefinitionParser;
+import org.mule.module.springconfig.parsers.MuleDefinitionParserConfiguration;
+import org.mule.module.springconfig.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ParentDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.TextDefinitionParser;
+import org.mule.module.springconfig.parsers.processors.CheckExclusiveAttributes;
+import org.mule.module.springconfig.parsers.specific.ComponentDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.FilterDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.CacheControlHeader;
 import org.mule.transport.http.CookieWrapper;

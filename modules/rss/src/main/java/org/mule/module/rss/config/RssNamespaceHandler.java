@@ -6,9 +6,9 @@
  */
 package org.mule.module.rss.config;
 
-import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.FilterDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.RouterDefinitionParser;
 import org.mule.module.rss.routing.EntryLastUpdatedFilter;
 import org.mule.module.rss.routing.FeedLastUpdatedFilter;
 import org.mule.module.rss.routing.FeedSplitter;

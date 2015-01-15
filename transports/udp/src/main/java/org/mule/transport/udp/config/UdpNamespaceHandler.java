@@ -6,7 +6,7 @@
  */
 package org.mule.transport.udp.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.udp.UdpConnector;
 

@@ -6,16 +6,16 @@
  */
 package org.mule.transport.ajax.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.MuleDefinitionParserConfiguration;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.ClientKeyStoreDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.KeyStoreDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.ProtocolHandlerDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.TrustStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.embedded.AjaxConnector;

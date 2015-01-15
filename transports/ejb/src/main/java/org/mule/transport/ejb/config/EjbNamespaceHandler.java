@@ -6,11 +6,11 @@
  */
 package org.mule.transport.ejb.config;
 
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.module.springconfig.factories.InboundEndpointFactoryBean;
+import org.mule.module.springconfig.factories.OutboundEndpointFactoryBean;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.ejb.EjbConnector;
 import org.mule.transport.rmi.config.RmiNamespaceHandler;

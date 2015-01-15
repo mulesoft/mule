@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.beans;
+package org.mule.module.springconfig.parsers.beans;
 
 import java.util.List;
 import java.util.Map;

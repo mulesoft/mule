@@ -7,12 +7,12 @@
 package org.mule.module.http.internal.config;
 
 import org.mule.api.config.MuleProperties;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.module.http.internal.HttpMapParam;
 import org.mule.module.http.internal.HttpMessageBuilderRef;
 import org.mule.module.http.internal.HttpParamType;

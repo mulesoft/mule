@@ -6,8 +6,8 @@
  */
 package org.mule.transport.tcp.config;
 
-import org.mule.config.spring.parsers.delegate.BooleanAttributeSelectionDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.BooleanAttributeSelectionDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 
 public class ByteOrMessageProtocolDefinitionParser extends BooleanAttributeSelectionDefinitionParser
 {

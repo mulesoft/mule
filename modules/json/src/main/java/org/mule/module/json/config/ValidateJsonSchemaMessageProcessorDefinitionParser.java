@@ -6,7 +6,7 @@
  */
 package org.mule.module.json.config;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
 
 import java.util.HashMap;

@@ -6,8 +6,8 @@
  */
 package org.mule.module.xml.config;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.assembly.BeanAssembler;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.transform.Result;

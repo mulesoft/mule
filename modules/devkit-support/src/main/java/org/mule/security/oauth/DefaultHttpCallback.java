@@ -25,7 +25,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
-import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
+import org.mule.module.springconfig.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.module.http.api.HttpConstants;

@@ -6,9 +6,9 @@
  */
 package org.mule.transport.jdbc.config;
 
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.module.springconfig.parsers.PreProcessor;
+import org.mule.module.springconfig.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.module.springconfig.util.SpringXMLUtils;
 import org.mule.util.StringUtils;
 
 import org.w3c.dom.Attr;

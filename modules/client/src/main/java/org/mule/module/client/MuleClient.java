@@ -30,7 +30,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.transport.ReceiveException;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.module.springconfig.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.security.MuleCredentials;

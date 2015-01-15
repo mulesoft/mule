@@ -8,7 +8,7 @@ package org.mule.module.db.integration.config;
 
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.module.springconfig.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

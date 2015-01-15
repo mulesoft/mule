@@ -8,7 +8,7 @@ package org.mule.test.routing;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.module.springconfig.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

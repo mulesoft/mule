@@ -23,7 +23,7 @@
     </test:connector>
 
     <test:connector name="testConnector5">
-        <reconnect-custom-strategy class="org.mule.config.spring.handlers.TestRetryPolicyTemplate">
+        <reconnect-custom-strategy class="org.mule.module.springconfig.handlers.TestRetryPolicyTemplate">
             <spring:property name="fooBar" value="true"/>
             <spring:property name="revolutions" value="500"/>
             <spring:property name="connectionUrls">
@@ -43,7 +43,7 @@
 
     <test:connector name="testConnector7">
         <reconnect>
-            <reconnect-custom-notifier class="org.mule.config.spring.handlers.TestRetryNotifier">
+            <reconnect-custom-notifier class="org.mule.module.springconfig.handlers.TestRetryNotifier">
                 <spring:property name="color" value="red"/>
             </reconnect-custom-notifier>
         </reconnect>

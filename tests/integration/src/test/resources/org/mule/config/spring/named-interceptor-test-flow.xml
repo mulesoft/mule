@@ -15,7 +15,7 @@
         <spring:property name="enableMessageHistory" value="false"/>
     </spring:bean>
 
-    <spring:bean name="advice" class="org.mule.config.spring.FunctionalTestAdvice"/>
+    <spring:bean name="advice" class="org.mule.module.springconfig.FunctionalTestAdvice"/>
 
     <spring:bean name="proxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
         <spring:property name="beanNames" value="target"/>

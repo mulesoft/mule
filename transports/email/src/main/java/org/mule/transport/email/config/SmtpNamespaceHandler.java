@@ -6,9 +6,9 @@
  */
 package org.mule.transport.email.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.email.GmailSmtpConnector;
 import org.mule.transport.email.MailProperties;

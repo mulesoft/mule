@@ -6,7 +6,7 @@
  */
 package org.mule.module.scripting.config;
 
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.ComponentDefinitionParser;
 import org.mule.module.scripting.component.ScriptComponent;
 
 public class ScriptComponentDefinitionParser extends ComponentDefinitionParser

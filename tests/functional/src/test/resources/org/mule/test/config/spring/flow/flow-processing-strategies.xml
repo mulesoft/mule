@@ -80,7 +80,7 @@
         poolExhaustedAction="WAIT" queueTimeout="100" maxQueueSize="10" />
 
 
-    <custom-processing-strategy name="customStrategy" class="org.mule.config.spring.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategy">
+    <custom-processing-strategy name="customStrategy" class="org.mule.module.springconfig.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategy">
         <spring:property name="foo" value="bar" />
     </custom-processing-strategy>
 

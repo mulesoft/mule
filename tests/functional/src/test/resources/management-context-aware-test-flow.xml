@@ -6,7 +6,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:bean name="bean"
-        class="org.mule.config.spring.DummyMuleContextAware" />
+        class="org.mule.module.springconfig.DummyMuleContextAware" />
 
 
 
@@ -17,7 +17,7 @@
         </inbound-endpoint>
 
         <component>
-            <singleton-object class="org.mule.config.spring.DummyComponent">
+            <singleton-object class="org.mule.module.springconfig.DummyComponent">
                 <property key="property" value-ref="bean" />
             </singleton-object>
         </component>

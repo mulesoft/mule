@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.config.domain.connection;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
 
 import org.w3c.dom.Element;

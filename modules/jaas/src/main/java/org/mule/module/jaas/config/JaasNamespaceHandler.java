@@ -7,9 +7,9 @@
 package org.mule.module.jaas.config;
 
 import org.mule.api.config.MuleProperties;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.NamedDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.module.jaas.JaasSimpleAuthenticationProvider;
 import org.mule.module.jaas.filters.JaasSecurityFilter;
 import org.mule.security.PasswordBasedEncryptionStrategy;

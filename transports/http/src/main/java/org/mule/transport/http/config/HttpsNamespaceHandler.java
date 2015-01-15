@@ -6,12 +6,12 @@
  */
 package org.mule.transport.http.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.ClientKeyStoreDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.KeyStoreDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.ProtocolHandlerDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.tls.TrustStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;

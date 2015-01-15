@@ -6,16 +6,16 @@
  */
 package org.mule.module.cxf.config;
 
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
+import org.mule.module.springconfig.parsers.PreProcessor;
+import org.mule.module.springconfig.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.module.springconfig.parsers.processors.CheckRequiredAttributesWhenNoChildren;
+import org.mule.module.springconfig.parsers.processors.CheckExclusiveAttributesAndChildren;
 
 import org.w3c.dom.Element;
 

@@ -6,17 +6,17 @@
  */
 package org.mule.transport.jdbc.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.ClassOrRefDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
-import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
-import org.mule.config.spring.parsers.specific.properties.NestedMapDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.ClassOrRefDefinitionParser;
+import org.mule.module.springconfig.parsers.MuleDefinitionParser;
+import org.mule.module.springconfig.parsers.collection.ChildSingletonMapDefinitionParser;
+import org.mule.module.springconfig.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.generic.ParentDefinitionParser;
+import org.mule.module.springconfig.parsers.processors.CheckExclusiveAttributes;
+import org.mule.module.springconfig.parsers.specific.ObjectFactoryWrapper;
+import org.mule.module.springconfig.parsers.specific.TransactionDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.properties.NestedMapDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcTransactionFactory;

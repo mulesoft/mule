@@ -6,10 +6,10 @@
  */
 package org.mule.transport.file.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.generic.ChildDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.FilterDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FileConnector;

@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.config.domain.query;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.module.springconfig.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.module.db.internal.config.domain.param.InputParamDefinitionDefinitionParser;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;

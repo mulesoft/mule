@@ -7,11 +7,11 @@
 package org.mule.module.scripting.config;
 
 import org.mule.component.DefaultInterfaceBinding;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.TextDefinitionParser;
-import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.springconfig.handlers.AbstractMuleNamespaceHandler;
+import org.mule.module.springconfig.parsers.generic.TextDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.BindingDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.ComponentDefinitionParser;
+import org.mule.module.springconfig.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.scripting.component.ScriptComponent;
 import org.mule.module.scripting.filter.ScriptFilter;
 import org.mule.module.scripting.transformer.ScriptTransformer;
