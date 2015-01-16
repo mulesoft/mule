@@ -123,9 +123,9 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    private String createLockId(String file)
+    String createLockId(String file)
     {
-        return connector.getName() + "-" + endpoint.getEndpointURI() + "-" + file;
+        return connector.getName() + "-" + endpoint.getEndpointURI().getPath() + "-" + file;
     }
 
     @Override

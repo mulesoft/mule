@@ -6,9 +6,8 @@
  */
 package org.mule.transport.sftp;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -22,12 +21,11 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.concurrent.Latch;
 import org.mule.util.lock.LockProvider;
 import org.mule.util.lock.MuleLockFactory;
 import org.mule.util.lock.SingleServerLockProvider;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,40 +35,12 @@ public class SftpMessageReceiverTestCase extends AbstractMuleTestCase
 {
 
     private static final String CONNECTOR_NAME = "connector-name";
-    private static final String ENDPOINT_URI = "endpoint-uri";
+    private static final String ENDPOINT_URI_PATH = "endpoint-uri-path";
     private static final String[] FILE_NAMES = new String[] {"some-file-1", "some-file-2"};
 
     private MuleLockFactory lockFactory;
     private LockProvider lockProvider;
     private TestSftpMessageReceiver receiver;
-
-    @Test
-    public void lockIsReleased() throws Exception
-    {
-        // Simulate two poll cycles
-        receiver.poll();
-        receiver.poll();
-
-        // Each time poll is called a new lock should be created for each file, and released after the file is processed.
-        // If the first created lock is not released the second call to poll won't create a new lock but use the previous one.
-        verify(lockProvider, times(2 * FILE_NAMES.length)).createLock(any(String.class));
-    }
-
-    @Test
-    public void lockContainsEndpointUri() throws Exception
-    {
-        receiver.poll();
-
-        for(String fileName : FILE_NAMES)
-        {
-            verify(lockProvider).createLock(getLockId(fileName));
-        }
-    }
-
-    private String getLockId(String fileName)
-    {
-        return String.format("%s-%s-%s", CONNECTOR_NAME, ENDPOINT_URI, fileName);
-    }
 
     @Before
     public void createMocks() throws Exception
@@ -86,7 +56,7 @@ public class SftpMessageReceiverTestCase extends AbstractMuleTestCase
         when(endpoint.getMuleContext()).thenReturn(muleContext);
         when(endpoint.getEndpointURI()).thenReturn(endpointURI);
         when(endpoint.getConnector()).thenReturn(sftpConnector);
-        when(endpointURI.toString()).thenReturn(ENDPOINT_URI);
+        when(endpointURI.getPath()).thenReturn(ENDPOINT_URI_PATH);
 
         lockProvider = spy(new SingleServerLockProvider());
 
@@ -99,6 +69,35 @@ public class SftpMessageReceiverTestCase extends AbstractMuleTestCase
 
         receiver = new TestSftpMessageReceiver(sftpConnector, flow, endpoint);
         receiver.doInitialise();
+    }
+
+    @Test
+    public void lockIsReleased() throws Exception
+    {
+        // Simulate two poll cycles
+        receiver.poll();
+        receiver.poll();
+
+        // Each time poll is called a new lock should be created for each file, and released after the file is processed.
+        // If the first created lock is not released the second call to poll won't create a new lock but use the previous one.
+        for(String fileName : FILE_NAMES)
+        {
+            verify(lockProvider, times(2)).createLock(receiver.createLockId(fileName));
+        }
+    }
+
+    @Test
+    public void lockContainsEndpointUri() throws Exception
+    {
+        for(String fileName : FILE_NAMES)
+        {
+            assertThat(receiver.createLockId(fileName), is(createTestLockId(fileName)));
+        }
+    }
+
+    private String createTestLockId(String fileName)
+    {
+        return String.format("%s-%s-%s", CONNECTOR_NAME, ENDPOINT_URI_PATH, fileName);
     }
 
     private class TestSftpMessageReceiver extends SftpMessageReceiver
@@ -117,18 +116,18 @@ public class SftpMessageReceiverTestCase extends AbstractMuleTestCase
 
         private void ensureLockIsLocked(final String path) throws InterruptedException
         {
-            final Latch latch = new Latch();
-            new Thread(new Runnable()
+            final AtomicBoolean lockObtained = new AtomicBoolean(true);
+            Thread otherThread = new Thread(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    assertThat(lockFactory.createLock(getLockId(path)).tryLock(), is(false));
-                    latch.release();
+                    lockObtained.set(lockFactory.createLock(receiver.createLockId(path)).tryLock());
                 }
-            }
-            ).start();
-            latch.await(1, TimeUnit.SECONDS);
+            });
+            otherThread.start();
+            otherThread.join(1000);
+            assertThat(lockObtained.get(), is(false));
         }
     }
 }
