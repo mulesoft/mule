@@ -1,0 +1,18 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-sftp'
+description = 'A Mule transport for Udp Multicasting. This transport supplies a Multicast Data Packet dispatcher and client implementation.'
+
+repositories {
+    maven { url "http://jsch.sourceforge.net/maven2/" }
+}
+
+dependencies {
+    compile project(':transport-file'),
+        "com.jcraft:jsch:0.1.51"
+
+    testCompile project(':test-functional'),
+            project(":transport-vm"),
+            project(":transport-quartz"),
+            "org.apache.sshd:sshd-core:0.6.0",
+            "org.bouncycastle:bcprov-jdk16:1.46"
+}

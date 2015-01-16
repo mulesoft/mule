@@ -1,0 +1,122 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+// Deployer configuration - either nexus or a local folder based on available properties
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+if (hasProperty("nexusUser")) {
+    configurations {
+        deployerJars
+    }
+
+    dependencies {
+        deployerJars "org.apache.maven.wagon:wagon-http:2.2"
+    }
+
+    ext.deployerRepoConfig = {
+        configuration = configurations.deployerJars
+
+        repository(url: "https://repository-master.mulesoft.org/nexus/content/repositories/releases") {
+            authentication(userName: nexusUser, password: nexusPassword)
+        }
+        snapshotRepository(url: "https://repository-master.mulesoft.org/nexus/content/repositories/snapshots") {
+            authentication(userName: nexusUser, password: nexusPassword)
+        }
+    }
+}
+else {
+    ext.deployerRepoConfig = {
+        repository(url: "file://${rootProject.buildDir}/releases")
+        snapshotRepository(url: "file://${rootProject.buildDir}/snapshots")
+    }
+}
+
+ext.deployerPomConfig = {
+    pom.project {
+        url "http://www.mulesoft.org"
+        inceptionYear '2003'
+
+        organization {
+            name 'Mulesoft, Inc.'
+            url "http://www.mulesoft.com"
+        }
+
+        mailingLists {
+            mailingList {
+                name 'developers'
+                post 'mule-esb@mulesoft.com'
+            }
+        }
+
+        scm {
+            url "http://github.com/mulesoft/mule"
+            connection "scm:git:git://github.com/mulesoft/mule.git"
+            developerConnection "scm:git:git@github.com:mulesoft/mule.git"
+        }
+        licenses {
+            license {
+                name 'CPAL v1.0'
+                url 'http://www.mulesoft.com/CPAL'
+            }
+        }
+        developers {
+            developer {
+                id 'rrinaudo'
+                name 'Ramiro Rinaudo'
+                email 'ramiro.rinaudo@mulesoft.com'
+                roles {
+                    role 'Project Manager'
+                }
+            }
+            developer {
+                id 'pabad'
+                name 'Pablo Abad'
+            }
+            developer {
+                id 'dfeist'
+                name 'Daniel Feist'
+            }
+            developer {
+                id 'afelisatti'
+                name 'Ana Felisatti'
+            }
+            developer {
+                id 'andresgregoire'
+                name 'Andres Gregoire'
+            }
+            developer {
+                id 'LucianoGandini'
+                name 'Luciano Gandini'
+            }
+            developer {
+                id 'marianogonzalez'
+                name 'Mariano Gonzalez'
+            }
+            developer {
+                id 'pablokraan'
+                name 'Pablo Kraan'
+            }
+            developer {
+                id 'pablolagreca'
+                name 'Pablo La Greca'
+            }
+            developer {
+                id 'marcosnc'
+                name 'Marcos Nunez Cortes'
+            }
+            developer {
+                id 'vromero'
+                name 'Victor Romero'
+            }
+            developer {
+                id 'asequeira'
+                name 'Alejandro Sequeira'
+            }
+        }
+    }
+}

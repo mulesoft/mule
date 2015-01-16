@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"           
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"    
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:file="http://www.mulesoft.org/schema/mule/file"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="               
@@ -9,24 +10,22 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd               
                http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <file:connector name="file" autoDelete="true" streaming="false"/>
 
-    <smtp:endpoint name="smtpEndpoint" user="bob" password="" host="smtp.gmail.com" from="Bob" subject="exception"
-                   to="exception@mulesoft.org"/>
-    
     <flow name="RequestResponseHTTP">
         <http:inbound-endpoint host="localhost" port="${port1}"/>
         <echo-component/>
-        <smtp:outbound-endpoint ref="smtpEndpoint" />
+        <test:component throwException="true"/>
     </flow>
 
     <flow name="FileSync" processingStrategy="synchronous">
         <file:inbound-endpoint path="${workingDirectory}">
             <file:filename-wildcard-filter pattern="mule-file-test-sync-*"/> 
         </file:inbound-endpoint>
-        <smtp:outbound-endpoint ref="smtpEndpoint" />
+        <test:component throwException="true"/>
         <default-exception-strategy>
             <vm:outbound-endpoint path="exception"/>
         </default-exception-strategy>
@@ -36,7 +35,7 @@
         <file:inbound-endpoint path="${workingDirectory}">
             <file:filename-wildcard-filter pattern="mule-file-test-async-*"/> 
         </file:inbound-endpoint>
-        <smtp:outbound-endpoint ref="smtpEndpoint" />
+        <test:component throwException="true"/>
         <default-exception-strategy>
             <vm:outbound-endpoint path="exception"/>
         </default-exception-strategy>

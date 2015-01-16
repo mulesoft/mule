@@ -13,6 +13,12 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.ClassUtils;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+
+import javax.xml.bind.SchemaOutputResolver;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -34,10 +40,12 @@ public class StaticResourcesMPFunctionalTestCase extends FunctionalTestCase
     private int responseCode;
     private String payload;
 
-    public StaticResourcesMPFunctionalTestCase()
+    public StaticResourcesMPFunctionalTestCase() throws URISyntaxException
     {
-        System.setProperty("test.root",
-            ClassUtils.getClassPathRoot(StaticResourcesMPFunctionalTestCase.class).getPath());
+        File resourcePath = Paths.get(ClassUtils.getResource("dummy-docroot",
+                                                             StaticResourcesMPFunctionalTestCase.class)
+                                              .toURI()).getParent().toFile();
+        System.setProperty("test.root", resourcePath.getPath());
         setDisposeContextPerClass(true);
     }
 

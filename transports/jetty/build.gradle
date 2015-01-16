@@ -1,0 +1,37 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-jetty'
+description = ' A Mule transport for Jetty Http Connectivity or binding to other Servlet containers. This transport can be used\n' +
+'        to embed a Jetty server used to service inbound http endpoints.'
+
+ext {
+    tomcatVersion='6.0.29'
+}
+
+dependencies {
+    compile project(':transport-servlet'),
+            project(':transport-tcp'),
+        "org.eclipse.jetty:jetty-server:${versions.jetty}",
+        "org.eclipse.jetty:jetty-deploy:${versions.jetty}",
+        "org.eclipse.jetty:jetty-util:${versions.jetty}",
+        "org.eclipse.jetty:jetty-continuation:${versions.jetty}",
+        "org.eclipse.jetty:jetty-servlet:${versions.jetty}",
+        "org.eclipse.jetty:jetty-webapp:${versions.jetty}",
+        "org.eclipse.jetty:jetty-annotations:${versions.jetty}",
+        "org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0",
+        "org.apache.tomcat:jasper-el:$tomcatVersion",
+        "org.apache.tomcat:jasper:$tomcatVersion",
+        "org.apache.tomcat:jsp-api:$tomcatVersion",
+        "org.apache.tomcat:annotations-api:$tomcatVersion",
+        "org.apache.tomcat:juli:$tomcatVersion"
+
+
+    testCompile project(':test-functional'),
+        project(':module-xml'),
+        project(':transport-vm'),
+        project(path: ':transport-tcp', configuration: 'testFixtures'),
+        project(path: ':transport-http', configuration: 'testFixtures'),
+        "commons-httpclient:commons-httpclient:3.1"
+
+}
+
+exportTests = true

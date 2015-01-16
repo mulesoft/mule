@@ -1,0 +1,19 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-management'
+description = 'Management Extensions for Mule'
+
+dependencies {
+    compile project(':module-spring-config'),
+        project(":module-xml"),
+        "mx4j:mx4j-jmx:2.1.1",
+        "mx4j:mx4j-impl:2.1.1",
+        "mx4j:mx4j-tools:2.1.1",
+        "mx4j:mx4j-remote:2.1.1",
+        "com.yourkit:yjp-controller-api-redist:9.0.8",
+        "tanukisoft:wrapper:3.2.3"
+
+
+    testCompile project(":test-functional"),
+        project(":transport-vm")
+}
+

@@ -14,7 +14,7 @@ org.mule.test.integration.transport.jdbc.JdbcTransactionalJdbcFunctionalTestCase
 org.mule.test.integration.transport.jdbc.JdbcTransactionalXaFunctionalTestCase
 
 # MULE-3593
-org.mule.test.integration.transaction.XATransactionsWithSpringDAO
+org.mule.test.integration.transaction.xa.XATransactionsWithSpringDAO
 
 # Convert transacted endpoint to XML config
 # MULE-3705

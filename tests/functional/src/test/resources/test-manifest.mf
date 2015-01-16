@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Specification-Title: Core Configuration Patterns
+Specification-Version: 3.3.0-RC3-SNAPSHOT
+Specification-Vendor: MuleSoft, Inc.
+Implementation-Title: Core Configuration Patterns
+Implementation-Version: 3.3.0-RC3-SNAPSHOT
+Implementation-Vendor-Id: org.mule.patterns
+Implementation-Vendor: MuleSoft, Inc.
+Build-Date: 2012-Apr-13 16:46:57
+Build-Revision: 24242
+Description: Mule ESB and Integration Platform
+Dev-List-Email: dev@mule.codehaus.org
+License: CPAL v1.0 http://www.mulesoft.com/CPAL/
+More-Info: For more information go to http://www.mulesoft.org
+Product-Url: http://www.mulesoft.org
+Recommended-Jdks: [1.6.0_26,1.7),[1.7.0_3,1.8)
+Support: Get commercial support: http://www.mulesoft.com/support
+Supported-Jdks: [1.6,1.8)
+Vendor-Url: http://www.mulesoft.com
+

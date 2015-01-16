@@ -1,0 +1,13 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-tcp'
+description = 'A Mule transport for Tcp Connectivity. This transport supplies a tcp Server and client implementation.'
+
+dependencies {
+    compile project(':module-spring-config')
+
+    testCompile project(':test-functional'),
+        project(':transport-vm'),
+        project(':module-client')
+}
+
+exportTests = true

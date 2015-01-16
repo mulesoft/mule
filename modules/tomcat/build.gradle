@@ -1,0 +1,11 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-tomcat'
+description = 'Integrates Mule as a global Tomcat service, to be used with deployable configuration builder'
+
+dependencies {
+    compile project(':core'),
+        project(':module-builders'),
+        "org.apache.tomcat:catalina:6.0.20"
+
+}
+

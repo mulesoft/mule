@@ -1,0 +1,101 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+// Not the best syntax, but works without having to create an independent plugin
+// Used like this to create verification tasks:
+// verifyContents(<task name>) {
+//    whitelist = file(<path to a whitelist file>)
+//    projectOutputFolder = file(<path to verify>)
+//    dependsOn(<task that builds the path>)
+// }
+
+ext.verifyContents = { String name, Closure action ->
+    task([type: ContentsVerifierTask], name, action)
+}
+
+class ContentsVerifierTask extends DefaultTask
+{
+    @InputFile
+    def File whitelist
+
+    @InputDirectory
+    def File projectOutputFolder
+
+    @TaskAction
+    def run() {
+        def Set mandatoryWildcards = []
+        def List whitelistEntries = []
+        def productVersion = project.version
+
+        whitelist.eachLine() {
+            if (!it.startsWith('#') && it.trim().size() != 0) {
+                // canonicalize and interpolate the entry
+                whitelistEntries << it.replaceAll("\\\\", "/").replaceAll(java.util.regex.Pattern.quote('${productVersion}'), productVersion)
+            }
+        }
+
+        mandatoryWildcards = whitelistEntries.findAll {
+            it.endsWith('+')
+        }
+
+        // wildcards will be checked explicitly, move them out of the way for regular validation
+        whitelistEntries.removeAll(mandatoryWildcards)
+
+        // strip the trailing + sign
+        mandatoryWildcards = mandatoryWildcards.collect {
+            it - '+'
+        }
+
+
+        def files = gatherFileNames(projectOutputFolder)
+
+        def missing = findMissing(whitelistEntries, files)
+        def unexpected = findUnexpected(whitelistEntries, mandatoryWildcards, files)
+
+        if (missing || unexpected) {
+            def msg = new StringBuilder("The following problems have been encountered:\n\n")
+            if (missing) {
+                msg << "\tMissing from the Distribution:\n"
+                missing.eachWithIndex { name, i ->
+                    msg << "\t\t\t${(i + 1).toString().padLeft(3)}. ${name}\n"
+                }
+            }
+            if (unexpected) {
+                msg << "\tUnexpected entries in the Distribution:\n"
+                unexpected.eachWithIndex { name, i ->
+                    msg << "\t\t\t${(i + 1).toString().padLeft(3)}. ${name}\n"
+                }
+            }
+            throw new IllegalStateException(msg as String)
+        }
+    }
+
+    // list all files, normalizing timestamps for SNAPSHOTs
+    def gatherFileNames(root) {
+        def canonicalRootPath = root.canonicalPath.replaceAll("\\\\", "/")
+
+        def files = []
+        root.eachFileRecurse() { file ->
+            def relativePath = file.canonicalPath.replaceAll("\\\\", "/") - canonicalRootPath
+            files << relativePath.replaceAll("-\\d{8}.\\d{6}-\\d+", "-SNAPSHOT")
+        }
+        files
+    }
+
+    def findMissing(expected, files) {
+        expected.findAll { !files.contains(it) }
+                .sort { it.toLowerCase() }
+    }
+
+    def findUnexpected(expected, wildcards, actualNames) {
+        // find all entries not in the whitelist and prefixed with wildcards
+        actualNames.findAll {
+            !expected.contains(it) &&
+            (wildcards.find { w -> it.startsWith(w)} == null)
+        }.sort { it.toLowerCase() }
+    }
+}

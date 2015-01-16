@@ -1,0 +1,13 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-rmi'
+description = 'A Mule transport for RMI Connectivity.'
+
+
+dependencies {
+    compile project(':module-spring-config')
+
+    testCompile project(':test-functional'),
+        project(':transport-vm')
+}
+
+exportTests = true

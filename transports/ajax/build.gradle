@@ -1,0 +1,17 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-ajax'
+description = 'A Mule transport for receiving and dispatching AJAX events using Cometd (Bayeux)'
+
+
+dependencies {
+    compile project(':module-json'),
+        project(":transport-jetty"),
+        "org.mortbay.jetty:cometd-server:6.1.26"
+
+    testCompile project(':test-functional'),
+        project(':transport-vm'),
+        "org.mortbay.jetty:cometd-client:6.1.26"
+}
+
+
+

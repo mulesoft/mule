@@ -11,7 +11,7 @@
         <!--
             Directory defaults to '${app.home}/webapps', but we have to change it for the maven test here
         -->
-        <jetty:webapps directory="${baseDir}target/webapps" port="${port1}"/>
+        <jetty:webapps directory="${workingDirectory}" port="${port1}"/>
     </jetty:connector>
     
 </mule>

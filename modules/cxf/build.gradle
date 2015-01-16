@@ -1,0 +1,108 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-cxf'
+description = 'A Mule module for web service connectivity using CXF.'
+
+ext {
+    cxfVersion='2.5.9'
+}
+
+configurations {
+    cxf {
+        visible = false
+    }
+
+    all*.exclude group:'org.apache.geronimo.specs', module: 'geronimo-activation_1.1_spec'
+    all*.exclude group:'org.apache.geronimo.specs', module: 'geronimo-javamail_1.4_spec'
+    all*.exclude group:'org.apache.geronimo.specs', module: 'geronimo-stax-api_1.0_spec'
+    all*.exclude group:'org.apache.geronimo.specs', module: 'geronimo-jaxws_2.1_spec'
+    compile.exclude group:'org.apache.velocity'
+    testCompile.exclude group:'org.apache.velocity'
+    all*.exclude group:'javax.activation'
+    all*.exclude group:'org.eclipse.jetty.orbit'
+    all*.exclude group:'org.jibx', module: 'jibx-tools'
+    all*.exclude group:'org.jibx', module: 'jibx-bind'
+}
+
+ext {
+    cxfWSDLArtifacts = [
+        'cxf-tools-wsdlto-frontend-jaxws',
+        'cxf-tools-wsdlto-databinding-jaxb',
+        'cxf-tools-common',
+        'cxf-tools-wsdlto-core'
+    ]
+}
+
+
+dependencies {
+    compile "org.apache.cxf:cxf-rt-core:$cxfVersion",
+            "org.apache.cxf:cxf-rt-bindings-soap:$cxfVersion",
+            "org.apache.cxf:cxf-rt-frontend-simple:$cxfVersion",
+            "org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion",
+            "org.apache.cxf:cxf-rt-databinding-aegis:$cxfVersion",
+            "org.apache.cxf:cxf-rt-databinding-jaxb:$cxfVersion",
+            "org.apache.cxf:cxf-rt-databinding-jibx:$cxfVersion",
+            "org.apache.cxf:cxf-rt-transports-local:$cxfVersion",
+            "org.apache.cxf:cxf-rt-ws-security:$cxfVersion",
+            "org.apache.cxf:cxf-rt-ws-rm:$cxfVersion",
+            "org.apache.cxf:cxf-rt-ws-addr:$cxfVersion",
+            "org.apache.cxf:cxf-rt-transports-http:$cxfVersion",
+            "org.apache.cxf:cxf-wstx-msv-validation:$cxfVersion",
+            "javax.mail:mail:1.4.3",
+        project(':transport-http'),
+        project(':module-xml'),
+        project(':module-spring-security')
+
+    testCompile project(':test-functional'),
+        project(':module-scripting'),
+        project(":transport-servlet"),
+        project(":transport-jetty"),
+        project(":transport-jms"),
+        project(":transport-quartz"),
+        project(":transport-vm"),
+        "org.apache.cxf:cxf-testutils:$cxfVersion",
+        "org.apache.activemq:activemq-core:5.5.0",
+        'org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1'
+
+
+    cxfWSDLArtifacts.each { artifact ->
+        cxf "org.apache.cxf:$artifact:$cxfVersion"
+    }
+}
+
+def generatedSourcesFolder = "$projectDir/src/generated/java"
+
+task wsdl2java(type: JavaExec) {
+    ext {
+        wsdlFile = 'src/test/resources/employeeDirectory.wsdl'
+        outputDir = file(generatedSourcesFolder)
+    }
+
+    inputs.file file(wsdlFile)
+    outputs.dir outputDir
+
+    // Main Java class to invoke.
+    main = 'org.apache.cxf.tools.wsdlto.WSDLToJava'
+
+    // Set classpath to dependencies assigned
+    // to the cxf configuration.
+    classpath = configurations.cxf
+
+    // Arguments to be passed to WSDLToJava.
+    args '-d', outputDir
+    args '-client'
+    args '-verbose'
+    args '-validate'
+    args wsdlFile
+}
+
+compileTestJava.dependsOn wsdl2java
+compileTestJava.source wsdl2java.outputs.files
+
+clean {
+    delete generatedSourcesFolder
+}
+
+test {
+    // This module requires more permgen than the default
+    jvmArgs += [ "-XX:MaxPermSize=256m" ]
+}

@@ -19,7 +19,7 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AbstractFileRecursiveFilterTestCase extends FunctionalTestCase
+public abstract class AbstractFileRecursiveFilterTestCase extends FunctionalTestCase
 {
 
     @Before

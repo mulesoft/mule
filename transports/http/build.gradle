@@ -1,0 +1,29 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-http'
+description = ' A Mule transport for Http Connectivity. This transport supplies a simple Http Server implementation.'
+
+
+dependencies {
+    compile project(':transport-ssl'),
+            project(':module-http'),
+        "commons-httpclient:commons-httpclient:3.1",
+        "org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0", // provided
+        "org.apache.tomcat:coyote:6.0.29",
+        "org.samba.jcifs:jcifs:1.3.3",
+        "joda-time:joda-time:2.5"
+
+    testCompile project(':test-functional'),
+        project(':transport-tcp'),
+        project(':module-xml'),
+        project(path: ':transport-ssl', configuration: 'testFixtures'),
+        project(path: ':transport-tcp', configuration: 'testFixtures'),
+        project(':module-client'),
+        project(':transport-vm'),
+        "org.eclipse.jetty:jetty-server:${versions.jetty}",
+        "org.eclipse.jetty:jetty-servlet:${versions.jetty}",
+        project(':module-scripting')  // for Groovy expressions usedin some tests
+}
+
+
+exportTests = true
+

@@ -1,0 +1,18 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-ftp'
+description = 'A Mule transport for Ftp Connectivity.'
+
+
+dependencies {
+    compile project(':module-spring-config'),
+        project(":transport-file"),
+        "commons-net:commons-net:2.2",
+        "oro:oro:2.0.8"
+
+    testCompile project(':test-functional'),
+        project(':transport-vm'),
+        project(path: ':transport-file', configuration: 'testFixtures')
+}
+
+
+

@@ -1,0 +1,14 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-ssl'
+description = 'A Mule transport for Socket connectivity using SSL authentication. This transport supplies a tcp Server and client implementation over SSL.'
+
+dependencies {
+    compile project(':transport-tcp')
+
+    testCompile project(':test-functional')
+}
+
+exportTests = true
+
+
+

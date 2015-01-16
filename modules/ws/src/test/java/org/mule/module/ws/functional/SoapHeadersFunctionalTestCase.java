@@ -6,6 +6,7 @@
  */
 package org.mule.module.ws.functional;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -19,6 +20,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.tck.functional.EventCallback;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -68,8 +70,9 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
 
         event = flow.process(event);
 
-        assertEquals(RESPONSE_HEADER_OUT, event.getMessage().getInboundProperty(SOAP_HEADER_OUT));
-        assertEquals(RESPONSE_HEADER_INOUT, event.getMessage().getInboundProperty(SOAP_HEADER_INOUT));
+
+        assertXMLEqual(RESPONSE_HEADER_OUT, (String) event.getMessage().getInboundProperty(SOAP_HEADER_OUT));
+        assertXMLEqual(RESPONSE_HEADER_INOUT, (String) event.getMessage().getInboundProperty(SOAP_HEADER_INOUT));
 
     }
 

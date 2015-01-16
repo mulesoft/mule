@@ -1,0 +1,9 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-stdio'
+description = 'A Mule transport used as the interface to Java\'s System.out and System.in objects, typically for testing purposes.'
+
+dependencies {
+    compile project(':module-spring-config')
+
+    testCompile project(':test-functional')
+}

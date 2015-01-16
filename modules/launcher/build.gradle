@@ -1,0 +1,17 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-launcher'
+description = 'Mule 3 Launcher.'
+
+dependencies {
+    compile project(':core'),
+        project(":module-reboot"),
+        "tanukisoft:wrapper:3.2.3",
+        "commons-collections:commons-collections:3.2.1",
+        "org.apache.logging.log4j:log4j-core:2.0.2"
+
+
+    testCompile project(":test-functional"),
+        project(":transport-vm"),
+        project(":transport-http")
+}
+

@@ -1,0 +1,17 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-spring-config'
+description = 'Mule Builder for use with Spring Namespace based XML configuration.'
+
+dependencies {
+    compile project(':core'),
+        project(':module-annotations'),
+        'org.codehaus.woodstox:woodstox-core-asl:4.1.4',
+        "org.springframework:spring-context:${versions.spring}",
+        'dom4j:dom4j:1.6.1',
+        "jaxen:jaxen:1.1.1"
+
+    testCompile project(path: ':core', configuration: 'testFixtures')
+}
+
+
+

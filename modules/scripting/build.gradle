@@ -1,0 +1,27 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-scripting'
+description = 'Support for Scripting Mule Services and embedding Mule inside scripts.'
+
+dependencies {
+    compile project(':core'),
+        project(':module-spring-config'),
+        project(':module-builders'),
+        "org.springframework:spring-context:${versions.spring}",
+        "org.livetribe:livetribe-jsr223:2.0.5"
+
+    compile("org.codehaus.groovy:groovy-all:2.3.7:indy") {
+        exclude group:'org.apache.ant'
+    }
+
+    compile "org.python:jython-standalone:2.7-b3",
+            "javax.script:js-engine:1.1:jdk14",
+            "org.mozilla:rhino:1.7R4",
+            "org.jruby:jruby-complete:1.0",
+            "javax.script:jruby-engine:1.1:jdk14"
+
+    testCompile project(':test-functional'),
+            project(':transport-vm')
+}
+
+
+

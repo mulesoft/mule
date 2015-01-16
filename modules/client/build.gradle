@@ -1,0 +1,14 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-client'
+description = 'MuleClient is a simple interface for Mule clients to send and receive events from local or remote Mule Servers.'
+
+dependencies {
+    compile project(':core'),
+        project(':module-spring-config'),
+        project(":module-xml")  // used by RemoteDispatcher
+
+    testCompile project(path: ':core', configuration: 'testFixtures')
+}
+
+
+

@@ -7,7 +7,7 @@
        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd">
 
     <jetty:connector name="jettyConnector">
-        <jetty:webapps directory="${baseDir}/target/webapps" host="localhost" port="${port}"/>
+        <jetty:webapps directory="${workingDirectory}" host="localhost" port="${port}"/>
     </jetty:connector>
     
 </mule>

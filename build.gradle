@@ -1,0 +1,52 @@
+apply from: 'gradle/dependencies.gradle'
+
+project.ext {
+    modules = rootProject.subprojects.findAll { pr -> pr.path.startsWith(':module') }
+    transports = rootProject.subprojects.findAll { pr -> pr.path.startsWith(':transport') }
+    isReleaseVersion = !version.endsWith("SNAPSHOT")
+}
+
+allprojects {
+    apply plugin: 'maven'
+
+    group = 'org.mule'
+    version = '4.0-SNAPSHOT'
+
+    repositories {
+        mavenLocal()
+        maven { url "https://repository.mulesoft.org/nexus/content/repositories/public/" }
+        maven { url "http://xqj.net/maven" }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = jdkVersion
+    targetCompatibility = jdkVersion
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'ISO-8859-1'
+    }
+    tasks.withType(Javadoc) {
+        options.encoding = 'ISO-8859-1'
+        options.charSet = 'ISO-8859-1'
+    }
+
+    dependencies {
+        testCompile libraries.tests
+    }
+
+    apply from: "$rootDir/gradle/publishJava.gradle"
+}
+
+apply from: 'gradle/testExport.gradle'
+apply from: 'gradle/resolution.gradle'
+apply from: 'gradle/distribution.gradle'
+apply from: 'gradle/ci.gradle'
+
+
+task wrapper(type: Wrapper) {
+    description = 'Update Gradle wrapper'
+    gradleVersion = '2.2.1'
+}

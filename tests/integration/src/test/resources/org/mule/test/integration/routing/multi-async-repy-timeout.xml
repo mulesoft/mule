@@ -15,11 +15,11 @@
     <flow name="Distributor">
         <inbound-endpoint address="vm://distributor.queue" exchange-pattern="request-response"/>
         <echo-component/>
-        <request-reply timeout="3000">
+        <request-reply timeout="5000">
             <recipient-list
                     expression="#[['vm://quoteprovider1.queue','vm://quoteprovider2.queue','vm://quoteprovider3.queue']]"/>
             <inbound-endpoint address="vm://Aggregator.queue" exchange-pattern="one-way">
-                <collection-aggregator timeout="3000" failOnTimeout="false"/>
+                <collection-aggregator storePrefix="reply-timeout" timeout="3000" failOnTimeout="false"/>
             </inbound-endpoint>
         </request-reply>
     </flow>

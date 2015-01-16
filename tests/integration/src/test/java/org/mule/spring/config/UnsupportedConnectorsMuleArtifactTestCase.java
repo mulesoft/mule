@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import junit.framework.Assert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -41,7 +41,7 @@ public class UnsupportedConnectorsMuleArtifactTestCase
                                   "        <https:tls-key-store path=\"~/ce/tests/integration/src/test/resources/muletest.keystore\" keyPassword=\"mulepassword\" storePassword=\"mulepassword\"/>\n" +
                                   "</https:connector>");
         //JMS
-        checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\" validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
+        checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost?broker.persistent=false&amp;broker.useJmx=false\" validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
         //XMPP
         //Doesn't work offline
         //checkUnsupportedConnector("<xmpp:connector name=\"xmppConnector\" user=\"muleinaction@jabber.org\" password=\"manning\" host=\"jabber.org\" xmlns:xmpp=\"http://www.mulesoft.org/schema/mule/xmpp\"/>");

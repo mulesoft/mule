@@ -11,6 +11,9 @@ import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,8 +22,6 @@ import org.junit.Test;
 
 public class PollingReceiversRestartTestCase extends FunctionalTestCase
 {
-
-    private static final int WAIT_TIME = 3000;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
@@ -44,25 +45,35 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
         Object ftc = getComponent("Test");
         assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
 
-        AtomicInteger pollCounter = new AtomicInteger(0);
+        final AtomicInteger pollCounter = new AtomicInteger(0);
         ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
-        // should be enough to poll for 2 messages
-        Thread.sleep(WAIT_TIME);
+        Probe probeForPollEvents = new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return pollCounter.get() > 0;
+            }
 
-        // stop
+            @Override
+            public String describeFailure()
+            {
+                return "No polls performed";
+            }
+        };
+
+        new PollingProber(10000, 100).check(probeForPollEvents);
+
+        // stop and restart
         muleContext.stop();
-        assertTrue("No polls performed", pollCounter.get() > 0);
-
-        // and restart
-        muleContext.start();
 
         pollCounter.set(0);
+        muleContext.start();
+
         ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
+        new PollingProber(10000, 100).check(probeForPollEvents);
 
-        Thread.sleep(WAIT_TIME);
         muleContext.dispose();
-        assertTrue("No polls performed", pollCounter.get() > 0);
     }
-
 }

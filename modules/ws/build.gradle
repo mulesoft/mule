@@ -1,0 +1,14 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-ws'
+description = 'Provides components for working with Web Services.'
+
+dependencies {
+    compile project(':module-spring-config'),
+        project(":transport-http"),
+        project(":module-cxf")
+
+    testCompile project(":test-functional"),
+        project(":transport-vm"),
+        project(":transport-jms"),
+        "org.apache.activemq:activemq-core:5.5.0"
+}

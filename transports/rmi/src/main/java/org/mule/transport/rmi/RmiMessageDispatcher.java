@@ -37,16 +37,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
     {
         if (remoteObject == null)
         {
-            // Shouldn't all this be in the connector?
-            String rmiPolicyPath = connector.getSecurityPolicy();
-            System.setProperty("java.security.policy", rmiPolicyPath);
-
-            // Set security manager
-            if (System.getSecurityManager() == null)
-            {
-                System.setSecurityManager(new RMISecurityManager());
-            }
-
+            connector.initSecurity();
             remoteObject = connector.getRemoteObject(endpoint);
         }
     }

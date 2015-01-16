@@ -1,0 +1,40 @@
+group = 'org.mule.tests'
+archivesBaseName = 'mule-tests-integration'
+description = 'Integration Tests'
+
+dependencies {
+
+    testCompile project(':test-functional'),
+        project(':test-infrastructure'),
+        project(":core"),
+        rootProject.modules,
+        rootProject.transports,
+        "org.eclipse.jetty:jetty-server:${versions.jetty}",
+        libraries.activeMQ,
+        "org.apache.derby:derby:10.9.1.0",
+        "hsqldb:hsqldb:1.8.0.7",
+        "com.h2database:h2:1.3.164",
+        "commons-dbcp:commons-dbcp:1.4",
+        "com.icegreen:greenmail:1.3",
+        "org.apache.ant:ant:1.7.0",
+        project(path: ':transport-email', configuration: 'testFixtures'),
+        project(path: ':module-spring-security', configuration: 'testFixtures'),
+        project(path: ':module-annotations', configuration: 'testFixtures')
+}
+
+test {
+    maxHeapSize = '512m'
+    jvmArgs '-XX:MaxPermSize=256m'
+
+    useJUnit()
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events "failed"
+        exceptionFormat "full"
+
+        // remove standard output/error logging from --info builds
+        // by assigning only 'failed' and 'skipped' events
+        info.events = ["failed", "skipped"]
+    }
+}

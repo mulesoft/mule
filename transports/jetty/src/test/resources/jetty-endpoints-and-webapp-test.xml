@@ -7,7 +7,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <jetty:connector name="jettyConnector">
-        <jetty:webapps directory="${baseDir}/target/webapps" host="localhost" port="${port1}"/>
+        <jetty:webapps directory="${workingDirectory}" host="localhost" port="${port1}"/>
     </jetty:connector>
 
     <flow name="contextA">

@@ -1,0 +1,14 @@
+include 'core'
+includeNested 'transports', 'transport'
+includeNested 'modules', 'module'
+includeNested 'tests', 'test'
+
+def includeNested(relativePath, prefix) {
+   file(relativePath).eachDir() { dir ->
+      if (new File(dir, 'build.gradle').exists()) {
+         String name = "$prefix-$dir.name"
+         include name
+         findProject(":$name").projectDir = dir
+      }
+   }
+}

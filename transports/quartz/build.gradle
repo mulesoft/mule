@@ -1,0 +1,16 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-quartz'
+description = 'A Mule transport for Quartz. This transport supplies a receiver for jobs scheduled with Quartz.'
+
+
+dependencies {
+    compile project(':core'),
+        project(':module-spring-config'),
+        'org.quartz-scheduler:quartz:1.8.5'
+
+    testCompile project(':test-functional'),
+        project(':transport-vm')
+}
+
+
+

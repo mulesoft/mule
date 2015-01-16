@@ -32,8 +32,8 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.URL;
 import java.rmi.NotBoundException;
-import java.rmi.RMISecurityManager;
 import java.rmi.Remote;
+import java.security.Policy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -78,28 +78,36 @@ public class RmiConnector extends AbstractJndiConnector
 
     protected long pollingFrequency = 1000L;
 
-    private SecurityManager securityManager = new RMISecurityManager();
+    private SecurityManager securityManager = new SecurityManager();
     
     public RmiConnector(MuleContext context)
     {
         super(context);
     }
 
-    @Override
-    protected void doInitialise() throws InitialisationException
+    /**
+     * As RMI requires a security manager, the connector has built int functionality
+     * to change the security manager and policy.
+     * This method is used to do that change, and may be called from other components
+     * that require the correct setup even before the connector is initialized
+     */
+    public void initSecurity()
     {
-
         if (securityPolicy != null)
         {
             System.setProperty("java.security.policy", securityPolicy);
+            Policy.getPolicy().refresh();
         }
-
-        // Set security manager
         if (securityManager != null)
         {
             System.setSecurityManager(securityManager);
         }
+    }
 
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        initSecurity();
         initJndiContext();
     }
 

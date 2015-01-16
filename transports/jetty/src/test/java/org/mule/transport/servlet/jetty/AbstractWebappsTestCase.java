@@ -41,13 +41,8 @@ public abstract class AbstractWebappsTestCase extends FunctionalTestCase
     {
         super.doSetUp();
 
-        final URL url = ClassUtils.getClassPathRoot(getClass());
-        File webapps = new File(url.getFile(), "../webapps");
-        FileUtils.deleteDirectory(webapps);
-        webapps.mkdir();
-
-        FileUtils.copyFile(new File(url.getFile(), "../../src/test/resources/test.war"),
-                           new File(webapps, "test.war"));
+        FileUtils.copyFile(new File(ClassUtils.getResource("test.war", getClass()).getFile()),
+                           new File(workingDirectory.getRoot(), "test.war"));
 
         muleContext.start();
     }

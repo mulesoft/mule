@@ -10,15 +10,30 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.CountDownLatch;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
 {
+    @Rule
+    public TestName testName = new TestName();
+
+    private String queue;
+
+    @Before
+    public void createQueueName() {
+        queue = testName.getMethodName();
+    }
+
     @Override
     protected String getConfigFile()
     {
@@ -29,12 +44,12 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
     public void testAutoAckSync() throws Exception
     {
         acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
-        putMessageOnQueue("sanity");
+        putMessageOnQueue(queue);
         // Read message from queue
-        Message msg = readMessageFromQueue("sanity");
+        Message msg = readMessageFromQueue(queue);
         assertNotNull(msg);
         // No more messages
-        msg = readMessageFromQueue("sanity");
+        msg = readMessageFromQueue(queue);
         assertNull(msg);
     }
 
@@ -42,21 +57,21 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
     public void testClientAckSync() throws Exception
     {
         acknowledgeMode = Session.CLIENT_ACKNOWLEDGE;
-        putMessageOnQueue("sanity");
+        putMessageOnQueue(queue);
         // Read message but don't acknowledge
-        Message msg = readMessageFromQueue("sanity");
+        Message msg = readMessageFromQueue(queue);
         assertNotNull(msg);
         closeConsumer();
 
         // Message is still on queue
-        msg = readMessageFromQueue("sanity");
+        msg = readMessageFromQueue(queue);
         assertNotNull(msg);
         // Acknowledge
         msg.acknowledge();
         closeConsumer();
 
         // Now message is gone
-        msg = readMessageFromQueue("sanity");
+        msg = readMessageFromQueue(queue);
         assertNull(msg);
     }
 
@@ -64,21 +79,21 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
     public void testAutoAckAsync() throws Exception
     {
         acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
-
-        listenOnQueue("sanity", new MessageListener()
+        final CountDownLatch received = new CountDownLatch(1);
+        listenOnQueue(queue, new MessageListener()
         {
             @Override
             public void onMessage(Message message)
             {
-                // Message is processed normally
+                received.countDown();
             }
         });
-        putMessageOnQueue("sanity");
-        Thread.sleep(500);
+        putMessageOnQueue(queue);
+        received.await();
         closeConsumer();
 
         // Delivery was successful so message should be gone
-        Message msg = readMessageFromQueue("sanity");
+        Message msg = readMessageFromQueue(queue);
         assertNull(msg);
     }
 
@@ -86,28 +101,24 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
     public void testAutoAckAsyncWithException() throws Exception
     {
         acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
-
-        listenOnQueue("sanity", new MessageListener()
-        {
+        final CountDownLatch received = new CountDownLatch(1);
+        listenOnQueue(queue, new MessageListener() {
             @Override
-            public void onMessage(Message message)
-            {
-                try
-                {
+            public void onMessage(Message message) {
+                try {
+                    received.countDown();
                     session.recover();
-                }
-                catch (JMSException e)
-                {
+                } catch (JMSException e) {
                     fail(e.getMessage());
                 }
             }
         });
-        putMessageOnQueue("sanity");
-        Thread.sleep(500);
+        putMessageOnQueue(queue);
+        received.await();
         closeConsumer();
 
         // Delivery failed so message should be back on the queue
-        Message msg = readMessageFromQueue("sanity");
+        Message msg = readMessageFromQueue(queue);
         assertNotNull(msg);
     }
 
@@ -116,7 +127,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
     {
         acknowledgeMode = Session.CLIENT_ACKNOWLEDGE;
 
-        listenOnQueue("sanity", new MessageListener()
+        listenOnQueue(queue, new MessageListener()
         {
             @Override
             public void onMessage(Message message)
@@ -132,12 +143,12 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
                 }
             }
         });
-        putMessageOnQueue("sanity");
+        putMessageOnQueue(queue);
         Thread.sleep(500);
         closeConsumer();
 
         // Delivery was successful so message should be gone
-        Message msg = readMessageFromQueue("sanity");
+        Message msg = readMessageFromQueue(queue);
         assertNull(msg);
     }
 
@@ -146,7 +157,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
     {
         acknowledgeMode = Session.CLIENT_ACKNOWLEDGE;
 
-        listenOnQueue("sanity", new MessageListener()
+        listenOnQueue(queue, new MessageListener()
         {
             @Override
             public void onMessage(Message message)
@@ -154,12 +165,12 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
                 // Exception occured, message is not acknowledged
             }
         });
-        putMessageOnQueue("sanity");
+        putMessageOnQueue(queue);
         Thread.sleep(500);
         closeConsumer();
 
         // Delivery failed so message should be back on the queue
-        Message msg = readMessageFromQueue("sanity");
+        Message msg = readMessageFromQueue(queue);
         assertNotNull(msg);
     }
 }

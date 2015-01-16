@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+/*
+ * This definition let's projects export test classes in a jar.
+ * By default the new task is disabled, but it can be enabled by
+ * definning exportTests = true in specific modules
+ */
+subprojects {
+    ext {
+        exportTests = false
+    }
+
+    configurations {
+        // Configuration that contains all the exported test classes
+        testFixtures {
+            extendsFrom testRuntime
+        }
+    }
+
+    // TODO: Remove this once no module exports test classes
+    task testJar(type: Jar) {
+        description = 'Assembles a jar archive containing test classes'
+        onlyIf { exportTests }
+        from project.sourceSets.test.output
+        classifier = 'tests'
+    }
+
+    project.artifacts {
+        testFixtures project.testJar
+    }
+}
+

@@ -1,0 +1,15 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-jms'
+description = 'A Mule transport for Jms Connectivity.'
+
+dependencies {
+    compile project(':module-spring-config'),
+            "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1",
+            "org.springframework:spring-jms:${versions.spring}"
+
+    testCompile project(':test-functional'),
+        project(':transport-vm'),
+        project(':module-jboss-transactions'),
+        "org.apache.activemq:activemq-core:5.5.0",
+        "org.apache.derby:derby:10.9.1.0"
+}

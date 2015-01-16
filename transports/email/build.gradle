@@ -1,0 +1,20 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-email'
+description = 'A Mule transport for Email Connectivity. This transport supplies a Pop3 connector, Smtp connector and a\n' +
+'        Mail connector which is an aggregation of the two.'
+
+
+dependencies {
+    compile project(':module-spring-config'),
+        "javax.mail:mail:1.4.3"
+
+
+    testCompile project(':test-functional'),
+        project(':transport-vm'),
+        project(":transport-file"),
+        "com.icegreen:greenmail:1.3"
+}
+
+// Only required for Integration project
+exportTests = true
+
