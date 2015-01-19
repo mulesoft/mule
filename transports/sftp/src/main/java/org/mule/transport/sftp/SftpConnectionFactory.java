@@ -76,6 +76,8 @@ public class SftpConnectionFactory implements PoolableObjectFactory
                 client.setPort(uriPort);
             }
 
+            client.setConnectionTimeoutMillis(endpoint.getResponseTimeout());
+
             SftpUtil sftpUtil = new SftpUtil(endpoint);
             String identityFile = sftpUtil.getIdentityFile();
 
