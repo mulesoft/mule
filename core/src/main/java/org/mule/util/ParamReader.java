@@ -17,9 +17,7 @@
  * under the License.
  */
 
-package org.mule.config.spring.util;
-
-// import org.apache.axis.utils.Messages;
+package org.mule.util;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -34,19 +32,20 @@ import java.util.Map;
  * This is the class file reader for obtaining the parameter names for declared
  * methods in a class. The class must have debugging attributes for us to obtain this
  * information.
- * <p>
+ * <p/>
  * This does not work for inherited methods. To obtain parameter names for inherited
  * methods, you must use a paramReader for the class that originally declared the
  * method.
- * <p>
+ * <p/>
  * don't get tricky, it's the bare minimum. Instances of this class are not
  * threadsafe -- don't share them.
- * <p>
- * 
+ * <p/>
+ *
  * @author Edwin Smith, Macromedia
  */
 public class ParamReader extends ClassReader
 {
+
     private String methodName;
     private Map<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
     private Class[] paramTypes;
@@ -54,7 +53,7 @@ public class ParamReader extends ClassReader
     /**
      * process a class file, given it's class. We'll use the defining classloader to
      * locate the bytecode.
-     * 
+     *
      * @param c
      * @throws IOException
      */
@@ -65,7 +64,7 @@ public class ParamReader extends ClassReader
 
     /**
      * process the given class bytes directly.
-     * 
+     *
      * @param b
      * @throws IOException
      */
@@ -178,7 +177,7 @@ public class ParamReader extends ClassReader
      * cannot determine the names, return null. The returned array will have one name
      * per parameter. The length of the array will be the same as the length of the
      * Class[] array returned by Constructor.getParameterTypes().
-     * 
+     *
      * @param ctor
      * @return String[] array of names, one per parameter, or null
      */
@@ -193,7 +192,7 @@ public class ParamReader extends ClassReader
      * determine the names, return null. The returned array will have one name per
      * parameter. The length of the array will be the same as the length of the
      * Class[] array returned by Method.getParameterTypes().
-     * 
+     *
      * @param method
      * @return String[] array of names, one per parameter, or null
      */
@@ -249,6 +248,7 @@ public class ParamReader extends ClassReader
 
     private static class MethodInfo
     {
+
         String[] names;
 
         public MethodInfo(int maxLocals)
@@ -269,7 +269,7 @@ public class ParamReader extends ClassReader
 
     /**
      * this is invoked when a LocalVariableTable attribute is encountered.
-     * 
+     *
      * @throws IOException
      */
     public void readLocalVariableTable() throws IOException
