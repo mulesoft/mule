@@ -72,6 +72,8 @@ public class SftpClient
 
     private String preferredAuthenticationMethods;
 
+    private int connectionTimeoutMillis = 0; // No timeout by default
+
     public SftpClient(String host)
     {
         this(host, null);
@@ -139,6 +141,7 @@ public class SftpClient
             session.setConfig(hash);
             session.setPort(port);
             session.setPassword(password);
+            session.setTimeout(connectionTimeoutMillis);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -186,6 +189,7 @@ public class SftpClient
             session = jsch.getSession(user, host);
             session.setConfig(hash);
             session.setPort(port);
+            session.setTimeout(connectionTimeoutMillis);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -213,6 +217,11 @@ public class SftpClient
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public void setConnectionTimeoutMillis(int connectionTimeoutMillis)
+    {
+        this.connectionTimeoutMillis = connectionTimeoutMillis;
     }
 
     public void rename(String filename, String dest) throws IOException
