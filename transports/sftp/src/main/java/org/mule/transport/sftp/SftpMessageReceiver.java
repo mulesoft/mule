@@ -91,14 +91,14 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         break;
                     }
-                    Lock fileLock = lockFactory.createLock(connector.getName() + file);
+                    Lock fileLock = lockFactory.createLock(createLockId(file));
                     if (fileLock.tryLock(10, TimeUnit.MILLISECONDS))
                     {
                         try
                         {
                             routeFile(file);
                         }
-                        catch (Exception e)
+                        finally
                         {
                             fileLock.unlock();
                         }
@@ -121,6 +121,11 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
+    }
+
+    String createLockId(String file)
+    {
+        return connector.getName() + "-" + endpoint.getEndpointURI().getPath() + "-" + file;
     }
 
     @Override
