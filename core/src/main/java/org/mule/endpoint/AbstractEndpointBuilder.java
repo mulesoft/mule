@@ -21,6 +21,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.CloneableMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
@@ -47,6 +48,7 @@ import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -915,7 +917,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         EndpointBuilder builder = (EndpointBuilder)super.clone();
         builder.setConnector(connector);
         builder.setURIBuilder(uriBuilder);
-        builder.setMessageProcessors(messageProcessors);
+        builder.setMessageProcessors(cloneMessageProcessors(messageProcessors));
         builder.setResponseMessageProcessors(responseMessageProcessors);
         builder.setName(name);
         builder.setProperties(properties);
@@ -947,6 +949,25 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         }
 
         return builder;
+    }
+
+    private List<MessageProcessor> cloneMessageProcessors(List<MessageProcessor> messageProcessors)
+    {
+        List<MessageProcessor> result = new ArrayList<>(messageProcessors.size());
+
+        for (MessageProcessor messageProcessor : messageProcessors)
+        {
+            if (messageProcessor instanceof CloneableMessageProcessor)
+            {
+                result.add(((CloneableMessageProcessor) messageProcessor).clone());
+            }
+            else
+            {
+                result.add(messageProcessor);
+            }
+        }
+
+        return result;
     }
 
     public final Object getAnnotation(QName name)

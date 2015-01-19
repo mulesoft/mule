@@ -12,6 +12,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.processor.CloneableMessageProcessor;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.ExceptionHelper;
@@ -50,7 +52,7 @@ import org.apache.cxf.ws.addressing.WSAContextUtils;
  * The CxfOutboundMessageProcessor performs outbound CXF processing, sending an event
  * through the CXF client, then on to the next MessageProcessor.
  */
-public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor
+public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor implements CloneableMessageProcessor
 {
 
     private static final String URI_REGEX = "cxf:\\[(.+?)\\]:(.+?)/\\[(.+?)\\]:(.+?)";
@@ -445,47 +447,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         return responseWithHolders.toArray();
     }
 
-//    public String parseSoapAction(String soapAction, QName method, MuleEvent event)
-//    {
-//        EndpointURI endpointURI = endpoint.getEndpointURI();
-//        Map<String, String> properties = new HashMap<String, String>();
-//        MuleMessage msg = event.getMessage();
-//        // propagate only invocation- and outbound-scoped properties
-//        for (String name : msg.getInvocationPropertyNames())
-//        {
-//            final String value = msg.getInvocationProperty(name, StringUtils.EMPTY);
-//            properties.put(name, value);
-//        }
-//        for (String name : msg.getOutboundPropertyNames())
-//        {
-//            final String value = msg.getOutboundProperty(name, StringUtils.EMPTY);
-//            properties.put(name, value);
-//        }
-//        properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
-//        properties.put("methodNamespace", method.getNamespaceURI());
-//        properties.put("address", endpointURI.getAddress());
-//        properties.put("scheme", endpointURI.getScheme());
-//        properties.put("host", endpointURI.getHost());
-//        properties.put("port", String.valueOf(endpointURI.getPort()));
-//        properties.put("path", endpointURI.getPath());
-//        properties.put("hostInfo",
-//            endpointURI.getScheme() + "://" + endpointURI.getHost()
-//                            + (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
-//        if (event.getFlowConstruct() != null)
-//        {
-//            properties.put("serviceName", event.getFlowConstruct().getName());
-//        }
-//
-//        soapAction = soapActionTemplateParser.parse(properties, soapAction);
-//
-//        if (logger.isDebugEnabled())
-//        {
-//            logger.debug("SoapAction for this call is: " + soapAction);
-//        }
-//
-//        return soapAction;
-//    }
-
     public void setPayloadToArguments(CxfPayloadToArguments payloadToArguments)
     {
         this.payloadToArguments = payloadToArguments;
@@ -535,5 +496,17 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     {
         this.decoupledEndpoint = decoupledEndpoint;
     }
-    
+
+    @Override
+    public MessageProcessor clone()
+    {
+        CxfOutboundMessageProcessor clone = new CxfOutboundMessageProcessor(client);
+        clone.payloadToArguments = this.payloadToArguments;
+        clone.proxy = this.proxy;
+        clone.operation = this.operation;
+        clone.clientProxy = clientProxy;
+        clone.decoupledEndpoint = decoupledEndpoint;
+
+        return clone;
+    }
 }
