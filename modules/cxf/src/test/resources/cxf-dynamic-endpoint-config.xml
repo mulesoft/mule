@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+            http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
+    <spring:beans>
+        <context:annotation-config/>
+        <spring:bean name="endpointEventListener"
+                     class="org.mule.module.cxf.CxfDynamicEndpointTestCase.EndpointMetricsNotification"/>
+    </spring:beans>
+
+    <notifications>
+        <notification event="ENDPOINT-MESSAGE"/>
+        <notification-listener ref="endpointEventListener"/>
+    </notifications>
+
+    <flow name="cxfInsideEndpoint">
+        <http:inbound-endpoint address="http://localhost:${httpPort}/cxfInsideEndpoint" exchange-pattern="request-response">
+            <cxf:proxy-service/>
+        </http:inbound-endpoint>
+
+        <http:outbound-endpoint address="http://localhost:${httpPort}/#[message.inboundProperties.DYNAMIC_PATH]" method="POST">
+            <cxf:proxy-client/>
+        </http:outbound-endpoint>
+    </flow>
+
+    <flow name="cxfOutsideEndpoint">
+        <http:inbound-endpoint address="http://localhost:${httpPort}/cxfOutsideEndpoint" exchange-pattern="request-response">
+            <cxf:proxy-service/>
+        </http:inbound-endpoint>
+
+        <cxf:proxy-client/>
+
+        <http:outbound-endpoint address="http://localhost:${httpPort}/#[message.inboundProperties.DYNAMIC_PATH]" method="POST"/>
+    </flow>
+
+
+    <flow name="testFlowPath1">
+        <http:inbound-endpoint address="http://localhost:${httpPort}/path1" exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld"/>
+        </http:inbound-endpoint>
+
+        <component class="org.mule.module.cxf.example.HelloWorldImpl"/>
+    </flow>
+
+    <flow name="testFlowPath2">
+        <http:inbound-endpoint address="http://localhost:${httpPort}/path2" exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld"/>
+        </http:inbound-endpoint>
+
+        <component class="org.mule.module.cxf.example.HelloWorldImpl"/>
+    </flow>
+
+</mule>
