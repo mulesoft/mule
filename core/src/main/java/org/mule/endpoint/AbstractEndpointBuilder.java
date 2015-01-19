@@ -10,7 +10,6 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -21,9 +20,9 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.exception.ExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.CloneableMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
@@ -34,7 +33,6 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
@@ -51,6 +49,7 @@ import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -912,7 +911,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         EndpointBuilder builder = (EndpointBuilder)super.clone();
         builder.setConnector(connector);
         builder.setURIBuilder(uriBuilder);
-        builder.setMessageProcessors(messageProcessors);
+        builder.setMessageProcessors(cloneMessageProcessors(messageProcessors));
         builder.setResponseMessageProcessors(responseMessageProcessors);
         builder.setName(name);
         builder.setProperties(properties);
@@ -944,6 +943,25 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         }
 
         return builder;
+    }
+
+    private List<MessageProcessor> cloneMessageProcessors(List<MessageProcessor> messageProcessors)
+    {
+        List<MessageProcessor> result = new ArrayList<MessageProcessor>(messageProcessors.size());
+
+        for (MessageProcessor messageProcessor : messageProcessors)
+        {
+            if (messageProcessor instanceof CloneableMessageProcessor)
+            {
+                result.add(((CloneableMessageProcessor) messageProcessor).clone());
+            }
+            else
+            {
+                result.add(messageProcessor);
+            }
+        }
+
+        return result;
     }
 
     public final Object getAnnotation(QName name)
