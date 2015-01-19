@@ -128,7 +128,7 @@ protected void deployToRemote(String repoUrl, String repoId, String groupId, Str
         {
             if (deploySignatures && getDependency(signature, "target/${it}-signature"))
             {
-                assert deployFile(optional, 'target/pom', "target/${it}-signature", repoUrl, repoId);
+                assert deployFile(signature, 'target/pom', "target/${it}-signature", repoUrl, repoId);
             }
             assert deployFile(optional, 'target/pom', "target/${it}", repoUrl, repoId);
         }
