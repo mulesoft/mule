@@ -18,6 +18,7 @@ import java.util.concurrent.locks.Lock;
 public class MuleLockFactory implements LockFactory, MuleContextAware, Initialisable, Disposable
 {
     private LockGroup lockGroup;
+    private LockProvider lockProvider;
     private MuleContext muleContext;
 
     public synchronized Lock createLock(String lockId)
@@ -34,9 +35,17 @@ public class MuleLockFactory implements LockFactory, MuleContextAware, Initialis
     @Override
     public void initialise() throws InitialisationException
     {
-        LockProvider lockProvider = muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER);
+        if (lockProvider == null)
+        {
+            lockProvider = muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER);
+        }
         lockGroup = new InstanceLockGroup(lockProvider);
 
+    }
+
+    public void setLockProvider(LockProvider lockProvider)
+    {
+        this.lockProvider = lockProvider;
     }
 
     @Override
