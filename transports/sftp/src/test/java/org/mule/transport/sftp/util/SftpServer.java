@@ -38,6 +38,11 @@ public class SftpServer
         configureSshdServer(factory, passwordAuthenticator());
     }
 
+    public void setPasswordAuthenticator(PasswordAuthenticator passwordAuthenticator)
+    {
+        sshdServer.setPasswordAuthenticator(passwordAuthenticator);
+    }
+
     private void configureSshdServer(SftpSubsystem.Factory factory,
                                      PasswordAuthenticator passwordAuthenticator)
     {
