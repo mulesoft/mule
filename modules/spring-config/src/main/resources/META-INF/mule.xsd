@@ -4763,6 +4763,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="parseExpressions" type="substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If the string value provided should be parsed for expressions, and each expression evaluated.  If expressions aren't required this can be set 'false' (default is 'true') to optimize for performance.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -6,13 +6,13 @@
  */
 package org.mule.transformer.simple;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
@@ -93,6 +93,19 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
 
         Object response = setPayloadTransformer.transformMessage(mockMuleMessage, "UTF-8");
         assertEquals(PLAIN_TEXT, response);
+    }
+
+    @Test
+    public void testSetPayloadTransformerExpressionParseExpressionsFalse() throws InitialisationException, TransformerException
+    {
+        setPayloadTransformer.setValue(EXPRESSION);
+        setPayloadTransformer.setParseExpressions(false);
+        when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
+        setPayloadTransformer.initialise();
+        when(mockExpressionManager.evaluate(EXPRESSION, mockMuleMessage)).thenReturn(PLAIN_TEXT);
+
+        String response = (String) setPayloadTransformer.transformMessage(mockMuleMessage, "UTF-8");
+        assertThat(response, equalTo(EXPRESSION));
     }
 
 }

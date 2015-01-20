@@ -21,6 +21,7 @@ import org.mule.util.AttributeEvaluator;
 public class SetPayloadTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator valueEvaluator;
+    private boolean parseExpressions = true;
 
     @Override
     public void initialise() throws InitialisationException
@@ -43,11 +44,23 @@ public class SetPayloadTransformer extends AbstractMessageTransformer
             return NullPayload.getInstance();
         }
 
-        return valueEvaluator.resolveValue(message);
+        if(parseExpressions)
+        {
+            return valueEvaluator.resolveValue(message);
+        }
+        else
+        {
+            return valueEvaluator.getRawValue();
+        }
     }
 
     public void setValue(String value)
     {
         valueEvaluator = new AttributeEvaluator(value);
+    }
+
+    public void setParseExpressions(boolean parseExpressions)
+    {
+        this.parseExpressions = parseExpressions;
     }
 }
