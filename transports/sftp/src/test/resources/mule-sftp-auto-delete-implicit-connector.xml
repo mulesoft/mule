@@ -1,0 +1,27 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+
+    <spring:beans>
+        <spring:import resource="sftp-properties.xml" />
+    </spring:beans>
+
+    <flow name="autoDeleteOff">
+        <sftp:inbound-endpoint
+                address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/autoDeleteOff"
+                name="inboundEndpointOff" autoDelete="false"/>
+        <custom-processor class="org.mule.transport.sftp.SftpAutoDeleteTestCase$LatchMessageProcessor"/>
+    </flow>
+
+    <flow name="autoDeleteOn">
+        <sftp:inbound-endpoint
+                address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/autoDeleteOn"
+                name="inboundEndpointOn" autoDelete="true"/>
+        <custom-processor class="org.mule.transport.sftp.SftpAutoDeleteTestCase$LatchMessageProcessor"/>
+    </flow>
+
+</mule>
