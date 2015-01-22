@@ -7,8 +7,8 @@
 package org.mule.tck.junit4;
 
 import static org.junit.Assert.fail;
-
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -47,6 +47,8 @@ import org.junit.Assert;
  */
 public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 {
+    protected static MuleContext domainContext;
+
     public FunctionalTestCase()
     {
         super();
@@ -64,32 +66,71 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         return null;
     }
 
-
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
+        String domainConfig = getDomainConfig();
+        domainContext = domainConfig != null ? new DomainContextBuilder().setDomainConfig(domainConfig).build() : null;
+        SpringXmlConfigurationBuilder configurationBuilder;
         String configResources = getConfigResources();
         if (configResources != null)
         {
-            return new SpringXmlConfigurationBuilder(configResources);
+            configurationBuilder = new SpringXmlConfigurationBuilder(configResources);
         }
-        configResources = getConfigFile();
-        if (configResources != null)
+        else
         {
-            if (configResources.contains(","))
+            configResources = getConfigFile();
+            if (configResources != null)
             {
-                throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
+                if (configResources.contains(","))
+                {
+                    throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
+                }
+                configurationBuilder = new SpringXmlConfigurationBuilder(configResources);
             }
-            return new SpringXmlConfigurationBuilder(configResources);
+            else
+            {
+                String[] multipleConfigResources = getConfigFiles();
+                configurationBuilder = new SpringXmlConfigurationBuilder(multipleConfigResources);
+            }
         }
-        String[] multipleConfigResources = getConfigFiles();
-        return new SpringXmlConfigurationBuilder(multipleConfigResources);
+        if (domainContext != null)
+        {
+            configurationBuilder.setDomainContext(domainContext);
+        }
+        return configurationBuilder;
+    }
+
+    @Override
+    protected void doTearDownAfterMuleContextDispose() throws Exception
+    {
+        super.doTearDownAfterMuleContextDispose();
+        try
+        {
+            if (domainContext != null && !(domainContext.isDisposed() || !domainContext.isDisposing()))
+            {
+                domainContext.dispose();
+            }
+        }
+        finally
+        {
+            domainContext = null;
+        }
+
     }
 
     /**
      * @return a single file that defines a mule application configuration
      */
     protected String getConfigFile()
+    {
+        return null;
+    }
+
+    /**
+     * @return a single file that defines a mule domain configuration for this application
+     */
+    protected String getDomainConfig()
     {
         return null;
     }
