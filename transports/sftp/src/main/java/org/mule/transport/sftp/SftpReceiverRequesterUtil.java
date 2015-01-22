@@ -218,10 +218,15 @@ public class SftpReceiverRequesterUtil
 
     private boolean determineAutoDelete()
     {
-        Boolean autoDelete = Boolean.valueOf((String) endpoint.getProperty("autoDelete"));
-        if (autoDelete == null)
+        boolean autoDelete;
+        String autoDeleteProperty = (String) endpoint.getProperty("autoDelete");
+        if (autoDeleteProperty == null)
         {
             autoDelete = connector.isAutoDelete();
+        }
+        else
+        {
+            autoDelete = Boolean.valueOf(autoDeleteProperty);
         }
         return autoDelete;
     }
