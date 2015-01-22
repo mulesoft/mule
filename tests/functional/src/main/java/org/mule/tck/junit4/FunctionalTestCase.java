@@ -105,10 +105,18 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected void doTearDownAfterMuleContextDispose() throws Exception
     {
         super.doTearDownAfterMuleContextDispose();
-        if (domainContext != null)
+        try
         {
-            domainContext.dispose();
+            if (domainContext != null && !(domainContext.isDisposed() || !domainContext.isDisposing()))
+            {
+                domainContext.dispose();
+            }
         }
+        finally
+        {
+            domainContext = null;
+        }
+
     }
 
     /**
