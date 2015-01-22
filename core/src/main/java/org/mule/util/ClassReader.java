@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.util;
+package org.mule.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -236,7 +236,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 return (T) primitiveTypeNameMap.get(className);
             }
         }
-        
+
         Class<?> clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
         {
             public Class<?> run()
@@ -424,7 +424,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static <T> T instanciateClass(Class<? extends T> clazz, Object... constructorArgs)
             throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-            IllegalAccessException, InvocationTargetException
+                   IllegalAccessException, InvocationTargetException
     {
         Class<?>[] args;
         if (constructorArgs != null)
@@ -465,7 +465,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 argsString.append(arg.getName()).append(", ");
             }
             throw new NoSuchMethodException("could not find constructor on class: " + clazz + ", with matching arg params: "
-                    + argsString);
+                                            + argsString);
         }
 
         return (T)ctor.newInstance(constructorArgs);
@@ -473,14 +473,14 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Object instanciateClass(String name, Object... constructorArgs)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException
+                   InstantiationException, IllegalAccessException, InvocationTargetException
     {
         return instanciateClass(name, constructorArgs, (ClassLoader) null);
     }
 
     public static Object instanciateClass(String name, Object[] constructorArgs, Class<?> callingClass)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException
+                   InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class<?> clazz = loadClass(name, callingClass);
         return instanciateClass(clazz, constructorArgs);
@@ -488,7 +488,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Object instanciateClass(String name, Object[] constructorArgs, ClassLoader classLoader)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException
+                   InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class<?> clazz;
         if (classLoader != null)
@@ -565,7 +565,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     {
         return getConstructor(clazz, paramTypes, false);
     }
-    
+
     /**
      *  Returns available constructor in the target class that as the parameters specified.
      *
@@ -632,10 +632,10 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *         none, an empty list is returned
      */
     public static List<Method> getSatisfiableMethods(Class<?> implementation,
-                                             Class<?>[] parameterTypes,
-                                             boolean voidOk,
-                                             boolean matchOnObject,
-                                             Set<String> ignoredMethodNames)
+                                                     Class<?>[] parameterTypes,
+                                                     boolean voidOk,
+                                                     boolean matchOnObject,
+                                                     Set<String> ignoredMethodNames)
     {
         return getSatisfiableMethods(implementation, parameterTypes, voidOk, matchOnObject, ignoredMethodNames, null);
     }
@@ -656,11 +656,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *         none, an empty list is returned
      */
     public static List<Method> getSatisfiableMethods(Class<?> implementation,
-                                             Class<?>[] parameterTypes,
-                                             boolean voidOk,
-                                             boolean matchOnObject,
-                                             Collection<String> ignoredMethodNames,
-                                             WildcardFilter filter)
+                                                     Class<?>[] parameterTypes,
+                                                     boolean voidOk,
+                                                     boolean matchOnObject,
+                                                     Collection<String> ignoredMethodNames,
+                                                     WildcardFilter filter)
     {
         List<Method> result = new ArrayList<Method>();
 
@@ -705,9 +705,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @return the list of methods that matched the return type and criteria. If none are found an empty result is returned
      */
     public static List<Method> getSatisfiableMethodsWithReturnType(Class implementation,
-                                                           Class returnType,
-                                                           boolean matchOnObject,
-                                                           Set<String> ignoredMethodNames)
+                                                                   Class returnType,
+                                                                   boolean matchOnObject,
+                                                                   Set<String> ignoredMethodNames)
     {
         List<Method> result = new ArrayList<Method>();
 
@@ -815,7 +815,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * and the arrays are the same size. If matchOnObject argument is true and there
      * is a parameter of type Object in c1 then the method returns false. If
      * acceptNulls argument is true, null values are accepted in c2.
-     * 
+     *
      * @param c1 parameter types array
      * @param c2 parameter types array
      * @param matchOnObject return false if there is a parameter of type Object in c1
@@ -837,8 +837,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 {
                     return false;
                 }
-            } 
-            else 
+            }
+            else
             {
                 if (c1[i] == null)
                 {
@@ -1008,7 +1008,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         {
             throw new IllegalArgumentException(
                     "PANIC: Mule has been started with an unsupported classloader: " + sys.getClass().getName()
-                            + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
+                    + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
         }
 
         // system classloader is in this case the one that launched the application,
