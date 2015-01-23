@@ -307,7 +307,11 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
             try
             {
-                consumer.setMessageListener(this);
+                MessageListener currentMessageListener = consumer.getMessageListener();
+                if (currentMessageListener == null || currentMessageListener != this)
+                {
+                    consumer.setMessageListener(this);
+                }
                 started = true;
             }
             catch (JMSException e)
