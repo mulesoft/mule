@@ -62,18 +62,17 @@ public class MuleSecureProtocolSocketFactory implements SecureProtocolSocketFact
         }
     }
 
-    /**
-     * This is a direct version of code in {@link ReflectionSocketFactory}.
-     */
     protected Socket createSocketWithTimeout(String host, int port, InetAddress localAddress,
         int localPort, int timeout) throws IOException
     {
-        Socket socket = socketFactory.createSocket();
+        // Create and connect underlying socket first to enable connect timeout to be defined.
+        Socket plainSocket = new Socket();
         SocketAddress local = new InetSocketAddress(localAddress, localPort);
         SocketAddress remote = new InetSocketAddress(host, port);
-        
-        socket.bind(local);
-        socket.connect(remote, timeout);
-        return socket;
+        plainSocket.bind(local);
+        plainSocket.connect(remote, timeout);
+
+        // Once we have socket, wrap with SSLSocket
+        return socketFactory.createSocket(plainSocket, host, port, true);
     }
 }
