@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
-    <spring:beans default-init-method="initialise">
+    <spring:beans>
         <!-- Marker for MULE-4813-->
 
         <context:component-scan base-package="org.mule,com.mulesoft" />

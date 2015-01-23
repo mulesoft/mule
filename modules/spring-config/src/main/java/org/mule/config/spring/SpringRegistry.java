@@ -12,12 +12,14 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
+import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
@@ -103,6 +105,18 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
         }
         //This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the application context
         springContextInitialised.set(true);
+
+        try
+        {
+            for (Object object : lookupObjectsForLifecycle(Initialisable.class))
+            {
+                lifecycleManager.applyPhase(object, NotInLifecyclePhase.PHASE_NAME, Initialisable.PHASE_NAME);
+            }
+        }
+        catch (LifecycleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     @Override
@@ -181,7 +195,8 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
-        return internalLookupByTypeWithoutAncestors(type, false, false).values();
+        Collection<T> objects = internalLookupByTypeWithoutAncestors(type, false, false).values();
+        return CollectionUtils.select(objects, new LifecycleObjectPredicate());
     }
 
     @Override
