@@ -56,23 +56,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
             registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
         }
-
-        /**
-         * We don't need to apply any lifecycle here since Spring manages that for us
-         * 
-         * @param o the object apply lifecycle to. This parameter will be ignored
-         * @throws LifecycleException never thrown
-         */
-        @Override
-        public void applyLifecycle(Object o) throws LifecycleException
-        {
-            // Spring starts initialised, don't do anything unless the context
-            // is already started and this is an object being registered on the fly
-            //if (getCurrentPhase() != NotInLifecyclePhase.PHASE_NAME)
-            //{
-                super.applyLifecycle(o);
-            //}
-        }
     }
 
     /**
@@ -93,7 +76,14 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
         @Override
         public void applyLifecycle(Object o) throws LifecycleException
         {
-            ((SpringRegistry) o).doDispose();
+            if (o instanceof SpringRegistry)
+            {
+                ((SpringRegistry) o).doDispose();
+            }
+            else
+            {
+                super.applyLifecycle(o);
+            }
         }
     }
 
