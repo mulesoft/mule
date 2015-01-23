@@ -188,7 +188,7 @@ public class SftpReceiverRequesterUtil
             String archiveTmpReceivingDir = sftpUtil.getArchiveTempReceivingDir();
             String archiveTmpSendingDir = sftpUtil.getArchiveTempSendingDir();
 
-            InputStream is = new SftpInputStream(client, fileInputStream, fileName, connector.isAutoDelete(),
+            InputStream is = new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(),
                 endpoint);
 
             // TODO ML FIX. Refactor to util-class...
@@ -213,7 +213,22 @@ public class SftpReceiverRequesterUtil
         // This special InputStream closes the SftpClient when the stream is closed.
         // The stream will be materialized in a Message Dispatcher or Service
         // Component
-        return new SftpInputStream(client, fileInputStream, fileName, connector.isAutoDelete(), endpoint);
+        return new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(), endpoint);
+    }
+
+    private boolean determineAutoDelete()
+    {
+        boolean autoDelete;
+        String autoDeleteProperty = (String) endpoint.getProperty("autoDelete");
+        if (autoDeleteProperty == null)
+        {
+            autoDelete = connector.isAutoDelete();
+        }
+        else
+        {
+            autoDelete = Boolean.valueOf(autoDeleteProperty);
+        }
+        return autoDelete;
     }
 
     private InputStream archiveFileUsingTempDirs(String archive,
