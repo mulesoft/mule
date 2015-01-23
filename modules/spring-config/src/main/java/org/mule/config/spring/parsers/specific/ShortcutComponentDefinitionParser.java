@@ -6,8 +6,6 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.object.AbstractObjectFactory;
 import org.mule.object.PrototypeObjectFactory;
@@ -37,8 +35,8 @@ public class ShortcutComponentDefinitionParser extends ComponentDefinitionParser
         objectFactoryBeanDefinition.getPropertyValues().addPropertyValue(
             AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME, className);
         //MArker for MULE-4813
-        objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
-        objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
+        //objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
+        //objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
 
         builder.addPropertyValue("objectFactory", objectFactoryBeanDefinition);
         super.parseChild(element, parserContext, builder);

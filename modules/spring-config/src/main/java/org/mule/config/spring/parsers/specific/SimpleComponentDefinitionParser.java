@@ -6,8 +6,6 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.object.AbstractObjectFactory;
 import org.mule.object.SingletonObjectFactory;
@@ -84,8 +82,8 @@ public class SimpleComponentDefinitionParser extends ComponentDefinitionParser
         objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("properties", properties);
 
         //Marker for MULE-4813
-        objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
-        objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
+        //objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
+        //objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
         return objectFactoryBeanDefinition;
     }
 }

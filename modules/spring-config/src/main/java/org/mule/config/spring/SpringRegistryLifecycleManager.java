@@ -60,7 +60,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
         /**
          * We don't need to apply any lifecycle here since Spring manages that for us
          * 
-         * @param o the object apply lifecycle to. This parameter will be ignorred
+         * @param o the object apply lifecycle to. This parameter will be ignored
          * @throws LifecycleException never thrown
          */
         @Override
@@ -68,10 +68,10 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
         {
             // Spring starts initialised, don't do anything unless the context
             // is already started and this is an object being registered on the fly
-            if (getCurrentPhase() != NotInLifecyclePhase.PHASE_NAME)
-            {
+            //if (getCurrentPhase() != NotInLifecyclePhase.PHASE_NAME)
+            //{
                 super.applyLifecycle(o);
-            }
+            //}
         }
     }
 
