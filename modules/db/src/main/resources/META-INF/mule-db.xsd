@@ -282,6 +282,7 @@
             </xsd:sequence>
             <xsd:sequence>
                 <xsd:element name="parameterized-query" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                <xsd:group ref="queryParameter" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:element name="dynamic-query" type="xsd:string" minOccurs="0" maxOccurs="1"/>
         </xsd:choice>
@@ -356,6 +357,12 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
+
+    <xsd:group name="queryParameter">
+        <xsd:choice>
+            <xsd:element name="in-param" type="InputParamType"/>
+        </xsd:choice>
+    </xsd:group>
 
     <xsd:group name="callParameter">
         <xsd:choice>
