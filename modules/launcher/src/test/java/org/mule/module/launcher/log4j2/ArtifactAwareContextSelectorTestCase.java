@@ -14,12 +14,14 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.module.launcher.application.CompositeApplicationClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -85,6 +87,16 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
         LoggerContext ctx = selector.getContext("", classLoader, true);
         assertThat(ctx, instanceOf(MuleLoggerContext.class));
         assertConfigurationLocation(ctx);
+    }
+
+    @Test
+    public void defaultToConfWhenNoConfigFound()
+    {
+        when(classLoader.findLocalResource(anyString())).thenReturn(null);
+        File expected = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
+        expected = new File(expected, "log4j2.xml");
+        LoggerContext ctx = selector.getContext("", classLoader, true);
+        assertThat(ctx.getConfigLocation(), equalTo(expected.toURI()));
     }
 
     private void assertConfigurationLocation(LoggerContext ctx)
