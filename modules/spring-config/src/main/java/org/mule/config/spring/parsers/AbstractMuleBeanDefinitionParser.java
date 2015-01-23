@@ -10,8 +10,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
@@ -274,15 +272,15 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
             && !Transformer.class.isAssignableFrom(beanClass)
             && !AbstractAsyncRequestReplyRequester.class.isAssignableFrom(beanClass))
         {
-            if (Initialisable.class.isAssignableFrom(beanClass))
-            {
-                builder.setInitMethodName(Initialisable.PHASE_NAME);
-            }
-
-            if (Disposable.class.isAssignableFrom(beanClass))
-            {
-                builder.setDestroyMethodName(Disposable.PHASE_NAME);
-            }
+            //if (Initialisable.class.isAssignableFrom(beanClass))
+            //{
+            //    builder.setInitMethodName(Initialisable.PHASE_NAME);
+            //}
+            //
+            //if (Disposable.class.isAssignableFrom(beanClass))
+            //{
+            //    builder.setDestroyMethodName(Disposable.PHASE_NAME);
+            //}
         }
 
         if (context.isNested())
