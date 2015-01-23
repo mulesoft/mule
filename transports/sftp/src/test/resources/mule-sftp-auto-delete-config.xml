@@ -1,0 +1,44 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+
+    <spring:beans>
+        <spring:import resource="sftp-properties.xml" />
+    </spring:beans>
+
+    <spring:beans profile="explicit-connector">
+        <mule>
+            <sftp:connector name="SFTP" autoDelete="false"/>
+            <sftp:endpoint
+                address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir/autoDeleteOff"
+                name="inboundEndpointOff" connector-ref="SFTP"/>
+            <sftp:endpoint
+                address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir/autoDeleteOn"
+                name="inboundEndpointOn" autoDelete="true" connector-ref="SFTP"/>
+        </mule>
+    </spring:beans>
+
+    <spring:beans profile="implicit-connector">
+        <sftp:endpoint
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir/autoDeleteOff"
+            name="inboundEndpointOff" autoDelete="false"/>
+        <sftp:endpoint
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir/autoDeleteOn"
+            name="inboundEndpointOn" autoDelete="true"/>
+    </spring:beans>
+
+    <flow name="autoDeleteOff">
+        <inbound-endpoint ref="inboundEndpointOff"/>
+        <custom-processor class="org.mule.transport.sftp.SftpAutoDeleteTestCase$LatchMessageProcessor"/>
+    </flow>
+
+    <flow name="autoDeleteOn">
+        <inbound-endpoint ref="inboundEndpointOn"/>
+        <custom-processor class="org.mule.transport.sftp.SftpAutoDeleteTestCase$LatchMessageProcessor"/>
+    </flow>
+
+</mule>
