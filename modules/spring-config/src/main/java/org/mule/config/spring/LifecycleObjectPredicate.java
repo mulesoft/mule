@@ -6,6 +6,7 @@
  */
 package org.mule.config.spring;
 
+import org.mule.api.MuleContext;
 import org.mule.api.component.Component;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -19,8 +20,16 @@ import org.apache.commons.collections.Predicate;
 final class LifecycleObjectPredicate implements Predicate
 {
 
-    private final Class<?>[] ignoredTypes = new Class[] {Component.class, MessageSource.class, OutboundRouterCollection.class,
-            AbstractMessageProcessorOwner.class, MessagingExceptionHandler.class, Transformer.class, AbstractAsyncRequestReplyRequester.class};
+    private final Class<?>[] ignoredTypes = new Class[] {
+            Component.class,
+            MessageSource.class,
+            AbstractMessageProcessorOwner.class,
+            MessagingExceptionHandler.class,
+            Transformer.class,
+            AbstractAsyncRequestReplyRequester.class,
+            OutboundRouterCollection.class,
+            MuleContext.class
+    };
 
     @Override
     public boolean evaluate(Object o)
