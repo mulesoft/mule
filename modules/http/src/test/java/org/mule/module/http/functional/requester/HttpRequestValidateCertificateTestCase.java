@@ -15,6 +15,7 @@ import org.mule.api.MessagingException;
 import org.mule.util.FileUtils;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 import org.junit.Test;
 import sun.security.provider.certpath.SunCertPathBuilderException;
@@ -45,7 +46,7 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
         catch (MessagingException e)
         {
             assertThat(e, is(instanceOf(MessagingException.class)));
-            assertThat(e.getCauseException(), is(instanceOf(SunCertPathBuilderException.class)));
+            assertThat(e.getCauseException(), is(instanceOf(GeneralSecurityException.class)));
         }
     }
 
