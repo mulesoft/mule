@@ -112,7 +112,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
 
         try
         {
-            for (Object object : lookupObjectsForLifecycle(Initialisable.class))
+            for (Initialisable object : lookupObjectsForLifecycle(Initialisable.class))
             {
                 lifecycleManager.applyPhase(object, NotInLifecyclePhase.PHASE_NAME, Initialisable.PHASE_NAME);
             }
@@ -128,7 +128,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     {
         // check we aren't trying to close a context which has never been started,
         // spring's appContext.isActive() isn't working for this case
-        if (!this.springContextInitialised.get())
+        if (!springContextInitialised.get())
         {
             return;
         }
@@ -257,25 +257,6 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
         registrationDelegate.registerObject(key, value, metadata);
-
-        try
-        {
-            if (getLifecycleManager().getCurrentPhase().equals(NotInLifecyclePhase.PHASE_NAME))
-            {
-                if (value instanceof Initialisable)
-                {
-                    ((Initialisable) value).initialise();
-                }
-            }
-            else
-            {
-                applyLifecycle(value);
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new RegistrationException(e);
-        }
     }
 
     @Override
@@ -285,7 +266,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     }
 
     @Override
-    public void unregisterObject(String key)
+    public void unregisterObject(String key) throws RegistrationException
     {
         registrationDelegate.unregisterObject(key);
     }
@@ -342,6 +323,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     private Object initialiseObject(ConfigurableApplicationContext applicationContext, String key, Object object) throws LifecycleException
     {
         Object initialised = applicationContext.getBeanFactory().initializeBean(object, key);
+        applicationContext.getBeanFactory().autowireBean(object);
         getLifecycleManager().applyCompletedPhases(initialised);
 
         return initialised;
@@ -397,9 +379,12 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
             }
         }
 
+        //TODO: Clean up this code!!!!
         @Override
         public void unregisterObject(String key) throws RegistrationException
         {
+            Object object = applicationContext.getBean(key);
+
             if (applicationContext.getBeanFactory().containsBeanDefinition(key))
             {
                 ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
@@ -407,20 +392,23 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
 
             ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
 
-            Object object = applicationContext.getBean(key);
 
             if (object instanceof Stoppable)
             {
                 try {
                     getLifecycleManager().applyPhase(object, Startable.PHASE_NAME, Stoppable.PHASE_NAME);
                 } catch (LifecycleException e) {
-                    throw new RegistrationException(MessageFactory.createStaticMessage("Exception found "))
+                    throw new RegistrationException(MessageFactory.createStaticMessage("Exception found "));
                 }
             }
 
             if (object instanceof Disposable)
             {
-                getLifecycleManager().applyPhase(object, Stoppable.PHASE_NAME, Disposable.PHASE_NAME);
+                try {
+                    getLifecycleManager().applyPhase(object, Stoppable.PHASE_NAME, Disposable.PHASE_NAME);
+                } catch (Exception e) {
+                    logger.error("Error disposing on unregister", e);
+                }
             }
         }
 
