@@ -8,6 +8,9 @@ package org.mule.processor;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -19,13 +22,16 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.processor.SedaStageInterceptingMessageProcessor.DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR;
+import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.notification.AsyncMessageNotificationListener;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -38,13 +44,16 @@ import org.mule.api.service.FailedToQueueEventException;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
+import org.mule.context.notification.AsyncMessageNotification;
 import org.mule.management.stats.QueueStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.service.Pausable;
+import org.mule.tck.MuleTestUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.beans.ExceptionListener;
 import java.io.Serializable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -334,6 +343,72 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
                 muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         createMPAndQueueSingleEvent(new QueueProfile(-1, queueStore));
+    }
+
+    @Test
+    public void testEventCopiedBeforeEnqueueInCallerThread() throws Exception
+    {
+        SedaStageInterceptingMessageProcessor sedaProcessor = (SedaStageInterceptingMessageProcessor) messageProcessor;
+
+        MuleEvent testEvent = getTestEvent("", MessageExchangePattern.ONE_WAY);
+        sedaProcessor.pause();
+        messageProcessor.process(testEvent);
+
+        MuleEvent queuedEvent = (MuleEvent) sedaProcessor.queue.poll(sedaProcessor.queueTimeout);
+
+        assertThat(queuedEvent, is(notNullValue()));
+        assertThat(queuedEvent, is(not(sameInstance(testEvent))));
+    }
+
+    @Test
+    public void oneWayWithAsyncNotificationListener() throws Exception
+    {
+        CountDownLatch notificationLatch = new CountDownLatch(2);
+        AsynMessageFiringNotificationListener listener = new AsynMessageFiringNotificationListener(notificationLatch);
+        muleContext.registerListener(listener);
+
+        MuleEvent event = MuleTestUtils.getTestEventUsingFlow(TEST_MESSAGE, MessageExchangePattern.ONE_WAY, muleContext);
+        assertAsync(messageProcessor, event);
+        notificationLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+        // ASYNC_SCHEDULED receives same event instance as is queued
+        assertThat(listener.asyncScheduledEvent, is(notNullValue()));
+        assertThat(listener.asyncScheduledEvent, is(sameInstance(event)));
+        assertThat(listener.asyncScheduledEvent, is(not(sameInstance(target.sensedEvent))));
+
+        // ASYNC_COMPLETE receives same event passed to target processor
+        assertThat(listener.asyncCompleteEvent, is(notNullValue()));
+        assertThat(listener.asyncCompleteEvent, is(not(sameInstance(event))));
+        assertThat(listener.asyncCompleteEvent, is(sameInstance(target.sensedEvent)));
+    }
+
+    private class AsynMessageFiringNotificationListener implements AsyncMessageNotificationListener<AsyncMessageNotification>
+    {
+
+        CountDownLatch latch;
+        MuleEvent asyncScheduledEvent;
+        MuleEvent asyncCompleteEvent;
+
+        public AsynMessageFiringNotificationListener(CountDownLatch latch)
+        {
+            this.latch = latch;
+        }
+
+        @Override
+        public void onNotification(final AsyncMessageNotification notification)
+        {
+            if (notification.getAction() == AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED)
+            {
+                asyncScheduledEvent = (MuleEvent) notification.getSource();
+                ((DefaultMuleMessage) asyncScheduledEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
+            }
+            else if (notification.getAction() == AsyncMessageNotification.PROCESS_ASYNC_COMPLETE)
+            {
+                asyncCompleteEvent = (MuleEvent) notification.getSource();
+                ((DefaultMuleMessage) asyncCompleteEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
+            }
+            latch.countDown();
+        }
     }
 
     private void createMPAndQueueSingleEvent(QueueProfile queueProfile) throws Exception
