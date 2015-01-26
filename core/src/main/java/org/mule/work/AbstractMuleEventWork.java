@@ -29,7 +29,17 @@ public abstract class AbstractMuleEventWork implements Work
     {
         // Event must be copied here rather than once work is executed, so main flow can't mutate the message
         // before work execution
-        this.event = DefaultMuleEvent.copy(event);
+        this(event, true);
+    }
+
+    /**
+     * Constructor allowing event copying to be disabled.  This is used when a copy has already been made previously
+     * e.g.  if the event is queued before being processed asynchronously like with {@link org.mule.processor
+     * .SedaStageInterceptingMessageProcessor}
+     */
+    public AbstractMuleEventWork(MuleEvent event, boolean copyEvent)
+    {
+        this.event = copyEvent ? DefaultMuleEvent.copy(event) : event;
     }
 
     public final void run()

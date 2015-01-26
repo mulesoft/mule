@@ -14,12 +14,14 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -229,6 +231,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
             thread = Thread.currentThread();
             sensedEvent = event;
             latch.countDown();
+            ((DefaultMuleMessage) sensedEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
             return event;
         }
     }

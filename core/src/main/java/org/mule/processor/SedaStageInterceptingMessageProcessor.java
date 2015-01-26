@@ -111,7 +111,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             logger.debug(MessageFormat.format("{1}: Putting event on queue {2}", queue.getName(),
                 getStageDescription(), event));
         }
-        queue.put(event);
+        queue.put(DefaultMuleEvent.copy(event));
         fireAsyncScheduledNotification(event);
     }
 
@@ -233,7 +233,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                             logger.debug(MessageFormat.format("{0}: Dequeued event from {1}",
                                 getStageDescription(), getQueueName()));
                         }
-                        AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(eventToProcess);
+                        AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(eventToProcess, false);
                         try
                         {
                             // TODO Remove this thread handoff to ensure Zero Message Loss
