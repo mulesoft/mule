@@ -6,13 +6,10 @@
  */
 package org.mule.config.spring.util;
 
-import org.mule.api.lifecycle.Initialisable;
-
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 public final class InitialisingBeanDefintionRegistry implements BeanDefinitionRegistry
 {
@@ -27,20 +24,7 @@ public final class InitialisingBeanDefintionRegistry implements BeanDefinitionRe
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException
     {
-        if ((beanDefinition instanceof GenericBeanDefinition))
-        {
-            initialise((GenericBeanDefinition) beanDefinition);
-        }
-
         delegate.registerBeanDefinition(beanName, beanDefinition);
-    }
-
-    private void initialise(GenericBeanDefinition beanDefinition)
-    {
-        if (Initialisable.class.isAssignableFrom(beanDefinition.getBeanClass()))
-        {
-            beanDefinition.setInitMethodName("initialise");
-        }
     }
 
     @Override

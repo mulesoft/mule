@@ -9,6 +9,7 @@ package org.mule.config.spring;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.Startable;
@@ -31,13 +32,11 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
 
     protected void registerPhases()
     {
-        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE,
-                      new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
+        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, emptyCallback);
         registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase());
-        registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(),
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
-        registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(),
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
+        registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
         registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase());
     }
 
@@ -55,6 +54,16 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
         {
             super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
             registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
+        }
+
+        @Override
+        public void applyLifecycle(Object o) throws LifecycleException
+        {
+            if (o instanceof SpringRegistry) {
+                return;
+            }
+
+            super.applyLifecycle(o);
         }
     }
 
