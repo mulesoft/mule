@@ -116,6 +116,7 @@ public class GrizzlyHttpClient implements HttpClient
                 throw new InitialisationException(CoreMessages.createStaticMessage("Cannot initialize SSL context"), e, this);
             }
 
+            builder.setSSLContext(sslContext);
             builder.setSSLEngineFactory(new SSLEngineFactory()
             {
                 @Override
