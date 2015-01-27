@@ -13,10 +13,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
-import org.mule.api.registry.InjectProcessor;
-import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
-import org.mule.api.registry.PreInitProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -223,29 +220,29 @@ public class TransientRegistry extends AbstractRegistry
     {
         Object theObject = object;
 
-        if (!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG))
-        {
-            //Process injectors first
-            Collection<InjectProcessor> injectProcessors = lookupObjects(InjectProcessor.class);
-            for (InjectProcessor processor : injectProcessors)
-            {
-                theObject = processor.process(theObject);
-            }
-        }
-
-        if (!hasFlag(metadata, MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG))
-        {
-            //Then any other processors
-            Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);
-            for (PreInitProcessor processor : processors)
-            {
-                theObject = processor.process(theObject);
-                if (theObject == null)
-                {
-                    return null;
-                }
-            }
-        }
+        //if (!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG))
+        //{
+        //    //Process injectors first
+        //    Collection<InjectProcessor> injectProcessors = lookupObjects(InjectProcessor.class);
+        //    for (InjectProcessor processor : injectProcessors)
+        //    {
+        //        theObject = processor.process(theObject);
+        //    }
+        //}
+        //
+        //if (!hasFlag(metadata, MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG))
+        //{
+        //    //Then any other processors
+        //    Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);
+        //    for (PreInitProcessor processor : processors)
+        //    {
+        //        theObject = processor.process(theObject);
+        //        if (theObject == null)
+        //        {
+        //            return null;
+        //        }
+        //    }
+        //}
         return theObject;
 
     }
@@ -285,22 +282,6 @@ public class TransientRegistry extends AbstractRegistry
         }
 
         registryMap.putAndLogWarningIfDuplicate(key, object);
-
-        try
-        {
-            if (!hasFlag(metadata, MuleRegistry.LIFECYCLE_BYPASS_FLAG))
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("applying lifecycle to object: " + object);
-                }
-                getLifecycleManager().applyCompletedPhases(object);
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new RegistrationException(e);
-        }
     }
 
     protected void checkDisposed() throws RegistrationException
@@ -311,42 +292,10 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    protected boolean hasFlag(Object metaData, int flag)
+    @Override
+    protected Object doUnregisterObject(String key) throws RegistrationException
     {
-        //return !(metaData == null || !(metaData instanceof Integer)) && ((Integer) metaData & flag) != 0;
-        return false;
-    }
-
-    /**
-     * Will remove an object by name from the registry. By default the registry will apply all remaining lifecycle phases
-     * to the object when it is removed.
-     *
-     * @param key      the name or key of the object to remove from the registry
-     * @param metadata Meta data flags supported are {@link org.mule.api.registry.MuleRegistry#LIFECYCLE_BYPASS_FLAG}
-     * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
-     *                               the object's lifecycle threw an exception
-     */
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
-    {
-        Object obj = registryMap.remove(key);
-
-        try
-        {
-            if (!hasFlag(metadata, MuleRegistry.LIFECYCLE_BYPASS_FLAG))
-            {
-                getLifecycleManager().applyPhase(obj, lifecycleManager.getCurrentPhase(), Disposable.PHASE_NAME);
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new RegistrationException(e);
-        }
-
-    }
-
-    public void unregisterObject(String key) throws RegistrationException
-    {
-        unregisterObject(key, Object.class);
+        return registryMap.remove(key);
     }
 
     // /////////////////////////////////////////////////////////////////////////

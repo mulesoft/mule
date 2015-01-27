@@ -9,7 +9,6 @@ package org.mule.api.registry;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.transport.Connector;
 
 import java.util.Collection;
 import java.util.Map;
@@ -106,7 +105,7 @@ public interface Registry extends Initialisable, Disposable
      * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because 
      * the object's lifecycle threw an exception
      */
-    void unregisterObject(String key) throws RegistrationException;
+    Object unregisterObject(String key) throws RegistrationException;
 
     /**
      * Will remove an object by name from the registry. By default the registry must apply all remaining lifecycle phases
@@ -117,7 +116,7 @@ public interface Registry extends Initialisable, Disposable
      * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
      * the object's lifecycle threw an exception
      */
-    void unregisterObject(String key, Object metadata) throws RegistrationException;
+    Object unregisterObject(String key, Object metadata) throws RegistrationException;
 
     // /////////////////////////////////////////////////////////////////////////
     // Registry Metadata
