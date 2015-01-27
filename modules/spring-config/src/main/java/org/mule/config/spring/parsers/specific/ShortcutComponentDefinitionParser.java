@@ -32,11 +32,7 @@ public class ShortcutComponentDefinitionParser extends ComponentDefinitionParser
 
         GenericBeanDefinition objectFactoryBeanDefinition = new GenericBeanDefinition();
         objectFactoryBeanDefinition.setBeanClass(OBJECT_FACTORY_TYPE);
-        objectFactoryBeanDefinition.getPropertyValues().addPropertyValue(
-            AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME, className);
-        //MArker for MULE-4813
-        //objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
-        //objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
+        objectFactoryBeanDefinition.getPropertyValues().addPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME, className);
 
         builder.addPropertyValue("objectFactory", objectFactoryBeanDefinition);
         super.parseChild(element, parserContext, builder);
