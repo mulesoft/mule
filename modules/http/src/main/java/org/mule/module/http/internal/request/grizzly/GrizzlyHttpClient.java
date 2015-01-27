@@ -33,7 +33,6 @@ import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
-import com.ning.http.client.SSLEngineFactory;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
@@ -41,13 +40,11 @@ import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.GeneralSecurityException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import javax.servlet.http.Part;
 
 import org.slf4j.Logger;
@@ -116,20 +113,9 @@ public class GrizzlyHttpClient implements HttpClient
                 throw new InitialisationException(CoreMessages.createStaticMessage("Cannot initialize SSL context"), e, this);
             }
 
+            // This sets all the TLS configuration needed, except for the enabled protocols and cipher suites.
+            // These parameters are set through the TlsTransportCustomizer class.
             builder.setSSLContext(sslContext);
-            builder.setSSLEngineFactory(new SSLEngineFactory()
-            {
-                @Override
-                public SSLEngine newSSLEngine() throws GeneralSecurityException
-                {
-                    SSLEngine sslEngine = sslContext.createSSLEngine();
-
-                    sslEngine.setEnabledCipherSuites(tlsContextFactory.getEnabledCipherSuites());
-                    sslEngine.setEnabledProtocols(tlsContextFactory.getEnabledProtocols());
-
-                    return sslEngine;
-                }
-            });
         }
     }
 
@@ -169,6 +155,11 @@ public class GrizzlyHttpClient implements HttpClient
         if (clientSocketProperties != null)
         {
             compositeTransportCustomizer.addTransportCustomizer(new SocketConfigTransportCustomizer(clientSocketProperties));
+        }
+
+        if (tlsContextFactory != null)
+        {
+            compositeTransportCustomizer.addTransportCustomizer(new TlsTransportCustomizer(tlsContextFactory));
         }
 
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, compositeTransportCustomizer);
