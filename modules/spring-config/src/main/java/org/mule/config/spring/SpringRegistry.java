@@ -10,12 +10,9 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
@@ -266,15 +263,9 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     }
 
     @Override
-    public void unregisterObject(String key) throws RegistrationException
+    protected Object doUnregisterObject(String key) throws RegistrationException
     {
-        registrationDelegate.unregisterObject(key);
-    }
-
-    @Override
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
-    {
-        registrationDelegate.unregisterObject(key, metadata);
+        return registrationDelegate.unregisterObject(key);
     }
 
     /**
@@ -322,8 +313,8 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
 
     private Object initialiseObject(ConfigurableApplicationContext applicationContext, String key, Object object) throws LifecycleException
     {
-        Object initialised = applicationContext.getBeanFactory().initializeBean(object, key);
         applicationContext.getBeanFactory().autowireBean(object);
+        Object initialised = applicationContext.getBeanFactory().initializeBean(object, key);
         getLifecycleManager().applyCompletedPhases(initialised);
 
         return initialised;
@@ -338,9 +329,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
 
         void registerObjects(Map<String, Object> objects) throws RegistrationException;
 
-        void unregisterObject(String key) throws RegistrationException;
-
-        void unregisterObject(String key, Object metadata) throws RegistrationException;
+        Object unregisterObject(String key) throws RegistrationException;
     }
 
     private class ConfigurableRegistrationDelegate implements RegistrationDelegate
@@ -379,9 +368,8 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
             }
         }
 
-        //TODO: Clean up this code!!!!
         @Override
-        public void unregisterObject(String key) throws RegistrationException
+        public Object unregisterObject(String key) throws RegistrationException
         {
             Object object = applicationContext.getBean(key);
 
@@ -392,44 +380,20 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
 
             ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
 
-
-            if (object instanceof Stoppable)
-            {
-                try {
-                    getLifecycleManager().applyPhase(object, Startable.PHASE_NAME, Stoppable.PHASE_NAME);
-                } catch (LifecycleException e) {
-                    throw new RegistrationException(MessageFactory.createStaticMessage("Exception found "));
-                }
-            }
-
-            if (object instanceof Disposable)
-            {
-                try {
-                    getLifecycleManager().applyPhase(object, Stoppable.PHASE_NAME, Disposable.PHASE_NAME);
-                } catch (Exception e) {
-                    logger.error("Error disposing on unregister", e);
-                }
-            }
-        }
-
-        @Override
-        public void unregisterObject(String key, Object metadata) throws RegistrationException
-        {
-            unregisterObject(key);
+            return object;
         }
 
         private synchronized void doRegisterObject(String key, Object value) throws RegistrationException
         {
             if (applicationContext.containsBean(key))
             {
-                unregisterObject(key);
+                SpringRegistry.this.unregisterObject(key);
             }
 
             try
             {
                 value = initialiseObject(applicationContext, key, value);
                 applicationContext.getBeanFactory().registerSingleton(key, value);
-                // TODO: make sure that object is disposed!
             }
             catch (Exception e)
             {
@@ -460,15 +424,10 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
         }
 
         @Override
-        public void unregisterObject(String key)
+        public Object unregisterObject(String key) throws RegistrationException
         {
             throwException();
-        }
-
-        @Override
-        public void unregisterObject(String key, Object metadata) throws RegistrationException
-        {
-            throwException();
+            return null;
         }
 
         private void throwException()
