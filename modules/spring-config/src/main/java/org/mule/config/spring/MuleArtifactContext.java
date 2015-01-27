@@ -26,6 +26,7 @@ import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -138,7 +139,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
         BeanDefinitionReader beanDefinitionReader = createBeanDefinitionReader(beanFactory);
-
         // Communicate mule context to parsers
         try
         {
@@ -158,6 +158,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         beanDefinitionReader.setDocumentReaderClass(getBeanDefinitionDocumentReaderClass());
         //add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
+        AnnotationConfigUtils.registerAnnotationConfigProcessors(beanDefinitionReader.getRegistry(), null);
 
         return beanDefinitionReader;
     }
