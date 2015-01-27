@@ -77,13 +77,9 @@ public class SimpleComponentDefinitionParser extends ComponentDefinitionParser
     {
         AbstractBeanDefinition objectFactoryBeanDefinition = new GenericBeanDefinition();
         objectFactoryBeanDefinition.setBeanClass(OBJECT_FACTORY_TYPE);
-        objectFactoryBeanDefinition.getPropertyValues()
-            .addPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS, componentInstanceClass);
+        objectFactoryBeanDefinition.getPropertyValues().addPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS, componentInstanceClass);
         objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("properties", properties);
 
-        //Marker for MULE-4813
-        //objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
-        //objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
         return objectFactoryBeanDefinition;
     }
 }
