@@ -11,7 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.oauth2.internal.OAuthConstants;
@@ -43,9 +43,13 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
     protected final DynamicPort localHostPort = new DynamicPort("port1");
     protected final DynamicPort oauthServerPort = new DynamicPort("port2");
     protected final DynamicPort oauthHttpsServerPort = new DynamicPort("port3");
+    private String keyStorePath = Thread.currentThread().getContextClassLoader().getResource("ssltest-keystore.jks").getPath();
+    private String keyStorePassword = "changeit";
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule(oauthServerPort.getNumber(), oauthHttpsServerPort.getNumber());
+    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(oauthServerPort.getNumber()).httpsPort
+            (oauthHttpsServerPort.getNumber()).keystorePath(keyStorePath).keystorePassword(keyStorePassword));
+
     @Rule
     public SystemProperty clientId = new SystemProperty("client.id", "ndli93xdws2qoe6ms1d389vl6bxquv3e");
     @Rule
