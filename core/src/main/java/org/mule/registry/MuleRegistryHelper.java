@@ -893,23 +893,22 @@ public class MuleRegistryHelper implements MuleRegistry
         {
             postObjectRegistrationActions(value);
         }
-
     }
 
     /**
      * {@inheritDoc}
      */
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
+    public Object unregisterObject(String key, Object metadata) throws RegistrationException
     {
-        registry.unregisterObject(key, metadata);
+        return registry.unregisterObject(key, metadata);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void unregisterObject(String key) throws RegistrationException
+    public Object unregisterObject(String key) throws RegistrationException
     {
-        registry.unregisterObject(key);
+        return registry.unregisterObject(key);
     }
 
     /**

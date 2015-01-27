@@ -13,7 +13,6 @@
         <!-- Marker for MULE-4813-->
 
         <context:component-scan base-package="org.mule,com.mulesoft" />
-
         <spring:bean name="_muleNotificationManager" class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
 
         <spring:bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>

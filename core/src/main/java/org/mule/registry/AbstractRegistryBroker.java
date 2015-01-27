@@ -215,12 +215,12 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         }
     }
 
-    public void unregisterObject(String key) throws RegistrationException
+    public Object unregisterObject(String key) throws RegistrationException
     {
-        unregisterObject(key, null);
+        return unregisterObject(key, null);
     }
 
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
+    public Object unregisterObject(String key, Object metadata) throws RegistrationException
     {
         Iterator it = getRegistries().iterator();
         Registry reg;
@@ -229,9 +229,10 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
             reg = (Registry) it.next();
             if (!reg.isReadOnly() && reg.lookupObject(key) != null)
             {
-                reg.unregisterObject(key, metadata);
-                break;
+                return reg.unregisterObject(key, metadata);
             }
         }
+
+        return null;
     }
 }

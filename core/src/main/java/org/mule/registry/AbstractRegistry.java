@@ -150,6 +150,34 @@ public abstract class AbstractRegistry implements Registry
     }
 
     @Override
+    public final Object unregisterObject(String key) throws RegistrationException
+    {
+        Object object = doUnregisterObject(key);
+
+        try
+        {
+            getLifecycleManager().applyPhase(object, getLifecycleManager().getCurrentPhase(), Disposable.PHASE_NAME);
+        }
+        catch (Exception e)
+        {
+            if (logger.isWarnEnabled())
+            {
+                logger.warn(String.format("Could not apply shutdown lifecycle to object '%s' after being unregistered.", key), e);
+            }
+        }
+
+        return object;
+    }
+
+    @Override
+    public final Object unregisterObject(String key, Object metadata) throws RegistrationException
+    {
+        return unregisterObject(key);
+    }
+
+    protected abstract Object doUnregisterObject(String key) throws RegistrationException;
+
+    @Override
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         // Accumulate objects from all registries.
