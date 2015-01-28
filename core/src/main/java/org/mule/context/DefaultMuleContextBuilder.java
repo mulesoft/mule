@@ -105,7 +105,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
         muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
         muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(),muleContext));
-        DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
+        DefaultRegistryBroker registryBroker = createRegistryBroker(muleContext);
         muleContext.setRegistryBroker(registryBroker);
         muleContext.setMuleRegistry(new MuleRegistryHelper(registryBroker, muleContext));
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
@@ -114,10 +114,17 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         return muleContext;
     }
 
+    protected DefaultRegistryBroker createRegistryBroker(MuleContext muleContext)
+    {
+        return new DefaultRegistryBroker(muleContext);
+    }
+
     protected DefaultMuleContext createDefaultMuleContext()
     {
         return new DefaultMuleContext();
     }
+
+
 
     public void setMuleConfiguration(MuleConfiguration config)
     {

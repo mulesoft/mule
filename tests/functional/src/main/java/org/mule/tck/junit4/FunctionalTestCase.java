@@ -15,6 +15,7 @@ import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.schedule.Scheduler;
@@ -26,6 +27,7 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
 import org.mule.construct.SimpleService;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -52,6 +54,12 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         super();
         // A functional test case that starts up the management context by default.
         setStartContext(true);
+    }
+
+    @Override
+    protected MuleContextBuilder createMuleContextBuilder()
+    {
+        return new DefaultMuleContextBuilder();
     }
 
     /**
