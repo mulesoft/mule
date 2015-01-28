@@ -25,10 +25,11 @@ import org.mule.api.model.Model;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
-import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.TestingMuleContextBuilder;
+import org.mule.tck.junit4.TestingMuleContextFactory;
 import org.mule.tck.testmodels.fruit.Banana;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ import org.mockito.InOrder;
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 {
 
-    private DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+    private DefaultMuleContextFactory muleContextFactory = new TestingMuleContextFactory();
     private static String TEST_STRING_KEY = "test";
     private static String TEST_STRING_VALUE = "test_value";
     private static String TEST_STRING_KEY2 = "test2";
@@ -287,7 +288,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         }
     }
 
-    static class TestMuleContextBuilder extends DefaultMuleContextBuilder
+    static class TestMuleContextBuilder extends TestingMuleContextBuilder
     {
 
         @Override

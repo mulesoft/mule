@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.registry.RegistryBroker;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.TestingRegistry;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.concurrent.CountDownLatch;
@@ -43,9 +44,9 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
     public void testCrossRegistryLifecycleOrder() throws MuleException
     {
 
-        TransientRegistry reg1 = new TransientRegistry(muleContext);
+        TransientRegistry reg1 = new TestingRegistry(muleContext);
         reg1.initialise();
-        TransientRegistry reg2 = new TransientRegistry(muleContext);
+        TransientRegistry reg2 = new TestingRegistry(muleContext);
         reg2.initialise();
 
         reg1.registerObject("conn", new LifecycleTrackerConnector("conn", muleContext));
@@ -59,13 +60,13 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
         muleContext.start();
 
         // Both connectors are started before either flow
-        assertEquals("conn2-start conn-start flow2-start flow-start ", tracker.toString());
+        assertEquals("conn-start conn2-start flow-start flow2-start ", tracker.toString());
 
         tracker = new String();
         muleContext.stop();
 
         // Both services are stopped before either connector
-        assertEquals("flow2-stop flow-stop conn2-stop conn-stop ", tracker);
+        assertEquals("flow-stop flow2-stop conn-stop conn2-stop ", tracker);
     }
 
     class LifecycleTrackerConnector extends TestConnector

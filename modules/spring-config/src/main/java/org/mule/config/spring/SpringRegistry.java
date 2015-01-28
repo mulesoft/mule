@@ -299,7 +299,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     }
 
     @Override
-    public Object applyProcessors(Object object, Object metadata)
+    public Object preInitialise(Object object)
     {
         try
         {
