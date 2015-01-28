@@ -31,7 +31,6 @@ import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
-import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.MuleTestUtils;
@@ -233,7 +232,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 
             builders.add(getBuilder());
             addBuilders(builders);
-            MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+            MuleContextBuilder contextBuilder = createMuleContextBuilder();
             DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
             String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
             logger.info("Using working directory for test: " + workingDirectory);
@@ -247,6 +246,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             }
         }
         return context;
+    }
+
+    protected MuleContextBuilder createMuleContextBuilder()
+    {
+        return new TestingMuleContextBuilder();
     }
 
     //This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
