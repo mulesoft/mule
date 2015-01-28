@@ -9,7 +9,6 @@ package org.mule.tck.junit4;
 import org.mule.api.MuleContext;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.registry.DefaultRegistryBroker;
-import org.mule.registry.TransientRegistry;
 
 public class TestingMuleContextBuilder extends DefaultMuleContextBuilder
 {
@@ -18,7 +17,7 @@ public class TestingMuleContextBuilder extends DefaultMuleContextBuilder
     protected DefaultRegistryBroker createRegistryBroker(MuleContext muleContext)
     {
         DefaultRegistryBroker broker = super.createRegistryBroker(muleContext);
-        broker.addRegistry(new TransientRegistry(muleContext));
+        broker.addRegistry(new TestingRegistry(muleContext));
 
         return broker;
     }

@@ -182,7 +182,7 @@ public class TransientRegistry extends AbstractRegistry
 
     public <T> T lookupObject(String key)
     {
-        return registryMap.<T>get(key);
+        return doGet(key);
     }
 
     @SuppressWarnings("unchecked")
@@ -219,7 +219,7 @@ public class TransientRegistry extends AbstractRegistry
         return object;
     }
 
-    Object applyProcessors(Object object, Object metadata)
+    protected Object applyProcessors(Object object, Object metadata)
     {
         Object theObject = object;
 
@@ -283,7 +283,17 @@ public class TransientRegistry extends AbstractRegistry
             return;
         }
 
-        registryMap.putAndLogWarningIfDuplicate(key, object);
+        doRegisterObject(key, object, metadata);
+    }
+
+    protected <T> T doGet(String key)
+    {
+        return registryMap.get(key);
+    }
+
+    protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException
+    {
+        doPut(key, object);
 
         try
         {
@@ -300,6 +310,11 @@ public class TransientRegistry extends AbstractRegistry
         {
             throw new RegistrationException(e);
         }
+    }
+
+    protected void doPut(String key, Object object)
+    {
+        registryMap.putAndLogWarningIfDuplicate(key, object);
     }
 
     protected void checkDisposed() throws RegistrationException

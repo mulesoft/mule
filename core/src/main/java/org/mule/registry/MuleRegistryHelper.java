@@ -729,19 +729,7 @@ public class MuleRegistryHelper implements MuleRegistry
     @Override
     public Object applyProcessors(Object object) throws MuleException
     {
-        return applyProcessors(object, null);
-    }
-
-    @Override
-    public Object applyProcessors(Object object, Object metadata)
-    {
-        InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
-        if (initialisingRegistry != null)
-        {
-            return initialisingRegistry.applyProcessors(object, metadata);
-        }
-
-        return object;
+        return preInitialise(object);
     }
 
     /**
@@ -750,10 +738,16 @@ public class MuleRegistryHelper implements MuleRegistry
     @Override
     public Object applyProcessors(Object object, int flags) throws MuleException
     {
+        return preInitialise(object);
+    }
+
+    @Override
+    public Object preInitialise(Object object) throws MuleException
+    {
         InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
         if (initialisingRegistry != null)
         {
-            return initialisingRegistry.applyProcessors(object, flags);
+            return initialisingRegistry.preInitialise(object);
         }
 
         return object;
