@@ -125,9 +125,11 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             logger.debug(MessageFormat.format("{1}: Putting event on queue {2}", queue.getName(),
                                               getStageDescription(), event));
         }
-        boolean queued = queue.offer(event, threadTimeout);
+        // Copy event to ensure message is not mutated by processors executed in another thread.
+        boolean queued = queue.offer(DefaultMuleEvent.copy(event), threadTimeout);
         if (queued)
         {
+            // Async scheduled notification uses same event instance pre-async
             fireAsyncScheduledNotification(event);
         }
         else
@@ -256,7 +258,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                             logger.debug(MessageFormat.format("{0}: Dequeued event from {1}",
                                 getStageDescription(), getQueueName()));
                         }
-                        AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(eventToProcess);
+                        AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(eventToProcess, false);
                         try
                         {
                             // TODO Remove this thread handoff to ensure Zero Message Loss

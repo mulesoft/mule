@@ -89,11 +89,15 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
                     if (getLifecycleState().isStopping()) {
                         break;
                     }
-                    Lock fileLock = lockFactory.createLock(connector.getName() + file);
-                    if (fileLock.tryLock(10, TimeUnit.MILLISECONDS)) {
-                        try {
+                    Lock fileLock = lockFactory.createLock(createLockId(file.getFilename()));
+                    if (fileLock.tryLock(10, TimeUnit.MILLISECONDS))
+                    {
+                        try
+                        {
                             routeFile(file.getFilename());
-                        } catch (Exception e) {
+                        }
+                        finally
+                        {
                             fileLock.unlock();
                         }
                     }
@@ -126,6 +130,11 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver {
             return reverse ? new ReverseComparator(comparator) : comparator;
         }
         return null;
+    }
+
+    String createLockId(String file)
+    {
+        return connector.getName() + "-" + endpoint.getEndpointURI().getPath() + "-" + file;
     }
 
     @Override

@@ -116,7 +116,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
     {
         logger.info("Initializing core extensions");
 
-        for (MuleCoreExtension extension : coreExtensions)
+        for (MuleCoreExtension extension : orderedCoreExtensions)
         {
             if (extension instanceof DeploymentServiceAware)
             {

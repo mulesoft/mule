@@ -60,7 +60,10 @@ public class SftpClient {
 
     private String preferredAuthenticationMethods;
 
-    public SftpClient(String host) {
+    private int connectionTimeoutMillis = 0; // No timeout by default
+
+    public SftpClient(String host)
+    {
         this(host, null);
     }
 
@@ -115,6 +118,7 @@ public class SftpClient {
             session.setConfig(hash);
             session.setPort(port);
             session.setPassword(password);
+            session.setTimeout(connectionTimeoutMillis);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -149,6 +153,7 @@ public class SftpClient {
             session = jsch.getSession(user, host);
             session.setConfig(hash);
             session.setPort(port);
+            session.setTimeout(connectionTimeoutMillis);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -170,7 +175,13 @@ public class SftpClient {
         this.port = port;
     }
 
-    public void rename(String filename, String dest) throws IOException {
+    public void setConnectionTimeoutMillis(int connectionTimeoutMillis)
+    {
+        this.connectionTimeoutMillis = connectionTimeoutMillis;
+    }
+
+    public void rename(String filename, String dest) throws IOException
+    {
         // Notify sftp rename file action
         if (notifier != null) {
             notifier.notify(SFTP_RENAME_ACTION, "from: " + currentDirectory + "/" + filename + " - to: "
@@ -266,7 +277,7 @@ public class SftpClient {
         } catch (SftpException e) {
             throw new IOException(e.getMessage(), e);
         }
-        return null;
+        return new FileDescriptor[0];
     }
 
     private boolean includeFile(boolean includeFiles, boolean includeDirectories, final FileDescriptor fileDesc) {

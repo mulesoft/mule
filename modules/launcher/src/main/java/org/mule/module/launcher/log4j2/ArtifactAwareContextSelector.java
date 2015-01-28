@@ -6,8 +6,8 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.DirectoryResourceLocator;
 import org.mule.module.launcher.LocalResourceLocator;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
@@ -20,6 +20,8 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableList;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -187,7 +189,17 @@ final class ArtifactAwareContextSelector implements ContextSelector
 
         if (appLogConfig == null)
         {
-            return null;
+            File defaultConfigFile = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
+            defaultConfigFile = new File(defaultConfigFile, "log4j2.xml");
+
+            try
+            {
+                appLogConfig = defaultConfigFile.toURI().toURL();
+            }
+            catch (MalformedURLException e)
+            {
+                throw new MuleRuntimeException(createStaticMessage("Could not locate log config in MULE_HOME"), e);
+            }
         }
 
         try
@@ -196,8 +208,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
         }
         catch (URISyntaxException e)
         {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Could not read log file " + appLogConfig), e);
+            throw new MuleRuntimeException(createStaticMessage("Could not read log file " + appLogConfig), e);
         }
     }
 
@@ -241,7 +252,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
             catch (ExecutionException e)
             {
                 throw new MuleRuntimeException(
-                        MessageFactory.createStaticMessage("Could not init logger context "), e);
+                        createStaticMessage("Could not init logger context "), e);
             }
 
             if (ctx.getState() == LifeCycle.State.INITIALIZED)

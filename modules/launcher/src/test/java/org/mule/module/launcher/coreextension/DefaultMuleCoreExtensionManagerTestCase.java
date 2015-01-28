@@ -48,6 +48,8 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         TestDeploymentServiceAwareExtension extension = mock(TestDeploymentServiceAwareExtension.class);
         extensions.add(extension);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+        when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
+
         DeploymentService deploymentService = mock(DeploymentService.class);
         coreExtensionManager.setDeploymentService(deploymentService);
 
@@ -63,6 +65,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         TestDeploymentListenerExtension extension = mock(TestDeploymentListenerExtension.class);
         extensions.add(extension);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+        when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
 
         DeploymentService deploymentService = mock(DeploymentService.class);
         coreExtensionManager.setDeploymentService(deploymentService);
@@ -79,6 +82,8 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         TestPluginClassLoaderManagerAwareExtension extension = mock(TestPluginClassLoaderManagerAwareExtension.class);
         extensions.add(extension);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+        when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
+
         PluginClassLoaderManager pluginClassLoaderManager = mock(PluginClassLoaderManager.class);
         coreExtensionManager.setPluginClassLoaderManager(pluginClassLoaderManager);
 
@@ -131,6 +136,27 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         InOrder ordered = inOrder(extension1, extension2);
         ordered.verify(extension2).stop();
         ordered.verify(extension1).stop();
+    }
+
+    @Test
+    public void initializesCoreExtensionsInOrder() throws Exception
+    {
+        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        MuleCoreExtension extension1 = mock(MuleCoreExtension.class);
+        MuleCoreExtension extension2 = mock(MuleCoreExtension.class);
+        extensions.add(extension1);
+        extensions.add(extension2);
+        when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+
+        List<MuleCoreExtension> orderedExtensions = new LinkedList<MuleCoreExtension>();
+        orderedExtensions.add(extension2);
+        orderedExtensions.add(extension1);
+        when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(orderedExtensions);
+        coreExtensionManager.initialise();
+
+        InOrder ordered = inOrder(extension1, extension2);
+        ordered.verify(extension2).initialise();
+        ordered.verify(extension1).initialise();
     }
 
     @Test

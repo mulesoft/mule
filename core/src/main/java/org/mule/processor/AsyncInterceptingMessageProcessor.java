@@ -180,7 +180,12 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         public AsyncMessageProcessorWorker(MuleEvent event)
         {
-            super(event);
+            super(event, true);
+        }
+
+        public AsyncMessageProcessorWorker(MuleEvent event, boolean copy)
+        {
+            super(event, copy);
         }
 
         @Override
@@ -233,6 +238,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected void firePipelineNotification(MuleEvent event, MessagingException exception)
     {
+        // Async completed notification uses same event instance as async listener
         if (event.getFlowConstruct() instanceof MessageProcessorPathResolver)
         {
             muleContext.getNotificationManager().fireNotification(

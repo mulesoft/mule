@@ -8006,26 +8006,6 @@
         </xsd:union>
     </xsd:simpleType>
 
-    <xsd:simpleType name="expression">
-        <xsd:annotation>
-            <xsd:documentation>
-                A custom xsd:string-like type that represents a MEL expresions.
-                Attributes should use this type to declare that they support expressions.
-                Those which don't will be assumed not to support them
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:union>
-            <xsd:simpleType>
-                <xsd:restriction base="propertyPlaceholderType"/>
-            </xsd:simpleType>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                    <xsd:pattern value=".*[^ ]+.*"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:union>
-    </xsd:simpleType>
-
     <xsd:simpleType name="substitutableName">
         <xsd:annotation>
             <xsd:documentation>
@@ -8077,6 +8057,38 @@
         </xsd:union>
     </xsd:simpleType>
 
+    <xsd:simpleType name="substitutableDecimal">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:decimal type that also allows for Ant-style property placeholders.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:decimal"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="substitutableDateTime">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:dateTime type that also allows for Ant-style property placeholders.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:dateTime"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
     <xsd:simpleType name="substitutableLong">
         <xsd:annotation>
             <xsd:documentation>
@@ -8107,6 +8119,115 @@
                 <xsd:restriction base="xsd:boolean"/>
             </xsd:simpleType>
         </xsd:union>
+    </xsd:simpleType>
+
+
+    <xsd:simpleType name="expression">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:string-like type that represents a MEL expression.
+                Attributes should use this type to declare that they support expressions.
+                It allows property placeholders and requires the value to not be blank.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="nonBlankString"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionString">
+        <xsd:annotation>
+            <xsd:documentation>
+                An embeddable expression that outputs a String
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionBoolean">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Boolean
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionInt">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs an Integer
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionLong">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Long
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionDouble">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Double
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionDecimal">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Decimal
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionObject">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a generic object
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionList">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Collection type
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionMap">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Map
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionDateTime">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Date
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
     </xsd:simpleType>
 
     <!-- i found this a bit confusing, so here is some background...
