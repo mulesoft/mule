@@ -74,11 +74,15 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
     public void injectOnRegisteredObject() throws Exception
     {
         TestLifecycleObject object = registerObject();
-        assertThat(object.getObjectStoreManager(), is(muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)));
-        assertThat(object.getMuleContext(), is(muleContext));
+        assertInjection(object);
+    }
 
-        // just to make sure that injection is to thank for this
-        assertThat(object, is(not(instanceOf(MuleContextAware.class))));
+    @Test
+    public void injectWithInheritance() throws Exception {
+        TestLifecycleObject object = new ExtendedTestLifecycleObject();
+        muleContext.getRegistry().registerObject(KEY, object);
+
+        assertInjection(object);
     }
 
     @Test
@@ -99,6 +103,14 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
         verify(lifecycleStateAware).setLifecycleState(any(LifecycleState.class));
     }
 
+    private void assertInjection(TestLifecycleObject object)
+    {
+        assertThat(object.getObjectStoreManager(), is(muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)));
+        assertThat(object.getMuleContext(), is(muleContext));
+
+        // just to make sure that injection is to thank for this
+        assertThat(object, is(not(instanceOf(MuleContextAware.class))));
+    }
 
     private void assertRegistered(Object object)
     {
@@ -195,5 +207,10 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
         {
             return muleContext;
         }
+    }
+
+    public static class ExtendedTestLifecycleObject extends TestLifecycleObject
+    {
+
     }
 }
