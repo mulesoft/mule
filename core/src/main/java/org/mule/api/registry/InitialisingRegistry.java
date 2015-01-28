@@ -24,5 +24,5 @@ public interface InitialisingRegistry extends Registry
 
     Object applyLifecycle(Object object, String phase) throws MuleException;
 
-    Object applyProcessors(Object object, Object metadata);
+    Object preInitialise(Object object) throws MuleException;
 }
