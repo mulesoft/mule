@@ -57,6 +57,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
             Collections.<Object> emptyList());
         expressionManager.setMuleContext(muleContext);
         expressionManager.initialise();
+
     }
 
     @Test

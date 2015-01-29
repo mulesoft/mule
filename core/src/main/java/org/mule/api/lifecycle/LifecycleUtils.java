@@ -19,9 +19,14 @@ import org.slf4j.Logger;
 public abstract class LifecycleUtils
 {
 
+    public static void initialiseIfNeeded(Object object) throws InitialisationException
+    {
+        initialiseIfNeeded(object, null);
+    }
+
     public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException
     {
-        if (object instanceof MuleContextAware)
+        if (muleContext != null && object instanceof MuleContextAware)
         {
             ((MuleContextAware) object).setMuleContext(muleContext);
         }

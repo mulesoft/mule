@@ -24,12 +24,18 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase
     private static final String VALUE = "MG";
     private ExpressionLanguage el;
 
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
+        setStartContext(true);
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         el = muleContext.getExpressionLanguage();
+
     }
 
     @Test
