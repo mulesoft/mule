@@ -1,0 +1,4 @@
+http\://www.mulesoft.org/schema/mule/pojo-test=org.mule.config.spring.parsers.specific.PojoTestNamesapceHandler
+http\://www.mulesoft.org/schema/mule/parsers-test=org.mule.config.spring.parsers.ParsersTestNamespaceHandler
+http\://www.mulesoft.org/schema/mule/nest-example-base=org.mule.test.spring.DummyNamespaceHandler
+http\://www.mulesoft.org/schema/mule/nest-example-extension=org.mule.test.spring.DummyNamespaceHandler
