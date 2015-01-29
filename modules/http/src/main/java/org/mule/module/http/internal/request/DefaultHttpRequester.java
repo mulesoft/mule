@@ -39,19 +39,19 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
     private HttpRequesterRequestBuilder requestBuilder;
     private ResponseValidator responseValidator = new SuccessStatusCodeValidator("0..399");
 
-    private AttributeEvaluator host;
-    private AttributeEvaluator port;
-    private AttributeEvaluator basePath;
-    private AttributeEvaluator path;
-    private AttributeEvaluator url;
+    private AttributeEvaluator host = new AttributeEvaluator(null);
+    private AttributeEvaluator port = new AttributeEvaluator(null);
+    private AttributeEvaluator basePath = new AttributeEvaluator(null);
+    private AttributeEvaluator path = new AttributeEvaluator(null);
+    private AttributeEvaluator url = new AttributeEvaluator(null);
 
     private AttributeEvaluator method = new AttributeEvaluator("GET");
-    private AttributeEvaluator followRedirects;
+    private AttributeEvaluator followRedirects = new AttributeEvaluator(null);
 
-    private AttributeEvaluator requestStreamingMode;
-    private AttributeEvaluator sendBodyMode;
-    private AttributeEvaluator parseResponse;
-    private AttributeEvaluator responseTimeout;
+    private AttributeEvaluator requestStreamingMode = new AttributeEvaluator(null);
+    private AttributeEvaluator sendBodyMode = new AttributeEvaluator(null);
+    private AttributeEvaluator parseResponse = new AttributeEvaluator(null);
+    private AttributeEvaluator responseTimeout = new AttributeEvaluator(null);
 
     private String source;
     private String target;
@@ -87,17 +87,17 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
 
     private void setEmptyAttributesFromConfig()  throws InitialisationException
     {
-        if (host == null)
+        if (host.getRawValue() == null)
         {
             setHost(requestConfig.getHost());
         }
 
-        if (port == null)
+        if (port.getRawValue() == null)
         {
             setPort(requestConfig.getPort());
         }
 
-        if (followRedirects == null)
+        if (followRedirects.getRawValue() == null)
         {
             String requestFollowRedirect = requestConfig.getFollowRedirects();
             if (requestFollowRedirect == null)
@@ -107,22 +107,22 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
             setFollowRedirects(requestFollowRedirect);
         }
 
-        if (requestStreamingMode == null)
+        if (requestStreamingMode.getRawValue() == null)
         {
             setRequestStreamingMode(requestConfig.getRequestStreamingMode());
         }
 
-        if (sendBodyMode == null)
+        if (sendBodyMode.getRawValue() == null)
         {
             setSendBodyMode(requestConfig.getSendBodyMode());
         }
 
-        if (parseResponse == null)
+        if (parseResponse.getRawValue() == null)
         {
             setParseResponse(requestConfig.getParseResponse());
         }
 
-        if (responseTimeout == null && requestConfig.getResponseTimeout() != null)
+        if (responseTimeout.getRawValue() == null && requestConfig.getResponseTimeout() != null)
         {
             setResponseTimeout(requestConfig.getResponseTimeout());
         }
@@ -130,19 +130,19 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
 
     private void validateRequiredProperties() throws InitialisationException
     {
-        if (url == null)
+        if (url.getRawValue() == null)
         {
-            if (host == null)
+            if (host.getRawValue() == null)
             {
                 throw new InitialisationException(CoreMessages.createStaticMessage("No host defined. Set the host attribute " +
                                                                                    "either in the request or request-config elements"), this);
             }
-            if (port == null)
+            if (port.getRawValue() == null)
             {
                 throw new InitialisationException(CoreMessages.createStaticMessage("No port defined. Set the host attribute " +
                                                                                    "either in the request or request-config elements"), this);
             }
-            if (path == null)
+            if (path.getRawValue() == null)
             {
                 throw new InitialisationException(CoreMessages.createStaticMessage("The path attribute is required in the HTTP request element"), this);
             }
@@ -206,7 +206,7 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
 
     private int resolveResponseTimeout(MuleEvent muleEvent)
     {
-        if (responseTimeout == null)
+        if (responseTimeout.getRawValue() == null)
         {
             return muleEvent.getTimeout();
         }
@@ -218,7 +218,7 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
 
     private String resolveURI(MuleEvent muleEvent) throws MessagingException
     {
-        if (url != null)
+        if (url.getRawValue() != null)
         {
             return url.resolveStringValue(muleEvent);
         }
