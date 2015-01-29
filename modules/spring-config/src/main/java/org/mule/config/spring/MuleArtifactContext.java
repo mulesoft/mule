@@ -6,14 +6,19 @@
  */
 package org.mule.config.spring;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.ConfigResource;
 import org.mule.config.bootstrap.BootstrapException;
+import org.mule.config.spring.editors.MessageExchangePatternPropertyEditor;
+import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
+import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.config.spring.util.InitialisingBeanDefintionRegistry;
+import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -68,16 +73,21 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     {
         super.prepareBeanFactory(beanFactory);
 
+        beanFactory.registerCustomEditor(MessageExchangePattern.class, MessageExchangePatternPropertyEditor.class);
+
         addBeanPostProcessors(beanFactory,
                               new MuleContextPostProcessor(muleContext),
                               new ExpressionEvaluatorPostProcessor(muleContext),
                               new GlobalNamePostProcessor(),
                               new ExpressionEnricherPostProcessor(muleContext),
                               new NotificationListenersPostProcessor(muleContext),
+                              new AnnotatedTransformerObjectPostProcessor(muleContext),
+                              new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
         );
 
         beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
+        beanFactory.registerCustomEditor(MessageExchangePattern.class, MessageExchangePatternPropertyEditor.class);
 
         SpringRegistryBootstrap bootstrap = new SpringRegistryBootstrap(new InitialisingBeanDefintionRegistry((BeanDefinitionRegistry) beanFactory));
         initialiseBootstrap(bootstrap);

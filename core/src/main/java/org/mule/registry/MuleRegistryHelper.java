@@ -185,12 +185,18 @@ public class MuleRegistryHelper implements MuleRegistry
         Object o = registry.lookupObject(name);
         if (o instanceof EndpointBuilder)
         {
-            logger.debug("Global endpoint EndpointBuilder for name: " + name + " found");
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Global endpoint EndpointBuilder for name: " + name + " found");
+            }
             return (EndpointBuilder) o;
         }
         else
         {
-            logger.debug("No endpoint builder with the name: " + name + " found.");
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("No endpoint builder with the name: " + name + " found.");
+            }
             return null;
         }
     }
@@ -838,7 +844,7 @@ public class MuleRegistryHelper implements MuleRegistry
         postObjectRegistrationActions(value);
     }
 
-    private void postObjectRegistrationActions(Object value)
+    public void postObjectRegistrationActions(Object value)
     {
         if (value instanceof TransformerResolver)
         {
