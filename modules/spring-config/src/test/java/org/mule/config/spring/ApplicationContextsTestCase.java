@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.TestingMuleContextFactory;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.After;
@@ -63,7 +64,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     @Test
     public void testSpringConfigurationBuilder() throws Exception
     {
-        context = new DefaultMuleContextFactory().createMuleContext();
+        context = new TestingMuleContextFactory().createMuleContext();
 
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
         ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
@@ -83,7 +84,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     @Test
     public void testSpringConfigurationBuilderPrecedence() throws Exception
     {
-        context = new DefaultMuleContextFactory().createMuleContext();
+        context = new TestingMuleContextFactory().createMuleContext();
 
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
         ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
@@ -104,7 +105,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     @Test
     public void testSpringConfigurationBuilderBackwardsPrecedence() throws Exception
     {
-        context = new DefaultMuleContextFactory().createMuleContext();
+        context = new TestingMuleContextFactory().createMuleContext();
 
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-2.xml");
         ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
@@ -120,28 +121,6 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
         assertEquals("Pirulo", ((Orange) orange).getBrand());
-    }
-
-    /**
-     * Test that the same bean from the TransientRegistry will have precedence over the 1st appContext
-     */
-    @Test
-    public void testTransientRegistryPrecedence() throws Exception
-    {
-        context = new DefaultMuleContextFactory().createMuleContext();
-
-        context.getRegistry().registerObject("orange", new Orange(12, 5.5, "Tutti Frutti"));
-
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
-        ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(context);
-
-        context.start();
-
-        Object orange = context.getRegistry().lookupObject("orange");
-        assertNotNull(orange);
-        assertTrue(orange instanceof Orange);
-        assertEquals("Tutti Frutti", ((Orange) orange).getBrand());
     }
 
     /**

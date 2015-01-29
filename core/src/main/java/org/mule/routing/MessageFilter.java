@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
@@ -137,6 +138,8 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         {
             ((Initialisable) unacceptedMessageProcessor).initialise();
         }
+
+        LifecycleUtils.initialiseIfNeeded(filter);
     }
 
     public void start() throws MuleException
