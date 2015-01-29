@@ -11,6 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Ignore;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -22,6 +23,7 @@ import org.junit.Test;
 /**
  * see MULE-2721
  */
+@Ignore("EE-2518")
 public class ReplyToTestCase extends FunctionalTestCase
 {
     private static final long RECEIVE_DELAY = 3000;

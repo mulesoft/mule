@@ -10,11 +10,13 @@ package org.mule.test.integration.models;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
+@Ignore("MULE-2742")
 public class ConfigureModelTestCase extends FunctionalTestCase
 {
     @Override

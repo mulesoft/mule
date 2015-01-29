@@ -6,7 +6,9 @@
  */
 package org.mule.test.integration.client;
 
+import org.junit.Ignore;
 
+@Ignore("MULE-3000")
 public class MuleClientRemotingTcpTestCase extends AbstractClientRemotingTestCase
 {
     @Override

@@ -16,6 +16,8 @@ import org.mule.api.store.ObjectStore;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
+import org.mule.util.store.MuleObjectStoreManager;
+import org.mule.util.store.SimpleMemoryObjectStore;
 
 public class MuleObjectStoreDisposalTestCase extends FunctionalTestCase
 {

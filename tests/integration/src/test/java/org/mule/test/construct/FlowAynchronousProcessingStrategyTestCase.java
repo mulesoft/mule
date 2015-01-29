@@ -13,10 +13,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.transaction.TransactionCoordination;
 
+@Ignore
 public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {
     @Override

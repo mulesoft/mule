@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -27,6 +28,7 @@ import org.junit.Test;
  * example config in the docco. this test is not run when building this module as it
  * relies on Jms, it's used to verify the example config works.
  */
+@Ignore("MULE-4976 (broken with migration to Spring 3)")
 public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
 {
     private final AtomicInteger eventCount = new AtomicInteger(0);
