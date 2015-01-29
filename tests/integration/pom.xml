@@ -213,5 +213,113 @@
             <version>4.3.5</version>
             <scope>test</scope>
         </dependency>
+		<!-- Needed for SpringXmlConfigurationBuilder and TestNamespaceHandler -->
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-spring-config</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-extensions-support</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- needed for org.springframework.beans.factory.FactoryBean interface -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<!-- Override scope="test" from parent -->
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ftpserver</groupId>
+			<artifactId>ftpserver-core</artifactId>
+			<version>${testFtpServerVersion}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ftpserver</groupId>
+			<artifactId>ftplet-api</artifactId>
+			<version>${testFtpServerVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sshd</groupId>
+			<artifactId>sshd-core</artifactId>
+			<version>${sshCoreVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>${bouncycastleVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbutils</groupId>
+			<artifactId>commons-dbutils</artifactId>
+			<version>${commonsDbUtilsVersion}</version>
+		</dependency>
+
+		<!-- Needed for ExtensionsFunctionalTestCase -->
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+		</dependency>
+
+
+		<!-- Unit tests -->
+		<!--<dependency>-->
+			<!--<groupId>org.mule</groupId>-->
+			<!--<artifactId>mule-core</artifactId>-->
+			<!--<version>${project.version}</version>-->
+			<!--<type>test-jar</type>-->
+		<!--</dependency>-->
+		<!-- required for ConfigurationBuilders at runtime -->
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-builders</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- required for AssertionMessageProcessorTestCase -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<!-- scope needs to be compile in order
+                  to have the site build working -->
+			<!--<scope>test</scope>-->
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

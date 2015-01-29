@@ -3,16 +3,16 @@
 #
 
 # This test is actually empty - do we still need it?
-org.mule.test.spring.NestExampleTestCase
+NestExampleTestCase
 
 # Needs UDP configured
-org.mule.test.firewall.FirewallTestCase
+FirewallTestCase
 
 # Test appears to be incorrectly written. Disabling because the correct behavior is unclear. 
 # Java 6 passes (but probably shouldn't). Java 7 fails (but probably should pass)
-org.mule.config.spring.parsers.specific.MethodInvokerDefinitionParserTestCase
+MethodInvokerDefinitionParserTestCase
 
 ##########################################################################
 # The following tests will fail if run off-line
 ##########################################################################
-org.mule.test.spring.SchemaValidationMule2225TestCase
+SchemaValidationMule2225TestCase

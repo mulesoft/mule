@@ -94,3 +94,18 @@ org.mule.test.construct.FlowAynchronousProcessingStrategyTestCase
 
 # EE-2518
 org.mule.test.usecases.ReplyToTestCase
+
+# This test is actually empty - do we still need it?
+NestExampleTestCase
+
+# Needs UDP configured
+FirewallTestCase
+
+# Test appears to be incorrectly written. Disabling because the correct behavior is unclear.
+# Java 6 passes (but probably shouldn't). Java 7 fails (but probably should pass)
+MethodInvokerDefinitionParserTestCase
+
+##########################################################################
+# The following tests will fail if run off-line
+##########################################################################
+SchemaValidationMule2225TestCase
