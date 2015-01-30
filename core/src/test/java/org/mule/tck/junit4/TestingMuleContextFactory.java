@@ -12,9 +12,10 @@ import org.mule.context.DefaultMuleContextFactory;
 public class TestingMuleContextFactory extends DefaultMuleContextFactory
 {
 
+
     @Override
     protected DefaultMuleContextBuilder newMuleContextBuilder()
     {
-        return new TestingMuleContextBuilder();
+        return new DefaultMuleContextBuilder(true);
     }
 }

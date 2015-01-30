@@ -25,10 +25,10 @@ import org.mule.api.model.Model;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.TestingMuleContextBuilder;
 import org.mule.tck.junit4.TestingMuleContextFactory;
 import org.mule.tck.testmodels.fruit.Banana;
 
@@ -288,8 +288,13 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         }
     }
 
-    static class TestMuleContextBuilder extends TestingMuleContextBuilder
+    static class TestMuleContextBuilder extends DefaultMuleContextBuilder
     {
+
+        TestMuleContextBuilder()
+        {
+            super(true);
+        }
 
         @Override
         protected DefaultMuleContext createDefaultMuleContext()

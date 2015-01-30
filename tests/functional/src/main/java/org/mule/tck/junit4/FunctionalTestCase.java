@@ -36,6 +36,7 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -74,24 +75,40 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
 
     @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders)
+    {
+        ConfigurationBuilder builder = null;
+        try
+        {
+            String configResources = getConfigResources();
+            if (configResources != null)
+            {
+                builder = new SpringXmlConfigurationBuilder(configResources);
+            } else {
+                configResources = getConfigFile();
+                if (configResources != null)
+                {
+                    if (configResources.contains(","))
+                    {
+                        throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
+                    }
+                    builder = new SpringXmlConfigurationBuilder(configResources);
+                } else {
+                    String[] multipleConfigResources = getConfigFiles();
+                    builder = new SpringXmlConfigurationBuilder(multipleConfigResources);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        builders.add(0, builder);
+    }
+
+    @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        String configResources = getConfigResources();
-        if (configResources != null)
-        {
-            return new SpringXmlConfigurationBuilder(configResources);
-        }
-        configResources = getConfigFile();
-        if (configResources != null)
-        {
-            if (configResources.contains(","))
-            {
-                throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
-            }
-            return new SpringXmlConfigurationBuilder(configResources);
-        }
-        String[] multipleConfigResources = getConfigFiles();
-        return new SpringXmlConfigurationBuilder(multipleConfigResources);
+        return null;
     }
 
     /**
@@ -237,7 +254,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     /**
      * Looks up the given flow in the registry and processes it with the given event.
      * A flow asserting is then executed by calling {@link
-     * org.mule.tck.functional.FlowAssert.verify(String)}
+     * org.mule.tck.functional.FlowAssert#verify(String)}
      * 
      * @param flowName the name of the flow to be executed
      * @param event the event ot execute with

@@ -56,6 +56,7 @@ import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.registry.SimpleRegistry;
 import org.mule.util.ClassUtils;
 import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
@@ -78,6 +79,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     protected static final Log logger = LogFactory.getLog(DefaultMuleContextBuilder.class);
     public static final String MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE = "mule.context.workmanager.maxthreadsactive";
 
+    protected final boolean createSimpleRegistry;
+
     protected MuleConfiguration config;
 
     protected MuleContextLifecycleManager lifecycleManager;
@@ -91,6 +94,16 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     protected SplashScreen startupScreen;
 
     protected SplashScreen shutdownScreen;
+
+    public DefaultMuleContextBuilder()
+    {
+        this(false);
+    }
+
+    public DefaultMuleContextBuilder(boolean createSimpleRegistry)
+    {
+        this.createSimpleRegistry = createSimpleRegistry;
+    }
 
     /**
      * {@inheritDoc}
@@ -116,7 +129,13 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected DefaultRegistryBroker createRegistryBroker(MuleContext muleContext)
     {
-        return new DefaultRegistryBroker(muleContext);
+        DefaultRegistryBroker broker = new DefaultRegistryBroker(muleContext);
+        if (createSimpleRegistry)
+        {
+            broker.addRegistry(new SimpleRegistry(muleContext));
+        }
+
+        return broker;
     }
 
     protected DefaultMuleContext createDefaultMuleContext()

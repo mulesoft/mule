@@ -10,6 +10,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.InterfaceBinding;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.component.AbstractComponent;
 import org.mule.component.BindingInvocationHandler;
 import org.mule.util.ClassUtils;
@@ -38,7 +39,7 @@ public class ScriptComponent extends AbstractComponent
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        script.setMuleContext(muleContext);
+        LifecycleUtils.initialiseIfNeeded(script, muleContext);
         super.doInitialise();
         try
         {

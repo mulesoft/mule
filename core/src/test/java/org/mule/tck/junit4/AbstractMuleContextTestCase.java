@@ -31,6 +31,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.MuleTestUtils;
@@ -230,8 +231,13 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             //This will enable annotations config for this instance
             addIfPresent(builders, CLASSNAME_ANNOTATIONS_CONFIG_BUILDER);
 
-            builders.add(getBuilder());
+            ConfigurationBuilder builder = getBuilder();
+            if (builder != null)
+            {
+                builders.add(builder);
+            }
             addBuilders(builders);
+
             MuleContextBuilder contextBuilder = createMuleContextBuilder();
             DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
             String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
@@ -250,7 +256,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 
     protected MuleContextBuilder createMuleContextBuilder()
     {
-        return new TestingMuleContextBuilder();
+        return new DefaultMuleContextBuilder(true);
     }
 
     //This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
