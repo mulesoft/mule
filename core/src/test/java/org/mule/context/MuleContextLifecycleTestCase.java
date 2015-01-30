@@ -28,7 +28,6 @@ import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.TestingMuleContextBuilder;
 import org.mule.util.JdkVersionUtils;
 import org.mule.util.UUID;
 import org.mule.util.queue.QueueManager;
@@ -54,7 +53,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
     @Before
     public void setup() throws Exception
     {
-        ctxBuilder = new TestingMuleContextBuilder();
+        ctxBuilder = new DefaultMuleContextBuilder(true);
         lifecycleManager = new SensingLifecycleManager();
         ctxBuilder.setLifecycleManager(lifecycleManager);
         ctx = ctxBuilder.buildMuleContext();

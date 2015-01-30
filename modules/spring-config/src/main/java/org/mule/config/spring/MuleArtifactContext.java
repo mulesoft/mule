@@ -13,6 +13,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.config.ConfigResource;
 import org.mule.config.bootstrap.BootstrapException;
 import org.mule.config.spring.editors.MessageExchangePatternPropertyEditor;
+import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
@@ -87,7 +88,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         );
 
         beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
-        beanFactory.registerCustomEditor(MessageExchangePattern.class, MessageExchangePatternPropertyEditor.class);
+
+        registerEditors(beanFactory);
 
         SpringRegistryBootstrap bootstrap = new SpringRegistryBootstrap(new InitialisingBeanDefintionRegistry((BeanDefinitionRegistry) beanFactory));
         initialiseBootstrap(bootstrap);
@@ -100,6 +102,13 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         {
             throw new MuleRuntimeException(e);
         }
+    }
+
+    private void registerEditors(ConfigurableListableBeanFactory beanFactory)
+    {
+        MulePropertyEditorRegistrar registrar = new MulePropertyEditorRegistrar();
+        registrar.setMuleContext(muleContext);
+        beanFactory.addPropertyEditorRegistrar(registrar);
     }
 
     protected void initialiseBootstrap(SpringRegistryBootstrap bootstrap)

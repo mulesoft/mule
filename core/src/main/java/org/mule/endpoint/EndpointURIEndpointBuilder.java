@@ -61,7 +61,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
     {
         super();
         this.uriBuilder = builder;
-        this.muleContext = builder.getMuleContext();
+        setMuleContext(builder.getMuleContext());
     }
 
     public EndpointURIEndpointBuilder(String address, MuleContext muleContext)

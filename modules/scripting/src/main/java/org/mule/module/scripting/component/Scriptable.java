@@ -125,7 +125,7 @@ public class Scriptable implements Initialisable, MuleContextAware
                 }
                 else
                 {
-                    setScriptEngineName(scriptEngine.getFactory().getEngineName());
+                    setScriptEngineName(ext);
                 }
             }
         }
