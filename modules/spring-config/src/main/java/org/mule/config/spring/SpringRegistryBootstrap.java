@@ -60,7 +60,7 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
  * myobject=org.foo.MyObject
  * </pre>
  * Will register an instance of MyObject with a key of 'myobject'. If you don't care about the object name and want to
- * ensure that the ojbect gets a unique name you can use -
+ * ensure that the object gets a unique name you can use -
  * <pre>
  * object.1=org.foo.MyObject
  * object.2=org.bar.MyObject

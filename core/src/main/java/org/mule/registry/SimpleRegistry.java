@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.tck.junit4;
+package org.mule.registry;
 
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
@@ -15,7 +15,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.registry.TransientRegistry;
 
 import java.lang.reflect.Field;
 
@@ -24,12 +23,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestingRegistry extends TransientRegistry implements InitialisingRegistry
+public class SimpleRegistry extends TransientRegistry implements InitialisingRegistry
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestingRegistry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleRegistry.class);
 
-    public TestingRegistry(MuleContext muleContext)
+    public SimpleRegistry(MuleContext muleContext)
     {
         super(muleContext);
     }

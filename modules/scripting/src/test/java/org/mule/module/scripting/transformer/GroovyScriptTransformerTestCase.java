@@ -34,6 +34,7 @@ public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
     {
         Scriptable script = new Scriptable(muleContext);
         script.setScriptFile("ListToString.groovy");
+        script.setScriptEngineName("groovy");
         script.initialise();
         
         ScriptTransformer transformer = new ScriptTransformer();

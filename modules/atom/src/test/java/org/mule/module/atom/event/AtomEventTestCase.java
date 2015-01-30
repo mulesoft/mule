@@ -97,7 +97,7 @@ public class AtomEventTestCase extends FunctionalTestCase
 
     private void clearJcrRepository()
     {
-        Repository repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
+        Repository repository = muleContext.getRegistry().lookupObject("jcrRepository");
         if (repository == null)
         {
             return;

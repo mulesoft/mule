@@ -8,19 +8,28 @@ package org.mule.module.scripting.filter;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.routing.filter.Filter;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 
 import javax.script.Bindings;
 
-public class ScriptFilter extends AbstractFilteringMessageProcessor implements Filter
+public class ScriptFilter extends AbstractFilteringMessageProcessor implements Filter, Initialisable
 {
 
     private Scriptable script;
     
     private String name;
-    
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        LifecycleUtils.initialiseIfNeeded(script, muleContext);
+    }
+
     @Override
     protected boolean accept(MuleEvent event)
     {

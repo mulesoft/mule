@@ -15,7 +15,6 @@ import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.TestingMuleContextBuilder;
 
 import org.junit.Test;
 
@@ -28,7 +27,7 @@ public class JmxMissingIdTestCase extends AbstractMuleTestCase
     {
         DefaultMuleConfiguration config = new DefaultMuleConfiguration();
         config.setId("MY_SERVER");
-        MuleContextBuilder contextBuilder = new TestingMuleContextBuilder();
+        MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder(true);
         contextBuilder.setMuleConfiguration(config);
         muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
 
