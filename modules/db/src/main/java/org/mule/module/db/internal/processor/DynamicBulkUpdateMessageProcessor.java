@@ -14,33 +14,30 @@ import org.mule.api.MuleMessage;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.executor.BulkExecutor;
 import org.mule.module.db.internal.domain.executor.BulkQueryExecutorFactory;
+import org.mule.module.db.internal.domain.query.BulkQuery;
 import org.mule.module.db.internal.domain.query.Query;
-import org.mule.module.db.internal.domain.query.QueryParamValue;
 import org.mule.module.db.internal.domain.query.QueryType;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
-import org.mule.module.db.internal.resolver.param.DynamicParamValueResolver;
-import org.mule.module.db.internal.resolver.param.ParamValueResolver;
 import org.mule.module.db.internal.resolver.query.QueryResolver;
 
 import java.sql.SQLException;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Executes an update query in bulk mode on a database
+ * Executes an update dynamic query in bulk mode on a database
  * * <p/>
- * An update query can be parametrized update, insert or delete query or a stored procedure
+ * A dynamic update query can be update, insert or delete query or a stored procedure
  * taking input parameters only and returning an update count.
  * <p/>
  * Both database and queries are resolved, if required, using the {@link org.mule.api.MuleEvent}
  * being processed.
  */
-public class PreparedBulkUpdateMessageProcessor extends AbstractBulkUpdateMessageProcessor
+public class DynamicBulkUpdateMessageProcessor extends AbstractBulkUpdateMessageProcessor
 {
 
-    public PreparedBulkUpdateMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver, BulkQueryExecutorFactory bulkUpdateExecutorFactory, TransactionalAction transactionalAction, List<QueryType> validQueryTypes)
+    public DynamicBulkUpdateMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver, BulkQueryExecutorFactory bulkUpdateExecutorFactory, TransactionalAction transactionalAction, List<QueryType> validQueryTypes)
     {
         super(dbConfigResolver, transactionalAction, validQueryTypes, queryResolver, bulkUpdateExecutorFactory);
     }
@@ -48,33 +45,18 @@ public class PreparedBulkUpdateMessageProcessor extends AbstractBulkUpdateMessag
     @Override
     protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException
     {
-        Query query = queryResolver.resolve(connection, muleEvent);
-
-        validateQueryType(query.getQueryTemplate());
-
-        List<List<QueryParamValue>> paramValues = resolveParamSets(muleEvent, query);
-
-        BulkExecutor bulkUpdateExecutor = bulkUpdateExecutorFactory.create();
-        return bulkUpdateExecutor.execute(connection, query, paramValues);
-    }
-
-    private List<List<QueryParamValue>> resolveParamSets(MuleEvent muleEvent, Query query)
-    {
         final Iterator<Object> paramsIterator = getIterator(muleEvent);
 
-        ParamValueResolver paramValueResolver = new DynamicParamValueResolver(muleContext.getExpressionManager());
-
-        List<List<QueryParamValue>> result = new LinkedList<List<QueryParamValue>>();
-
+        BulkQuery bulkQuery = new BulkQuery();
         while (paramsIterator.hasNext())
         {
             MuleMessage itemMessage = new DefaultMuleMessage(paramsIterator.next(), muleContext);
             MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
-            List<QueryParamValue> queryParamValues = paramValueResolver.resolveParams(itemEvent, query.getParamValues());
-            result.add(queryParamValues);
+            Query query = queryResolver.resolve(connection, itemEvent);
+            bulkQuery.add(query.getQueryTemplate());
         }
 
-        return result;
+        BulkExecutor bulkUpdateExecutor = bulkUpdateExecutorFactory.create();
+        return bulkUpdateExecutor.execute(connection, bulkQuery);
     }
-
 }
