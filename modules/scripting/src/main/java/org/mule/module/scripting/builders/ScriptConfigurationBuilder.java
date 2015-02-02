@@ -70,7 +70,6 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
         TransientRegistry registry = new TransientRegistry(muleContext);
         registry.initialise();
         muleContext.addRegistry(registry);
-        //registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP, new SimpleRegistryBootstrap());
 
         scriptComponent = new Scriptable(muleContext);
         scriptComponent.setScriptEngineName(scriptEngineName);

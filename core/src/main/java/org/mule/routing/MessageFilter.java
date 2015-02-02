@@ -164,5 +164,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         {
             ((Disposable) unacceptedMessageProcessor).dispose();
         }
+
+        LifecycleUtils.disposeIfNeeded(filter);
     }
 }
