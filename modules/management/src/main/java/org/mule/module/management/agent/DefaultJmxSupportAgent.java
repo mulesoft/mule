@@ -10,7 +10,6 @@ import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.util.StringUtils;
@@ -166,7 +165,6 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
     protected void registerAgent(Agent agent, MuleRegistry registry) throws MuleException
     {
-        LifecycleUtils.initialiseIfNeeded(agent, muleContext);
         registry.registerAgent(agent);
     }
 
