@@ -11,13 +11,13 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.Registry;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.RegistryLifecycleManager;
-import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
+import org.mule.lifecycle.phases.MuleContextDisposePhase;
+import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
@@ -44,22 +44,13 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
     // Spring custom lifecycle phases
     // ///////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * A lifecycle phase that will delegate any lifecycle invocations to a container
-     * such as Spring or Guice
-     */
-    class SpringContextInitialisePhase extends ContainerManagedLifecyclePhase
+    class SpringContextInitialisePhase extends MuleContextInitialisePhase
     {
-        public SpringContextInitialisePhase()
-        {
-            super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
-            registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
-        }
-
         @Override
         public void applyLifecycle(Object o) throws LifecycleException
         {
-            if (o instanceof SpringRegistry) {
+            if (o instanceof SpringRegistry)
+            {
                 return;
             }
 
@@ -72,15 +63,8 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
      * {@link org.mule.config.spring.SpringRegistry#doDispose()} method which in turn
      * will destroy the application context managed by this registry
      */
-    class SpringContextDisposePhase extends ContainerManagedLifecyclePhase
+    class SpringContextDisposePhase extends MuleContextDisposePhase
     {
-        public SpringContextDisposePhase()
-        {
-            super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
-            registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
-            // You can dispose from all phases
-            registerSupportedPhase(LifecyclePhase.ALL_PHASES);
-        }
 
         @Override
         public void applyLifecycle(Object o) throws LifecycleException

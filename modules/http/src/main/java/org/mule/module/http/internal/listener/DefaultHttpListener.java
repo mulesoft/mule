@@ -15,6 +15,7 @@ import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.MessageProcessingManager;
@@ -112,14 +113,18 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     @Override
     public synchronized void start() throws MuleException
     {
-        try
+        if (requestHandlerManager == null)
         {
-            requestHandlerManager = this.config.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler());
+            try
+            {
+                requestHandlerManager = this.config.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler());
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
         }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+
         requestHandlerManager.start();
     }
 
@@ -188,10 +193,14 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         {
             responseBuilder = HttpResponseBuilder.emptyInstance(muleContext);
         }
+        LifecycleUtils.initialiseIfNeeded(responseBuilder);
+
         if (errorResponseBuilder == null)
         {
             errorResponseBuilder = HttpResponseBuilder.emptyInstance(muleContext);
         }
+        LifecycleUtils.initialiseIfNeeded(errorResponseBuilder);
+
         path = HttpParser.sanitizePathWithStartSlash(path);
         path = config.resolvePath(path);
         responseBuilder.setResponseStreaming(responseStreamingMode);

@@ -14,6 +14,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
@@ -72,6 +73,7 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
         {
             requestBuilder = new HttpRequesterRequestBuilder();
         }
+        LifecycleUtils.initialiseIfNeeded(requestBuilder);
 
         setEmptyAttributesFromConfig();
         validateRequiredProperties();
