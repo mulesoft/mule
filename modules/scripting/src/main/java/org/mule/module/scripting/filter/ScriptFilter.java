@@ -8,6 +8,7 @@ package org.mule.module.scripting.filter;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
@@ -17,8 +18,13 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
 
 import javax.script.Bindings;
 
-public class ScriptFilter extends AbstractFilteringMessageProcessor implements Filter, Initialisable
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ScriptFilter extends AbstractFilteringMessageProcessor implements Filter, Initialisable, Disposable
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptFilter.class);
 
     private Scriptable script;
     
@@ -28,6 +34,12 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
     public void initialise() throws InitialisationException
     {
         LifecycleUtils.initialiseIfNeeded(script, muleContext);
+    }
+
+    @Override
+    public void dispose()
+    {
+        LifecycleUtils.disposeIfNeeded(script, LOGGER);
     }
 
     @Override
