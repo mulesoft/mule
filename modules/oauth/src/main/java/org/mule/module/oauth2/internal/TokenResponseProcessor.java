@@ -13,6 +13,9 @@ import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfigurat
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Process a token url response and extracts all the oauth context variables
  * based on the user configuration.
@@ -20,6 +23,7 @@ import java.util.Map;
 public class TokenResponseProcessor
 {
 
+    protected Logger logger = LoggerFactory.getLogger(getClass());
     private final TokenResponseConfiguration tokenResponseConfiguration;
     private final ExpressionManager expressionManager;
     private final boolean retrieveRefreshToken;
@@ -48,9 +52,19 @@ public class TokenResponseProcessor
     public void process(final MuleEvent muleEvent)
     {
         accessToken = expressionManager.parse(tokenResponseConfiguration.getAccessToken(), muleEvent);
+        accessToken = isEmpty(accessToken) ? null : accessToken;
+        if (accessToken == null)
+        {
+            logger.error("Could not extract access token from token URL. Expressions used to retrieve access token was " + tokenResponseConfiguration.getAccessToken());
+        }
         if (retrieveRefreshToken)
         {
             refreshToken = expressionManager.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent);
+            refreshToken = isEmpty(refreshToken) ? null : refreshToken;
+            if (refreshToken == null)
+            {
+                logger.error("Could not extract refresh token from token URL. Expressions used to retrieve refresh token was " + tokenResponseConfiguration.getRefreshToken());
+            }
         }
         expiresIn = expressionManager.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent);
         customResponseParameters = new HashMap<>();
@@ -78,5 +92,11 @@ public class TokenResponseProcessor
     public Map<String, Object> getCustomResponseParameters()
     {
         return customResponseParameters;
+    }
+
+    private boolean isEmpty(String value)
+    {
+        //TODO remove "null" check when MULE-8281 gets fixed.
+        return value == null || org.mule.util.StringUtils.isEmpty(value) || "null".equals(value);
     }
 }

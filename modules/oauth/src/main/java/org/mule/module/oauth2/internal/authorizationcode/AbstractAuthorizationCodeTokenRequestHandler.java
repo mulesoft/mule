@@ -113,7 +113,6 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
             final String flowName = "OAuthRedirectUrlFlow" + getOauthConfig().getRedirectionUrl();
             final Flow redirectUrlFlow = DynamicFlowFactory.createDynamicFlow(getMuleContext(), flowName, Arrays.asList(createRedirectUrlProcessor()));
             final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(getMuleContext())
-                    .setSuccessStatusCode("#[flowVars['statusCode']]")
                     .setUrl(new URL(getOauthConfig().getRedirectionUrl()))
                     .setFlow(redirectUrlFlow);
             if (getOauthConfig().getTlsContext() != null)
