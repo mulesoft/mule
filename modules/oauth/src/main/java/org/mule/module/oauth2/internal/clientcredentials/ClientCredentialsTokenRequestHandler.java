@@ -9,6 +9,7 @@ package org.mule.module.oauth2.internal.clientcredentials;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -72,9 +73,18 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
 
     public void refreshAccessToken() throws MuleException
     {
+
         final DefaultMuleEvent accessTokenEvent = new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), getMuleContext()), MessageExchangePattern.REQUEST_RESPONSE, new Flow("test", getMuleContext()));
         setMapPayloadWithTokenRequestParameters(accessTokenEvent);
-        final MuleEvent response = invokeTokenUrl(accessTokenEvent);
+        final MuleEvent response;
+        try
+        {
+            response = invokeTokenUrl(accessTokenEvent);
+        }
+        catch (TokenUrlResponseException e)
+        {
+            throw new DefaultMuleException(e);
+        }
         final TokenResponseProcessor tokenResponseProcessor = TokenResponseProcessor.createClientCredentialsProcessor(tokenResponseConfiguration, getMuleContext().getExpressionManager());
         tokenResponseProcessor.process(response);
         final ResourceOwnerOAuthContext defaultUserState = tokenManager.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);

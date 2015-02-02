@@ -298,4 +298,25 @@ public class HttpParser
     {
         return path.replaceAll(WHITE_SPACE, SPACE_ENTITY);
     }
+
+    /**
+     * Appends a query parameter to an URL that may or may not contain query parameters already.
+     *
+     * @param url base URL to apply the new query parameter
+     * @param queryParamName query parameter name
+     * @param queryParamValue query parameter value
+     * @return a new string with the query parameter appended
+     */
+    public static String appendQueryParam(String url, String queryParamName, String queryParamValue)
+    {
+        try
+        {
+            String urlPreparedForNewParameter = url.contains("?") ? url + "&" : url + "?";
+            return urlPreparedForNewParameter + URLEncoder.encode(queryParamName, Charsets.UTF_8.name()) + "=" + URLEncoder.encode(queryParamValue, Charsets.UTF_8.name());
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
 }
