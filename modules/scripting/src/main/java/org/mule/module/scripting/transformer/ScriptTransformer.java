@@ -26,7 +26,15 @@ public class ScriptTransformer extends AbstractMessageTransformer
     @Override
     public void initialise() throws InitialisationException
     {
+        super.initialise();
         LifecycleUtils.initialiseIfNeeded(script, muleContext);
+    }
+
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+        LifecycleUtils.disposeIfNeeded(script);
     }
 
     @Override

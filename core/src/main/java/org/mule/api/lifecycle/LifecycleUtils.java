@@ -15,9 +15,12 @@ import java.util.Collection;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class LifecycleUtils
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleUtils.class);
 
     public static void initialiseIfNeeded(Object object) throws InitialisationException
     {
@@ -62,6 +65,10 @@ public abstract class LifecycleUtils
     public static void stopIfNeeded(Object object) throws MuleException
     {
         doApplyPhase(Stoppable.PHASE_NAME, Arrays.asList(object), null);
+    }
+
+    public static void disposeIfNeeded(Object object) {
+        disposeIfNeeded(object, LOGGER);
     }
 
     public static void disposeIfNeeded(Object object, Logger logger)
