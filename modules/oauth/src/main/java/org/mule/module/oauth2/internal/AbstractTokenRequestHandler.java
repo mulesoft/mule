@@ -6,23 +6,31 @@
  */
 package org.mule.module.oauth2.internal;
 
+import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.transport.ssl.api.TlsContextFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractTokenRequestHandler implements MuleContextAware
 {
 
+    protected Logger logger = LoggerFactory.getLogger(getClass());
     private MuleContext muleContext;
     private String refreshTokenWhen = OAuthConstants.DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION;
     private String tokenUrl;
-    private HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();;
+    private HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().build();
     private TlsContextFactory tlsContextFactory;
 
     /**
@@ -56,13 +64,36 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware
 
     public void setTlsContextFactory(final TlsContextFactory tlsContextFactory)
     {
-        httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).build();
+        httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().tlsContextFactory(tlsContextFactory).build();
     }
 
-    protected MuleEvent invokeTokenUrl(final MuleEvent event) throws MuleException
+    protected MuleEvent invokeTokenUrl(final MuleEvent event) throws MuleException, TokenUrlResponseException
     {
         event.setMessage(muleContext.getClient().send(tokenUrl, event.getMessage(), httpRequestOptions));
+        if (event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY) >= BAD_REQUEST.getStatusCode())
+        {
+            throw new TokenUrlResponseException(event);
+        }
         return event;
     }
 
+    protected String getTokenUrl()
+    {
+        return tokenUrl;
+    }
+
+    protected class TokenUrlResponseException extends Exception
+    {
+        private MuleEvent tokenUrlResponse;
+
+        public TokenUrlResponseException(final MuleEvent tokenUrlResponse)
+        {
+            this.tokenUrlResponse = tokenUrlResponse;
+        }
+
+        public MuleEvent getTokenUrlResponse()
+        {
+            return tokenUrlResponse;
+        }
+    }
 }

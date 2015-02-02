@@ -12,6 +12,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.oauth2.internal.OAuthConstants;
@@ -77,12 +80,29 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
 
     protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(String accessToken)
     {
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(accessToken, REFRESH_TOKEN);
+    }
+
+    protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(String accessToken, String refreshToken)
+    {
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" +
+                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," +
+                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + "," +
+                                                                                       "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}");
+    }
+
+    protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(String body)
+    {
         wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH))
                                      .willReturn(aResponse()
-                                                         .withBody("{" +
-                                                                   "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," +
-                                                                   "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + "," +
-                                                                   "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\":\"" + REFRESH_TOKEN + "\"}")));
+                                                         .withBody(body)));
+    }
+
+    protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeAndFail()
+    {
+        wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH))
+                                     .willReturn(aResponse()
+                                                         .withStatus(INTERNAL_SERVER_ERROR.getStatusCode())));
     }
 
     protected void configureWireMockToExpectTokenPathRequestForClientCredentialsGrantType()
