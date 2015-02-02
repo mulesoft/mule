@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import org.junit.Test;
-import sun.security.provider.certpath.SunCertPathBuilderException;
 
 public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestTestCase
 {
