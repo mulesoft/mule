@@ -8,6 +8,7 @@ package org.mule.test.integration.message;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -19,6 +20,7 @@ import org.junit.Test;
 /**
  * see EE-1794
  */
+@Ignore("BL-38 Need to port for CXF changes")
 public class MessagePropertyInResponseTransformersTestCase extends FunctionalTestCase
 {
     @Override

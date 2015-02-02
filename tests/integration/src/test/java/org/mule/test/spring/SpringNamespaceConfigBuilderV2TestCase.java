@@ -34,7 +34,7 @@ import org.junit.Test;
 
 /**
  * This is an extended version of the same test covered in
- * {@link org.mule.test.spring.SpringNamespaceConfigBuilderTestCase}.  Both are translations of an
+ * {@link SpringNamespaceConfigBuilderTestCase}.  Both are translations of an
  * earlier (1.X) test.
  *
  * I realise this seems rather messy, and I did consider merging the two, but they often test different

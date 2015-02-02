@@ -6,6 +6,9 @@
  */
 package org.mule.test.integration.models;
 
+import org.junit.Ignore;
+
+@Ignore("MULE-2741")
 public class SedaPipelineTestCase extends AbstractPipelineTestCase
 {
     @Override

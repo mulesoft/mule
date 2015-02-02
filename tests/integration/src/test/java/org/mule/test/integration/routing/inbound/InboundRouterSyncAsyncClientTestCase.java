@@ -9,6 +9,7 @@ package org.mule.test.integration.routing.inbound;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Ignore;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -16,6 +17,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
+@Ignore("MULE-4485")
 public class InboundRouterSyncAsyncClientTestCase extends FunctionalTestCase
 {
     @Override

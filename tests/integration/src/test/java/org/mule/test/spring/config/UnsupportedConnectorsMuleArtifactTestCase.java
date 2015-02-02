@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.spring.config;
+package org.mule.test.spring.config;
 
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;

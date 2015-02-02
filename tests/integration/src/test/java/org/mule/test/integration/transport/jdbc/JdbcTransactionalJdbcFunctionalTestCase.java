@@ -6,9 +6,11 @@
  */
 package org.mule.test.integration.transport.jdbc;
 
+import org.junit.Ignore;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.transport.jdbc.JdbcTransactionFactory;
 
+@Ignore("MULE-2749")
 public class JdbcTransactionalJdbcFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
 {
 

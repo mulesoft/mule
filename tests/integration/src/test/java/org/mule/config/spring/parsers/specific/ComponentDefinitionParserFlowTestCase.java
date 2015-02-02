@@ -18,7 +18,6 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
