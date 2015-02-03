@@ -10,16 +10,10 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.agent.Agent;
-import org.mule.api.config.Config;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.model.Model;
 import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.transport.Connector;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
@@ -29,8 +23,6 @@ import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -113,18 +105,6 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
         }
         //This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the application context
         springContextInitialised.set(true);
-    }
-
-    private List<Initialisable> getInitialisableObjects()
-    {
-        final Class[] initialisableTypes = new Class[] {Config.class, Connector.class, Agent.class, Model.class, FlowConstruct.class, Initialisable.class};
-        List<Initialisable> initialisables = new LinkedList<>();
-        for (Class<? extends Initialisable> type : initialisableTypes)
-        {
-            initialisables.addAll(lookupObjectsForLifecycle(type));
-        }
-
-        return initialisables;
     }
 
     @Override

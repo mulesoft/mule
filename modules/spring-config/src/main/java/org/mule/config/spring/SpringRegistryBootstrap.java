@@ -8,14 +8,11 @@ package org.mule.config.spring;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transaction.TransactionFactory;
-import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
@@ -25,7 +22,6 @@ import org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer;
 import org.mule.config.bootstrap.RegistryBootstrapDiscoverer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
-import org.mule.registry.MuleRegistryHelper;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
@@ -214,7 +210,6 @@ public class SpringRegistryBootstrap implements MuleContextAware
         try
         {
             registerUnnamedObjects(unnamedObjects);
-            registerTransformers((MuleRegistryHelper) context.getRegistry());
             registerTransformers(transformers);
             registerObjects(namedObjects);
             registerTransactionFactories(singleTransactionFactories, context);
@@ -344,15 +339,6 @@ public class SpringRegistryBootstrap implements MuleContextAware
             }
 
             name = null;
-        }
-    }
-
-    private void registerTransformers(MuleRegistryHelper registry) throws MuleException
-    {
-        Map<String, Converter> converters = registry.lookupByType(Converter.class);
-        for (Converter converter : converters.values())
-        {
-            registry.notifyTransformerResolvers(converter, TransformerResolver.RegistryAction.ADDED);
         }
     }
 
