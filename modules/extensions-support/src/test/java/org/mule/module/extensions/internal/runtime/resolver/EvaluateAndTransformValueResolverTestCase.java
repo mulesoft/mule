@@ -32,6 +32,12 @@ public class EvaluateAndTransformValueResolverTestCase extends AbstractMuleConte
 
     private DefaultExpressionManager expressionManager;
 
+    public EvaluateAndTransformValueResolverTestCase()
+    {
+        super();
+        setStartContext(true);
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
