@@ -34,8 +34,6 @@ import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +57,6 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     private HttpResponseBuilder errorResponseBuilder;
     private HttpStreamingType responseStreamingMode = HttpStreamingType.AUTO;
     private RequestHandlerManager requestHandlerManager;
-
-    @Inject
     private MessageProcessingManager messageProcessingManager;
     private String[] parsedAllowedMethods;
 
@@ -206,6 +202,15 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         responseBuilder.setResponseStreaming(responseStreamingMode);
         validatePath();
         parseRequest = config.resolveParseRequest(parseRequest);
+
+        try
+        {
+            messageProcessingManager = DefaultHttpListener.this.muleContext.getRegistry().lookupObject(MessageProcessingManager.class);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     private void validatePath() throws InitialisationException

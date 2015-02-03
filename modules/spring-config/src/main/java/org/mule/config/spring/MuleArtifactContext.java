@@ -6,17 +6,16 @@
  */
 package org.mule.config.spring;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.ConfigResource;
 import org.mule.config.bootstrap.BootstrapException;
-import org.mule.config.spring.editors.MessageExchangePatternPropertyEditor;
 import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
+import org.mule.config.spring.processors.NotifyTransformerResolversPostProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.config.spring.util.InitialisingBeanDefintionRegistry;
 import org.mule.registry.MuleRegistryHelper;
@@ -74,13 +73,14 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     {
         super.prepareBeanFactory(beanFactory);
 
-        beanFactory.registerCustomEditor(MessageExchangePattern.class, MessageExchangePatternPropertyEditor.class);
+        registerEditors(beanFactory);
 
         addBeanPostProcessors(beanFactory,
                               new MuleContextPostProcessor(muleContext),
                               new ExpressionEvaluatorPostProcessor(muleContext),
                               new GlobalNamePostProcessor(),
                               new ExpressionEnricherPostProcessor(muleContext),
+                              new NotifyTransformerResolversPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
                               new NotificationListenersPostProcessor(muleContext),
                               new AnnotatedTransformerObjectPostProcessor(muleContext),
                               new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
@@ -89,7 +89,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
         beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
 
-        registerEditors(beanFactory);
 
         SpringRegistryBootstrap bootstrap = new SpringRegistryBootstrap(new InitialisingBeanDefintionRegistry((BeanDefinitionRegistry) beanFactory));
         initialiseBootstrap(bootstrap);
