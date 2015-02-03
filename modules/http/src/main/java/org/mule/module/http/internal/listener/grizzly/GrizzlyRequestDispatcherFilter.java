@@ -6,10 +6,12 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.glassfish.grizzly.http.util.HttpStatus.CONINTUE_100;
+import static org.glassfish.grizzly.http.util.HttpStatus.EXPECTATION_FAILED_417;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
-import org.mule.module.http.api.HttpConstants;
+import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
+import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.domain.response.HttpResponse;
@@ -26,6 +28,7 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
+import org.glassfish.grizzly.http.HttpResponsePacket;
 
 /**
  * Grizzly filter that dispatches the request to the right request handler
@@ -48,6 +51,26 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         final int port = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getPort();
         final HttpContent httpContent = ctx.getMessage();
         final HttpRequestPacket request = (HttpRequestPacket) httpContent.getHttpHeader();
+
+        // Handle Expect Continue
+        if (request.requiresAcknowledgement())
+        {
+            final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(request);
+            if (CONTINUE.equalsIgnoreCase(request.getHeader(EXPECT)))
+            {
+                responsePacketBuilder.status(CONINTUE_100.getStatusCode());
+                HttpResponsePacket packet = responsePacketBuilder.build();
+                packet.setAcknowledgement(true);
+                ctx.write(packet);
+                return ctx.getStopAction();
+            }
+            else
+            {
+                responsePacketBuilder.status(EXPECTATION_FAILED_417.getStatusCode());
+                ctx.write(responsePacketBuilder.build());
+                return ctx.getStopAction();
+            }
+        }
 
         final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(ctx, httpContent);
         HttpRequestContext requestContext = new HttpRequestContext(httpRequest, (InetSocketAddress) ctx.getConnection().getPeerAddress(), scheme);
