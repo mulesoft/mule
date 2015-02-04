@@ -89,7 +89,6 @@ public class AuthorizationRequestHandler implements MuleContextAware
             final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(muleContext);
             final String flowName = "authorization-request-handler-" + localAuthorizationUrl;
             final Flow flow = DynamicFlowFactory.createDynamicFlow(muleContext, flowName, createLocalAuthorizationUrlListener());
-            muleContext.getRegistry().registerObject(flow.getName(), flow);
             httpListenerBuilder.setUrl(new URL(localAuthorizationUrl))
                     .setSuccessStatusCode(REDIRECT_STATUS_CODE)
                     .setFlow(flow);
