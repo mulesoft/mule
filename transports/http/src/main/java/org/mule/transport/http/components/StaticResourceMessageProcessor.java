@@ -38,6 +38,7 @@ import javax.activation.MimetypesFileTypeMap;
 public class StaticResourceMessageProcessor implements MessageProcessor, Initialisable
 {
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+    public static final String ANY_PATH = "/*";
     public static final String ROOT_PATH = "/";
 
     private String resourceBase;
@@ -61,7 +62,24 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         }
 
         String path = event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
-        String contextPath = event.getMessage().getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+        String contextPath = event.getMessage().getInboundProperty(org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
+        if (contextPath == null)
+        {
+            //If not found then try the transport property
+            contextPath = event.getMessage().getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+        }
+        else
+        {
+            //Get rid of ending wildcards.
+            if (contextPath.equals(ANY_PATH))
+            {
+                contextPath = ROOT_PATH;
+            }
+            if (contextPath.endsWith(ANY_PATH))
+            {
+                contextPath = StringUtils.removeEnd(contextPath, ANY_PATH);
+            }
+        }
 
         if (!ROOT_PATH.equals(contextPath))
         {
