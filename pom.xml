@@ -1891,7 +1891,7 @@
                             <Build-Date>${timestamp}</Build-Date>
                             <Dev-List-Email>${dev.list}</Dev-List-Email>
                             <Supported-Jdks>[1.7.0,1.8)</Supported-Jdks>
-                            <Recommended-Jdks>[1.7.0_3,1.8)</Recommended-Jdks>
+                            <Recommended-Jdks>[1.7.0_60,1.8)</Recommended-Jdks>
                         </manifestEntries>
                     </archive>
                 </configuration>
