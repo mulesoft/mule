@@ -36,7 +36,7 @@
 
         <spring:alias name="_muleQueueManager" alias="_localQueueManager"/>
 
-        <spring:bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" destroy-method="dispose" />
+        <spring:bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" />
 
         <spring:alias name="_muleObjectStoreManager" alias="_localObjectStoreManager" />
 
@@ -60,7 +60,7 @@
 
         <spring:bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
 
-        <spring:bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguageWrapper">
+        <spring:bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguage">
             <spring:constructor-arg  ref="_muleContext"/>
         </spring:bean>
 
