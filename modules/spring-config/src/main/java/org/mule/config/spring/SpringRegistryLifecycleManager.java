@@ -37,6 +37,7 @@ import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.registry.AbstractRegistryBroker;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
+import org.mule.util.ArrayUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -110,6 +111,12 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
      */
     class SpringContextDisposePhase extends MuleContextDisposePhase
     {
+
+        public SpringContextDisposePhase()
+        {
+            super();
+            setIgnoredObjectTypes((Class<?>[]) ArrayUtils.add(getIgnoredObjectTypes(), MuleContext.class));
+        }
 
         @Override
         public void applyLifecycle(Object o) throws LifecycleException

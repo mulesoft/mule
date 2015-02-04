@@ -19,7 +19,7 @@ import org.mule.api.store.ObjectStore;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.connector.MuleConnectorOperationLocator;
-import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.el.mvel.MVELExpressionLanguageWrapper;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.execution.MuleMessageProcessingManager;
 import org.mule.management.stats.DefaultProcessingTimeWatcher;
@@ -107,7 +107,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
         configureSystemModel(registry);
 
-        registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(muleContext));
+        registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext));
         registry.registerObject(MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator());
     }
 

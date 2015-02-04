@@ -5,11 +5,11 @@
     <parent>
         <artifactId>mule-tools</artifactId>
         <groupId>org.mule.tools</groupId>
-        <version>3.7.0-M1-SNAPSHOT</version>
+        <version>3.7.0-lifecycle</version>
     </parent>
     <packaging>maven-plugin</packaging>
     <artifactId>mule-catalog-archetype</artifactId>
-    <version>3.7.0-M1-SNAPSHOT</version>
+    <version>3.7.0-lifecycle</version>
     <name>Mule Configuration Patterns Catalog Archetype</name>
 
     <properties>

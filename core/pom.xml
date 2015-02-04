@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.7.0-M1-SNAPSHOT</version>
+        <version>3.7.0-lifecycle</version>
     </parent>
     <artifactId>mule-core</artifactId>
     <packaging>jar</packaging>
@@ -184,7 +184,8 @@
         <dependency>
             <groupId>org.mule.common</groupId>
             <artifactId>mule-common</artifactId>
-            <version>${project.version}</version>
+            <!--<version>${project.version}</version>-->
+            <version>3.7.0-M1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
