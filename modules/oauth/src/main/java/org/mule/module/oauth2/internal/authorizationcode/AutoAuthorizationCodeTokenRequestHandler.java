@@ -33,8 +33,10 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.HttpParser;
+import org.mule.module.oauth2.internal.MuleEventLogger;
 import org.mule.module.oauth2.internal.OAuthConstants;
 import org.mule.module.oauth2.internal.StateDecoder;
+import org.mule.module.oauth2.internal.TokenNotFoundException;
 import org.mule.module.oauth2.internal.TokenResponseProcessor;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
@@ -55,6 +57,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     public static final int TOKEN_NOT_FOUND_STATUS = 201;
     public static final int FAILURE_PROCESSING_REDIRECT_URL_REQUEST_STATUS = 300;
     private TokenResponseConfiguration tokenResponseConfiguration = new TokenResponseConfiguration();
+    private MuleEventLogger muleEventLogger = new MuleEventLogger(logger);
 
     public void setTokenResponseConfiguration(final TokenResponseConfiguration tokenResponseConfiguration)
     {
@@ -114,7 +117,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                 catch (NoAuthorizationCodeException e)
                 {
                     logger.error("Could not extract authorization code from OAuth provider HTTP request done to the redirect URL");
-                    logMessageContent(event);
+                    muleEventLogger.logContent(event);
                     authorizationStatus = NO_AUTHORIZATION_CODE_STATUS;
                     statusCodeToReturn = BAD_REQUEST.getStatusCode();
                     responseMessage = "Failure retrieving access token.\n OAuth Server uri from callback: " + event.getMessage().getInboundProperty(HTTP_REQUEST_URI);
@@ -122,7 +125,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                 catch (TokenUrlResponseException e)
                 {
                     logger.error((String.format("HTTP response from token URL %s returned a failure status code", getTokenUrl())));
-                    logMessageContent(e.getTokenUrlResponse());
+                    muleEventLogger.logContent(e.getTokenUrlResponse());
                     authorizationStatus = TOKEN_URL_CALL_FAILED_STATUS;
                     statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
                     responseMessage = String.format("Failure calling token url %s. Exception message is %s", getTokenUrl(), e.getMessage());
@@ -131,7 +134,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                 {
                     logger.error(String.format("Could not extract access token or refresh token from token URL. Access token is %s, Refresh token is %s",
                                                e.getTokenResponseProcessor().getAccessToken(), e.getTokenResponseProcessor().getRefreshToken()));
-                    logMessageContent(e.getTokenUrlResponse());
+                    muleEventLogger.logContent(e.getTokenUrlResponse());
                     authorizationStatus = TOKEN_NOT_FOUND_STATUS;
                     statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
                     responseMessage = "Failed getting access token or refresh token from token URL response. See logs for details.";
@@ -178,22 +181,6 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     {
         return tokenResponseProcessor.getAccessToken() != null && tokenResponseProcessor.getRefreshToken() != null;
     }
-
-    private void logMessageContent(MuleEvent tokenUrlResponse)
-    {
-        logger.error("Message content type is " + tokenUrlResponse.getMessage().getPayload().getClass());
-        logger.error("Message content is " + tokenUrlResponse.getMessage());
-        try
-        {
-            String payloadAsString = tokenUrlResponse.getMessage().getPayloadAsString();
-            logger.error("Message payload is " + (isEmpty(payloadAsString) ? "EMPTY CONTENT" : payloadAsString));
-        }
-        catch (Exception e)
-        {
-            //just skip the logging message if we couldn't convert the payload to string.
-        }
-    }
-
 
     private void setMapPayloadWithTokenRequestParameters(final MuleEvent event, final String authorizationCode)
     {
@@ -313,32 +300,6 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
      */
     private class NoAuthorizationCodeException extends Exception
     {
-    }
-
-    /**
-     * It was not possible to retrieve the access token or the refresh token from the token URL response
-     */
-    private class TokenNotFoundException extends Exception
-    {
-
-        private final TokenResponseProcessor tokenResponseProcessor;
-        private final MuleEvent tokenUrlResponse;
-
-        public TokenNotFoundException(MuleEvent tokenUrlResponse, TokenResponseProcessor tokenResponseProcessor)
-        {
-            this.tokenUrlResponse = tokenUrlResponse;
-            this.tokenResponseProcessor = tokenResponseProcessor;
-        }
-
-        public TokenResponseProcessor getTokenResponseProcessor()
-        {
-            return tokenResponseProcessor;
-        }
-
-        public MuleEvent getTokenUrlResponse()
-        {
-            return tokenUrlResponse;
-        }
     }
 
 }
