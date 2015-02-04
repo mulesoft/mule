@@ -7,6 +7,7 @@
 package org.mule.config.spring;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -14,11 +15,9 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
-import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
@@ -141,7 +140,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
         if (StringUtils.isBlank(key))
         {
             logger.warn(
-                    MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
+                    createStaticMessage("Detected a lookup attempt with an empty or null key"),
                     new Throwable().fillInStackTrace());
             return null;
         }
@@ -152,15 +151,33 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
         }
         else
         {
+            Object object;
             try
             {
-                return applicationContext.getBean(key);
+                object = applicationContext.getBean(key);
             }
             catch (NoSuchBeanDefinitionException e)
             {
-                logger.debug(e);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(e);
+                }
                 return null;
             }
+
+            if (!applicationContext.isSingleton(key))
+            {
+                try
+                {
+                    getLifecycleManager().applyCompletedPhases(object);
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(createStaticMessage("Could not apply lifecycle into prototype object " + key), e);
+                }
+            }
+
+            return object;
         }
     }
 
@@ -182,8 +199,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
-        Collection<T> objects = internalLookupByTypeWithoutAncestors(type, false, false).values();
-        return CollectionUtils.select(objects, new LifecycleObjectPredicate());
+        return internalLookupByTypeWithoutAncestors(type, false, false).values();
     }
 
     @Override
@@ -202,7 +218,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
         {
             // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
             String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
-            throw new MuleRuntimeException(MessageFactory.createStaticMessage(message), fbex);
+            throw new MuleRuntimeException(createStaticMessage(message), fbex);
         }
         catch (Exception e)
         {
@@ -221,7 +237,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
         {
             // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
             String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
-            throw new MuleRuntimeException(MessageFactory.createStaticMessage(message), fbex);
+            throw new MuleRuntimeException(createStaticMessage(message), fbex);
         }
         catch (Exception e)
         {
@@ -383,7 +399,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
             }
             catch (Exception e)
             {
-                throw new RegistrationException(MessageFactory.createStaticMessage("Could not register object for key " + key), e);
+                throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
             }
         }
     }

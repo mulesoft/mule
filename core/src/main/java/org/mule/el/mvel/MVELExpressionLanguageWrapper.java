@@ -13,6 +13,7 @@ import org.mule.expression.DefaultExpressionManager;
  * Wraps a {@link MVELExpressionLanguage} to take care of injecting new instances in the
  * muleContext's {@link DefaultExpressionManager}
  */
+@Deprecated
 public final class MVELExpressionLanguageWrapper extends MVELExpressionLanguage
 {
 
