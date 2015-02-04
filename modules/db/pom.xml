@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.7.0-M1-SNAPSHOT</version>
+        <version>3.7.0-lifecycle</version>
     </parent>
 
     <artifactId>mule-module-db</artifactId>
@@ -88,7 +88,8 @@
         <dependency>
             <groupId>org.mule.common</groupId>
             <artifactId>mule-common</artifactId>
-            <version>${project.version}</version>
+            <!--<version>${project.version}</version>-->
+            <version>3.7.0-M1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
