@@ -29,11 +29,6 @@ public class ExpressionEvaluatorPostProcessor implements BeanPostProcessor
 
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
     {
-        if (muleContext == null)
-        {
-            return bean;
-        }
-
         if (bean instanceof ExpressionEvaluator)
         {
             ExpressionEvaluator ee = (ExpressionEvaluator) bean;

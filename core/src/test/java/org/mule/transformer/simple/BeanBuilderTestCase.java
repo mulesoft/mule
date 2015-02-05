@@ -31,6 +31,7 @@ public class BeanBuilderTestCase extends AbstractTransformerTestCase
         trans.addArgument(new ExpressionArgument("segments", new ExpressionConfig("segments", "header", null), false));
         trans.addArgument(new ExpressionArgument("radius", new ExpressionConfig("radius", "header", null), false));
         trans.initialise();
+        trans.start();
         return trans;
     }
 

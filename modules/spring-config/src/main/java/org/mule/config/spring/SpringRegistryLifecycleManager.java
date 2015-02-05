@@ -24,7 +24,9 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.context.notification.ServerNotificationManager;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
@@ -37,7 +39,6 @@ import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.registry.AbstractRegistryBroker;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
-import org.mule.util.ArrayUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -115,7 +116,14 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
         public SpringContextDisposePhase()
         {
             super();
-            setIgnoredObjectTypes((Class<?>[]) ArrayUtils.add(getIgnoredObjectTypes(), MuleContext.class));
+            setIgnoredObjectTypes(new Class[] {
+                    Component.class,
+                    MessageSource.class,
+                    OutboundRouterCollection.class,
+                    OutboundRouter.class,
+                    Transformer.class,
+                    MuleContext.class,
+                    ServerNotificationManager.class});
         }
 
         @Override

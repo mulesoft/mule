@@ -15,7 +15,6 @@ import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
-import org.mule.config.spring.processors.NotifyTransformerResolversPostProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.config.spring.util.InitialisingBeanDefintionRegistry;
 import org.mule.registry.MuleRegistryHelper;
@@ -80,7 +79,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                               new ExpressionEvaluatorPostProcessor(muleContext),
                               new GlobalNamePostProcessor(),
                               new ExpressionEnricherPostProcessor(muleContext),
-                              new NotifyTransformerResolversPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
                               new NotificationListenersPostProcessor(muleContext),
                               new AnnotatedTransformerObjectPostProcessor(muleContext),
                               new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
