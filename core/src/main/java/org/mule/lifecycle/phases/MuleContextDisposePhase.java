@@ -69,7 +69,7 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         orderedObjects.add(new NotificationLifecycleObject(Connector.class));
         orderedObjects.add(new NotificationLifecycleObject(Config.class));
         orderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
-        orderedObjects.add(new NotificationLifecycleObject(Disposable.class));
+        orderedObjects.add(new NotificationLifecycleObject(Object.class));
 
         //Can call dispose from all lifecycle Phases
         registerSupportedPhase(LifecyclePhase.ALL_PHASES);

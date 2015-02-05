@@ -15,9 +15,12 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.TransformerResolver;
+import org.mule.api.transformer.Converter;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
+import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
@@ -102,8 +105,27 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
         {
             ((ConfigurableApplicationContext) applicationContext).refresh();
         }
+
+        initTransformers();
         //This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the application context
         springContextInitialised.set(true);
+    }
+
+    private void initTransformers()
+    {
+        MuleRegistryHelper registryHelper = (MuleRegistryHelper) muleContext.getRegistry();
+
+        Map<String, TransformerResolver> resolvers = registryHelper.lookupByType(TransformerResolver.class);
+        for (TransformerResolver resolver : resolvers.values())
+        {
+            registryHelper.registerTransformerResolver(resolver);
+        }
+
+        Map<String, Converter> converters = registryHelper.lookupByType(Converter.class);
+        for (Converter converter : converters.values())
+        {
+            registryHelper.notifyTransformerResolvers(converter, TransformerResolver.RegistryAction.ADDED);
+        }
     }
 
     @Override
