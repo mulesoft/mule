@@ -867,7 +867,7 @@ public class MuleRegistryHelper implements MuleRegistry
         postObjectRegistrationActions(value);
     }
 
-    private void registerTransformerResolver(TransformerResolver value)
+    public void registerTransformerResolver(TransformerResolver value)
     {
         Lock lock = transformerResolversLock.writeLock();
         lock.lock();
