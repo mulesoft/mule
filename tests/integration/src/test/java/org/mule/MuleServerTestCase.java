@@ -9,6 +9,8 @@ package org.mule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.junit.Ignore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 import org.mule.util.FilenameUtils;
@@ -91,6 +93,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         muleServer.initialize();
     }
 
+    @Ignore("MULE-6926: Flaky test - fails on build server")
     @Test
     public void testMuleServerAppConfig() throws Exception
     {
