@@ -8,6 +8,7 @@
 package org.mule.module.db.internal.domain.database;
 
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.common.DefaultResult;
@@ -36,13 +37,16 @@ import javax.sql.DataSource;
 
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.enhydra.jdbc.standard.StandardXADataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines a database configuration that is not customized for any particular
  * database vendor
  */
-public class GenericDbConfig implements DbConfig, Initialisable
+public class GenericDbConfig implements DbConfig, Initialisable, Disposable
 {
+    protected static final Logger logger = LoggerFactory.getLogger(GenericDbConfig.class);
 
     private DataSource dataSource;
     private final String name;
@@ -157,6 +161,24 @@ public class GenericDbConfig implements DbConfig, Initialisable
             }
         }
         dataSource = decorateDataSourceIfRequired(dataSource);
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (poolingProfile == null || useXaTransactions)
+        {
+            return;
+        }
+
+        try
+        {
+            DataSources.destroy(dataSource);
+        }
+        catch (SQLException e)
+        {
+            logger.warn("Unable to properly release pooled data source", e);
+        }
     }
 
     protected DataSource createDataSource() throws Exception

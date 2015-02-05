@@ -9,6 +9,7 @@ package org.mule.module.db.internal.config.domain.database;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
@@ -31,7 +32,7 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implements MuleContextAware, Initialisable
+public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implements MuleContextAware, Initialisable, Disposable
 {
 
     private String name;
@@ -220,5 +221,14 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     public void setCustomDataTypes(List<DbType> customDataTypes)
     {
         this.customDataTypes = customDataTypes;
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (dbConfig != null)
+        {
+            dbConfig.dispose();
+        }
     }
 }
