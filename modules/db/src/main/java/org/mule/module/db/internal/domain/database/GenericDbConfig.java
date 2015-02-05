@@ -8,6 +8,7 @@
 package org.mule.module.db.internal.domain.database;
 
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -25,7 +26,6 @@ import org.mule.module.db.internal.domain.connection.TransactionalDbConnectionFa
 import org.mule.module.db.internal.domain.transaction.TransactionCoordinationDbTransactionManager;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.internal.domain.xa.CompositeDataSourceDecorator;
-import org.mule.retry.policies.NoRetryPolicyTemplate;
 
 import com.mchange.v2.c3p0.DataSources;
 
@@ -39,6 +39,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.enhydra.jdbc.standard.StandardXADataSource;
 
@@ -46,8 +48,10 @@ import org.enhydra.jdbc.standard.StandardXADataSource;
  * Defines a database configuration that is not customized for any particular
  * database vendor
  */
-public class GenericDbConfig implements DbConfig, Initialisable
+public class GenericDbConfig implements DbConfig, Initialisable, Disposable
 {
+
+    protected static Log logger = LogFactory.getLog(GenericDbConfig.class);
 
     private DataSource dataSource;
     private final String name;
@@ -169,6 +173,24 @@ public class GenericDbConfig implements DbConfig, Initialisable
         }
 
         dbConnectionFactory = new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, this.getDataSource());
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (poolingProfile == null || useXaTransactions)
+        {
+            return;
+        }
+
+        try
+        {
+            DataSources.destroy(dataSource);
+        }
+        catch (SQLException e)
+        {
+            logger.warn("Unable to properly release pooled data source", e);
+        }
     }
 
     protected DataSource createDataSource() throws Exception
