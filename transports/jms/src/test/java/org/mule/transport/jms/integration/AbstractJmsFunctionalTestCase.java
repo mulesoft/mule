@@ -15,6 +15,7 @@ import static org.junit.Assert.fail;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -50,6 +51,8 @@ import javax.transaction.SystemException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
@@ -237,7 +240,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * @throws Exception
      */
     @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
+    protected void addBuilders(List<ConfigurationBuilder> builders)
     {
         if (multipleProviders)
         {
@@ -248,19 +251,46 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 throw new IllegalArgumentException("Parameterized tests don't support multiple " +
                                                    "config files as input: " + configFile);
             }
-            
+
             String resources = configFile.substring(configFile.lastIndexOf("/") + 1);
             resources = String.format("integration/%s/connector-%s",
-                getJmsConfig().getName(), resources);
-            
+                                      getJmsConfig().getName(), resources);
+
             String[] configFiles = new String[] { resources, configFile };
-            SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
-            return builder;
+            try
+            {
+                SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
+                builder.setParentContext(makeParentContext());
+                builders.add(0, builder);
+            }
+            catch (ConfigurationException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
         else
         {
-            return super.getBuilder();
+            super.addBuilders(builders);
         }
+    }
+
+    private ApplicationContext makeParentContext()
+    {
+        Properties properties = getStartUpProperties();
+        if (properties == null || properties.isEmpty())
+        {
+            return null;
+        }
+
+        GenericApplicationContext parent = new GenericApplicationContext();
+        parent.refresh();
+
+        for (Map.Entry<Object, Object> entry : properties.entrySet())
+        {
+            parent.getBeanFactory().registerSingleton(entry.getKey().toString(), entry.getValue());
+        }
+
+        return parent;
     }
 
     /**

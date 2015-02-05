@@ -21,6 +21,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.PreInitProcessor;
 import org.mule.api.routing.OutboundRouter;
@@ -55,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
  * If one is not found a default  SEDA Model will be created
  * Finally, the processor will register the service with the Registry and return null.
  */
-public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, MuleContextAware
+public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, MuleContextAware, Startable
 {
     /**
      * logger used by this class
@@ -84,15 +85,21 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
             this.context = context;
             this.regProps = new RegistryMap(context.getRegistry());
             this.helper = new AnnotatedEndpointHelper(context);
-            this.parserFactory = context.getRegistry().lookupObject(AnnotationsParserFactory.class);
-            if(parserFactory==null)
-            {
-                logger.info(AnnotationsParserFactory.class.getName() +" implementation not found in registry, annotations not enabled");
-            }
         }
         catch (MuleException e)
         {
             throw new MuleRuntimeException(CoreMessages.failedToCreate(getClass().getName()), e);
+        }
+    }
+
+
+    @Override
+    public void start() throws MuleException
+    {
+        parserFactory = context.getRegistry().lookupObject(AnnotationsParserFactory.class);
+        if (parserFactory == null)
+        {
+            logger.info(AnnotationsParserFactory.class.getName() + " implementation not found in registry, annotations not enabled");
         }
     }
 
