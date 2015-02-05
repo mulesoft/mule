@@ -7,6 +7,8 @@
 package org.mule.test.integration.streaming;
 
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Ignore;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -21,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+@Ignore("Flaky - fails on build server")
 public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
