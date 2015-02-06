@@ -164,6 +164,12 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     }
 
     @Override
+    public boolean isTrustStoreConfigured()
+    {
+        return tlsConfiguration.getTrustStore() != null;
+    }
+
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)

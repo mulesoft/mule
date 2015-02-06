@@ -52,4 +52,10 @@ public interface TlsContextFactory
      */
     boolean isKeyStoreConfigured();
 
+    /**
+     * @return true if the trust store was configured, false otherwise
+     */
+    boolean isTrustStoreConfigured();
+
+
 }
