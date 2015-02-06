@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.ssl.DefaultTlsContextFactory;
 import org.mule.util.ClassUtils;
 
 import java.io.File;
@@ -113,9 +114,11 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Functi
 
     private SSLSocket createSocket(String[] cipherSuites, String[] enabledProtocols) throws Exception
     {
-        SSLContext sslContext = SSLContext.getInstance(SERVER_PROTOCOL_ENABLED);
-        sslContext.init(null, null, null);
+        DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+        tlsContextFactory.setTrustStorePath("trustStore");
+        tlsContextFactory.setTrustStorePassword("mulepassword");
 
+        SSLContext sslContext = tlsContextFactory.createSslContext();
         SSLSocketFactory socketFactory = sslContext.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", httpsPort.getNumber());
 

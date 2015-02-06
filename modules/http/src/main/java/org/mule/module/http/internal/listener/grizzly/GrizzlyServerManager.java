@@ -7,10 +7,8 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.HttpServerManager;
 import org.mule.module.http.internal.listener.Server;
@@ -227,7 +225,8 @@ public class GrizzlyServerManager implements HttpServerManager
     {
         try
         {
-            final SSLEngineConfigurator serverConfig = new SSLEngineConfigurator(tlsContextFactory.createSslContext(), false, false, false);
+            boolean clientAuth = tlsContextFactory.isTrustStoreConfigured();
+            final SSLEngineConfigurator serverConfig = new SSLEngineConfigurator(tlsContextFactory.createSslContext(), false, clientAuth, false);
             final String[] enabledProtocols = tlsContextFactory.getEnabledProtocols();
             if (enabledProtocols != null)
             {

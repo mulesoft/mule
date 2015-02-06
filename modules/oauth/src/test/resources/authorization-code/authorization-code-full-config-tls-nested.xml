@@ -19,7 +19,6 @@
                 redirectionUrl="${redirect.url}"
                 tokenManager-ref="tokenManagerConfig">
             <tls:context>
-                <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
                 <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
             <oauth2:authorization-request
