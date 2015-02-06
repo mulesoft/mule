@@ -8,12 +8,12 @@ package org.mule.transformer.encryption;
 
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -105,6 +105,8 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
         {
             throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
         }
+
+        LifecycleUtils.initialiseIfNeeded(strategy);
     }
 
     public EncryptionStrategy getStrategy()

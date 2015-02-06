@@ -8,7 +8,6 @@ package org.mule.module.oauth2.internal.tokenmanager;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;

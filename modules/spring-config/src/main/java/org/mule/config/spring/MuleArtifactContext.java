@@ -6,6 +6,9 @@
  */
 package org.mule.config.spring;
 
+import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+import static org.springframework.context.annotation.AnnotationConfigUtils.COMMON_ANNOTATION_PROCESSOR_BEAN_NAME;
+import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
@@ -14,6 +17,7 @@ import org.mule.config.bootstrap.BootstrapException;
 import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
+import org.mule.config.spring.processors.FilteringCommonAnnotationBeanPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.config.spring.util.InitialisingBeanDefintionRegistry;
@@ -21,16 +25,24 @@ import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigUtils;
+import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -174,9 +186,54 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         beanDefinitionReader.setDocumentReaderClass(getBeanDefinitionDocumentReaderClass());
         //add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
-        AnnotationConfigUtils.registerAnnotationConfigProcessors(beanDefinitionReader.getRegistry(), null);
+        registerAnnotationConfigProcessors(beanDefinitionReader.getRegistry(), null);
 
         return beanDefinitionReader;
+    }
+
+    private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)
+    {
+
+        if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME))
+        {
+            RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
+            def.setSource(source);
+            registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME);
+        }
+
+        if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME))
+        {
+            RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
+            def.setSource(source);
+            registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
+        }
+
+        if (!registry.containsBeanDefinition(AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME))
+        {
+            RootBeanDefinition def = new RootBeanDefinition(RequiredAnnotationBeanPostProcessor.class);
+            def.setSource(source);
+            registerPostProcessor(registry, def, AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
+        }
+
+        registerJsr250PostProcessors(registry, source);
+    }
+
+    private void registerJsr250PostProcessors(BeanDefinitionRegistry registry, Object source)
+    {
+        RootBeanDefinition def = new RootBeanDefinition(FilteringCommonAnnotationBeanPostProcessor.class);
+        ConstructorArgumentValues arguments = new ConstructorArgumentValues();
+        Set<String> filteredPackages = new HashSet<>();
+        filteredPackages.add("org.apache.cxf");
+        arguments.addGenericArgumentValue(filteredPackages);
+        def.setConstructorArgumentValues(arguments);
+        def.setSource(source);
+        registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME);
+    }
+
+    private void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName)
+    {
+        definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+        registry.registerBeanDefinition(beanName, definition);
     }
 
     protected Class<? extends MuleBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass()
