@@ -207,8 +207,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
             {
                 ((MessageFilter) mp).setThrowOnUnaccepted(true);
             }
-
-            //LifecycleUtils.initialiseIfNeeded(mp);
         }
 
         InboundEndpoint inboundEndpoint = createInboundEndpoint(endpointURI, mergedProcessors, mergedResponseProcessors, connector);
