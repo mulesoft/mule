@@ -14,7 +14,6 @@
     <properties>
         <skipExportTests>false</skipExportTests>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
-        <skipTests>true</skipTests>
     </properties>
 
 
