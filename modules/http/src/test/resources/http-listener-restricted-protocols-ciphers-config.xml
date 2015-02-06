@@ -8,7 +8,6 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="tlsContext" >
-        <tls:trust-store path="trustStore" password="mulepassword"/>
         <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
     </tls:context>
 
