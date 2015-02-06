@@ -11,7 +11,6 @@ import org.mule.api.EndpointAnnotationParser;
 import org.mule.api.MessageProcessorAnnotationParser;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.annotations.meta.Channel;
 import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.annotations.meta.Router;
@@ -32,7 +31,6 @@ import org.mule.component.AbstractJavaComponent;
 import org.mule.config.AnnotationsParserFactory;
 import org.mule.config.endpoint.AnnotatedEndpointHelper;
 import org.mule.config.i18n.AnnotationsMessages;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.registry.RegistryMap;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
@@ -80,22 +78,15 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
 
     public void setMuleContext(MuleContext context)
     {
-        try
-        {
-            this.context = context;
-            this.regProps = new RegistryMap(context.getRegistry());
-            this.helper = new AnnotatedEndpointHelper(context);
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToCreate(getClass().getName()), e);
-        }
+        this.context = context;
+        this.regProps = new RegistryMap(context.getRegistry());
     }
 
 
     @Override
     public void start() throws MuleException
     {
+        helper = new AnnotatedEndpointHelper(context);
         parserFactory = context.getRegistry().lookupObject(AnnotationsParserFactory.class);
         if (parserFactory == null)
         {
