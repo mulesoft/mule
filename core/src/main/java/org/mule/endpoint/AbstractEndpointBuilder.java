@@ -23,7 +23,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.processor.CloneableMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
@@ -209,7 +208,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
                 ((MessageFilter) mp).setThrowOnUnaccepted(true);
             }
 
-            LifecycleUtils.initialiseIfNeeded(mp);
+            //LifecycleUtils.initialiseIfNeeded(mp);
         }
 
         InboundEndpoint inboundEndpoint = createInboundEndpoint(endpointURI, mergedProcessors, mergedResponseProcessors, connector);
