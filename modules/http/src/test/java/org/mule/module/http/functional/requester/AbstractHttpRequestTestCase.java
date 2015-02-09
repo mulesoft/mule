@@ -98,7 +98,7 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
         try
         {
-            sslContextFactory.setKeyStorePath(getKeyStorePath());
+            sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("serverKeystore", getClass()));
         }
         catch (IOException e)
         {
@@ -111,11 +111,6 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
         ServerConnector connector = new ServerConnector(server, sslContextFactory);
         connector.setPort(httpsPort.getNumber());
         server.addConnector(connector);
-    }
-
-    protected String getKeyStorePath() throws IOException
-    {
-        return FileUtils.getResourcePath("serverKeystore", getClass());
     }
 
     protected AbstractHandler createHandler(Server server)

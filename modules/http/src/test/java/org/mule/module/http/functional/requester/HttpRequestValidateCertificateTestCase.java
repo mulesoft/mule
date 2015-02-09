@@ -7,14 +7,14 @@
 package org.mule.module.http.functional.requester;
 
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.api.MessagingException;
-import org.mule.util.FileUtils;
+import org.mule.api.MuleEvent;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
     }
 
     @Test
-    public void missingCertificate() throws Exception
+    public void rejectsMissingCertificate() throws Exception
     {
         try
         {
@@ -49,10 +49,10 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
         }
     }
 
-    @Override
-    protected String getKeyStorePath() throws IOException
+    @Test
+    public void acceptsValidCertificate() throws Exception
     {
-        return FileUtils.getResourcePath("validate-certificate-keystore.jks", getClass());
+        MuleEvent result = runFlow("validCertFlow", TEST_MESSAGE);
+        assertThat(result.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
     }
-
 }
