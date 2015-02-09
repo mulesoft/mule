@@ -9,7 +9,9 @@ package org.mule.module.launcher.artifact;
 import org.mule.module.launcher.DirectoryResourceLocator;
 import org.mule.module.launcher.FineGrainedControlClassLoader;
 import org.mule.module.launcher.LocalResourceLocator;
+import org.mule.util.IOUtils;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,11 +26,16 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractArtifactClassLoader extends FineGrainedControlClassLoader implements ArtifactClassLoader
 {
+
+    private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/module/launcher/artifact/DefaultResourceReleaser.class";
+
     protected Log logger = LogFactory.getLog(getClass());
 
     protected List<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
     private LocalResourceLocator localResourceLocator;
+
+    private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
 
     public AbstractArtifactClassLoader(URL[] urls, ClassLoader parent)
     {
@@ -60,7 +67,30 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
                 logger.error(e);
             }
         }
+
+        createResourceReleaserInstance().release();
+
         super.dispose();
+    }
+
+    public void setResourceReleaserClassLocation(String resourceReleaserClassLocation)
+    {
+        this.resourceReleaserClassLocation = resourceReleaserClassLocation;
+    }
+
+    protected ResourceReleaser createResourceReleaserInstance()
+    {
+        try
+        {
+            InputStream classStream = this.getClass().getResourceAsStream(resourceReleaserClassLocation);
+            byte[] classBytes = IOUtils.toByteArray(classStream);
+            Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
+            return (ResourceReleaser) clazz.newInstance();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Can not create resource releaser instance of type: " + resourceReleaserClassLocation, e);
+        }
     }
 
     public URL findLocalResource(String resourceName)
