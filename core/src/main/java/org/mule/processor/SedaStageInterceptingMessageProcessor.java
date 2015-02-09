@@ -111,7 +111,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             logger.debug(MessageFormat.format("{1}: Putting event on queue {2}", queue.getName(),
                 getStageDescription(), event));
         }
-        queue.put(event);
+        queue.put(DefaultMuleEvent.copy(event));
         fireAsyncScheduledNotification(event);
     }
 
