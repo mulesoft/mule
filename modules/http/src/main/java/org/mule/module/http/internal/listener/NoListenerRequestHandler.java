@@ -6,65 +6,25 @@
  */
 package org.mule.module.http.internal.listener;
 
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-
-import java.io.ByteArrayInputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Request handle for request calls to paths with no listener configured.
  */
-public class NoListenerRequestHandler implements RequestHandler
+public class NoListenerRequestHandler extends NoMatchingListenerRequestHandler
 {
 
     public static final int RESOURCE_NOT_FOUND_STATUS_CODE = 404;
     public static final String RESOURCE_NOT_FOUND = "Resource not found.";
 
-    private Logger logger = LoggerFactory.getLogger(NoListenerRequestHandler.class);
-
     private static NoListenerRequestHandler instance = new NoListenerRequestHandler();
 
     private NoListenerRequestHandler()
     {
-
+        super(RESOURCE_NOT_FOUND_STATUS_CODE, "No listener for endpoint: %s", RESOURCE_NOT_FOUND);
     }
 
     public static NoListenerRequestHandler getInstance()
     {
         return instance;
-    }
-
-    @Override
-    public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
-    {
-        responseCallback.responseReady(new HttpResponseBuilder()
-                                               .setStatusCode(RESOURCE_NOT_FOUND_STATUS_CODE)
-                                               .setReasonPhrase("No listener for endpoint: " + requestContext.getRequest().getUri())
-                                               .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(RESOURCE_NOT_FOUND.getBytes())))
-                                               .build(), new ResponseStatusCallback()
-        {
-            @Override
-            public void responseSendFailure(Throwable exception)
-            {
-                logger.warn("Error while sending 404 response " + exception.getMessage());
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("exception thrown",exception);
-                }
-            }
-
-            @Override
-            public void responseSendSuccessfully()
-            {
-            }
-        });
     }
 
 }

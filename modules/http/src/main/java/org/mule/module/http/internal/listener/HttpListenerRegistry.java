@@ -197,14 +197,21 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             Preconditions.checkArgument(path.startsWith(SLASH), "path parameter must start with /");
             Stack<PathMap> foundPaths = findPossibleRequestHandlersFromCache(path);
 
+            boolean methodNotAllowed = false;
             RequestHandlerMatcherPair requestHandlerMatcherPair = null;
             while (!foundPaths.empty())
             {
                 final PathMap pathMap = foundPaths.pop();
-                requestHandlerMatcherPair = findRequestHandlerMatcherPair(pathMap.getRequestHandlerMatcherPairs(), request);
+                List<RequestHandlerMatcherPair> requestHandlerMatcherPairs = pathMap.getRequestHandlerMatcherPairs();
+                requestHandlerMatcherPair = findRequestHandlerMatcherPair(requestHandlerMatcherPairs, request);
                 if (requestHandlerMatcherPair != null)
                 {
                     break;
+                }
+                if (!requestHandlerMatcherPairs.isEmpty())
+                {
+                    //there were matching paths but no matching methods
+                    methodNotAllowed = true;
                 }
             }
             if (requestHandlerMatcherPair == null)
@@ -213,6 +220,10 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 {
                     logger.info("No listener found for request: " + getMethodAndPath(request.getMethod(), request.getPath()));
                     logger.info("Available listeners are: [{}]", Joiner.on(", ").join(this.paths));
+                }
+                if(methodNotAllowed)
+                {
+                    return NoMethodRequestHandler.getInstance();
                 }
                 return NoListenerRequestHandler.getInstance();
             }
