@@ -50,12 +50,6 @@ wrapperAdditionalConfFile.withWriter() {
         }
         paramIndex++
 
-        // increase max PermGen space size
-        // IBM JVM doesn't have a notion of the PermGen space
-        if (!System.properties."java.vm.vendor".toUpperCase().contains("IBM")) {
-            w << "wrapper.java.additional.${paramIndex++}=-XX:MaxPermSize=128m\n"
-        }
-
         if (debugEnabled) {
             writeJpdaOpts(w)
         }
