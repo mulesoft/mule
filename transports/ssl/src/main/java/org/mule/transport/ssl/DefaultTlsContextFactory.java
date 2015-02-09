@@ -138,7 +138,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory
         {
             if (!initialized)
             {
-                tlsConfiguration.initialise(null == getKeyStorePath(), TlsConfiguration.JSSE_NAMESPACE);
+                tlsConfiguration.initialise(null == getKeyStorePath(), null);
                 initialized = true;
             }
         }
