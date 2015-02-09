@@ -6,10 +6,12 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.apache.http.HttpStatus.SC_METHOD_NOT_ALLOWED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.mule.module.http.internal.listener.NoListenerRequestHandler.RESOURCE_NOT_FOUND;
 import static org.mule.module.http.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.DefaultMuleMessage;
@@ -105,6 +107,13 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(RESOURCE_NOT_FOUND));
     }
 
+    @Test
+    public void fullConfigWrongMethod() throws Exception
+    {
+        final String url = String.format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), "post");
+        final HttpResponse httpResponse = callAndAssertStatus(url, SC_METHOD_NOT_ALLOWED);
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(METHOD_NOT_ALLOWED.getReasonPhrase()));
+    }
     @Test
     public void useSlashInPathAndBasePath() throws Exception
     {
