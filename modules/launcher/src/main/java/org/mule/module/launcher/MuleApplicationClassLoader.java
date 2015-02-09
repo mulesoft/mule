@@ -10,10 +10,13 @@ import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
 import org.mule.module.launcher.nativelib.NativeLibraryFinder;
 import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -46,12 +49,18 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
 
+    private static final String DEFAULT_LEAK_CLEANER_CLASS = "DefaultLeakCleaner.class";
+
     private String appName;
 
     private File appDir;
     private File classesDir;
     private File libDir;
     private NativeLibraryFinder nativeLibraryFinder;
+
+    private LeakCleaner leakCleaner;
+
+    private String leakCleanerClassName;
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder)
     {
@@ -186,4 +195,52 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
     {
         return new String[] {classesDir.getAbsolutePath()};
     }
+
+    @Override
+    public void dispose()
+    {
+        LeakCleaner leakCleaner = getLeakCleanerInstance();
+        if (leakCleaner != null)
+        {
+            leakCleaner.clean();
+        }
+        super.dispose();
+    }
+
+    public String getLeakCleanerClassName()
+    {
+        return StringUtils.defaultString(leakCleanerClassName, DEFAULT_LEAK_CLEANER_CLASS);
+    }
+
+    public void setLeakCleanerClassName(String leakCleanerClass)
+    {
+        this.leakCleanerClassName = leakCleanerClass;
+        leakCleaner = null;
+    }
+
+    public LeakCleaner getLeakCleanerInstance()
+    {
+        if(leakCleaner==null)
+        {
+            leakCleaner = createLeakCleanerInstance(getLeakCleanerClassName());
+        }
+        return leakCleaner;
+    }
+
+    private LeakCleaner createLeakCleanerInstance(String className)
+    {
+        InputStream classStream = this.getClass().getResourceAsStream(className);
+        byte[] classBytes = IOUtils.toByteArray(classStream);
+        Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
+        try
+        {
+            return (LeakCleaner) clazz.newInstance();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Could not instantiate leak cleaner instance of type: " + className, e);
+        }
+        return null;
+    }
+
 }
