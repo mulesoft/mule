@@ -10,10 +10,12 @@ import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
 import org.mule.module.launcher.nativelib.NativeLibraryFinder;
 import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -45,6 +47,8 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
     public static final String PATH_PER_APP = "per-app";
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
+
+    private static final String DRIVER_MANAGER_CLEANER_CLASS = "DriverManagerCleaner.class";
 
     private String appName;
 
@@ -186,4 +190,27 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
     {
         return new String[] {classesDir.getAbsolutePath()};
     }
+
+    @Override
+    public void dispose()
+    {
+        executeDBDriversCleanUp();
+        super.dispose();
+    }
+
+    private void executeDBDriversCleanUp()
+    {
+        InputStream classStream = this.getClass().getResourceAsStream(DRIVER_MANAGER_CLEANER_CLASS);
+        byte[] classBytes = IOUtils.toByteArray(classStream);
+        Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
+        try
+        {
+            ((Runnable) clazz.newInstance()).run();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Could not unload DB Drivers.");
+        }
+    }
+
 }

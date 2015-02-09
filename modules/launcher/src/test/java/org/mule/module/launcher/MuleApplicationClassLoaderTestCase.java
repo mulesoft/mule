@@ -98,6 +98,12 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void disposeDrivers() throws Exception
+    {
+        appCL.dispose();
+    }
+
+    @Test
     public void loadLocalResourcesOnlyFromExpectedDirectories() throws Exception
     {
         // Ensure all resources can be loaded from their respective locations using findResource
