@@ -28,6 +28,11 @@
         <echo-component/>
     </flow>
 
+    <flow name="restrictedMethodsFlow">
+        <http:listener path="post" config-ref="fullConfig" allowedMethods="POST"/>
+        <echo-component/>
+    </flow>
+
     <http:listener-config name="slashListenerConfig" host="localhost" port="${slashConfigPort}" basePath="/"/>
 
     <flow name="useSlashInPathAndBasePath1">
