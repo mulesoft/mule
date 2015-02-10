@@ -24,6 +24,8 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.PatchMethod;
 import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
+import org.mule.transport.http.multipart.MultiPartInputStream;
+import org.mule.transport.http.multipart.PartDataSource;
 import org.mule.util.IOUtils;
 import org.mule.util.ObjectUtils;
 import org.mule.util.SerializationUtils;
@@ -461,9 +463,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
         for (final Iterator<String> iterator = msg.getOutboundAttachmentNames().iterator(); iterator.hasNext(); i++)
         {
-            final String attachmentNames = iterator.next();
-            String fileName = attachmentNames;
-            final DataHandler dh = msg.getOutboundAttachment(attachmentNames);
+            final String attachmentName = iterator.next();
+            final DataHandler dh = msg.getOutboundAttachment(attachmentName);
+            String fileName = dh.getName();
             if (dh.getDataSource() instanceof StringDataSource)
             {
                 final StringDataSource ds = (StringDataSource) dh.getDataSource();
@@ -485,7 +487,20 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                         fileName = fileName.substring(x + 1);
                     }
                 }
-                parts[i] = new FilePart(fileName, new ByteArrayPartSource(fileName,
+                else if (dh.getDataSource() instanceof PartDataSource)
+                {
+                    org.mule.transport.http.multipart.Part part = ((PartDataSource) dh.getDataSource()).getPart();
+                    if (part instanceof MultiPartInputStream.MultiPart)
+                    {
+                        String partFileName = ((MultiPartInputStream.MultiPart) part).getContentDispositionFilename();
+                        if (!StringUtils.isEmpty(partFileName))
+                        {
+                            fileName = partFileName;
+                        }
+                    }
+                }
+
+                parts[i] = new FilePart(attachmentName, new ByteArrayPartSource(StringUtils.defaultString(fileName, attachmentName),
                     IOUtils.toByteArray(dh.getInputStream())), dh.getContentType(), null);
             }
         }
