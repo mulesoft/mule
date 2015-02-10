@@ -132,7 +132,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
         addVariableTransformer.setValue(PLAIN_STRING_VALUE);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
-        Mockito.verify(mockMessage, VerificationModeFactory.times(1)).setProperty((String) isNull(), anyString(),
+        Mockito.verify(mockMessage, VerificationModeFactory.times(0)).setProperty((String) isNull(), anyString(),
             Matchers.<PropertyScope> anyObject());
     }
 
@@ -144,8 +144,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
         addVariableTransformer.setValue(NULL_EXPRESSION);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
-        Mockito.verify(mockMessage, VerificationModeFactory.times(1)).setProperty(anyString(), isNull(),
-            Matchers.<PropertyScope> anyObject());
+        Mockito.verify(mockMessage, VerificationModeFactory.times(1)).removeProperty(PLAIN_STRING_KEY, scope);
     }
 
 }
