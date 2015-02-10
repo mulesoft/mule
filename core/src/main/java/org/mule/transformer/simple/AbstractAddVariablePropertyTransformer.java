@@ -14,6 +14,8 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
 
+import java.text.MessageFormat;
+
 public abstract class AbstractAddVariablePropertyTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator identifierEvaluator;
@@ -38,8 +40,29 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
     {
         Object keyValue = identifierEvaluator.resolveValue(message);
         String key = (keyValue == null ? null : keyValue.toString());
-        message.setProperty(key, valueEvaluator.resolveValue(message), getScope());
+        if (key == null)
+        {
+            logger.error("Setting Null variable keys is not supported, this entry is being ignored");
+        }
+        else
+        {
+            Object value = valueEvaluator.resolveValue(message);
+            if (value == null)
+            {
+                message.removeProperty(key, getScope());
 
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(MessageFormat.format(
+                            "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
+                            key, valueEvaluator.getRawValue()));
+                }
+            }
+            else
+            {
+                message.setProperty(key, value, getScope());
+            }
+        }
         return message;
     }
 
