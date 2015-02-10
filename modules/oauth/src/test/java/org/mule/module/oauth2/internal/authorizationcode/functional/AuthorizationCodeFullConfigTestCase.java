@@ -155,6 +155,9 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
         DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
         tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
         tlsContextFactory.setTrustStorePassword("changeit");
+        tlsContextFactory.setKeyStorePath("ssltest-keystore.jks");
+        tlsContextFactory.setKeyStorePassword("changeit");
+        tlsContextFactory.setKeyManagerPassword("changeit");
 
         return tlsContextFactory;
     }
