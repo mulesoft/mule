@@ -88,25 +88,62 @@ public class SftpClient
     }
 
     public void changeWorkingDirectory(String wd) throws IOException
-    {
-        currentDirectory = wd;
-
-        try
-        {
-            wd = getAbsolutePath(wd);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Attempting to cwd to: " + wd);
-            }
-            channelSftp.cd(wd);
-        }
-        catch (SftpException e)
-        {
-            String message = "Error '" + e.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
-            logger.error(message);
-            throw new IOException(message);
-        }
-    }
+	{
+    	this.currentDirectory = wd;
+	    try
+	    {
+	      wd = getAbsolutePath(wd);
+	      if (this.logger.isDebugEnabled()) 
+	      {
+	        this.logger.debug("Attempting to cwd to: " + wd);
+	      }
+	      this.channelSftp.cd(wd);
+	    }
+	    catch (SftpException e)
+	    {
+	      if (e.id == 2)
+	      {
+	        String[] subPaths = wd.split("(?=[/])");
+	        wd = "";
+	        for (String subPath : subPaths)
+	        {
+	          this.logger.info("Inside changeWorkingDirectory with path = " + subPath);
+	          try
+	          {
+	            if (!subPath.isEmpty())
+	            {
+	              wd = getAbsolutePath(wd + subPath);
+	              this.channelSftp.cd(wd);
+	            }
+	          }
+	          catch (SftpException e2)
+	          {
+	            this.logger.info("Got an exception when trying to change the working directory to the new dir. Will try to create the directory " + 
+	              subPath);
+	            try
+	            {
+	              mkdir(wd);
+	              
+	
+	              this.channelSftp.cd(wd);
+	            }
+	            catch (SftpException e3)
+	            {
+	              String message = "Error '" + e3.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
+	              this.logger.error(message);
+	              throw new IOException(message);
+	            }
+	          }
+	        }
+	      }
+	      else
+	      {
+	        String message = "Error '" + e.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
+	        this.logger.error(message);
+	        throw new IOException(message);
+	      }
+	    }
+	  }
 
     /**
      * Converts a relative path to an absolute path according to
