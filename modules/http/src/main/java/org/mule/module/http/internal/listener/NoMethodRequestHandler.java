@@ -6,16 +6,16 @@
  */
 package org.mule.module.http.internal.listener;
 
-import org.mule.module.http.api.HttpConstants;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 
-public class NoMethodRequestHandler extends NoMatchingListenerRequestHandler
+public class NoMethodRequestHandler extends ErrorRequestHandler
 {
 
     private static NoMethodRequestHandler instance = new NoMethodRequestHandler();
 
     private NoMethodRequestHandler()
     {
-        super(HttpConstants.HttpStatus.METHOD_NOT_ALLOWED.getStatusCode(), "Method not allowed for endpoint: %s", HttpConstants.HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase());
+        super(METHOD_NOT_ALLOWED.getStatusCode(), "Method not allowed for endpoint: %s", METHOD_NOT_ALLOWED.getReasonPhrase());
     }
 
     public static NoMethodRequestHandler getInstance()

@@ -17,19 +17,19 @@ import java.io.ByteArrayInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NoMatchingListenerRequestHandler implements RequestHandler
+public class ErrorRequestHandler implements RequestHandler
 {
-    private Logger logger = LoggerFactory.getLogger(NoMatchingListenerRequestHandler.class);
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private int statusCode;
     private String reasonPhraseFormat;
     private String entity;
 
-    public NoMatchingListenerRequestHandler(int aStatusCode, String aReasonPhraseFormat, String anEntity)
+    public ErrorRequestHandler(int statusCode, String reasonPhraseFormat, String entity)
     {
-        statusCode = aStatusCode;
-        reasonPhraseFormat = aReasonPhraseFormat;
-        entity = anEntity;
+        this.statusCode = statusCode;
+        this.reasonPhraseFormat = reasonPhraseFormat;
+        this.entity = entity;
     }
 
     @Override

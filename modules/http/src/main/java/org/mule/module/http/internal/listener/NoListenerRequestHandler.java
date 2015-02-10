@@ -6,20 +6,21 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+
 /**
  * Request handle for request calls to paths with no listener configured.
  */
-public class NoListenerRequestHandler extends NoMatchingListenerRequestHandler
+public class NoListenerRequestHandler extends ErrorRequestHandler
 {
 
-    public static final int RESOURCE_NOT_FOUND_STATUS_CODE = 404;
     public static final String RESOURCE_NOT_FOUND = "Resource not found.";
 
     private static NoListenerRequestHandler instance = new NoListenerRequestHandler();
 
     private NoListenerRequestHandler()
     {
-        super(RESOURCE_NOT_FOUND_STATUS_CODE, "No listener for endpoint: %s", RESOURCE_NOT_FOUND);
+        super(NOT_FOUND.getStatusCode(), "No listener for endpoint: %s", RESOURCE_NOT_FOUND);
     }
 
     public static NoListenerRequestHandler getInstance()
