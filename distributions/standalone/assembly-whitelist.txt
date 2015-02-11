@@ -326,7 +326,7 @@
 /mule-standalone-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.5.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-4.6.jar
-/mule-standalone-${productVersion}/lib/opt/jruby-complete-1.0.jar
+/mule-standalone-${productVersion}/lib/opt/jruby-complete-1.6.5.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.51.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
