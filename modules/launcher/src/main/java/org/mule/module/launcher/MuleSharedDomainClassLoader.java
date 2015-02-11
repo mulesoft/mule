@@ -84,6 +84,15 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
         }
     }
 
+    /**
+     * For testing purposes
+     */
+    protected MuleSharedDomainClassLoader(ClassLoader parent)
+    {
+        super(new URL[0], parent);
+        domain = null;
+    }
+
     @Override
     public String toString()
     {
