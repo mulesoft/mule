@@ -6,17 +6,21 @@
  */
 package org.mule.module.launcher;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 
 import org.junit.After;
@@ -95,6 +99,32 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
             System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, previousMuleHome);
         }
         FileUtils.deleteTree(tempMuleHome.getRoot());
+    }
+
+    @Test
+    public void leakCleanerIsCreatedByCorrectClassLoaderApp() throws Exception
+    {
+        ensureLeakCleanerIsCreatedByCorrectClassLoader(appCL);
+    }
+
+    @Test
+    public void leakCleanerIsCreatedByCorrectClassLoaderDomain() throws Exception
+    {
+        ensureLeakCleanerIsCreatedByCorrectClassLoader(domainCL);
+    }
+
+    private void ensureLeakCleanerIsCreatedByCorrectClassLoader(AbstractArtifactClassLoader artifactClassLoader) throws Exception
+    {
+        assertThat(artifactClassLoader.getClass().getClassLoader(), is(Thread.currentThread().getContextClassLoader()));
+        artifactClassLoader.setLeakCleanerClassName("TestLeakCleaner.class");
+        artifactClassLoader.dispose();
+
+        // We must call the getClassLoaderClassName method from TestLeakCleaner dynamically in order to not load the
+        // class by the current class loader if not a java.lang.LinkageError is raised.
+        Method getClassLoaderMethod = artifactClassLoader.getLeakCleanerInstance().getClass().getMethod("getClassLoader");
+        ClassLoader classLoader = (ClassLoader) getClassLoaderMethod.invoke(artifactClassLoader.getLeakCleanerInstance());
+
+        assertThat(classLoader, is((ClassLoader) artifactClassLoader));
     }
 
     @Test
