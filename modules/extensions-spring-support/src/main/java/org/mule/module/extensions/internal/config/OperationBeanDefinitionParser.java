@@ -142,7 +142,7 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
         builder.setScope(BeanDefinition.SCOPE_SINGLETON);
 
-        ManagedList<MessageProcessor> processors = (ManagedList<MessageProcessor>) parserContext.getDelegate().parseListElement(element, builder.getBeanDefinition());
+        ManagedList<MessageProcessor> processors = (ManagedList) parserContext.getDelegate().parseListElement(element, builder.getBeanDefinition());
         parserContext.getRegistry().removeBeanDefinition(generateChildBeanName(element));
 
         return processors;
