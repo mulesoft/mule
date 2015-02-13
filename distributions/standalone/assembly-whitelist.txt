@@ -687,7 +687,6 @@
 /mule-standalone-${productVersion}/lib/opt/sxc-core-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-runtime-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/uri-template-0.9.jar
 /mule-standalone-${productVersion}/lib/opt/catalina-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/coyote-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
