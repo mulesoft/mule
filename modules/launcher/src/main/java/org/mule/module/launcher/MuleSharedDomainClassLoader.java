@@ -44,35 +44,7 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
 
             validateAndGetDomainFolders();
 
-            addURL(domainLibraryFolder.getParentFile().toURI().toURL());
-
-            if (domainLibraryFolder.exists())
-            {
-                Collection<File> jars = FileUtils.listFiles(domainLibraryFolder, new String[] {"jar"}, false);
-
-                if (logger.isDebugEnabled())
-                {
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Loading Shared ClassLoader Domain: ").append(domain).append(SystemUtils.LINE_SEPARATOR);
-                        sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-
-                        for (File jar : jars)
-                        {
-                            sb.append(jar.toURI().toURL()).append(SystemUtils.LINE_SEPARATOR);
-                        }
-
-                        sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-
-                        logger.debug(sb.toString());
-                    }
-                }
-
-                for (File jar : jars)
-                {
-                    addURL(jar.toURI().toURL());
-                }
-            }
+            addUrls();
         }
         catch (RuntimeException e)
         {
@@ -126,7 +98,7 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
         return resource;
     }
 
-    private void validateAndGetDomainFolders() throws Exception
+    protected void validateAndGetDomainFolders() throws Exception
     {
         File oldDomainDir = new File(MuleContainerBootstrapUtils.getMuleHome(), OLD_DOMAIN_LIBRARY_FOLDER + File.separator + domain);
         if (oldDomainDir.exists())
@@ -156,6 +128,39 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
         domainDir = newDomainDir;
         domainLibraryFolder = new File(newDomainDir, DOMAIN_LIBRARY_FOLDER);
         logger.info(String.format("Using domain dir %s for domain %s", domainDir.getAbsolutePath(), domain));
+    }
+
+    protected void addUrls() throws MalformedURLException
+    {
+        addURL(domainLibraryFolder.getParentFile().toURI().toURL());
+
+        if (domainLibraryFolder.exists())
+        {
+            Collection<File> jars = FileUtils.listFiles(domainLibraryFolder, new String[] {"jar"}, false);
+
+            if (logger.isDebugEnabled())
+            {
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Loading Shared ClassLoader Domain: ").append(domain).append(SystemUtils.LINE_SEPARATOR);
+                    sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+
+                    for (File jar : jars)
+                    {
+                        sb.append(jar.toURI().toURL()).append(SystemUtils.LINE_SEPARATOR);
+                    }
+
+                    sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+
+                    logger.debug(sb.toString());
+                }
+            }
+
+            for (File jar : jars)
+            {
+                addURL(jar.toURI().toURL());
+            }
+        }
     }
 
     @Override
