@@ -3,7 +3,7 @@
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   name="TestService" targetNamespace="http://consumer.ws.module.mule.org/">
 
-<!--
+    <!--
     This is another WSDL for the TestService, but imports the types from a separate WSDL "TestIncludedTypeDefinitions.wsdl".
     -->
 

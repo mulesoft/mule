@@ -20,9 +20,12 @@ public class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFuncti
         return "included-wsdl-types-config.xml";
     }
 
-    //This test verifies that a no parameter operation is successful having a WSDL definition file that imports
-    //the types from another WSDL file, which includes the schema from yet another XSD file. If the metadata cannot
-    //be generated then the payload would be used as SOAP body and the test would fail.
+    /**
+     * Verifies that a no parameter operation is successful having a WSDL definition file that imports
+     * the types from another WSDL file, which includes the schema from yet another XSD file. If the metadata cannot
+     * be generated then the payload would be used as SOAP body and the test would fail.
+     * @throws Exception
+     */
     @Test
     public void metadataIsGeneratedAndPayloadIsIgnored() throws Exception
     {
