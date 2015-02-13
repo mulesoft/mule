@@ -156,7 +156,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/abdera-server-0.4.0-incubating.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/abdera-spring-0.4.0-incubating.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/activation-1.1-osgi.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/annotations-api-6.0.29.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/annotations-api-6.0.41.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/ant-1.7.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/antlr-3.1.1.jar
@@ -173,7 +173,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/bcprov-ext-jdk16-1.46.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/bcprov-jdk16-1.46.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/bctsp-jdk16-1.46.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/catalina-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cglib-nodep-2.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cometd-api-1.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cometd-server-6.1.26.jar
@@ -187,7 +186,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/commons-lang-2.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/commons-net-2.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/commons-pool-1.5.3.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/coyote-6.0.29.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/coyote-6.0.41.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-api-2.5.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-rt-management-2.5.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-common-utilities-2.5.9.jar
@@ -215,7 +214,8 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-api-5.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-compiler-5.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-core-5.0.1.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/el-api-6.0.29.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/ecj-3.5.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/el-api-6.0.41.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-annotation_1.0_spec-1.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1-osgi.jar
@@ -235,8 +235,8 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-jaxrs-1.9.11.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-xc-1.7.1.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jasper-6.0.29.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jasper-el-6.0.29.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jasper-6.0.41.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jasper-el-6.0.41.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-jdt-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jaxb-api-2.1-osgi.jar
@@ -264,14 +264,14 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/joda-time-1.6.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsch-0.1.50.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jsp-api-6.0.29.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jsp-api-6.0.41.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsr181-api-1.0-MR1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsr250-api-1.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jta-1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/juel-impl-2.2.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jug-2.0.0-asl.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/juli-6.0.29.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/juli-6.0.41.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/msv-core-2011.1.jar
@@ -316,7 +316,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-core-0.7.3-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-runtime-0.7.3-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-xpath-0.7.3-osgi.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/woodstox-core-asl-4.4.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wss4j-1.6.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/xapool-1.5.0-osgi.jar
