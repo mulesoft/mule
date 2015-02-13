@@ -22,7 +22,6 @@ import javax.wsdl.Definition;
 import javax.wsdl.Import;
 import javax.wsdl.Types;
 import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.extensions.schema.SchemaImport;
 import javax.wsdl.extensions.schema.SchemaReference;
 import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap.SOAPBody;
@@ -43,6 +42,7 @@ public class WSDLUtils
 
     private static final String XML_NS_PREFIX = "xmlns:";
     private static final String XML_IMPORT_ELEMENT = "import";
+    private static final String XML_INCLUDE_ELEMENT = "include";
     private static final String XML_SCHEMA_LOCATION_ATTRIBUTE = "schemaLocation";
 
     /**
@@ -83,11 +83,6 @@ public class WSDLUtils
                     fixSchemaLocations(schema);
 
                     schemas.add(schemaToString(schema));
-
-                    for (Object location : schema.getIncludes())
-                    {
-                        schemas.add(schemaToString(((SchemaReference) location).getReferencedSchema()));
-                    }
                 }
             }
         }
@@ -111,29 +106,27 @@ public class WSDLUtils
     private static void fixSchemaLocations(Schema schema)
     {
         String basePath = getBasePath(schema.getDocumentBaseURI());
-        Collection<List<SchemaImport>> schemaImportsCollection = schema.getImports().values();
+        Collection<List<SchemaReference>> schemaImportsCollection = schema.getImports().values();
+        Collection<SchemaReference> schemaIncludesCollection = schema.getIncludes();
 
-        if (!schemaImportsCollection.isEmpty())
+        if (!schemaImportsCollection.isEmpty() || !schemaIncludesCollection.isEmpty())
         {
             // Fix schemaLocation values in POJO
-            for (List<SchemaImport> schemaImports : schemaImportsCollection)
+            //for imports
+            for (List<SchemaReference> schemaReferences : schemaImportsCollection)
             {
-                for (SchemaImport schemaImport : schemaImports)
-                {
-                    String schemaLocationURI = schemaImport.getSchemaLocationURI();
-                    if (schemaLocationURI != null && !schemaLocationURI.startsWith(basePath))
-                    {
-                        schemaImport.setSchemaLocationURI(basePath + schemaLocationURI);
-                    }
-                }
+                fixSchemaReferencesLocations(basePath, schemaReferences);
             }
+            //for includes
+            fixSchemaReferencesLocations(basePath, schemaIncludesCollection);
+
 
             // Fix schemaLocation values in DOM
             NodeList children = schema.getElement().getChildNodes();
             for (int i = 0; i < children.getLength(); i++)
             {
                 Node item = children.item(i);
-                if (XML_IMPORT_ELEMENT.equals(item.getLocalName()))
+                if (XML_IMPORT_ELEMENT.equals(item.getLocalName()) || XML_INCLUDE_ELEMENT.equals(item.getLocalName()))
                 {
                     NamedNodeMap attributes = item.getAttributes();
                     Node namedItem = attributes.getNamedItem(XML_SCHEMA_LOCATION_ATTRIBUTE);
@@ -146,6 +139,18 @@ public class WSDLUtils
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private static void fixSchemaReferencesLocations(String basePath, Collection<SchemaReference> schemaReferences)
+    {
+        for (SchemaReference schemaReference : schemaReferences)
+        {
+            String schemaLocationURI = schemaReference.getSchemaLocationURI();
+            if (schemaLocationURI != null && !schemaLocationURI.startsWith(basePath))
+            {
+                schemaReference.setSchemaLocationURI(basePath + schemaLocationURI);
             }
         }
     }
