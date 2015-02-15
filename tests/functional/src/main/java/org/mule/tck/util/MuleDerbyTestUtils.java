@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -24,31 +23,32 @@ import javax.sql.DataSource;
 
 public class MuleDerbyTestUtils
 {
+
     private static final String DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
     private static final String DERBY_DATASOURCE_CLASS = "org.apache.derby.jdbc.EmbeddedDataSource";
-    
+
     //class cannot be instantiated
     private MuleDerbyTestUtils()
     {
         super();
     }
-    
+
     //by default, set the derby home to the target directory
     public static String setDerbyHome()
     {
         return setDerbyHome("target");
     }
-    
+
     public static String setDerbyHome(String path)
     {
         File derbySystemHome = new File(System.getProperty("user.dir"), path);
-        System.setProperty("derby.system.home",  derbySystemHome.getAbsolutePath());
+        System.setProperty("derby.system.home", derbySystemHome.getAbsolutePath());
         return derbySystemHome.getAbsolutePath();
     }
-    
+
     /**
      * Properly shutdown an embedded Derby database
-     * 
+     *
      * @throws SQLException
      * @see <h href="http://db.apache.org/derby/docs/10.3/devguide/tdevdvlp20349.html">Derby docs</a>
      */
@@ -56,54 +56,66 @@ public class MuleDerbyTestUtils
     {
         try
         {
-            // force loading the driver so it's available even if no prior connection to the
-            // database was made
-            ClassUtils.instanciateClass(DERBY_DRIVER_CLASS);
-
-            DriverManager.getConnection("jdbc:derby:;shutdown=true");
-        }
-        catch (SQLException sqlex)
-        {
-            // this exception is documented to be thrown upon shutdown
-            if (!"XJ015".equals(sqlex.getSQLState()))
-            {
-                throw sqlex;
-            }
+            loadDriverAndExecuteConnection("jdbc:derby:;shutdown=true", null);
         }
         catch (Exception ex)
         {
-            // this can only happen when the driver class is not in classpath. In this case, just
-            // throw up
-            throw new RuntimeException(ex);
+            // XJ015 Error is documented to be thrown upon shutdown
+            if (!isXJ015Error(ex))
+            {
+                if (ex instanceof SQLException)
+                {
+                    throw (SQLException) ex;
+                }
+                throw new RuntimeException(ex);
+            }
         }
     }
-    
+
+    private static boolean isXJ015Error(Throwable exception)
+    {
+        while (exception != null)
+        {
+            if (exception instanceof SQLException && "XJ015".equals(((SQLException) exception).getSQLState()))
+            {
+                return true;
+            }
+            exception = exception != exception.getCause() ? exception.getCause() : null;
+        }
+        return false;
+    }
+
     public static void cleanupDerbyDb(String databaseName) throws IOException, SQLException
     {
         cleanupDerbyDb(setDerbyHome(), databaseName);
     }
-    
+
     public static void cleanupDerbyDb(String derbySystemHome, String databaseName) throws IOException, SQLException
     {
         stopDatabase();
         FileUtils.deleteTree(new File(derbySystemHome + File.separator + databaseName));
     }
-    
-    /** 
-     * Start a previously created (and stopped) database 
+
+    /**
+     * Start a previously created (and stopped) database
      */
     public static void startDataBase(String databaseName) throws Exception
+    {
+        loadDriverAndExecuteConnection("jdbc:derby:" + databaseName, null);
+    }
+
+    private static void loadDriverAndExecuteConnection(String connectionName, Properties properties) throws Exception
     {
         Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS);
 
         Method connectMethod = derbyDriver.getClass().getMethod("connect", String.class, Properties.class);
 
-        String connectionName = "jdbc:derby:" + databaseName;
-        connectMethod.invoke(derbyDriver, connectionName, null);
+        connectMethod.invoke(derbyDriver, connectionName, properties);
     }
 
     /**
      * Create a new embedded database
+     *
      * @param databaseName
      * @throws SQLException
      */
@@ -114,30 +126,33 @@ public class MuleDerbyTestUtils
 
     /**
      * Create a new embedded database
+     *
      * @param databaseName
-     * @param creationSql - SQL used to create and populate initial database tables
+     * @param creationSql  - SQL used to create and populate initial database tables
      * @throws SQLException
      */
     public static void createDataBase(String databaseName, String creationSql) throws SQLException
     {
-        createDataBase(databaseName, new String[] { creationSql } );
+        createDataBase(databaseName, new String[] {creationSql});
     }
-    
+
     /**
      * Create a new embedded database
+     *
      * @param databaseName
-     * @param creationSql - SQL used to create and populate initial database tables
+     * @param creationSql  - SQL used to create and populate initial database tables
      * @throws SQLException
      */
     public static void createDataBase(String databaseName, String[] creationSql) throws SQLException
     {
         createDataBase(databaseName, creationSql, null);
     }
-    
+
     /**
      * Create a new embedded database
+     *
      * @param databaseName
-     * @param creationSql - SQL used to create and populate initial database tables
+     * @param creationSql  - SQL used to create and populate initial database tables
      * @throws SQLException
      */
     public static void createDataBase(String databaseName, String[] creationSql, Properties properties) throws SQLException
@@ -146,14 +161,7 @@ public class MuleDerbyTestUtils
         // on derby.jar
         try
         {
-            String connectionName = "jdbc:derby:" + databaseName + ";create=true";
-            /*
-             * EmbeddedDriver derbyDriver = new EmbeddedDriver();
-             * derbyDriver.connect(connectionName, null);
-             */
-            Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS);
-            Method connectMethod = derbyDriver.getClass().getMethod("connect", String.class, Properties.class);
-            connectMethod.invoke(derbyDriver, connectionName, properties);
+            loadDriverAndExecuteConnection("jdbc:derby:" + databaseName + ";create=true", properties);
 
             if (creationSql != null)
             {
@@ -190,7 +198,7 @@ public class MuleDerbyTestUtils
             throw new RuntimeException("Error creating the database " + databaseName, ex);
         }
     }
-    
+
     public static String loadDatabaseName(String propertiesLocation, String propertyName) throws IOException
     {
         Properties derbyProperties = new Properties();
