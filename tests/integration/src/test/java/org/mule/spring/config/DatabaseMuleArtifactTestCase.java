@@ -9,8 +9,11 @@ package org.mule.spring.config;
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.tck.util.MuleDerbyTestDatabase;
+import org.mule.util.ClassUtils;
 
 import java.io.IOException;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +26,7 @@ import org.xml.sax.SAXException;
 
 public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFactoryTestCase
 {
+
     protected static final String TRANSFORMER1 = "<object-to-string-transformer name=\"tx1\" xmlns=\"http://www.mulesoft.org/schema/mule/core\"/>";
     protected static final String TRANSFORMER2 = "<object-to-string-transformer name=\"tx2\" xmlns=\"http://www.mulesoft.org/schema/mule/core\"/>";
     protected static final String HSQL_DATASOURCE = "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.commons.dbcp.BasicDataSource\" destroy-method=\"close\" id=\"hsqlDatasource\">"
@@ -53,7 +57,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
 
     protected static class DatabaseConfigurationCallback extends MapXmlConfigurationCallback
     {
-        private static Map<String,String> SCHEMA_MAP = new HashMap<String, String>();
+
+        private static Map<String, String> SCHEMA_MAP = new HashMap<String, String>();
+
         static
         {
             SCHEMA_MAP.put("http://www.springframework.org/schema/jdbc", "http://www.springframework.org/schema/jdbc/spring-jdbc.xsd");
@@ -115,8 +121,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     }
 
     @Test
-    public void verifiesH2() throws SAXException, IOException, MuleArtifactFactoryException
+    public void verifiesH2() throws Exception
     {
+        loadDriver("org.h2.Driver");
         String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"h2Datasource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
         Document document = XMLUnit.buildControlDocument(config);
 
@@ -129,8 +136,7 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
                 + "      <spring:property name=\"password\" value=\"password\"/>"
                 + "    </spring:bean>"
                 + "  </spring:constructor-arg>"
-                + "</spring:bean>"
-                ;
+                + "</spring:bean>";
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("h2Datasource", refDef));
         doTest(document, callback);
 
@@ -157,8 +163,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     }
 
     @Test
-    public void verifiesHsql() throws SAXException, IOException, MuleArtifactFactoryException
+    public void verifiesHsql() throws Exception
     {
+        loadDriver("org.hsqldb.jdbcDriver");
         Document document = XMLUnit.buildControlDocument(HSQL_CONNECTOR);
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("hsqlDatasource", HSQL_DATASOURCE));
         doTest(document, callback);
@@ -180,8 +187,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     }
 
     @Test
-    public void verifiesOneTransformerRef() throws SAXException, IOException, MuleArtifactFactoryException
+    public void verifiesOneTransformerRef() throws Exception
     {
+        loadDriver("org.hsqldb.jdbcDriver");
         String endpoint = "<jdbc:inbound-endpoint queryKey=\"q\" transformer-refs=\"tx1\" exchange-pattern=\"one-way\" queryTimeout=\"-1\" pollingFrequency=\"1000\" connector-ref=\"jdbcConnector\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"><jdbc:query key=\"q\" value=\"select * from dual\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/></jdbc:inbound-endpoint>";
 
         Document document = XMLUnit.buildControlDocument(endpoint);
@@ -195,8 +203,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     }
 
     @Test
-    public void verifiesMultipleTransformerRefWithSpaceToken() throws SAXException, IOException, MuleArtifactFactoryException
+    public void verifiesMultipleTransformerRefWithSpaceToken() throws Exception
     {
+        loadDriver("org.hsqldb.jdbcDriver");
         String endpoint = "<jdbc:inbound-endpoint queryKey=\"q\" transformer-refs=\"tx1 tx2\" exchange-pattern=\"one-way\" queryTimeout=\"-1\" pollingFrequency=\"1000\" connector-ref=\"jdbcConnector\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"><jdbc:query key=\"q\" value=\"select * from dual\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/></jdbc:inbound-endpoint>";
 
         Document document = XMLUnit.buildControlDocument(endpoint);
@@ -240,5 +249,10 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
         callbackData.put("tx2", TRANSFORMER2);
 
         doTestMessageProcessorArtifactRetrieval(document, new DatabaseConfigurationCallback(callbackData));
+    }
+
+    private void loadDriver(String driverClass) throws Exception
+    {
+        DriverManager.registerDriver((Driver) ClassUtils.instanciateClass(driverClass));
     }
 }
