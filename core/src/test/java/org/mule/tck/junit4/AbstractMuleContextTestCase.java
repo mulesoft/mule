@@ -403,7 +403,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected MuleMessage getTestMuleMessage()
     {
-        return new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
+        return getTestMuleMessage(TEST_PAYLOAD);
     }
 
     /**
