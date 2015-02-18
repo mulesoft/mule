@@ -153,6 +153,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="connectionTimeout" type="mule:substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Number of milliseconds to wait until an outbound connection to a remote server is successfully created. No timeout is configured by default.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="addressAttributes">
