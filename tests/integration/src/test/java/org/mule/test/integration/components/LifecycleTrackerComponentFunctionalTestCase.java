@@ -8,8 +8,6 @@ package org.mule.test.integration.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.lifecycle.AbstractLifecycleTracker;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -202,7 +200,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     {
         MuleClient client = muleContext.getClient();
         final AbstractLifecycleTracker ltc = (AbstractLifecycleTracker) client.send(
-            "vm://" + serviceName + ".In", new DefaultMuleMessage(NullPayload.getInstance(), muleContext)).getPayload();
+            "vm://" + serviceName + ".In", getTestMuleMessage(NullPayload.getInstance())).getPayload();
 
         assertNotNull(ltc);
 

@@ -8,8 +8,6 @@ package org.mule.transport.jms.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
@@ -27,7 +25,7 @@ public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCa
     public void testOutboundJmsTransaction() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.send("vm://in", new DefaultMuleMessage(DEFAULT_INPUT_MESSAGE, muleContext));
+        client.send("vm://in", getTestMuleMessage(DEFAULT_INPUT_MESSAGE));
 
         MuleMessage response = client.request("vm://out", getTimeout());
         assertNotNull(response);

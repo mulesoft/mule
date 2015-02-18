@@ -13,7 +13,6 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.cxf.wssec.ClientPasswordCallback;
@@ -83,6 +82,6 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalT
 
     protected MuleMessage sendRequest(String url,String payload) throws MuleException
     {
-        return muleContext.getClient().send(url, new DefaultMuleMessage(payload, muleContext), HTTP_REQUEST_OPTIONS);
+        return muleContext.getClient().send(url, getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
     }
 }

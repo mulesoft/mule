@@ -8,8 +8,6 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -53,7 +51,7 @@ public class CustomFilterMule2437TestCase extends AbstractServiceAndFlowTestCase
     protected void doTest(String message, String destination) throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in", new DefaultMuleMessage(message, muleContext));
+        client.dispatch("vm://in", getTestMuleMessage(message));
         MuleMessage response = client.request(destination, TIMEOUT);
         assertNotNull(response);
         assertEquals(message, response.getPayloadAsString());

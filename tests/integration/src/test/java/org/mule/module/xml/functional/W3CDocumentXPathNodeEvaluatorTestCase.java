@@ -6,7 +6,8 @@
  */
 package org.mule.module.xml.functional;
 
-import org.mule.DefaultMuleMessage;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -17,9 +18,6 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Node;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -51,7 +49,7 @@ public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlo
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage message = new DefaultMuleMessage(XML_INPUT, muleContext);
+        MuleMessage message = getTestMuleMessage(XML_INPUT);
         MuleMessage response = client.send("vm://test", message);
         assertNotNull(response);
         assertNotNull(response.getPayload());

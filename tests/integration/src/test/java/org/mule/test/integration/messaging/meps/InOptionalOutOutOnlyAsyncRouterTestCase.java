@@ -9,8 +9,6 @@ package org.mule.test.integration.messaging.meps;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
@@ -52,7 +50,7 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractServiceAndF
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNull(result);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("some data", muleContext);
+        MuleMessage msg = getTestMuleMessage("some data");
         msg.setOutboundProperty("foo", "bar");
         result = client.send("inboundEndpoint", msg);
         assertNotNull(result);

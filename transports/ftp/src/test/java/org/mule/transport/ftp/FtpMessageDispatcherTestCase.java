@@ -6,7 +6,7 @@
  */
 package org.mule.transport.ftp;
 
-import org.mule.DefaultMuleMessage;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEvent;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.OutputHandler;
@@ -15,7 +15,6 @@ import org.mule.util.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertTrue;
 
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
 {
@@ -48,7 +45,7 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
     public void dispatch() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch(getMuleFtpEndpoint(), new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+        client.dispatch(getMuleFtpEndpoint(), getTestMuleMessage(TEST_MESSAGE));
 
         // check that the message arrived on the FTP server
         assertTrue(latch.await(getTimeout(), TimeUnit.MILLISECONDS));
@@ -77,7 +74,7 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
                 }
             }
         };
-        client.dispatch(getMuleFtpEndpoint(), new DefaultMuleMessage(oh, muleContext));
+        client.dispatch(getMuleFtpEndpoint(), getTestMuleMessage(oh));
 
         // check that the message arrived on the FTP server
         assertTrue(latch.await(getTimeout(), TimeUnit.MILLISECONDS));
@@ -97,7 +94,7 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
 
         MuleClient client = muleContext.getClient();
         String path = getMuleFtpEndpoint() + "/" + dirName;
-        client.dispatch(path, new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+        client.dispatch(path, getTestMuleMessage(TEST_MESSAGE));
 
         // check that the message arrived on the FTP server
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -149,7 +148,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy", new DefaultMuleMessage(requestPayload, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy", getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertEquals(String.valueOf(HttpConstants.SC_OK), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString());
         assertTrue(resString.contains("Anonymous"));

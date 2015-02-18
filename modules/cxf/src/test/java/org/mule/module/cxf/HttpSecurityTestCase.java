@@ -11,7 +11,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeThat;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -104,7 +103,7 @@ public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("cxf:http://admin:admin@localhost:" + dynamicPort1.getNumber() + "/services/Echo?method=echo", new DefaultMuleMessage("Hello", muleContext));
+        MuleMessage result = client.send("cxf:http://admin:admin@localhost:" + dynamicPort1.getNumber() + "/services/Echo?method=echo", getTestMuleMessage("Hello"));
 
         final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);

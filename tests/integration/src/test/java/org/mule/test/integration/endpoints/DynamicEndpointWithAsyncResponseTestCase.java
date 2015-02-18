@@ -6,7 +6,8 @@
  */
 package org.mule.test.integration.endpoints;
 
-import org.mule.DefaultMuleMessage;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -18,9 +19,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class DynamicEndpointWithAsyncResponseTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -44,7 +42,7 @@ public class DynamicEndpointWithAsyncResponseTestCase extends AbstractServiceAnd
     @Test
     public void testDynamicEndpointWithAsyncResponse() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("hello", muleContext);
+        MuleMessage message = getTestMuleMessage("hello");
         message.setOutboundProperty("host", "localhost");
         message.setOutboundProperty("port", port1.getNumber());
         message.setOutboundProperty("path", "/TEST");

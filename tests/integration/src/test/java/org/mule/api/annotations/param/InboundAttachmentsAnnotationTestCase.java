@@ -11,8 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.expression.RequiredValueException;
@@ -78,7 +76,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
             attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
             attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
         }
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         for (Map.Entry<String, DataHandler> attachment : attachments.entrySet())
         {
             message.addOutboundAttachment(attachment.getKey(), attachment.getValue());

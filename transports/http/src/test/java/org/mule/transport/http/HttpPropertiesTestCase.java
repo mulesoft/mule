@@ -8,11 +8,9 @@ package org.mule.transport.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.config.spring.DefaultMuleArtifact;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -62,7 +60,7 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
     public void testRedirectionWithRelativeProperty() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/redirect/products?retrieve=all&order=desc", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/redirect/products?retrieve=all&order=desc", getTestMuleMessage(TEST_MESSAGE));
         assertEquals("Successfully redirected: products?retrieve=all&order=desc", response.getPayloadAsString());
     }
 }

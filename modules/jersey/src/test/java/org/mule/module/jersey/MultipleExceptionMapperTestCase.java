@@ -9,8 +9,6 @@ package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.http.api.client.HttpRequestOptions;
@@ -59,7 +57,7 @@ public class MultipleExceptionMapperTestCase extends org.mule.tck.junit4.Functio
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwBadRequestException", new DefaultMuleMessage(TEST_MESSAGE, muleContext), getHttpOptions());
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwBadRequestException", getTestMuleMessage(), getHttpOptions());
 
         assertEquals((Integer) HttpConstants.SC_BAD_REQUEST, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
@@ -75,7 +73,7 @@ public class MultipleExceptionMapperTestCase extends org.mule.tck.junit4.Functio
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwException", new DefaultMuleMessage(TEST_MESSAGE, muleContext), getHttpOptions());
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwException", getTestMuleMessage(), getHttpOptions());
 
         assertEquals((Integer) HttpConstants.SC_SERVICE_UNAVAILABLE, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }

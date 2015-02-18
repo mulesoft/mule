@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.mule.module.http.internal.listener.NoListenerRequestHandler.RESOURCE_NOT_FOUND;
 import static org.mule.module.http.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
@@ -127,7 +126,7 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
 
     private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception
     {
-        MuleMessage response = muleContext.getClient().send(url, new DefaultMuleMessage("", muleContext), GET_OPTIONS);
+        MuleMessage response = muleContext.getClient().send(url, getTestMuleMessage(), GET_OPTIONS);
         assertThat((Integer) response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), is(expectedStatus));
         return IOUtils.toString((InputStream) response.getPayload());
     }
