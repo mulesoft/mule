@@ -9,7 +9,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -129,7 +128,7 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
     {
         MuleMessage response = muleContext.getClient().send(
                 String.format("http://localhost:%d/services/%s", dynamicPort.getNumber(), path),
-                new DefaultMuleMessage(getRequestPayload(soapMethod), muleContext), HTTP_REQUEST_OPTIONS);
+                getTestMuleMessage(getRequestPayload(soapMethod)), HTTP_REQUEST_OPTIONS);
         assertFault(faultTemplate, response.getPayloadAsString(), faultMessage);
 
     }

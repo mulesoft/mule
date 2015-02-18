@@ -17,7 +17,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.internal.HttpParser;
@@ -99,7 +98,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
                 .tlsContextFactory(createClientTlsContextFactory())
                 .build();
 
-        muleContext.getClient().send(localAuthorizationUrl.getValue(), new DefaultMuleMessage(NullPayload.getInstance(), muleContext), options);
+        muleContext.getClient().send(localAuthorizationUrl.getValue(), getTestMuleMessage(NullPayload.getInstance()), options);
 
         final List<LoggedRequest> requests = findAll(getRequestedFor(urlMatching(AUTHORIZE_PATH + ".*")));
         assertThat(requests.size(), is(1));
@@ -137,7 +136,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
                 .put(OAuthConstants.STATE_PARAMETER, state.getValue()).build();
 
         muleContext.getClient().send(redirectUrl.getValue() + "?" + HttpParser.encodeQueryString(redirectUrlQueryParams),
-                new DefaultMuleMessage(NullPayload.getInstance(), muleContext), newOptions().tlsContextFactory(createClientTlsContextFactory()).build());
+                getTestMuleMessage(NullPayload.getInstance()), newOptions().tlsContextFactory(createClientTlsContextFactory()).build());
 
         verifyRequestDoneToTokenUrlForAuthorizationCode();
 

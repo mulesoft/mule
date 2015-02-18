@@ -8,11 +8,8 @@ package org.mule.test.integration.transport.cxf;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.http.HttpConstants;
 
@@ -54,7 +51,7 @@ public class CxfEnvelopePayloadWithWsdlTestCase extends AbstractServiceAndFlowTe
     public void testEnvelopePayloadIsProcessedWhenMessageAndWsdlContainsHeaders() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:28182/ScratchCardServiceV1", new DefaultMuleMessage(msg, muleContext), newOptions().disableStatusCodeValidation().method(HttpConstants.METHOD_POST).build());
+        MuleMessage result = client.send("http://localhost:28182/ScratchCardServiceV1", getTestMuleMessage(msg), newOptions().disableStatusCodeValidation().method(HttpConstants.METHOD_POST).build());
         assertNotNull("The result shouln't have been null", result);
 
         final String payloadAsString = result.getPayloadAsString();

@@ -163,7 +163,7 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
                 latch.countDown();
             }
         });
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy", new DefaultMuleMessage(requestPayload, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy", getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
 

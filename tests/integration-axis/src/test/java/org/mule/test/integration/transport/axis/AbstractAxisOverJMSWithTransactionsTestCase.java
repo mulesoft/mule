@@ -8,8 +8,6 @@ package org.mule.test.integration.transport.axis;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.Connector;
@@ -43,9 +41,9 @@ public abstract class AbstractAxisOverJMSWithTransactionsTestCase extends Functi
     public void testTransactionsOverAxis() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("axis:jms://TestComponent?method=echo", new DefaultMuleMessage("test", muleContext));
+        client.dispatch("axis:jms://TestComponent?method=echo", getTestMuleMessage());
         MuleMessage message = client.request("jms://testout", 5000);
         assertNotNull(message.getPayload());
-        assertTrue(message.getPayloadAsString().equals("test"));
+        assertTrue(message.getPayloadAsString().equals(TEST_PAYLOAD));
     }
 }

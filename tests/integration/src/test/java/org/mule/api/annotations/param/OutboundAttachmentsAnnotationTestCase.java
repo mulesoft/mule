@@ -9,8 +9,6 @@ package org.mule.api.annotations.param;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -46,7 +44,7 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlo
     public void testProcessAttachment() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://attachment", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage message = client.send("vm://attachment", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<String, DataHandler> result = getMapPayload(message);
@@ -57,7 +55,7 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlo
     public void testProcessAttachmentWithExistingOutAttachments() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://attachment2", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage message = client.send("vm://attachment2", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<String, DataHandler> result = getMapPayload(message);
@@ -69,7 +67,7 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlo
     public void testInvalidParamType() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://invalid", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage message = client.send("vm://invalid", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(IllegalArgumentException.class,

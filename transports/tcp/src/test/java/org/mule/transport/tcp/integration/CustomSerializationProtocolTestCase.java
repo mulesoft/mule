@@ -8,8 +8,6 @@ package org.mule.transport.tcp.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -54,7 +52,7 @@ public class CustomSerializationProtocolTestCase extends AbstractServiceAndFlowT
 
         for (int i = 0; i < messages; i++)
         {
-            client.dispatch("vm://in", new DefaultMuleMessage(message, muleContext));
+            client.dispatch("vm://in", getTestMuleMessage(message));
         }
 
         for (int i = 0; i < messages; i++)

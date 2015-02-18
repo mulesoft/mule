@@ -7,7 +7,6 @@
 package org.mule.properties;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
 import org.mule.tck.functional.FlowAssert;
@@ -80,7 +79,7 @@ public class MessagePropertyTransformerTestCase extends FunctionalTestCase
 
     public void runScenario(String flowName) throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
+        MuleMessage message = getTestMuleMessage("data");
         DefaultMuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
         Flow flow = (Flow) getFlowConstruct(flowName);
         flow.process(event);

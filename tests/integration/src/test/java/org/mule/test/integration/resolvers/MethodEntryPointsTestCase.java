@@ -9,8 +9,6 @@ package org.mule.test.integration.resolvers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -72,7 +70,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     public void testValidCallToReverse() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
+        MuleMessage msg = getTestMuleMessage("hello");
         msg.setOutboundProperty("method", "reverseString");
         MuleMessage message = client.send("vm://service", msg);
         assertNotNull(message);
@@ -83,7 +81,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     public void testValidCallToUpperCase() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
+        MuleMessage msg = getTestMuleMessage("hello");
         msg.setOutboundProperty("method", "upperCaseString");
         MuleMessage message = client.send("vm://service", msg);
         assertNotNull(message);

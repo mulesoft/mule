@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.transport.http.HttpConstants.SC_OK;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.HttpConstants;
@@ -65,7 +64,7 @@ public class ContextResolverTestCase extends FunctionalTestCase
 
         for (int i = 0; i < COUNT; i++)
         {
-            MuleMessage result = client.send(url, new DefaultMuleMessage("", muleContext), httpPostRequestOptions);
+            MuleMessage result = client.send(url, getTestMuleMessage(), httpPostRequestOptions);
             assertThat(result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0), is(SC_OK));
             assertThat(result.getPayloadAsString(), is(String.format(MASK, i)));
         }

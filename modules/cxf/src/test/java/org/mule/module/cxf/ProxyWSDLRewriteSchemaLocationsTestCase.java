@@ -10,7 +10,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
@@ -94,7 +93,7 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase
     public void testProxyWSDLRewriteAllSchemaLocations() throws Exception
     {
         String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", getTestMuleMessage(NullPayload.getInstance()), HTTP_REQUEST_OPTIONS);
 
         Set<String> expectedParametersValues = new HashSet<String>();
         expectedParametersValues.addAll(Arrays.asList("xsd=xsd0"));
