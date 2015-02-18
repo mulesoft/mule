@@ -104,7 +104,7 @@ public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         String message = LocaleMessageHandler.getString("test-data",
             Locale.JAPAN, "CxfBasicTestCase.testEchoServiceEncoding", new Object[]{});
-        MuleMessage result = client.send("cxf:http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?method=echo", new DefaultMuleMessage(message, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("cxf:http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?method=echo", getTestMuleMessage(message), HTTP_REQUEST_OPTIONS);
         String ct = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
 
         assertEquals(message, result.getPayloadAsString());
@@ -115,7 +115,7 @@ public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
     public void testEchoWsdl() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", new DefaultMuleMessage(null, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", getTestMuleMessage(null), HTTP_REQUEST_OPTIONS);
         assertNotNull(result.getPayload());
         XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
     }

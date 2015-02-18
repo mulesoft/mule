@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
@@ -68,7 +67,7 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testFilterOnce() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE);
         msg.setOutboundProperty("pass", "true");
 
         MuleClient client = muleContext.getClient();
@@ -93,7 +92,7 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testWrongPropertyKey() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE);
         msg.setProperty("fail", "true", PropertyScope.INVOCATION);
 
         MuleClient client = muleContext.getClient();
@@ -112,8 +111,8 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testWrongPropertyValue() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        msg.setInboundProperty("pass", "false");
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE);
+        msg.setProperty("pass", "false", PropertyScope.INBOUND);
 
         MuleClient client = muleContext.getClient();
         client.send("vm://async", msg);
@@ -131,7 +130,7 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testNoProperty() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE);
 
         MuleClient client = muleContext.getClient();
         client.send("vm://async", msg);

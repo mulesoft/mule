@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -166,19 +165,19 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
 
     private MuleMessage executeSoap11Call(String msgString, String soapAction) throws MuleException
     {
-        MuleMessage msg = new DefaultMuleMessage(msgString, muleContext);
+        MuleMessage msg = getTestMuleMessage(msgString);
         msg.setProperty("soapAction", soapAction, PropertyScope.OUTBOUND);
 
-        return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+        return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg, HTTP_REQUEST_OPTIONS);
     }
 
     private MuleMessage executeSoap12Call(String msgString, String soapAction) throws MuleException
     {
-        MuleMessage msg = new DefaultMuleMessage(msgString, muleContext);
+        MuleMessage msg = getTestMuleMessage(msgString);
         String contentType = "application/soap+xml;charset=UTF-8;action=\"" + soapAction + "\"";
         msg.setProperty("Content-Type", contentType, PropertyScope.OUTBOUND);
 
-        return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+        return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg, HTTP_REQUEST_OPTIONS);
     }
 }
 

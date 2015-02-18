@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.message;
 
-import org.mule.DefaultMuleMessage;
+import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -14,8 +14,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractPropertyScopeTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -31,7 +29,7 @@ public abstract class AbstractPropertyScopeTestCase extends AbstractServiceAndFl
     public void testRequestResponse() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "fooValue");
 
         MuleMessage result = client.send("inbound", message);

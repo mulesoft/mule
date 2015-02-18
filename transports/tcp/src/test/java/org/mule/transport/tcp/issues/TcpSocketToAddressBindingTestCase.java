@@ -8,8 +8,6 @@ package org.mule.transport.tcp.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
@@ -95,7 +93,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
         {
             /* Request not using loopback address to endpoint listening at all local addresses should get an
              * appropriate response. */
-            result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort3.getNumber(), new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+            result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort3.getNumber(), getTestMuleMessage(TEST_MESSAGE));
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
     }

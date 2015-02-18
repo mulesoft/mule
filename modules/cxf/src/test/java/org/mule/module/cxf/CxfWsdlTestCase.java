@@ -7,9 +7,7 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -34,7 +32,7 @@ public class CxfWsdlTestCase extends AbstractMuleContextTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage message = new DefaultMuleMessage("test1", muleContext);
+        MuleMessage message = getTestMuleMessage("test1");
         MuleMessage reply = client.send(TEST_URL, message);
         assertNotNull(reply);
 
@@ -59,7 +57,7 @@ public class CxfWsdlTestCase extends AbstractMuleContextTestCase
         OutboundEndpoint endpoint =
             muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
 
-        MuleMessage message = new DefaultMuleMessage("test1", muleContext);
+        MuleMessage message = getTestMuleMessage("test1");
         MuleEvent event = new DefaultMuleEvent(message, endpoint.getExchangePattern(),(FlowConstruct) null);
         MuleMessage reply = endpoint.process(event).getMessage();
 

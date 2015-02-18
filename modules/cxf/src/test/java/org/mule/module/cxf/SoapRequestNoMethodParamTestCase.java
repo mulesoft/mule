@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -52,7 +51,7 @@ public class SoapRequestNoMethodParamTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testCXFSoapRequest() throws Exception
     {
-        MuleMessage msg = muleContext.getClient().send("http://localhost:" + port1.getValue() + "/services/TestComponent", new DefaultMuleMessage(request, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage msg = muleContext.getClient().send("http://localhost:" + port1.getValue() + "/services/TestComponent", getTestMuleMessage(request), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(msg);
         assertNotNull(msg.getPayload());

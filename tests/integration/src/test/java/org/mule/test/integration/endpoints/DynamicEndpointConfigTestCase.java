@@ -9,8 +9,6 @@ package org.mule.test.integration.endpoints;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -49,7 +47,7 @@ public class DynamicEndpointConfigTestCase extends AbstractServiceAndFlowTestCas
     @Test
     public void testName() throws Exception
     {
-        MuleMessage msg = new DefaultMuleMessage("Data", muleContext);
+        MuleMessage msg = getTestMuleMessage("Data");
         msg.setOutboundProperty("testProp", "testPath");
         MuleMessage response = muleContext.getClient().send("vm://in1", msg);
         assertNotNull(response);

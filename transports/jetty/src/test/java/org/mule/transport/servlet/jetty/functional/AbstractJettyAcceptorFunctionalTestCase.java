@@ -12,8 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -110,7 +108,7 @@ public abstract class AbstractJettyAcceptorFunctionalTestCase extends Functional
     protected void assertRequest(final Protocol protocol) throws Exception
     {
         final MuleClient client = muleContext.getClient();
-        final MuleMessage message = client.send(String.format("%s://localhost:%s", protocol, port1.getNumber()), new DefaultMuleMessage(TEST_MESSAGE, muleContext), newOptions().method(POST.name()).build());
+        final MuleMessage message = client.send(String.format("%s://localhost:%s", protocol, port1.getNumber()), getTestMuleMessage(TEST_MESSAGE), newOptions().method(POST.name()).build());
         assertEquals(200, message.getInboundProperty("http.status"));
         assertEquals(TEST_MESSAGE + " received", message.getPayloadAsString());
     }

@@ -7,7 +7,6 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -86,7 +85,7 @@ public class ServletTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT + getContextPath()
-                                         + "/services/mycomponent", new DefaultMuleMessage(request, muleContext));
+                                         + "/services/mycomponent", getTestMuleMessage(request));
         String res = result.getPayloadAsString();
 
         assertTrue(res.indexOf("Test String") != -1);
