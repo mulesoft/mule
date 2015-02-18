@@ -7,8 +7,6 @@
 package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -40,7 +38,7 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
         RootIDGatherer.initialize();
         MuleClient client = muleContext.getClient();
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("Hello", muleContext);
+        MuleMessage msg = getTestMuleMessage("Hello");
         msg.setOutboundProperty("where", "client");
         RootIDGatherer.process(msg);
         client.send("vm://vmin", msg);

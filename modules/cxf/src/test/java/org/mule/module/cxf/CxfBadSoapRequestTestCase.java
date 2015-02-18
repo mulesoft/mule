@@ -9,7 +9,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.client.HttpRequestOptions;
@@ -63,8 +62,8 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
                              + "</ssss>"
                              + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent", new DefaultMuleMessage(
-            soapRequest, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent", getTestMuleMessage(
+            soapRequest), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

@@ -9,8 +9,6 @@ package org.mule.transport.soap.axis.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -60,7 +58,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/EchoService1?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage result = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/EchoService1?wsdl", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -88,7 +86,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort2.getNumber() + "/services/EchoService2?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage result = client.send("http://localhost:" + dynamicPort2.getNumber() + "/services/EchoService2?wsdl", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -111,7 +109,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort3.getNumber() + "/services/EchoService3?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage result = client.send("http://localhost:" + dynamicPort3.getNumber() + "/services/EchoService3?wsdl", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);

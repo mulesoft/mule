@@ -7,7 +7,6 @@
 package org.mule.test.integration.message;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;

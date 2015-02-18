@@ -9,8 +9,6 @@ package org.mule.test.integration.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
@@ -44,7 +42,7 @@ public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowT
     @Test
     public void testAggregatorWithNoTimeout() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://distributor.queue", message);
 

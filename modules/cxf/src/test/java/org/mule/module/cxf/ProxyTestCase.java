@@ -101,7 +101,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     public void testServerWithEcho() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
     }
@@ -113,7 +113,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
                      + "<soap:Body> <foo xmlns=\"http://foo\"></foo>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
 
         assertTrue(resString.indexOf("<foo xmlns=\"http://foo\"") != -1);
@@ -143,7 +143,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     public void doTestProxyValidation(String url) throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send(url, new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send(url, getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("Schema validation error on message") != -1);
 
@@ -155,7 +155,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
                     "</echo>"
             + "</soap:Body>"
             + "</soap:Envelope>";
-        result = client.send(url, new DefaultMuleMessage(valid, muleContext), HTTP_REQUEST_OPTIONS);
+        result = client.send(url, getTestMuleMessage(valid), HTTP_REQUEST_OPTIONS);
         resString = result.getPayloadAsString();
         assertTrue(resString.contains("<echoResponse xmlns=\"http://www.muleumo.org\">"));
     }
@@ -178,7 +178,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
-                                         + "/services/proxyWithWsdl", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+                                         + "/services/proxyWithWsdl", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
@@ -203,7 +203,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
-                                         + "/services/proxyWithWsdl2", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+                                         + "/services/proxyWithWsdl2", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
@@ -217,7 +217,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
-                                         + "/services/proxyWithTransform", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+                                         + "/services/proxyWithTransform", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         System.out.println(resString);
         assertTrue(resString.indexOf("<transformed xmlns=\"http://foo\">") != -1);
@@ -232,7 +232,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
-                                         + "/services/greeter-databinding-proxy", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+                                         + "/services/greeter-databinding-proxy", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("greetMeResponse") != -1);
     }
@@ -246,7 +246,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
-                                         + "/services/greeter-proxy", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+                                         + "/services/greeter-proxy", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
 
         assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
@@ -264,7 +264,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
-                                         + "/services/transform-proxy", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+                                         + "/services/transform-proxy", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("greetMeResponse") != -1);
     }
@@ -498,7 +498,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
-                                         + "/services/envelope-proxy", new DefaultMuleMessage(msgWithComment, muleContext), HTTP_REQUEST_OPTIONS);
+                                         + "/services/envelope-proxy", getTestMuleMessage(msgWithComment), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains(doGoogleSearch));
     }
@@ -514,7 +514,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
-                                         + "/services/envelope-xslt-proxy", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+                                         + "/services/envelope-xslt-proxy", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         assertTrue(result.getPayloadAsString().contains(msg));
     }
 
@@ -540,7 +540,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
                    "</soapenv:Envelope>";
 
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService", new DefaultMuleMessage(msg, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         assertNotNull(result);
         assertTrue(result.getPayloadAsString().contains("![CDATA["));
     }
@@ -556,7 +556,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
                                + "</soap:Body>" + "</soap:Envelope>";
 
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyFault",
-            new DefaultMuleMessage(proxyFaultMsg, muleContext), HTTP_REQUEST_OPTIONS);
+            getTestMuleMessage(proxyFaultMsg), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains("ERROR"));
     }

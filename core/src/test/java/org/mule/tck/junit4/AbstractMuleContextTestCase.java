@@ -396,7 +396,16 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected MuleMessage getTestMuleMessage()
     {
-        return new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
+        return getTestMuleMessage(TEST_PAYLOAD);
+    }
+
+    /**
+     * @param message
+     * @return creates a new {@link org.mule.api.MuleMessage} with message as payload
+     */
+    protected MuleMessage getTestMuleMessage(Object message)
+    {
+        return new DefaultMuleMessage(message, muleContext);
     }
 
     public static MuleEvent getTestEvent(Object data, FlowConstruct service) throws Exception

@@ -6,10 +6,9 @@
  */
 package org.mule.module.cxf;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.HttpConstants;
@@ -52,7 +51,7 @@ public class CxfConfigurationWsdlTestCase extends org.mule.tck.junit4.Functional
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send(String.format("http://localhost:%s?wsdl", httpPort.getNumber()), new DefaultMuleMessage(null, muleContext), newOptions().method(HttpConstants.Methods.POST.name()).build());
+        MuleMessage result = client.send(String.format("http://localhost:%s?wsdl", httpPort.getNumber()), getTestMuleMessage(null), newOptions().method(HttpConstants.Methods.POST.name()).build());
 
         // Don't want to compare full WSDL, just checking one tag's content
         String serviceLocation = String.format("<soap:address location=\"http://localhost:%s/\"/>", httpPort.getNumber());

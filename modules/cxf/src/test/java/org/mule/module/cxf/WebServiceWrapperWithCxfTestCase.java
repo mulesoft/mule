@@ -8,8 +8,6 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -49,7 +47,7 @@ public class WebServiceWrapperWithCxfTestCase extends AbstractServiceAndFlowTest
     public void testWsCall() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://testin", new DefaultMuleMessage(testString, muleContext));
+        MuleMessage result = client.send("vm://testin", getTestMuleMessage(testString));
         assertNotNull(result.getPayload());
         assertEquals("Payload", testString, result.getPayloadAsString());
     }

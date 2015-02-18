@@ -12,7 +12,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.core.env.AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -112,7 +111,7 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
         sftpClient.changeWorkingDirectory(directory);
         sftpClient.storeFile(FILENAME, new ByteArrayInputStream(FILE_CONTENT.getBytes()));
         MuleClient muleClient = muleContext.getClient();
-        muleClient.dispatch(getUrl(directory), new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+        muleClient.dispatch(getUrl(directory), getTestMuleMessage(TEST_MESSAGE));
         latch.await(TIMEOUT, TimeUnit.MILLISECONDS);
         assertThat(message, notNullValue());
         assertThat(message.getPayloadAsString(), is(FILE_CONTENT));

@@ -10,13 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
@@ -82,7 +78,7 @@ public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTe
         muleContext.setExceptionListener(exceptionStrategy);
 
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:28181/ScratchCardServiceV1", new DefaultMuleMessage(msg, muleContext),
+        MuleMessage result = client.send("http://localhost:28181/ScratchCardServiceV1", getTestMuleMessage(msg),
                                          HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull("The result shouln't have been null", result);
         final String payloadAsString = result.getPayloadAsString();

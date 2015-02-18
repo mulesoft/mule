@@ -11,8 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -127,7 +125,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         props.remove("foo");
 
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://headers", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
+        MuleMessage message = client.send("vm://headers", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(RequiredValueException.class,

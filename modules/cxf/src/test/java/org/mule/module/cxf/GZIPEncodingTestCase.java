@@ -87,7 +87,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     @Test
     public void proxyWithGZIPResponse() throws Exception
     {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(getAllRequest, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
         validateResponse(response);
     }
 
