@@ -16,6 +16,7 @@ import java.util.Map;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.Ftplet;
+import org.apache.ftpserver.ftplet.UserManager;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 
@@ -44,9 +45,9 @@ public class Server
 
     public Server(int port, Ftplet ftplet) throws Exception
     {
-        FtpServerFactory serverFactory = new FtpServerFactory();        
-        
-        setupListenerFactory( serverFactory, port);                
+        FtpServerFactory serverFactory = new FtpServerFactory();
+
+        setupListenerFactory( serverFactory, port);
         setupUserManagerFactory(serverFactory);
         setupFtplet(serverFactory, ftplet);
         server = serverFactory.createServer();
@@ -65,6 +66,12 @@ public class Server
 
     private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException
     {
+        UserManager userManager = createUserManager();
+        serverFactory.setUserManager(userManager);
+    }
+
+    protected UserManager createUserManager() throws IOException
+    {
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
         URL usersFile = IOUtils.getResourceAsUrl("users.properties", getClass());
         if (usersFile == null)
@@ -72,7 +79,8 @@ public class Server
             throw new IOException("users.properties file not found in the classpath");
         }
         userManagerFactory.setFile(new File(usersFile.getFile()));
-        serverFactory.setUserManager(userManagerFactory.createUserManager());
+
+        return userManagerFactory.createUserManager();
     }
 
     private void setupFtplet(FtpServerFactory serverFactory, Ftplet ftplet)
