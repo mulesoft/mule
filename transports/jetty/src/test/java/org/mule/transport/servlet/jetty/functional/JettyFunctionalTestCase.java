@@ -10,8 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -68,7 +66,7 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
         testComponent.setEventCallback(callback);
 
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/normal/extrapath?param1=value1", new DefaultMuleMessage(TEST_MESSAGE, muleContext), newOptions().method(POST.name()).build());
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/normal/extrapath?param1=value1", getTestMuleMessage(TEST_MESSAGE), newOptions().method(POST.name()).build());
         assertEquals(200, response.getInboundProperty("http.status"));
         assertEquals(TEST_MESSAGE + " received", IOUtils.toString((InputStream) response.getPayload()));
     }
@@ -78,7 +76,7 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/exception", new DefaultMuleMessage(TEST_MESSAGE, muleContext), httpRequestOptions);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/exception", getTestMuleMessage(TEST_MESSAGE), httpRequestOptions);
         assertEquals(500, response.getInboundProperty("http.status"));
     }
 }

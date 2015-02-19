@@ -9,11 +9,8 @@ package org.mule.module.sxc;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -45,7 +42,7 @@ public class HttpRoutingTestCase extends FunctionalTestCase
 
         String address = "http://localhost:" + dynamicPort.getNumber() + "/proxy";
         final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).disableStatusCodeValidation().build();
-        MuleMessage res = client.send(address, new DefaultMuleMessage(out.toByteArray(), muleContext), httpRequestOptions);
+        MuleMessage res = client.send(address, getTestMuleMessage(out.toByteArray()), httpRequestOptions);
         System.out.println(res.getPayloadAsString());
         assertTrue(res.getPayloadAsString().contains("purchaseOrder"));
         assertTrue(res.getPayloadAsString().contains("Alice"));
@@ -53,7 +50,7 @@ public class HttpRoutingTestCase extends FunctionalTestCase
         out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/namespace-purchase-order.xml"), out);
 
-        res = client.send(address, new DefaultMuleMessage(out.toByteArray(), muleContext), httpRequestOptions);
+        res = client.send(address, getTestMuleMessage(out.toByteArray()), httpRequestOptions);
         System.out.println(res.getPayloadAsString());
         assertTrue(res.getPayloadAsString().contains("purchaseOrder"));
         assertTrue(res.getPayloadAsString().contains("Alice"));

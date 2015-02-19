@@ -8,8 +8,6 @@ package org.mule.transport.servlet.jetty.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
@@ -28,7 +26,7 @@ public class JettyHttpBadEncodingFunctionalTestCase extends JettyHttpEncodingFun
 
         // Send as bytes so that the StringRequestEntity isn't used. If it is used
         // it will throw an exception and stop us from testing the server side.
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE.getBytes(), muleContext);
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE.getBytes());
         msg.setEncoding("UTFF-912");
         MuleMessage reply = client.send("clientEndpoint", msg);
         assertNotNull(reply);

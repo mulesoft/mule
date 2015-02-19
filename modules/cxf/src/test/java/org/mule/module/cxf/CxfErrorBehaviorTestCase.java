@@ -149,7 +149,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
     public void testServerClientProxyWithFault() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithFault", new DefaultMuleMessage(requestFaultPayload, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithFault", getTestMuleMessage(requestFaultPayload), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertThat(resString, containsString("<faultstring>Cxf Exception Message</faultstring>"));
         assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString());
@@ -159,7 +159,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
     public void testServerClientProxyWithTransformerException() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerException", new DefaultMuleMessage(requestPayload, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerException", getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains("TransformerException"));
         assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString());
@@ -168,7 +168,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
     public void testServerClientJaxwsWithUnwrapFault() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapProxyFault", new DefaultMuleMessage(requestPayload, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapProxyFault", getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertThat(resString, containsString("Illegal argument!!"));
         assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString());

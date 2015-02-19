@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.message;
 
-import org.mule.DefaultMuleMessage;
+import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 
@@ -15,9 +15,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
@@ -38,7 +35,7 @@ public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     public void testRequestResponseChain() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "fooValue");
 
         MuleMessage result = client.send("inbound2", message);
@@ -50,7 +47,7 @@ public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     public void testOneWay() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "fooValue");
 
         client.dispatch("vm://queueIn", message);
@@ -63,7 +60,7 @@ public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     public void testRRToOneWay() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "rrfooValue");
 
         MuleMessage echo = client.send("vm://rrQueueIn", message);
@@ -76,7 +73,7 @@ public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     public void testSimpleQueueAccess() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "rrfooValue");
 
         client.dispatch("vm://notInConfig", message);

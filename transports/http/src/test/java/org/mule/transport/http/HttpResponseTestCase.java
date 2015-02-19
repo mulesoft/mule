@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -60,7 +59,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testHttpResponseMove() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
+        MuleMessage muleMessage = getTestMuleMessage(HTTP_BODY);
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/move", muleMessage);
         assertEquals(HTTP_BODY, response.getPayloadAsString());
         assertEquals("" + HttpConstants.SC_MOVED_PERMANENTLY, response.getInboundProperty("http.status"));
@@ -71,7 +70,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testHttpResponseAll() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
+        MuleMessage muleMessage = getTestMuleMessage(HTTP_BODY);
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/all", muleMessage);
         assertEquals("Custom body", response.getPayloadAsString());
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));

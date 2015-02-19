@@ -8,11 +8,10 @@
 package org.mule.module.cxf;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.runners.Parameterized.*;
+import static org.junit.runners.Parameterized.Parameter;
+import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -68,7 +67,7 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
     public void testProxyWSDLRewriteSinglePort() throws Exception
     {
         String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/single";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", getTestMuleMessage(NullPayload.getInstance()), HTTP_REQUEST_OPTIONS);
         for(Element port : getPorts(getWsdl(response)))
         {
             String location = getLocation(port);
@@ -89,7 +88,7 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
     public void testProxyWSDLRewriteAllPorts() throws Exception
     {
         String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/all";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", getTestMuleMessage(NullPayload.getInstance()), HTTP_REQUEST_OPTIONS);
         for(Element port : getPorts(getWsdl(response)))
         {
             assertEquals(proxyAddress, getLocation(port));

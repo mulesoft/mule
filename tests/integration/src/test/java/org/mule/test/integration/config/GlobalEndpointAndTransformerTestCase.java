@@ -7,8 +7,6 @@
 package org.mule.test.integration.config;
 
 import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -43,7 +41,7 @@ public class GlobalEndpointAndTransformerTestCase extends AbstractServiceAndFlow
     public void testNormal() throws MuleException
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage msg=client.send("vm://in",new DefaultMuleMessage("HELLO!", muleContext));
+        MuleMessage msg=client.send("vm://in", getTestMuleMessage("HELLO!"));
         assertTrue(msg.getPayload() instanceof byte[]);
     }
 }

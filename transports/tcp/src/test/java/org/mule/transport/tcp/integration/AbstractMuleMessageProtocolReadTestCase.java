@@ -7,8 +7,6 @@
 package org.mule.transport.tcp.integration;
 
 import static org.junit.Assert.assertEquals;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -37,12 +35,12 @@ public abstract class AbstractMuleMessageProtocolReadTestCase extends Functional
     public void testServer() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        safeProtocolSend("localhost", port.getNumber(), new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+        safeProtocolSend("localhost", port.getNumber(), getTestMuleMessage(TEST_MESSAGE));
         MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
         assertEquals(TEST_MESSAGE, response.getPayload());
     }
 
-    private void safeProtocolSend(String host, int port, DefaultMuleMessage msg) throws IOException, MuleException
+    private void safeProtocolSend(String host, int port, MuleMessage msg) throws IOException, MuleException
     {
         Socket clientSocket = new Socket(host, port);
         DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());

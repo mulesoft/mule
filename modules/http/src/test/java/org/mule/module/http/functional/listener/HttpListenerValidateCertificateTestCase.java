@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -81,7 +80,7 @@ public class HttpListenerValidateCertificateTestCase extends FunctionalTestCase
 
     private String sendRequest(String url, String payload) throws Exception
     {
-        MuleMessage response = muleContext.getClient().send(url, new DefaultMuleMessage(payload, muleContext),
+        MuleMessage response = muleContext.getClient().send(url, getTestMuleMessage(payload),
                                                             newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).build());
         return response.getPayloadAsString();
     }

@@ -7,10 +7,10 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.runners.Parameterized.*;
+import static org.junit.runners.Parameterized.Parameter;
+import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -62,7 +62,7 @@ public class ProxyWithValidationTestCase extends FunctionalTestCase
     @Test
     public void acceptsRequestWithCData() throws Exception
     {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/Echo", new DefaultMuleMessage(SAMPLE_REQUEST, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/Echo", getTestMuleMessage(SAMPLE_REQUEST), HTTP_REQUEST_OPTIONS);
 
         assertTrue(response.getPayloadAsString().contains("bla"));
     }
