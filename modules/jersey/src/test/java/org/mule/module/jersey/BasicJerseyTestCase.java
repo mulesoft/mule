@@ -65,7 +65,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
         result = client.send(String.format(URL, "/helloworld"), getTestMuleMessage(), disableValidationOptions);
         assertEquals((Integer)405, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
-        result = client.send(String.format(URL, "/helloworld"), getTestMuleMessage(), newOptions().method(org.mule.module.http.api.HttpConstants.Methods.DELETE.name()).build());
+        result = client.send(String.format(URL, "/helloworld"), getTestMuleMessage(""), newOptions().method(org.mule.module.http.api.HttpConstants.Methods.DELETE.name()).build());
         assertEquals("Hello World Delete", result.getPayloadAsString());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
