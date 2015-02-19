@@ -81,6 +81,8 @@ public class FtpConnector extends AbstractConnector
     /** Streaming is off by default until MULE-3192 gets fixed */
     private boolean streaming = false;
 
+    private int connectionTimeout = 0;
+
     private Map<String, ObjectPool> pools;
 
     private String connectionFactoryClass = DEFAULT_FTP_CONNECTION_FACTORY_CLASS;
@@ -220,6 +222,7 @@ public class FtpConnector extends AbstractConnector
                 FtpConnectionFactory connectionFactory =
                         (FtpConnectionFactory) ClassUtils.instanciateClass(getConnectionFactoryClass(),
                                                                             new Object[] {uri}, getClass());
+                connectionFactory.setConnectionTimeout(connectionTimeout);
                 GenericObjectPool genericPool = createPool(connectionFactory);
                 pools.put(key, genericPool);
                 pool = genericPool;
@@ -389,6 +392,11 @@ public class FtpConnector extends AbstractConnector
     public void setPassive(final boolean passive)
     {
         this.passive = passive;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout)
+    {
+        this.connectionTimeout = connectionTimeout;
     }
 
     /**

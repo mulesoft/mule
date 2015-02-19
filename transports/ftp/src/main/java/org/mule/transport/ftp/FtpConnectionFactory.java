@@ -18,10 +18,16 @@ import org.apache.commons.pool.PoolableObjectFactory;
 public class FtpConnectionFactory implements PoolableObjectFactory
 {
     private EndpointURI uri;
+    private int connectionTimeout = 0;
 
     public FtpConnectionFactory(EndpointURI uri)
     {
         this.uri = uri;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout)
+    {
+        this.connectionTimeout = connectionTimeout;
     }
 
     public Object makeObject() throws Exception
@@ -53,7 +59,10 @@ public class FtpConnectionFactory implements PoolableObjectFactory
 
     protected FTPClient createFtpClient()
     {
-        return new FTPClient();
+        FTPClient ftpClient = new FTPClient();
+        ftpClient.setConnectTimeout(connectionTimeout);
+
+        return ftpClient;
     }
 
     public void destroyObject(Object obj) throws Exception
