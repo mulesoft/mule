@@ -8,11 +8,11 @@
            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
            http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
 
-    <ftp:connector name="FTP" pollingFrequency="1000" validateConnections="true" connectionTimeout="1"/>
+    <ftp:connector name="FTP" pollingFrequency="1000" validateConnections="true" connectionTimeout="100"/>
 
     <flow name="main-test">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
 
-        <ftp:outbound-endpoint host="localhost" port="${ftpPort}" path="~" user="muletest1" password="muletest1"  connector-ref="FTP" responseTimeout="10000"/>
+        <ftp:outbound-endpoint host="localhost" port="${ftpPort}" path="~" user="muletest1" password="muletest1"  connector-ref="FTP"/>
     </flow>
 </mule>
