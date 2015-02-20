@@ -11,12 +11,12 @@
            http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
 
     <ftp:connector name="FTP" pollingFrequency="1000" validateConnections="true">
-        <spring:property name="connectionTimeout" value="1"/>
+        <spring:property name="connectionTimeout" value="100"/>
     </ftp:connector>
 
     <flow name="main-test">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
 
-        <ftp:outbound-endpoint host="localhost" port="${ftpPort}" path="~" user="muletest1" password="muletest1"  connector-ref="FTP" responseTimeout="10000"/>
+        <ftp:outbound-endpoint host="localhost" port="${ftpPort}" path="~" user="muletest1" password="muletest1"  connector-ref="FTP"/>
     </flow>
 </mule>
