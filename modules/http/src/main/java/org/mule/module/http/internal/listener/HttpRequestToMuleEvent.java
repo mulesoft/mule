@@ -15,6 +15,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
+import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
@@ -70,7 +71,7 @@ public class HttpRequestToMuleEvent
         if (parseRequest)
         {
             final HttpEntity entity = request.getEntity();
-            if (entity != null)
+            if (entity != null && !(entity instanceof EmptyHttpEntity))
             {
                 if (entity instanceof MultipartHttpEntity)
                 {
