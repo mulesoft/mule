@@ -21,9 +21,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("Can' rely on server socket constructor parameter 'backlog' as its behaviour is implementation dependant")
 public class FtpConnectionTimeoutTestCase extends FunctionalTestCase
 {
 
