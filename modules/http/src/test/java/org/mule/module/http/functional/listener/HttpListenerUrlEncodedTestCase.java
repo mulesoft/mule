@@ -115,6 +115,21 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     public void urlEncodedEmptyParamsGenerateANullPayload() throws Exception
     {
         final Response response = Request.Post(getListenerUrl()).execute();
+        assertNullPayloadAndEmptyResponse(response);
+    }
+
+    @Test
+    public void urlEncodedEmptyParamsUrlEncodedContentTypeGenerateANullPayload() throws Exception
+    {
+        final Response response = Request.Post(getListenerUrl())
+                .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
+                .execute();
+
+        assertNullPayloadAndEmptyResponse(response);
+    }
+
+    private void assertNullPayloadAndEmptyResponse(Response response) throws Exception
+    {
         final MuleMessage receivedMessage = muleContext.getClient().request(VM_OUTPUT_ENDPOINT, 1000);
         assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(NullPayload.class));
 
