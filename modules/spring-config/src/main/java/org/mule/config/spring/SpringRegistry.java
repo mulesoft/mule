@@ -339,7 +339,6 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     {
         applicationContext.getBeanFactory().autowireBean(object);
         Object initialised = applicationContext.getBeanFactory().initializeBean(object, key);
-        getLifecycleManager().applyCompletedPhases(initialised);
 
         return initialised;
     }
@@ -417,6 +416,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
             try
             {
                 value = initialiseObject(applicationContext, key, value);
+                applyLifecycle(value);
                 applicationContext.getBeanFactory().registerSingleton(key, value);
             }
             catch (Exception e)

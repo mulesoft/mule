@@ -37,9 +37,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The
@@ -77,14 +81,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     @Override
     protected void addBuilders(List<ConfigurationBuilder> builders)
     {
-        ConfigurationBuilder builder = null;
+        SpringXmlConfigurationBuilder builder = null;
         try
         {
             String configResources = getConfigResources();
             if (configResources != null)
             {
                 builder = new SpringXmlConfigurationBuilder(configResources);
-            } else {
+            }
+            else
+            {
                 configResources = getConfigFile();
                 if (configResources != null)
                 {
@@ -93,16 +99,40 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
                         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
                     }
                     builder = new SpringXmlConfigurationBuilder(configResources);
-                } else {
+                }
+                else
+                {
                     String[] multipleConfigResources = getConfigFiles();
                     builder = new SpringXmlConfigurationBuilder(multipleConfigResources);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException(e);
         }
 
+        builder.setParentContext(makeParentContext());
         builders.add(0, builder);
+    }
+
+    protected ApplicationContext makeParentContext()
+    {
+        Properties properties = getStartUpProperties();
+        if (properties == null || properties.isEmpty())
+        {
+            return null;
+        }
+
+        GenericApplicationContext parent = new GenericApplicationContext();
+        parent.refresh();
+
+        for (Map.Entry<Object, Object> entry : properties.entrySet())
+        {
+            parent.getBeanFactory().registerSingleton(entry.getKey().toString(), entry.getValue());
+        }
+
+        return parent;
     }
 
     @Override

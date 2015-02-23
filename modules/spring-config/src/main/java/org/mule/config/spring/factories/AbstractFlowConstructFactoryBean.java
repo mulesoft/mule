@@ -12,8 +12,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
@@ -21,13 +19,10 @@ import org.mule.construct.builder.AbstractFlowConstructWithSingleInboundEndpoint
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.FactoryBeanNotInitializedException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<FlowConstruct>,
-    InitializingBean, ApplicationContextAware, MuleContextAware, Initialisable
+public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<FlowConstruct>, ApplicationContextAware, MuleContextAware
 {
 
     protected ApplicationContext applicationContext;
@@ -82,21 +77,11 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
         getFlowConstructBuilder().exceptionStrategy(exceptionListener);
     }
 
-    public void afterPropertiesSet() throws Exception
-    {
-        flowConstruct = createFlowConstruct();
-    }
-
-    public void initialise() throws InitialisationException
-    {
-        flowConstruct.initialise();
-    }
-
     public FlowConstruct getObject() throws Exception
     {
         if (flowConstruct == null)
         {
-            throw new FactoryBeanNotInitializedException();
+            flowConstruct = createFlowConstruct();
         }
         return flowConstruct;
     }

@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.ConfigurationBuilder;
@@ -51,8 +50,6 @@ import javax.transaction.SystemException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
@@ -272,25 +269,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         {
             super.addBuilders(builders);
         }
-    }
-
-    private ApplicationContext makeParentContext()
-    {
-        Properties properties = getStartUpProperties();
-        if (properties == null || properties.isEmpty())
-        {
-            return null;
-        }
-
-        GenericApplicationContext parent = new GenericApplicationContext();
-        parent.refresh();
-
-        for (Map.Entry<Object, Object> entry : properties.entrySet())
-        {
-            parent.getBeanFactory().registerSingleton(entry.getKey().toString(), entry.getValue());
-        }
-
-        return parent;
     }
 
     /**
