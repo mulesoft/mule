@@ -48,12 +48,12 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
         if (variant.equals(ConfigVariant.FLOW))
         {
             testComponentLifecycle("MuleSingletonService",
-                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+                "[setProperty, setMuleContext, jsr250 initialise, jsr250 initialise, start, stop, jsr250 dispose]");
         }
         else
         {
             testComponentLifecycle("MuleSingletonService",
-                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+                "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, start, stop, jsr250 dispose]");
         }
     }
 
@@ -69,12 +69,12 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
         if (variant.equals(ConfigVariant.FLOW))
         {
             testComponentLifecycle("MulePrototypeService",
-                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+                "[setProperty, setMuleContext, jsr250 initialise, jsr250 initialise, start, stop, jsr250 dispose]");
         }
         else
         {
             testComponentLifecycle("MulePrototypeService",
-                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+                "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, start, stop, jsr250 dispose]");
         }
     }
 
@@ -90,12 +90,12 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
         if (variant.equals(ConfigVariant.FLOW))
         {
             testComponentLifecycle("MulePooledPrototypeService",
-                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+                "[setProperty, setMuleContext, jsr250 initialise, jsr250 initialise, start, stop, jsr250 dispose]");
         }
         else
         {
             testComponentLifecycle("MulePooledPrototypeService",
-                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+                "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, start, stop, jsr250 dispose]");
         }
     }
 
@@ -114,13 +114,13 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
         {
             testComponentLifecycle(
                 "MulePooledSingletonService",
-                "[setProperty, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
+                "[setProperty, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
         }
         else
         {
             testComponentLifecycle(
                 "MulePooledSingletonService",
-                "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
+                "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
         }
     }
 

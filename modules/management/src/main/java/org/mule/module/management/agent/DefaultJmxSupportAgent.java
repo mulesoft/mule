@@ -152,10 +152,6 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                     registerAgent(agent, registry);
                 }
             }
-
-            // remove this agent once it has registered the other agents
-            //TODO RM* this currently does nothing!!!
-            registry.unregisterAgent(name);
         }
         catch (MuleException e)
         {

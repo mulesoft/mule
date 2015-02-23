@@ -55,11 +55,11 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
 
         if (variant.equals(ConfigVariant.FLOW))
         {
-            expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, start, stop, springDestroy]";
+            expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, initialise, start, stop, dispose, springDestroy]";
         }
         else
         {
-            expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, setService, start, stop, springDestroy]";
+            expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, initialise, setService, start, stop, dispose, springDestroy]";
         }
 
         testComponentLifecycle("SpringBeanService", expectedLifeCycle);
@@ -81,11 +81,11 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
 
         if (variant.equals(ConfigVariant.FLOW))
         {
-            expectedLifeCycle = "[setProperty, setMuleContext, start, stop]";
+            expectedLifeCycle = "[setProperty, setMuleContext, initialise, start, stop, dispose]";
         }
         else
         {
-            expectedLifeCycle = "[setProperty, setMuleContext, setService, start, stop]";
+            expectedLifeCycle = "[setProperty, setMuleContext, initialise, setService, start, stop, dispose]";
         }
 
         testComponentLifecycle("SpringBeanService2", expectedLifeCycle);
