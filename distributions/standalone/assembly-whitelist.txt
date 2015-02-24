@@ -289,7 +289,7 @@
 /mule-standalone-${productVersion}/lib/opt/jasper-jdt-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
-/mule-standalone-${productVersion}/lib/opt/javax.inject-2.3.0-b05.jar
+/mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
 /mule-standalone-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.9.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.9.jar
