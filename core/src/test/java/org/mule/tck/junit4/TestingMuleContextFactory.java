@@ -6,12 +6,20 @@
  */
 package org.mule.tck.junit4;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextFactory;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.registry.SimpleRegistry;
 
+/**
+ * An implementation of {@link MuleContextFactory} to use for testing.
+ * It will create a {@link MuleContext} which uses a {@link SimpleRegistry}
+ *
+ * @since 3.7.0
+ */
 public class TestingMuleContextFactory extends DefaultMuleContextFactory
 {
-
 
     @Override
     protected DefaultMuleContextBuilder newMuleContextBuilder()

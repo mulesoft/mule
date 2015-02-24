@@ -13,6 +13,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 
+/**
+ * A subclass of {@link CommonAnnotationBeanPostProcessor} which ignores objects from
+ * a specific set of packages
+ *
+ * @since 3.7.0
+ */
 public class FilteringCommonAnnotationBeanPostProcessor extends CommonAnnotationBeanPostProcessor
 {
 

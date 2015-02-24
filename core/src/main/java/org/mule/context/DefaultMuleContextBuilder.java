@@ -100,6 +100,15 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         this(false);
     }
 
+    /**
+     * if {@code createSimpleRegistry} is {@code true}, then a {@link SimpleRegistry}
+     * will automatically be added to the created context. That only makes sense
+     * when trying to start a light weight context which doesn't require starting a heavier
+     * registry such as Spring or Guice or when testing. This is not something we would
+     * advice on production
+     *
+     * @param createSimpleRegistry whether or not to add a {@link SimpleRegistry} to the created context
+     */
     public DefaultMuleContextBuilder(boolean createSimpleRegistry)
     {
         this.createSimpleRegistry = createSimpleRegistry;
@@ -142,8 +151,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     {
         return new DefaultMuleContext();
     }
-
-
 
     public void setMuleConfiguration(MuleConfiguration config)
     {
