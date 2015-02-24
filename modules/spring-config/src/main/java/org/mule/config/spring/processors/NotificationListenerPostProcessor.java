@@ -8,10 +8,17 @@ package org.mule.config.spring.processors;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.context.notification.ServerNotificationManager;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
+/**
+ * A {@link BeanPostProcessor} which registers {@link ServerNotificationListener} objects
+ * into the {@link ServerNotificationManager}
+ *
+ * @since 3.7.0
+ */
 public class NotificationListenerPostProcessor implements BeanPostProcessor
 {
 

@@ -735,25 +735,29 @@ public class MuleRegistryHelper implements MuleRegistry
     @Override
     public Object applyProcessors(Object object) throws MuleException
     {
-        return preInitialise(object);
+        return inject(object);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public Object applyProcessors(Object object, int flags) throws MuleException
     {
-        return preInitialise(object);
+        return inject(object);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object preInitialise(Object object) throws MuleException
+    public Object inject(Object object) throws MuleException
     {
         InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
         if (initialisingRegistry != null)
         {
-            return initialisingRegistry.preInitialise(object);
+            return initialisingRegistry.inject(object);
         }
 
         return object;

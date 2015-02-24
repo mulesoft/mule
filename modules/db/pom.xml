@@ -88,8 +88,7 @@
         <dependency>
             <groupId>org.mule.common</groupId>
             <artifactId>mule-common</artifactId>
-            <!--<version>${project.version}</version>-->
-            <version>3.7.0-M1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

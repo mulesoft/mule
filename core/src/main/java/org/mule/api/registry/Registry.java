@@ -115,7 +115,9 @@ public interface Registry extends Initialisable, Disposable
      * @param metadata an implementation specific argument that can be passed into the method
      * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
      * the object's lifecycle threw an exception
+     * @deprecated as of 3.7.0. Use {@link #unregisterObject(String)} instead
      */
+    @Deprecated
     Object unregisterObject(String key, Object metadata) throws RegistrationException;
 
     // /////////////////////////////////////////////////////////////////////////

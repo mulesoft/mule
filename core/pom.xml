@@ -120,9 +120,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.glassfish.hk2.external</groupId>
+            <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-            <version>${hk2Version}</version>
         </dependency>
 
         <dependency>
@@ -184,8 +183,7 @@
         <dependency>
             <groupId>org.mule.common</groupId>
             <artifactId>mule-common</artifactId>
-            <!--<version>${project.version}</version>-->
-            <version>3.7.0-M1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

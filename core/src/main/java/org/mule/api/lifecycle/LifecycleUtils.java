@@ -67,7 +67,8 @@ public abstract class LifecycleUtils
         doApplyPhase(Stoppable.PHASE_NAME, Arrays.asList(object), null);
     }
 
-    public static void disposeIfNeeded(Object object) {
+    public static void disposeIfNeeded(Object object)
+    {
         disposeIfNeeded(object, LOGGER);
     }
 
