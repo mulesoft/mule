@@ -91,7 +91,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                               new ExpressionEvaluatorPostProcessor(muleContext),
                               new GlobalNamePostProcessor(),
                               new ExpressionEnricherPostProcessor(muleContext),
-                              new NotificationListenersPostProcessor(muleContext),
+                              //new NotificationListenersPostProcessor(muleContext),
                               new AnnotatedTransformerObjectPostProcessor(muleContext),
                               new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
