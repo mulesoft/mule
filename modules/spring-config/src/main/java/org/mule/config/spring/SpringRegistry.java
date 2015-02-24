@@ -323,7 +323,7 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     }
 
     @Override
-    public Object preInitialise(Object object)
+    public Object inject(Object object)
     {
         try
         {

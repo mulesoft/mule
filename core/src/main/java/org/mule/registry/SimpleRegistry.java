@@ -23,6 +23,16 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A very simple implementation of {@link InitialisingRegistry}. Useful for starting really lightweight
+ * contexts which don't depend on heavier object containers such as Spring or Guice (testing being
+ * the best example). <b>Do not use this registry for heavy duty production environments</b>.
+ * <p/>
+ * The {@link #inject(Object)} operation will only consider fields annotated with {@link Inject} and will perform
+ * the injection using simple, not-cached reflection. Again, not recommended for production environments.
+ *
+ * @since 3.7.0
+ */
 public class SimpleRegistry extends TransientRegistry implements InitialisingRegistry
 {
 
@@ -84,7 +94,7 @@ public class SimpleRegistry extends TransientRegistry implements InitialisingReg
     }
 
     @Override
-    public Object preInitialise(Object object)
+    public Object inject(Object object)
     {
         return applyProcessors(object, null);
     }

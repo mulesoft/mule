@@ -44,8 +44,9 @@ import org.apache.commons.logging.Log;
 
 /**
  * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
+ * @deprecated as of 3.7.0. Use {@link SimpleRegistry instead}.
  */
-//@ThreadSafe
+@Deprecated
 public class TransientRegistry extends AbstractRegistry
 {
 

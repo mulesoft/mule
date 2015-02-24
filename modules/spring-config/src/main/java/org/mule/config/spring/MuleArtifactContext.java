@@ -20,7 +20,6 @@ import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.FilteringCommonAnnotationBeanPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
-import org.mule.config.spring.util.InitialisingBeanDefintionRegistry;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.IOUtils;
 
@@ -91,7 +90,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                               new ExpressionEvaluatorPostProcessor(muleContext),
                               new GlobalNamePostProcessor(),
                               new ExpressionEnricherPostProcessor(muleContext),
-                              //new NotificationListenersPostProcessor(muleContext),
                               new AnnotatedTransformerObjectPostProcessor(muleContext),
                               new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
@@ -100,7 +98,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
 
 
-        SpringRegistryBootstrap bootstrap = new SpringRegistryBootstrap(new InitialisingBeanDefintionRegistry((BeanDefinitionRegistry) beanFactory));
+        SpringRegistryBootstrap bootstrap = new SpringRegistryBootstrap((BeanDefinitionRegistry) beanFactory);
         initialiseBootstrap(bootstrap);
 
         try

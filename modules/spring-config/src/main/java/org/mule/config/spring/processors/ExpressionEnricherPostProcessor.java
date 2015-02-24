@@ -8,10 +8,17 @@ package org.mule.config.spring.processors;
 
 import org.mule.api.MuleContext;
 import org.mule.api.expression.ExpressionEnricher;
+import org.mule.api.expression.ExpressionManager;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
+/**
+ * A {@link BeanPostProcessor} which registers {@link ExpressionEnricher}s
+ * in the {@link ExpressionManager}
+ *
+ * @since 3.7.0
+ */
 public final class ExpressionEnricherPostProcessor implements BeanPostProcessor
 {
     private final MuleContext muleContext;

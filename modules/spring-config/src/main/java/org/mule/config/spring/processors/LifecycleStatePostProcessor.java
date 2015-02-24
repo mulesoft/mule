@@ -12,6 +12,12 @@ import org.mule.api.lifecycle.LifecycleStateAware;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
+/**
+ * A {@link BeanPostProcessor} which sets a given {@link #state}
+ * into instances of {@link LifecycleStateAware}
+ *
+ * @since 3.7.0
+ */
 public final class LifecycleStatePostProcessor implements BeanPostProcessor
 {
 

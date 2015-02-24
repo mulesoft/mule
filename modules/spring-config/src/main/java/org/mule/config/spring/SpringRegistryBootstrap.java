@@ -45,7 +45,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 /**
- * This object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry.
+ * This object will generate bean definitions for entries defined in a file called <code>registry-bootstrap.properties</code>.
  * This allows modules and transports to make certain objects available by default.  The most common use case is for a
  * module or transport to load stateless transformers into the registry.
  * For this file to be located it must be present in the modules META-INF directory under
@@ -86,21 +86,22 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
  * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
  * {@link MuleContextAware} and lifecycle interfaces such as {@link Initialisable}.
+ *
+ * @since 3.7.0
  */
 public class SpringRegistryBootstrap implements MuleContextAware
 {
 
-    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
-
-    public String TRANSFORMER_KEY = ".transformer.";
-    public String OBJECT_KEY = ".object.";
-    public String SINGLE_TX = ".singletx.";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringRegistryBootstrap.class);
+    private static final String TRANSFORMER_KEY = ".transformer.";
+    private static final String OBJECT_KEY = ".object.";
+    private static final String SINGLE_TX = ".singletx.";
 
     private final RegistryBootstrapDiscoverer discoverer;
     private final BeanDefinitionRegistry beanDefinitionRegistry;
 
     private ArtifactType supportedArtifactType = ArtifactType.APP;
-    protected MuleContext context;
+    private MuleContext context;
 
     public enum ArtifactType
     {
@@ -432,9 +433,9 @@ public class SpringRegistryBootstrap implements MuleContextAware
     {
         if (optional)
         {
-            if (logger.isDebugEnabled())
+            if (LOGGER.isDebugEnabled())
             {
-                logger.debug(message);
+                LOGGER.debug(message);
             }
         }
         else if ( t instanceof Exception)

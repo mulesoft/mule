@@ -10,6 +10,11 @@ import org.mule.config.bootstrap.BootstrapObjectFactory;
 
 import org.springframework.beans.factory.FactoryBean;
 
+/**
+ * A {@link FactoryBean which returns an object created through a {@link BootstrapObjectFactory}}
+ *
+ * @since 3.7.0
+ */
 public class BootstrapObjectFactoryBean implements FactoryBean<Object>
 {
 
