@@ -16,25 +16,45 @@
 
         <spring:bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentQueueStore"/>
 
-        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
+        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.config.spring.factories.ReplicatingFactoryBean">
+            <spring:property name="key" value="_defaultInMemoryObjectStore"/>
+            <spring:property name="type" value="org.mule.api.store.ObjectStore"/>
+            <spring:property name="defaultValue" ref="_localInMemoryObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_defaultInMemoryObjectStore" alias="_localInMemoryObjectStore" />
+        <spring:bean name="_localInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
 
-        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
+        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.config.spring.factories.ReplicatingFactoryBean">
+            <spring:property name="key" value="_defaultPersistentObjectStore"/>
+            <spring:property name="type" value="org.mule.api.store.ObjectStore"/>
+            <spring:property name="defaultValue" ref="_localPersistentObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_defaultPersistentObjectStore" alias="_localPersistentObjectStore" />
+        <spring:bean name="_localPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
 
-        <spring:bean name="_defaultUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
+        <spring:bean name="_defaultUserObjectStore" class="org.mule.config.spring.factories.ReplicatingFactoryBean">
+            <spring:property name="key" value="_defaultUserObjectStore"/>
+            <spring:property name="type" value="org.mule.api.store.ObjectStore"/>
+            <spring:property name="defaultValue" ref="_localUserObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_defaultUserObjectStore" alias="_localUserObjectStore" />
+        <spring:bean name="_localUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
 
-        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
+        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.config.spring.factories.ReplicatingFactoryBean">
+            <spring:property name="key" value="_defaultTransientUserObjectStore"/>
+            <spring:property name="type" value="org.mule.api.store.ObjectStore"/>
+            <spring:property name="defaultValue" ref="_localTransientUserObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_defaultTransientUserObjectStore" alias="_localTransientUserObjectStore" />
+        <spring:bean name="_localTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
 
-        <spring:bean name="_muleQueueManager" class="org.mule.util.queue.DelegateQueueManager"/>
+        <spring:bean name="_muleQueueManager" class="org.mule.config.spring.factories.ReplicatingFactoryBean">
+            <spring:property name="key" value="_muleQueueManager"/>
+            <spring:property name="type" value="org.mule.util.queue.QueueManager"/>
+            <spring:property name="defaultValue" ref="_localTransientUserObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_muleQueueManager" alias="_localQueueManager"/>
+        <spring:bean name="_localQueueManager" class="org.mule.util.queue.DelegateQueueManager"/>
 
         <spring:bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" />
 

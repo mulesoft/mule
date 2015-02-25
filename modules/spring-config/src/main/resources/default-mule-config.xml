@@ -33,7 +33,13 @@
 
         <spring:bean name="_muleLockFactory" class="org.mule.util.lock.MuleLockFactory"/>
 
-        <spring:bean name="_muleLockProvider" class="org.mule.util.lock.SingleServerLockProvider"/>
+        <spring:bean name="_muleLockProvider" class="org.mule.config.spring.factories.ReplicatingFactoryBean">
+            <spring:property name="key" value="_muleLockProvider"/>
+            <spring:property name="type" value="org.mule.util.lock.LockProvider"/>
+            <spring:property name="defaultValue">
+                <spring:bean class="org.mule.util.lock.SingleServerLockProvider"/>
+            </spring:property>
+        </spring:bean>
 
         <spring:bean name="_muleProcessingTimeWatcher" class="org.mule.management.stats.DefaultProcessingTimeWatcher"/>
 
