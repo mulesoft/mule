@@ -217,11 +217,6 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 
     public Object unregisterObject(String key) throws RegistrationException
     {
-        return unregisterObject(key, null);
-    }
-
-    public Object unregisterObject(String key, Object metadata) throws RegistrationException
-    {
         Iterator it = getRegistries().iterator();
         Registry reg;
         while (it.hasNext())
@@ -229,10 +224,19 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
             reg = (Registry) it.next();
             if (!reg.isReadOnly() && reg.lookupObject(key) != null)
             {
-                return reg.unregisterObject(key, metadata);
+                return reg.unregisterObject(key);
             }
         }
 
         return null;
+    }
+
+    /**
+     * @deprecated as of 3.7.0. Use {@link #unregisterObject(String)} instead
+     */
+    @Deprecated
+    public Object unregisterObject(String key, Object metadata) throws RegistrationException
+    {
+        return unregisterObject(key);
     }
 }
