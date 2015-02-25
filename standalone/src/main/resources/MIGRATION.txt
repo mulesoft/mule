@@ -6,6 +6,7 @@ Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+
 
 Migration changes from 3.6.x to 3.7.x
 MULE-8315: the following Apache Tomcat libraries were upgraded form version 6.0.29 to version 6.0.41: annotations-api, coyote, el-api, jasper, jasper-el, jsp-api, juli. Removed catalina-6.0.29.jar as is not needed anymore.
+MULE-8340: A new system property "mule.tls.disableSystemPropertiesMapping" has been added. When set to true, connectors that use TLS will not map their key store and trust store properties to the default JVM system properties.
 
 Migration changes from 3.5.x to 3.6.x
 
