@@ -27,7 +27,7 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
 
     public void addRegistry(Registry registry)
     {
-        registries.add(0, registry);
+        registries.add(registry);
     }
 
     public void removeRegistry(Registry registry)
