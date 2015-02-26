@@ -174,7 +174,7 @@
         <tomcatVersion>6.0.29</tomcatVersion>
         <woodstoxVersion>4.0.8</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
-        <xalanVersion>2.7.1</xalanVersion>
+        <xalanVersion>2.7.2</xalanVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xmlResolverVersion>1.2</xmlResolverVersion>
         <xmlSecurityVersion>1.4.0</xmlSecurityVersion>
