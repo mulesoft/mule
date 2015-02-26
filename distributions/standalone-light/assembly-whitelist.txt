@@ -82,7 +82,7 @@
 # /lib/endorsed
 #
 /mule-standalone-nodocs-${productVersion}/lib/endorsed
-/mule-standalone-nodocs-${productVersion}/lib/endorsed/xalan-2.7.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/endorsed/xalan-2.7.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/endorsed/xercesImpl-2.9.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/endorsed/xml-apis-1.3.04.jar
 /mule-standalone-nodocs-${productVersion}/lib/endorsed/xml-serializer-2.7.1.jar
