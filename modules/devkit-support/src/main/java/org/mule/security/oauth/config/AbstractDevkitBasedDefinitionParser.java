@@ -453,7 +453,7 @@ public abstract class AbstractDevkitBasedDefinitionParser implements BeanDefinit
         BeanDefinition beanDefinition = builder.getBeanDefinition();
         parserContext.getRegistry().registerBeanDefinition(generateChildBeanName(element), beanDefinition);
         element.setAttribute("name", generateChildBeanName(element));
-        builder.setSource(parserContext.extractSource(element));
+        builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
         builder.setScope(BeanDefinition.SCOPE_SINGLETON);
         List list = parserContext.getDelegate().parseListElement(element, builder.getBeanDefinition());
         parserContext.getRegistry().removeBeanDefinition(generateChildBeanName(element));
@@ -466,7 +466,7 @@ public abstract class AbstractDevkitBasedDefinitionParser implements BeanDefinit
         BeanDefinition beanDefinition = builder.getBeanDefinition();
         parserContext.getRegistry().registerBeanDefinition(generateChildBeanName(element), beanDefinition);
         element.setAttribute("name", generateChildBeanName(element));
-        builder.setSource(parserContext.extractSource(element));
+        builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
         builder.setScope(BeanDefinition.SCOPE_SINGLETON);
         List list = parserContext.getDelegate().parseListElement(element, builder.getBeanDefinition());
         parserContext.getRegistry().removeBeanDefinition(generateChildBeanName(element));
