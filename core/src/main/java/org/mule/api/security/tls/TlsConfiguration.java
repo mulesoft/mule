@@ -6,6 +6,7 @@
  */
 package org.mule.api.security.tls;
 
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
@@ -40,6 +41,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -118,6 +120,8 @@ public final class TlsConfiguration
     public static final String JSSE_NAMESPACE = "javax.net";
     public static final String DEFAULT_PROPERTIES_FILE = "tls-default.conf";
 
+    public static final String DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY = SYSTEM_PROPERTY_PREFIX + "tls.disableSystemPropertiesMapping";
+
     private Log logger = LogFactory.getLog(getClass());
 
     private SecurityProviderFactory spFactory = new AutoDiscoverySecurityProviderFactory();
@@ -158,6 +162,7 @@ public final class TlsConfiguration
     private boolean requireClientAuthentication = false;
 
     private TlsProperties tlsProperties = new TlsProperties();
+    private boolean disableSystemPropertiesMapping = false;
 
     /**
      * Support for TLS connections with a given initial value for the key store
@@ -167,6 +172,7 @@ public final class TlsConfiguration
     public TlsConfiguration(String keyStore)
     {
         this.keyStoreName = keyStore;
+        disableSystemPropertiesMapping = BooleanUtils.toBoolean(System.getProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY));
     }
 
     // note - in what follows i'm using "raw" variables rather than accessors because
@@ -195,7 +201,12 @@ public final class TlsConfiguration
         }
         initTrustManagerFactory();
 
-        if (null != namespace)
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("TLS system properties mapping is " + (disableSystemPropertiesMapping ? "disabled" : "enabled"));
+        }
+
+        if (null != namespace && !disableSystemPropertiesMapping)
         {
             new TlsPropertiesMapper(namespace).writeToProperties(System.getProperties(), this);
         }
