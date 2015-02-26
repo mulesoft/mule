@@ -11,10 +11,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeThat;
+import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConnector;
 
 import java.util.Arrays;
@@ -33,6 +35,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
 
     private static final String HTTP_SECURITY_CONF_FLOW_HTTPN_XML = "http-security-conf-flow-httpn.xml";
 
