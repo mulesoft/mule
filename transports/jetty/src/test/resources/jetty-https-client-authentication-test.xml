@@ -22,11 +22,13 @@
 
 
     <https:connector name="httpConnectorWithAuthentication">
-        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
         <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="storepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword" />
     </https:connector>
 
-    <https:connector name="httpConnectorWithoutAuthentication"/>
+    <https:connector name="httpConnectorWithoutAuthentication">
+        <https:tls-server path="trustStore" storePassword="mulepassword" />
+    </https:connector>
 
     <flow name="clientFlowWithAuthentication">
         <vm:inbound-endpoint address="vm://authenticatedClientEndpoint" exchange-pattern="request-response"/>

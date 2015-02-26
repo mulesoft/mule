@@ -156,7 +156,7 @@ public final class TlsConfiguration
     private boolean requireClientAuthentication = false;
 
     private TlsProperties tlsProperties = new TlsProperties();
-    private boolean disableSystemPropertiesMapping = false;
+    private boolean disableSystemPropertiesMapping = true;
 
     /**
      * Support for TLS connections with a given initial value for the key store
@@ -166,7 +166,13 @@ public final class TlsConfiguration
     public TlsConfiguration(String keyStore)
     {
         this.keyStoreName = keyStore;
-        disableSystemPropertiesMapping = BooleanUtils.toBoolean(System.getProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY));
+
+        String disableSystemPropertiesMappingValue = System.getProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY);
+
+        if (disableSystemPropertiesMappingValue != null)
+        {
+            disableSystemPropertiesMapping = BooleanUtils.toBoolean(disableSystemPropertiesMappingValue);
+        }
     }
 
     // note - in what follows i'm using "raw" variables rather than accessors because
@@ -193,9 +199,9 @@ public final class TlsConfiguration
         }
         initTrustManagerFactory();
 
-        if (disableSystemPropertiesMapping)
+        if (logger.isDebugEnabled())
         {
-            logger.info("TLS system properties mapping is disabled");
+            logger.debug("TLS system properties mapping is " + (disableSystemPropertiesMapping ? "disabled" : "enabled"));
         }
 
         if (null != namespace && !disableSystemPropertiesMapping)

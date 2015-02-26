@@ -10,9 +10,11 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
@@ -31,7 +33,10 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpSecurityFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    private static String soapRequest = 
+    @Rule
+    public SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
+
+    private static String soapRequest =
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
            "<soapenv:Header/>" +
            "<soapenv:Body>" +

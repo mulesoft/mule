@@ -7,9 +7,10 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.ClassUtils;
 
@@ -21,6 +22,9 @@ import org.junit.Test;
 
 public class StaticResourcesMPFunctionalTestCase extends FunctionalTestCase
 {
+    @ClassRule
+    public static SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
+
     @ClassRule
     public static DynamicPort port1 = new DynamicPort("port1");
 
