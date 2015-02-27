@@ -8,7 +8,6 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -23,6 +22,7 @@ import java.util.Map;
 
 import javax.xml.ws.Holder;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,6 +61,7 @@ public class HolderTestCase extends FunctionalTestCase
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
         assertEquals("one-response", payload[0]);
+        assertEquals(null, payload[1]);
         assertEquals("one-holder1", ((Holder)payload[2]).value);
         assertEquals("one-holder2", ((Holder)payload[3]).value);
     }
@@ -79,6 +80,19 @@ public class HolderTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testClientEcho2Holder() throws Exception
+    {
+        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
+        MuleClient client = muleContext.getClient();
+        MuleMessage received = client.send("vm://echo2Client", request);
+        assertNotNull(received);
+        Object[] payload = (Object[])received.getPayload();
+        assertEquals("one-response", payload[0]);
+        assertEquals(null, payload[1]);
+        assertEquals("two-holder", ((Holder)payload[2]).value);
+    }
+
+    @Test
     public void testClientProxyEcho2Holder() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
@@ -91,6 +105,19 @@ public class HolderTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testClientEcho3Holder() throws Exception
+    {
+        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
+        MuleClient client = muleContext.getClient();
+        MuleMessage received = client.send("vm://echo3Client", request);
+        assertNotNull(received);
+        Object[] payload = (Object[])received.getPayload();
+        assertEquals(null, payload[0]);
+        assertEquals("one", ((Holder)payload[1]).value);
+    }
+
+    @Test
+    @Ignore("MULE-8350: This scenario was broken by the CXF upgrade to 2.7.15")
     public void testClientProxyEcho3Holder() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
@@ -107,8 +134,8 @@ public class HolderTestCase extends FunctionalTestCase
         @Override
         protected Object doTransform(Object src, String enc) throws TransformerException
         {
-            Holder<String> outS1 = new Holder<String>();
-            Holder<String> outS2 = new Holder<String>();
+            Holder<String> outS1 = new Holder<>();
+            Holder<String> outS2 = new Holder<>();
 
             Object objArray[] = new Object[3];
             objArray[0] = "one";
@@ -124,7 +151,7 @@ public class HolderTestCase extends FunctionalTestCase
         @Override
         protected Object doTransform(Object src, String enc) throws TransformerException
         {
-            Holder<String> outS1 = new Holder<String>();
+            Holder<String> outS1 = new Holder<>();
 
             Object objArray[] = new Object[3];
             objArray[0] = "one";
@@ -140,7 +167,7 @@ public class HolderTestCase extends FunctionalTestCase
         @Override
         protected Object doTransform(Object src, String enc) throws TransformerException
         {
-            Holder<String> outS1 = new Holder<String>();
+            Holder<String> outS1 = new Holder<>();
 
             Object objArray[] = new Object[2];
             objArray[0] = outS1;

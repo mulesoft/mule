@@ -44,7 +44,11 @@
                     address="https://localhost:${port2}/services/Echo"
                     exchange-pattern="request-response">
                     <spring-sec:http-security-filter realm="mule-realm"/>
-                    <cxf:simple-service/>
+                    <cxf:simple-service>
+                        <cxf:inInterceptors>
+                            <spring:bean class="org.apache.cxf.interceptor.URIMappingInterceptor"/>
+                        </cxf:inInterceptors>
+                    </cxf:simple-service>
                 </inbound-endpoint>
             </inbound>
             <echo-component/>
@@ -55,7 +59,11 @@
                     address="http://localhost:${port1}/services/Echo"
                     exchange-pattern="request-response">
                     <spring-sec:http-security-filter realm="mule-realm"/>
-                    <cxf:simple-service/>
+                    <cxf:simple-service>
+                        <cxf:inInterceptors>
+                            <spring:bean class="org.apache.cxf.interceptor.URIMappingInterceptor"/>
+                        </cxf:inInterceptors>
+                    </cxf:simple-service>
                 </inbound-endpoint>
             </inbound>
             <echo-component/>

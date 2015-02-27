@@ -42,7 +42,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.transport.http.UrlUtilities;
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ResourceManagerWSDLLocator;
@@ -83,7 +83,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 || baseUri.toLowerCase().contains("xsd=")))) {
 
             int idx = baseUri.indexOf("?");
-            Map<String, String> map = UrlUtilities.parseQueryString(baseUri.substring(idx + 1));
+            Map<String, String> map = UrlUtils.parseQueryString(baseUri.substring(idx + 1));
             if (map.containsKey("wsdl")
                 || map.containsKey("xsd")) {
                 if (contextMatchExact) {
@@ -91,7 +91,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 } else {
                     // contextMatchStrategy will be "stem"
                     return endpointInfo.getAddress().
-                                contains(UrlUtilities.getStem(baseUri.substring(0, idx)));
+                                contains(UrlUtils.getStem(baseUri.substring(0, idx)));
                 }
             }
         }
@@ -103,7 +103,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                               EndpointInfo endpointInfo, OutputStream os) {
         try {
             int idx = baseUri.toLowerCase().indexOf("?");
-            Map<String, String> params = UrlUtilities.parseQueryString(baseUri.substring(idx + 1));
+            Map<String, String> params = UrlUtils.parseQueryString(baseUri.substring(idx + 1));
 
             String base;
 

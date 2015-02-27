@@ -21,7 +21,7 @@ import javax.xml.ws.Service;
  * 
  */
 @WebServiceClient(name = "HolderServiceService", 
-                  wsdlLocation = "/Users/evangelinamartinezruizmoreno/echoHolder.wsdl",
+                  wsdlLocation = "echoHolder.wsdl",
                   targetNamespace = "http://cxf.module.mule.org/") 
 public class HolderServiceService extends Service {
 
@@ -32,11 +32,11 @@ public class HolderServiceService extends Service {
     static {
         URL url = null;
         try {
-            url = new URL("/Users/evangelinamartinezruizmoreno/echoHolder.wsdl");
+            url = new URL("echoHolder.wsdl");
         } catch (MalformedURLException e) {
             java.util.logging.Logger.getLogger(HolderServiceService.class.getName())
                 .log(java.util.logging.Level.INFO, 
-                     "Can not initialize the default wsdl from {0}", "/Users/evangelinamartinezruizmoreno/echoHolder.wsdl");
+                     "Can not initialize the default wsdl from {0}", "echoHolder.wsdl");
         }
         WSDL_LOCATION = url;
     }
