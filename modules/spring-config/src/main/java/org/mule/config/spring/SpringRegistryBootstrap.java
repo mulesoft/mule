@@ -102,7 +102,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
     private final BeanDefinitionRegistry beanDefinitionRegistry;
 
     private ArtifactType supportedArtifactType = ArtifactType.APP;
-    private MuleContext context;
+    private MuleContext muleContext;
 
     public enum ArtifactType
     {
@@ -159,7 +159,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
      */
     public void setMuleContext(MuleContext context)
     {
-        this.context = context;
+        this.muleContext = context;
     }
 
     public void boot() throws BootstrapException
@@ -214,7 +214,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
             registerUnnamedObjects(unnamedObjects);
             registerTransformers(transformers);
             registerObjects(namedObjects);
-            registerTransactionFactories(singleTransactionFactories, context);
+            registerTransactionFactories(singleTransactionFactories, muleContext);
             registerLimboObjects();
         }
         catch (Exception e1)
@@ -350,18 +350,16 @@ public class SpringRegistryBootstrap implements MuleContextAware
 
     private void registerLimboObjects()
     {
-        if (!(context.getRegistry() instanceof ObjectLimboLocator))
+        if (!(muleContext.getRegistry() instanceof ObjectLimboLocator))
         {
             return;
         }
 
-        ObjectLimbo limbo = ((ObjectLimboLocator) context.getRegistry()).getLimbo();
+        ObjectLimbo limbo = ((ObjectLimboLocator) muleContext.getRegistry()).getLimbo();
 
         for (Entry<String, Object> entry : limbo.getObjects().entrySet())
         {
-            BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(FixedFactoryBean.class);
-            builder.addConstructorArgValue(entry.getValue());
-            doRegisterObject(entry.getKey(), builder);
+            registerInstance(entry.getKey(), entry.getValue());
         }
 
         limbo.clear();
@@ -432,7 +430,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
         if (BootstrapObjectFactory.class.isAssignableFrom(type))
         {
             builder = BeanDefinitionBuilder.rootBeanDefinition(BootstrapObjectFactoryBean.class);
-            builder.addConstructorArgValue(type);
+            builder.addConstructorArgValue(ClassUtils.instanciateClass(type));
         }
         else
         {
@@ -445,6 +443,13 @@ public class SpringRegistryBootstrap implements MuleContextAware
     private void doRegisterObject(String key, BeanDefinitionBuilder builder)
     {
         beanDefinitionRegistry.registerBeanDefinition(key, builder.getBeanDefinition());
+    }
+
+    private void registerInstance(String key, Object value)
+    {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(FixedFactoryBean.class);
+        builder.addConstructorArgValue(value);
+        doRegisterObject(key, builder);
     }
 
     private Class getClass(String className) throws ClassNotFoundException
