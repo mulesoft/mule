@@ -11,7 +11,6 @@ import org.mule.api.EndpointAnnotationParser;
 import org.mule.api.MessageProcessorAnnotationParser;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.annotations.meta.Channel;
 import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.annotations.meta.Router;
@@ -21,6 +20,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.PreInitProcessor;
 import org.mule.api.routing.OutboundRouter;
@@ -31,7 +31,6 @@ import org.mule.component.AbstractJavaComponent;
 import org.mule.config.AnnotationsParserFactory;
 import org.mule.config.endpoint.AnnotatedEndpointHelper;
 import org.mule.config.i18n.AnnotationsMessages;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.registry.RegistryMap;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
@@ -54,8 +53,12 @@ import org.apache.commons.logging.LogFactory;
  * It will look for a non-system {@link org.mule.api.model.Model} registered with the Registry.
  * If one is not found a default  SEDA Model will be created
  * Finally, the processor will register the service with the Registry and return null.
+ *
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
-public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, MuleContextAware
+@Deprecated
+public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, MuleContextAware, Startable
 {
     /**
      * logger used by this class
@@ -79,20 +82,19 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
 
     public void setMuleContext(MuleContext context)
     {
-        try
+        this.context = context;
+        this.regProps = new RegistryMap(context.getRegistry());
+    }
+
+
+    @Override
+    public void start() throws MuleException
+    {
+        helper = new AnnotatedEndpointHelper(context);
+        parserFactory = context.getRegistry().lookupObject(AnnotationsParserFactory.class);
+        if (parserFactory == null)
         {
-            this.context = context;
-            this.regProps = new RegistryMap(context.getRegistry());
-            this.helper = new AnnotatedEndpointHelper(context);
-            this.parserFactory = context.getRegistry().lookupObject(AnnotationsParserFactory.class);
-            if(parserFactory==null)
-            {
-                logger.info(AnnotationsParserFactory.class.getName() +" implementation not found in registry, annotations not enabled");
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToCreate(getClass().getName()), e);
+            logger.info(AnnotationsParserFactory.class.getName() + " implementation not found in registry, annotations not enabled");
         }
     }
 

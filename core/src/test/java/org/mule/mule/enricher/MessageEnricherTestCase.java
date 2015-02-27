@@ -27,6 +27,12 @@ import org.junit.Test;
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 {
 
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
+        setStartContext(true);
+    }
+
     @Test
     public void testEnrichHeaderWithPayload() throws Exception
     {

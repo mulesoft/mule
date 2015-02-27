@@ -9,6 +9,7 @@ package org.mule.lifecycle.phases;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.component.Component;
+import org.mule.api.config.Config;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
@@ -23,7 +24,6 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.TransactionalQueueManager;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -64,6 +64,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Config.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
 

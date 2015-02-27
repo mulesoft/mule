@@ -30,4 +30,10 @@ final class MuleDomainContext extends MuleArtifactContext
         return MuleDomainBeanDefinitionDocumentReader.class;
     }
 
+    @Override
+    protected void initialiseBootstrap(SpringRegistryBootstrap bootstrap)
+    {
+        super.initialiseBootstrap(bootstrap);
+        bootstrap.setSupportedArtifactType(SpringRegistryBootstrap.ArtifactType.DOMAIN);
+    }
 }

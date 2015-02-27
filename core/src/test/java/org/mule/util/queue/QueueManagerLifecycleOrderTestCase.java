@@ -8,18 +8,16 @@ package org.mule.util.queue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.construct.Flow;
-import org.mule.context.DefaultMuleContextFactory;
 import org.mule.security.MuleSecurityManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.TestingMuleContextFactory;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
     @Test
     public void testStartupOrder() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
+        MuleContext muleContext = new TestingMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
         FlowConstruct fc = new RecordingFlow("dummy", muleContext);
         muleContext.getRegistry().registerFlowConstruct(fc);
         muleContext.start();

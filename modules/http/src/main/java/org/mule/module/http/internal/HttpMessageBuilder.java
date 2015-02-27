@@ -7,6 +7,9 @@
 package org.mule.module.http.internal;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
@@ -14,11 +17,11 @@ import com.google.common.collect.Multimap;
 
 import java.util.List;
 
-public class HttpMessageBuilder
+public class HttpMessageBuilder implements Initialisable
 {
 
     private String name;
-    private Multimap<HttpParamType, HttpParam> params = ArrayListMultimap.create();
+    protected Multimap<HttpParamType, HttpParam> params = ArrayListMultimap.create();
 
     public void setParams(List<HttpParam> httpParams)
     {
@@ -26,6 +29,13 @@ public class HttpMessageBuilder
         {
             params.put(httpParam.getType(), httpParam);
         }
+    }
+
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        LifecycleUtils.initialiseIfNeeded(params.values());
     }
 
     public ParameterMap resolveParams(MuleEvent muleEvent, HttpParamType httpParamType)

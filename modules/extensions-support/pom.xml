@@ -34,17 +34,6 @@
 			<artifactId>mule-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-        </dependency>
-
-        <!--move to higher level-->
-        <dependency>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>${javaInjectionVersion}</version>
-        </dependency>
 
         <!--Test Dependencies-->
         <dependency>

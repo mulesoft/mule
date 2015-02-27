@@ -603,7 +603,7 @@ public class DefaultMuleContext implements MuleContext
 
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
     {
-        registryBroker.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+        getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
         this.queueManager = queueManager;
     }
 
@@ -762,11 +762,19 @@ public class DefaultMuleContext implements MuleContext
         return executionClassLoader;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
     public void addRegistry(Registry registry)
     {
         registryBroker.addRegistry(registry);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
     public void removeRegistry(Registry registry)
     {
         registryBroker.removeRegistry(registry);

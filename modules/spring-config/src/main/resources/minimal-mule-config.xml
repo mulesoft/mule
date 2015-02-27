@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
-    <spring:beans default-init-method="initialise">
-        <!-- Marker for MULE-4813-->
+    <spring:beans>
 
         <spring:bean name="_muleNotificationManager" class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
 
@@ -18,29 +16,56 @@
 
         <spring:bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentQueueStore"/>
 
-        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
+        <!--=================================-->
+        <!--BEGINNING OF LOCAL/CLUSTER SECTION-->
+        <!--=================================-->
 
-        <spring:alias name="_defaultInMemoryObjectStore" alias="_localInMemoryObjectStore" />
+        <!--The following section contains beans which implementation is replaced when the cluster core extension is active.-->
+        <!--However, non cluster aware components such as Batch still need the local version of those components-->
+        <!--to be available. Such components are defined in this section. Notice that the FixedFactoryBean is used-->
+        <!--instead of a simple spring alias to allow the core extension to replace the default implementation-->
+        <!--while keeping the local version intact. When the cluster core extension is not active, both-->
+        <!--the default and local beans resolve to the same instance-->
 
-        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
+        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.config.spring.factories.FixedFactoryBean">
+            <spring:constructor-arg ref="_localInMemoryObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_defaultPersistentObjectStore" alias="_localPersistentObjectStore" />
+        <spring:bean name="_localInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
 
-        <spring:bean name="_defaultUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
+        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.config.spring.factories.FixedFactoryBean">
+            <spring:constructor-arg ref="_localPersistentObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_defaultUserObjectStore" alias="_localUserObjectStore" />
+        <spring:bean name="_localPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
 
-        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
+        <spring:bean name="_defaultUserObjectStore" class="org.mule.config.spring.factories.FixedFactoryBean">
+            <spring:constructor-arg ref="_localUserObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_defaultTransientUserObjectStore" alias="_localTransientUserObjectStore" />
+        <spring:bean name="_localUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
 
-        <spring:bean name="_muleQueueManager" class="org.mule.util.queue.DelegateQueueManager"/>
+        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.config.spring.factories.FixedFactoryBean">
+            <spring:constructor-arg ref="_localTransientUserObjectStore"/>
+        </spring:bean>
 
-        <spring:alias name="_muleQueueManager" alias="_localQueueManager"/>
+        <spring:bean name="_localTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
 
-        <spring:bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" destroy-method="dispose" />
+        <spring:bean name="_muleQueueManager" class="org.mule.config.spring.factories.FixedFactoryBean">
+            <spring:constructor-arg ref="_localQueueManager"/>
+        </spring:bean>
+
+        <spring:bean name="_localQueueManager" class="org.mule.util.queue.DelegateQueueManager"/>
+
+        <!--object store manager needs to be initialised by spring to keep backwards compatibility with-->
+        <!--beans using it as factory method (i.e: cache)-->
+        <spring:bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" init-method="initialise"/>
 
         <spring:alias name="_muleObjectStoreManager" alias="_localObjectStoreManager" />
+
+        <!--============================-->
+        <!--END OF LOCAL/CLUSTER SECTION-->
+        <!--============================-->
 
         <spring:bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
 

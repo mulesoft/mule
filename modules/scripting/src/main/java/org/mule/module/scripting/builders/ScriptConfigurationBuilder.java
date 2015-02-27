@@ -12,6 +12,7 @@ import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.builders.i18n.BuildersMessages;
 import org.mule.module.scripting.component.Scriptable;
+import org.mule.registry.SimpleRegistry;
 
 import javax.script.Bindings;
 
@@ -66,6 +67,9 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
         this.muleContext = muleContext;
+        SimpleRegistry registry = new SimpleRegistry(muleContext);
+        registry.initialise();
+        muleContext.addRegistry(registry);
 
         scriptComponent = new Scriptable(muleContext);
         scriptComponent.setScriptEngineName(scriptEngineName);

@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
@@ -21,11 +20,14 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
-
 import org.junit.Test;
 
 public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
 {
+    public ExpressionTransformerTestCase()
+    {
+        setStartContext(true);
+    }
 
     /**
      * See: MULE-4797 GroovyExpressionEvaluator script is unable to load user classes when used with hot
@@ -34,18 +36,19 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
      * @throws TransformerException
      */
     @Test
-    public void testExpressionEvaluationClassLoader() throws ClassNotFoundException, TransformerException
+    public void testExpressionEvaluationClassLoader() throws Exception
     {
         ExpressionTransformer transformer = new ExpressionTransformer();
-        transformer.setMuleContext(muleContext);
         transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig(
-            "payload instanceof org.MyClass", "groovy", null), false));
+                "payload instanceof org.MyClass", "groovy", null), false));
+        transformer.setMuleContext(muleContext);
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
             Thread.currentThread().setContextClassLoader(new MyClassClassLoader());
             transformer.initialise();
+            transformer.start();
         }
         catch (Exception e)
         {
@@ -60,18 +63,19 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testExpressionEvaluationClassLoaderEL() throws ClassNotFoundException, TransformerException
+    public void testExpressionEvaluationClassLoaderEL() throws Exception
     {
         ExpressionTransformer transformer = new ExpressionTransformer();
         transformer.setMuleContext(muleContext);
         transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig("payload is org.MyClass",
-            null, null), false));
+                                                                                    null, null), false));
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
             Thread.currentThread().setContextClassLoader(new MyClassClassLoader());
             transformer.initialise();
+            transformer.start();
         }
         catch (Exception e)
         {

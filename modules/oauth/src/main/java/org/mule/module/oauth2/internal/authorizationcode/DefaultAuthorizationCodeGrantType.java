@@ -146,6 +146,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
             if (tokenManagerConfig == null)
             {
                 this.tokenManagerConfig = TokenManagerConfig.createDefault(muleContext);
+                this.tokenManagerConfig.initialise();
             }
             if (localAuthorizationUrlResourceOwnerIdEvaluator == null)
             {

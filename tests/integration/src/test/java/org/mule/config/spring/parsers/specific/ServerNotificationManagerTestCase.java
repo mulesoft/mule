@@ -97,7 +97,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
 
-        // Not registered asad-hoc listener with null subscription as this is defined
+        // Not registered as ad-hoc listener with null subscription as this is defined
         // explicitly.
         assertFalse(manager.getListeners().contains(
             new ListenerSubscriptionPair((ServerNotificationListener) muleContext.getRegistry().lookupObject(

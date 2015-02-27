@@ -21,7 +21,10 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.AbstractServiceDescriptor;
+import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.ObjectLimbo;
+import org.mule.api.registry.ObjectLimboLocator;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.ServiceDescriptor;
@@ -64,7 +67,7 @@ import org.apache.commons.logging.LogFactory;
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
  * Registry interface.
  */
-public class MuleRegistryHelper implements MuleRegistry
+public class MuleRegistryHelper implements MuleRegistry, ObjectLimboLocator
 {
     protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
@@ -146,35 +149,13 @@ public class MuleRegistryHelper implements MuleRegistry
     }
 
     /**
-     * Removed this method from {@link Registry} API as it should only be used
-     * internally and may confuse users. The {@link EndpointFactory} should be used
-     * for creating endpoints.<br/><br/> Looks up an returns endpoints registered in the
-     * registry by their identifier (currently endpoint name)<br/><br/ <b>NOTE:
-     * This method does not create new endpoint instances, but rather returns
-     * existing endpoint instances that have been registered. This lookup method
-     * should be avoided and the intelligent, role specific endpoint lookup methods
-     * should be used instead.<br/><br/>
-     *
-     * @param name the idendtifer/name used to register endpoint in registry
-     * @return foo
+     * {@inheritDoc}
      */
-    /*public ImmutableEndpoint lookupEndpoint(String name)
+    @Override
+    public ObjectLimbo getLimbo()
     {
-        Object obj = registry.lookupObject(name);
-        if (obj instanceof ImmutableEndpoint)
-        {
-            return (ImmutableEndpoint) obj;
-        }
-        else
-        {
-            logger.debug("No endpoint with the name: "
-                    + name
-                    + "found.  If "
-                    + name
-                    + " is a global endpoint you should use the EndpointFactory to create endpoint instances from global endpoints.");
-            return null;
-        }
-    }*/
+        return registry.getLimbo();
+    }
 
     /**
      * {@inheritDoc}
@@ -184,12 +165,18 @@ public class MuleRegistryHelper implements MuleRegistry
         Object o = registry.lookupObject(name);
         if (o instanceof EndpointBuilder)
         {
-            logger.debug("Global endpoint EndpointBuilder for name: " + name + " found");
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Global endpoint EndpointBuilder for name: " + name + " found");
+            }
             return (EndpointBuilder) o;
         }
         else
         {
-            logger.debug("No endpoint builder with the name: " + name + " found.");
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("No endpoint builder with the name: " + name + " found.");
+            }
             return null;
         }
     }
@@ -528,10 +515,10 @@ public class MuleRegistryHelper implements MuleRegistry
         String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
         // TODO If we want these descriptors loaded form Spring we need to change the key mechanism
         // and the scope, and then deal with circular reference issues.
-        ServiceDescriptor sd = (ServiceDescriptor) registry.lookupObject(key);
 
         synchronized (this)
         {
+            ServiceDescriptor sd = registry.lookupObject(key);
             if (sd == null)
             {
                 sd = createServiceDescriptor(type, name, overrides);
@@ -544,8 +531,8 @@ public class MuleRegistryHelper implements MuleRegistry
                     throw new ServiceException(e.getI18nMessage(), e);
                 }
             }
+            return sd;
         }
-        return sd;
     }
 
     protected ServiceDescriptor createServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
@@ -725,30 +712,59 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object applyProcessors(Object object) throws MuleException
     {
-        return registry.getTransientRegistry().applyProcessors(object, null);
+        return inject(object);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
+    @Deprecated
     public Object applyProcessors(Object object, int flags) throws MuleException
     {
-        return registry.getTransientRegistry().applyProcessors(object, flags);
+        return inject(object);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Object applyLifecycle(Object object) throws MuleException
+    @Override
+    public Object inject(Object object) throws MuleException
     {
-        return registry.getTransientRegistry().applyLifecycle(object);
+        InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
+        if (initialisingRegistry != null)
+        {
+            return initialisingRegistry.inject(object);
+        }
+
+        return object;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object applyLifecycle(Object object) throws MuleException
+    {
+        return applyLifecycle(object, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Object applyLifecycle(Object object, String phase) throws MuleException
     {
-        return registry.getTransientRegistry().applyLifecycle(object, phase);
+        InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
+        if (initialisingRegistry != null)
+        {
+            return initialisingRegistry.applyLifecycle(object, phase);
+        }
+
+        return object;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -812,7 +828,7 @@ public class MuleRegistryHelper implements MuleRegistry
         postObjectRegistrationActions(value);
     }
 
-    private void postObjectRegistrationActions(Object value)
+    public void postObjectRegistrationActions(Object value)
     {
         if (value instanceof TransformerResolver)
         {
@@ -835,7 +851,7 @@ public class MuleRegistryHelper implements MuleRegistry
         postObjectRegistrationActions(value);
     }
 
-    private void registerTransformerResolver(TransformerResolver value)
+    public void registerTransformerResolver(TransformerResolver value)
     {
         Lock lock = transformerResolversLock.writeLock();
         lock.lock();
@@ -861,23 +877,22 @@ public class MuleRegistryHelper implements MuleRegistry
         {
             postObjectRegistrationActions(value);
         }
-
     }
 
     /**
      * {@inheritDoc}
      */
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
+    public Object unregisterObject(String key, Object metadata) throws RegistrationException
     {
-        registry.unregisterObject(key, metadata);
+        return registry.unregisterObject(key, metadata);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void unregisterObject(String key) throws RegistrationException
+    public Object unregisterObject(String key) throws RegistrationException
     {
-        registry.unregisterObject(key);
+        return registry.unregisterObject(key);
     }
 
     /**

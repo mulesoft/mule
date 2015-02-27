@@ -24,4 +24,9 @@ public class BootstrapException extends ConfigurationException
     {
         super(message, cause);
     }
+
+    public BootstrapException(Message message)
+    {
+        super(message);
+    }
 }

@@ -8,7 +8,6 @@ package org.mule.module.extensions.internal.config;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
@@ -19,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-abstract class BaseResolverFactoryBean<T extends ValueResolver> implements FactoryBean<T> , MuleContextAware, Initialisable, Disposable
+abstract class BaseResolverFactoryBean<T extends ValueResolver> implements FactoryBean<T> , MuleContextAware, Initialisable
 {
     protected final Logger logger = LoggerFactory.getLogger(getObjectType());
 
@@ -75,16 +74,4 @@ abstract class BaseResolverFactoryBean<T extends ValueResolver> implements Facto
     {
         LifecycleUtils.initialiseIfNeeded(valueResolver, muleContext);
     }
-
-    /**
-     * Propagates the disposal event to the
-     * underlying {@link #valueResolver} if it implements
-     * the {@link Disposable} interface
-     */
-    @Override
-    public void dispose()
-    {
-        LifecycleUtils.disposeIfNeeded(valueResolver, logger);
-    }
-
 }

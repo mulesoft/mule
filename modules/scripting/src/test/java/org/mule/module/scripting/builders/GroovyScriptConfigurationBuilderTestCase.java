@@ -7,17 +7,12 @@
 package org.mule.module.scripting.builders;
 
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.MuleProperties;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
-import org.mule.util.store.QueuePersistenceObjectStore;
-import org.mule.util.store.QueueStoreAdapter;
-import org.mule.util.store.SimpleMemoryObjectStore;
 
-import java.io.Serializable;
-import java.util.Properties;
+import java.util.List;
 
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
@@ -42,15 +37,15 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
     }
 
     @Override
-    protected Properties getStartUpProperties()
+    protected void addBuilders(List<ConfigurationBuilder> builders)
     {
-        Properties superProps = super.getStartUpProperties();
-        Properties props = superProps == null ? new Properties() : new Properties(superProps);
-        props.put(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>()));
-        props.put(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME, new QueueStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>()));
-        props.put(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, new SimpleMemoryObjectStore<Serializable>());
-        props.put(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, new QueuePersistenceObjectStore<Serializable>());
-
-        return props;
+        try
+        {
+            builders.add(0, new SpringXmlConfigurationBuilder(new String[] {}));
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }
