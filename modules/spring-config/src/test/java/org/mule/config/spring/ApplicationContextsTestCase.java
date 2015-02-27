@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.TestingMuleContextFactory;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -129,7 +128,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     @Test
     public void testParentContext() throws Exception
     {
-        context = new DefaultMuleContextFactory().createMuleContext();
+        context = new TestingMuleContextFactory().createMuleContext();
 
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
 
@@ -151,7 +150,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     @Test
     public void testAppContextTogetherWithMuleConfig() throws Exception
     {
-        context = new DefaultMuleContextFactory().createMuleContext();
+        context = new TestingMuleContextFactory().createMuleContext();
 
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("application-context.xml, mule-config.xml");
         builder.configure(context);
