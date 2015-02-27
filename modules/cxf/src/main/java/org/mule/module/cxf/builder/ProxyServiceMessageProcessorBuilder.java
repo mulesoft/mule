@@ -87,7 +87,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
 
         if (isValidationEnabled())
         {
-            server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(),
+            server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(), server.getEndpoint(),
                     server.getEndpoint().getService().getServiceInfos().get(0)));
         }
     }

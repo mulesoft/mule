@@ -1,84 +1,90 @@
-<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="EchoComponent" targetNamespace="http://simple.component.mule.org/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://simple.component.mule.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <wsdl:types>
-<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://simple.component.mule.org/" xmlns:tns="http://simple.component.mule.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-<xsd:element name="echo" type="tns:echo" />
-<xsd:complexType name="echo">
-<xsd:sequence>
-<xsd:element minOccurs="0" name="echo" nillable="true" type="xsd:string" />
-</xsd:sequence>
-</xsd:complexType>
-<xsd:element name="echoResponse" type="tns:echoResponse" />
-<xsd:complexType name="echoResponse">
-<xsd:sequence>
-<xsd:element minOccurs="0" name="return" nillable="true" type="xsd:string" />
-</xsd:sequence>
-</xsd:complexType>
-<xsd:element name="log" type="tns:log" />
-<xsd:complexType name="log">
-<xsd:sequence>
-<xsd:element minOccurs="0" name="message" nillable="true" type="xsd:string" />
-</xsd:sequence>
-</xsd:complexType>
-<xsd:element name="logResponse" type="tns:logResponse" />
-<xsd:complexType name="logResponse">
-<xsd:sequence />
-</xsd:complexType>
-</xsd:schema>
-  </wsdl:types>
-  <wsdl:message name="logResponse">
-    <wsdl:part element="tns:logResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="log">
-    <wsdl:part element="tns:log" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="echoResponse">
-    <wsdl:part element="tns:echoResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="echo">
-    <wsdl:part element="tns:echo" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="EchoComponentPortType">
-    <wsdl:operation name="echo">
-      <wsdl:input message="tns:echo" name="echo">
-    </wsdl:input>
-      <wsdl:output message="tns:echoResponse" name="echoResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="log">
-      <wsdl:input message="tns:log" name="log">
-    </wsdl:input>
-      <wsdl:output message="tns:logResponse" name="logResponse">
-    </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="EchoComponentSoapBinding" type="tns:EchoComponentPortType">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
-    <wsdl:operation name="echo">
-      <soap:operation soapAction="" style="document" />
-      <wsdl:input name="echo">
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="echoResponse">
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="log">
-      <soap:operation soapAction="" style="document" />
-      <wsdl:input name="log">
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="logResponse">
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="EchoComponent">
-    <wsdl:port binding="tns:EchoComponentSoapBinding" name="EchoComponentPort">
-      <soap:address location="http://Dan-X301:6070/webServiceProxy" />
-    </wsdl:port>
-  </wsdl:service>
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions name="EchoComponent" targetNamespace="http://simple.component.mule.org/"
+                  xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="http://simple.component.mule.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <wsdl:types>
+        <xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+                    targetNamespace="http://simple.component.mule.org/" xmlns:tns="http://simple.component.mule.org/"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <xsd:element name="echo" type="tns:echo"/>
+            <xsd:complexType name="echo">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="echo" nillable="true" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="echoResponse" type="tns:echoResponse"/>
+            <xsd:complexType name="echoResponse">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="return" nillable="true" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="log" type="tns:log"/>
+            <xsd:complexType name="log">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="message" nillable="true" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="logResponse" type="tns:logResponse"/>
+            <xsd:complexType name="logResponse">
+                <xsd:sequence/>
+            </xsd:complexType>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="logResponse">
+        <wsdl:part element="tns:logResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="log">
+        <wsdl:part element="tns:log" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="echoResponse">
+        <wsdl:part element="tns:echoResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="echo">
+        <wsdl:part element="tns:echo" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="EchoComponentPortType">
+        <wsdl:operation name="echo">
+            <wsdl:input message="tns:echo" name="echo">
+            </wsdl:input>
+            <wsdl:output message="tns:echoResponse" name="echoResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="log">
+            <wsdl:input message="tns:log" name="log">
+            </wsdl:input>
+            <wsdl:output message="tns:logResponse" name="logResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="EchoComponentSoapBinding" type="tns:EchoComponentPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="echo">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="echo">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="echoResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="log">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="log">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="logResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="EchoComponent">
+        <wsdl:port binding="tns:EchoComponentSoapBinding" name="EchoComponentPort">
+            <soap:address location="http://Dan-X301:6070/webServiceProxy"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>
