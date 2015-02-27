@@ -37,10 +37,11 @@ public class SimpleRegistry extends TransientRegistry implements InitialisingReg
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleRegistry.class);
+    private static final String REGISTRY_ID = "org.mule.Registry.Simple";
 
     public SimpleRegistry(MuleContext muleContext)
     {
-        super(muleContext);
+        super(REGISTRY_ID, muleContext);
     }
 
     @Override
