@@ -13,7 +13,11 @@ import org.mule.api.registry.PreInitProcessor;
 /**
  * Will register any {@link org.mule.api.context.notification.ServerNotificationListener} instances with the MuleContext
  * to receive notifications
+ *
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
+@Deprecated
 public class NotificationListenerProcessor implements PreInitProcessor
 {
     private MuleContext context;

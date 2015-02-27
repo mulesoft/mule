@@ -28,6 +28,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * @deprecated as of 3.7.0. This will be removed in Mule 4.0
+ */
+@Deprecated
 public abstract class AbstractRegistryBroker implements RegistryBroker, ObjectLimboLocator
 {
     private final ObjectLimbo limbo = new DefaultObjectLimbo();

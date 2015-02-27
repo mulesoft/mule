@@ -217,10 +217,16 @@ public interface MuleContext extends Lifecycle
      */
     public StreamCloserService getStreamCloserService();
 
-    // TODO This should ideally only be available via an Admin interface
+    /**
+     * @deprecated as of 3.7.0. This will be removed in Mule 4.0
+     */
+    @Deprecated
     void addRegistry(Registry registry);
 
-    // TODO This should ideally only be available via an Admin interface
+    /**
+     * @deprecated as of 3.7.0. This will be removed in Mule 4.0
+     */
+    @Deprecated
     void removeRegistry(Registry registry);
 
     /**
