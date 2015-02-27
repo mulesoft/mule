@@ -762,11 +762,19 @@ public class DefaultMuleContext implements MuleContext
         return executionClassLoader;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
     public void addRegistry(Registry registry)
     {
         registryBroker.addRegistry(registry);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
     public void removeRegistry(Registry registry)
     {
         registryBroker.removeRegistry(registry);

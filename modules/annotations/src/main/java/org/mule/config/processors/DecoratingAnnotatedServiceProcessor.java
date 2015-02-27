@@ -53,7 +53,11 @@ import org.apache.commons.logging.LogFactory;
  * It will look for a non-system {@link org.mule.api.model.Model} registered with the Registry.
  * If one is not found a default  SEDA Model will be created
  * Finally, the processor will register the service with the Registry and return null.
+ *
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
+@Deprecated
 public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, MuleContextAware, Startable
 {
     /**

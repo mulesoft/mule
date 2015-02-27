@@ -8,9 +8,13 @@ package org.mule.api.registry;
 
 /**
  * A RegistryBroker delegates calls to a collection of Registries.
+ *
+ * @deprecated as of 3.7.0. This will be removed in Mule 4.0
  */
+@Deprecated
 public interface RegistryBroker extends Registry
 {
+
     void addRegistry(Registry registry);
 
     void removeRegistry(Registry registry);
