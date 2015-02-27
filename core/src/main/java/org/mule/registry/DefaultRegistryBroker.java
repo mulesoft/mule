@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * @deprecated as of 3.7.0. This will be removed in Mule 4.0
+ */
+@Deprecated
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {
     private final List<Registry> registries = new CopyOnWriteArrayList<>();
@@ -24,6 +28,7 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
     {
         super(context);
     }
+
 
     public void addRegistry(Registry registry)
     {
