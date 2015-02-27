@@ -87,7 +87,9 @@ public interface Registry extends Initialisable, Disposable
      * @param value the object to store in the registry. This is a non-null value
      * @param metadata an implementation specific argument that can be passed into the method
      * @throws RegistrationException if an object with the same key already exists
+     * @deprecated as of 3.7.0. Use {@link #registerObject(String, Object)} instead
      */
+    @Deprecated
     void registerObject(String key, Object value, Object metadata) throws RegistrationException;
 
     /**

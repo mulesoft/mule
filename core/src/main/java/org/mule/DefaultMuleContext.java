@@ -603,7 +603,7 @@ public class DefaultMuleContext implements MuleContext
 
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
     {
-        registryBroker.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+        getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
         this.queueManager = queueManager;
     }
 
