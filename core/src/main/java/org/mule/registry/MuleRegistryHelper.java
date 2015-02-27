@@ -23,6 +23,8 @@ import org.mule.api.model.Model;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.InitialisingRegistry;
 import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.ObjectLimbo;
+import org.mule.api.registry.ObjectLimboLocator;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.ServiceDescriptor;
@@ -65,7 +67,7 @@ import org.apache.commons.logging.LogFactory;
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
  * Registry interface.
  */
-public class MuleRegistryHelper implements MuleRegistry
+public class MuleRegistryHelper implements MuleRegistry, ObjectLimboLocator
 {
     protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
@@ -147,35 +149,13 @@ public class MuleRegistryHelper implements MuleRegistry
     }
 
     /**
-     * Removed this method from {@link Registry} API as it should only be used
-     * internally and may confuse users. The {@link EndpointFactory} should be used
-     * for creating endpoints.<br/><br/> Looks up an returns endpoints registered in the
-     * registry by their identifier (currently endpoint name)<br/><br/ <b>NOTE:
-     * This method does not create new endpoint instances, but rather returns
-     * existing endpoint instances that have been registered. This lookup method
-     * should be avoided and the intelligent, role specific endpoint lookup methods
-     * should be used instead.<br/><br/>
-     *
-     * @param name the idendtifer/name used to register endpoint in registry
-     * @return foo
+     * {@inheritDoc}
      */
-    /*public ImmutableEndpoint lookupEndpoint(String name)
+    @Override
+    public ObjectLimbo getLimbo()
     {
-        Object obj = registry.lookupObject(name);
-        if (obj instanceof ImmutableEndpoint)
-        {
-            return (ImmutableEndpoint) obj;
-        }
-        else
-        {
-            logger.debug("No endpoint with the name: "
-                    + name
-                    + "found.  If "
-                    + name
-                    + " is a global endpoint you should use the EndpointFactory to create endpoint instances from global endpoints.");
-            return null;
-        }
-    }*/
+        return registry.getLimbo();
+    }
 
     /**
      * {@inheritDoc}

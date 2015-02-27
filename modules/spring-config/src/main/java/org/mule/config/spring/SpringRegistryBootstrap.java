@@ -11,6 +11,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.registry.ObjectLimbo;
+import org.mule.api.registry.ObjectLimboLocator;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.DataType;
@@ -22,6 +24,7 @@ import org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer;
 import org.mule.config.bootstrap.RegistryBootstrapDiscoverer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
+import org.mule.config.spring.factories.FixedFactoryBean;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
@@ -39,10 +42,8 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 /**
  * This object will generate bean definitions for entries defined in a file called <code>registry-bootstrap.properties</code>.
@@ -214,6 +215,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
             registerTransformers(transformers);
             registerObjects(namedObjects);
             registerTransactionFactories(singleTransactionFactories, context);
+            registerLimboObjects();
         }
         catch (Exception e1)
         {
@@ -302,17 +304,14 @@ public class SpringRegistryBootstrap implements MuleContextAware
                     }
                 }
 
-                GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-                beanDefinition.setBeanClass(transformerClass);
-
-                MutablePropertyValues properties = new MutablePropertyValues();
+                BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(transformerClass);
 
                 DataType returnType = null;
 
                 if (returnClass != null)
                 {
                     returnType = DataTypeFactory.create(returnClass, mime);
-                    properties.addPropertyValue("returnDataType", returnType);
+                    builder.addPropertyValue("returnDataType", returnType);
                 }
 
                 if (name == null)
@@ -323,11 +322,8 @@ public class SpringRegistryBootstrap implements MuleContextAware
                     name = "_" + TransformerUtils.generateTransformerName(transformerClass, returnType);
                 }
 
-                properties.addPropertyValue("name", name);
-                beanDefinition.setPropertyValues(properties);
-
-                beanDefinitionRegistry.registerBeanDefinition(name, beanDefinition);
-
+                builder.addPropertyValue("name", name);
+                doRegisterObject(name, builder);
             }
             catch (NoClassDefFoundError ncdfe)
             {
@@ -350,6 +346,25 @@ public class SpringRegistryBootstrap implements MuleContextAware
             registerObject((String)entry.getKey(), (String)entry.getValue());
         }
         props.clear();
+    }
+
+    private void registerLimboObjects()
+    {
+        if (!(context.getRegistry() instanceof ObjectLimboLocator))
+        {
+            return;
+        }
+
+        ObjectLimbo limbo = ((ObjectLimboLocator) context.getRegistry()).getLimbo();
+
+        for (Entry<String, Object> entry : limbo.getObjects().entrySet())
+        {
+            BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(FixedFactoryBean.class);
+            builder.addConstructorArgValue(entry.getValue());
+            doRegisterObject(entry.getKey(), builder);
+        }
+
+        limbo.clear();
     }
 
     private void registerUnnamedObjects(Properties props) throws Exception
@@ -393,21 +408,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
             }
 
             Class<?> clazz = getClass(className);
-            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-
-            if (BootstrapObjectFactory.class.isAssignableFrom(clazz))
-            {
-                beanDefinition.setBeanClass(BootstrapObjectFactoryBean.class);
-                ConstructorArgumentValues arguments = new ConstructorArgumentValues();
-                arguments.addGenericArgumentValue(ClassUtils.instanciateClass(className));
-                beanDefinition.setConstructorArgumentValues(arguments);
-            }
-            else
-            {
-                beanDefinition.setBeanClass(clazz);
-            }
-
-            beanDefinitionRegistry.registerBeanDefinition(key, beanDefinition);
+            doRegisterObject(key, clazz);
         }
         catch (InvocationTargetException itex)
         {
@@ -422,6 +423,28 @@ public class SpringRegistryBootstrap implements MuleContextAware
         {
             throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional object: " + className);
         }
+    }
+
+    private void doRegisterObject(String key, Class<?> type) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+    {
+        BeanDefinitionBuilder builder;
+
+        if (BootstrapObjectFactory.class.isAssignableFrom(type))
+        {
+            builder = BeanDefinitionBuilder.rootBeanDefinition(BootstrapObjectFactoryBean.class);
+            builder.addConstructorArgValue(type);
+        }
+        else
+        {
+            builder = BeanDefinitionBuilder.rootBeanDefinition(type);
+        }
+
+        doRegisterObject(key, builder);
+    }
+
+    private void doRegisterObject(String key, BeanDefinitionBuilder builder)
+    {
+        beanDefinitionRegistry.registerBeanDefinition(key, builder.getBeanDefinition());
     }
 
     private Class getClass(String className) throws ClassNotFoundException
