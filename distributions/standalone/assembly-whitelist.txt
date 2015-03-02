@@ -207,6 +207,7 @@
 /mule-standalone-${productVersion}/lib/opt/bcprov-jdk16-1.46.jar
 /mule-standalone-${productVersion}/lib/opt/bctsp-jdk16-1.46.jar
 /mule-standalone-${productVersion}/lib/opt/btf-1.2.jar
+/mule-standalone-${productVersion}/lib/opt/bytelist-1.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-api-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-server-6.1.26.jar
@@ -271,6 +272,7 @@
 /mule-standalone-${productVersion}/lib/opt/hk2-api-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/hk2-locator-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/hk2-utils-2.3.0-b05.jar
+/mule-standalone-${productVersion}/lib/opt/invokebinder-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-2.4.3.jar
@@ -297,6 +299,7 @@
 /mule-standalone-${productVersion}/lib/opt/jbpm-log-4.4.jar
 /mule-standalone-${productVersion}/lib/opt/jbpm-pvm-4.4.jar
 /mule-standalone-${productVersion}/lib/opt/jcifs-1.3.3.jar
+/mule-standalone-${productVersion}/lib/opt/jcodings-1.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/jdom-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/jersey-client-2.11.jar
 /mule-standalone-${productVersion}/lib/opt/jersey-common-2.11.jar
@@ -320,10 +323,22 @@
 /mule-standalone-${productVersion}/lib/opt/jetty-xml-9.0.7.v20131107.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-util-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-util5-6.1.26.jar
+/mule-standalone-${productVersion}/lib/opt/jffi-1.2.5.jar
+/mule-standalone-${productVersion}/lib/opt/jffi-1.2.7-native.jar
 /mule-standalone-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
+/mule-standalone-${productVersion}/lib/opt/jline-2.7.jar
+/mule-standalone-${productVersion}/lib/opt/jnr-constants-0.8.4.jar
+/mule-standalone-${productVersion}/lib/opt/jnr-enxio-0.4.jar
+/mule-standalone-${productVersion}/lib/opt/jnr-ffi-1.0.4.jar
+/mule-standalone-${productVersion}/lib/opt/jnr-netdb-1.1.2.jar
+/mule-standalone-${productVersion}/lib/opt/jnr-posix-2.5.2.jar
+/mule-standalone-${productVersion}/lib/opt/jnr-unixsocket-0.3.jar
+/mule-standalone-${productVersion}/lib/opt/jnr-x86asm-1.0.2.jar
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.5.jar
+/mule-standalone-${productVersion}/lib/opt/joni-2.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-4.6.jar
-/mule-standalone-${productVersion}/lib/opt/jruby-complete-1.0.jar
+/mule-standalone-${productVersion}/lib/opt/jruby-core-1.7.4.jar
+/mule-standalone-${productVersion}/lib/opt/jruby-stdlib-1.7.4.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.51.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
@@ -336,6 +351,7 @@
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.41.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7-b3.jar
+/mule-standalone-${productVersion}/lib/opt/jzlib-1.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-6.0.jar
 /mule-standalone-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
@@ -360,6 +376,7 @@
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.1.0.jar
+/mule-standalone-${productVersion}/lib/opt/snakeyaml-1.11.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-3.2.10.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-beans-3.2.10.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-context-3.2.10.RELEASE.jar
