@@ -12,16 +12,16 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.SPIServiceRegistry;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
-import org.mule.extensions.ExtensionsManager;
-import org.mule.extensions.introspection.Describer;
-import org.mule.extensions.introspection.Extension;
-import org.mule.extensions.introspection.ExtensionFactory;
-import org.mule.extensions.resources.GenerableResource;
-import org.mule.extensions.resources.ResourcesGenerator;
-import org.mule.extensions.resources.spi.GenerableResourceContributor;
-import org.mule.module.extensions.internal.DefaultExtensionsManager;
-import org.mule.module.extensions.internal.introspection.DefaultExtensionFactory;
-import org.mule.module.extensions.internal.resources.AbstractResourcesGenerator;
+import org.mule.extension.ExtensionManager;
+import org.mule.extension.introspection.Describer;
+import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.resources.GenerableResource;
+import org.mule.extension.resources.ResourcesGenerator;
+import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.module.extension.internal.DefaultExtensionManager;
+import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.module.extension.internal.resources.AbstractResourcesGenerator;
 import org.mule.util.ArrayUtils;
 import org.mule.util.IOUtils;
 
@@ -41,12 +41,12 @@ import org.apache.commons.io.FileUtils;
  * <p/>
  * The value added by this class in comparison to a traditional
  * {@link FunctionalTestCase} is that before creating
- * the {@link MuleContext}, it creates a {@link ExtensionsManager}
+ * the {@link MuleContext}, it creates a {@link ExtensionManager}
  * and automatically discovers extensions by delegating on
- * {@link ExtensionsManager#discoverExtensions(ClassLoader)}.
+ * {@link ExtensionManager#discoverExtensions(ClassLoader)}.
  * <p/>
  * By default, standard extension discovery will be
- * performed by invoking {@link ExtensionsManager#discoverExtensions(ClassLoader)}.
+ * performed by invoking {@link ExtensionManager#discoverExtensions(ClassLoader)}.
  * Although this behavior suits most use cases, it can be time consuming because of
  * all the classpath scanning and the overhead of initialising extensions that
  * are most likely not used in this tests. As the number of extensions available grows,
@@ -63,7 +63,7 @@ import org.apache.commons.io.FileUtils;
  * either through an IDE or build tool such as maven or gradle.
  * <p/>
  * Since this class extends {@link FunctionalTestCase}, a new {@link MuleContext}
- * is created per each test. That also means that a new {@link ExtensionsManager}
+ * is created per each test. That also means that a new {@link ExtensionManager}
  * is created per test.
  *
  * @since 3.7.0
@@ -73,7 +73,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
 
     private final ServiceRegistry serviceRegistry = new SPIServiceRegistry();
     private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry);
-    private ExtensionsManager extensionsManager = new DefaultExtensionsManager();
+    private ExtensionManager extensionManager = new DefaultExtensionManager();
     private File generatedResourcesDirectory;
 
 
@@ -89,7 +89,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
      * initialised by providing the {@link Describer}s for
      * the extensions that you actually want to use for this test.
      * Returning a {@code null} or empty array forces the
-     * {@link ExtensionsManager} to perform a full classpath discovery.
+     * {@link ExtensionManager} to perform a full classpath discovery.
      * Default implementation of this method returns {@code null}
      */
     protected Describer[] getManagedDescribers()
@@ -106,7 +106,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
             @Override
             protected void doConfigure(MuleContext muleContext) throws Exception
             {
-                ((DefaultMuleContext) muleContext).setExtensionsManager(extensionsManager);
+                ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
             }
         });
     }
@@ -118,16 +118,16 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
 
     private void createExtensionsManager() throws Exception
     {
-        extensionsManager = new DefaultExtensionsManager();
+        extensionManager = new DefaultExtensionManager();
 
         Describer[] describers = getManagedDescribers();
         if (ArrayUtils.isEmpty(describers))
         {
-            extensionsManager.discoverExtensions(muleContext.getExecutionClassLoader());
+            extensionManager.discoverExtensions(muleContext.getExecutionClassLoader());
         }
         else
         {
-            loadExtensionsFromDescribers(extensionsManager, describers);
+            loadExtensionsFromDescribers(extensionManager, describers);
         }
 
         generatedResourcesDirectory = getGenerationTargetDirectory();
@@ -135,7 +135,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         ResourcesGenerator generator = new ExtensionsTestInfrastructureResourcesGenerator(serviceRegistry, generatedResourcesDirectory);
 
         List<GenerableResourceContributor> resourceContributors = getGenerableResourceContributors();
-        for (Extension extension : extensionsManager.getExtensions())
+        for (Extension extension : extensionManager.getExtensions())
         {
             for (GenerableResourceContributor contributor : resourceContributors)
             {
@@ -146,11 +146,11 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         generateResourcesAndAddToClasspath(generator);
     }
 
-    private void loadExtensionsFromDescribers(ExtensionsManager extensionsManager, Describer[] describers)
+    private void loadExtensionsFromDescribers(ExtensionManager extensionManager, Describer[] describers)
     {
         for (Describer describer : describers)
         {
-            extensionsManager.registerExtension(extensionFactory.createFrom(describer.describe()));
+            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe()));
         }
     }
 

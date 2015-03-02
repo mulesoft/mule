@@ -8,12 +8,12 @@ package org.mule.config.builders;
 
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
-import org.mule.extensions.ExtensionsManager;
+import org.mule.extension.ExtensionManager;
 import org.mule.util.ClassUtils;
 
 /**
  * Implementation of {@link org.mule.api.config.ConfigurationBuilder}
- * that register a {@link ExtensionsManager} if
+ * that register a {@link ExtensionManager} if
  * it's present in the classpath
  *
  * @since 3.7.0
@@ -29,10 +29,10 @@ public class ExtensionsManagerConfigurationBuilder extends AbstractConfiguration
         if (muleContext instanceof DefaultMuleContext &&
             ClassUtils.isClassOnPath(EXTENSIONS_MANAGER_CLASS_NAME, getClass()))
         {
-            ExtensionsManager extensionsManager = (ExtensionsManager) ClassUtils.instanciateClass(EXTENSIONS_MANAGER_CLASS_NAME);
-            extensionsManager.discoverExtensions(Thread.currentThread().getContextClassLoader());
+            ExtensionManager extensionManager = (ExtensionManager) ClassUtils.instanciateClass(EXTENSIONS_MANAGER_CLASS_NAME);
+            extensionManager.discoverExtensions(Thread.currentThread().getContextClassLoader());
 
-            ((DefaultMuleContext) muleContext).setExtensionsManager(extensionsManager);
+            ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
         }
     }
 }
