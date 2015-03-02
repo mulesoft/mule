@@ -6,8 +6,19 @@
  */
 package org.mule.api.registry;
 
+/**
+ * A contact for objects capable of giving access
+ * to a {@link ObjectLimbo}
+ *
+ * @since 3.7.0
+ */
 public interface ObjectLimboLocator
 {
 
+    /**
+     * Returns a {@link ObjectLimbo}
+     *
+     * @return a {@link ObjectLimbo}
+     */
     ObjectLimbo getLimbo();
 }

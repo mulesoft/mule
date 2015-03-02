@@ -52,6 +52,14 @@ public abstract class LifecycleUtils
         }
     }
 
+    public static void startIfNeeded(Object object) throws MuleException
+    {
+        if (object instanceof Startable)
+        {
+            ((Startable) object).start();
+        }
+    }
+
     public static void startIfNeeded(Collection<? extends Object> objects) throws MuleException
     {
         doApplyPhase(Startable.PHASE_NAME, objects, null);

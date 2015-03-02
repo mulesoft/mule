@@ -13,28 +13,46 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Default implementation of {@link ObjectLimbo}. This implementation is thread-safe
+ *
+ * @since 3.7.0
+ */
 public class DefaultObjectLimbo implements ObjectLimbo
 {
+
     private final Map<String, Object> map = new ConcurrentHashMap<>();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void registerObject(String key, Object value)
     {
         map.put(key, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T unregisterObject(String key)
     {
         return (T) map.remove(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, Object> getObjects()
     {
         return ImmutableMap.copyOf(map);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear()
     {
