@@ -7,10 +7,26 @@
 package org.mule.config.spring.factories;
 
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleUtils;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class FixedFactoryBean<T> implements FactoryBean<T>
+/**
+ * A {@link FactoryBean} which returns a fixed instanced obtained
+ * through the constructor. {@link #isSingleton()} always returns {@code true}.
+ * <p/>
+ * Invocations related to the {@link MuleContextAware} and {@link Lifecycle} interfaces
+ * are delegated into the {@link #value} object when applies.
+ *
+ * @param <T>
+ * @since 3.7.0
+ */
+public class FixedFactoryBean<T> implements FactoryBean<T>, MuleContextAware, Lifecycle
 {
 
     private final T value;
@@ -37,5 +53,38 @@ public class FixedFactoryBean<T> implements FactoryBean<T>
     public Class<?> getObjectType()
     {
         return value.getClass();
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        if (value instanceof MuleContextAware)
+        {
+            ((MuleContextAware) value).setMuleContext(context);
+        }
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        LifecycleUtils.initialiseIfNeeded(value);
+    }
+
+    @Override
+    public void start() throws MuleException
+    {
+        LifecycleUtils.startIfNeeded(value);
+    }
+
+    @Override
+    public void stop() throws MuleException
+    {
+        LifecycleUtils.stopIfNeeded(value);
+    }
+
+    @Override
+    public void dispose()
+    {
+        LifecycleUtils.disposeIfNeeded(value);
     }
 }

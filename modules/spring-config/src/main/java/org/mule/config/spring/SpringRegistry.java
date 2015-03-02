@@ -304,7 +304,16 @@ public class SpringRegistry extends AbstractRegistry implements InitialisingRegi
     @Override
     public Object applyLifecycle(Object object) throws MuleException
     {
-        getLifecycleManager().applyCompletedPhases(object);
+        if (lifecycleManager.getCurrentPhase().equals(NotInLifecyclePhase.PHASE_NAME) && lifecycleManager.getExecutingPhase() != null)
+        {
+            // no phase is completed but one is on going, apply to this as well
+            lifecycleManager.applyPhase(object, NotInLifecyclePhase.PHASE_NAME, lifecycleManager.getExecutingPhase());
+        }
+        else
+        {
+            getLifecycleManager().applyCompletedPhases(object);
+        }
+
         return object;
     }
 
