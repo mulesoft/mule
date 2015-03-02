@@ -183,8 +183,8 @@
         </dependency>
         <dependency>
             <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>1.0</version>
+            <artifactId>jruby-core</artifactId>
+            <version>1.7.4</version>
         </dependency>
         <dependency>
             <groupId>rhino</groupId>
