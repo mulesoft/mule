@@ -241,6 +241,8 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
             }
 
             // overlapping interfaces can cause duplicates
+            // TODO: each LifecycleManager should keep this set per executing phase
+            // and clear it when the phase is fully applied
             Set<Object> duplicates = new HashSet<Object>();
 
             for (LifecycleObject lo : phase.getOrderedLifecycleObjects())
