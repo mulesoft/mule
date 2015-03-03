@@ -324,7 +324,7 @@
 /mule-standalone-${productVersion}/lib/opt/jetty-util-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-util5-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jffi-1.2.5.jar
-/mule-standalone-${productVersion}/lib/opt/jffi-1.2.7-native.jar
+/mule-standalone-${productVersion}/lib/opt/jffi-1.2.8-native.jar
 /mule-standalone-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/jline-2.7.jar
 /mule-standalone-${productVersion}/lib/opt/jnr-constants-0.8.4.jar
