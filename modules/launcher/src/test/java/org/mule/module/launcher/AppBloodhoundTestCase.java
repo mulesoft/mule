@@ -6,59 +6,73 @@
  */
 package org.mule.module.launcher;
 
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.plugin.PluginClasspath;
 import org.mule.module.launcher.plugin.PluginDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Set;
 
+import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.rules.TemporaryFolder;
 
 public class AppBloodhoundTestCase extends AbstractMuleTestCase
 {
 
-    private File muleHome;
-    private File appsDir;
+    public static final String APP_NAME = "testApp";
+    public static final String JAR_FILE_NAME = "test.jar";
+
+    @Rule
+    public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
 
     @Test
-    public void testPlugin() throws Exception
+    public void readsPlugin() throws Exception
     {
-        // set up some mule home structure
-        final String tmpDir = System.getProperty("java.io.tmpdir");
-        muleHome = new File(tmpDir, getClass().getSimpleName() + System.currentTimeMillis());
-        appsDir = new File(muleHome, "apps");
-        appsDir.mkdirs();
-        System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHome.getCanonicalPath());
-
-        final String appName = "app-with-plugin";
-        final File appDir = new File(appsDir, appName);
-        appDir.mkdirs();
-        final File pluginDir = new File(appDir, "plugins");
+        File pluginDir = MuleFoldersUtil.getAppPluginsFolder(APP_NAME);
         pluginDir.mkdirs();
-        final InputStream sourcePlugin = IOUtils.getResourceAsStream("plugins/groovy-plugin.zip", getClass());
-        IOUtils.copy(sourcePlugin, new FileOutputStream(new File(pluginDir, "groovy-plugin.zip")));
+        copyResourceAs("plugins/groovy-plugin.zip", pluginDir, "groovy-plugin.zip");
 
-        AppBloodhound hound = new DefaultAppBloodhound();
-        ApplicationDescriptor desc = hound.fetch(appName);
-        assertNotNull(desc);
+        ApplicationDescriptor desc = new DefaultAppBloodhound().fetch(APP_NAME);
+
         Set<PluginDescriptor> plugins = desc.getPlugins();
-        assertNotNull(plugins);
-        assertEquals(1, plugins.size());
+        assertThat(plugins.size(), equalTo(1));
 
         final PluginDescriptor plugin = plugins.iterator().next();
-        assertEquals("groovy-plugin", plugin.getName());
+        assertThat(plugin.getName(), equalTo("groovy-plugin"));
         final PluginClasspath cp = plugin.getClasspath();
-        assertEquals(2, cp.toURLs().length);
-        assertTrue(cp.getRuntimeLibs()[0].toExternalForm().endsWith("groovy-all-1.8.0.jar"));
+        assertThat(cp.toURLs().length, equalTo(2));
+        assertThat(cp.getRuntimeLibs()[0].toExternalForm(), endsWith("groovy-all-1.8.0.jar"));
+    }
+
+    @Test
+    public void readsSharedPluginLibs() throws Exception
+    {
+        File pluginLibDir = MuleFoldersUtil.getAppSharedPluginLibsFolder(APP_NAME);
+        pluginLibDir.mkdirs();
+
+        copyResourceAs("test-jar-with-resources.jar", pluginLibDir, JAR_FILE_NAME);
+        ApplicationDescriptor desc = new DefaultAppBloodhound().fetch(APP_NAME);
+
+        URL[] sharedPluginLibs = desc.getSharedPluginLibs();
+
+        assertThat(sharedPluginLibs[0].toExternalForm(), endsWith(JAR_FILE_NAME));
+    }
+
+    private void copyResourceAs(String resourceName, File folder, String fileName) throws IOException
+    {
+        final InputStream sourcePlugin = IOUtils.getResourceAsStream(resourceName, getClass());
+        IOUtils.copy(sourcePlugin, new FileOutputStream(new File(folder, fileName)));
     }
 }

@@ -90,6 +90,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor brokenAppWithFunkyNameDescriptor = new ArtifactDescriptor("broken-app+", "/broken-app+.zip", null, "brokenApp+.zip", null);
     private static final ArtifactDescriptor incompleteAppDescriptor = new ArtifactDescriptor("incompleteApp", "/incompleteApp.zip", "/incompleteApp", "incompleteApp.zip", null);
     private static final ArtifactDescriptor waitAppDescriptor = new ArtifactDescriptor("wait-app", "/wait-app.zip", "/wait-app", "wait-app.zip", "mule-config.xml");
+    private static final ArtifactDescriptor sharedPluginLibAppDescriptor = new ArtifactDescriptor("shared-plugin-lib-app", "/shared-plugin-lib-app.zip", "/shared-plugin-lib-app", "shared-plugin-lib-app.zip", "mule-config.xml");
 
     //Domain constants
     private static final ArtifactDescriptor brokenDomainDescriptor = new ArtifactDescriptor("brokenDomain", "/broken-domain.zip", null, "brokenDomain.zip", "/broken-config.xml");
@@ -1145,6 +1146,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
         assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieApplications().size());
+    }
+
+    @Test
+    public void deploysAppWithPluginSharedLibrary() throws IOException
+    {
+        addPackedAppFromResource(sharedPluginLibAppDescriptor.zipPath);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedPluginLibAppDescriptor.id);
+        assertAppsDir(NONE, new String[] {sharedPluginLibAppDescriptor.id}, true);
+        assertApplicationAnchorFileExists(sharedPluginLibAppDescriptor.id);
     }
 
     @Test

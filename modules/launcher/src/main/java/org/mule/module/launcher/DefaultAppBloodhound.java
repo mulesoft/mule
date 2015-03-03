@@ -22,8 +22,11 @@ import org.mule.util.PropertiesUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -116,8 +119,27 @@ public class DefaultAppBloodhound implements AppBloodhound
         final Set<PluginDescriptor> plugins = new PluginDescriptorParser(desc, appDir).parse();
         desc.setPlugins(plugins);
 
-        return desc;
+        desc.setSharedPluginLibs(findSharedPluginLibs(appName));
 
+        return desc;
+    }
+
+    private URL[] findSharedPluginLibs(String appName) throws MalformedURLException
+    {
+        Set<URL> urls = new HashSet<>();
+
+        final File sharedPluginLibs = MuleFoldersUtil.getAppSharedPluginLibsFolder(appName);
+        if (sharedPluginLibs.exists())
+        {
+            Collection<File> jars = FileUtils.listFiles(sharedPluginLibs, new String[] {"jar"}, false);
+
+            for (File jar : jars)
+            {
+                urls.add(jar.toURI().toURL());
+            }
+        }
+
+        return urls.toArray(new URL[0]);
     }
 
     public void setApplicationProperties(ApplicationDescriptor desc, File appPropsFile) throws IOException
