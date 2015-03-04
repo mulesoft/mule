@@ -9,7 +9,19 @@ MULE-8298: Spring dependency was upgraded to version 4.1.5.RELEASE.
 MULE-8315: the following Apache Tomcat libraries were upgraded form version 6.0.29 to version 6.0.41: annotations-api, coyote, el-api, jasper, jasper-el, jsp-api, juli. Removed catalina-6.0.29.jar as is not needed anymore.
 MULE-8340: TLS configuration is not mapped anymore to the default JVM system properties. In order to keep this behavior, define the following system property: mule.tls.disableSystemPropertiesMapping=false
 MULE-8308: jruby was upgraded to version 1.7.4 because of a security issue with previous version. Artifact jruby-complete was removed and replaced with jruby-core and its dependencies.
-MULE-8297: CXF was upgraded to version 2.7.15. Apache wss4j was upgraded to 1.6.18. If you need to use uri parameters add a org.apache.cxf.interceptor.URIMappingInterceptor interceptor to the CXF service in your flow.
+MULE-8297: CXF was upgraded to version 2.7.15. Also, the following dependencies were updated:
+    * jibx-extras: from version 1.2.4.5 to 1.2.5
+    * jibx-run: from version 1.2.4.5 to 1.2.5
+    * jibx-schema: from version 1.2.4.5 to 1.2.5
+    * neethi: from version 3.0.2 to 3.0.3
+    * opensaml: from version 2.5.1-1 to 2.6.1
+    * openws: from version 1.4.2-1 to 1.5.1
+    * wsdl4j: from version 1.6.2 to 1.6.3
+    * wss4j: from version 1.6.9 to 1.6.18
+    * xmlschema-core: from version 2.0.3 to 2.1.0
+    * xmltooling: from version 1.3.2-1 to 1.4.1
+    Note 1: If you need to use uri parameters add an org.apache.cxf.interceptor.URIMappingInterceptor interceptor to the CXF service in your flow, see http://cxf.apache.org/cve-2012-5633.html.
+    Note 2: jibx binding could have some issues if you use it under Java 8.
 
 Migration changes from 3.5.x to 3.6.x
 
