@@ -28,7 +28,7 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.springframework.context.ApplicationContext;

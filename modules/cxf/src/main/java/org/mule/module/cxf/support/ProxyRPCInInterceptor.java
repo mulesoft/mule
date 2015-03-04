@@ -9,6 +9,7 @@ package org.mule.module.cxf.support;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
 import org.apache.cxf.databinding.stax.StaxDataBindingInterceptor;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
@@ -21,7 +22,6 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.tools.common.extensions.soap.SoapBody;
 
 /**
  * Sets the correct operation when the binding style is RPC. The processing of the message content

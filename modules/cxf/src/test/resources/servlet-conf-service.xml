@@ -23,7 +23,11 @@
             <inbound>
                 <inbound-endpoint address="servlet://mycomponent"
                     exchange-pattern="request-response">
-                    <cxf:jaxws-service />
+                    <cxf:jaxws-service>
+                        <cxf:inInterceptors>
+                            <spring:bean class="org.apache.cxf.interceptor.URIMappingInterceptor"/>
+                        </cxf:inInterceptors>
+                    </cxf:jaxws-service>
                 </inbound-endpoint>
             </inbound>
             <component class="org.mule.module.cxf.testmodels.Echo"/>

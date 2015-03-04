@@ -42,14 +42,23 @@
     <flow name="SecureUMO">
         <http:listener config-ref="httpsConfig" path="services/Echo/*" allowedMethods="GET, POST"/>
         <spring-sec:http-security-filter realm="mule-realm"/>
-        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+            <cxf:inInterceptors>
+                <spring:bean class="org.apache.cxf.interceptor.URIMappingInterceptor"/>
+            </cxf:inInterceptors>
+        </cxf:simple-service>
         <echo-component/>
     </flow>
 
     <flow name="AnotherSecureUMO">
         <http:listener config-ref="httpConfig" path="services/Echo/*" allowedMethods="GET, POST"/>
         <spring-sec:http-security-filter realm="mule-realm"/>
-        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+            <cxf:inInterceptors>
+                <spring:bean class="org.apache.cxf.interceptor.URIMappingInterceptor"/>
+            </cxf:inInterceptors>
+        </cxf:simple-service>
+
         <echo-component/>
     </flow>
 
