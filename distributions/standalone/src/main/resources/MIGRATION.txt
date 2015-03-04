@@ -10,6 +10,17 @@ MULE-8315: the following Apache Tomcat libraries were upgraded form version 6.0.
 MULE-8340: TLS configuration is not mapped anymore to the default JVM system properties. In order to keep this behavior, define the following system property: mule.tls.disableSystemPropertiesMapping=false
 MULE-8308: jruby was upgraded to version 1.7.4 because of a security issue with previous version. Artifact jruby-complete was removed and replaced with jruby-core and its dependencies.
 MULE-8297: CXF was upgraded to version 2.7.15. Apache wss4j was upgraded to 1.6.18. If you need to use uri parameters add a org.apache.cxf.interceptor.URIMappingInterceptor interceptor to the CXF service in your flow.
+    Also, the following dependencies were updated:
+    * jibx-extras-1.2.5.jar
+    * jibx-run-1.2.5.jar
+    * jibx-schema-1.2.5.jar
+    * neethi-3.0.3.jar
+    * opensaml-2.6.1.jar
+    * openws-1.5.1.jar
+    * wsdl4j-1.6.3.jar
+    * wss4j-1.6.18.jar
+    * xmlschema-core-2.1.0.jar
+    * xmltooling-1.4.1.jar
 
 Migration changes from 3.5.x to 3.6.x
 
