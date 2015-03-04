@@ -2,7 +2,7 @@
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:tns="http://www.wcs.com/2010/07/14/emop.wsdl" xmlns:xsdl="http://www.wcs.com/2010/07/14/emop"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:ns="http://www.wcs.com/emop" name="scratchcardValidateAndPay"
+    name="scratchcardValidateAndPay"
     targetNamespace="http://www.wcs.com/2010/07/14/emop.wsdl">
     <wsdl:types>
         <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -49,18 +49,16 @@
     </wsdl:portType>
     <wsdl:binding name="IntegrationLayerServiceBinding" type="tns:IntegrationLayerService">
         <soap:binding style="document"
-            transport="http://schemas.xmlsoap.org/soap/http" required="true" />
+            transport="http://schemas.xmlsoap.org/soap/http" />
         <wsdl:operation name="validateAndPayScratchCard">
             <soap:operation soapAction="" />
-            <wsdl:input message="tns:ScratchcardValidateAndPayRequest">
+            <wsdl:input>
                 <soap:body parts="requestBody" use="literal" />
-                <soap:header use="literal" message="tns:ScratchcardValidateAndPayRequest"
-                    part="header" />
+                <soap:header use="literal" message="tns:ScratchcardValidateAndPayRequest" part="header" />
             </wsdl:input>
-            <wsdl:output message="tns:ScratchcardValidateAndPayResponse">
+            <wsdl:output>
                 <soap:body parts="responseBody" use="literal" />
-                <soap:header use="literal" message="tns:ScratchcardValidateAndPayResponse"
-                    part="header" />
+                <soap:header use="literal" message="tns:ScratchcardValidateAndPayResponse" part="header" />
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>

@@ -40,7 +40,11 @@
     <flow name="SecureUMO">
         <inbound-endpoint address="https://localhost:${port2}/services/Echo" exchange-pattern="request-response">
             <spring-sec:http-security-filter realm="mule-realm"/>
-            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
+            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+                <cxf:inInterceptors>
+                    <spring:bean class="org.apache.cxf.interceptor.URIMappingInterceptor"/>
+                </cxf:inInterceptors>
+            </cxf:simple-service>
         </inbound-endpoint>
         <echo-component/>
     </flow>
@@ -48,7 +52,11 @@
     <flow name="AnotherSecureUMO">
         <inbound-endpoint address="http://localhost:${port1}/services/Echo" exchange-pattern="request-response">
             <spring-sec:http-security-filter realm="mule-realm"/>
-            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
+            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+                <cxf:inInterceptors>
+                    <spring:bean class="org.apache.cxf.interceptor.URIMappingInterceptor"/>
+                </cxf:inInterceptors>
+            </cxf:simple-service>
         </inbound-endpoint>
         <echo-component/>
     </flow>

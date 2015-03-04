@@ -26,6 +26,7 @@ import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.module.cxf.support.WSDLQueryHandler;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.ws.security.handler.WSHandlerConstants;
 
 /**
  * An abstract builder for CXF services. It handles all common operations such
@@ -296,6 +298,15 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             if(wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty())
             {
                 sfb.getInInterceptors().add(new WSS4JInInterceptor(wsSecurity.getConfigProperties()));
+
+                // CXF changed the way it validates SAML subject confirmation from 2.5.x to 2.7.x
+                // see https://issues.apache.org/jira/browse/CXF-4655
+                // In order to keep backwards compatibility we use the previous approach
+                String actionProperty = (String) wsSecurity.getConfigProperties().get(WSHandlerConstants.ACTION);
+                if (!StringUtils.isEmpty(actionProperty) && actionProperty.contains(WSHandlerConstants.SAML_TOKEN_UNSIGNED))
+                {
+                    properties.put("ws-security.validate.saml.subject.conf", false);
+                }
             }
         }
     }

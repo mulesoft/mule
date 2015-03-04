@@ -17,6 +17,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.message.Message;
@@ -26,18 +27,19 @@ import org.apache.cxf.service.model.ServiceInfo;
 
 public class ProxySchemaValidationInInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(ProxySchemaValidationInInterceptor.class);
-    
+
+    private Endpoint endpoint;
     private ServiceInfo service;
     private Bus bus;
     
-    public ProxySchemaValidationInInterceptor(Bus bus, ServiceInfo service) {
+    public ProxySchemaValidationInInterceptor(Bus bus, Endpoint endpoint, ServiceInfo service) {
         super(Phase.READ);
         this.bus = bus;
+        this.endpoint = endpoint;
         this.service = service;
         addBefore(StartBodyInterceptor.class.getName());
         addAfter(ReadHeadersInterceptor.class.getName());
     }
-
 
     public void handleMessage(Message message) throws Fault {
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
@@ -60,7 +62,7 @@ public class ProxySchemaValidationInInterceptor extends AbstractPhaseInterceptor
         if (Boolean.TRUE.equals(en) || "true".equals(en)) {
             StaxValidationManager mgr = bus.getExtension(StaxValidationManager.class);
             if (mgr != null) {
-                mgr.setupValidation(reader, service);
+                mgr.setupValidation(reader, endpoint, service);
             }
         }
     }
