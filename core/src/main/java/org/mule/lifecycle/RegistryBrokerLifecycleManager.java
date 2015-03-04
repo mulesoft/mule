@@ -33,12 +33,11 @@ public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager
     protected void registerPhases()
     {
         RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
-        registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(),
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
+        registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), emptyCallback);
         registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
         registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
-        registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(),
-            new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), emptyCallback);
     }
 
     public void fireInitialisePhase(LifecycleCallback<AbstractRegistryBroker> callback)

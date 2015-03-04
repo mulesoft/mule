@@ -25,7 +25,10 @@ import java.util.List;
  * transformer is used, the method will get invoked
  *
  * @see org.mule.api.annotations.Transformer
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
+@Deprecated
 public class AnnotatedTransformerObjectProcessor implements PreInitProcessor, MuleContextAware
 {
 

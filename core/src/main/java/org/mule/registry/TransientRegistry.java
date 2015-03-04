@@ -44,8 +44,9 @@ import org.apache.commons.logging.Log;
 
 /**
  * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
+ * @deprecated as of 3.7.0. Use {@link SimpleRegistry instead}.
  */
-//@ThreadSafe
+@Deprecated
 public class TransientRegistry extends AbstractRegistry
 {
 
@@ -66,7 +67,7 @@ public class TransientRegistry extends AbstractRegistry
 
     private void putDefaultEntriesIntoRegistry()
     {
-        Map<String, Object> processors = new HashMap<String, Object>();
+        Map<String, Object> processors = new HashMap<>();
         processors.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
         //processors("_muleNotificationProcessor", new NotificationListenersProcessor(muleContext));
         processors.put("_muleExpressionEvaluatorProcessor", new ExpressionEvaluatorProcessor(muleContext));
@@ -124,7 +125,7 @@ public class TransientRegistry extends AbstractRegistry
             return null;
         }
 
-        Map<String, Object> results = new HashMap<String, Object>();
+        Map<String, Object> results = new HashMap<>();
         for (Map.Entry<String, Object> entry : objects.entrySet())
         {
             // We do this inside the loop in case the map contains ObjectProcessors
@@ -182,7 +183,7 @@ public class TransientRegistry extends AbstractRegistry
 
     public <T> T lookupObject(String key)
     {
-        return registryMap.<T>get(key);
+        return doGet(key);
     }
 
     @SuppressWarnings("unchecked")
@@ -219,7 +220,7 @@ public class TransientRegistry extends AbstractRegistry
         return object;
     }
 
-    Object applyProcessors(Object object, Object metadata)
+    protected Object applyProcessors(Object object, Object metadata)
     {
         Object theObject = object;
 
@@ -283,7 +284,17 @@ public class TransientRegistry extends AbstractRegistry
             return;
         }
 
-        registryMap.putAndLogWarningIfDuplicate(key, object);
+        doRegisterObject(key, object, metadata);
+    }
+
+    protected <T> T doGet(String key)
+    {
+        return registryMap.get(key);
+    }
+
+    protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException
+    {
+        doPut(key, object);
 
         try
         {
@@ -302,6 +313,11 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
+    protected void doPut(String key, Object object)
+    {
+        registryMap.putAndLogWarningIfDuplicate(key, object);
+    }
+
     protected void checkDisposed() throws RegistrationException
     {
         if (getLifecycleManager().isPhaseComplete(Disposable.PHASE_NAME))
@@ -315,36 +331,10 @@ public class TransientRegistry extends AbstractRegistry
         return !(metaData == null || !(metaData instanceof Integer)) && ((Integer) metaData & flag) != 0;
     }
 
-    /**
-     * Will remove an object by name from the registry. By default the registry will apply all remaining lifecycle phases
-     * to the object when it is removed.
-     *
-     * @param key      the name or key of the object to remove from the registry
-     * @param metadata Meta data flags supported are {@link org.mule.api.registry.MuleRegistry#LIFECYCLE_BYPASS_FLAG}
-     * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
-     *                               the object's lifecycle threw an exception
-     */
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
+    @Override
+    protected Object doUnregisterObject(String key) throws RegistrationException
     {
-        Object obj = registryMap.remove(key);
-
-        try
-        {
-            if (!hasFlag(metadata, MuleRegistry.LIFECYCLE_BYPASS_FLAG))
-            {
-                getLifecycleManager().applyPhase(obj, lifecycleManager.getCurrentPhase(), Disposable.PHASE_NAME);
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new RegistrationException(e);
-        }
-
-    }
-
-    public void unregisterObject(String key) throws RegistrationException
-    {
-        unregisterObject(key, Object.class);
+        return registryMap.remove(key);
     }
 
     // /////////////////////////////////////////////////////////////////////////

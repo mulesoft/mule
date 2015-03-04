@@ -16,12 +16,15 @@ import org.mule.util.StringUtils;
 
 import java.lang.reflect.Field;
 
+import javax.inject.Inject;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO
+ * @deprecated as of 3.7.0. Use a registry which supports {@link Inject} annotations instead
  */
+@Deprecated
 public class LookupInjectionProcessor implements InjectProcessor, MuleContextAware
 {
     /**

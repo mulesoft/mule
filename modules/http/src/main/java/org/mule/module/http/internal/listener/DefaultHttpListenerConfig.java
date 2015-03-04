@@ -9,7 +9,6 @@ package org.mule.module.http.internal.listener;
 import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -163,25 +162,6 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         verifyConnectionsParameters();
 
 
-        ServerAddress serverAddress;
-
-        try
-        {
-            serverAddress = createServerAddress();
-        }
-        catch (UnknownHostException e)
-        {
-            throw new InitialisationException(CoreMessages.createStaticMessage("Cannot resolve host %s", host), e, this);
-        }
-
-        if (tlsContext == null)
-        {
-            server = connectionManager.createServer(serverAddress, createWorkManagerSource(), usePersistentConnections, connectionIdleTimeout);
-        }
-        else
-        {
-            server = connectionManager.createSslServer(serverAddress, createWorkManagerSource(), tlsContext, usePersistentConnections, connectionIdleTimeout);
-        }
         initialised = true;
     }
 
@@ -262,6 +242,27 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         {
             return;
         }
+
+        ServerAddress serverAddress;
+
+        try
+        {
+            serverAddress = createServerAddress();
+        }
+        catch (UnknownHostException e)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("Cannot resolve host %s", host), e, this);
+        }
+
+        if (tlsContext == null)
+        {
+            server = connectionManager.createServer(serverAddress, createWorkManagerSource(), usePersistentConnections, connectionIdleTimeout);
+        }
+        else
+        {
+            server = connectionManager.createSslServer(serverAddress, createWorkManagerSource(), tlsContext, usePersistentConnections, connectionIdleTimeout);
+        }
+
         try
         {
             workManager = createWorkManager();

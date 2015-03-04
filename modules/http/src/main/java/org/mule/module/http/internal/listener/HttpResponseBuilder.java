@@ -19,9 +19,10 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.HttpMessageBuilder;
-import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.module.http.internal.HttpMessageBuilder;
+import org.mule.module.http.internal.HttpParamType;
+import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
@@ -31,7 +32,6 @@ import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
-import org.mule.module.http.internal.HttpParamType;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.IOUtils;
@@ -65,10 +65,11 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
 
     public void initialise() throws InitialisationException
     {
+        super.initialise();
         init();
     }
 
-    void init()
+    void init() throws InitialisationException
     {
         statusCodeEvaluator = new AttributeEvaluator(statusCode).initialize(muleContext.getExpressionManager());
         reasonPhraseEvaluator = new AttributeEvaluator(reasonPhrase).initialize(muleContext.getExpressionManager());
@@ -299,7 +300,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         }
     }
 
-    public static HttpResponseBuilder emptyInstance(MuleContext muleContext)
+    public static HttpResponseBuilder emptyInstance(MuleContext muleContext) throws InitialisationException
     {
         final HttpResponseBuilder httpResponseBuilder = new HttpResponseBuilder();
         httpResponseBuilder.setMuleContext(muleContext);

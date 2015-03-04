@@ -13,6 +13,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.registry.ObjectLimbo;
+import org.mule.api.registry.ObjectLimboLocator;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
@@ -23,16 +25,26 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
-public abstract class AbstractRegistryBroker implements RegistryBroker
+/**
+ * @deprecated as of 3.7.0. This will be removed in Mule 4.0
+ */
+@Deprecated
+public abstract class AbstractRegistryBroker implements RegistryBroker, ObjectLimboLocator
 {
+    private final ObjectLimbo limbo = new DefaultObjectLimbo();
+
     protected RegistryBrokerLifecycleManager lifecycleManager;
+
 
     public AbstractRegistryBroker(MuleContext muleContext)
     {
         lifecycleManager = new RegistryBrokerLifecycleManager("mule.registry.broker", this, muleContext);
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         lifecycleManager.fireInitialisePhase(new LifecycleCallback<AbstractRegistryBroker>()
@@ -47,6 +59,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         });
     }
 
+    @Override
     public void dispose()
     {
         lifecycleManager.fireDisposePhase(new LifecycleCallback<AbstractRegistryBroker>()
@@ -61,6 +74,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         });
     }
 
+    @Override
     public void fireLifecycle(String phase) throws LifecycleException
     {
         if (Initialisable.PHASE_NAME.equals(phase))
@@ -82,16 +96,19 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 
     }
 
+    @Override
     public String getRegistryId()
     {
         return this.toString();
     }
 
+    @Override
     public boolean isReadOnly()
     {
         return false;
     }
 
+    @Override
     public boolean isRemote()
     {
         return false;
@@ -104,24 +121,28 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
     ////////////////////////////////////////////////////////////////////////////////
 
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T get(String key)
     {
         return (T) lookupObject(key);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T lookupObject(String key)
     {
         Object obj = null;
-        Iterator it = getRegistries().iterator();
+        Iterator<Registry> it = getRegistries().iterator();
         while (obj == null && it.hasNext())
         {
-            obj = ((Registry) it.next()).lookupObject(key);
+            Registry registry = it.next();
+            obj = registry.lookupObject(key);
         }
         return (T) obj;
     }
 
+    @Override
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         Object object;
@@ -136,6 +157,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         return null;
     }
 
+    @Override
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
         Collection<T> objects = new ArrayList<T>();
@@ -148,6 +170,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         return objects;
     }
 
+    @Override
     public <T> Collection<T> lookupLocalObjects(Class<T> type)
     {
         Collection<T> objects = new ArrayList<T>();
@@ -159,6 +182,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         return objects;
     }
 
+    @Override
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
         Map<String, T> results = new HashMap<String, T>();
@@ -169,7 +193,8 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 
         return results;
     }
-    
+
+    @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
         Collection<T> objects = new ArrayList<T>();
@@ -182,55 +207,92 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         return objects;
     }
 
-       
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void registerObject(String key, Object value) throws RegistrationException
     {
-        registerObject(key, value, null);
+        Collection<Registry> registries = getRegistries();
+        if (registries.isEmpty())
+        {
+            limbo.registerObject(key, value);
+        }
+        else
+        {
+            for (Registry registry : registries)
+            {
+                if (!registry.isReadOnly())
+                {
+                    registry.registerObject(key, value);
+                    break;
+                }
+            }
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
-        Iterator it = getRegistries().iterator();
-        Registry reg;
-        while (it.hasNext())
-        {
-            reg = (Registry) it.next();
-            if (!reg.isReadOnly())
-            {
-                reg.registerObject(key, value, metadata);
-                break;
-            }
-        }
+        registerObject(key, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void registerObjects(Map objects) throws RegistrationException
     {
-        Iterator it = objects.keySet().iterator();
-        Object key;
-        while (it.hasNext())
+        for (Entry<String, Object> entry : (Set<Entry<String, Object>>) objects.entrySet())
         {
-            key = it.next();
-            registerObject((String) key, objects.get(key));
+            registerObject(entry.getKey(), entry.getValue());
         }
     }
 
-    public void unregisterObject(String key) throws RegistrationException
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object unregisterObject(String key) throws RegistrationException
     {
-        unregisterObject(key, null);
-    }
-
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
-    {
-        Iterator it = getRegistries().iterator();
-        Registry reg;
-        while (it.hasNext())
+        Collection<Registry> registries = getRegistries();
+        if (registries.isEmpty())
         {
-            reg = (Registry) it.next();
-            if (!reg.isReadOnly() && reg.lookupObject(key) != null)
+            return limbo.unregisterObject(key);
+        }
+        else
+        {
+            for (Registry registry : registries)
             {
-                reg.unregisterObject(key, metadata);
-                break;
+                if (!registry.isReadOnly() && registry.lookupObject(key) != null)
+                {
+                    return registry.unregisterObject(key);
+                }
             }
         }
+
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public Object unregisterObject(String key, Object metadata) throws RegistrationException
+    {
+        return unregisterObject(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectLimbo getLimbo()
+    {
+        return limbo;
     }
 }

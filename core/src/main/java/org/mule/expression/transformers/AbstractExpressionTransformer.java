@@ -6,7 +6,10 @@
  */
 package org.mule.expression.transformers;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
@@ -34,7 +37,7 @@ import java.util.List;
  * This transformer provides a very powerful way to pull different bits of information from the
  * message and pass them to the service.
  */
-public abstract class AbstractExpressionTransformer extends AbstractMessageTransformer
+public abstract class AbstractExpressionTransformer extends AbstractMessageTransformer implements Startable
 {
     protected List<ExpressionArgument> arguments;
 
@@ -70,7 +73,11 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
         {
             throw new InitialisationException(CoreMessages.objectIsNull("arguments[]"), this);
         }
+    }
 
+    @Override
+    public void start() throws MuleException
+    {
         for (Iterator<ExpressionArgument> iterator = arguments.iterator(); iterator.hasNext();)
         {
             ExpressionArgument argument = iterator.next();
@@ -82,7 +89,7 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
             }
             catch (Exception e)
             {
-                throw new InitialisationException(e, this);
+                throw new MuleRuntimeException(e);
             }
         }
     }

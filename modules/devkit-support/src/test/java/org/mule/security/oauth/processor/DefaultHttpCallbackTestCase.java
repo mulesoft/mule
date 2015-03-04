@@ -15,7 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.config.DefaultMuleConfiguration;
 import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.security.oauth.DefaultHttpCallback;
@@ -133,8 +132,9 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
         listenerConfig.setPort(localPort.getNumber());
         listenerConfig.setHost("localhost");
         listenerConfig.setMuleContext(muleContext);
-        muleContext.getRegistry().registerObject("callbackConfig", listenerConfig);
+        listenerConfig.initialise();
         listenerConfig.start();
+        muleContext.getRegistry().registerObject("callbackConfig", listenerConfig);
 
         callback = createCallback(null);
         sendCallbackRequest();

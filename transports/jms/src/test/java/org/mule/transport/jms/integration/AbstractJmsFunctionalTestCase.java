@@ -11,10 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -237,7 +237,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * @throws Exception
      */
     @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
+    protected void addBuilders(List<ConfigurationBuilder> builders)
     {
         if (multipleProviders)
         {
@@ -248,18 +248,26 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 throw new IllegalArgumentException("Parameterized tests don't support multiple " +
                                                    "config files as input: " + configFile);
             }
-            
+
             String resources = configFile.substring(configFile.lastIndexOf("/") + 1);
             resources = String.format("integration/%s/connector-%s",
-                getJmsConfig().getName(), resources);
-            
+                                      getJmsConfig().getName(), resources);
+
             String[] configFiles = new String[] { resources, configFile };
-            SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
-            return builder;
+            try
+            {
+                SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
+                builder.setParentContext(makeParentContext());
+                builders.add(0, builder);
+            }
+            catch (ConfigurationException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
         else
         {
-            return super.getBuilder();
+            super.addBuilders(builders);
         }
     }
 

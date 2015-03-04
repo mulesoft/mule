@@ -8,6 +8,7 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.registry.Registry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
@@ -58,7 +59,10 @@ public class SpringConfigurationBuilder extends AbstractConfigurationBuilder
         // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
         // some beans may try to look up other beans via the Registry during preInstantiateSingletons().
         muleContext.addRegistry(registry);
-        registry.initialise();
+        if (muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME))
+        {
+            registry.initialise();
+        }
     }
 
 }

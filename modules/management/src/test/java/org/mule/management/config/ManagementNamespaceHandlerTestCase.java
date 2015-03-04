@@ -107,18 +107,18 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(agents.size(), 8);
         
         Iterator<Agent> iter = agents.iterator();
-        assertTrue(iter.next() instanceof JmxApplicationAgent);
         assertTrue(iter.next() instanceof Log4jAgent);
         assertTrue(iter.next() instanceof Mx4jAgent);
         assertTrue(iter.next() instanceof TestAgent);
         assertTrue(iter.next() instanceof JmxServerNotificationAgent);
-        
+
         Log4jNotificationLoggerAgent log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
         assertEquals(log4jAgent.getName(), "log4j-notifications");
-        
+
         log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
         assertEquals(log4jAgent.getName(), "chainsaw-notifications");
         assertTrue(iter.next() instanceof EndpointNotificationLoggerAgent);
+        assertTrue(iter.next() instanceof JmxApplicationAgent);
     }
 
 }

@@ -11,8 +11,11 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.HttpServerManager;
+import org.mule.module.http.internal.listener.RequestHandlerManager;
 import org.mule.module.http.internal.listener.Server;
 import org.mule.module.http.internal.listener.ServerAddress;
+import org.mule.module.http.internal.listener.async.RequestHandler;
+import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.concurrent.NamedThreadFactory;
@@ -186,7 +189,7 @@ public class GrizzlyServerManager implements HttpServerManager
         sslFilterDelegate.addFilterForAddress(serverAddress, createSslFilter(tlsContextFactory));
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
-        final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
+        final GrizzlyServer grizzlyServer = wrap(new GrizzlyServer(serverAddress, transport, httpListenerRegistry), serverAddress);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
     }
@@ -204,9 +207,14 @@ public class GrizzlyServerManager implements HttpServerManager
         startTransportIfNotStarted();
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
-        final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
+        final GrizzlyServer grizzlyServer = wrap(new GrizzlyServer(serverAddress, transport, httpListenerRegistry), serverAddress);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
+    }
+
+    private GrizzlyServer wrap(GrizzlyServer server, ServerAddress serverAddress)
+    {
+        return new ServerWrapper(server, serverAddress);
     }
 
     @Override
@@ -269,7 +277,57 @@ public class GrizzlyServerManager implements HttpServerManager
     private int convertToSeconds(int milliseconds)
     {
         return (int) Math.ceil((double) milliseconds / 1000.0);
+    }
 
+    private class ServerWrapper extends GrizzlyServer
+    {
+
+        private final ServerAddress address;
+        private final GrizzlyServer delegate;
+
+        public ServerWrapper(GrizzlyServer delegate, ServerAddress address)
+        {
+            super(null, null, null);
+            this.address = address;
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void start() throws IOException
+        {
+            delegate.start();
+        }
+
+        @Override
+        public void stop()
+        {
+            servers.remove(address);
+            delegate.stop();
+        }
+
+        @Override
+        public ServerAddress getServerAddress()
+        {
+            return delegate.getServerAddress();
+        }
+
+        @Override
+        public boolean isStopping()
+        {
+            return delegate.isStopping();
+        }
+
+        @Override
+        public boolean isStopped()
+        {
+            return delegate.isStopped();
+        }
+
+        @Override
+        public RequestHandlerManager addRequestHandler(ListenerRequestMatcher listenerRequestMatcher, RequestHandler requestHandler)
+        {
+            return delegate.addRequestHandler(listenerRequestMatcher, requestHandler);
+        }
     }
 
 }
