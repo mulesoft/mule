@@ -352,14 +352,14 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         return internalLookupByTypeWithoutAncestors(type, false, false);
     }
 
-    protected Map<String, Object> getDependents(String key)
+    protected Map<String, Object> getDepencies(String key)
     {
         if (applicationContext instanceof ConfigurableApplicationContext)
         {
             Map<String, Object> dependents = new HashMap<>();
-            for (String dependentKey : ((ConfigurableApplicationContext) applicationContext).getBeanFactory().getDependentBeans(key))
+            for (String dependentKey : ((ConfigurableApplicationContext) applicationContext).getBeanFactory().getDependenciesForBean(key))
             {
-                dependents.put(dependentKey, get(key));
+                dependents.put(dependentKey, get(dependentKey));
             }
 
             return dependents;

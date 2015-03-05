@@ -67,8 +67,8 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase
         Map<String, Object> childsOf4 = new LinkedHashMap<>();
         childsOf4.put("5", objects.get("5"));
 
-        when(springRegistry.getDependents("1")).thenReturn((Map<String, Object>) childsOf1);
-        when(springRegistry.getDependents("4")).thenReturn(childsOf4);
+        when(springRegistry.getDepencies("1")).thenReturn((Map<String, Object>) childsOf1);
+        when(springRegistry.getDepencies("4")).thenReturn(childsOf4);
         when(springRegistry.lookupEntriesForLifecycle(Initialisable.class)).thenReturn(objects);
         InOrder inOrder = inOrder(objects.values().toArray());
 

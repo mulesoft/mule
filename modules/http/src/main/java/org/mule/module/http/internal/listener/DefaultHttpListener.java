@@ -9,7 +9,6 @@ package org.mule.module.http.internal.listener;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
@@ -109,18 +108,6 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     @Override
     public synchronized void start() throws MuleException
     {
-        if (requestHandlerManager == null)
-        {
-            try
-            {
-                requestHandlerManager = this.config.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler());
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        }
-
         requestHandlerManager.start();
     }
 
@@ -189,12 +176,14 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         {
             responseBuilder = HttpResponseBuilder.emptyInstance(muleContext);
         }
+
         LifecycleUtils.initialiseIfNeeded(responseBuilder);
 
         if (errorResponseBuilder == null)
         {
             errorResponseBuilder = HttpResponseBuilder.emptyInstance(muleContext);
         }
+
         LifecycleUtils.initialiseIfNeeded(errorResponseBuilder);
 
         path = HttpParser.sanitizePathWithStartSlash(path);
@@ -202,10 +191,10 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         responseBuilder.setResponseStreaming(responseStreamingMode);
         validatePath();
         parseRequest = config.resolveParseRequest(parseRequest);
-
         try
         {
             messageProcessingManager = DefaultHttpListener.this.muleContext.getRegistry().lookupObject(MessageProcessingManager.class);
+            requestHandlerManager = this.config.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler());
         }
         catch (Exception e)
         {
