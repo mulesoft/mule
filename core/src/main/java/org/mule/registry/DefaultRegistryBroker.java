@@ -7,7 +7,7 @@
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
-import org.mule.api.registry.InitialisingRegistry;
+import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.Registry;
 
 import java.util.Collection;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {
     private final List<Registry> registries = new CopyOnWriteArrayList<>();
-    private final AtomicReference<InitialisingRegistry> initialisingRegistry = new AtomicReference<>(null);
+    private final AtomicReference<LifecycleRegistry> lifecycleRegistry = new AtomicReference<>(null);
 
     public DefaultRegistryBroker(MuleContext context)
     {
@@ -38,9 +38,9 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
     public void removeRegistry(Registry registry)
     {
         registries.remove(registry);
-        if (registry instanceof InitialisingRegistry)
+        if (registry instanceof LifecycleRegistry)
         {
-            initialisingRegistry.compareAndSet((InitialisingRegistry) registry, null);
+            lifecycleRegistry.compareAndSet((LifecycleRegistry) registry, null);
         }
     }
 
@@ -49,17 +49,17 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
         return registries;
     }
 
-    protected InitialisingRegistry getInitialisingRegistry()
+    protected LifecycleRegistry getLifecycleRegistry()
     {
-        InitialisingRegistry initialising = initialisingRegistry.get();
+        LifecycleRegistry initialising = lifecycleRegistry.get();
         if (initialising == null)
         {
             for (Registry registry : registries)
             {
-                if (registry instanceof InitialisingRegistry)
+                if (registry instanceof LifecycleRegistry)
                 {
-                    initialising = (InitialisingRegistry) registry;
-                    return initialisingRegistry.compareAndSet(null, initialising) ? initialising : initialisingRegistry.get();
+                    initialising = (LifecycleRegistry) registry;
+                    return lifecycleRegistry.compareAndSet(null, initialising) ? initialising : lifecycleRegistry.get();
                 }
             }
         }

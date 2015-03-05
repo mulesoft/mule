@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
  *
  * @since 3.7.0
  */
-public interface InitialisingRegistry extends Registry
+public interface LifecycleRegistry extends Registry
 {
 
     /**

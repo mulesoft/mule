@@ -12,7 +12,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.InitialisingRegistry;
+import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 
@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A very simple implementation of {@link InitialisingRegistry}. Useful for starting really lightweight
+ * A very simple implementation of {@link LifecycleRegistry}. Useful for starting really lightweight
  * contexts which don't depend on heavier object containers such as Spring or Guice (testing being
  * the best example). <b>Do not use this registry for heavy duty production environments</b>.
  * <p/>
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public class SimpleRegistry extends TransientRegistry implements InitialisingRegistry
+public class SimpleRegistry extends TransientRegistry implements LifecycleRegistry
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleRegistry.class);

@@ -13,7 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.registry.InitialisingRegistry;
+import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transformer.Converter;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class SpringRegistry extends AbstractRegistry implements InitialisingRegistry
+public class SpringRegistry extends AbstractRegistry implements LifecycleRegistry
 {
 
     public static final String REGISTRY_ID = "org.mule.Registry.Spring";

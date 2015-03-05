@@ -21,7 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.AbstractServiceDescriptor;
-import org.mule.api.registry.InitialisingRegistry;
+import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectLimbo;
 import org.mule.api.registry.ObjectLimboLocator;
@@ -734,10 +734,10 @@ public class MuleRegistryHelper implements MuleRegistry, ObjectLimboLocator
     @Override
     public Object inject(Object object) throws MuleException
     {
-        InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
-        if (initialisingRegistry != null)
+        LifecycleRegistry lifecycleRegistry = registry.getLifecycleRegistry();
+        if (lifecycleRegistry != null)
         {
-            return initialisingRegistry.inject(object);
+            return lifecycleRegistry.inject(object);
         }
 
         return object;
@@ -758,10 +758,10 @@ public class MuleRegistryHelper implements MuleRegistry, ObjectLimboLocator
     @Override
     public Object applyLifecycle(Object object, String phase) throws MuleException
     {
-        InitialisingRegistry initialisingRegistry = registry.getInitialisingRegistry();
-        if (initialisingRegistry != null)
+        LifecycleRegistry lifecycleRegistry = registry.getLifecycleRegistry();
+        if (lifecycleRegistry != null)
         {
-            return initialisingRegistry.applyLifecycle(object, phase);
+            return lifecycleRegistry.applyLifecycle(object, phase);
         }
 
         return object;
