@@ -30,7 +30,7 @@ import java.util.Properties;
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
  * Registry interface.
  */
-public interface MuleRegistry extends InitialisingRegistry
+public interface MuleRegistry extends LifecycleRegistry
 {
 
     /**
