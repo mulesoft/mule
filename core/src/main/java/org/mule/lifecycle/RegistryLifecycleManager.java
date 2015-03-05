@@ -18,7 +18,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
@@ -26,18 +25,9 @@ import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistryBroker;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 
 public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry> implements RegistryLifecycleHelpers
@@ -56,7 +46,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
 
     protected void registerPhases()
     {
-        final RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
+        final RegistryLifecycleCallback<Object> callback = new RegistryLifecycleCallback<>(this);
         final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
 
         registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, emptyCallback);
@@ -69,7 +59,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     public RegistryLifecycleManager(String id, Registry object, Map<String, LifecyclePhase> phases )
     {
         super(id, object);
-        RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
+        RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
 
         registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, new LifecycleCallback(){
             public void onTransition(String phaseName, Object object) throws MuleException
@@ -100,7 +90,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     protected void registerPhase(String phaseName, LifecyclePhase phase)
     {
         phaseNames.add(phaseName);
-        callbacks.put(phaseName, new RegistryLifecycleCallback());
+        callbacks.put(phaseName, new RegistryLifecycleCallback(this));
         phases.put(phaseName, phase);
     }
 
@@ -218,66 +208,4 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         }
     }
 
-    class RegistryLifecycleCallback implements LifecycleCallback<Object>
-    {
-        /**
-         * logger used by this class
-         */
-        protected transient final Log logger = LogFactory.getLog(RegistryLifecycleCallback.class);
-
-        public void onTransition(String phaseName, Object object) throws MuleException
-        {
-            LifecyclePhase phase = phases.get(phaseName);
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Applying lifecycle phase: " + phase + " for registry: " + object.getClass().getSimpleName());
-            }
-
-            if (phase instanceof ContainerManagedLifecyclePhase)
-            {
-                phase.applyLifecycle(object);
-                return;
-            }
-
-            // overlapping interfaces can cause duplicates
-            // TODO: each LifecycleManager should keep this set per executing phase
-            // and clear it when the phase is fully applied
-            Set<Object> duplicates = new HashSet<Object>();
-
-            for (LifecycleObject lo : phase.getOrderedLifecycleObjects())
-            {
-                // TODO Collection -> List API refactoring
-                Collection<?> targetsObj = getLifecycleObject().lookupObjectsForLifecycle(lo.getType());
-                List<Object> targets = new LinkedList<Object>(targetsObj);
-                if (targets.size() == 0)
-                {
-                    continue;
-                }
-
-                lo.firePreNotification(muleContext);
-
-                for (Iterator<Object> target = targets.iterator(); target.hasNext();)
-                {
-                    Object o = target.next();
-                    if (duplicates.contains(o))
-                    {
-                        target.remove();
-                    }
-                    else
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("lifecycle phase: " + phase.getName() + " for object: " + o);
-                        }
-                        phase.applyLifecycle(o);
-                        target.remove();
-                        duplicates.add(o);
-                    }
-                }
-
-                lo.firePostNotification(muleContext);
-            }
-        }
-    }
 }
