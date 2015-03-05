@@ -19,7 +19,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
-import org.mule.api.registry.Registry;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
@@ -45,16 +44,17 @@ import java.util.Set;
 
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
 {
-    public SpringRegistryLifecycleManager(String id, Registry object, MuleContext muleContext)
+
+    public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext)
     {
-        super(id, object, muleContext);
+        super(id, springRegistry, muleContext);
     }
 
     protected void registerPhases()
     {
         final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
         registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, emptyCallback);
-        registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase());
+        registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), new SpringLifecycleCallback(this));
         registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
         registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
         registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase());

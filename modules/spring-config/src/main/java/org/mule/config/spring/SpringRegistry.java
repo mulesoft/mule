@@ -25,6 +25,7 @@ import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -221,51 +222,13 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
-        return internalLookupByTypeWithoutAncestors(type, false, false).values();
+        return lookupEntriesForLifecycle(type).values();
     }
 
     @Override
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
         return internalLookupByType(type, true, true);
-    }
-
-    protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit)
-    {
-        try
-        {
-            return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
-        }
-        catch (FatalBeanException fbex)
-        {
-            // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
-            String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
-            throw new MuleRuntimeException(createStaticMessage(message), fbex);
-        }
-        catch (Exception e)
-        {
-            logger.debug(e);
-            return Collections.emptyMap();
-        }
-    }
-
-    protected <T> Map<String, T> internalLookupByTypeWithoutAncestors(Class<T> type, boolean nonSingletons, boolean eagerInit)
-    {
-        try
-        {
-            return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
-        }
-        catch (FatalBeanException fbex)
-        {
-            // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
-            String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
-            throw new MuleRuntimeException(createStaticMessage(message), fbex);
-        }
-        catch (Exception e)
-        {
-            logger.debug(e);
-            return Collections.emptyMap();
-        }
     }
 
     @Override
@@ -343,16 +306,66 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         return initialised;
     }
 
-    private interface RegistrationDelegate
+    protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit)
     {
+        try
+        {
+            return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
+        }
+        catch (FatalBeanException fbex)
+        {
+            // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
+            String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
+            throw new MuleRuntimeException(createStaticMessage(message), fbex);
+        }
+        catch (Exception e)
+        {
+            logger.debug(e);
+            return Collections.emptyMap();
+        }
+    }
 
-        void registerObject(String key, Object value) throws RegistrationException;
+    protected <T> Map<String, T> internalLookupByTypeWithoutAncestors(Class<T> type, boolean nonSingletons, boolean eagerInit)
+    {
+        try
+        {
+            return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
+        }
+        catch (FatalBeanException fbex)
+        {
+            // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
+            String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
+            throw new MuleRuntimeException(createStaticMessage(message), fbex);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(e);
+            }
+            return Collections.emptyMap();
+        }
+    }
 
-        void registerObject(String key, Object value, Object metadata) throws RegistrationException;
+    protected <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type)
+    {
+        return internalLookupByTypeWithoutAncestors(type, false, false);
+    }
 
-        void registerObjects(Map<String, Object> objects) throws RegistrationException;
+    protected Map<String, Object> getDependents(String key)
+    {
+        if (applicationContext instanceof ConfigurableApplicationContext)
+        {
+            Map<String, Object> dependents = new HashMap<>();
+            for (String dependentKey : ((ConfigurableApplicationContext) applicationContext).getBeanFactory().getDependentBeans(key))
+            {
+                dependents.put(dependentKey, get(key));
+            }
 
-        Object unregisterObject(String key) throws RegistrationException;
+            return dependents;
+        }
+
+        throw new UnsupportedOperationException("This operation is only available when this registry is backed by a ConfigurableApplicationContext");
     }
 
     private class ConfigurableRegistrationDelegate implements RegistrationDelegate
@@ -424,42 +437,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                 throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
             }
         }
-    }
-
-    private class ReadOnlyRegistrationDelegate implements RegistrationDelegate
-    {
-
-        @Override
-        public void registerObject(String key, Object value) throws RegistrationException
-        {
-            throwException();
-        }
-
-        @Override
-        public void registerObject(String key, Object value, Object metadata) throws RegistrationException
-        {
-            throwException();
-        }
-
-        @Override
-        public void registerObjects(Map<String, Object> objects) throws RegistrationException
-        {
-            throwException();
-        }
-
-        @Override
-        public Object unregisterObject(String key) throws RegistrationException
-        {
-            throwException();
-            return null;
-        }
-
-        private void throwException()
-        {
-            throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
-        }
-
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
