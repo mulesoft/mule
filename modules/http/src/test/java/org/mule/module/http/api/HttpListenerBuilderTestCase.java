@@ -7,52 +7,43 @@
 package org.mule.module.http.api;
 
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.api.MuleContext;
-import org.mule.api.context.WorkManagerSource;
 import org.mule.construct.Flow;
-import org.mule.execution.MessageProcessingManager;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerBuilder;
 import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.module.http.internal.listener.HttpListenerConnectionManager;
 import org.mule.module.http.internal.listener.ServerAddress;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.ssl.api.TlsContextFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
 
 import org.hamcrest.core.Is;
+import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Answers;
 
-@SmallTest
-public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
+public class HttpListenerBuilderTestCase extends FunctionalTestCase
 {
 
     public static URL TEST_URL;
     public static final String PATH = "somePath";
-    public static final int PORT = 1000;
+
     public static final String HOST = "localhost";
     public static final String IP = "127.0.0.1";
 
-    private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
-    private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
+    @Rule
+    public final DynamicPort port = new DynamicPort("port");
+
+    private TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class, RETURNS_DEEP_STUBS);
     private DefaultHttpListenerConfig mockListenerConfig = mock(DefaultHttpListenerConfig.class);
     private Flow mockFlow = mock(Flow.class);
-    private MessageProcessingManager mockMessageProcessingManager = mock(MessageProcessingManager.class);
-    private HttpListenerConnectionManager mockListenerConnectionManager = mock(HttpListenerConnectionManager.class, Answers.RETURNS_DEEP_STUBS.get());
 
     static
     {
@@ -66,75 +57,78 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Override
+    protected String[] getConfigFiles()
+    {
+        return new String[] {};
+    }
+
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetPortAfterSetUrl() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setUrl(TEST_URL).setPort(PORT);
+        new HttpListenerBuilder(muleContext).setUrl(TEST_URL).setPort(port.getNumber());
     }
 
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetHostAfterSetUrl() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setUrl(TEST_URL).setHost(HOST);
+        new HttpListenerBuilder(muleContext).setUrl(TEST_URL).setHost(HOST);
     }
 
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetPathAfterSetUrl() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setUrl(TEST_URL).setPath(PATH);
+        new HttpListenerBuilder(muleContext).setUrl(TEST_URL).setPath(PATH);
     }
 
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetUrlAfterSetHost() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setPort(PORT).setUrl(TEST_URL);
+        new HttpListenerBuilder(muleContext).setPort(port.getNumber()).setUrl(TEST_URL);
     }
 
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetUrltAfterSetPort() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setHost(HOST).setUrl(TEST_URL);
+        new HttpListenerBuilder(muleContext).setHost(HOST).setUrl(TEST_URL);
     }
 
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetUrlAfterSetPath() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setPath(PATH).setUrl(TEST_URL);
+        new HttpListenerBuilder(muleContext).setPath(PATH).setUrl(TEST_URL);
     }
 
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetTlsContextIfProtocolIsHttp() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setUrl(TEST_URL).setTlsContextFactory(mockTlsContextFactory);
+        new HttpListenerBuilder(muleContext).setUrl(TEST_URL).setTlsContextFactory(mockTlsContextFactory);
     }
 
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetTlsContextIfThereIsAListenerConfig() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setListenerConfig(mockListenerConfig).setTlsContextFactory(mockTlsContextFactory);
+        new HttpListenerBuilder(muleContext).setListenerConfig(mockListenerConfig).setTlsContextFactory(mockTlsContextFactory);
     }
 
     @Test(expected = IllegalStateException.class)
     public void doNotAllowSetAListenerConfigIfThereIsATlsContext() throws MalformedURLException
     {
-        new HttpListenerBuilder(mockMuleContext).setTlsContextFactory(mockTlsContextFactory).setListenerConfig(mockListenerConfig);
+        new HttpListenerBuilder(muleContext).setTlsContextFactory(mockTlsContextFactory).setListenerConfig(mockListenerConfig);
     }
 
     @Test
     public void useExistentListenerConfig() throws Exception
     {
-        when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(mockMessageProcessingManager);
-        when(mockMuleContext.getRegistry().lookupObjects(HttpListenerConfig.class)).thenReturn(Arrays.<HttpListenerConfig>asList(mockListenerConfig));
-        when(mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)).thenReturn(mockListenerConnectionManager);
-        when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
-        when(mockListenerConfig.getPort()).thenReturn(PORT);
+        when(mockListenerConfig.getPort()).thenReturn(port.getNumber());
         when(mockListenerConfig.getHost()).thenReturn(HOST);
         when(mockListenerConfig.resolvePath(anyString())).thenCallRealMethod();
 
-        final HttpListener httpListener = new HttpListenerBuilder(mockMuleContext)
+        final HttpListener httpListener = new HttpListenerBuilder(muleContext)
                 .setFlow(mockFlow)
                 .setHost(HOST)
-                .setPort(PORT)
+                .setPort(port.getNumber())
+                .setListenerConfig(mockListenerConfig)
                 .setPath(PATH).build();
 
         assertThat(httpListener.getConfig(), Is.<HttpListenerConfig>is(mockListenerConfig));
@@ -143,50 +137,45 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void createListenerConfigIfThereIsNoMatch() throws Exception
     {
-        when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(mockMessageProcessingManager);
-        when(mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)).thenReturn(mockListenerConnectionManager);
-        when(mockMuleContext.getRegistry().lookupObjects(HttpListenerConfig.class)).thenReturn(Collections.<HttpListenerConfig>emptyList());
-        when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
-
-        new HttpListenerBuilder(mockMuleContext)
+        new HttpListenerBuilder(muleContext)
                 .setFlow(mockFlow)
                 .setHost(HOST)
-                .setPort(PORT)
+                .setPort(port.getNumber())
                 .setPath(PATH).build();
 
-        verify(mockListenerConnectionManager).createServer(eq(new ServerAddress(IP, PORT)), any(WorkManagerSource.class), eq(true), eq(DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT));
+        assertServerCreated();
     }
 
     @Test
     public void createListenerSslConfigIfThereIsNoMatch() throws Exception
     {
-        when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(mockMessageProcessingManager);
-        when(mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)).thenReturn(mockListenerConnectionManager);
-        when(mockMuleContext.getRegistry().lookupObjects(DefaultHttpListenerConfig.class)).thenReturn(Collections.<DefaultHttpListenerConfig>emptyList());
         when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
-        when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
 
-        new HttpListenerBuilder(mockMuleContext)
+        new HttpListenerBuilder(muleContext)
                 .setTlsContextFactory(mockTlsContextFactory)
                 .setFlow(mockFlow)
                 .setHost(HOST)
-                .setPort(PORT)
+                .setPort(port.getNumber())
                 .setPath(PATH).build();
 
-        verify(mockListenerConnectionManager).createSslServer(eq(new ServerAddress(IP, PORT)), any(WorkManagerSource.class), eq(mockTlsContextFactory), eq(true), eq(DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT));
+        assertServerCreated();
     }
 
     @Test
     public void useConfiguredListenerConfig() throws Exception
     {
-        when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(mockMessageProcessingManager);
         when(mockListenerConfig.resolvePath(anyString())).thenCallRealMethod();
 
-        final HttpListener httpListener = new HttpListenerBuilder(mockMuleContext)
+        final HttpListener httpListener = new HttpListenerBuilder(muleContext)
                 .setFlow(mockFlow)
                 .setListenerConfig(mockListenerConfig)
                 .setPath(PATH).build();
 
         assertThat(httpListener.getConfig(), Is.<HttpListenerConfig>is(mockListenerConfig));
+    }
+
+    protected void assertServerCreated() throws org.mule.api.registry.RegistrationException
+    {
+        muleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class).containsServerFor(new ServerAddress(IP, port.getNumber()));
     }
 }

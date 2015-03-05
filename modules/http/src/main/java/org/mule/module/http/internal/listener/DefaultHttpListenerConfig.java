@@ -18,7 +18,6 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpConstants;
@@ -36,6 +35,8 @@ import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private String basePath;
     private Boolean parseRequest;
     private MuleContext muleContext;
+    @Inject
     private HttpListenerConnectionManager connectionManager;
     private TlsContextFactory tlsContext;
     private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
@@ -126,14 +128,6 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             return;
         }
         basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
-        try
-        {
-            connectionManager = muleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new InitialisationException(e, this);
-        }
         if (workerThreadingProfile == null)
         {
             workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
@@ -162,6 +156,25 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         verifyConnectionsParameters();
 
 
+        ServerAddress serverAddress;
+
+        try
+        {
+            serverAddress = createServerAddress();
+        }
+        catch (UnknownHostException e)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("Cannot resolve host %s", host), e, this);
+        }
+
+        if (tlsContext == null)
+        {
+            server = connectionManager.createServer(serverAddress, createWorkManagerSource(), usePersistentConnections, connectionIdleTimeout);
+        }
+        else
+        {
+            server = connectionManager.createSslServer(serverAddress, createWorkManagerSource(), tlsContext, usePersistentConnections, connectionIdleTimeout);
+        }
         initialised = true;
     }
 
@@ -242,27 +255,6 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         {
             return;
         }
-
-        ServerAddress serverAddress;
-
-        try
-        {
-            serverAddress = createServerAddress();
-        }
-        catch (UnknownHostException e)
-        {
-            throw new InitialisationException(CoreMessages.createStaticMessage("Cannot resolve host %s", host), e, this);
-        }
-
-        if (tlsContext == null)
-        {
-            server = connectionManager.createServer(serverAddress, createWorkManagerSource(), usePersistentConnections, connectionIdleTimeout);
-        }
-        else
-        {
-            server = connectionManager.createSslServer(serverAddress, createWorkManagerSource(), tlsContext, usePersistentConnections, connectionIdleTimeout);
-        }
-
         try
         {
             workManager = createWorkManager();
@@ -335,4 +327,8 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
+    public void setConnectionManager(HttpListenerConnectionManager connectionManager)
+    {
+        this.connectionManager = connectionManager;
+    }
 }
