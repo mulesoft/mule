@@ -29,6 +29,7 @@ public class ExpressionConfig
 
     private String expressionPrefix = ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
     private String expressionPostfix = ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+    private volatile boolean parsed = false;
 
     public ExpressionConfig()
     {
@@ -38,8 +39,8 @@ public class ExpressionConfig
     public ExpressionConfig(String expression, String evaluator, String customEvaluator)
     {
         this(expression, evaluator, customEvaluator,
-                ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+             ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+             ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
     }
 
@@ -54,12 +55,32 @@ public class ExpressionConfig
 
     public void parse(String expressionString)
     {
+        if (parsed)
+        {
+            return;
+        }
+
+        synchronized (this)
+        {
+            if (parsed)
+            {
+                return;
+            }
+
+            doParse(expressionString);
+
+            parsed = true;
+        } 
+    }
+
+    private void doParse(String expressionString)
+    {
         if(expressionString.startsWith(expressionPrefix))
         {
             expressionString = expressionString.substring(expressionPrefix.length());
             expressionString = expressionString.substring(0, expressionString.length() - expressionPostfix.length());
         }
-        
+
         int i = expressionString.indexOf(EXPRESSION_SEPARATOR);
         if(i < 0)
         {
@@ -115,7 +136,7 @@ public class ExpressionConfig
     public void setCustomEvaluator(String customEvaluator)
     {
         this.customEvaluator = StringUtils.trimToNull(customEvaluator);
-        fullExpression=null;        
+        fullExpression=null;
     }
 
     public String getEvaluator()
@@ -137,6 +158,7 @@ public class ExpressionConfig
     public void setExpression(String expression)
     {
         this.expression = StringUtils.trimToEmpty(expression);
-        fullExpression=null;
+        this.fullExpression=null;
+        this.parsed = false;
     }
 }
