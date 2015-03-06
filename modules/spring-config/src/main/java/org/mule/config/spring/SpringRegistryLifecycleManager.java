@@ -19,6 +19,7 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
@@ -88,6 +89,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
                     MessagingExceptionHandler.class,
                     AbstractAsyncRequestReplyRequester.class,
                     OutboundRouter.class,
+                    MessageProcessorChain.class,
                     OutboundRouterCollection.class,
                     MuleContext.class
             });

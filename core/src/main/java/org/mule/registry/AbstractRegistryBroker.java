@@ -23,7 +23,6 @@ import org.mule.lifecycle.RegistryBrokerLifecycleManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -34,7 +33,8 @@ import java.util.Set;
 @Deprecated
 public abstract class AbstractRegistryBroker implements RegistryBroker, ObjectLimboLocator
 {
-    private final ObjectLimbo limbo = new DefaultObjectLimbo();
+    //private final ObjectLimbo limbo = new DefaultObjectLimbo();
+    private final ObjectLimbo limbo;
 
     protected RegistryBrokerLifecycleManager lifecycleManager;
 
@@ -42,6 +42,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, ObjectLi
     public AbstractRegistryBroker(MuleContext muleContext)
     {
         lifecycleManager = new RegistryBrokerLifecycleManager("mule.registry.broker", this, muleContext);
+        limbo = new DefaultObjectLimbo(muleContext);
     }
 
     @Override
@@ -132,19 +133,34 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, ObjectLi
     @SuppressWarnings("unchecked")
     public <T> T lookupObject(String key)
     {
-        Object obj = null;
-        Iterator<Registry> it = getRegistries().iterator();
-        while (obj == null && it.hasNext())
+        Collection<Registry> registries = getRegistries();
+        if (registries.isEmpty())
         {
-            Registry registry = it.next();
-            obj = registry.lookupObject(key);
+            return limbo.lookupObject(key);
         }
+
+        Object obj = null;
+        for (Registry registry : registries)
+        {
+            obj = registry.lookupObject(key);
+            if (obj != null)
+            {
+                break;
+            }
+        }
+
         return (T) obj;
     }
 
     @Override
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
+        Collection<Registry> registries = getRegistries();
+        if (registries.isEmpty())
+        {
+            return limbo.lookupObject(type);
+        }
+
         Object object;
         for (Registry registry : getRegistries())
         {
@@ -160,32 +176,50 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, ObjectLi
     @Override
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
-        Collection<T> objects = new ArrayList<T>();
-
-        Iterator it = getRegistries().iterator();
-        while (it.hasNext())
+        Collection<Registry> registries = getRegistries();
+        if (registries.isEmpty())
         {
-            objects.addAll(((Registry) it.next()).lookupObjects(type));
+            return limbo.lookupObjects(type);
         }
+
+        Collection<T> objects = new ArrayList<>();
+
+        for (Registry registry : registries)
+        {
+            objects.addAll(registry.lookupObjects(type));
+        }
+
         return objects;
     }
 
     @Override
     public <T> Collection<T> lookupLocalObjects(Class<T> type)
     {
-        Collection<T> objects = new ArrayList<T>();
-        Iterator it = getRegistries().iterator();
-        while (it.hasNext())
+        Collection<Registry> registries = getRegistries();
+        if (registries.isEmpty())
         {
-            objects.addAll(((Registry) it.next()).lookupLocalObjects(type));
+            return limbo.lookupLocalObjects(type);
         }
+
+        Collection<T> objects = new ArrayList<>();
+        for (Registry registry : registries)
+        {
+            objects.addAll(registry.lookupLocalObjects(type));
+        }
+
         return objects;
     }
 
     @Override
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
-        Map<String, T> results = new HashMap<String, T>();
+        Collection<Registry> registries = getRegistries();
+        if (registries.isEmpty())
+        {
+            return limbo.lookupByType(type);
+        }
+
+        Map<String, T> results = new HashMap<>();
         for (Registry registry : getRegistries())
         {
             results.putAll(registry.lookupByType(type));
@@ -197,13 +231,18 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, ObjectLi
     @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
-        Collection<T> objects = new ArrayList<T>();
-
-        Iterator it = getRegistries().iterator();
-        while (it.hasNext())
+        Collection<Registry> registries = getRegistries();
+        if (registries.isEmpty())
         {
-            objects.addAll(((Registry) it.next()).lookupObjectsForLifecycle(type));
+            return limbo.lookupObjectsForLifecycle(type);
         }
+
+        Collection<T> objects = new ArrayList<>();
+        for (Registry registry : registries)
+        {
+            objects.addAll(registry.lookupObjectsForLifecycle(type));
+        }
+
         return objects;
     }
 

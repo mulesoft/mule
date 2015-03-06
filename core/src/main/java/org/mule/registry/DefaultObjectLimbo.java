@@ -6,48 +6,22 @@
  */
 package org.mule.registry;
 
+import org.mule.api.MuleContext;
 import org.mule.api.registry.ObjectLimbo;
-
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Default implementation of {@link ObjectLimbo}. This implementation is thread-safe
  *
  * @since 3.7.0
  */
-public class DefaultObjectLimbo implements ObjectLimbo
+public class DefaultObjectLimbo extends SimpleRegistry implements ObjectLimbo
 {
 
-    private final Map<String, Object> map = new ConcurrentHashMap<>();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void registerObject(String key, Object value)
+    public DefaultObjectLimbo(MuleContext muleContext)
     {
-        map.put(key, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> T unregisterObject(String key)
-    {
-        return (T) map.remove(key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, Object> getObjects()
-    {
-        return ImmutableMap.copyOf(map);
+        super(muleContext);
+        // SimpleRegistry always adds some stuff by default
+        clear();
     }
 
     /**
@@ -56,6 +30,6 @@ public class DefaultObjectLimbo implements ObjectLimbo
     @Override
     public void clear()
     {
-        map.clear();
+        getRegistryMap().clear();
     }
 }

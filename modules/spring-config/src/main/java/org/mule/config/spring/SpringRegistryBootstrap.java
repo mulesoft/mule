@@ -357,7 +357,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
 
         ObjectLimbo limbo = ((ObjectLimboLocator) muleContext.getRegistry()).getLimbo();
 
-        for (Entry<String, Object> entry : limbo.getObjects().entrySet())
+        for (Entry<String, Object> entry : limbo.lookupByType(Object.class).entrySet())
         {
             registerInstance(entry.getKey(), entry.getValue());
         }

@@ -6,8 +6,6 @@
  */
 package org.mule.api.registry;
 
-import java.util.Map;
-
 /**
  * An intermediate deposit for objects that are registered
  * before the any {@link Registry} has been added into the
@@ -22,30 +20,8 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-public interface ObjectLimbo
+public interface ObjectLimbo extends Registry
 {
-
-    /**
-     * Registers a key value pair. No lifecycle is applied.
-     * If a value already exists for the given {@code key}, then
-     * it will be override.
-     */
-    void registerObject(String key, Object value);
-
-    /**
-     * Unregisters the value for the given {@code key} if any
-     *
-     * @param key a key
-     * @return the registered value if any. {@code null} otherwise
-     */
-    <T> T unregisterObject(String key);
-
-    /**
-     * Returns an immutable view of the registered objects
-     *
-     * @return a immutable {@link Map}
-     */
-    Map<String, Object> getObjects();
 
     /**
      * Removes all the entries in this limbo. Registries should

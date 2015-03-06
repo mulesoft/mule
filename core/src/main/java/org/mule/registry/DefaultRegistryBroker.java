@@ -15,12 +15,17 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @deprecated as of 3.7.0. This will be removed in Mule 4.0
  */
 @Deprecated
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRegistryBroker.class);
+
     private final List<Registry> registries = new CopyOnWriteArrayList<>();
     private final AtomicReference<LifecycleRegistry> lifecycleRegistry = new AtomicReference<>(null);
 
@@ -33,6 +38,10 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
     public void addRegistry(Registry registry)
     {
         registries.add(0, registry);
+        if (registries.size() > 1 && LOGGER.isWarnEnabled())
+        {
+            LOGGER.warn("A second registry has been registered, however adding registries has been deprecated as of Mule 3.7.0");
+        }
     }
 
     public void removeRegistry(Registry registry)
