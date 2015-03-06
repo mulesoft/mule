@@ -203,5 +203,6 @@ public class ExpressionConfig
         this.unParsedExpression = expression;
         this.expression = null;
         this.fullExpression = null;
+        this.parsed = false;
     }
 }
