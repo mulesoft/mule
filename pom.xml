@@ -230,7 +230,7 @@
         <smackVersion>3.1.0</smackVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <!-- see http://www.springsource.com/security/cve-2010-1622 -->
-        <springVersion>3.2.10.RELEASE</springVersion>
+        <springVersion>3.2.13.RELEASE</springVersion>
         <springSecurityVersion>3.1.0.RELEASE</springSecurityVersion>
         <sshCoreVersion>0.6.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
