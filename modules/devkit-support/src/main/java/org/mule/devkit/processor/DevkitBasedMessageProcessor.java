@@ -6,6 +6,7 @@
  */
 package org.mule.devkit.processor;
 
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -14,6 +15,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -92,9 +94,12 @@ public abstract class DevkitBasedMessageProcessor extends ExpressionEvaluatorSup
         }
         catch (NotAuthorizedException e)
         {
+            Object policyAwareCandidate = evaluateIfExpression(event, moduleObject);
+            checkArgument(policyAwareCandidate instanceof OnNoTokenPolicyAware, String.format("Was expecting config to be an instance of %s but it's a %s instead",
+                                                                                              OnNoTokenPolicyAware.class.getName(), policyAwareCandidate.getClass().getName()));
             try
             {
-                return this.handleNotAuthorized((OnNoTokenPolicyAware) moduleObject, e, event);
+                return this.handleNotAuthorized((OnNoTokenPolicyAware) policyAwareCandidate, e, event);
             }
             catch (Exception ne)
             {
@@ -171,17 +176,33 @@ public abstract class DevkitBasedMessageProcessor extends ExpressionEvaluatorSup
                 }
             }
         }
-        if (temporaryObject instanceof String)
+
+        return evaluateIfExpression(muleEvent, temporaryObject);
+    }
+
+    /**
+     * if {@code temporaryObject} is a {@link String} then it tries to evaluate it
+     * using the {@link ExpressionManager} in {@code muleContext}. Otherwise, it simply
+     * returns {@code temporaryObject}
+     *
+     * @param muleEvent the current mule event
+     * @param object an object
+     * @return {@code temporaryObject} or the result of evaluating it as a expression if it's a String
+     * @throws ConfigurationException
+     */
+    private Object evaluateIfExpression(MuleEvent muleEvent, Object object) throws ConfigurationException
+    {
+        if (object instanceof String)
         {
-            temporaryObject = (muleContext.getExpressionManager().evaluate(((String) temporaryObject),
-                muleEvent, true));
-            if (temporaryObject == null)
+            object = (muleContext.getExpressionManager().evaluate(((String) object),
+                                                                           muleEvent, true));
+            if (object == null)
             {
                 throw new ConfigurationException(
                     MessageFactory.createStaticMessage("Cannot find object by config name"));
             }
         }
-        return temporaryObject;
+        return object;
     }
 
     /**
