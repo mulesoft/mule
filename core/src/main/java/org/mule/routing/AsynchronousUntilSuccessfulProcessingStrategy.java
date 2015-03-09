@@ -29,6 +29,7 @@ import org.mule.util.store.QueuePersistenceObjectStore;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +51,7 @@ import org.apache.commons.logging.LogFactory;
 public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy implements Initialisable, Startable, Stoppable
 {
 
+    private static final Random random = new Random();
     protected transient Log logger = LogFactory.getLog(getClass());
     private ScheduledExecutorService scheduledPool;
 
@@ -212,8 +214,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         // the key is built in way to prevent UntilSuccessful workers across a
         // cluster to compete for the same
         // events over a shared object store
-        String key = muleEvent.getFlowConstruct() + "-" + muleEvent.getMuleContext().getClusterId() + "-"
-                     + muleEvent.getId();
+        // it also adds a random trailer to support events which have been
+        // splitted and thus have the same id. Random number was chosen over
+        // UUID for performance reasons
+        String key = String.format("%s-%s-%s-%d", muleEvent.getFlowConstruct(), muleEvent.getMuleContext().getClusterId(), muleEvent.getId(), random.nextInt());
+
         return new QueueKey(QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, key);
     }
 
