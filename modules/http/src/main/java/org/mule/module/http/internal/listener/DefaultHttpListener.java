@@ -57,6 +57,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     private RequestHandlerManager requestHandlerManager;
     private MessageProcessingManager messageProcessingManager;
     private String[] parsedAllowedMethods;
+    private ListenerPath listenerPath;
 
     @Override
     public void setListener(final MessageProcessor messageProcessor)
@@ -119,7 +120,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
             {
                 try
                 {
-                    final HttpMessageProcessorTemplate httpMessageProcessorTemplate = new HttpMessageProcessorTemplate(createEvent(requestContext, path), messageProcessor, responseCallback, responseBuilder, errorResponseBuilder);
+                    final HttpMessageProcessorTemplate httpMessageProcessorTemplate = new HttpMessageProcessorTemplate(createEvent(requestContext), messageProcessor, responseCallback, responseBuilder, errorResponseBuilder);
                     final HttpMessageProcessContext messageProcessContext = new HttpMessageProcessContext(DefaultHttpListener.this, flowConstruct, config.getWorkManager(), muleContext.getExecutionClassLoader());
                     messageProcessingManager.processMessage(httpMessageProcessorTemplate, messageProcessContext);
                 }
@@ -158,7 +159,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         };
     }
 
-    private MuleEvent createEvent(HttpRequestContext requestContext, String listenerPath) throws HttpRequestParsingException
+    private MuleEvent createEvent(HttpRequestContext requestContext) throws HttpRequestParsingException
     {
         return HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, parseRequest, listenerPath);
     }
@@ -180,7 +181,8 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
             errorResponseBuilder = HttpResponseBuilder.emptyInstance(muleContext);
         }
         path = HttpParser.sanitizePathWithStartSlash(path);
-        path = config.resolvePath(path);
+        listenerPath = config.getFullListenerPath(path);
+        path = listenerPath.getResolvedPath();
         responseBuilder.setResponseStreaming(responseStreamingMode);
         validatePath();
         parseRequest = config.resolveParseRequest(parseRequest);

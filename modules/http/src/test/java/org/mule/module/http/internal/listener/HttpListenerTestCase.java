@@ -9,7 +9,6 @@ package org.mule.module.http.internal.listener;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.InitialisationException;
@@ -55,7 +54,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
         httpListener.setMuleContext(mockMuleContext);
         httpListener.setFlowConstruct(mockFlowConstruct);
         httpListener.setConfig(mockHttpListenerConfig);
-        when(mockHttpListenerConfig.resolvePath(anyString())).thenReturn(listenerPath);
+        when(mockHttpListenerConfig.getFullListenerPath(anyString())).thenReturn(new ListenerPath(null ,listenerPath));
         when(mockMuleContext.getRegistry().get(HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER)).thenReturn(mockHttpListenerConnectionManager);
         httpListener.setPath(listenerPath);
 
