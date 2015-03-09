@@ -6,9 +6,12 @@
  */
 package org.mule.exception;
 
+import org.mule.api.MuleContext;
 import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.processor.MessageProcessor;
 
 import java.util.ArrayList;
@@ -18,7 +21,14 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
 {
     private RedeliveryExceeded redeliveryExceeded;
     private Integer maxRedeliveryAttempts;
-    
+
+
+    @Override
+    protected void doInitialise(MuleContext muleContext) throws InitialisationException
+    {
+        LifecycleUtils.initialiseIfNeeded(redeliveryExceeded);
+        super.doInitialise(muleContext);
+    }
 
     public void setRedeliveryExceeded(RedeliveryExceeded redeliveryExceeded)
     {

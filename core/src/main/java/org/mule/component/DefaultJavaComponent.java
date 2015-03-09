@@ -11,6 +11,7 @@ import org.mule.api.component.InterfaceBinding;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.registry.ServiceException;
@@ -91,6 +92,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        LifecycleUtils.initialiseIfNeeded(objectFactory);
         for (InterfaceBinding binding : bindings)
         {
             applyLifecycleAndDependencyInjection(binding);

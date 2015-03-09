@@ -15,12 +15,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.config.DefaultMuleConfiguration;
 import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.security.oauth.DefaultHttpCallback;
 import org.mule.tck.MuleTestUtils;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 
@@ -40,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
+public class DefaultHttpCallbackTestCase extends FunctionalTestCase
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHttpCallbackTestCase.class);
@@ -61,6 +60,12 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     private GetMethod callbackMethod;
 
     private HttpCallback callback;
+
+    @Override
+    protected String[] getConfigFiles()
+    {
+        return new String[] {};
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -112,8 +117,7 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
         config.setPort(localPort.getNumber());
         config.setHost("localhost");
         config.setMuleContext(muleContext);
-        config.initialise();
-        config.start();
+        muleContext.getRegistry().registerObject("callbackConfig", config);
 
         callback = createCallback(config);
         sendCallbackRequest();
@@ -134,7 +138,6 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
         listenerConfig.setHost("localhost");
         listenerConfig.setMuleContext(muleContext);
         muleContext.getRegistry().registerObject("callbackConfig", listenerConfig);
-        listenerConfig.start();
 
         callback = createCallback(null);
         sendCallbackRequest();

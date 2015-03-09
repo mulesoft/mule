@@ -6,28 +6,40 @@
  */
 package org.mule.config.spring;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.api.registry.TransformerResolver;
+import org.mule.api.transformer.Converter;
 import org.mule.lifecycle.RegistryLifecycleManager;
+import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
+import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class SpringRegistry extends AbstractRegistry
+public class SpringRegistry extends AbstractRegistry implements LifecycleRegistry
 {
+
     public static final String REGISTRY_ID = "org.mule.Registry.Spring";
 
     /**
@@ -38,44 +50,53 @@ public class SpringRegistry extends AbstractRegistry
 
     protected ApplicationContext applicationContext;
 
+    private boolean readOnly;
+
+    private RegistrationDelegate registrationDelegate;
+
     //This is used to track the Spring context lifecycle since there is no way to confirm the
     //lifecycle phase from the application context
     protected AtomicBoolean springContextInitialised = new AtomicBoolean(false);
 
-    public SpringRegistry(MuleContext muleContext)
-    {
-        super(REGISTRY_ID, muleContext);
-    }
-
-    public SpringRegistry(String id, MuleContext muleContext)
-    {
-        super(id, muleContext);
-    }
-
     public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext)
     {
         super(REGISTRY_ID, muleContext);
-        this.applicationContext = applicationContext;
+        setApplicationContext(applicationContext);
     }
 
     public SpringRegistry(String id, ApplicationContext applicationContext, MuleContext muleContext)
     {
         super(id, muleContext);
-        this.applicationContext = applicationContext;
+        setApplicationContext(applicationContext);
     }
 
     public SpringRegistry(ConfigurableApplicationContext applicationContext, ApplicationContext parentContext, MuleContext muleContext)
     {
         super(REGISTRY_ID, muleContext);
         applicationContext.setParent(parentContext);
-        this.applicationContext = applicationContext;
+        setApplicationContext(applicationContext);
     }
 
     public SpringRegistry(String id, ConfigurableApplicationContext applicationContext, ApplicationContext parentContext, MuleContext muleContext)
     {
         super(id, muleContext);
         applicationContext.setParent(parentContext);
+        setApplicationContext(applicationContext);
+    }
+
+    private void setApplicationContext(ApplicationContext applicationContext)
+    {
         this.applicationContext = applicationContext;
+        if (applicationContext instanceof ConfigurableApplicationContext)
+        {
+            readOnly = false;
+            registrationDelegate = new ConfigurableRegistrationDelegate((ConfigurableApplicationContext) applicationContext);
+        }
+        else
+        {
+            readOnly = true;
+            registrationDelegate = new ReadOnlyRegistrationDelegate();
+        }
     }
 
     @Override
@@ -83,10 +104,29 @@ public class SpringRegistry extends AbstractRegistry
     {
         if (applicationContext instanceof ConfigurableApplicationContext)
         {
-                ((ConfigurableApplicationContext) applicationContext).refresh();
+            ((ConfigurableApplicationContext) applicationContext).refresh();
         }
+
+        initTransformers();
         //This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the application context
         springContextInitialised.set(true);
+    }
+
+    private void initTransformers()
+    {
+        MuleRegistryHelper registryHelper = (MuleRegistryHelper) muleContext.getRegistry();
+
+        Map<String, TransformerResolver> resolvers = registryHelper.lookupByType(TransformerResolver.class);
+        for (TransformerResolver resolver : resolvers.values())
+        {
+            registryHelper.registerTransformerResolver(resolver);
+        }
+
+        Map<String, Converter> converters = registryHelper.lookupByType(Converter.class);
+        for (Converter converter : converters.values())
+        {
+            registryHelper.notifyTransformerResolvers(converter, TransformerResolver.RegistryAction.ADDED);
+        }
     }
 
     @Override
@@ -94,20 +134,19 @@ public class SpringRegistry extends AbstractRegistry
     {
         // check we aren't trying to close a context which has never been started,
         // spring's appContext.isActive() isn't working for this case
-        if (!this.springContextInitialised.get())
+        if (!springContextInitialised.get())
         {
             return;
         }
 
         if (applicationContext instanceof ConfigurableApplicationContext
-                && ((ConfigurableApplicationContext) applicationContext).isActive())
+            && ((ConfigurableApplicationContext) applicationContext).isActive())
         {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
 
         // release the circular implicit ref to MuleContext
         applicationContext = null;
-
         this.springContextInitialised.set(false);
     }
 
@@ -124,7 +163,7 @@ public class SpringRegistry extends AbstractRegistry
         if (StringUtils.isBlank(key))
         {
             logger.warn(
-                    MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
+                    createStaticMessage("Detected a lookup attempt with an empty or null key"),
                     new Throwable().fillInStackTrace());
             return null;
         }
@@ -135,15 +174,33 @@ public class SpringRegistry extends AbstractRegistry
         }
         else
         {
+            Object object;
             try
             {
-                return applicationContext.getBean(key);
+                object = applicationContext.getBean(key);
             }
             catch (NoSuchBeanDefinitionException e)
             {
-                logger.debug(e);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(e);
+                }
                 return null;
             }
+
+            if (!applicationContext.isSingleton(key))
+            {
+                try
+                {
+                    getLifecycleManager().applyCompletedPhases(object);
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(createStaticMessage("Could not apply lifecycle into prototype object " + key), e);
+                }
+            }
+
+            return object;
         }
     }
 
@@ -165,13 +222,88 @@ public class SpringRegistry extends AbstractRegistry
     @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
-        return internalLookupByTypeWithoutAncestors(type, false, false).values();
+        return lookupEntriesForLifecycle(type).values();
     }
 
     @Override
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
         return internalLookupByType(type, true, true);
+    }
+
+    @Override
+    public void registerObject(String key, Object value) throws RegistrationException
+    {
+        registrationDelegate.registerObject(key, value);
+    }
+
+    @Override
+    public void registerObject(String key, Object value, Object metadata) throws RegistrationException
+    {
+        registrationDelegate.registerObject(key, value, metadata);
+    }
+
+    @Override
+    public void registerObjects(Map<String, Object> objects) throws RegistrationException
+    {
+        registrationDelegate.registerObjects(objects);
+    }
+
+    @Override
+    protected Object doUnregisterObject(String key) throws RegistrationException
+    {
+        return registrationDelegate.unregisterObject(key);
+    }
+
+    /**
+     * Will fire any lifecycle methods according to the current lifecycle without actually
+     * registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects.
+     *
+     * @param object the object to process
+     * @return the same object with lifecycle methods called (if it has any)
+     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
+     */
+    @Override
+    public Object applyLifecycle(Object object) throws MuleException
+    {
+        getLifecycleManager().applyCompletedPhases(object);
+        return object;
+    }
+
+    @Override
+    public Object applyLifecycle(Object object, String phase) throws MuleException
+    {
+        if (phase == null)
+        {
+            getLifecycleManager().applyCompletedPhases(object);
+        }
+        else
+        {
+            getLifecycleManager().applyPhase(object, NotInLifecyclePhase.PHASE_NAME, phase);
+        }
+        return object;
+    }
+
+    @Override
+    public Object inject(Object object)
+    {
+        try
+        {
+            return initialiseObject((ConfigurableApplicationContext) applicationContext, EMPTY, object);
+        }
+        catch (LifecycleException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
+
+    private Object initialiseObject(ConfigurableApplicationContext applicationContext, String key, Object object) throws LifecycleException
+    {
+        applicationContext.getBeanFactory().autowireBean(object);
+        Object initialised = applicationContext.getBeanFactory().initializeBean(object, key);
+
+        return initialised;
     }
 
     protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit)
@@ -184,7 +316,7 @@ public class SpringRegistry extends AbstractRegistry
         {
             // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
             String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
-            throw new MuleRuntimeException(MessageFactory.createStaticMessage(message), fbex);
+            throw new MuleRuntimeException(createStaticMessage(message), fbex);
         }
         catch (Exception e)
         {
@@ -203,48 +335,108 @@ public class SpringRegistry extends AbstractRegistry
         {
             // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
             String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
-            throw new MuleRuntimeException(MessageFactory.createStaticMessage(message), fbex);
+            throw new MuleRuntimeException(createStaticMessage(message), fbex);
         }
         catch (Exception e)
         {
-            logger.debug(e);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(e);
+            }
             return Collections.emptyMap();
         }
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    // Registry is read-only
-    ////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void registerObject(String key, Object value) throws RegistrationException
+    protected <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type)
     {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        return internalLookupByTypeWithoutAncestors(type, false, false);
     }
 
-    @Override
-    public void registerObject(String key, Object value, Object metadata) throws RegistrationException
+    protected Map<String, Object> getDepencies(String key)
     {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        if (applicationContext instanceof ConfigurableApplicationContext)
+        {
+            Map<String, Object> dependents = new HashMap<>();
+            for (String dependentKey : ((ConfigurableApplicationContext) applicationContext).getBeanFactory().getDependenciesForBean(key))
+            {
+                dependents.put(dependentKey, get(dependentKey));
+            }
+
+            return dependents;
+        }
+
+        throw new UnsupportedOperationException("This operation is only available when this registry is backed by a ConfigurableApplicationContext");
     }
 
-    @Override
-    public void registerObjects(Map<String, Object> objects) throws RegistrationException
+    private class ConfigurableRegistrationDelegate implements RegistrationDelegate
     {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
-    }
 
-    @Override
-    public void unregisterObject(String key)
-    {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
-    }
+        private final ConfigurableApplicationContext applicationContext;
 
-    @Override
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
-    {
-        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+        private ConfigurableRegistrationDelegate(ConfigurableApplicationContext applicationContext)
+        {
+            this.applicationContext = applicationContext;
+        }
+
+        @Override
+        public void registerObject(String key, Object value) throws RegistrationException
+        {
+            doRegisterObject(key, value);
+        }
+
+        @Override
+        public void registerObject(String key, Object value, Object metadata) throws RegistrationException
+        {
+            registerObject(key, value);
+        }
+
+        @Override
+        public void registerObjects(Map<String, Object> objects) throws RegistrationException
+        {
+            if (objects == null || objects.isEmpty())
+            {
+                return;
+            }
+
+            for (Map.Entry<String, Object> entry : objects.entrySet())
+            {
+                registerObject(entry.getKey(), entry.getValue());
+            }
+        }
+
+        @Override
+        public Object unregisterObject(String key) throws RegistrationException
+        {
+            Object object = applicationContext.getBean(key);
+
+            if (applicationContext.getBeanFactory().containsBeanDefinition(key))
+            {
+                ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
+            }
+
+            ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
+
+            return object;
+        }
+
+        private synchronized void doRegisterObject(String key, Object value) throws RegistrationException
+        {
+            if (applicationContext.containsBean(key))
+            {
+                SpringRegistry.this.unregisterObject(key);
+            }
+
+            try
+            {
+                value = initialiseObject(applicationContext, key, value);
+                applyLifecycle(value);
+                applicationContext.getBeanFactory().registerSingleton(key, value);
+            }
+            catch (Exception e)
+            {
+                throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -254,7 +446,7 @@ public class SpringRegistry extends AbstractRegistry
     @Override
     public boolean isReadOnly()
     {
-        return true;
+        return readOnly;
     }
 
     @Override

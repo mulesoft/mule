@@ -56,6 +56,7 @@ import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.registry.SimpleRegistry;
 import org.mule.util.ClassUtils;
 import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
@@ -78,6 +79,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     protected static final Log logger = LogFactory.getLog(DefaultMuleContextBuilder.class);
     public static final String MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE = "mule.context.workmanager.maxthreadsactive";
 
+    protected final boolean createSimpleRegistry;
+
     protected MuleConfiguration config;
 
     protected MuleContextLifecycleManager lifecycleManager;
@@ -92,6 +95,25 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected SplashScreen shutdownScreen;
 
+    public DefaultMuleContextBuilder()
+    {
+        this(false);
+    }
+
+    /**
+     * if {@code createSimpleRegistry} is {@code true}, then a {@link SimpleRegistry}
+     * will automatically be added to the created context. That only makes sense
+     * when trying to start a light weight context which doesn't require starting a heavier
+     * registry such as Spring or Guice or when testing. This is not something we would
+     * advice on production
+     *
+     * @param createSimpleRegistry whether or not to add a {@link SimpleRegistry} to the created context
+     */
+    public DefaultMuleContextBuilder(boolean createSimpleRegistry)
+    {
+        this.createSimpleRegistry = createSimpleRegistry;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -105,13 +127,24 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
         muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
         muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(),muleContext));
-        DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
+        DefaultRegistryBroker registryBroker = createRegistryBroker(muleContext);
         muleContext.setRegistryBroker(registryBroker);
         muleContext.setMuleRegistry(new MuleRegistryHelper(registryBroker, muleContext));
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
         muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
         return muleContext;
+    }
+
+    protected DefaultRegistryBroker createRegistryBroker(MuleContext muleContext)
+    {
+        DefaultRegistryBroker broker = new DefaultRegistryBroker(muleContext);
+        if (createSimpleRegistry)
+        {
+            broker.addRegistry(new SimpleRegistry(muleContext));
+        }
+
+        return broker;
     }
 
     protected DefaultMuleContext createDefaultMuleContext()

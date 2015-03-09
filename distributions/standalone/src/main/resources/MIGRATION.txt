@@ -5,6 +5,7 @@ The following is a list of changes you have to execute to migrate from Mule ESB 
 Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+Notes for more details.
 
 Migration changes from 3.6.x to 3.7.x
+
 MULE-8298: Spring dependency was upgraded to version 4.1.5.RELEASE.
 MULE-8315: the following Apache Tomcat libraries were upgraded form version 6.0.29 to version 6.0.41: annotations-api, coyote, el-api, jasper, jasper-el, jsp-api, juli. Removed catalina-6.0.29.jar as is not needed anymore.
 MULE-8340: TLS configuration is not mapped anymore to the default JVM system properties. In order to keep this behavior, define the following system property: mule.tls.disableSystemPropertiesMapping=false
@@ -22,6 +23,13 @@ MULE-8297: CXF was upgraded to version 2.7.15. Also, the following dependencies 
     * xmltooling: from version 1.3.2-1 to 1.4.1
     Note 1: If you need to use uri parameters add an org.apache.cxf.interceptor.URIMappingInterceptor interceptor to the CXF service in your flow, see http://cxf.apache.org/cve-2012-5633.html.
     Note 2: jibx binding could have some issues if you use it under Java 8.
+MULE-7588: Lifecycle has been fixed. Initialisable objects will only be invoked after the registry has instantiated all objects and successfully injected dependencies into them. initialise() is no longer early invoked.
+MULE-7588: TransientRegistry is deprecated and no longer be used by the runtime. SpringRegistry is now the only registry the runtime uses by default. AbstarctMuleContextTestCase uses a SimpleRegistry instead.
+MULE-7588: addRegistry() and removeRegistry() methods from the MuleContext have been deprecated. Manually added registries will not participate of dependency injection
+MULE-7588: SimpleRegistryBootstrap is deprecated and is no longer used by the runtime. SpringRegistryBootstrap is used instead
+MULE-7588: PreInjectProcessor, InjectProcessor, ObjectProcessor and all their implementation have been deprecated and are no longer used by the runtime. Use a Spring BeanPostProcessor instead
+MULE-7588: JSR-330 annotations are now the recommended way of getting hold of dependencies. Manual lookups through the mule context registry are still supported but not recommended
+MULE-7588: Spring's init-method and destroy-method are no longer recommended when defining Spring beans
 
 Migration changes from 3.5.x to 3.6.x
 

@@ -83,7 +83,9 @@ import org.apache.commons.logging.LogFactory;
  * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
  * {@link org.mule.api.context.MuleContextAware} and lifecycle interfaces such as {@link org.mule.api.lifecycle.Initialisable}.
+ * @deprecated as of 3.7.0. Try to use {@link org.mule.config.spring.SpringRegistryBootstrap} instead.
  */
+@Deprecated
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
 

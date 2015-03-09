@@ -9,7 +9,6 @@ package org.mule.module.http.internal.listener;
 import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -19,7 +18,6 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpConstants;
@@ -37,6 +35,8 @@ import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +56,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private String basePath;
     private Boolean parseRequest;
     private MuleContext muleContext;
+    @Inject
     private HttpListenerConnectionManager connectionManager;
     private TlsContextFactory tlsContext;
     private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
@@ -127,14 +128,6 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             return;
         }
         basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
-        try
-        {
-            connectionManager = muleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new InitialisationException(e, this);
-        }
         if (workerThreadingProfile == null)
         {
             workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
@@ -334,4 +327,8 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
+    public void setConnectionManager(HttpListenerConnectionManager connectionManager)
+    {
+        this.connectionManager = connectionManager;
+    }
 }

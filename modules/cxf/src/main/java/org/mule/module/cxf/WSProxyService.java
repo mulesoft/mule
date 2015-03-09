@@ -71,7 +71,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
     private static final String WSDL_PARAM_2 = "&wsdl";
 
     /** This is an internal semaphore, not a property */
-    private boolean lazyInit = true;
+    private boolean lazyInit = false;
 
     protected static transient Log logger = LogFactory.getLog(WSProxyService.class);
 

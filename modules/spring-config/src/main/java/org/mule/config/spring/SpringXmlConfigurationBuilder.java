@@ -11,10 +11,10 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
-import org.mule.api.registry.Registry;
 import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -29,8 +29,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     public static final String MULE_DEFAULTS_CONFIG = "default-mule-config.xml";
     public static final String MULE_SPRING_CONFIG = "mule-spring-config.xml";
     public static final String MULE_MINIMAL_SPRING_CONFIG = "minimal-mule-config.xml";
-    public static final String MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG = "registry-bootstrap-mule-config.xml";
-    public static final String MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG = "registry-bootstrap-mule-domain-config.xml";
 
     /**
      * Prepend "default-mule-config.xml" to the list of config resources.
@@ -38,7 +36,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected boolean useDefaultConfigResource = true;
     protected boolean useMinimalConfigResource = false;
 
-    protected Registry registry;
+    protected SpringRegistry registry;
 
     protected ApplicationContext domainContext;
     protected ApplicationContext parentContext;
@@ -65,20 +63,18 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         ConfigResource[] allResources;
         if (useMinimalConfigResource)
         {
-            allResources = new ConfigResource[configResources.length + 3];
-            allResources[0] = new ConfigResource(MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG);
-            allResources[1] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
-            allResources[2] = new ConfigResource(MULE_SPRING_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 3, configResources.length);
+            allResources = new ConfigResource[configResources.length + 2];
+            allResources[0] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
+            allResources[1] = new ConfigResource(MULE_SPRING_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 2, configResources.length);
         }
         else if (useDefaultConfigResource)
         {
-            allResources = new ConfigResource[configResources.length + 4];
-            allResources[0] = new ConfigResource(MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG);
-            allResources[1] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
-            allResources[2] = new ConfigResource(MULE_SPRING_CONFIG);
-            allResources[3] = new ConfigResource(MULE_DEFAULTS_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 4, configResources.length);
+            allResources = new ConfigResource[configResources.length + 3];
+            allResources[0] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
+            allResources[1] = new ConfigResource(MULE_SPRING_CONFIG);
+            allResources[2] = new ConfigResource(MULE_DEFAULTS_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 3, configResources.length);
         }
         else
         {
@@ -95,7 +91,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         registry.dispose();
         if (muleContext != null)
         {
-        	muleContext.removeRegistry(registry);
+            muleContext.removeRegistry(registry);
         }
         registry = null;
         configured = false;
@@ -108,7 +104,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
 
     protected void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext)
-        throws Exception
+            throws Exception
     {
         if (parentContext != null && domainContext != null)
         {
@@ -132,6 +128,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // some beans may try to look up other beans via the Registry during
         // preInstantiateSingletons().
         muleContext.addRegistry(registry);
+
         registry.initialise();
     }
 

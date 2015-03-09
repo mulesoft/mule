@@ -2,18 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd"
-       default-init-method="initialise">
-    <!-- Marker for MULE-4813-->    
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <bean id="_muleCustomEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-        <property name="propertyEditorRegistrars">
-            <list>
-                <bean class="org.mule.config.spring.editors.MulePropertyEditorRegistrar"/>
-            </list>
-        </property>
-    </bean>
-    
     <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.processors.MuleObjectNameProcessor"/>
     
     <bean name="_mulePropertyPlaceholderProcessor"

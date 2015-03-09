@@ -16,7 +16,11 @@ import org.mule.api.registry.PreInitProcessor;
  * be resolved at run-time.
  * {@link org.mule.api.expression.ExpressionEvaluator} objects are used to execute property expressions (usually on the
  * current message) at run-time to extract a dynamic value.
+ *
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
+@Deprecated
 public class ExpressionEnricherProcessor implements PreInitProcessor, Disposable
 {
     private MuleContext context;

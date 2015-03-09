@@ -6,13 +6,19 @@
  */
 package org.mule.api.registry;
 
+import org.mule.registry.TransientRegistry;
+
 /**
- * The parent interface for all object processors. Object processors can be registered in the Mule regisrty and fired
+ * The parent interface for all object processors. Object processors can be registered in the Mule registry and fired
  * at the correct time.
- *
+ * <p/>
  * Developers must not implement this interface directly. Instead use either {@link org.mule.api.registry.InjectProcessor} or
- * {@link org.mule.api.registry.PreInitProcessor}. 
+ * {@link org.mule.api.registry.PreInitProcessor}.
+ *
+ * @deprecated as of 3.7.0 since these are only used by {@link TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
+@Deprecated
 public interface ObjectProcessor
 {
     Object process(Object object);

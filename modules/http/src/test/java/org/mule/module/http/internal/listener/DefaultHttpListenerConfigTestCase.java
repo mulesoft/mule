@@ -94,6 +94,7 @@ public class DefaultHttpListenerConfigTestCase extends AbstractMuleTestCase
         DefaultHttpListenerConfig listenerConfig = new DefaultHttpListenerConfig();
         listenerConfig.setHost(LOCALHOST);
         listenerConfig.setMuleContext(mockMuleContext);
+        listenerConfig.setConnectionManager(mockHttpListenerConnectionManager);
         return listenerConfig;
     }
 }

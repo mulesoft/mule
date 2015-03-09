@@ -108,7 +108,8 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             final MuleRegistry registry = muleContext.getRegistry();
             if (!isAgentRegistered(agent))
             {
-                registry.registerAgent(agent);
+                agent.initialise();
+                registerAgent(agent, registry);
             }
 
             // any existing jmx agent will be modified with remote connector settings
@@ -116,13 +117,13 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             // there must be only one jmx agent, so lookup by type instead
             if (registry.lookupObject(AbstractJmxAgent.class) == null)
             {
-                registry.registerAgent(agent);
+                registerAgent(agent, registry);
             }
 
             agent = createJmxNotificationAgent();
             if (!isAgentRegistered(agent))
             {
-                registry.registerAgent(agent);
+                registerAgent(agent, registry);
             }
 
             if (loadJdmkAgent)
@@ -130,7 +131,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createJdmkAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    registry.registerAgent(agent);
+                    registerAgent(agent, registry);
                 }
             }
 
@@ -139,7 +140,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createMx4jAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    registry.registerAgent(agent);
+                    registerAgent(agent, registry);
                 }
             }
 
@@ -148,18 +149,19 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createProfilerAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    registry.registerAgent(agent);
+                    registerAgent(agent, registry);
                 }
             }
-
-            // remove this agent once it has registered the other agents
-            //TODO RM* this currently does nothing!!!
-            registry.unregisterAgent(name);
         }
         catch (MuleException e)
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    protected void registerAgent(Agent agent, MuleRegistry registry) throws MuleException
+    {
+        registry.registerAgent(agent);
     }
 
     public AbstractJmxAgent createJmxAgent()
