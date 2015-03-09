@@ -206,7 +206,7 @@
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>8.1.13.v20130916</jettyVersion>
-        <jodaTimeVersion>1.6</jodaTimeVersion>
+        <jodaTimeVersion>2.5</jodaTimeVersion>
         <jschVersion>0.1.50</jschVersion>
         <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>

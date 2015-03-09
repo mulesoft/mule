@@ -12,7 +12,7 @@
 /lib/user/jnr-posix-2.5.2.jar
 /lib/user/jnr-unixsocket-0.3.jar
 /lib/user/jnr-x86asm-1.0.2.jar
-/lib/user/joda-time-2.1.jar
+/lib/user/joda-time-2.5.jar
 /lib/user/joni-2.0.0.jar
 /lib/user/jruby-core-1.7.4.jar
 /lib/user/jruby-stdlib-1.7.4.jar

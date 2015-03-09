@@ -629,7 +629,7 @@
 /mule-standalone-${productVersion}/lib/opt/jetty-util-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-util5-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/joda-time-1.6.jar
+/mule-standalone-${productVersion}/lib/opt/joda-time-2.5.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.50.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-1.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
