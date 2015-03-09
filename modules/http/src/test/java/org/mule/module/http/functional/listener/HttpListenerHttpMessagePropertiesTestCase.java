@@ -48,6 +48,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
     public static final String SECOND_QUERY_PARAM_NAME = "queryParam2";
     public static final String SECOND_QUERY_PARAM_VALUE = "paramValue2";
     public static final String CONTEXT_PATH = "/context/path";
+    public static final String API_CONTEXT_PATH = "/api" + CONTEXT_PATH;
     public static final String BASE_PATH = "/";
 
     private static final String FIRST_URI_PARAM_NAME = "uri-param1";
@@ -58,7 +59,10 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
     public static final String THIRD_URI_PARAM_VALUE = "uri-param-value-3";
 
     @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
+    public DynamicPort listenPort = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort listenBasePort = new DynamicPort("port2");
 
     @Override
     protected String getConfigFile()
@@ -74,6 +78,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_URI), is(BASE_PATH));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY), is(BASE_PATH));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY), is(BASE_PATH));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_QUERY_STRING), is(""));
         assertThat(message.getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS), notNullValue());
         assertThat(message.<Map>getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS).isEmpty(), is(true));
@@ -98,6 +103,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_URI), is(uri));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY), is(BASE_PATH));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY), is(BASE_PATH));
         Map<String, String> retrivedQueryParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS);
         assertThat(retrivedQueryParams, IsNull.notNullValue());
         assertThat(retrivedQueryParams.size(), is(2));
@@ -158,6 +164,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_URI), is(CONTEXT_PATH));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY), is(CONTEXT_PATH));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY), is(CONTEXT_PATH));
     }
 
     @Test
@@ -214,6 +221,20 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
                 .connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage forwardedMessage = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(forwardedMessage.<String>getInboundProperty(HTTP_REMOTE_ADDRESS), is("/192.1.2.3:1234"));
+    }
+
+    @Test
+    public void getBasePath() throws Exception
+    {
+        final String url = String.format("http://localhost:%s%s", listenBasePort.getNumber(), API_CONTEXT_PATH);
+        Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
+        final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_LISTENER_PATH), is("/api/*"));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY), is(API_CONTEXT_PATH));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY), is(CONTEXT_PATH));
+        ParameterMap uriParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS);
+        assertThat(uriParams, notNullValue());
+        assertThat(uriParams.isEmpty(), is(true));
     }
 
     public String buildQueryString(Map<String, Object> queryParams) throws UnsupportedEncodingException
