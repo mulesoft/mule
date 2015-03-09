@@ -22,6 +22,7 @@ MULE-8297: CXF was upgraded to version 2.7.15. Also, the following dependencies 
     * xmltooling: from version 1.3.2-1 to 1.4.1
     Note 1: If you need to use uri parameters add an org.apache.cxf.interceptor.URIMappingInterceptor interceptor to the CXF service in your flow, see http://cxf.apache.org/cve-2012-5633.html.
     Note 2: jibx binding could have some issues if you use it under Java 8.
+MULE-8367: Property http.relative.path was added to the inbound properties of the HTTP listener. This property will reflect the value of the http.request.path property without the basePath part of the corresponding listener.
 
 Migration changes from 3.5.x to 3.6.x
 
