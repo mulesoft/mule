@@ -33,7 +33,6 @@ import java.util.Set;
 @Deprecated
 public abstract class AbstractRegistryBroker implements RegistryBroker, ObjectLimboLocator
 {
-    //private final ObjectLimbo limbo = new DefaultObjectLimbo();
     private final ObjectLimbo limbo;
 
     protected RegistryBrokerLifecycleManager lifecycleManager;

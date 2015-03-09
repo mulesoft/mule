@@ -44,10 +44,10 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     public MuleContext createMuleContext() throws InitialisationException, ConfigurationException
     {
         // Configure with defaults needed for a feasible/startable MuleContext
-        return createMuleContext(new DefaultsConfigurationBuilder(), newMuleContextBuilder());
+        return createMuleContext(new DefaultsConfigurationBuilder(), createMuleContextBuilder());
     }
 
-    protected DefaultMuleContextBuilder newMuleContextBuilder()
+    protected DefaultMuleContextBuilder createMuleContextBuilder()
     {
         return new DefaultMuleContextBuilder();
     }
@@ -59,7 +59,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
             throws InitialisationException, ConfigurationException
     {
         // Create MuleContext using default MuleContextBuilder
-        return createMuleContext(configurationBuilder, newMuleContextBuilder());
+        return createMuleContext(configurationBuilder, createMuleContextBuilder());
     }
 
     /**
@@ -141,7 +141,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     public MuleContext createMuleContext(final String configResources, final Properties properties)
             throws InitialisationException, ConfigurationException
     {
-        return doCreateMuleContext(newMuleContextBuilder(), new ContextConfigurator()
+        return doCreateMuleContext(createMuleContextBuilder(), new ContextConfigurator()
         {
             @Override
             public void configure(MuleContext muleContext) throws ConfigurationException
@@ -183,7 +183,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
             throws InitialisationException, ConfigurationException
     {
         // Create MuleContext
-        DefaultMuleContextBuilder contextBuilder = newMuleContextBuilder();
+        DefaultMuleContextBuilder contextBuilder = createMuleContextBuilder();
         contextBuilder.setMuleConfiguration(configuration);
         return doCreateMuleContext(contextBuilder, new ContextConfigurator()
         {

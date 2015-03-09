@@ -22,7 +22,7 @@ public class TestingMuleContextFactory extends DefaultMuleContextFactory
 {
 
     @Override
-    protected DefaultMuleContextBuilder newMuleContextBuilder()
+    protected DefaultMuleContextBuilder createMuleContextBuilder()
     {
         return new DefaultMuleContextBuilder(true);
     }

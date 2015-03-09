@@ -307,12 +307,17 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         tempProcessors.addAll(getTransformersFromUri(endpointURI));
         tempProcessors.addAll(transformers);
 
-        for (MessageProcessor mp : tempProcessors)
-        {
-            registerMessageProcessor(mp, endpointURI);
-        }
+        registerMessageProcessors(endpointURI, tempProcessors);
 
         return tempProcessors;
+    }
+
+    private void registerMessageProcessors(EndpointURI endpointURI, List<MessageProcessor> tempProcessors) throws TransportFactoryException
+    {
+        for (MessageProcessor messageProcessor : tempProcessors)
+        {
+            registerMessageProcessor(messageProcessor, endpointURI);
+        }
     }
 
     private void registerMessageProcessor(MessageProcessor messageProcessor, EndpointURI uri) throws TransportFactoryException {
@@ -340,10 +345,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         tempResponseProcessors.addAll(getResponseTransformersFromUri(endpointURI));
         tempResponseProcessors.addAll(responseTransformers);
 
-        for (MessageProcessor mp : tempResponseProcessors)
-        {
-            registerMessageProcessor(mp, endpointURI);
-        }
+        registerMessageProcessors(endpointURI, tempResponseProcessors);
         return tempResponseProcessors;
     }
 

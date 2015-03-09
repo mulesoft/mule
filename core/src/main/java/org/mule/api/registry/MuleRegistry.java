@@ -249,6 +249,15 @@ public interface MuleRegistry extends LifecycleRegistry
     Object applyProcessors(Object object) throws MuleException;
 
     /**
+     * Will execute any processors on an object without actually registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects.  Not that this will only be applied to Mule registries.  Third party registries
+     * such as Guice support wiring, but you need to get a reference to the container/context to call the method.  This is so that
+     * wiring mechanisms don't trip over each other.
+     *
+     * @param object the object to process
+     * @param flags {@link org.mule.api.registry.MuleRegistry} flags which control which injectors will be applied
+     * @return the same object with any processors called
+     * @throws org.mule.api.MuleException if the registry fails to process object processors for the object.
      * @since 3.0
      * @deprecated as of 3.7.0. Use {@link #applyProcessors(Object)} instead.
      */

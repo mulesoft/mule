@@ -38,13 +38,14 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>
         this.registryLifecycleManager = registryLifecycleManager;
     }
 
+    @Override
     public void onTransition(String phaseName, T object) throws MuleException
     {
         LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
 
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug("Applying lifecycle phase: " + phase + " for registry: " + object.getClass().getSimpleName());
+            LOGGER.debug(String.format("Applying lifecycle phase: %s for registry: %s", phase, object.getClass().getSimpleName()));
         }
 
         if (phase instanceof ContainerManagedLifecyclePhase)
@@ -58,17 +59,17 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>
         // and clear it when the phase is fully applied
         Set<Object> duplicates = new HashSet<Object>();
 
-        for (LifecycleObject lo : phase.getOrderedLifecycleObjects())
+        for (LifecycleObject lifecycleObject : phase.getOrderedLifecycleObjects())
         {
             // TODO Collection -> List API refactoring
-            Collection<?> targetsObj = lookupObjectsForLifecycle(lo);
-            List<Object> targets = new LinkedList<Object>(targetsObj);
-            if (targets.size() == 0)
+            Collection<?> targetsObj = lookupObjectsForLifecycle(lifecycleObject);
+            if (targetsObj.size() == 0)
             {
                 continue;
             }
 
-            lo.firePreNotification(registryLifecycleManager.muleContext);
+            List<Object> targets = new LinkedList<>(targetsObj);
+            lifecycleObject.firePreNotification(registryLifecycleManager.muleContext);
 
             for (Iterator<Object> target = targets.iterator(); target.hasNext();)
             {
@@ -89,7 +90,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>
                 }
             }
 
-            lo.firePostNotification(registryLifecycleManager.muleContext);
+            lifecycleObject.firePostNotification(registryLifecycleManager.muleContext);
         }
     }
 

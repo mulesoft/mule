@@ -34,6 +34,7 @@ public interface LifecycleRegistry extends Registry
      * clutter the registry with single use objects.
      *
      * @param object the object to process
+     * @param phase  the specific lifecycle phase you want to fire
      * @return the same object with lifecycle methods called (if it has any)
      * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
      */
