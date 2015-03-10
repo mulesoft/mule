@@ -4,11 +4,6 @@ MIGRATION GUIDE
 The following is a list of changes you have to execute to migrate from Mule ESB Community edition version 3.4.x to version 3.6.x
 Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+Notes for more details.
 
-Migration changes from 3.6.x to 3.7.x
-MULE-8298: Spring dependency was upgraded to version 4.1.5.RELEASE.
-MULE-8315: the following Apache Tomcat libraries were upgraded form version 6.0.29 to version 6.0.41: annotations-api, coyote, el-api, jasper, jasper-el, jsp-api, juli. Removed catalina-6.0.29.jar as is not needed anymore.
-MULE-8340: TLS configuration is not mapped anymore to the default JVM system properties. In order to keep this behavior, define the following system property: mule.tls.disableSystemPropertiesMapping=false
-
 Migration changes from 3.5.x to 3.6.x
 
 MULE-7774: All date related headers for the HTTP transport are now in GMT following RFC2616. To maintain the previous behaviour where the Date header was in the server's time zone, you can set system property mule.http.dateheaderservertimezone to true.
