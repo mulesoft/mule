@@ -29,8 +29,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     public static final String MULE_DEFAULTS_CONFIG = "default-mule-config.xml";
     public static final String MULE_SPRING_CONFIG = "mule-spring-config.xml";
     public static final String MULE_MINIMAL_SPRING_CONFIG = "minimal-mule-config.xml";
-    public static final String MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG = "registry-bootstrap-mule-config.xml";
-    public static final String MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG = "registry-bootstrap-mule-domain-config.xml";
 
     /**
      * Prepend "default-mule-config.xml" to the list of config resources.
@@ -65,20 +63,18 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         ConfigResource[] allResources;
         if (useMinimalConfigResource)
         {
-            allResources = new ConfigResource[configResources.length + 3];
-            allResources[0] = new ConfigResource(MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG);
-            allResources[1] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
-            allResources[2] = new ConfigResource(MULE_SPRING_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 3, configResources.length);
+            allResources = new ConfigResource[configResources.length + 2];
+            allResources[0] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
+            allResources[1] = new ConfigResource(MULE_SPRING_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 2, configResources.length);
         }
         else if (useDefaultConfigResource)
         {
-            allResources = new ConfigResource[configResources.length + 4];
-            allResources[0] = new ConfigResource(MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG);
-            allResources[1] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
-            allResources[2] = new ConfigResource(MULE_SPRING_CONFIG);
-            allResources[3] = new ConfigResource(MULE_DEFAULTS_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 4, configResources.length);
+            allResources = new ConfigResource[configResources.length + 3];
+            allResources[0] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
+            allResources[1] = new ConfigResource(MULE_SPRING_CONFIG);
+            allResources[2] = new ConfigResource(MULE_DEFAULTS_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 3, configResources.length);
         }
         else
         {

@@ -4,8 +4,6 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <bean name="_muleSimpleRegistryBootstrap" class="java.lang.Object" />
-
     <!-- Force Object Stores to be always in memory. DataSense doesn't need persistence -->
     <bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
     <bean name="_defaultPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>

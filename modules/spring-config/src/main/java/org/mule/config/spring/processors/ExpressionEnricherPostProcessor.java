@@ -31,7 +31,7 @@ public final class ExpressionEnricherPostProcessor implements BeanPostProcessor
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
     {
-        if (bean instanceof ExpressionEnricher)
+        if(bean instanceof ExpressionEnricher)
         {
             muleContext.getExpressionManager().registerEnricher((ExpressionEnricher) bean);
         }

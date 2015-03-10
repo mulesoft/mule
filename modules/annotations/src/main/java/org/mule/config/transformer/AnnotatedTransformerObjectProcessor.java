@@ -55,22 +55,22 @@ public class AnnotatedTransformerObjectProcessor implements PreInitProcessor, Mu
         {
             return object;
         }
-        List<AnnotationMetaData> annotations = AnnotationUtils.getMethodAnnotations(clazz, Transformer.class);
+        List<AnnotationMetaData> annos = AnnotationUtils.getMethodAnnotations(clazz, Transformer.class);
 
-        if (annotations.size() == 0)
+        if (annos.size() == 0)
         {
             return object;
         }
-        for (AnnotationMetaData data : annotations)
+        for (AnnotationMetaData data : annos)
         {
             try
             {
-                Transformer annotation = (Transformer) data.getAnnotation();
-                String sourceMimeType = annotation.sourceMimeType().equals(MimeTypes.ANY) ? null : annotation.sourceMimeType();
-                String resultMimeType = annotation.resultMimeType().equals(MimeTypes.ANY) ? null : annotation.resultMimeType();
+                Transformer anno = (Transformer) data.getAnnotation();
+                String sourceMimeType = anno.sourceMimeType().equals(MimeTypes.ANY) ? null : anno.sourceMimeType();
+                String resultMimeType = anno.resultMimeType().equals(MimeTypes.ANY) ? null : anno.resultMimeType();
                 AnnotatedTransformerProxy trans = new AnnotatedTransformerProxy(
-                        annotation.priorityWeighting(),
-                        object, (Method) data.getMember(), annotation.sourceTypes(),
+                        anno.priorityWeighting(),
+                        object, (Method) data.getMember(), anno.sourceTypes(),
                         sourceMimeType, resultMimeType);
 
                 muleContext.getRegistry().registerTransformer(trans);
