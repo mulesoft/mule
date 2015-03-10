@@ -40,7 +40,7 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
         registries.add(0, registry);
         if (registries.size() > 1 && LOGGER.isWarnEnabled())
         {
-            LOGGER.warn("A second registry has been registered, however adding registries has been deprecated as of Mule 3.7.0");
+            LOGGER.warn(registries.size() + " registries have been registered, however adding registries has been deprecated as of Mule 3.7.0");
         }
     }
 
@@ -60,19 +60,19 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
 
     protected LifecycleRegistry getLifecycleRegistry()
     {
-        LifecycleRegistry initialising = lifecycleRegistry.get();
-        if (initialising == null)
+        LifecycleRegistry cachedLifecycleRegistry = lifecycleRegistry.get();
+        if (cachedLifecycleRegistry == null)
         {
             for (Registry registry : registries)
             {
                 if (registry instanceof LifecycleRegistry)
                 {
-                    initialising = (LifecycleRegistry) registry;
-                    return lifecycleRegistry.compareAndSet(null, initialising) ? initialising : lifecycleRegistry.get();
+                    cachedLifecycleRegistry = (LifecycleRegistry) registry;
+                    return lifecycleRegistry.compareAndSet(null, cachedLifecycleRegistry) ? cachedLifecycleRegistry : lifecycleRegistry.get();
                 }
             }
         }
 
-        return initialising;
+        return cachedLifecycleRegistry;
     }
 }

@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -21,7 +20,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TransientRegistryTestCase extends AbstractMuleContextTestCase
@@ -71,41 +69,6 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 
         muleContext.dispose();
         assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
-    }
-
-    @Test
-    @Ignore
-    public void testObjectBypassLifecycle() throws Exception
-    {
-        muleContext.start();
-
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker, MuleRegistry.LIFECYCLE_BYPASS_FLAG);
-        muleContext.dispose();
-        assertEquals("[setMuleContext, stop, dispose]", tracker.getTracker().toString());
-    }
-
-    @Test
-    @Ignore
-    public void testObjectBypassInjectors() throws Exception
-    {
-        muleContext.start();
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG);
-        muleContext.dispose();
-        assertEquals("[initialise, start, stop, dispose]", tracker.getTracker().toString());
-    }
-
-    @Test
-    @Ignore
-    public void testObjectBypassLifecycleAndInjectors() throws Exception
-    {
-        muleContext.start();
-
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker, MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG);
-        muleContext.dispose();
-        assertEquals("[stop, dispose]", tracker.getTracker().toString());
     }
 
     @Test

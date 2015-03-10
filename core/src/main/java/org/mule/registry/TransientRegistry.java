@@ -40,7 +40,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.InstanceofPredicate;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
@@ -380,9 +380,9 @@ public class TransientRegistry extends AbstractRegistry
             }
         });
 
-        private Log logger;
+        private Logger logger;
 
-        public RegistryMap(Log log)
+        public RegistryMap(Logger log)
         {
             super();
             logger = log;

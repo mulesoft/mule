@@ -22,8 +22,8 @@ import org.mule.util.UUID;
 
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class AbstractRegistry implements Registry
@@ -31,7 +31,7 @@ public abstract class AbstractRegistry implements Registry
     /** the unique id for this Registry */
     private String id;
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected MuleContext muleContext;
 

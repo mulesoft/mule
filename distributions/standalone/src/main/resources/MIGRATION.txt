@@ -30,6 +30,7 @@ MULE-7588: SimpleRegistryBootstrap is deprecated and is no longer used by the ru
 MULE-7588: PreInjectProcessor, InjectProcessor, ObjectProcessor and all their implementation have been deprecated and are no longer used by the runtime. Use a Spring BeanPostProcessor instead
 MULE-7588: JSR-330 annotations are now the recommended way of getting hold of dependencies. Manual lookups through the mule context registry are still supported but not recommended
 MULE-7588: Spring's init-method and destroy-method are no longer recommended when defining Spring beans
+MULE-7588: Spring Bean Definition parsers will no longer automatically call the initialise() and dispose() methods. If you want to maintain that behavior in your custom parsers, you must explicitly do it yourself.
 
 Migration changes from 3.5.x to 3.6.x
 

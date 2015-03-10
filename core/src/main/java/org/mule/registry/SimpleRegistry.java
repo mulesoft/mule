@@ -20,9 +20,6 @@ import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * A very simple implementation of {@link LifecycleRegistry}. Useful for starting really lightweight
  * contexts which don't depend on heavier object containers such as Spring or Guice (testing being
@@ -36,7 +33,6 @@ import org.slf4j.LoggerFactory;
 public class SimpleRegistry extends TransientRegistry implements LifecycleRegistry
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleRegistry.class);
     private static final String REGISTRY_ID = "org.mule.Registry.Simple";
 
     public SimpleRegistry(MuleContext muleContext)
@@ -58,6 +54,11 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
         Object previous = doGet(key);
         if (previous != null)
         {
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("An entry already exists for key %s. It will be replaced", key));
+            }
             unregisterObject(key);
         }
 
@@ -124,11 +125,8 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
             }
             catch (Exception e)
             {
-                if (LOGGER.isDebugEnabled())
-                {
-                    LOGGER.debug(String.format("Could not inject dependency on field %s of type %s",
-                                               field.getName(), object.getClass().getName()), e);
-                }
+                throw new RuntimeException(String.format("Could not inject dependency on field %s of type %s",
+                                                         field.getName(), object.getClass().getName()), e);
             }
         }
     }

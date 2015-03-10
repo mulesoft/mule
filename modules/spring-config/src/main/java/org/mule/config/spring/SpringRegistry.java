@@ -163,7 +163,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         if (StringUtils.isBlank(key))
         {
             logger.warn(
-                    createStaticMessage("Detected a lookup attempt with an empty or null key"),
+                    createStaticMessage("Detected a lookup attempt with an empty or null key").getMessage(),
                     new Throwable().fillInStackTrace());
             return null;
         }
@@ -183,7 +183,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(e);
+                    logger.debug(e.getMessage(), e);
                 }
                 return null;
             }
@@ -320,7 +320,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         }
         catch (Exception e)
         {
-            logger.debug(e);
+            logger.debug(e.getMessage(), e);
             return Collections.emptyMap();
         }
     }
@@ -341,7 +341,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug(e.getMessage(), e);
             }
             return Collections.emptyMap();
         }
