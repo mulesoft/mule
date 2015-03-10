@@ -13,7 +13,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.construct.Flow;
@@ -129,7 +128,7 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
         when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
         when(mockListenerConfig.getPort()).thenReturn(PORT);
         when(mockListenerConfig.getHost()).thenReturn(HOST);
-        when(mockListenerConfig.resolvePath(anyString())).thenCallRealMethod();
+        when(mockListenerConfig.getFullListenerPath(anyString())).thenCallRealMethod();
 
         final HttpListener httpListener = new HttpListenerBuilder(mockMuleContext)
                 .setFlow(mockFlow)
@@ -180,7 +179,7 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
     public void useConfiguredListenerConfig() throws Exception
     {
         when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(mockMessageProcessingManager);
-        when(mockListenerConfig.resolvePath(anyString())).thenCallRealMethod();
+        when(mockListenerConfig.getFullListenerPath(anyString())).thenCallRealMethod();
 
         final HttpListener httpListener = new HttpListenerBuilder(mockMuleContext)
                 .setFlow(mockFlow)

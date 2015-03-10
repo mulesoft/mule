@@ -20,7 +20,7 @@ public class HttpMessagePropertiesResolver
     private String method;
     private String protocol;
     private String remoteHostAddress;
-    private String listenerPath;
+    private ListenerPath listenerPath;
     private String scheme;
 
     public HttpMessagePropertiesResolver setUri(String uri)
@@ -47,7 +47,7 @@ public class HttpMessagePropertiesResolver
         return this;
     }
 
-    public HttpMessagePropertiesResolver setListenerPath(String listenerPath)
+    public HttpMessagePropertiesResolver setListenerPath(ListenerPath listenerPath)
     {
         this.listenerPath = listenerPath;
         return this;
@@ -61,6 +61,7 @@ public class HttpMessagePropertiesResolver
 
     public void addPropertiesTo(Map<String, Object> propertiesMap)
     {
+        final String resolvedListenerPath = listenerPath.getResolvedPath();
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY, this.method);
         final String path = HttpParser.extractPath(uri);
         final String rawQueryString = HttpParser.extractQueryParams(uri);
@@ -71,11 +72,10 @@ public class HttpMessagePropertiesResolver
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY, this.protocol);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REQUEST_URI, this.uri);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS, remoteHostAddress);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_URI_PARAMS, HttpParser.decodeUriParams(this.listenerPath, path));
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, listenerPath);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_URI_PARAMS, HttpParser.decodeUriParams(resolvedListenerPath, path));
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, resolvedListenerPath);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH, listenerPath.getRelativePath(path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_SCHEME, scheme);
     }
-
-
 
 }
