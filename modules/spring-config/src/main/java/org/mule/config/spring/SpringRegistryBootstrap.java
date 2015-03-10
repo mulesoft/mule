@@ -11,9 +11,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.registry.ObjectLimbo;
-import org.mule.api.registry.ObjectLimboLocator;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.Registry;
+import org.mule.api.registry.RegistryProvider;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
@@ -24,7 +24,7 @@ import org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer;
 import org.mule.config.bootstrap.RegistryBootstrapDiscoverer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
-import org.mule.config.spring.factories.FixedFactoryBean;
+import org.mule.config.spring.factories.ConstantFactoryBean;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
@@ -215,7 +215,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
             registerTransformers(transformers);
             registerObjects(namedObjects);
             registerTransactionFactories(singleTransactionFactories, muleContext);
-            registerLimboObjects();
+            monopolizeRegistries();
         }
         catch (Exception e1)
         {
@@ -348,21 +348,27 @@ public class SpringRegistryBootstrap implements MuleContextAware
         props.clear();
     }
 
-    private void registerLimboObjects()
+    private void monopolizeRegistries()
     {
-        if (!(muleContext.getRegistry() instanceof ObjectLimboLocator))
+        if (!(muleContext.getRegistry() instanceof RegistryProvider))
         {
             return;
         }
 
-        ObjectLimbo limbo = ((ObjectLimboLocator) muleContext.getRegistry()).getLimbo();
-
-        for (Entry<String, Object> entry : limbo.lookupByType(Object.class).entrySet())
+        for (Registry registry : ((RegistryProvider) muleContext.getRegistry()).getRegistries())
         {
-            registerInstance(entry.getKey(), entry.getValue());
-        }
+            if (registry instanceof SpringRegistry)
+            {
+                continue;
+            }
 
-        limbo.clear();
+            for (Entry<String, Object> entry : registry.lookupByType(Object.class).entrySet())
+            {
+                registerInstance(entry.getKey(), entry.getValue());
+            }
+
+            muleContext.removeRegistry(registry);
+        }
     }
 
     private void registerUnnamedObjects(Properties props) throws Exception
@@ -447,7 +453,7 @@ public class SpringRegistryBootstrap implements MuleContextAware
 
     private void registerInstance(String key, Object value)
     {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(FixedFactoryBean.class);
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
         builder.addConstructorArgValue(value);
         doRegisterObject(key, builder);
     }

@@ -23,9 +23,9 @@ import org.mule.api.model.Model;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.ObjectLimbo;
-import org.mule.api.registry.ObjectLimboLocator;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.Registry;
+import org.mule.api.registry.RegistryProvider;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
@@ -45,6 +45,8 @@ import org.mule.util.Predicate;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,7 +69,7 @@ import org.apache.commons.logging.LogFactory;
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
  * Registry interface.
  */
-public class MuleRegistryHelper implements MuleRegistry, ObjectLimboLocator
+public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
 {
     protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
@@ -146,15 +148,6 @@ public class MuleRegistryHelper implements MuleRegistry, ObjectLimboLocator
     public Connector lookupConnector(String name)
     {
         return (Connector) registry.lookupObject(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ObjectLimbo getLimbo()
-    {
-        return registry.getLimbo();
     }
 
     /**
@@ -893,6 +886,12 @@ public class MuleRegistryHelper implements MuleRegistry, ObjectLimboLocator
     public Object unregisterObject(String key) throws RegistrationException
     {
         return registry.unregisterObject(key);
+    }
+
+    @Override
+    public Collection<Registry> getRegistries()
+    {
+        return ImmutableList.copyOf(registry.getRegistries());
     }
 
     /**

@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -920,7 +921,7 @@ public class DefaultMuleContext implements MuleContext
     {
         if (this.expressionLanguage == null)
         {
-            this.expressionLanguage = this.registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+            this.expressionLanguage = this.registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
         }
 
         return this.expressionLanguage;

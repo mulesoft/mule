@@ -102,7 +102,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        if (applicationContext instanceof ConfigurableApplicationContext)
+        if (!readOnly)
         {
             ((ConfigurableApplicationContext) applicationContext).refresh();
         }
@@ -139,8 +139,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             return;
         }
 
-        if (applicationContext instanceof ConfigurableApplicationContext
-            && ((ConfigurableApplicationContext) applicationContext).isActive())
+        if (!isReadOnly() && ((ConfigurableApplicationContext) applicationContext).isActive())
         {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
@@ -354,7 +353,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
     protected Map<String, Object> getDepencies(String key)
     {
-        if (applicationContext instanceof ConfigurableApplicationContext)
+        if (!readOnly)
         {
             Map<String, Object> dependents = new HashMap<>();
             for (String dependentKey : ((ConfigurableApplicationContext) applicationContext).getBeanFactory().getDependenciesForBean(key))
@@ -423,6 +422,10 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         {
             if (applicationContext.containsBean(key))
             {
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn(String.format("Spring registry already contains an object named '%s'.  he previous object will be overwritten.", key));
+                }
                 SpringRegistry.this.unregisterObject(key);
             }
 

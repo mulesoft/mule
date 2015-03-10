@@ -604,14 +604,6 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     {
         MVELExpressionLanguage mel = new MVELExpressionLanguage(muleContext);
         mel.initialise();
-        try
-        {
-            mel.start();
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
         expressionLanguage = mel;
     }
 

@@ -32,18 +32,20 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
     public DefaultRegistryBroker(MuleContext context)
     {
         super(context);
+        addRegistry(new SimpleRegistry(context));
     }
 
-
+    @Override
     public void addRegistry(Registry registry)
     {
         registries.add(0, registry);
-        if (registries.size() > 1 && LOGGER.isWarnEnabled())
+        if (registries.size() > 2 && LOGGER.isWarnEnabled())
         {
             LOGGER.warn(registries.size() + " registries have been registered, however adding registries has been deprecated as of Mule 3.7.0");
         }
     }
 
+    @Override
     public void removeRegistry(Registry registry)
     {
         registries.remove(registry);
@@ -53,7 +55,8 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
         }
     }
 
-    protected Collection<Registry> getRegistries()
+    @Override
+    public Collection<Registry> getRegistries()
     {
         return registries;
     }

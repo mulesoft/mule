@@ -26,12 +26,12 @@ import org.springframework.beans.factory.FactoryBean;
  * @param <T>
  * @since 3.7.0
  */
-public class FixedFactoryBean<T> implements FactoryBean<T>, MuleContextAware, Lifecycle
+public class ConstantFactoryBean<T> implements FactoryBean<T>, MuleContextAware, Lifecycle
 {
 
     private final T value;
 
-    public FixedFactoryBean(T value)
+    public ConstantFactoryBean(T value)
     {
         checkArgument(value != null, "value cannot be null");
         this.value = value;

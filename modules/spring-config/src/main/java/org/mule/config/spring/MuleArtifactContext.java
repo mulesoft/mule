@@ -9,6 +9,7 @@ package org.mule.config.spring;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.COMMON_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
+import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
@@ -40,7 +41,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
@@ -97,18 +97,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
         beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
 
-
         SpringRegistryBootstrap bootstrap = new SpringRegistryBootstrap((BeanDefinitionRegistry) beanFactory);
         initialiseBootstrap(bootstrap);
-
-        try
-        {
-            bootstrap.boot();
-        }
-        catch (BootstrapException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
     }
 
     private void registerEditors(ConfigurableListableBeanFactory beanFactory)
@@ -121,6 +111,15 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected void initialiseBootstrap(SpringRegistryBootstrap bootstrap)
     {
         bootstrap.setMuleContext(muleContext);
+
+        try
+        {
+            bootstrap.boot();
+        }
+        catch (BootstrapException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
     }
 
     private void addBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, BeanPostProcessor... processors)
@@ -191,29 +190,16 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)
     {
-
-        if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME))
-        {
-            RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
-            def.setSource(source);
-            registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME);
-        }
-
-        if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME))
-        {
-            RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
-            def.setSource(source);
-            registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
-        }
-
-        if (!registry.containsBeanDefinition(AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME))
-        {
-            RootBeanDefinition def = new RootBeanDefinition(RequiredAnnotationBeanPostProcessor.class);
-            def.setSource(source);
-            registerPostProcessor(registry, def, AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
-        }
-
+        registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME, ConfigurationClassPostProcessor.class, source);
+        registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, AutowiredAnnotationBeanPostProcessor.class, source);
+        registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME, RequiredAnnotationBeanPostProcessor.class, source);
         registerJsr250PostProcessors(registry, source);
+    }
+
+    private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source) {
+        RootBeanDefinition beanDefinition = new RootBeanDefinition(type);
+        beanDefinition.setSource(source);
+        registerPostProcessor(registry, beanDefinition, key);
     }
 
     private void registerJsr250PostProcessors(BeanDefinitionRegistry registry, Object source)

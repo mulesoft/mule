@@ -25,7 +25,6 @@ import org.mule.config.ClusterConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.TestingMuleContextFactory;
 import org.mule.transport.PollingController;
 import org.mule.util.SpiUtils;
 import org.mule.util.store.MuleObjectStoreManager;
@@ -56,7 +55,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
-        muleContextFactory = new TestingMuleContextFactory();
+        muleContextFactory = new DefaultMuleContextFactory();
     }
 
     @Test

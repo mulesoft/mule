@@ -231,14 +231,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             //This will enable annotations config for this instance
             addIfPresent(builders, CLASSNAME_ANNOTATIONS_CONFIG_BUILDER);
 
-            ConfigurationBuilder builder = getBuilder();
-            if (builder != null)
-            {
-                builders.add(builder);
-            }
+            builders.add(getBuilder());
             addBuilders(builders);
-
-            MuleContextBuilder contextBuilder = createMuleContextBuilder();
+            MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
             DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
             String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
             logger.info("Using working directory for test: " + workingDirectory);
@@ -252,11 +247,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             }
         }
         return context;
-    }
-
-    protected MuleContextBuilder createMuleContextBuilder()
-    {
-        return new DefaultMuleContextBuilder(true);
     }
 
     //This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when

@@ -6,6 +6,7 @@
  */
 package org.mule.config.spring;
 
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.RegistryLifecycleCallback;
 import org.mule.lifecycle.RegistryLifecycleManager;
@@ -17,6 +18,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A {@link RegistryLifecycleCallback} to be used with instances
+ * of {@link SpringRegistry}. For each object in which a {@link Lifecycle} phase
+ * is going to be applied, it detects all the dependencies for that object
+ * and applies the same phase on those dependencies first (recursively).
+ * <p/>
+ * This guarantees that if object A depends on object B and C, necessary lifecycle phases will have
+ * been applied on B and C before it is applied to A
+ *
+ * @since 3.7.0
+ */
 class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
 {
 
@@ -30,7 +42,7 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
     {
         Map<String, Object> objects = getSpringRegistry().lookupEntriesForLifecycle(lo.getType());
 
-        DependencyNode root = new DependencyNode(null, null);
+        final DependencyNode root = new DependencyNode(null, null);
 
         for (Map.Entry<String, Object> entry : objects.entrySet())
         {
@@ -49,7 +61,7 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
         List<Object> orderedObjects = new LinkedList<>();
         for (DependencyNode node : orderedNodes)
         {
-            if (node.isRoot())
+            if (node == root)
             {
                 break;
             }
@@ -71,9 +83,9 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
         final DependencyNode node = new DependencyNode(key, object);
         parent.addChild(node);
 
-        for (Map.Entry<String, Object> entry : getSpringRegistry().getDepencies(key).entrySet())
+        for (Map.Entry<String, Object> dependency : getSpringRegistry().getDepencies(key).entrySet())
         {
-            addDependency(node, entry.getKey(), entry.getValue());
+            addDependency(node, dependency.getKey(), dependency.getValue());
         }
     }
 
@@ -94,11 +106,6 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
         {
             childs.add(child);
             return this;
-        }
-
-        public boolean isRoot()
-        {
-            return key == null;
         }
 
         public List<DependencyNode> getChilds()

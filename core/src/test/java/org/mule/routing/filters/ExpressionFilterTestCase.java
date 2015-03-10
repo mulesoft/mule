@@ -26,12 +26,6 @@ import org.junit.Test;
 public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
 {
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        setStartContext(true);
-    }
-
     @Test
     public void testHeaderFilter() throws Exception
     {

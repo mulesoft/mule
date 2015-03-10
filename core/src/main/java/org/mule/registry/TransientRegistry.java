@@ -120,7 +120,7 @@ public class TransientRegistry extends AbstractRegistry
 
     protected Map<String, Object> applyProcessors(Map<String, Object> objects)
     {
-        if (objects == null)
+        if (objects == null || !isInitialised())
         {
             return null;
         }
@@ -186,11 +186,6 @@ public class TransientRegistry extends AbstractRegistry
         return doGet(key);
     }
 
-    protected RegistryMap getRegistryMap()
-    {
-        return registryMap;
-    }
-
     @SuppressWarnings("unchecked")
     public <T> Collection<T> lookupObjects(Class<T> returntype)
     {
@@ -227,6 +222,11 @@ public class TransientRegistry extends AbstractRegistry
 
     protected Object applyProcessors(Object object, Object metadata)
     {
+        if (!isInitialised())
+        {
+            return object;
+        }
+
         Object theObject = object;
 
         if (!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG))

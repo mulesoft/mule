@@ -25,12 +25,6 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase
     private ExpressionLanguage el;
 
     @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        setStartContext(true);
-    }
-
-    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();

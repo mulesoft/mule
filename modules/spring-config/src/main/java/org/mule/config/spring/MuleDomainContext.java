@@ -33,7 +33,7 @@ final class MuleDomainContext extends MuleArtifactContext
     @Override
     protected void initialiseBootstrap(SpringRegistryBootstrap bootstrap)
     {
-        super.initialiseBootstrap(bootstrap);
         bootstrap.setSupportedArtifactType(SpringRegistryBootstrap.ArtifactType.DOMAIN);
+        super.initialiseBootstrap(bootstrap);
     }
 }

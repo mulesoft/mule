@@ -30,17 +30,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class FixedFactoryBeanTestCase extends AbstractMuleTestCase
+public class ConstantFactoryBeanTestCase extends AbstractMuleTestCase
 {
 
     @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class})
     private Object value;
-    private FixedFactoryBean<Object> factoryBean;
+    private ConstantFactoryBean<Object> factoryBean;
 
     @Before
     public void before() throws Exception
     {
-        factoryBean = new FixedFactoryBean<>(value);
+        factoryBean = new ConstantFactoryBean<>(value);
     }
 
     @Test

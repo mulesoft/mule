@@ -8,7 +8,6 @@ package org.mule.el.mvel;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionManager;
@@ -16,7 +15,6 @@ import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
 import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.mvel2.CompileException;
@@ -44,7 +42,7 @@ import javax.activation.MimeType;
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
  */
-public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable, Startable
+public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 {
     protected ParserConfiguration parserConfiguration;
     protected MuleContext muleContext;
@@ -71,11 +69,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         parserConfiguration = createParserConfiguration();
         expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
-    }
 
-    @Override
-    public void start() throws MuleException
-    {
         loadGlobalFunctions();
         createStaticContext();
     }

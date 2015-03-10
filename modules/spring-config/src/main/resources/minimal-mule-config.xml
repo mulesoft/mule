@@ -27,31 +27,31 @@
         <!--while keeping the local version intact. When the cluster core extension is not active, both-->
         <!--the default and local beans resolve to the same instance-->
 
-        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.config.spring.factories.FixedFactoryBean">
+        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localInMemoryObjectStore"/>
         </spring:bean>
 
         <spring:bean name="_localInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
 
-        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.config.spring.factories.FixedFactoryBean">
+        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localPersistentObjectStore"/>
         </spring:bean>
 
         <spring:bean name="_localPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
 
-        <spring:bean name="_defaultUserObjectStore" class="org.mule.config.spring.factories.FixedFactoryBean">
+        <spring:bean name="_defaultUserObjectStore" class="org.mule.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localUserObjectStore"/>
         </spring:bean>
 
         <spring:bean name="_localUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
 
-        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.config.spring.factories.FixedFactoryBean">
+        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localTransientUserObjectStore"/>
         </spring:bean>
 
         <spring:bean name="_localTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
 
-        <spring:bean name="_muleQueueManager" class="org.mule.config.spring.factories.FixedFactoryBean">
+        <spring:bean name="_muleQueueManager" class="org.mule.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localQueueManager"/>
         </spring:bean>
 
@@ -87,7 +87,7 @@
 
         <spring:bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
 
-        <spring:bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguageWrapper">
+        <spring:bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguageWrapper" init-method="initialise">
             <spring:constructor-arg  ref="_muleContext"/>
         </spring:bean>
 

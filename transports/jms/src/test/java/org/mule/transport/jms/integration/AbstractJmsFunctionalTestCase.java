@@ -11,10 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -237,7 +237,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * @throws Exception
      */
     @Override
-    protected void addBuilders(List<ConfigurationBuilder> builders)
+    protected ConfigurationBuilder getBuilder() throws Exception
     {
         if (multipleProviders)
         {
@@ -254,20 +254,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                                       getJmsConfig().getName(), resources);
 
             String[] configFiles = new String[] { resources, configFile };
-            try
-            {
-                SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
-                builder.setParentContext(makeParentContext());
-                builders.add(0, builder);
-            }
-            catch (ConfigurationException e)
-            {
-                throw new RuntimeException(e);
-            }
+            SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
+            return builder;
         }
         else
         {
-            super.addBuilders(builders);
+            return super.getBuilder();
         }
     }
 

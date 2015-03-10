@@ -25,7 +25,6 @@ public class XPathBeanBuilderTestCase extends AbstractTransformerTestCase
         trans.addArgument(new ExpressionArgument("segments", new ExpressionConfig("/fruit/orange/segments", "xpath", null), false));
         trans.addArgument(new ExpressionArgument("radius", new ExpressionConfig("/fruit/orange/radius", "xpath", null), false));
         trans.initialise();
-        trans.start();
         return trans;
     }
 

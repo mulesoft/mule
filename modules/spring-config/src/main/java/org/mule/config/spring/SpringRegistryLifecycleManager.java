@@ -83,6 +83,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             setOrderedLifecycleObjects(initOrderedObjects);
 
             setIgnoredObjectTypes(new Class[] {
+                    SpringRegistry.class,
                     Component.class,
                     MessageSource.class,
                     AbstractMessageProcessorOwner.class,
@@ -93,17 +94,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
                     OutboundRouterCollection.class,
                     MuleContext.class
             });
-        }
-
-        @Override
-        public void applyLifecycle(Object o) throws LifecycleException
-        {
-            if (o instanceof SpringRegistry)
-            {
-                return;
-            }
-
-            super.applyLifecycle(o);
         }
     }
 

@@ -53,7 +53,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
     @Before
     public void setup() throws Exception
     {
-        ctxBuilder = new DefaultMuleContextBuilder(true);
+        ctxBuilder = new DefaultMuleContextBuilder();
         lifecycleManager = new SensingLifecycleManager();
         ctxBuilder.setLifecycleManager(lifecycleManager);
         ctx = ctxBuilder.buildMuleContext();

@@ -113,19 +113,19 @@ public class Scriptable implements Initialisable, MuleContextAware
             if (i > -1)
             {
                 logger.info("Script Engine name not set. Guessing by file extension.");
-                String ext = scriptFile.substring(i + 1);
-                scriptEngine = createScriptEngineByExtension(ext);
+                String extension = scriptFile.substring(i + 1);
+                scriptEngine = createScriptEngineByExtension(extension);
                 if (scriptEngine == null)
                 {
                     throw new InitialisationException(
                         MessageFactory.createStaticMessage("File extension '"
-                                                           + ext
+                                                           + extension
                                                            + "' does not map to a scripting engine.  Available engines are: "
                                                            + listAvailableEngines()), this);
                 }
                 else
                 {
-                    setScriptEngineName(ext);
+                    setScriptEngineName(extension);
                 }
             }
         }

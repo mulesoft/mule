@@ -18,7 +18,6 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.TestingMuleContextFactory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -68,7 +67,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         ThreadSafeAccess.AccessControl.setAssertMessageAccess(false);
         config.setAutoWrapMessageAwareTransform(false);
         
-        MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder(true);
+        MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
         contextBuilder.setMuleConfiguration(config);
         muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
         
@@ -105,7 +104,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess", "false");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap", "false");
         
-        muleContext = new TestingMuleContextFactory().createMuleContext();
+        muleContext = new DefaultMuleContextFactory().createMuleContext();
         muleContext.start();
 
         verifyConfiguration();
@@ -132,7 +131,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
     @Test
     public void testConfigureAfterInitFails() throws Exception
     {
-        muleContext = new TestingMuleContextFactory().createMuleContext();
+        muleContext = new DefaultMuleContextFactory().createMuleContext();
 
         DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
         
@@ -168,7 +167,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
     @Test
     public void testConfigureAfterStartFails() throws Exception
     {
-        muleContext = new TestingMuleContextFactory().createMuleContext();
+        muleContext = new DefaultMuleContextFactory().createMuleContext();
         muleContext.start();
 
         DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());

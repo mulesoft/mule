@@ -213,7 +213,7 @@ public class MuleClient implements Disposable
         {
             logger.info("No existing ManagementContext found, creating a new Mule instance");
 
-            MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder(true);
+            MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
             DefaultMuleConfiguration config = new DefaultMuleConfiguration();
             config.setClientMode(true);
             contextBuilder.setMuleConfiguration(config);

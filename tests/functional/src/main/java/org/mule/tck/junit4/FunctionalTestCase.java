@@ -15,7 +15,6 @@ import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.schedule.Scheduler;
@@ -27,7 +26,6 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
 import org.mule.construct.SimpleService;
-import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -36,14 +34,9 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The
@@ -61,12 +54,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         setStartContext(true);
     }
 
-    @Override
-    protected MuleContextBuilder createMuleContextBuilder()
-    {
-        return new DefaultMuleContextBuilder();
-    }
-
     /**
      * @return
      * @deprecated use getConfigFile instead.
@@ -79,66 +66,24 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
 
     @Override
-    protected void addBuilders(List<ConfigurationBuilder> builders)
-    {
-        SpringXmlConfigurationBuilder builder = null;
-        try
-        {
-            String configResources = getConfigResources();
-            if (configResources != null)
-            {
-                builder = new SpringXmlConfigurationBuilder(configResources);
-            }
-            else
-            {
-                configResources = getConfigFile();
-                if (configResources != null)
-                {
-                    if (configResources.contains(","))
-                    {
-                        throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
-                    }
-                    builder = new SpringXmlConfigurationBuilder(configResources);
-                }
-                else
-                {
-                    String[] multipleConfigResources = getConfigFiles();
-                    builder = new SpringXmlConfigurationBuilder(multipleConfigResources);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        builder.setParentContext(makeParentContext());
-        builders.add(0, builder);
-    }
-
-    protected ApplicationContext makeParentContext()
-    {
-        Properties properties = getStartUpProperties();
-        if (properties == null || properties.isEmpty())
-        {
-            return null;
-        }
-
-        GenericApplicationContext parent = new GenericApplicationContext();
-        parent.refresh();
-
-        for (Map.Entry<Object, Object> entry : properties.entrySet())
-        {
-            parent.getBeanFactory().registerSingleton(entry.getKey().toString(), entry.getValue());
-        }
-
-        return parent;
-    }
-
-    @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return null;
+        String configResources = getConfigResources();
+        if (configResources != null)
+        {
+            return new SpringXmlConfigurationBuilder(configResources);
+        }
+        configResources = getConfigFile();
+        if (configResources != null)
+        {
+            if (configResources.contains(","))
+            {
+                throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
+            }
+            return new SpringXmlConfigurationBuilder(configResources);
+        }
+        String[] multipleConfigResources = getConfigFiles();
+        return new SpringXmlConfigurationBuilder(multipleConfigResources);
     }
 
     /**
@@ -210,13 +155,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         }
 
         throw new RegistrationException(
-            MessageFactory.createStaticMessage("Can't get component from flow construct "
-                                               + flowConstruct.getName()));
+                MessageFactory.createStaticMessage("Can't get component from flow construct "
+                                                   + flowConstruct.getName()));
     }
 
     /**
      * A convenience method to get a type-safe reference to the FunctionTestComponent
-     * 
+     *
      * @param serviceName service name as declared in the config
      * @return test component
      * @since 2.2
@@ -272,7 +217,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Tests the given flow with a one-way message exchange pattern
-     * 
+     *
      * @param flowName the name of the flow to be executed
      * @throws Exception
      */
@@ -284,8 +229,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     /**
      * Looks up the given flow in the registry and processes it with the given event.
      * A flow asserting is then executed by calling {@link
-     * org.mule.tck.functional.FlowAssert#verify(String)}
-     * 
+     * org.mule.tck.functional.FlowAssert.verify(String)}
+     *
      * @param flowName the name of the flow to be executed
      * @param event the event ot execute with
      * @throws Exception
@@ -299,7 +244,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Runs the given flow with a default event
-     * 
+     *
      * @param flowName the name of the flow to be executed
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
@@ -311,7 +256,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Executes the given flow with a default message carrying the payload
-     * 
+     *
      * @param flowName the name of the flow to be executed
      * @param payload the payload to use in the message
      * @return the resulting <code>MuleEvent</code>
@@ -337,7 +282,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Run the flow specified by name and assert equality on the expected output
-     * 
+     *
      * @param flowName The name of the flow to run
      * @param expect The expected output
      */
@@ -349,14 +294,14 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     /**
      * Runs the given flow and asserts for property name in the outbound scope to
      * match the expected value
-     * 
+     *
      * @param flowName the name of the flow to be executed
      * @param propertyName the name of the property to test
      * @param expect the expected value
      * @throws Exception
      */
     protected <T> void runFlowAndExpectProperty(String flowName, String propertyName, T expect)
-        throws Exception
+            throws Exception
     {
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = getTestEvent(null);
@@ -368,7 +313,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     /**
      * Run the flow specified by name using the specified payload and assert equality
      * on the expected output
-     * 
+     *
      * @param flowName The name of the flow to run
      * @param expect The expected output
      * @param payload The payload of the input event
@@ -380,7 +325,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Retrieve a flow by name from the registry
-     * 
+     *
      * @param name Name of the flow to retrieve
      */
     protected Flow lookupFlowConstruct(String name)

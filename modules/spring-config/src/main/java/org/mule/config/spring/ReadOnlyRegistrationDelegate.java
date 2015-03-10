@@ -22,29 +22,29 @@ final class ReadOnlyRegistrationDelegate implements RegistrationDelegate
     @Override
     public void registerObject(String key, Object value) throws RegistrationException
     {
-        throwException();
+        unsupportedFeature();
     }
 
     @Override
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
-        throwException();
+        unsupportedFeature();
     }
 
     @Override
     public void registerObjects(Map<String, Object> objects) throws RegistrationException
     {
-        throwException();
+        unsupportedFeature();
     }
 
     @Override
     public Object unregisterObject(String key) throws RegistrationException
     {
-        throwException();
+        unsupportedFeature();
         return null;
     }
 
-    private void throwException()
+    private void unsupportedFeature()
     {
         throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
     }

@@ -14,9 +14,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.el.ExpressionLanguageContext;
@@ -24,6 +24,7 @@ import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.DataType;
 import org.mule.config.MuleManifest;
 import org.mule.el.context.AppContext;
@@ -89,22 +90,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         this.variant = variant;
         OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
-        setStartContext(true);
     }
 
     @Before
-    public void setupMVEL() throws Exception
+    public void setupMVEL() throws InitialisationException
     {
         mvel = new MVELExpressionLanguage(muleContext);
-        initialiseMvel();
-    }
-
-    protected void initialiseMvel() throws MuleException
-    {
         mvel.initialise();
-        mvel.start();
     }
-
 
     @Test
     public void testEvaluateString()
@@ -255,7 +248,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void appTakesPrecedenceOverEverything() throws Exception
+    public void appTakesPrecedenceOverEverything() throws RegistrationException, InitialisationException
     {
         mvel.setAliases(Collections.singletonMap("app", "'other1'"));
         MuleMessage message = new DefaultMuleMessage("", muleContext);
@@ -268,12 +261,12 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
                 context.addVariable("app", "otherc");
             }
         });
-        initialiseMvel();
+        mvel.initialise();
         assertEquals(AppContext.class, evaluate("app").getClass());
     }
 
     @Test
-    public void messageTakesPrecedenceOverEverything() throws Exception
+    public void messageTakesPrecedenceOverEverything() throws RegistrationException, InitialisationException
     {
         mvel.setAliases(Collections.singletonMap("message", "'other1'"));
         MuleMessage message = new DefaultMuleMessage("", muleContext);
@@ -286,12 +279,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
                 context.addVariable("message", "other3");
             }
         });
-        initialiseMvel();
+        mvel.initialise();
         assertEquals(MessageContext.class, evaluate("message", message).getClass());
     }
 
     @Test
-    public void extensionTakesPrecedenceOverAutoResolved() throws Exception
+    public void extensionTakesPrecedenceOverAutoResolved()
+        throws RegistrationException, InitialisationException
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setInvocationProperty("foo", "other");
@@ -303,12 +297,12 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
                 context.addVariable("foo", "bar");
             }
         });
-        initialiseMvel();
+        mvel.initialise();
         assertEquals("bar", evaluate("foo", message));
     }
 
     @Test
-    public void aliasTakesPrecedenceOverAutoResolved() throws Exception
+    public void aliasTakesPrecedenceOverAutoResolved() throws RegistrationException, InitialisationException
     {
         mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
         muleContext.getRegistry().registerObject("key", new ExpressionLanguageExtension()
@@ -319,41 +313,41 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
                 context.addVariable("foo", "other");
             }
         });
-        initialiseMvel();
+        mvel.initialise();
         assertEquals("bar", evaluate("foo"));
     }
 
     @Test
-    public void aliasTakesPrecedenceOverExtension() throws Exception
+    public void aliasTakesPrecedenceOverExtension() throws RegistrationException, InitialisationException
     {
         mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setInvocationProperty("foo", "other");
-        initialiseMvel();
+        mvel.initialise();
         assertEquals("bar", evaluate("foo"));
     }
 
     @Test
-    public void addImport() throws Exception
+    public void addImport() throws InitialisationException
     {
         mvel.setImports(Collections.<String, Class<?>> singletonMap("loc", Locale.class));
-        initialiseMvel();
+        mvel.initialise();
         assertEquals(Locale.class, evaluate("loc"));
     }
 
     @Test
-    public void addAlias() throws Exception
+    public void addAlias() throws InitialisationException
     {
         mvel.setAliases(Collections.<String, String> singletonMap("appName", "app.name"));
-        initialiseMvel();
+        mvel.initialise();
         assertEquals(muleContext.getConfiguration().getId(), evaluate("appName"));
     }
 
     @Test
-    public void addGlobalFunction() throws Exception
+    public void addGlobalFunction() throws InitialisationException
     {
         mvel.addGlobalFunction("hello", new HelloWorldFunction(new ParserContext(mvel.parserConfiguration)));
-        initialiseMvel();
+        mvel.initialise();
         assertEquals("Hello World!", evaluate("hello()"));
     }
 
@@ -437,7 +431,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testConcurrentEvaluation() throws Exception
     {
-        final int N = 1;
+        final int N = 100;
         final CountDownLatch start = new CountDownLatch(1);
         final CountDownLatch end = new CountDownLatch(N);
         final AtomicInteger errors = new AtomicInteger(0);

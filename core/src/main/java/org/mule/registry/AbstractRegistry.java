@@ -21,6 +21,7 @@ import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.util.UUID;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,9 @@ public abstract class AbstractRegistry implements Registry
 
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected MuleContext muleContext;
+    private final AtomicBoolean initialised = new AtomicBoolean(false);
 
+    protected MuleContext muleContext;
     protected RegistryLifecycleManager lifecycleManager;
 
     protected AbstractRegistry(String id, MuleContext muleContext)
@@ -124,6 +126,13 @@ public abstract class AbstractRegistry implements Registry
         {
             throw new InitialisationException(e, this);
         }
+
+        initialised.set(true);
+    }
+
+    protected boolean isInitialised()
+    {
+        return initialised.get();
     }
 
     public RegistryLifecycleManager getLifecycleManager()

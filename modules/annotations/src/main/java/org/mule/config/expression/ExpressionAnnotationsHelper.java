@@ -7,7 +7,6 @@
 package org.mule.config.expression;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
@@ -52,14 +51,6 @@ public class ExpressionAnnotationsHelper
             }
         }
         trans.initialise();
-        try
-        {
-            trans.start();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, trans);
-        }
         return trans;
     }
 

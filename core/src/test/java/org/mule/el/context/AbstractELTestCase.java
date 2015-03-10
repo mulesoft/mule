@@ -14,7 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
@@ -41,22 +40,15 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
     {
         this.variant = variant;
         OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
-        setStartContext(true);
     }
 
     @Before
     public void setupExprssionEvaluator() throws Exception
     {
         expressionLanguage = getExpressionLanguage();
-
         if (expressionLanguage instanceof Initialisable)
         {
             ((Initialisable) expressionLanguage).initialise();
-        }
-
-        if (expressionLanguage instanceof Startable)
-        {
-            ((Startable) expressionLanguage).start();
         }
     }
 
