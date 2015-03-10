@@ -38,7 +38,7 @@ import javax.activation.DataHandler;
 public class HttpRequestToMuleEvent
 {
 
-    public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, String listenerPath) throws HttpRequestParsingException
+    public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
     {
         final HttpRequest request = requestContext.getRequest();
         final Collection<String> headerNames = request.getHeaderNames();

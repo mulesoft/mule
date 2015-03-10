@@ -9,7 +9,6 @@ package org.mule.module.http.internal.listener;
 import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -113,10 +112,10 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         this.parseRequest = parseRequest;
     }
 
-    public String resolvePath(String listenerPath)
+    public ListenerPath getFullListenerPath(String listenerPath)
     {
         Preconditions.checkArgument(listenerPath.startsWith("/"), "listenerPath must start with /");
-        return this.basePath == null ? listenerPath : this.basePath + listenerPath;
+        return new ListenerPath(basePath, listenerPath);
     }
 
     @Override

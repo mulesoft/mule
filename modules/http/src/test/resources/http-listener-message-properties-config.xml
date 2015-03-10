@@ -8,7 +8,8 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerBaseConfig" host="localhost" port="${port2}" basePath="api"/>
 
     <flow name="generalFlow">
         <http:listener  path="/*" config-ref="listenerConfig"/>
@@ -24,6 +25,12 @@
 
     <flow name="oneUriParameterInTheMiddle">
         <http:listener config-ref="listenerConfig" path="/some-path/{uri-param1}/some-other-path" />
+        <copy-properties propertyName="*" />
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="basePathConfig">
+        <http:listener config-ref="listenerBaseConfig" path="*" />
         <copy-properties propertyName="*" />
         <vm:outbound-endpoint path="out"/>
     </flow>
