@@ -8,7 +8,6 @@ package org.mule.config.bootstrap;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -38,8 +37,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.omg.CORBA.INV_FLAG;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry.
@@ -89,45 +89,15 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
 
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
     public String SINGLE_TX = ".singletx.";
 
-    private ArtifactType supportedArtifactType = ArtifactType.APP;
-    private final RegistryBootstrapDiscoverer discoverer;
-    protected MuleContext context;
-
-    public enum ArtifactType
-    {
-        APP("app"), DOMAIN("domain"), ALL("app/domain");
-
-        public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
-        private final String artifactTypeAsString;
-
-        ArtifactType(String artifactTypeAsString)
-        {
-            this.artifactTypeAsString = artifactTypeAsString;
-        }
-
-        public String getAsString()
-        {
-            return this.artifactTypeAsString;
-        }
-
-        public static ArtifactType createFromString(String artifactTypeAsString)
-        {
-            for (ArtifactType artifactType : values())
-            {
-                if (artifactType.artifactTypeAsString.equals(artifactTypeAsString))
-                {
-                    return artifactType;
-                }
-            }
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("No artifact type found for value: " + artifactTypeAsString));
-        }
-    }
+    protected ArtifactType supportedArtifactType = ArtifactType.APP;
+    protected final RegistryBootstrapDiscoverer discoverer;
+    protected MuleContext muleContext;
 
     /**
      * Creates a default SimpleRegistryBootstrap using a {@link org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer}
@@ -153,7 +123,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
      */
     public void setMuleContext(MuleContext context)
     {
-        this.context = context;
+        this.muleContext = context;
     }
 
     /** {@inheritDoc} */
@@ -214,11 +184,11 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
         try
         {
-            registerUnnamedObjects(unnamedObjects, context.getRegistry());
-            registerTransformers((MuleRegistryHelper) context.getRegistry());
-            registerTransformers(transformers, context.getRegistry());
-            registerObjects(namedObjects, context.getRegistry());
-            registerTransactionFactories(singleTransactionFactories, context);
+            registerUnnamedObjects(unnamedObjects);
+            registerTransformers();
+            registerTransformers(transformers);
+            registerObjects(namedObjects);
+            registerTransactionFactories(singleTransactionFactories, muleContext);
         }
         catch (Exception e1)
         {
@@ -257,7 +227,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerTransformers(Properties props, MuleRegistry registry) throws Exception
+    private void registerTransformers(Properties props) throws Exception
     {
         String transString;
         String name = null;
@@ -279,7 +249,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 optional = p.containsKey("optional");
             }
 
-            final String transClass = (x == -1 ? transString : transString.substring(0, x));
+            final Class<? extends Transformer> transformerClass = getClass(x == -1 ? transString : transString.substring(0, x));
             try
             {
                 String mime = null;
@@ -300,51 +270,62 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                         returnClass = ClassUtils.loadClass(returnClassString, getClass());
                     }
                 }
-                Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass);
-                if (!(trans instanceof DiscoverableTransformer))
-                {
-                    throw new RegistrationException(CoreMessages.transformerNotImplementDiscoverable(trans));
-                }
-                if (returnClass != null)
-                {
-                    trans.setReturnDataType(DataTypeFactory.create(returnClass, mime));
-                }
-                if (name != null)
-                {
-                    trans.setName(name);
-                }
-                else
-                {
-                    //This will generate a default name for the transformer
-                    name = trans.getName();
-                    //We then prefix the name to ensure there is less chance of conflict if the user registers
-                    // the transformer with the same name
-                    trans.setName("_" + name);
-                }
-                registry.registerTransformer(trans);
+
+                doRegisterTransformer(name, returnClass, transformerClass, mime);
             }
             catch (InvocationTargetException itex)
             {
                 Throwable cause = ExceptionUtils.getCause(itex);
-                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional transformer: " + transClass);
+                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional transformer: " + transformerClass.getClass().getName());
             }
             catch (NoClassDefFoundError ncdfe)
             {
-                throwExceptionIfNotOptional( optional, ncdfe, "Ignoring optional transformer: " + transClass);
+                throwExceptionIfNotOptional( optional, ncdfe, "Ignoring optional transformer: " + transformerClass.getClass().getName());
 
             }
             catch (ClassNotFoundException cnfe)
             {
-                throwExceptionIfNotOptional( optional, cnfe, "Ignoring optional transformer: " + transClass);
+                throwExceptionIfNotOptional( optional, cnfe, "Ignoring optional transformer: " + transformerClass.getClass().getName());
             }
 
             name = null;
-            returnClass = null;
         }
     }
 
-    private void registerTransformers(MuleRegistryHelper registry) throws MuleException
+    protected void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime) throws Exception
     {
+        Transformer trans = ClassUtils.instanciateClass(transformerClass);
+        if (!(trans instanceof DiscoverableTransformer))
+        {
+            throw new RegistrationException(CoreMessages.transformerNotImplementDiscoverable(trans));
+        }
+        if (returnClass != null)
+        {
+            trans.setReturnDataType(DataTypeFactory.create(returnClass, mime));
+        }
+        if (name != null)
+        {
+            trans.setName(name);
+        }
+        else
+        {
+            //This will generate a default name for the transformer
+            name = trans.getName();
+            //We then prefix the name to ensure there is less chance of conflict if the user registers
+            // the transformer with the same name
+            trans.setName("_" + name);
+        }
+        muleContext.getRegistry().registerTransformer(trans);
+    }
+
+    protected Class getClass(String className) throws ClassNotFoundException
+    {
+        return ClassUtils.loadClass(className, getClass());
+    }
+
+    protected void registerTransformers() throws MuleException
+    {
+        MuleRegistryHelper registry = (MuleRegistryHelper) muleContext.getRegistry();
         Map<String, Converter> converters = registry.lookupByType(Converter.class);
         for (Converter converter : converters.values())
         {
@@ -352,26 +333,26 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerObjects(Properties props, Registry registry) throws Exception
+    private void registerObjects(Properties props) throws Exception
     {
         for (Map.Entry<Object, Object> entry : props.entrySet())
         {
-            registerObject((String)entry.getKey(), (String)entry.getValue(), registry);
+            registerObject((String)entry.getKey(), (String)entry.getValue());
         }
         props.clear();
     }
 
-    private void registerUnnamedObjects(Properties props, Registry registry) throws Exception
+    private void registerUnnamedObjects(Properties props) throws Exception
     {
         for (Map.Entry<Object, Object> entry : props.entrySet())
         {
             final String key = String.format("%s#%s", entry.getKey(), UUID.getUUID());
-            registerObject(key, (String) entry.getValue(), registry);
+            registerObject(key, (String) entry.getValue());
         }
         props.clear();
     }
 
-    private void registerObject(String key, String value, Registry registry) throws Exception
+    private void registerObject(String key, String value) throws Exception
     {
         ArtifactType artifactTypeParameterValue = ArtifactType.APP;
 
@@ -401,22 +382,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 return;
             }
 
-            Object o = ClassUtils.instanciateClass(className);
-            Class<?> meta = Object.class;
-
-            if (o instanceof ObjectProcessor)
-            {
-                meta = ObjectProcessor.class;
-            }
-            else if (o instanceof StreamCloser)
-            {
-                meta = StreamCloser.class;
-            }
-            else if (o instanceof BootstrapObjectFactory)
-            {
-                o = ((BootstrapObjectFactory)o).create();
-            }
-            registry.registerObject(key, o, meta);
+            doRegisterObject(key, className);
         }
         catch (InvocationTargetException itex)
         {
@@ -431,6 +397,27 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         {
             throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional object: " + className);
         }
+    }
+
+    protected void doRegisterObject(String key, String className) throws Exception
+    {
+        Object o = ClassUtils.instanciateClass(className);
+        Class<?> meta = Object.class;
+
+        if (o instanceof ObjectProcessor)
+        {
+            meta = ObjectProcessor.class;
+        }
+        else if (o instanceof StreamCloser)
+        {
+            meta = StreamCloser.class;
+        }
+        else if (o instanceof BootstrapObjectFactory)
+        {
+            o = ((BootstrapObjectFactory)o).create();
+        }
+
+        muleContext.getRegistry().registerObject(key, o, meta);
     }
 
     private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception
