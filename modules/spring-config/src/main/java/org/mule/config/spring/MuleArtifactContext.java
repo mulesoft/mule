@@ -6,12 +6,14 @@
  */
 package org.mule.config.spring;
 
-import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.COMMON_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.ConfigResource;
 import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor;
@@ -52,7 +54,6 @@ import org.springframework.core.io.UrlResource;
  */
 public class MuleArtifactContext extends AbstractXmlApplicationContext
 {
-    private static final String BEAN_FACTORY_OBJECT_KEY = "_muleBeanFactory";
 
     private MuleContext muleContext;
     private Resource[] springResources;
@@ -94,8 +95,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
         );
 
-        beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
-        //beanFactory.registerSingleton(BEAN_FACTORY_OBJECT_KEY, beanFactory);
+        beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
+
+        SpringRegistryBootstrap bootstrap = new SpringRegistryBootstrap();
+        bootstrap.setBeanFactory(beanFactory);
+        initialiseBootstrap(bootstrap);
     }
 
     private void registerEditors(ConfigurableListableBeanFactory beanFactory)
@@ -103,6 +107,20 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         MulePropertyEditorRegistrar registrar = new MulePropertyEditorRegistrar();
         registrar.setMuleContext(muleContext);
         beanFactory.addPropertyEditorRegistrar(registrar);
+    }
+
+    protected void initialiseBootstrap(SpringRegistryBootstrap bootstrap)
+    {
+        bootstrap.setMuleContext(muleContext);
+
+        try
+        {
+            bootstrap.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
     }
 
     private void addBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, BeanPostProcessor... processors)
