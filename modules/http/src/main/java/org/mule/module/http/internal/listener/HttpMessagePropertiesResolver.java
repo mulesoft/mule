@@ -74,7 +74,7 @@ public class HttpMessagePropertiesResolver
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS, remoteHostAddress);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_URI_PARAMS, HttpParser.decodeUriParams(resolvedListenerPath, path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, resolvedListenerPath);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY, listenerPath.getRelativePath(path));
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH, listenerPath.getRelativePath(path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_SCHEME, scheme);
     }
 

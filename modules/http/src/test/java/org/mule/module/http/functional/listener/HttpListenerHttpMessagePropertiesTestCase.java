@@ -78,7 +78,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_URI), is(BASE_PATH));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY), is(BASE_PATH));
-        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY), is(BASE_PATH));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH), is(BASE_PATH));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_QUERY_STRING), is(""));
         assertThat(message.getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS), notNullValue());
         assertThat(message.<Map>getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS).isEmpty(), is(true));
@@ -103,7 +103,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_URI), is(uri));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY), is(BASE_PATH));
-        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY), is(BASE_PATH));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH), is(BASE_PATH));
         Map<String, String> retrivedQueryParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS);
         assertThat(retrivedQueryParams, IsNull.notNullValue());
         assertThat(retrivedQueryParams.size(), is(2));
@@ -164,7 +164,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_URI), is(CONTEXT_PATH));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY), is(CONTEXT_PATH));
-        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY), is(CONTEXT_PATH));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH), is(CONTEXT_PATH));
     }
 
     @Test
@@ -231,7 +231,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_LISTENER_PATH), is("/api/*"));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY), is(API_CONTEXT_PATH));
-        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH_PROPERTY), is(CONTEXT_PATH));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH), is(CONTEXT_PATH));
         ParameterMap uriParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS);
         assertThat(uriParams, notNullValue());
         assertThat(uriParams.isEmpty(), is(true));
