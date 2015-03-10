@@ -8,7 +8,6 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.config.ConfigResource;
-import org.mule.config.bootstrap.ArtifactType;
 
 import org.springframework.beans.BeansException;
 
@@ -31,10 +30,4 @@ final class MuleDomainContext extends MuleArtifactContext
         return MuleDomainBeanDefinitionDocumentReader.class;
     }
 
-    @Override
-    protected void initialiseBootstrap(SpringRegistryBootstrap bootstrap)
-    {
-        bootstrap.setSupportedArtifactType(ArtifactType.DOMAIN);
-        super.initialiseBootstrap(bootstrap);
-    }
 }
