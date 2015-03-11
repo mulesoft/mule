@@ -285,7 +285,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     }
 
     @Override
-    public Object inject(Object object)
+    public <T> T inject(T object)
     {
         try
         {
@@ -297,10 +297,10 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         }
     }
 
-    private Object initialiseObject(ConfigurableApplicationContext applicationContext, String key, Object object) throws LifecycleException
+    private <T> T initialiseObject(ConfigurableApplicationContext applicationContext, String key, T object) throws LifecycleException
     {
         applicationContext.getBeanFactory().autowireBean(object);
-        Object initialised = applicationContext.getBeanFactory().initializeBean(object, key);
+        T initialised = (T) applicationContext.getBeanFactory().initializeBean(object, key);
 
         return initialised;
     }
@@ -424,7 +424,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             {
                 if (logger.isWarnEnabled())
                 {
-                    logger.warn(String.format("Spring registry already contains an object named '%s'.  he previous object will be overwritten.", key));
+                    logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
                 }
                 SpringRegistry.this.unregisterObject(key);
             }

@@ -15,12 +15,17 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.Registry;
+import org.mule.api.registry.RegistryBroker;
 import org.mule.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.registry.AbstractRegistryBroker;
 
+/**
+ * @deprecated as of 3.7.0 since {@link RegistryBroker} also is
+ */
+@Deprecated
 public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager
 {
 

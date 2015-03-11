@@ -69,6 +69,15 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
 
+    public DefaultHttpListenerConfig()
+    {
+    }
+
+    DefaultHttpListenerConfig(HttpListenerConnectionManager connectionManager)
+    {
+        this.connectionManager = connectionManager;
+    }
+
     public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile)
     {
         this.workerThreadingProfile = workerThreadingProfile;
@@ -325,10 +334,5 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     public void setConnectionIdleTimeout(int connectionIdleTimeout)
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
-    }
-
-    public void setConnectionManager(HttpListenerConnectionManager connectionManager)
-    {
-        this.connectionManager = connectionManager;
     }
 }

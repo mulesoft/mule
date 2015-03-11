@@ -160,7 +160,7 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void registerOnLimboWhenNoRegistriesYet() throws Exception
+    public void registerWhenNoRegistriesManuallyAddedYet() throws Exception
     {
         final String KEY1 = "apple";
         final Object VALUE1 = new Apple();

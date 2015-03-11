@@ -23,10 +23,12 @@ import javax.inject.Inject;
 /**
  * A very simple implementation of {@link LifecycleRegistry}. Useful for starting really lightweight
  * contexts which don't depend on heavier object containers such as Spring or Guice (testing being
- * the best example). <b>Do not use this registry for heavy duty production environments</b>.
+ * the best example).
  * <p/>
  * The {@link #inject(Object)} operation will only consider fields annotated with {@link Inject} and will perform
- * the injection using simple, not-cached reflection. Again, not recommended for production environments.
+ * the injection using simple, not-cached reflection. Also, initialisation lifecycle will be performed
+ * in pseudo-random order, no analysis will be done to ensure that dependencies of a given object
+ * get their lifecycle before it.
  *
  * @since 3.7.0
  */
@@ -54,11 +56,11 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
         Object previous = doGet(key);
         if (previous != null)
         {
-
             if (logger.isDebugEnabled())
             {
                 logger.debug(String.format("An entry already exists for key %s. It will be replaced", key));
             }
+
             unregisterObject(key);
         }
 
@@ -96,9 +98,15 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
     }
 
     @Override
-    public Object inject(Object object)
+    public <T> T inject(T object)
     {
-        return applyProcessors(object, null);
+        return (T) applyProcessors(object, null);
+    }
+
+    @Override
+    protected Object applyProcessors(Object object, Object metadata)
+    {
+        return injectInto(super.applyProcessors(object, metadata));
     }
 
     private void injectFieldDependencies() throws InitialisationException
@@ -108,8 +116,7 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
             injectInto(object);
         }
     }
-
-    private void injectInto(Object object)
+    private <T> T injectInto(T object)
     {
         for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class)))
         {
@@ -129,6 +136,8 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
                                                          field.getName(), object.getClass().getName()), e);
             }
         }
+
+        return object;
     }
 
     private void initialiseObjects() throws InitialisationException

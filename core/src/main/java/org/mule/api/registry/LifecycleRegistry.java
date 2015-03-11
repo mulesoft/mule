@@ -7,6 +7,7 @@
 package org.mule.api.registry;
 
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Injector;
 
 /**
  * A {@link Registry} which not only registers and fetches objects,
@@ -14,7 +15,7 @@ import org.mule.api.MuleException;
  *
  * @since 3.7.0
  */
-public interface LifecycleRegistry extends Registry
+public interface LifecycleRegistry extends Registry, Injector
 {
 
     /**
@@ -23,7 +24,7 @@ public interface LifecycleRegistry extends Registry
      * clutter the registry with single use objects.
      *
      * @param object the object to process
-     * @return the same object with lifecycle methods called (if it has any)
+     * @return either the same object but with the lifecycle applied or a proxy to it
      * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
      */
     Object applyLifecycle(Object object) throws MuleException;
@@ -35,17 +36,9 @@ public interface LifecycleRegistry extends Registry
      *
      * @param object the object to process
      * @param phase  the specific lifecycle phase you want to fire
-     * @return the same object with lifecycle methods called (if it has any)
+     * @return either the same object but with the lifecycle applied or a proxy to it
      * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
      */
     Object applyLifecycle(Object object, String phase) throws MuleException;
 
-    /**
-     * Injects dependencies into the given object
-     *
-     * @param object the object on which dependencies are to be injected on
-     * @return the injected object or a proxy to it
-     * @throws MuleException
-     */
-    Object inject(Object object) throws MuleException;
 }
