@@ -26,15 +26,15 @@ import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
 import java.io.OutputStream;
 import java.util.Date;
 
-import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
-import org.quartz.SimpleTrigger;
 import org.quartz.StatefulJob;
-import org.quartz.Trigger;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.triggers.AbstractTrigger;
+import org.quartz.impl.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * Listens for Quartz sheduled events using the Receiver Job and fires events to the
@@ -87,7 +87,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
                 throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
             }
 
-            JobDetail jobDetail = new JobDetail();
+            JobDetailImpl jobDetail = new JobDetailImpl();
             jobDetail.setName(endpoint.getEndpointURI().getAddress());
             Class<? extends Job> jobClass = jobConfig.getJobClass();
             jobDetail.setJobClass(jobClass);
@@ -117,7 +117,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
             jobDetail.setJobDataMap(jobDataMap);
 
-            Trigger trigger;
+            AbstractTrigger trigger;
             String cronExpression = (String)endpoint.getProperty(QuartzConnector.PROPERTY_CRON_EXPRESSION);
             String repeatInterval = (String)endpoint.getProperty(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
             String repeatCount = (String)endpoint.getProperty(QuartzConnector.PROPERTY_REPEAT_COUNT);
@@ -138,13 +138,13 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
             if (cronExpression != null)
             {
-                CronTrigger ctrigger = new CronTrigger();
+                CronTriggerImpl ctrigger = new CronTriggerImpl();
                 ctrigger.setCronExpression(cronExpression);
                 trigger = ctrigger;
             }
             else if (repeatInterval != null)
             {
-                SimpleTrigger strigger = new SimpleTrigger();
+                SimpleTriggerImpl strigger = new SimpleTriggerImpl();
                 strigger.setRepeatInterval(Long.parseLong(repeatInterval));
                 if (repeatCount != null)
                 {

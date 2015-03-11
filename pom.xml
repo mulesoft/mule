@@ -226,7 +226,7 @@
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
         <reflectionsVersion>0.9.9</reflectionsVersion>
-        <quartzVersion>1.8.5</quartzVersion>
+        <quartzVersion>2.2.1</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
         <saajVersion>1.3</saajVersion>

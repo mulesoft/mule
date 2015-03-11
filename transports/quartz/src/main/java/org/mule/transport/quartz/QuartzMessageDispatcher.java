@@ -22,13 +22,13 @@ import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 import java.util.Date;
 
-import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.triggers.AbstractTrigger;
+import org.quartz.impl.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * Can schedule a Job with the Quartz scheduler. The event must contain the Job to
@@ -58,7 +58,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
         }
 
-        JobDetail jobDetail = new JobDetail();
+        JobDetailImpl jobDetail = new JobDetailImpl();
         // make the job name unique per endpoint (MULE-753)
         jobDetail.setName(endpoint.getEndpointURI().getAddress() + "-" + event.getId());
 
@@ -114,7 +114,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         //RM: The custom job may want the message and the Job type may not be delegating job
         jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, payload);
 
-        Trigger trigger;
+        AbstractTrigger trigger;
         String cronExpression = jobDataMap.getString(QuartzConnector.PROPERTY_CRON_EXPRESSION);
         String repeatInterval = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
         String repeatCount = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_COUNT);
@@ -135,13 +135,13 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         if (cronExpression != null)
         {
-            CronTrigger ctrigger = new CronTrigger();
+            CronTriggerImpl ctrigger = new CronTriggerImpl();
             ctrigger.setCronExpression(cronExpression);
             trigger = ctrigger;
         }
         else if (repeatInterval != null)
         {
-            SimpleTrigger strigger = new SimpleTrigger();
+            SimpleTriggerImpl strigger = new SimpleTriggerImpl();
             strigger.setRepeatInterval(Long.parseLong(repeatInterval));
             if (repeatCount != null)
             {
