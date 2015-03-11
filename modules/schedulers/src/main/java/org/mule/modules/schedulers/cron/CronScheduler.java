@@ -27,10 +27,14 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
+import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.triggers.CronTriggerImpl;
 
 /**
  * <p>
@@ -96,7 +100,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
     @Override
     public void schedule() throws Exception
     {
-        quartzScheduler.triggerJob(jobName, groupName);
+        quartzScheduler.triggerJob(JobKey.jobKey(jobName, groupName));
     }
 
     @Override
@@ -140,9 +144,9 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
         {
             if (quartzScheduler.isStarted())
             {
-                if (quartzScheduler.getTrigger(getName(), groupName) == null)
+                if (quartzScheduler.getTrigger(TriggerKey.triggerKey(getName(), groupName)) == null)
                 {
-                    CronTrigger cronTrigger = new CronTrigger(getName(), groupName, jobName, groupName, cronExpression);
+                    CronTrigger cronTrigger = new CronTriggerImpl(getName(), groupName, jobName, groupName, cronExpression);
                     quartzScheduler.scheduleJob(cronTrigger);
                 }
                 else
@@ -188,7 +192,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
 
     private JobDetail jobDetail(String jobName, String groupName, PollingReceiverWorker job)
     {
-        JobDetail jobDetail = new JobDetail(jobName, groupName, CronJob.class);
+        JobDetailImpl jobDetail = new JobDetailImpl(jobName, groupName, CronJob.class);
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(POLL_CRON_SCHEDULER_JOB, job);
         jobDetail.setJobDataMap(jobDataMap);
