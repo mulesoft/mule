@@ -24,7 +24,6 @@ import org.mule.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -44,7 +43,6 @@ import org.springframework.context.ApplicationContext;
 public class SpringRegistryBootstrap extends SimpleRegistryBootstrap implements BeanFactoryAware
 {
 
-    private final AtomicBoolean initialised = new AtomicBoolean(false);
     private BeanDefinitionRegistry beanDefinitionRegistry;
 
     public SpringRegistryBootstrap()
@@ -62,11 +60,6 @@ public class SpringRegistryBootstrap extends SimpleRegistryBootstrap implements 
     @Override
     public void initialise() throws InitialisationException
     {
-        if (initialised.get())
-        {
-            return;
-        }
-
         super.initialise();
         try
         {
@@ -76,8 +69,6 @@ public class SpringRegistryBootstrap extends SimpleRegistryBootstrap implements 
         {
             throw new InitialisationException(e, this);
         }
-
-        initialised.set(true);
     }
 
     @Override

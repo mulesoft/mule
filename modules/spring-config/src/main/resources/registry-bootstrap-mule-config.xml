@@ -2,9 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd"
-       default-init-method="initialise">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.spring.SpringRegistryBootstrap" />
+    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.spring.SpringRegistryBootstrap" init-method="initialise"/>
 
 </beans>

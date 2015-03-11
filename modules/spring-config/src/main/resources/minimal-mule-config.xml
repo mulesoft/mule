@@ -87,7 +87,7 @@
 
         <spring:bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
 
-        <spring:bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguageWrapper" init-method="initialise">
+        <spring:bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguageWrapper">
             <spring:constructor-arg  ref="_muleContext"/>
         </spring:bean>
 
