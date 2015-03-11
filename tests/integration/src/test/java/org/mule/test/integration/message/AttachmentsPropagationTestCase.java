@@ -6,9 +6,9 @@
  */
 package org.mule.test.integration.message;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -17,8 +17,11 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.email.transformers.PlainTextDataSource;
 
+import java.util.Set;
+
 import javax.activation.DataHandler;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class AttachmentsPropagationTestCase extends FunctionalTestCase implements EventCallback
@@ -62,7 +65,7 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
 
         // return the list of attachment names
         FunctionalTestComponent fc = (FunctionalTestComponent) component;
-        fc.setReturnData(message.getOutboundAttachmentNames().toString());
+        fc.setReturnData(message.getOutboundAttachmentNames());
     }
 
     @Test
@@ -70,14 +73,14 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://Single", "", null);
-        assertNotNull(result);
+        assertThat(result, is(notNullValue()));
 
         // expect SINGLE attachment from SINGLE service
-        assertEquals("[SINGLE]", result.getPayloadAsString());
+        assertThat((Set<String>) result.getPayload(), Matchers.containsInAnyOrder("SINGLE"));
 
         DataHandler attachment = result.getInboundAttachment("SINGLE");
-        assertNotNull(attachment);
-        assertEquals(ATTACHMENT_CONTENT, attachment.getContent().toString());
+        assertThat(attachment, is(notNullValue()));
+        assertThat(attachment.getContent().toString(), is(ATTACHMENT_CONTENT));
     }
 
     @Test
@@ -85,11 +88,11 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://Chained", "", null);
-        assertNotNull(result);
+        assertThat(result, is(notNullValue()));
 
         // expect CHAINED attachment from CHAINED service
         // and SINGLE attachment from SINGLE service
-        assertEquals("[CHAINED, SINGLE]", result.getPayloadAsString());
+        assertThat((Set<String>) result.getPayload(), Matchers.containsInAnyOrder("SINGLE", "CHAINED"));
 
         // don't check the attachments now - it seems they're not copied properly from inbound
         // to outbound on flow boundaries
