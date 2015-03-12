@@ -7,7 +7,6 @@
 package org.mule.api.registry;
 
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Injector;
 
 /**
  * A {@link Registry} which not only registers and fetches objects,
@@ -15,7 +14,7 @@ import org.mule.api.lifecycle.Injector;
  *
  * @since 3.7.0
  */
-public interface LifecycleRegistry extends Registry, Injector
+public interface LifecycleRegistry extends Registry
 {
 
     /**

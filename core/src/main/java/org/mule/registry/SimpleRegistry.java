@@ -8,6 +8,7 @@ package org.mule.registry;
 
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Initialisable;
@@ -32,7 +33,7 @@ import javax.inject.Inject;
  *
  * @since 3.7.0
  */
-public class SimpleRegistry extends TransientRegistry implements LifecycleRegistry
+public class SimpleRegistry extends TransientRegistry implements LifecycleRegistry, Injector
 {
 
     private static final String REGISTRY_ID = "org.mule.Registry.Simple";

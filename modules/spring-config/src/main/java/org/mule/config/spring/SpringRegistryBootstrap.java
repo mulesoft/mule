@@ -8,22 +8,19 @@ package org.mule.config.spring;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.Registry;
-import org.mule.api.registry.RegistryProvider;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
+import org.mule.config.bootstrap.AbstractRegistryBootstrap;
 import org.mule.config.bootstrap.BootstrapObjectFactory;
 import org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
-import org.mule.config.spring.factories.ConstantFactoryBean;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map.Entry;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -40,7 +37,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @since 3.7.0
  */
-public class SpringRegistryBootstrap extends SimpleRegistryBootstrap implements BeanFactoryAware
+public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements BeanFactoryAware
 {
 
     private BeanDefinitionRegistry beanDefinitionRegistry;
@@ -55,20 +52,6 @@ public class SpringRegistryBootstrap extends SimpleRegistryBootstrap implements 
     {
         checkArgument(beanFactory instanceof BeanDefinitionRegistry, "this bootstrap class only accepts BeanFactory instances which implement " + BeanDefinitionRegistry.class);
         beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        try
-        {
-            monopolizeRegistries();
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
     }
 
     @Override
@@ -102,29 +85,6 @@ public class SpringRegistryBootstrap extends SimpleRegistryBootstrap implements 
         doRegisterObject(name, builder);
     }
 
-    private void monopolizeRegistries()
-    {
-        if (!(muleContext.getRegistry() instanceof RegistryProvider))
-        {
-            return;
-        }
-
-        for (Registry registry : ((RegistryProvider) muleContext.getRegistry()).getRegistries())
-        {
-            if (registry instanceof SpringRegistry)
-            {
-                continue;
-            }
-
-            for (Entry<String, Object> entry : registry.lookupByType(Object.class).entrySet())
-            {
-                registerInstance(entry.getKey(), entry.getValue());
-            }
-
-            muleContext.removeRegistry(registry);
-        }
-    }
-
     @Override
     protected void doRegisterObject(String key, String className) throws Exception
     {
@@ -154,10 +114,4 @@ public class SpringRegistryBootstrap extends SimpleRegistryBootstrap implements 
         beanDefinitionRegistry.registerBeanDefinition(key, builder.getBeanDefinition());
     }
 
-    private void registerInstance(String key, Object value)
-    {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
-        builder.addConstructorArgValue(value);
-        doRegisterObject(key, builder);
-    }
 }

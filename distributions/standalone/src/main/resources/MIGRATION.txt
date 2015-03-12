@@ -29,7 +29,7 @@ MULE-7588: Lifecycle has been fixed. Please have the following considerations:
     * Initialisation is now applied on dependency order. Meaning that if object 'A' depends on 'B' and 'C', mule will guarantee that by the time that 'A' is initialised, 'B' and 'C'
       will have already been initialised. Note that for this to work, to dependency has to be explicitly expresses through the javax.inject.Inject annotation or through a
       Spring configuration.
-    * TransientRegistry is deprecated and no longer used by the runtime. SpringRegistry is now the only registry the runtime uses by default. AbstarctMuleContextTestCase
+    * TransientRegistry is deprecated and no longer used by the runtime. SpringRegistry is now the only registry the runtime uses by default. AbstractMuleContextTestCase
       uses the new SimpleRegistry instead.
     * addRegistry() and removeRegistry() methods from the MuleContext have been deprecated. Manually added registries will not participate of dependency injection
     * The org.mule.api.registry.Registry.registerObject(key, Object, metadata) method has been deprecated. The metadata will no longer be used.

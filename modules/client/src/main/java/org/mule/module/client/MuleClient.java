@@ -218,7 +218,6 @@ public class MuleClient implements Disposable
             config.setClientMode(true);
             contextBuilder.setMuleConfiguration(config);
             muleContext = muleContextFactory.createMuleContext(contextBuilder);
-
         }
         else
         {

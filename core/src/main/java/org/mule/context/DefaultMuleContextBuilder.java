@@ -56,6 +56,7 @@ import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.registry.RegistryDelegatingInjector;
 import org.mule.util.ClassUtils;
 import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
@@ -105,9 +106,13 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
         muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
         muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(),muleContext));
+
         DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
         muleContext.setRegistryBroker(registryBroker);
-        muleContext.setMuleRegistry(new MuleRegistryHelper(registryBroker, muleContext));
+        MuleRegistryHelper muleRegistry = new MuleRegistryHelper(registryBroker, muleContext);
+        muleContext.setMuleRegistry(muleRegistry);
+        muleContext.setInjector(new RegistryDelegatingInjector(muleRegistry));
+
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
         muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());

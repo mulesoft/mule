@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.lifecycle;
-
-import org.mule.api.MuleException;
+package org.mule.api;
 
 /**
  * Component capable of injecting dependencies into a given object
+ *
  * @since 3.7.0
  */
 public interface Injector
 {
+
     /**
      * Injects dependencies into the given object
      *

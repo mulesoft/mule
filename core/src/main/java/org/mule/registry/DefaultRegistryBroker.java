@@ -10,6 +10,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.Registry;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -39,7 +41,8 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
     public void addRegistry(Registry registry)
     {
         registries.add(0, registry);
-        if (registries.size() > 2 && LOGGER.isWarnEnabled())
+        lifecycleRegistry.set(null);
+        if (registries.size() > 1 && LOGGER.isWarnEnabled())
         {
             LOGGER.warn(registries.size() + " registries have been registered, however adding registries has been deprecated as of Mule 3.7.0");
         }
@@ -55,10 +58,13 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<Registry> getRegistries()
     {
-        return registries;
+        return ImmutableList.copyOf(registries);
     }
 
     protected LifecycleRegistry getLifecycleRegistry()

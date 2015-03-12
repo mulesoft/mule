@@ -155,13 +155,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         }
 
         throw new RegistrationException(
-                MessageFactory.createStaticMessage("Can't get component from flow construct "
-                                                   + flowConstruct.getName()));
+            MessageFactory.createStaticMessage("Can't get component from flow construct "
+                                               + flowConstruct.getName()));
     }
 
     /**
      * A convenience method to get a type-safe reference to the FunctionTestComponent
-     *
+     * 
      * @param serviceName service name as declared in the config
      * @return test component
      * @since 2.2
@@ -217,7 +217,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Tests the given flow with a one-way message exchange pattern
-     *
+     * 
      * @param flowName the name of the flow to be executed
      * @throws Exception
      */
@@ -230,7 +230,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * Looks up the given flow in the registry and processes it with the given event.
      * A flow asserting is then executed by calling {@link
      * org.mule.tck.functional.FlowAssert.verify(String)}
-     *
+     * 
      * @param flowName the name of the flow to be executed
      * @param event the event ot execute with
      * @throws Exception
@@ -244,7 +244,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Runs the given flow with a default event
-     *
+     * 
      * @param flowName the name of the flow to be executed
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
@@ -256,7 +256,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Executes the given flow with a default message carrying the payload
-     *
+     * 
      * @param flowName the name of the flow to be executed
      * @param payload the payload to use in the message
      * @return the resulting <code>MuleEvent</code>
@@ -282,7 +282,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Run the flow specified by name and assert equality on the expected output
-     *
+     * 
      * @param flowName The name of the flow to run
      * @param expect The expected output
      */
@@ -294,14 +294,14 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     /**
      * Runs the given flow and asserts for property name in the outbound scope to
      * match the expected value
-     *
+     * 
      * @param flowName the name of the flow to be executed
      * @param propertyName the name of the property to test
      * @param expect the expected value
      * @throws Exception
      */
     protected <T> void runFlowAndExpectProperty(String flowName, String propertyName, T expect)
-            throws Exception
+        throws Exception
     {
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = getTestEvent(null);
@@ -313,7 +313,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     /**
      * Run the flow specified by name using the specified payload and assert equality
      * on the expected output
-     *
+     * 
      * @param flowName The name of the flow to run
      * @param expect The expected output
      * @param payload The payload of the input event
@@ -325,7 +325,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 
     /**
      * Retrieve a flow by name from the registry
-     *
+     * 
      * @param name Name of the flow to retrieve
      */
     protected Flow lookupFlowConstruct(String name)

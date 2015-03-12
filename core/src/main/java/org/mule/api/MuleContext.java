@@ -197,6 +197,15 @@ public interface MuleContext extends Lifecycle
 
     MuleRegistry getRegistry();
 
+    /**
+     * Returns a {@link Injector} capable of
+     * injecting dependencies into objects
+     *
+     * @return a {@link Injector}
+     * @since 3.7.0
+     */
+    Injector getInjector();
+
     MuleConfiguration getConfiguration();
 
     ThreadingProfile getDefaultMessageDispatcherThreadingProfile();

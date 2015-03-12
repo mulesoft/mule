@@ -8,6 +8,7 @@ package org.mule.config.spring;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -37,7 +38,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class SpringRegistry extends AbstractRegistry implements LifecycleRegistry
+public class SpringRegistry extends AbstractRegistry implements LifecycleRegistry, Injector
 {
 
     public static final String REGISTRY_ID = "org.mule.Registry.Spring";

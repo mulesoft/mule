@@ -8,6 +8,7 @@ package org.mule;
 
 import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -112,6 +113,13 @@ public class DefaultMuleContext implements MuleContext
      * Simplified Mule configuration interface
      */
     private MuleRegistry muleRegistryHelper;
+
+    /**
+     * Default component to perform dependency injection
+     *
+     * @since 3.7.0
+     */
+    private Injector injector;
 
     /**
      * stats used for management
@@ -687,9 +695,22 @@ public class DefaultMuleContext implements MuleContext
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MuleRegistry getRegistry()
     {
         return muleRegistryHelper;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Injector getInjector()
+    {
+        return injector;
     }
 
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
@@ -1005,6 +1026,11 @@ public class DefaultMuleContext implements MuleContext
     public void setRegistryBroker(DefaultRegistryBroker registryBroker)
     {
         this.registryBroker = registryBroker;
+    }
+
+    public void setInjector(Injector injector)
+    {
+        this.injector = injector;
     }
 
     public void setMuleRegistry(MuleRegistryHelper muleRegistry)

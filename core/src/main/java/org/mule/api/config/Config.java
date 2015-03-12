@@ -9,8 +9,7 @@ package org.mule.api.config;
 /**
  * A generic component's configuration. For now it's just a marker to enable
  * a lifecycle mechanism in which configs are initialised and started before the
- * owning component. This interface should not be used in extensions or applications
- * since in the future we might use this interface to enforce a tighter contract
+ * owning component.
  *
  * @since 3.7.0
  */

@@ -708,7 +708,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     @Override
     public Object applyProcessors(Object object) throws MuleException
     {
-        return inject(object);
+        return muleContext.getInjector().inject(object);
     }
 
     /**
@@ -718,22 +718,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     @Deprecated
     public Object applyProcessors(Object object, int flags) throws MuleException
     {
-        return inject(object);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object inject(Object object) throws MuleException
-    {
-        LifecycleRegistry lifecycleRegistry = registry.getLifecycleRegistry();
-        if (lifecycleRegistry != null)
-        {
-            return lifecycleRegistry.inject(object);
-        }
-
-        return object;
+        return applyProcessors(object);
     }
 
     /**
