@@ -37,21 +37,26 @@ public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransf
     {
         return new PropertyEditorTextToValueTransformer(getBooleanPropertyEditor(), Boolean.class);
     }
-    
-    private PropertyEditor getBooleanPropertyEditor() throws Exception {
-        PropertyEditor editor = null;
-        
-        try
+
+    private PropertyEditor getBooleanPropertyEditor() throws Exception
+    {
+        String[] classNames = {
+                "com.sun.beans.editors.BooleanEditor", // java 8
+                "sun.beans.editors.BooleanEditor", // java 7
+                "sun.beans.editors.BoolEditor"}; // java 6
+        ClassNotFoundException exception = null;
+        for (String className : classNames)
         {
-            // try first with java 7 package name
-            editor = (PropertyEditor) Class.forName("sun.beans.editors.BooleanEditor").newInstance();
+            try
+            {
+                return (PropertyEditor) Class.forName(className).newInstance();
+            }
+            catch (ClassNotFoundException e)
+            {
+                exception = e;
+            }
         }
-        catch (ClassNotFoundException e)
-        {
-            // if that doesn't exist, try with java 6 and lower package name
-            editor = (PropertyEditor) Class.forName("sun.beans.editors.BoolEditor").newInstance();   
-        }
-        return editor;
+        throw exception;
     }
 
 }

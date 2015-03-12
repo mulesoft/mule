@@ -135,8 +135,9 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
         message.addInboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addInboundAttachment("bar", Mockito.mock(DataHandler.class));
-        assertEquals("foo", evaluate("message.inboundAttachments.keySet().toArray()[0]", message));
-        assertEquals("bar", evaluate("message.inboundAttachments.keySet().toArray()[1]", message));
+        assertEquals(2, evaluate("message.inboundAttachments.keySet().size()", message));
+        assertTrue((Boolean)evaluate("message.inboundAttachments.keySet().contains('foo')", message));
+        assertTrue((Boolean) evaluate("message.inboundAttachments.keySet().contains('bar')", message));
     }
 
     @Test
@@ -241,8 +242,9 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
         message.addOutboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addOutboundAttachment("bar", Mockito.mock(DataHandler.class));
-        assertEquals("foo", evaluate("message.outboundAttachments.keySet().toArray()[0]", message));
-        assertEquals("bar", evaluate("message.outboundAttachments.keySet().toArray()[1]", message));
+        assertEquals(2, evaluate("message.outboundAttachments.keySet().size()", message));
+        assertTrue((Boolean) evaluate("message.outboundAttachments.keySet().contains('foo')", message));
+        assertTrue((Boolean) evaluate("message.outboundAttachments.keySet().contains('bar')", message));
     }
 
     @Test
