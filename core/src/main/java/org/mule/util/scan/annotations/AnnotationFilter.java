@@ -11,6 +11,7 @@ package org.mule.util.scan.annotations;
  * An Annotation filter is used to filter throw annotations on a class (including fields, methods and parameters) to determine
  * whether the annotion should be accepted
  */
+@Deprecated
 public interface AnnotationFilter
 {
     /**

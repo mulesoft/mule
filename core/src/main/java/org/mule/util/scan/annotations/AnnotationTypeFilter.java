@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 /**
  * Simply filters for annotations that match the annotation class
  */
+@Deprecated
 public class AnnotationTypeFilter implements AnnotationFilter
 {
     private Class<? extends Annotation> annotation;

@@ -18,6 +18,7 @@ import org.objectweb.asm.commons.EmptyVisitor;
 /**
  * Will determine if the class provide is assignable from the interface class provied.
  */
+@Deprecated
 public class InterfaceClassScanner extends EmptyVisitor implements ClassScanner
 {
     private Class interfaceClass;

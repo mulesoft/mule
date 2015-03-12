@@ -18,6 +18,7 @@ import org.objectweb.asm.commons.EmptyVisitor;
 /**
  * Will determine if the class provide extends and thus is assignable from the implementatation class provied.
  */
+@Deprecated
 public class ImplementationClassScanner extends EmptyVisitor implements ClassScanner
 {
     private Class implementationClass;
