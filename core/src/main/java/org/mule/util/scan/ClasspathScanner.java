@@ -51,7 +51,10 @@ import org.objectweb.asm.ClassReader;
  * making orders of magnitude better performance and uses a lot less memory. ASM
  * seems to be the fasted of the byte code manipulation libraries i.e. JavaAssist or
  * BCEL Note that the scanner will not scan inner or anonymous classes.
+ *
+ * @deprecated: As ASM 3.3.1 is not fully compliant with Java 8, this class has been deprecated, however you can still use it under Java 7.
  */
+@Deprecated
 public class ClasspathScanner
 {
     public static final int INCLUDE_ABSTRACT = 0x01;

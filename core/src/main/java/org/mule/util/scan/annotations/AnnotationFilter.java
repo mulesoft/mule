@@ -10,7 +10,10 @@ package org.mule.util.scan.annotations;
  * A filter is used when performing an Annotation scan on a single class or the classpath.
  * An Annotation filter is used to filter throw annotations on a class (including fields, methods and parameters) to determine
  * whether the annotion should be accepted
+ *
+ * @deprecated: As ASM 3.3.1 is not fully compliant with Java 8, this class has been deprecated, however you can still use it under Java 7.
  */
+@Deprecated
 public interface AnnotationFilter
 {
     /**

@@ -11,7 +11,10 @@ import org.objectweb.asm.ClassVisitor;
 /**
  * This interface is used by scanners to let the {@link ClasspathScanner} know if there was a
  * match on the class and whan the class was.
+ *
+ * @deprecated: As ASM 3.3.1 is not fully compliant with Java 8, this class has been deprecated, however you can still use it under Java 7.
  */
+@Deprecated
 public interface ClassScanner extends ClassVisitor
 {
     boolean isMatch();

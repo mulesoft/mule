@@ -6,6 +6,9 @@
  */
 package org.mule.util.scan;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.BloodOrange;
@@ -21,16 +24,14 @@ import org.mule.util.scan.annotations.SampleClassWithAnnotations;
 
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class ClasspathScannerTestCase extends AbstractMuleTestCase
 {
     //This is slow
     @Test
+    @Ignore("MULE-8260: ASM 3.3.1 is not working properly with Java 8")
     public void testSearchInterfaceScanClasspathAndJars() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org");
@@ -46,6 +47,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore("MULE-8260: ASM 3.3.1 is not working properly with Java 8")
     public void testSearchInterfaceScanClasspathAndJarsWithInterfaceFlag() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org/mule");
@@ -62,6 +64,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
 
     //This will be a lot more efficient
     @Test
+    @Ignore("MULE-8260: ASM 3.3.1 is not working properly with Java 8")
     public void testInterfaceScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org/mule");
