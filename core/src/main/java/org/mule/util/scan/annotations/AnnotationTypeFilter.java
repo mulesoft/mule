@@ -10,7 +10,10 @@ import java.lang.annotation.Annotation;
 
 /**
  * Simply filters for annotations that match the annotation class
+ *
+ * @deprecated: As ASM 3.3.1 is not fully compliant with Java 8, this class has been deprecated, however you can still use it under Java 7.
  */
+@Deprecated
 public class AnnotationTypeFilter implements AnnotationFilter
 {
     private Class<? extends Annotation> annotation;

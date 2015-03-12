@@ -16,8 +16,11 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.commons.EmptyVisitor;
 
 /**
- * Will determine if the class provide is assignable from the interface class provied.
+ * Will determine if the class provide is assignable from the interface class provided.
+ *
+ * @deprecated: As ASM 3.3.1 is not fully compliant with Java 8, this class has been deprecated, however you can still use it under Java 7.
  */
+@Deprecated
 public class InterfaceClassScanner extends EmptyVisitor implements ClassScanner
 {
     private Class interfaceClass;

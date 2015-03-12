@@ -12,8 +12,11 @@ import java.io.InputStream;
 import org.objectweb.asm.ClassReader;
 
 /**
- * A Class reader trhat will close the stream once initialised
+ * A Class reader that will close the stream once initialised
+ *
+ * @deprecated: As ASM 3.3.1 is not fully compliant with Java 8, this class has been deprecated, however you can still use it under Java 7.
  */
+@Deprecated
 public class ClosableClassReader extends ClassReader
 {
     public ClosableClassReader(String s) throws IOException
