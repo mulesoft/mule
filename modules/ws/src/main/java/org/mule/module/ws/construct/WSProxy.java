@@ -169,7 +169,8 @@ public class WSProxy extends AbstractConfigurationPattern
         private static final String XSD_PARAM_1 = "?xsd=";
         private static final String XSD_PARAM_2 = "&xsd=";
         private static final String LOCALHOST = "localhost";
-        
+        private static final String LOCALHOST_LOCALDOMAIN = "localhost.localdomain";
+
         protected final Log logger = LogFactory.getLog(WSProxy.class);
         private String outboundAddress;
 
@@ -234,9 +235,16 @@ public class WSProxy extends AbstractConfigurationPattern
             }
 
 
-            if (wsdlContents.indexOf(LOCALHOST) > -1)
+            if (wsdlContents.contains(LOCALHOST_LOCALDOMAIN))
             {
-                wsdlContents = wsdlContents.replaceAll(LOCALHOST, NetworkUtils.getLocalHost().getHostName());
+                wsdlContents = wsdlContents.replaceAll(LOCALHOST_LOCALDOMAIN, NetworkUtils.getLocalHost().getHostName());
+            }
+            else
+            {
+                if (wsdlContents.contains(LOCALHOST))
+                {
+                    wsdlContents = wsdlContents.replaceAll(LOCALHOST, NetworkUtils.getLocalHost().getHostName());
+                }
             }
 
             if (logger.isDebugEnabled())

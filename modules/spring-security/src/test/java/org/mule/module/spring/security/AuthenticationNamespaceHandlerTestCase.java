@@ -6,16 +6,16 @@
  */
 package org.mule.module.spring.security;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.junit.Assert.assertThat;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.SecurityProvider;
 import org.mule.security.MuleSecurityManager;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.junit.Test;
 
@@ -24,20 +24,26 @@ public abstract class AuthenticationNamespaceHandlerTestCase extends FunctionalT
     @Test
     public void testSecurityManagerConfigured()
     {
-        MuleSecurityManager securityManager =
-            (MuleSecurityManager) muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
+        MuleSecurityManager securityManager = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
         assertNotNull(securityManager);
 
         Collection<SecurityProvider> providers = securityManager.getProviders();
         assertEquals(2, providers.size());
 
-        Iterator<SecurityProvider> providersIterator = providers.iterator();
-        SecurityProvider provider = providersIterator.next();
-        assertEquals(SpringProviderAdapter.class, provider.getClass());
-        assertEquals(UserAndPasswordAuthenticationProvider.class, ((SpringProviderAdapter) provider).getAuthenticationProvider().getClass());
+        assertThat(containsSecurityProvider(providers, UserAndPasswordAuthenticationProvider.class), is(true));
+        assertThat(containsSecurityProvider(providers, PreAuthenticatedAuthenticationProvider.class), is(true));
+    }
 
-        provider = providersIterator.next();
-        assertEquals(SpringProviderAdapter.class, provider.getClass());
-        assertEquals(PreAuthenticatedAuthenticationProvider.class, ((SpringProviderAdapter) provider).getAuthenticationProvider().getClass());
+    private boolean containsSecurityProvider(Collection<SecurityProvider> providers, Class authenticationProviderClass)
+    {
+        for(SecurityProvider provider : providers)
+        {
+            assertEquals(SpringProviderAdapter.class, provider.getClass());
+            if (authenticationProviderClass.equals(((SpringProviderAdapter) provider).getAuthenticationProvider().getClass()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
