@@ -1714,12 +1714,6 @@
                             <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
                             <exclude>**/__artifactId__IBean.java</exclude>
                             <exclude>**/__artifactId__IBeanTestCase.java</exclude>
-
-                            <!-- Excluded files from EE distribution -->
-                            <exclude>**/CronTriggerFactoryBean.java</exclude>
-                            <exclude>**/MethodInvokingJobDetailFactoryBean.java</exclude>
-                            <exclude>**/SchedulerAccessor.java</exclude>
-                            <exclude>**/SchedulerFactoryBean.java</exclude>
                         </excludes>
                         <includes>
                             <include>**/*.java</include>
