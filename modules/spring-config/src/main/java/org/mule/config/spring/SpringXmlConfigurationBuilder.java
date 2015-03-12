@@ -11,17 +11,10 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
-import org.mule.api.registry.Registry;
-import org.mule.api.registry.RegistryProvider;
 import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.config.spring.factories.ConstantFactoryBean;
 
-import java.util.Map;
-
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -94,7 +87,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             System.arraycopy(configResources, 0, allResources, 1, configResources.length);
         }
         applicationContext = createApplicationContext(muleContext, allResources);
-        absorbAndDiscardOtherRegistries(muleContext);
         createSpringRegistry(muleContext, applicationContext);
     }
 
@@ -165,43 +157,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))
         {
             lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
-        }
-    }
-
-    /**
-     * We want the SpringRegistry to be the only default one. This method
-     * looks for other registries and absorbs its objects into the created
-     * {@code applicationContext}. Then, the absorbed registry is unregistered
-     * from the context
-     */
-    private void absorbAndDiscardOtherRegistries(MuleContext muleContext)
-    {
-        if (!(muleContext.getRegistry() instanceof RegistryProvider))
-        {
-            return;
-        }
-
-        BeanDefinitionRegistry beanDefinitionRegistry = null;
-        if (applicationContext instanceof ConfigurableApplicationContext)
-        {
-            beanDefinitionRegistry = (BeanDefinitionRegistry) ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
-        }
-
-        for (Registry registry : ((RegistryProvider) muleContext.getRegistry()).getRegistries())
-        {
-            if (registry instanceof SpringRegistry)
-            {
-                continue;
-            }
-
-            for (Map.Entry<String, Object> registeredObject : registry.lookupByType(Object.class).entrySet())
-            {
-                BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
-                builder.addConstructorArgValue(registeredObject.getValue());
-                beanDefinitionRegistry.registerBeanDefinition(registeredObject.getKey(), builder.getBeanDefinition());
-            }
-
-            muleContext.removeRegistry(registry);
         }
     }
 

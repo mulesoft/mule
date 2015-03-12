@@ -8,7 +8,9 @@ package org.mule.config.spring;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.Registry;
+import org.mule.api.registry.RegistryProvider;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.bootstrap.AbstractRegistryBootstrap;
@@ -16,11 +18,13 @@ import org.mule.config.bootstrap.BootstrapObjectFactory;
 import org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
+import org.mule.config.spring.factories.ConstantFactoryBean;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map.Entry;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -55,6 +59,20 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     }
 
     @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        try
+        {
+            absorbAndDiscardOtherRegistries();
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
+    }
+
+    @Override
     protected void registerTransformers() throws MuleException
     {
         //no-op .. will happen on post processors
@@ -83,6 +101,36 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
         builder.addPropertyValue("name", name);
         doRegisterObject(name, builder);
+    }
+
+
+    /**
+     * We want the SpringRegistry to be the only default one. This method
+     * looks for other registries and absorbs its objects into the created
+     * {@code beanDefinitionRegistry}. Then, the absorbed registry is unregistered
+     * from the context
+     */
+    private void absorbAndDiscardOtherRegistries()
+    {
+        if (!(muleContext.getRegistry() instanceof RegistryProvider))
+        {
+            return;
+        }
+
+        for (Registry registry : ((RegistryProvider) muleContext.getRegistry()).getRegistries())
+        {
+            if (registry instanceof SpringRegistry)
+            {
+                continue;
+            }
+
+            for (Entry<String, Object> entry : registry.lookupByType(Object.class).entrySet())
+            {
+                registerInstance(entry.getKey(), entry.getValue());
+            }
+
+            muleContext.removeRegistry(registry);
+        }
     }
 
     @Override
@@ -114,4 +162,10 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
         beanDefinitionRegistry.registerBeanDefinition(key, builder.getBeanDefinition());
     }
 
+    private void registerInstance(String key, Object value)
+    {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
+        builder.addConstructorArgValue(value);
+        doRegisterObject(key, builder);
+    }
 }
