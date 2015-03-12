@@ -29,12 +29,14 @@ import org.mule.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMap;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -156,7 +158,14 @@ public class IntrospectionUtils
             return ImmutableMap.of();
         }
 
-        ImmutableMap.Builder<Method, DataType> map = ImmutableMap.builder();
+        ImmutableMap.Builder<Method, DataType> map = ImmutableSortedMap.orderedBy(new Comparator<Method>()
+        {
+            @Override
+            public int compare(Method m1, Method m2)
+            {
+                return m1.getName().compareTo(m2.getName());
+            }
+        });
         for (Method setter : setters)
         {
             if (isIgnored(setter))
