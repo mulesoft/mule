@@ -6,6 +6,10 @@
  */
 package org.mule.transport.quartz;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -22,13 +26,12 @@ import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 import java.util.Date;
 
-import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 
 /**
  * Can schedule a Job with the Quartz scheduler. The event must contain the Job to
@@ -58,9 +61,6 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
         }
 
-        JobDetail jobDetail = new JobDetail();
-        // make the job name unique per endpoint (MULE-753)
-        jobDetail.setName(endpoint.getEndpointURI().getAddress() + "-" + event.getId());
 
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(QuartzConnector.PROPERTY_JOB_DYNAMIC, Boolean.TRUE);
@@ -84,7 +84,6 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
             jobDataMap.put("endpointRef", endpointRef);
         }
-        jobDetail.setJobDataMap(jobDataMap);
 
         Job job = null;
         // work out what we're actually calling
@@ -101,20 +100,19 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             jobConfig = ((CustomJobFromMessageConfig) jobConfig).getJobConfig(msg);
         }
 
-        jobDataMap.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);        
-        jobDetail.setJobClass(jobConfig.getJobClass());
+        jobDataMap.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);
+        Class<? extends Job> jobClass = jobConfig.getJobClass();
         // If there has been a job created or found then we default to a customJob configuration
         if (job != null)
         {
             jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
-            jobDetail.setJobClass(CustomJob.class);
+            jobClass = CustomJob.class;
         }
        
         // The payload will be ignored by the CustomJob - don't know why we need it here
         //RM: The custom job may want the message and the Job type may not be delegating job
         jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, payload);
 
-        Trigger trigger;
         String cronExpression = jobDataMap.getString(QuartzConnector.PROPERTY_CRON_EXPRESSION);
         String repeatInterval = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
         String repeatCount = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_COUNT);
@@ -131,37 +129,31 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             jobGroupName = groupName;
         }
 
-        jobDetail.setGroup(groupName);
+        JobDetail jobDetail = newJob(jobClass)
+            // make the job name unique per endpoint (MULE-753)
+            .withIdentity(endpoint.getEndpointURI().getAddress() + "-" + event.getId(), groupName)
+            .usingJobData(jobDataMap)
+                .build();
+
+        TriggerBuilder triggerBuilder = newTrigger()
+            .withIdentity(endpoint.getEndpointURI().toString() + "-" + event.getId(), groupName)
+            .forJob(jobDetail.getKey().getName(), jobGroupName);
 
         if (cronExpression != null)
         {
-            CronTrigger ctrigger = new CronTrigger();
-            ctrigger.setCronExpression(cronExpression);
-            trigger = ctrigger;
+            triggerBuilder.withSchedule(cronSchedule(cronExpression));
         }
         else if (repeatInterval != null)
         {
-            SimpleTrigger strigger = new SimpleTrigger();
-            strigger.setRepeatInterval(Long.parseLong(repeatInterval));
-            if (repeatCount != null)
-            {
-                strigger.setRepeatCount(Integer.parseInt(repeatCount));
-            }
-            else
-            {
-                strigger.setRepeatCount(-1);
-            }
-            trigger = strigger;
+            triggerBuilder.withSchedule(simpleSchedule()
+                .withIntervalInMilliseconds(Long.parseLong(repeatInterval))
+                .withRepeatCount(repeatCount != null ? Integer.parseInt(repeatCount) : SimpleTrigger.REPEAT_INDEFINITELY));
         }
         else
         {
             throw new IllegalArgumentException(
                 QuartzMessages.cronExpressionOrIntervalMustBeSet().getMessage());
         }
-        trigger.setName(endpoint.getEndpointURI().toString() + "-" + event.getId());
-        trigger.setGroup(groupName);
-        trigger.setJobName(jobDetail.getName());
-        trigger.setJobGroup(jobGroupName);
 
         Scheduler scheduler = ((QuartzConnector) this.getConnector()).getQuartzScheduler();
 
@@ -171,9 +163,9 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         {
             start += Long.parseLong(startDelay);
         }
-        trigger.setStartTime(new Date(start));
+        triggerBuilder.startAt(new Date(start));
 
-        scheduler.scheduleJob(jobDetail, trigger);
+        scheduler.scheduleJob(jobDetail, triggerBuilder.build());
     }
 
     @Override

@@ -350,7 +350,6 @@
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.41.jar
-/mule-standalone-${productVersion}/lib/opt/jta-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.41.jar
@@ -371,7 +370,7 @@
 /mule-standalone-${productVersion}/lib/opt/ognl-2.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/oro-2.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/osgi-resource-locator-1.0.1.jar
-/mule-standalone-${productVersion}/lib/opt/quartz-1.8.5.jar
+/mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar

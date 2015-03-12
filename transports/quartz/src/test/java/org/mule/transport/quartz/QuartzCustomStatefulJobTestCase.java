@@ -7,6 +7,7 @@
 package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertTrue;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
@@ -40,7 +40,7 @@ public class QuartzCustomStatefulJobTestCase extends AbstractServiceAndFlowTestC
     @Test
     public void testCustomStatefulJob() throws Exception
     {
-        CountDownLatch eventLatch = (CountDownLatch) muleContext.getRegistry().lookupObject("latch");
+        CountDownLatch eventLatch = muleContext.getRegistry().lookupObject("latch");
 
         // we wait up to 60 seconds here which is WAY too long for one tick but it seems that 
         // "sometimes" it takes a very long time for Quartz go kick in. Once it starts 
@@ -60,7 +60,7 @@ public class QuartzCustomStatefulJobTestCase extends AbstractServiceAndFlowTestC
         
         public void execute(JobExecutionContext context) throws JobExecutionException
         {
-            assertTrue(context.getJobDetail().isStateful());
+            assertTrue(context.getJobInstance() instanceof StatefulJob );
             latch.countDown();
         }
     }

@@ -10,7 +10,9 @@ import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotCreateS
 import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotPauseSchedulers;
 import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotScheduleJob;
 import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotShutdownScheduler;
-import static org.mule.modules.schedulers.i18n.SchedulerMessages.invalidCronExpression;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -19,7 +21,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.polling.schedule.PollScheduler;
 
-import java.text.ParseException;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -27,9 +28,11 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
@@ -96,7 +99,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
     @Override
     public void schedule() throws Exception
     {
-        quartzScheduler.triggerJob(jobName, groupName);
+        quartzScheduler.triggerJob(JobKey.jobKey(jobName, groupName));
     }
 
     @Override
@@ -140,9 +143,13 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
         {
             if (quartzScheduler.isStarted())
             {
-                if (quartzScheduler.getTrigger(getName(), groupName) == null)
+                if (quartzScheduler.getTrigger(TriggerKey.triggerKey(getName(), groupName)) == null)
                 {
-                    CronTrigger cronTrigger = new CronTrigger(getName(), groupName, jobName, groupName, cronExpression);
+                    CronTrigger cronTrigger = newTrigger()
+                        .withIdentity(getName(), groupName)
+                        .forJob(jobName, groupName)
+                        .withSchedule(cronSchedule(cronExpression))
+                        .build();
                     quartzScheduler.scheduleJob(cronTrigger);
                 }
                 else
@@ -155,10 +162,6 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
         catch (SchedulerException e)
         {
             throw new DefaultMuleException(couldNotScheduleJob(), e);
-        }
-        catch (ParseException e)
-        {
-            throw new DefaultMuleException(invalidCronExpression(), e);
         }
     }
 
@@ -188,11 +191,13 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
 
     private JobDetail jobDetail(String jobName, String groupName, PollingReceiverWorker job)
     {
-        JobDetail jobDetail = new JobDetail(jobName, groupName, CronJob.class);
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(POLL_CRON_SCHEDULER_JOB, job);
-        jobDetail.setJobDataMap(jobDataMap);
-        return jobDetail;
+        return newJob(CronJob.class)
+                .storeDurably()
+                .withIdentity(jobName, groupName)
+                .usingJobData(jobDataMap)
+                .build();
     }
 
 

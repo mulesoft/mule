@@ -6,6 +6,10 @@
  */
 package org.mule.transport.quartz;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -26,15 +30,14 @@ import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
 import java.io.OutputStream;
 import java.util.Date;
 
-import org.quartz.CronTrigger;
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
 import org.quartz.StatefulJob;
-import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 
 /**
  * Listens for Quartz sheduled events using the Receiver Job and fires events to the
@@ -87,10 +90,8 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
                 throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
             }
 
-            JobDetail jobDetail = new JobDetail();
-            jobDetail.setName(endpoint.getEndpointURI().getAddress());
             Class<? extends Job> jobClass = jobConfig.getJobClass();
-            jobDetail.setJobClass(jobClass);
+            JobBuilder jobBuilder = newJob(jobClass);
             isStateful = StatefulJob.class.isAssignableFrom(jobClass);
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put(QUARTZ_RECEIVER_PROPERTY, this.getReceiverKey());
@@ -112,12 +113,10 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             if (job != null)
             {
                 jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
-                jobDetail.setJobClass(jobClass);
             }
 
-            jobDetail.setJobDataMap(jobDataMap);
+            jobBuilder.usingJobData(jobDataMap);
 
-            Trigger trigger;
             String cronExpression = (String)endpoint.getProperty(QuartzConnector.PROPERTY_CRON_EXPRESSION);
             String repeatInterval = (String)endpoint.getProperty(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
             String repeatCount = (String)endpoint.getProperty(QuartzConnector.PROPERTY_REPEAT_COUNT);
@@ -134,27 +133,21 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
                 jobGroupName = groupName;
             }
 
-            jobDetail.setGroup(groupName);
+            jobBuilder.withIdentity(endpoint.getEndpointURI().getAddress(), groupName);
+
+            TriggerBuilder triggerBuilder = newTrigger()
+                    .withIdentity(endpoint.getEndpointURI().getAddress(), groupName)
+                    .forJob(endpoint.getEndpointURI().getAddress(), jobGroupName);
 
             if (cronExpression != null)
             {
-                CronTrigger ctrigger = new CronTrigger();
-                ctrigger.setCronExpression(cronExpression);
-                trigger = ctrigger;
+                triggerBuilder.withSchedule(cronSchedule(cronExpression));
             }
             else if (repeatInterval != null)
             {
-                SimpleTrigger strigger = new SimpleTrigger();
-                strigger.setRepeatInterval(Long.parseLong(repeatInterval));
-                if (repeatCount != null)
-                {
-                    strigger.setRepeatCount(Integer.parseInt(repeatCount));
-                }
-                else
-                {
-                    strigger.setRepeatCount(-1);
-                }
-                trigger = strigger;
+                triggerBuilder.withSchedule(simpleSchedule()
+                    .withIntervalInMilliseconds(Long.parseLong(repeatInterval))
+                    .withRepeatCount(repeatCount != null ? Integer.parseInt(repeatCount) : SimpleTrigger.REPEAT_INDEFINITELY));
             }
             else
             {
@@ -162,10 +155,6 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
                         QuartzMessages.cronExpressionOrIntervalMustBeSet().getMessage());
             }
 
-            trigger.setName(endpoint.getEndpointURI().getAddress());
-            trigger.setGroup(groupName);
-            trigger.setJobName(endpoint.getEndpointURI().getAddress());
-            trigger.setJobGroup(jobGroupName);
 
             // Minimize the the time window capturing the start time and scheduling the job.
             long start = System.currentTimeMillis();
@@ -173,12 +162,12 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             {
                 start += Long.parseLong(startDelay);
             }
-            trigger.setStartTime(new Date(start));
+            triggerBuilder.startAt(new Date(start));
 
             // We need to handle cases when the job has already been persisted
             try
             {
-                scheduler.scheduleJob(jobDetail, trigger);
+                scheduler.scheduleJob(jobBuilder.build(), triggerBuilder.build());
             }
             catch (ObjectAlreadyExistsException oaee)
             {
