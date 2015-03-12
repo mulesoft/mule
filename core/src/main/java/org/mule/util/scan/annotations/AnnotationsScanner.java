@@ -26,6 +26,7 @@ import org.objectweb.asm.commons.EmptyVisitor;
  * This scanner can process interfaces, implementation classes and annotation classes.  The scanner uses ASM to read the class
  * bytecode, removing the need to actally load the class which would be expensive.
  */
+@Deprecated
 public class AnnotationsScanner extends EmptyVisitor implements ClassScanner
 {
     protected final Log log = LogFactory.getLog(getClass());

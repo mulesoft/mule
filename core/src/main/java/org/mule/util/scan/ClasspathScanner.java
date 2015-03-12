@@ -52,6 +52,7 @@ import org.objectweb.asm.ClassReader;
  * seems to be the fasted of the byte code manipulation libraries i.e. JavaAssist or
  * BCEL Note that the scanner will not scan inner or anonymous classes.
  */
+@Deprecated
 public class ClasspathScanner
 {
     public static final int INCLUDE_ABSTRACT = 0x01;

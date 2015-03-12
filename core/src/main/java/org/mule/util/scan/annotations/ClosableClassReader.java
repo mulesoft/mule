@@ -14,6 +14,7 @@ import org.objectweb.asm.ClassReader;
 /**
  * A Class reader trhat will close the stream once initialised
  */
+@Deprecated
 public class ClosableClassReader extends ClassReader
 {
     public ClosableClassReader(String s) throws IOException
