@@ -312,6 +312,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 }
                 else
                 {
+                    File file = new File(directory, entry.getName());
+                    if (!file.getParentFile().exists() && !file.getParentFile().mkdirs())
+                    {
+                        throw new IOException("Unable to create folders for zip entry: " + entry.getName());
+                    }
+
                     InputStream is = zip.getInputStream(entry);
                     OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
                     IOUtils.copy(is, os);
