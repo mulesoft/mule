@@ -136,13 +136,13 @@ public class DefaultMuleSessionTestCase
 
         copy1.merge(copy2);
 
-        assertEquals(6, copy1.getPropertyNamesAsSet().size());
+        assertEquals(7, copy1.getPropertyNamesAsSet().size());
         assertEquals("value1", copy1.getProperty("key1"));
         assertEquals("value2", copy1.getProperty("key2"));
         assertEquals(nonSerializableValue3, copy1.getProperty("key3"));
         assertEquals("value4", copy1.getProperty("key4"));
         assertEquals("value5NEW", copy1.getProperty("key5"));
-        assertNull(copy1.getProperty("key6"));
+        assertEquals("value6", copy1.getProperty("key6"));
         assertEquals("value7", copy1.getProperty("key7"));
 
         assertEquals(5, copy2.getPropertyNamesAsSet().size());
