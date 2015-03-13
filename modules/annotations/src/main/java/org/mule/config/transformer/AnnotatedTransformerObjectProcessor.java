@@ -25,7 +25,10 @@ import java.util.List;
  * transformer is used, the method will get invoked
  *
  * @see org.mule.api.annotations.Transformer
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
+@Deprecated
 public class AnnotatedTransformerObjectProcessor implements PreInitProcessor, MuleContextAware
 {
 
@@ -52,22 +55,22 @@ public class AnnotatedTransformerObjectProcessor implements PreInitProcessor, Mu
         {
             return object;
         }
-        List<AnnotationMetaData> annos = AnnotationUtils.getMethodAnnotations(clazz, Transformer.class);
+        List<AnnotationMetaData> annotations = AnnotationUtils.getMethodAnnotations(clazz, Transformer.class);
 
-        if (annos.size() == 0)
+        if (annotations.size() == 0)
         {
             return object;
         }
-        for (AnnotationMetaData data : annos)
+        for (AnnotationMetaData data : annotations)
         {
             try
             {
-                Transformer anno = (Transformer) data.getAnnotation();
-                String sourceMimeType = anno.sourceMimeType().equals(MimeTypes.ANY) ? null : anno.sourceMimeType();
-                String resultMimeType = anno.resultMimeType().equals(MimeTypes.ANY) ? null : anno.resultMimeType();
+                Transformer annotation = (Transformer) data.getAnnotation();
+                String sourceMimeType = annotation.sourceMimeType().equals(MimeTypes.ANY) ? null : annotation.sourceMimeType();
+                String resultMimeType = annotation.resultMimeType().equals(MimeTypes.ANY) ? null : annotation.resultMimeType();
                 AnnotatedTransformerProxy trans = new AnnotatedTransformerProxy(
-                        anno.priorityWeighting(),
-                        object, (Method) data.getMember(), anno.sourceTypes(),
+                        annotation.priorityWeighting(),
+                        object, (Method) data.getMember(), annotation.sourceTypes(),
                         sourceMimeType, resultMimeType);
 
                 muleContext.getRegistry().registerTransformer(trans);

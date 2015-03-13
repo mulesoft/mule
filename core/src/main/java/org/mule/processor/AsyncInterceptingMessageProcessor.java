@@ -72,7 +72,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     public void start() throws MuleException
     {
-        if (workManager != null)
+        if (workManager != null && !workManager.isStarted())
         {
             workManager.start();
         }

@@ -7,9 +7,9 @@
        default-init-method="initialise">
 
 
-    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap">
+    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.spring.SpringRegistryBootstrap">
         <property name="supportedArtifactType">
-            <util:constant static-field="org.mule.config.bootstrap.SimpleRegistryBootstrap$ArtifactType.DOMAIN"/>
+            <util:constant static-field="org.mule.config.bootstrap.ArtifactType.DOMAIN"/>
         </property>
     </bean>
 

@@ -79,7 +79,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
 
     public Server createServer(ServerAddress serverAddress, WorkManagerSource workManagerSource, boolean usePersistentConnections, int connectionIdleTimeout)
     {
-        if (!httpServerManager.containsServerFor(serverAddress))
+        if (!containsServerFor(serverAddress))
         {
             try
             {
@@ -96,9 +96,14 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
     }
 
+    public boolean containsServerFor(ServerAddress serverAddress)
+    {
+        return httpServerManager.containsServerFor(serverAddress);
+    }
+
     public Server createSslServer(ServerAddress serverAddress, WorkManagerSource workManagerSource, TlsContextFactory tlsContext, boolean usePersistentConnections, int connectionIdleTimeout)
     {
-        if (!httpServerManager.containsServerFor(serverAddress))
+        if (!containsServerFor(serverAddress))
         {
             try
             {

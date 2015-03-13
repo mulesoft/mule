@@ -6,8 +6,6 @@
  */
 package org.mule.config.expression;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.api.lifecycle.InitialisationException;
@@ -20,6 +18,9 @@ import org.mule.expression.transformers.ExpressionTransformer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * TODO

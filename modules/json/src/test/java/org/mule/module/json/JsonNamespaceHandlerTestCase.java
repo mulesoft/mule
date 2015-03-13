@@ -36,17 +36,17 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testJsonConfig() throws Exception
     {
-        JsonToXml jToX = (JsonToXml)muleContext.getRegistry().lookupObject("jToX");
+        JsonToXml jToX = muleContext.getRegistry().lookupObject("jToX");
         assertNotNull(jToX);
 
-        XmlToJson xToJ = (XmlToJson)muleContext.getRegistry().lookupObject("xToJ");
+        XmlToJson xToJ = muleContext.getRegistry().lookupObject("xToJ");
         assertNotNull(xToJ);
 
-        JsonXsltTransformer jToJ = (JsonXsltTransformer)muleContext.getRegistry().lookupObject("jToJ");
+        JsonXsltTransformer jToJ = muleContext.getRegistry().lookupObject("jToJ");
         assertNotNull(jToJ);
         assertNotNull(jToJ.getXslt());
 
-        JsonSchemaValidationFilter jvf = (JsonSchemaValidationFilter)muleContext.getRegistry().lookupObject("jvf");
+        JsonSchemaValidationFilter jvf = muleContext.getRegistry().lookupObject("jvf");
         assertNotNull(jvf);
         assertNotNull(jvf.getSchemaLocations());
 

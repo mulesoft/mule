@@ -202,12 +202,8 @@ public class GuiceRegistry extends AbstractRegistry
         throw new UnsupportedOperationException("registerObjects");
     }
 
-    public void unregisterObject(String key) throws RegistrationException
-    {
-        throw new UnsupportedOperationException("unregisterObject");
-    }
-
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
+    @Override
+    protected Object doUnregisterObject(String key) throws RegistrationException
     {
         throw new UnsupportedOperationException("unregisterObject");
     }

@@ -26,9 +26,16 @@ public class QuartzStatefulScheduledDispatchTestCase extends AbstractQuartzState
         return "quartz-stateful-scheduled-dispatch-config.xml";
     }
 
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        messages.clear();
+    }
+
     @Test
     public void testIssue() throws Exception
     {
+        messages.clear();
         LocalMuleClient client = muleContext.getClient();
         client.dispatch(VM_TEST_INPUT, TEST_MESSAGE, null);
 

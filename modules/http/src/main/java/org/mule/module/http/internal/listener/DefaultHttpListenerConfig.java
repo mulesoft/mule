@@ -18,7 +18,6 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpConstants;
@@ -36,6 +35,8 @@ import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private String basePath;
     private Boolean parseRequest;
     private MuleContext muleContext;
+    @Inject
     private HttpListenerConnectionManager connectionManager;
     private TlsContextFactory tlsContext;
     private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
@@ -66,6 +68,15 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
+
+    public DefaultHttpListenerConfig()
+    {
+    }
+
+    DefaultHttpListenerConfig(HttpListenerConnectionManager connectionManager)
+    {
+        this.connectionManager = connectionManager;
+    }
 
     public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile)
     {
@@ -112,6 +123,12 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         this.parseRequest = parseRequest;
     }
 
+    public String resolvePath(String listenerPath)
+    {
+        Preconditions.checkArgument(listenerPath.startsWith("/"), "listenerPath must start with /");
+        return this.basePath == null ? listenerPath : this.basePath + listenerPath;
+    }
+
     public ListenerPath getFullListenerPath(String listenerPath)
     {
         Preconditions.checkArgument(listenerPath.startsWith("/"), "listenerPath must start with /");
@@ -126,14 +143,6 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             return;
         }
         basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
-        try
-        {
-            connectionManager = muleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new InitialisationException(e, this);
-        }
         if (workerThreadingProfile == null)
         {
             workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
@@ -332,5 +341,4 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
-
 }

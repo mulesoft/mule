@@ -248,11 +248,11 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 throw new IllegalArgumentException("Parameterized tests don't support multiple " +
                                                    "config files as input: " + configFile);
             }
-            
+
             String resources = configFile.substring(configFile.lastIndexOf("/") + 1);
             resources = String.format("integration/%s/connector-%s",
-                getJmsConfig().getName(), resources);
-            
+                                      getJmsConfig().getName(), resources);
+
             String[] configFiles = new String[] { resources, configFile };
             SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
             return builder;

@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -26,6 +25,8 @@ import org.junit.Test;
 public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 {
 
+    private static final String LIFECYCLE_PHASES = "[setMuleContext, initialise, start, stop, dispose]";
+
     @Test
     public void testObjectLifecycle() throws Exception
     {
@@ -35,7 +36,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         muleContext.getRegistry().registerObject("test", tracker);
 
         muleContext.dispose();
-        assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
+        assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
     }
 
     @Test
@@ -53,9 +54,9 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         muleContext.getRegistry().registerObject("test", tracker3);
 
         muleContext.dispose();
-        assertEquals("[setMuleContext, initialise, start, dispose]", tracker1.getTracker().toString());
-        assertEquals("[setMuleContext, initialise, start, dispose]", tracker2.getTracker().toString());
-        assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker3.getTracker().toString());
+        assertEquals(LIFECYCLE_PHASES, tracker1.getTracker().toString());
+        assertEquals(LIFECYCLE_PHASES, tracker2.getTracker().toString());
+        assertEquals(LIFECYCLE_PHASES, tracker3.getTracker().toString());
     }
 
     @Test
@@ -68,38 +69,6 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 
         muleContext.dispose();
         assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
-    }
-
-    @Test
-    public void testObjectBypassLifecycle() throws Exception
-    {
-        muleContext.start();
-
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker, MuleRegistry.LIFECYCLE_BYPASS_FLAG);
-        muleContext.dispose();
-        assertEquals("[setMuleContext, stop, dispose]", tracker.getTracker().toString());
-    }
-
-    @Test
-    public void testObjectBypassInjectors() throws Exception
-    {
-        muleContext.start();
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG);
-        muleContext.dispose();
-        assertEquals("[initialise, start, stop, dispose]", tracker.getTracker().toString());
-    }
-
-    @Test
-    public void testObjectBypassLifecycleAndInjectors() throws Exception
-    {
-        muleContext.start();
-
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker, MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG);
-        muleContext.dispose();
-        assertEquals("[stop, dispose]", tracker.getTracker().toString());
     }
 
     @Test
@@ -146,7 +115,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         }
 
         muleContext.dispose();
-        assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
+        assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
 
         try
         {
@@ -208,7 +177,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 
         muleContext.dispose();
         //Stop called implicitly because you cannot dispose component without stopping it first
-        assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
+        assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
     }
 
     @Test
