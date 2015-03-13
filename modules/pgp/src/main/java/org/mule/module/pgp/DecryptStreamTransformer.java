@@ -20,7 +20,6 @@ import org.bouncycastle.openpgp.PGPEncryptedDataList;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPObjectFactory;
-import org.bouncycastle.openpgp.PGPOnePassSignature;
 import org.bouncycastle.openpgp.PGPOnePassSignatureList;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -110,12 +109,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         {
             if (pgpObject instanceof PGPOnePassSignatureList)
             {
-                PGPOnePassSignature signature = null;
-                PGPOnePassSignatureList list = (PGPOnePassSignatureList) pgpObject;
-                signature = list.get(0);
-                signature.initVerify(this.publicKey, "BC");
-                // TODO verify signature
-                // signature.verify(null);
+                // TODO MULE-8386: Add support for PGP signature verification
                 pgpObject = pgpObjectFactory.nextObject();
             }
             else if (pgpObject instanceof PGPCompressedData)
