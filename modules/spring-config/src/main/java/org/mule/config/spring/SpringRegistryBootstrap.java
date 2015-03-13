@@ -33,6 +33,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * Specialization of {@link SimpleRegistryBootstrap which instead of registering the objects directly
@@ -41,9 +42,10 @@ import org.springframework.context.ApplicationContext;
  *
  * @since 3.7.0
  */
-public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements BeanFactoryAware
+public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements BeanFactoryAware, ApplicationContextAware
 {
 
+    private OptionalObjectsController optionalObjectsController;
     private BeanDefinitionRegistry beanDefinitionRegistry;
 
     public SpringRegistryBootstrap()
@@ -56,6 +58,15 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     {
         checkArgument(beanFactory instanceof BeanDefinitionRegistry, "this bootstrap class only accepts BeanFactory instances which implement " + BeanDefinitionRegistry.class);
         beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        if (applicationContext instanceof MuleArtifactContext)
+        {
+            optionalObjectsController = ((MuleArtifactContext) applicationContext).getOptionalObjectsController();
+        }
     }
 
     @Override
@@ -79,7 +90,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     }
 
     @Override
-    protected void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime) throws Exception
+    protected void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime, boolean optional) throws Exception
     {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(transformerClass);
 
@@ -100,6 +111,8 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
         }
 
         builder.addPropertyValue("name", name);
+
+        notifyIfOptional(name, optional);
         doRegisterObject(name, builder);
     }
 
@@ -134,10 +147,20 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     }
 
     @Override
-    protected void doRegisterObject(String key, String className) throws Exception
+    protected void doRegisterObject(String key, String className, boolean optional) throws Exception
     {
+        notifyIfOptional(key, optional);
+
         Class<?> clazz = getClass(className);
         doRegisterObject(key, clazz);
+    }
+
+    private void notifyIfOptional(String key, boolean optional)
+    {
+        if (optional && optionalObjectsController != null)
+        {
+            optionalObjectsController.registerOptionalKey(key);
+        }
     }
 
     private void doRegisterObject(String key, Class<?> type) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
@@ -167,5 +190,10 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
         builder.addConstructorArgValue(value);
         doRegisterObject(key, builder);
+    }
+
+    protected OptionalObjectsController getOptionalObjectsController()
+    {
+        return optionalObjectsController;
     }
 }

@@ -79,9 +79,9 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
 
     protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    public String TRANSFORMER_KEY = ".transformer.";
-    public String OBJECT_KEY = ".object.";
-    public String SINGLE_TX = ".singletx.";
+    public static final String TRANSFORMER_KEY = ".transformer.";
+    public static final String OBJECT_KEY = ".object.";
+    public static final String SINGLE_TX = ".singletx.";
 
     protected ArtifactType supportedArtifactType = ArtifactType.APP;
     protected final RegistryBootstrapDiscoverer discoverer;
@@ -138,7 +138,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
         Properties transformers = new OrderedProperties();
         Properties namedObjects = new OrderedProperties();
         Properties unnamedObjects = new OrderedProperties();
-        Map<String, String> singleTransactionFactories = new LinkedHashMap<String, String>();
+        Map<String, String> singleTransactionFactories = new LinkedHashMap<>();
 
         for (Properties bootstrap : bootstraps)
         {
@@ -238,7 +238,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
                 return;
             }
 
-            doRegisterObject(key, className);
+            doRegisterObject(key, className, optional);
         }
         catch (InvocationTargetException itex)
         {
@@ -252,6 +252,10 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
         catch (ClassNotFoundException cnfe)
         {
             throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional object: " + className);
+        }
+        catch (NoSuchMethodException nsme)
+        {
+            throwExceptionIfNotOptional(optional, nsme, "Ignoring optional object: " + className);
         }
     }
 
@@ -330,7 +334,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
                     }
                 }
 
-                doRegisterTransformer(name, returnClass, transformerClass, mime);
+                doRegisterTransformer(name, returnClass, transformerClass, mime, optional);
             }
             catch (InvocationTargetException itex)
             {
@@ -351,7 +355,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
         }
     }
 
-    protected abstract void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime) throws Exception;
+    protected abstract void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime, boolean optional) throws Exception;
 
     protected Class getClass(String className) throws ClassNotFoundException
     {
@@ -360,7 +364,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
 
     protected abstract void registerTransformers() throws MuleException;
 
-    protected abstract void doRegisterObject(String key, String className) throws Exception;
+    protected abstract void doRegisterObject(String key, String className, boolean optional) throws Exception;
 
     private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception
     {
