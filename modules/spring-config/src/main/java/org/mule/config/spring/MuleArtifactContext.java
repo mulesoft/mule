@@ -15,10 +15,12 @@ import org.mule.api.MuleContext;
 import org.mule.config.ConfigResource;
 import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor;
+import org.mule.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.FilteringCommonAnnotationBeanPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
+import org.mule.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.IOUtils;
 
@@ -36,6 +38,7 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -52,9 +55,11 @@ import org.springframework.core.io.UrlResource;
  */
 public class MuleArtifactContext extends AbstractXmlApplicationContext
 {
+    private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
+
     private MuleContext muleContext;
     private Resource[] springResources;
-    private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<MuleContext>();
+    private OptionalObjectsController optionalObjectsController = new OptionalObjectsController();
 
     /**
      * Parses configuration files creating a spring ApplicationContext which is used
@@ -76,6 +81,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         this.springResources = springResources;
     }
 
+    @Override
     protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory)
     {
         super.prepareBeanFactory(beanFactory);
@@ -89,6 +95,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                               new ExpressionEnricherPostProcessor(muleContext),
                               new AnnotatedTransformerObjectPostProcessor(muleContext),
                               new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
+                              new DiscardedOptionalBeanPostProcessor(optionalObjectsController, (DefaultListableBeanFactory) beanFactory),
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
         );
 
@@ -209,19 +216,26 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected DefaultListableBeanFactory createBeanFactory()
     {
         //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
-        DefaultListableBeanFactory bf = super.createBeanFactory();
+        DefaultListableBeanFactory beanFactory = super.createBeanFactory();
+        beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(), optionalObjectsController));
+
         if (getParent() != null)
         {
             //Copy over all processors
-            AbstractBeanFactory beanFactory = (AbstractBeanFactory) getParent().getAutowireCapableBeanFactory();
-            bf.copyConfigurationFrom(beanFactory);
+            AbstractBeanFactory parentBeanFactory = (AbstractBeanFactory) getParent().getAutowireCapableBeanFactory();
+            beanFactory.copyConfigurationFrom(parentBeanFactory);
         }
-        return bf;
+        return beanFactory;
     }
 
     public MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    protected OptionalObjectsController getOptionalObjectsController()
+    {
+        return optionalObjectsController;
     }
 
     public static ThreadLocal<MuleContext> getCurrentMuleContext()
