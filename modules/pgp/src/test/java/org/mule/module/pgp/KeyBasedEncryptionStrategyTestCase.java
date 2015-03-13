@@ -30,6 +30,13 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         testDecrypt("encrypted-signed-compressed.asc");
     }
 
+    @Test
+    public void testDecryptCompressedSignedDifferentKeys() throws Exception
+    {
+        testDecrypt("encrypted-compressed-signed-different-keys.asc");
+    }
+
+
     private void testDecrypt(String file) throws Exception
     {
         URL url = Thread.currentThread().getContextClassLoader().getResource(file);
