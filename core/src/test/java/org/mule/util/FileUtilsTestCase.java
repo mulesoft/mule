@@ -6,19 +6,23 @@
  */
 package org.mule.util;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.tck.ZipUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class FileUtilsTestCase extends AbstractMuleTestCase
 {
@@ -27,21 +31,15 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     private static final String TEST_DIRECTORY = "target" + File.separator + "testDirectory";
     private static final String UNZIPPED_FILE_PATH = TEST_DIRECTORY + File.separator +  "testFolder" + File.separator + "testFile.txt";
 
-    private final File toDir = FileUtils.newFile(TEST_DIRECTORY);
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private File toDir;
 
     @Before
-    public void createDirs()
+    public void setupDir()
     {
-        if (!toDir.exists())
-        {
-            toDir.mkdirs();
-        }
-    }
-
-    @After
-    public void deleteDir()
-    {
-        toDir.delete();
+        toDir = temporaryFolder.getRoot();
     }
 
     @Test
@@ -374,6 +372,21 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             File testFile = new File(UNZIPPED_FILE_PATH);
             assertTrue(testFile.exists());
         }
+    }
+
+    @Test
+    public void unzipsFileWithoutParentFolderEntry() throws Exception
+    {
+        final String resourceName = "dummy.xml";
+        final String resourceAlias = "folder" + File.separator + resourceName;
+        final File resourceFile = new File(IOUtils.getResourceAsUrl(resourceName, getClass()).getFile());
+
+        final File compressedFile = new File(toDir, "test.zip");
+        ZipUtils.compress(compressedFile, new ZipUtils.ZipResource[] {new ZipUtils.ZipResource(resourceFile, resourceAlias)});
+
+        FileUtils.unzip(compressedFile, toDir);
+
+        assertThat(new File(new File(toDir, "folder"), resourceName).exists(), is(true));
     }
 
     private File createTestFile(String filePath) throws IOException
