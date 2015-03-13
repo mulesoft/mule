@@ -43,7 +43,7 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
     }
 
     @Override
-    protected void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime) throws Exception
+    protected void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime, boolean optional) throws Exception
     {
         Transformer trans = ClassUtils.instanciateClass(transformerClass);
         if (!(trans instanceof DiscoverableTransformer))
@@ -81,7 +81,7 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
     }
 
     @Override
-    protected void doRegisterObject(String key, String className) throws Exception
+    protected void doRegisterObject(String key, String className, boolean optional) throws Exception
     {
         Object o = ClassUtils.instanciateClass(className);
         Class<?> meta = Object.class;
