@@ -178,9 +178,14 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)
     {
         registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME, ConfigurationClassPostProcessor.class, source);
-        registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, AutowiredAnnotationBeanPostProcessor.class, source);
         registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME, RequiredAnnotationBeanPostProcessor.class, source);
+        registerInjectorProcessor(registry);
         registerJsr250PostProcessors(registry, source);
+    }
+
+    protected void registerInjectorProcessor(BeanDefinitionRegistry registry)
+    {
+        registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, AutowiredAnnotationBeanPostProcessor.class, null);
     }
 
     private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source) {
@@ -201,7 +206,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME);
     }
 
-    private void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName)
+    protected void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName)
     {
         definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
         registry.registerBeanDefinition(beanName, definition);
