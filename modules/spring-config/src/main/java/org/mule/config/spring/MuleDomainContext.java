@@ -6,10 +6,15 @@
  */
 package org.mule.config.spring;
 
+import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.api.MuleContext;
 import org.mule.config.ConfigResource;
+import org.mule.config.spring.processors.ContextExclusiveInjectorProcessor;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 
 /**
  * A specialization of {@link MuleArtifactContext} for domains
@@ -28,6 +33,14 @@ final class MuleDomainContext extends MuleArtifactContext
     protected Class<MuleDomainBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass()
     {
         return MuleDomainBeanDefinitionDocumentReader.class;
+    }
+
+    @Override
+    protected void registerInjectorProcessor(BeanDefinitionRegistry registry)
+    {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ContextExclusiveInjectorProcessor.class);
+        builder.addConstructorArgValue(this);
+        registerPostProcessor(registry, (RootBeanDefinition) builder.getBeanDefinition(), AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
     }
 
 }
