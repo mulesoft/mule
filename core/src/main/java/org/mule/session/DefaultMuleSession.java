@@ -217,18 +217,19 @@ public final class DefaultMuleSession implements MuleSession
         {
             return;
         }
-        Iterator<Entry<String, Object>> propertyIterator = properties.entrySet().iterator();
-        while (propertyIterator.hasNext())
+        Map<String, Object> oldProperties = this.properties;
+        this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/* <String, Object> */());
+        for (String propertyKey : updatedSession.getPropertyNamesAsSet())
         {
-            final Entry<String, Object> entry = propertyIterator.next();
-            if (entry.getValue() instanceof Serializable)
-            {
-                propertyIterator.remove();
-            }
+            this.properties.put(propertyKey, updatedSession.<Object> getProperty(propertyKey));
         }
-        for (String updatedPropertyKey : updatedSession.getPropertyNamesAsSet())
+        for (Map.Entry<String, Object> property : oldProperties.entrySet())
         {
-            this.properties.put(updatedPropertyKey, updatedSession.<Object> getProperty(updatedPropertyKey));
+            if (!this.properties.containsKey(property.getKey())
+                && !(oldProperties.get(property.getKey()) instanceof Serializable))
+            {
+                this.properties.put(property.getKey(), oldProperties.get(property.getKey()));
+            }
         }
     }
 
