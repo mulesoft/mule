@@ -45,10 +45,6 @@
             </roles>
         </developer>
         <developer>
-            <id>pabad</id>
-            <name>Pablo Abad</name>
-        </developer>
-        <developer>
             <id>dfeist</id>
             <name>Daniel Feist</name>
         </developer>
@@ -67,6 +63,10 @@
         <developer>
             <id>marianogonzalez</id>
             <name>Mariano Gonzalez</name>
+        </developer>
+        <developer>
+            <id>aiannucci</id>
+            <name>Alejandro Iannucci</name>
         </developer>
         <developer>
             <id>pablokraan</id>
