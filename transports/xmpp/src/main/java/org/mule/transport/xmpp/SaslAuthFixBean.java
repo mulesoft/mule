@@ -6,21 +6,10 @@
  */
 package org.mule.transport.xmpp;
 
-import org.jivesoftware.smack.SASLAuthentication;
-
 /**
- * Instantiate this bean in your spring config to work around a known issue with the SMACK
- * API: http://www.igniterealtime.org/issues/browse/SMACK-264
+ * This bean is no longer required
  */
+@Deprecated
 public class SaslAuthFixBean
 {
-    public SaslAuthFixBean()
-    {
-        super();
-        
-        // fix SASL auth
-        SASLAuthentication.supportSASLMechanism("PLAIN", 0);
-    }
 }
-
-

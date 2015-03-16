@@ -7,13 +7,15 @@
 package org.mule.transport.xmpp;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.transport.ConnectException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 
@@ -34,7 +36,7 @@ public abstract class AbstractXmppConversation implements XmppConversation
     }
 
     @Override
-    public void connect() throws ConnectException
+    public void connect() throws NoResponseException, SmackException, XMPPException
     {
         doConnect();
         packetCollector = createPacketCollector();
@@ -42,8 +44,11 @@ public abstract class AbstractXmppConversation implements XmppConversation
 
     /**
      * Subclasses can override this method to create their conversation specific connection.
+     * @throws SmackException 
+     * @throws NoResponseException 
+     * @throws XMPPException 
      */
-    protected void doConnect() throws ConnectException
+    protected void doConnect() throws NoResponseException, SmackException, XMPPException
     {
         // template method
     }
@@ -68,7 +73,7 @@ public abstract class AbstractXmppConversation implements XmppConversation
     }
 
     @Override
-    public void disconnect()
+    public void disconnect() throws NotConnectedException
     {
         if (packetCollector != null)
         {
@@ -80,8 +85,9 @@ public abstract class AbstractXmppConversation implements XmppConversation
 
     /**
      * Subclasses can override this method to perform custom disconnect actions.
+     * @throws NotConnectedException 
      */
-    protected void doDisconnect()
+    protected void doDisconnect() throws NotConnectedException
     {
         // template method
     }

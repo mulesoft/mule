@@ -23,13 +23,23 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>jivesoftware</groupId>
-            <artifactId>smack</artifactId>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-core</artifactId>
             <version>${smackVersion}</version>
         </dependency>
         <dependency>
-            <groupId>jivesoftware</groupId>
-            <artifactId>smackx</artifactId>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-extensions</artifactId>
+            <version>${smackVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-tcp</artifactId>
+            <version>${smackVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-resolver-javax</artifactId>
             <version>${smackVersion}</version>
         </dependency>
 

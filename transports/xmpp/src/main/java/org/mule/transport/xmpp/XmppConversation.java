@@ -6,10 +6,11 @@
  */
 package org.mule.transport.xmpp;
 
-import org.mule.transport.ConnectException;
-
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.packet.Message;
 
 /**
@@ -20,18 +21,22 @@ public interface XmppConversation
 {
     /**
      * Connect to the Jabber conversation, e.g. join a chat.
+     * @throws SmackException 
+     * @throws NoResponseException 
+     * @throws XMPPException 
      */
-    void connect() throws ConnectException;
+    void connect() throws NoResponseException, SmackException, XMPPException;
 
     /**
      * Disconnect from the Jabber conversation, e.g. leave a chat.
+     * @throws NotConnectedException 
      */
-    void disconnect();
+    void disconnect() throws NotConnectedException;
 
     /**
      * Asynchronously dispatch <code>message</code> via the Jabber conversation.
      */
-    void dispatch(Message message) throws XMPPException;
+    void dispatch(Message message) throws XMPPException, NotConnectedException;
 
     /**
      * Adds <code>listener</code> to this conversation's XMPP connection.

@@ -6,14 +6,16 @@
  */
 package org.mule.transport.xmpp.transformers;
 
+import java.util.Map;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
 import org.mule.util.StringUtils;
-
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.jiveproperties.JivePropertiesManager;
 
 public class XmppPacketToObject extends AbstractMessageTransformer
 {
@@ -53,9 +55,9 @@ public class XmppPacketToObject extends AbstractMessageTransformer
 
     private void copyProperties(Message xmppMessage, MuleMessage muleMessage)
     {
-        for (String propertyName : xmppMessage.getPropertyNames())
-        {
-            muleMessage.setOutboundProperty(propertyName, xmppMessage.getProperty(propertyName));
+        for (Map.Entry<String, Object> entry : JivePropertiesManager
+                .getProperties(xmppMessage).entrySet()) {
+            muleMessage.setOutboundProperty(entry.getKey(), entry.getValue());
         }
     }
 }

@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.jiveproperties.JivePropertiesManager;
 
 public class XmppMuleMessageFactory extends AbstractMuleMessageFactory
 {
@@ -53,9 +54,10 @@ public class XmppMuleMessageFactory extends AbstractMuleMessageFactory
 
     private void addXmppPacketProperties(Packet packet, Map<String, Object> properties)
     {
-        for (String key : packet.getPropertyNames())
+        Map<String, Object> packetProperties = JivePropertiesManager.getProperties(packet);
+        for (Map.Entry<String, Object> entry : packetProperties.entrySet())
         {
-            properties.put(key, packet.getProperty(key));
+            properties.put(entry.getKey(), entry.getValue());
         }        
     }
 

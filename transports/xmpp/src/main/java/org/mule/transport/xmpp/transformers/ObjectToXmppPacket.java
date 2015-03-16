@@ -11,9 +11,9 @@ import org.mule.api.transformer.DataType;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
-
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.XMPPError;
+import org.jivesoftware.smackx.jiveproperties.JivePropertiesManager;
 
 /**
  * Creates an Xmpp message packet from a MuleMessage
@@ -70,7 +70,7 @@ public class ObjectToXmppPacket extends AbstractMessageTransformer
             }
             else
             {
-                result.setProperty(propertyName, muleMessage.<Object>getOutboundProperty(propertyName));
+                JivePropertiesManager.addProperty(result, propertyName, muleMessage.<Object>getOutboundProperty(propertyName));
             }
         }
 

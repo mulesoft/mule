@@ -10,8 +10,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.util.UUID;
-
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.jiveproperties.JivePropertiesManager;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -46,7 +46,7 @@ public class XmppMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         
         Message payload = (Message) getValidTransportMessage();
         payload.setSubject("the subject");
-        payload.setProperty("foo", "foo-value");
+        JivePropertiesManager.addProperty(payload, "foo", "foo-value");
         payload.setPacketID(uuid);
      
         MuleMessageFactory factory = createMuleMessageFactory();

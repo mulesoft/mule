@@ -7,13 +7,14 @@
 package org.mule.transport.xmpp;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.Connector;
-import org.mule.transport.ConnectException;
 import org.mule.util.UUID;
-
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.SmackConfiguration;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
@@ -23,12 +24,10 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
 {
     private MultiUserChat chat;
     private String nickname;
-    private final Connector connector;
     
     public XmppMultiUserChatConversation(ImmutableEndpoint endpoint)
     {
         super(endpoint);
-        connector = endpoint.getConnector();
         
         Object nickValue = endpoint.getProperty(XmppConnector.XMPP_NICKNAME);
         if (nickValue != null)
@@ -42,19 +41,19 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
     }
 
     @Override
-    protected void doConnect() throws ConnectException
+    protected void doConnect() throws NoResponseException, SmackException, XMPPException
     {
         chat = new MultiUserChat(connection, recipient);
         joinChat();
     }
 
-    protected void joinChat() throws ConnectException
+    protected void joinChat() throws NoResponseException, SmackException, XMPPException
     {
         try
         {
             tryToJoinChat();
         }
-        catch (XMPPException e)
+        catch (XMPPErrorException e)
         {
             if (roomDoesNotExist(e))
             {
@@ -62,18 +61,18 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
             }
             else
             {
-                throw new ConnectException(e, connector);
+                throw e;
             }
         }
     }
     
-    protected void tryToJoinChat() throws XMPPException
+    protected void tryToJoinChat() throws XMPPException, NoResponseException, NotConnectedException
     {
         DiscussionHistory history = new DiscussionHistory();
         history.setMaxStanzas(0);
         
         // use the same default value that the smack API uses internally
-        long joinTimeout = SmackConfiguration.getPacketReplyTimeout();
+        long joinTimeout = SmackConfiguration.getDefaultPacketReplyTimeout();
         
         chat.join(nickname, null, history, joinTimeout);
         if (logger.isDebugEnabled())
@@ -82,35 +81,27 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
         }
     }
     
-    protected boolean roomDoesNotExist(XMPPException exception)
+    protected boolean roomDoesNotExist(XMPPErrorException exception)
     {
         XMPPError error = exception.getXMPPError();
-        if ((error.getCode() == 404) &&
-            error.getCondition().equals(XMPPError.Condition.recipient_unavailable.toString()))
+        if (error.getCondition().equals(XMPPError.Condition.recipient_unavailable.toString()))
         {
             return true;
         }
         return false;
     }
     
-    protected void createRoom() throws ConnectException
+    protected void createRoom() throws NoResponseException, SmackException, XMPPErrorException
     {
-        try
+        chat.create(nickname);
+        if (logger.isDebugEnabled())
         {
-            chat.create(nickname);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("created and joined groupchat '" + recipient + "'");
-            }
-        }
-        catch (XMPPException e)
-        {
-            throw new ConnectException(e, connector);
+            logger.debug("created and joined groupchat '" + recipient + "'");
         }
     }
 
     @Override
-    protected void doDisconnect()
+    protected void doDisconnect() throws NotConnectedException
     {
         chat.leave();
     }
@@ -125,7 +116,7 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
         return null;
     }
 
-    public void dispatch(Message message) throws XMPPException
+    public void dispatch(Message message) throws XMPPException, NotConnectedException
     {
         message.setType(Message.Type.groupchat);
         message.setTo(recipient);
