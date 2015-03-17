@@ -88,10 +88,12 @@
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://www.mulesoft.org</productUrl>
+        <dev.list>mule-esb@mulesoft.com</dev.list>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
         <coberturaVersion>2.2</coberturaVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <jdk14Name>jdk1.4</jdk14Name>
+
         <!--
              Use the name of an Eclipse Java execution environment, Eclipse will
              choose the right one by itself.
@@ -171,7 +173,7 @@
         <springSecurityVersion>3.0.3.RELEASE</springSecurityVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.3</sxcVersion>
-        <tomcatVersion>6.0.29</tomcatVersion>
+        <tomcatVersion>6.0.41</tomcatVersion>
         <woodstoxVersion>4.0.8</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.2</xalanVersion>
