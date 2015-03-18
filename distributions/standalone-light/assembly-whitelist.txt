@@ -315,7 +315,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-core-0.7.3-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-runtime-0.7.3-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-xpath-0.7.3-osgi.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/woodstox-core-asl-4.4.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wss4j-1.6.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/xapool-1.5.0-osgi.jar
