@@ -121,7 +121,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         super.doSetUp();
         // set up some mule home structure
         final String tmpDir = System.getProperty("java.io.tmpdir");
-        muleHome = new File(tmpDir, getClass().getSimpleName() + System.currentTimeMillis());
+        muleHome = new File(new File(tmpDir, "mule home"), getClass().getSimpleName() + System.currentTimeMillis());
         appsDir = new File(muleHome, "apps");
         appsDir.mkdirs();
         domainsDir = new File(muleHome, "domains");

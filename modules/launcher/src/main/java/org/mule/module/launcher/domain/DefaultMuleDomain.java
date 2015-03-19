@@ -33,7 +33,9 @@ import org.mule.util.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -66,7 +68,14 @@ public class DefaultMuleDomain implements Domain
         URL resource = deploymentClassLoader.findLocalResource(this.DOMAIN_CONFIG_FILE_LOCATION);
         if (resource != null)
         {
-            this.configResourceFile = new File(resource.getFile());
+            try
+            {
+                this.configResourceFile = new File(URLDecoder.decode(resource.getFile(), "UTF-8"));
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                throw new RuntimeException("Unable to find config resource file: " + resource.getFile());
+            }
         }
     }
 
