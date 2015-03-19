@@ -333,6 +333,19 @@ public class XMLUtils extends org.mule.util.XMLUtils
             // TODO Handle encoding/charset?
             return factory.createXMLStreamReader(new ByteArrayInputStream((byte[]) obj));
         }
+        else if (obj instanceof OutputHandler)
+        {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try
+            {
+                ((OutputHandler)obj).write(RequestContext.getEvent(), outputStream);
+            }
+            catch (IOException e)
+            {
+                throw new XMLStreamException(e);
+            }
+            return factory.createXMLStreamReader(new ByteArrayInputStream(outputStream.toByteArray()));
+        }
         else
         {
             return null;
