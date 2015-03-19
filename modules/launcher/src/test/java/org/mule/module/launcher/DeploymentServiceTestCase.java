@@ -12,6 +12,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -1436,6 +1437,30 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
         assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
         assertDomainDir(NONE, new String[] {dummyDomainDescriptor.id}, true);
+    }
+
+    @Test
+    public void redeployedDomainsAreDifferent() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+        Domain firstDomain = deploymentService.getDomains().get(0);
+
+        reset(domainDeploymentListener);
+
+        addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+
+        assertUndeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+        Domain secondDomain = deploymentService.getDomains().get(0);
+
+        assertNotSame(firstDomain, secondDomain);
     }
 
     @Test

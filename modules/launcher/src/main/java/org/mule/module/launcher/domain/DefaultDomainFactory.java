@@ -64,7 +64,7 @@ public class DefaultDomainFactory implements DomainFactory
 
     public void dispose(Domain domain)
     {
-        domains.remove(domain);
+        domains.remove(domain.getArtifactName());
     }
 
 }
