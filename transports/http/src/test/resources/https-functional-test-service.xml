@@ -12,7 +12,7 @@
 
     <https:connector name="httpConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-key-store path="${serverKeystorePath}" keyPassword="mulepassword" storePassword="mulepassword"/>
         <https:tls-server path="trustStore" storePassword="mulepassword"/>
     </https:connector>
 

@@ -70,7 +70,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     public static InputStream getResourceAsStream(final String resourceName,
                                                   final Class callingClass) throws IOException
     {
-        return getResourceAsStream(parseResourceName(resourceName), callingClass, true, true);
+        return getResourceAsStream(resourceName, callingClass, true, true);
     }
 
     /**
@@ -193,62 +193,6 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             }
         }
         return url;
-    }
-
-    /**
-     * This method checks whether the name of the resource needs to be parsed. If it
-     * is, it parses the name and tries to get the variable from the Environmental
-     * Variables configured on the system.
-     * 
-     * @param src
-     */
-    private static String parseResourceName(String src)
-    {
-        String var;
-        String[] split;
-        String ps = File.separator;
-
-        if (src.indexOf('$') > -1)
-        {
-            split = src.split("}");
-        }
-        else
-        {
-            return src;
-        }
-
-        var = split[0].substring(2);
-        var = SystemUtils.getenv(var);
-        if (split.length > 1)
-        {
-            if (var == null)
-            {
-                var = System.getProperty(split[0].substring(2));
-                if (var == null)
-                {
-                    return split[1].substring(1);
-                }
-                else
-                {
-                    return var + ps + split[1].substring(1);
-                }
-            }
-            else
-            {
-                return var + ps + split[1].substring(1);
-            }
-        }
-        else
-        {
-            if (var == null)
-            {
-                return "";
-            }
-            else
-            {
-                return var;
-            }
-        }
     }
     
     /**
