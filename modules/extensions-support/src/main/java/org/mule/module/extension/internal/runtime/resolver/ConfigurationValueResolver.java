@@ -6,21 +6,18 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.NamedObject;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.Configuration;
 import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * A {@link ValueResolver} for returning instances that implement
@@ -39,34 +36,42 @@ import java.util.concurrent.TimeUnit;
  * point of view. Notice however that the named object is this resolver and in the case of
  * dynamic configurations instances are not likely to be unique
  * <p/>
- * Finally, this class implements {@link MuleContextAware} and {@link Lifecycle}. All the invocations
- * associated to those interfaces will be propagated to the underlying {@link #resolverSet} and
- * all generated instances
+ * The generated instance will be registered with the {@code extensionManager}
+ * through {@link ExtensionManager#registerConfigurationInstance(Configuration, String, Object)}
  *
  * @since 3.7.0
  */
-public final class ConfigurationValueResolver implements ValueResolver<Object>, MuleContextAware, Lifecycle, NamedObject
+public final class ConfigurationValueResolver implements ValueResolver<Object>, NamedObject
 {
 
     private final String name;
-    private final ResolverSet resolverSet;
-    private MuleContext muleContext;
-    private ValueResolver resolver;
+    private final ValueResolver delegate;
 
-    public ConfigurationValueResolver(String name, Configuration configuration, ResolverSet resolverSet)
+    public ConfigurationValueResolver(String name,
+                                      Configuration configuration,
+                                      ResolverSet resolverSet,
+                                      MuleContext muleContext)
     {
         this.name = name;
-        this.resolverSet = resolverSet;
 
         ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
 
         if (resolverSet.isDynamic())
         {
-            resolver = new CachedConfigurationValueResolver(configurationObjectBuilder, resolverSet, 1, TimeUnit.MINUTES);
+            delegate = new DynamicConfigurationValueResolver(name, configuration, configurationObjectBuilder, resolverSet, muleContext);
         }
         else
         {
-            resolver = new ObjectBuilderValueResolver(new ConfigurationObjectBuilder(configuration, resolverSet));
+            try
+            {
+                Object config = configurationObjectBuilder.build(getInitialiserEvent(muleContext));
+                muleContext.getExtensionManager().registerConfigurationInstance(configuration, name, config);
+                delegate = new StaticValueResolver<>(config);
+            }
+            catch (MuleException e)
+            {
+                throw new MuleRuntimeException(e);
+            }
         }
     }
 
@@ -80,7 +85,7 @@ public final class ConfigurationValueResolver implements ValueResolver<Object>, 
     @Override
     public Object resolve(MuleEvent event) throws MuleException
     {
-        return resolver.resolve(event);
+        return delegate.resolve(event);
     }
 
     /**
@@ -89,98 +94,18 @@ public final class ConfigurationValueResolver implements ValueResolver<Object>, 
     @Override
     public boolean isDynamic()
     {
-        return resolver.isDynamic();
+        return delegate.isDynamic();
     }
 
-    /**
-     * Initialises this instance and propagates the event and the {@link MuleContext}
-     * to the underlying {@code resolverSet}
-     *
-     * @throws InitialisationException
-     */
-    @Override
-    public void initialise() throws InitialisationException
+
+    private MuleEvent getInitialiserEvent(MuleContext muleContext)
     {
-        injectMuleContextIfNeeded(resolverSet);
-        injectMuleContextIfNeeded(resolver);
-        resolverSet.initialise();
-
-        if (resolver instanceof Initialisable)
-        {
-            ((Initialisable) resolver).initialise();
-        }
-    }
-
-    /**
-     * Starts this instance and propagates the event to the underlying {@code resolverSet}
-     *
-     * @throws MuleException
-     */
-    @Override
-    public void start() throws MuleException
-    {
-        resolverSet.start();
-
-        if (resolver instanceof Startable)
-        {
-            ((Startable) resolver).start();
-        }
-
-        resolver = new InitialLifecycleValueResolver(resolver, muleContext);
-
-        if (!resolver.isDynamic())
-        {
-            resolver = new CachingValueResolverWrapper(resolver);
-        }
-    }
-
-    /**
-     * Stop this instance and propagates the event to the underlying {@code resolverSet}
-     *
-     * @throws MuleException
-     */
-    @Override
-    public void stop() throws MuleException
-    {
-        if (resolver instanceof Stoppable)
-        {
-            ((Stoppable) resolver).stop();
-        }
-
-        resolverSet.stop();
-    }
-
-    /**
-     * Disposes this instance and propagates the event to the underlying {@code resolverSet}
-     */
-    @Override
-    public void dispose()
-    {
-        if (resolver instanceof Disposable)
-        {
-            ((Disposable) resolver).dispose();
-        }
-
-        resolverSet.dispose();
-    }
-
-    private void injectMuleContextIfNeeded(Object configuration)
-    {
-        if (configuration instanceof MuleContextAware)
-        {
-            ((MuleContextAware) configuration).setMuleContext(muleContext);
-        }
+        return new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
     }
 
     @Override
     public String getName()
     {
         return name;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
     }
 }

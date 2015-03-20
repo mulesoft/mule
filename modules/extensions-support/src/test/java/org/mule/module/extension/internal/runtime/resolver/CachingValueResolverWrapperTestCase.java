@@ -12,30 +12,35 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.HELLO_WORLD;
+import org.mule.api.MuleEvent;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class CachingValueResolverWrapperTestCase extends BaseValueResolverWrapperTestCase
+public class CachingValueResolverWrapperTestCase extends AbstractMuleTestCase
 {
+    @Mock
+    private ValueResolver delegate;
 
-    @Override
-    protected BaseValueResolverWrapper createResolver(ValueResolver delegate)
-    {
-        return new CachingValueResolverWrapper(delegate);
-    }
+    @Mock
+    private MuleEvent event;
+
+    private BaseValueResolverWrapper resolver;
 
     @Before
-    public void doBefore() throws Exception
+    public void before() throws Exception
     {
         when(delegate.resolve(event))
                 .thenReturn(HELLO_WORLD)
                 .thenReturn(null);
+        resolver = new CachingValueResolverWrapper(delegate);
     }
 
     @Test

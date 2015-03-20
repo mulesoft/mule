@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getDefaultValue;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getExtension;
-import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getGroupParameterFields;
+import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterGroupFields;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getOperationMethods;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSetter;
@@ -33,10 +33,10 @@ import org.mule.extension.introspection.declaration.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.WithParameters;
 import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.ImplementedTypeCapability;
-import org.mule.module.extension.internal.capability.metadata.ImplicitArgumentCapability;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
-import org.mule.module.extension.internal.runtime.TypeAwareOperationImplementation;
+import org.mule.module.extension.internal.runtime.ReflectiveDelegateFactory;
+import org.mule.module.extension.internal.runtime.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.CollectionUtils;
 
@@ -59,6 +59,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private CapabilitiesResolver capabilitiesResolver = new DefaultCapabilitiesResolver(new SPIServiceRegistry());
     private final Class<?> extensionType;
+    private final ReflectiveDelegateFactory delegateFactory = new ReflectiveDelegateFactory();
 
     public AnnotationsBasedDescriber(Class<?> extensionType)
     {
@@ -137,7 +138,7 @@ public final class AnnotationsBasedDescriber implements Describer
     private List<ParameterGroup> declareConfigurationParametersGroups(Class<?> extensionType, ConfigurationConstruct configuration)
     {
         List<ParameterGroup> groups = new LinkedList<>();
-        for (Field field : getGroupParameterFields(extensionType))
+        for (Field field : getParameterGroupFields(extensionType))
         {
             Set<ParameterConstruct> parameters = declareSingleParameters(field.getType(), configuration.with());
 
@@ -212,14 +213,14 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void declareOperation(DeclarationConstruct declaration, Class<?> actingClass)
+    private <T> void declareOperation(DeclarationConstruct declaration, Class<T> actingClass)
     {
         for (Method method : getOperationMethods(actingClass))
         {
             OperationConstruct operation = declaration.withOperation(method.getName())
-                    .implementedIn(new TypeAwareOperationImplementation(actingClass, method));
+                    .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method, delegateFactory));
 
-            declareOperationParameters(actingClass, method, operation);
+            declareOperationParameters(method, operation);
 
             calculateImplementedTypes(actingClass, method, operation);
         }
@@ -239,49 +240,9 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void declareOperationParameters(Class<?> actingClass, Method method, OperationConstruct operation)
+    private void declareOperationParameters(Method method, OperationConstruct operation)
     {
-        declareSingleOperationParameters(method, operation);
-        List<ParameterGroup> groups = declareOperationParameterGroups(actingClass, operation);
-        if (!CollectionUtils.isEmpty(groups))
-        {
-            operation.withCapability(new ParameterGroupCapability(groups));
-        }
-    }
-
-    private List<ParameterGroup> declareOperationParameterGroups(Class<?> actingClass, OperationConstruct operation)
-    {
-        List<ParameterGroup> groups = new LinkedList<>();
-        for (Field field : getGroupParameterFields(actingClass))
-        {
-            Set<ParameterConstruct> parameters = declareSingleParameters(field.getType(), operation.with());
-
-            if (!parameters.isEmpty())
-            {
-                ParameterGroup group = new ParameterGroup(field.getType(), getSetter(actingClass, field.getName(), field.getType()));
-                groups.add(group);
-
-                for (ParameterConstruct construct : parameters)
-                {
-                    construct.withCapability(new ImplicitArgumentCapability());
-                    ParameterDeclaration parameter = construct.getDeclaration();
-                    group.addParameter(construct.getDeclaration().getName(), getSetter(field.getType(), parameter.getName(), parameter.getType().getRawType()));
-                }
-
-                List<ParameterGroup> childGroups = declareOperationParameterGroups(field.getType(), operation);
-                if (!CollectionUtils.isEmpty(childGroups))
-                {
-                    group.addCapability(new ParameterGroupCapability(childGroups));
-                }
-            }
-        }
-
-        return groups;
-    }
-
-    private void declareSingleOperationParameters(Method method, OperationConstruct operation)
-    {
-        List<ParameterDescriptor> descriptors = MuleExtensionAnnotationParser.parseParameter(method);
+        List<ParameterDescriptor> descriptors = MuleExtensionAnnotationParser.parseParameters(method);
 
         for (ParameterDescriptor parameterDescriptor : descriptors)
         {
@@ -294,6 +255,7 @@ public final class AnnotationsBasedDescriber implements Describer
             hideIfNecessary(parameterDescriptor, parameter);
             addTypeRestrictions(parameter, parameterDescriptor);
         }
+
     }
 
     private void hideIfNecessary(ParameterDescriptor parameterDescriptor, ParameterConstruct parameter)

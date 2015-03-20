@@ -8,6 +8,7 @@ package org.mule.config.builders;
 
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.extension.ExtensionManager;
 import org.mule.util.ClassUtils;
 
@@ -33,6 +34,10 @@ public class ExtensionsManagerConfigurationBuilder extends AbstractConfiguration
             extensionManager.discoverExtensions(Thread.currentThread().getContextClassLoader());
 
             ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+            if (extensionManager instanceof MuleContextAware)
+            {
+                ((MuleContextAware) extensionManager).setMuleContext(muleContext);
+            }
         }
     }
 }

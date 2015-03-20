@@ -140,35 +140,6 @@ public class CollectionValueResolverTestCase extends AbstractMuleTestCase
         assertThat(resolved.size(), equalTo(originalSize + 1));
     }
 
-    @Test
-    public void initialise() throws Exception
-    {
-        resolver.setMuleContext(muleContext);
-        resolver.initialise();
-        ExtensionsTestUtils.verifyAllInitialised(childResolvers, muleContext);
-    }
-
-    @Test
-    public void start() throws Exception
-    {
-        resolver.start();
-        ExtensionsTestUtils.verifyAllStarted(childResolvers);
-    }
-
-    @Test
-    public void stop() throws Exception
-    {
-        resolver.stop();
-        ExtensionsTestUtils.verifyAllStopped(childResolvers);
-    }
-
-    @Test
-    public void dispose() throws Exception
-    {
-        resolver.dispose();
-        ExtensionsTestUtils.verifyAllDisposed(childResolvers);
-    }
-
     protected int getChildResolversCount()
     {
         return 10;

@@ -17,12 +17,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.Describer;
 import org.mule.module.extension.Door;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.Ricin;
-import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
@@ -89,9 +87,9 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
     }
 
     @Override
-    protected Describer[] getManagedDescribers()
+    protected Class<?>[] getAnnotatedExtensionClasses()
     {
-        return new Describer[] {new AnnotationsBasedDescriber(HeisenbergExtension.class)};
+        return new Class<?>[] {HeisenbergExtension.class};
     }
 
     @Test
@@ -104,23 +102,23 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
     @Test
     public void sameInstanceForEquivalentEvent() throws Exception
     {
-        ValueResolver heisenbergResolver = muleContext.getRegistry().lookupObject(testConfig);
+        ValueResolver<HeisenbergExtension> heisenbergResolver = muleContext.getRegistry().lookupObject(testConfig);
         MuleEvent event = getHeisenbergEvent();
-        HeisenbergExtension heisenberg = (HeisenbergExtension) heisenbergResolver.resolve(event);
+        HeisenbergExtension heisenberg = heisenbergResolver.resolve(event);
         assertThat(heisenberg, is(sameInstance(heisenbergResolver.resolve(event))));
     }
 
     @Test
-    public void lifeCycle() throws Exception
+    public void lifecycle() throws Exception
     {
         HeisenbergExtension heisenberg = lookupHeisenberg(testConfig);
         assertThat(heisenberg.getInitialise(), is(1));
         assertThat(heisenberg.getStart(), is(1));
 
         muleContext.stop();
-        assertThat(heisenberg.getStop(), is(1));
-
         muleContext.dispose();
+
+        assertThat(heisenberg.getStop(), is(1));
         assertThat(heisenberg.getDispose(), is(1));
     }
 
@@ -129,6 +127,13 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
     {
         HeisenbergExtension heisenberg = lookupHeisenberg(testConfig);
         assertThat(heisenberg.getMuleContext(), is(muleContext));
+    }
+
+    @Test
+    public void dependenciesInjected() throws Exception
+    {
+        HeisenbergExtension heisenberg = lookupHeisenberg(testConfig);
+        assertThat(heisenberg.getExtensionManager(), is(sameInstance(muleContext.getExtensionManager())));
     }
 
     private HeisenbergExtension lookupHeisenberg(String key) throws Exception

@@ -16,11 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.extension.annotations.WithConfig;
-import org.mule.extension.introspection.OperationContext;
+import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
@@ -43,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class TypeAwareOperationImplementationTestCase extends AbstractMuleTestCase
+public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestCase
 {
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -54,67 +50,56 @@ public class TypeAwareOperationImplementationTestCase extends AbstractMuleTestCa
 
     private Map<Parameter, Object> parameterValues = new HashMap<>();
 
-    private TypeAwareOperationImplementation implementation;
+    private ReflectiveMethodOperationExecutor executor;
     private HeisenbergExtension config;
     private OperationContext operationContext;
+    private HeisenbergOperations operations;
 
 
     @Before
     public void before()
     {
         initHeisenberg();
-        operationContext = new DefaultOperationContext(config, parameters, muleEvent, null);
-        when(operationContext.getParametersValues()).thenReturn(parameterValues);
+        operationContext = new DefaultOperationContext(parameters, muleEvent);
+        when(operationContext.getParameters()).thenReturn(parameterValues);
     }
 
     @Test
     public void operationWithReturnValueAndWithoutParameters() throws Exception
     {
         Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {});
-        implementation = new TypeAwareOperationImplementation(HeisenbergOperations.class, method);
-        assertResult(implementation.execute(operationContext), HEISENBERG);
+        executor = new ReflectiveMethodOperationExecutor(method, operations, ValueReturnDelegate.INSTANCE);
+        assertResult(executor.execute(operationContext), HEISENBERG);
     }
 
     @Test
     public void voidOperationWithoutParameters() throws Exception
     {
         Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {});
-        implementation = new TypeAwareOperationImplementation(HeisenbergOperations.class, method);
-        assertSameInstance(implementation.execute(operationContext), muleEvent);
+        executor = new ReflectiveMethodOperationExecutor(method, operations, VoidReturnDelegate.INSTANCE);
+        assertSameInstance(executor.execute(operationContext), muleEvent);
         assertThat(config.getFinalHealth(), is(DEAD));
     }
 
     @Test
     public void withArgumentsAndReturnValue() throws Exception
     {
+        operationContext = mock(OperationContext.class);
+        when(operationContext.getParameterValue("index")).thenReturn(0);
+
         Method method = ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {int.class});
-        implementation = new TypeAwareOperationImplementation(HeisenbergOperations.class, method);
-        parameterValues.put(mock(Parameter.class), 0);
-        assertResult(implementation.execute(operationContext), "Hank");
+        executor = new ReflectiveMethodOperationExecutor(method, operations, ValueReturnDelegate.INSTANCE);
+
+        assertResult(executor.execute(operationContext), "Hank");
     }
 
     @Test
     public void voidWithArguments() throws Exception
     {
-        HeisenbergOperations.eventHolder.set(muleEvent);
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "hideMethInEvent", new Class<?>[] {});
-        implementation = new TypeAwareOperationImplementation(HeisenbergOperations.class, method);
-        assertSameInstance(implementation.execute(operationContext), muleEvent);
+        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "hideMethInEvent", new Class<?>[] {MuleEvent.class});
+        executor = new ReflectiveMethodOperationExecutor(method, operations, VoidReturnDelegate.INSTANCE);
+        assertSameInstance(executor.execute(operationContext), muleEvent);
         verify(muleEvent).setFlowVariable("secretPackage", "meth");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void operationWithTwoConfigs() throws Exception
-    {
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "hideMethInEvent", new Class<?>[] {});
-        new TypeAwareOperationImplementation(TwoConfigs.class, method);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void operationWithLifecycle() throws Exception
-    {
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "hideMethInEvent", new Class<?>[] {});
-        new TypeAwareOperationImplementation(WithLifecycle.class, method);
     }
 
     private void initHeisenberg()
@@ -122,7 +107,7 @@ public class TypeAwareOperationImplementationTestCase extends AbstractMuleTestCa
         config = new HeisenbergExtension();
         config.getPersonalInfo().setMyName(HEISENBERG);
         config.setEnemies(Arrays.asList("Hank"));
-        HeisenbergOperations.eventHolder.set(muleEvent);
+        operations = new HeisenbergOperations(config);
     }
 
     private void assertResult(Future<Object> result, Object expected) throws Exception
@@ -135,44 +120,5 @@ public class TypeAwareOperationImplementationTestCase extends AbstractMuleTestCa
     {
         Object value = result.get();
         assertThat(value, is(sameInstance(expected)));
-    }
-
-    public static class TwoConfigs extends HeisenbergOperations
-    {
-
-        @WithConfig
-        private HeisenbergExtension config;
-
-        public TwoConfigs()
-        {
-        }
-    }
-
-    public static class WithLifecycle extends HeisenbergOperations implements Lifecycle
-    {
-
-        @Override
-        public void dispose()
-        {
-
-        }
-
-        @Override
-        public void initialise() throws InitialisationException
-        {
-
-        }
-
-        @Override
-        public void start() throws MuleException
-        {
-
-        }
-
-        @Override
-        public void stop() throws MuleException
-        {
-
-        }
     }
 }

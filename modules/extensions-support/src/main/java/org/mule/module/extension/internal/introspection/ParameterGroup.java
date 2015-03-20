@@ -64,7 +64,7 @@ public class ParameterGroup implements Capable
 
     public ParameterGroup(Class<?> type, Method setter)
     {
-        checkArgument(type != null, "field cannot be null");
+        checkArgument(type != null, "type cannot be null");
         checkArgument(setter != null, "setter cannot be null");
 
         this.type = type;

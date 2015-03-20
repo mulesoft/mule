@@ -25,7 +25,6 @@ import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
-import org.mule.config.builders.ExtensionsManagerConfigurationBuilder;
 import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.module.launcher.InstallException;
@@ -173,7 +172,6 @@ public class DefaultMuleApplication implements Application
                 List<ConfigurationBuilder> builders = new LinkedList<>();
                 builders.add(cfgBuilder);
                 builders.add(createConfigurationBuilderFromApplicationProperties());
-                builders.add(createApplicationLevelExtensionManagerBuilder());
 
                 // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
                 addAnnotationsConfigBuilderIfPresent(builders);
@@ -247,11 +245,6 @@ public class DefaultMuleApplication implements Application
         appProperties.put(MuleProperties.APP_NAME_PROPERTY, getArtifactName());
 
         return new SimpleConfigurationBuilder(appProperties);
-    }
-
-    private ConfigurationBuilder createApplicationLevelExtensionManagerBuilder()
-    {
-        return new ExtensionsManagerConfigurationBuilder();
     }
 
     protected void addAnnotationsConfigBuilderIfPresent(List<ConfigurationBuilder> builders) throws Exception

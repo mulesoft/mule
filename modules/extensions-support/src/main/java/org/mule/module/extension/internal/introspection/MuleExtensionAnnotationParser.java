@@ -17,7 +17,6 @@ import static org.reflections.ReflectionUtils.withParameters;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.extension.annotations.Extension;
-import org.mule.extension.annotations.Parameters;
 import org.mule.extension.annotations.RestrictedTo;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.Payload;
@@ -37,9 +36,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +55,7 @@ import org.apache.commons.lang.StringUtils;
 public final class MuleExtensionAnnotationParser
 {
 
-    private static final Set<Class<?>> disallowedOperationParameterTypes = ImmutableSet.<Class<?>>builder()
+    private static final Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
             .add(MuleEvent.class)
             .add(MuleMessage.class)
             .build();
@@ -70,14 +69,14 @@ public final class MuleExtensionAnnotationParser
         return extension;
     }
 
-    static Collection<Field> getParameterFields(Class<?> extensionType)
+    public static Collection<Field> getParameterFields(Class<?> extensionType)
     {
         return getAllFields(extensionType, withAnnotation(org.mule.extension.annotations.Parameter.class));
     }
 
-    static Collection<Field> getGroupParameterFields(Class<?> extensionType)
+    public static Collection<Field> getParameterGroupFields(Class<?> extensionType)
     {
-        return getAllFields(extensionType, withAnnotation(Parameters.class));
+        return getAllFields(extensionType, withAnnotation(org.mule.extension.annotations.ParameterGroup.class));
     }
 
     static Collection<Method> getOperationMethods(Class<?> declaringClass)
@@ -114,7 +113,7 @@ public final class MuleExtensionAnnotationParser
         return methods.iterator().next();
     }
 
-    static List<ParameterDescriptor> parseParameter(Method method)
+    static List<ParameterDescriptor> parseParameters(Method method)
     {
         String[] paramNames = getParamNames(method);
 
@@ -126,49 +125,86 @@ public final class MuleExtensionAnnotationParser
         DataType[] parameterTypes = IntrospectionUtils.getMethodArgumentTypes(method);
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
-        List<ParameterDescriptor> parameters = new ArrayList<>(paramNames.length);
+        List<ParameterDescriptor> parameterDescriptors = new LinkedList<>();
 
         for (int i = 0; i < paramNames.length; i++)
         {
-            checkParametrizable(parameterTypes[i]);
+            Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
 
-            DataType dataType = parameterTypes[i];
-
-            ParameterDescriptor parameter = new ParameterDescriptor();
-            parameter.setName(paramNames[i]);
-            parameter.setType(dataType);
-
-            Map<Class<? extends Annotation>, Annotation> annotations = parseAnnotations(parameterAnnotations[i]);
-
-            Optional optional = (Optional) annotations.get(Optional.class);
-            if (optional != null)
+            if (annotations.containsKey(org.mule.extension.annotations.ParameterGroup.class))
             {
-                parameter.setRequired(false);
-                parameter.setDefaultValue(getDefaultValue(optional, dataType));
+                parseGroupParameters(parameterTypes[i], parameterDescriptors);
             }
             else
             {
-                parameter.setRequired(true);
+                ParameterDescriptor parameterDescriptor = doParseParameter(paramNames[i], parameterTypes[i], annotations);
+                if (parameterDescriptor != null)
+                {
+                    parameterDescriptors.add(parameterDescriptor);
+                }
             }
-
-            Payload payload = (Payload) annotations.get(Payload.class);
-            if (payload != null)
-            {
-                parameter.setRequired(false);
-                parameter.setDefaultValue("#[payload]");
-                parameter.setHidden(true);
-            }
-
-            RestrictedTo typeRestriction = (RestrictedTo) annotations.get(RestrictedTo.class);
-            if (typeRestriction != null)
-            {
-                parameter.setTypeRestriction(typeRestriction.value());
-            }
-
-            parameters.add(parameter);
         }
 
-        return parameters;
+        return parameterDescriptors;
+    }
+
+    private static void parseGroupParameters(DataType parameterType, List<ParameterDescriptor> parameterDescriptors)
+    {
+        for (Field field : getParameterFields(parameterType.getRawType()))
+        {
+            if (field.getAnnotation(org.mule.extension.annotations.ParameterGroup.class) != null)
+            {
+                parseGroupParameters(DataType.of(field.getType()), parameterDescriptors);
+            }
+            else
+            {
+                ParameterDescriptor parameterDescriptor = doParseParameter(field.getName(), DataType.of(field.getType()), toMap(field.getAnnotations()));
+                if (parameterDescriptor != null)
+                {
+                    parameterDescriptors.add(parameterDescriptor);
+                }
+            }
+        }
+    }
+
+    private static ParameterDescriptor doParseParameter(String paramName, DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
+    {
+        if (IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()))
+        {
+            return null;
+        }
+
+        DataType dataType = parameterType;
+
+        ParameterDescriptor parameter = new ParameterDescriptor();
+        parameter.setName(paramName);
+        parameter.setType(dataType);
+
+        Optional optional = (Optional) annotations.get(Optional.class);
+        if (optional != null)
+        {
+            parameter.setRequired(false);
+            parameter.setDefaultValue(getDefaultValue(optional, dataType));
+        }
+        else
+        {
+            parameter.setRequired(true);
+        }
+
+        Payload payload = (Payload) annotations.get(Payload.class);
+        if (payload != null)
+        {
+            parameter.setRequired(false);
+            parameter.setDefaultValue("#[payload]");
+            parameter.setHidden(true);
+        }
+
+        RestrictedTo typeRestriction = (RestrictedTo) annotations.get(RestrictedTo.class);
+        if (typeRestriction != null)
+        {
+            parameter.setTypeRestriction(typeRestriction.value());
+        }
+        return parameter;
     }
 
     protected static Object getDefaultValue(Optional optional, DataType dataType)
@@ -191,14 +227,14 @@ public final class MuleExtensionAnnotationParser
 
     private static void checkParametrizable(DataType type)
     {
-        if (disallowedOperationParameterTypes.contains(type.getRawType()))
+        if (IMPLICIT_ARGUMENT_TYPES.contains(type.getRawType()))
         {
             throw new IllegalArgumentException(
                     String.format("Type %s is not allowed as an operation parameter. Use dependency injection instead", type.getRawType().getName()));
         }
     }
 
-    private static String[] getParamNames(Method method)
+    public static String[] getParamNames(Method method)
     {
         String[] paramNames;
         try
@@ -215,7 +251,7 @@ public final class MuleExtensionAnnotationParser
         return paramNames;
     }
 
-    private static Map<Class<? extends Annotation>, Annotation> parseAnnotations(Annotation[] annotations)
+    public static Map<Class<? extends Annotation>, Annotation> toMap(Annotation[] annotations)
     {
 
         Map<Class<? extends Annotation>, Annotation> map = new HashMap<>();

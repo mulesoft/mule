@@ -11,8 +11,6 @@ import static org.mule.module.extension.internal.util.NameUtils.getGlobalPojoTyp
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
 import org.mule.api.NestedProcessor;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
@@ -462,20 +460,6 @@ final class XmlExtensionParserUtils
             }
 
             resolverSet.add(parameter, CollectionValueResolver.of(ArrayList.class, nestedProcessorResolvers));
-        }
-    }
-
-    static void applyLifecycle(BeanDefinitionBuilder builder)
-    {
-        Class<?> declaringClass = builder.getBeanDefinition().getBeanClass();
-        if (Initialisable.class.isAssignableFrom(declaringClass))
-        {
-            builder.setInitMethodName(Initialisable.PHASE_NAME);
-        }
-
-        if (Disposable.class.isAssignableFrom(declaringClass))
-        {
-            builder.setDestroyMethodName(Disposable.PHASE_NAME);
         }
     }
 

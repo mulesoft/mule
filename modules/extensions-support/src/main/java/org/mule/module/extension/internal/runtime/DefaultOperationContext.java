@@ -7,12 +7,11 @@
 package org.mule.module.extension.internal.runtime;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.OperationContext;
 import org.mule.extension.introspection.Parameter;
+import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.module.extension.internal.util.ValueSetter;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,58 +24,46 @@ import java.util.Map;
 public final class DefaultOperationContext implements OperationContext
 {
 
-    /**
-     * The configuration instance for this execution
-     */
-    private final Object configurationInstance;
-
-    /**
-     * the values for each parameter
-     */
-    private final ResolverSetResult parameters;
+    private final Map<Parameter, Object> parameters;
+    private final Map<String, Object> parametersByName;
 
     /**
      * The current {@link MuleEvent}
      */
     private final MuleEvent event;
 
-    /**
-     *  A list of {@link ValueSetter} to resolve parameter groups
-     */
-    private final List<ValueSetter> groupValueSetters;
-
-    public DefaultOperationContext(Object configurationInstance, ResolverSetResult parameters, MuleEvent event, List<ValueSetter> groupValueSetters)
+    public DefaultOperationContext(ResolverSetResult parameters, MuleEvent event)
     {
-        this.configurationInstance = configurationInstance;
-        this.parameters = parameters;
+        this.parameters = parameters.asMap();
+        parametersByName = new HashMap<>(this.parameters.size());
+        for (Map.Entry<Parameter, Object> parameter : this.parameters.entrySet())
+        {
+            parametersByName.put(parameter.getKey().getName(), parameter.getValue());
+        }
+
         this.event = event;
-        this.groupValueSetters = groupValueSetters;
     }
 
     @Override
-    public Object getConfigurationInstance()
-    {
-        return configurationInstance;
-    }
-
-    @Override
-    public Map<Parameter, Object> getParametersValues()
-    {
-        return parameters.asMap();
-    }
-
-    ResolverSetResult getParameters()
+    public Map<Parameter, Object> getParameters()
     {
         return parameters;
     }
 
-    MuleEvent getEvent()
+    @Override
+    public Object getParameterValue(Parameter parameter)
     {
-        return event;
+        return parameters.get(parameter);
     }
 
-    List<ValueSetter> getGroupValueSetters()
+    @Override
+    public Object getParameterValue(String parameterName)
     {
-        return groupValueSetters;
+        return parametersByName.get(parameterName);
+    }
+
+    public MuleEvent getEvent()
+    {
+        return event;
     }
 }

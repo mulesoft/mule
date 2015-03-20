@@ -104,9 +104,6 @@ public class EvaluateAndTransformValueResolverTestCase extends AbstractMuleConte
 
     private ValueResolver getResolver(String expression, Class<?> expectedType) throws Exception
     {
-        EvaluateAndTransformValueResolver resolver = new EvaluateAndTransformValueResolver(expression, DataType.of(expectedType));
-        resolver.setMuleContext(muleContext);
-
-        return resolver;
+        return new EvaluateAndTransformValueResolver(expression, DataType.of(expectedType));
     }
 }
