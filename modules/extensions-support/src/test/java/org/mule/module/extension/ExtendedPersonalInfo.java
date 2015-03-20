@@ -6,11 +6,11 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.annotations.Parameters;
+import org.mule.extension.annotations.ParameterGroup;
 
 public class ExtendedPersonalInfo extends PersonalInfo
 {
-    @Parameters
+    @ParameterGroup
     private LifetimeInfo lifetimeInfo = new LifetimeInfo();
 
     public LifetimeInfo getLifetimeInfo()

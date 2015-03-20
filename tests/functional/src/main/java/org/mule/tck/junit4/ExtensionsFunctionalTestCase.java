@@ -19,8 +19,9 @@ import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.resources.GenerableResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.extension.resources.spi.GenerableResourceContributor;
-import org.mule.module.extension.internal.DefaultExtensionManager;
+import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.module.extension.internal.resources.AbstractResourcesGenerator;
 import org.mule.util.ArrayUtils;
 import org.mule.util.IOUtils;
@@ -50,7 +51,7 @@ import org.apache.commons.io.FileUtils;
  * Although this behavior suits most use cases, it can be time consuming because of
  * all the classpath scanning and the overhead of initialising extensions that
  * are most likely not used in this tests. As the number of extensions available grows,
- * the problem gets worst. For those cases,  you can override the {@link #getManagedDescribers()}
+ * the problem gets worst. For those cases,  you can override the {@link #getDescribers()}
  * and specify which describers are to be used to initialise the extensions manager. In that way,
  * extensions discovery is skipped and you only initialise what you need.
  * <p/>
@@ -73,7 +74,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
 
     private final ServiceRegistry serviceRegistry = new SPIServiceRegistry();
     private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry);
-    private ExtensionManager extensionManager = new DefaultExtensionManager();
+    private ExtensionManager extensionManager;
     private File generatedResourcesDirectory;
 
 
@@ -88,11 +89,26 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
      * Implement this method to limit the amount of extensions
      * initialised by providing the {@link Describer}s for
      * the extensions that you actually want to use for this test.
-     * Returning a {@code null} or empty array forces the
-     * {@link ExtensionManager} to perform a full classpath discovery.
+     * Returning a {@code null} or empty array will cause the
+     * {@link #getAnnotatedExtensionClasses()} method to be considered.
      * Default implementation of this method returns {@code null}
      */
-    protected Describer[] getManagedDescribers()
+    protected Describer[] getDescribers()
+    {
+        return null;
+    }
+
+    /**
+     * Implement this method to limit the amount of extensions
+     * initialised by providing the annotated classes which define
+     * the extensions that you actually want to use for this test.
+     * Returning a {@code null} or empty array forces the
+     * {@link ExtensionManager} to perform a full classpath discovery.
+     * Default implementation of this method returns {@code null}.
+     * This method will only be considered if {@link #getDescribers()}
+     * returns {@code null}
+     */
+    protected Class<?>[] getAnnotatedExtensionClasses()
     {
         return null;
     }
@@ -120,10 +136,24 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
     {
         extensionManager = new DefaultExtensionManager();
 
-        Describer[] describers = getManagedDescribers();
+        Describer[] describers = getDescribers();
         if (ArrayUtils.isEmpty(describers))
         {
-            extensionManager.discoverExtensions(muleContext.getExecutionClassLoader());
+            Class<?>[] annotatedClasses = getAnnotatedExtensionClasses();
+            if (!ArrayUtils.isEmpty(annotatedClasses))
+            {
+                describers = new Describer[annotatedClasses.length];
+                int i = 0;
+                for (Class<?> annotatedClass : annotatedClasses)
+                {
+                    describers[i++] = new AnnotationsBasedDescriber(annotatedClass);
+                }
+            }
+        }
+
+        if (ArrayUtils.isEmpty(describers))
+        {
+            extensionManager.discoverExtensions(getClass().getClassLoader());
         }
         else
         {
@@ -243,7 +273,6 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
             {
                 throw new RuntimeException(e);
             }
-
         }
     }
 }

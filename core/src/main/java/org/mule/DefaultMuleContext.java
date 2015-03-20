@@ -1046,5 +1046,9 @@ public class DefaultMuleContext implements MuleContext
     public void setExtensionManager(ExtensionManager extensionManager)
     {
         this.extensionManager = extensionManager;
+        if (extensionManager instanceof MuleContextAware)
+        {
+            ((MuleContextAware) extensionManager).setMuleContext(this);
+        }
     }
 }

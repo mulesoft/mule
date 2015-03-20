@@ -76,35 +76,6 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void initialise() throws Exception
-    {
-        set.setMuleContext(muleContext);
-        set.initialise();
-        ExtensionsTestUtils.verifyAllInitialised(mapping.values(), muleContext);
-    }
-
-    @Test
-    public void start() throws Exception
-    {
-        set.start();
-        ExtensionsTestUtils.verifyAllStarted(mapping.values());
-    }
-
-    @Test
-    public void stop() throws Exception
-    {
-        set.stop();
-        ExtensionsTestUtils.verifyAllStopped(mapping.values());
-    }
-
-    @Test
-    public void dispose() throws Exception
-    {
-        set.dispose();
-        ExtensionsTestUtils.verifyAllDisposed(mapping.values());
-    }
-
-    @Test
     public void isNotDynamic()
     {
         assertThat(set.isDynamic(), is(false));

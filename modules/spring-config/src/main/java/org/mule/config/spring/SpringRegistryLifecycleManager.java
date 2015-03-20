@@ -31,6 +31,7 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.extension.ExtensionManager;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
@@ -77,6 +78,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             super();
 
             Set<LifecycleObject> initOrderedObjects = new LinkedHashSet<>();
+            initOrderedObjects.add(new NotificationLifecycleObject(ExtensionManager.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionEvaluator.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionEnricher.class));

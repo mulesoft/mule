@@ -11,11 +11,12 @@ import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.annotations.Extensible;
 import org.mule.extension.annotations.Extension;
 import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.Parameters;
+import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.annotations.param.Optional;
 
@@ -25,8 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 @Extension(name = HeisenbergExtension.EXTENSION_NAME, description = HeisenbergExtension.EXTENSION_DESCRIPTION, version = HeisenbergExtension.EXTENSION_VERSION)
-@Operations({HeisenbergOperations.class, HeisenbergAliasOperations.class})
+@Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
 @Xml(schemaLocation = HeisenbergExtension.SCHEMA_LOCATION, namespace = HeisenbergExtension.NAMESPACE, schemaVersion = HeisenbergExtension.SCHEMA_VERSION)
 @Extensible(alias = "heisenberg-empire")
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
@@ -49,7 +52,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     private MuleContext muleContext;
 
-    @Parameters
+    @Inject
+    private ExtensionManager extensionManager;
+
+    @ParameterGroup
     private ExtendedPersonalInfo personalInfo = new ExtendedPersonalInfo();
 
     @Parameter
@@ -108,6 +114,11 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public void dispose()
     {
         dispose++;
+    }
+
+    public ExtensionManager getExtensionManager()
+    {
+        return extensionManager;
     }
 
     public List<String> getEnemies()

@@ -6,26 +6,25 @@
  */
 package org.mule.module.extension.internal.util;
 
-import static org.mockito.Mockito.inOrder;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.Collection;
-
 import org.apache.commons.lang.ArrayUtils;
-import org.mockito.InOrder;
+import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public abstract class ExtensionsTestUtils
 {
@@ -59,43 +58,34 @@ public abstract class ExtensionsTestUtils
         return parameter;
     }
 
-    public static void verifyInitialisation(Object object, MuleContext muleContext) throws Exception
+    public static void stubRegistryKey(MuleContext muleContext, final String... keys)
     {
-        InOrder order = inOrder(object);
-        order.verify((MuleContextAware) object).setMuleContext(muleContext);
-        order.verify((Initialisable) object).initialise();
-    }
-
-    public static void verifyAllInitialised(Collection<? extends Object> objects, MuleContext muleContext) throws Exception
-    {
-        for (Object object : objects)
+        when(muleContext.getRegistry().get(anyString())).thenAnswer(new Answer<Object>()
         {
-            verifyInitialisation(object, muleContext);
-        }
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                String name = (String) invocation.getArguments()[0];
+                if (name != null)
+                {
+                    for (String key : keys)
+                    {
+                        if (name.contains(key))
+                        {
+                            return null;
+                        }
+                    }
+                }
+
+                return RETURNS_DEEP_STUBS.get().answer(invocation);
+            }
+        });
     }
 
-    public static void verifyAllStarted(Collection<? extends Object> objects) throws Exception
+    public static void assertRegisteredWithUniqueMadeKey(MuleContext muleContext, String key, Object object) throws Exception
     {
-        for (Object object : objects)
-        {
-            verify((Startable) object).start();
-        }
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(muleContext.getRegistry()).registerObject(captor.capture(), same(object));
+        assertThat(captor.getValue(), containsString(key));
     }
-
-    public static void verifyAllStopped(Collection<? extends Object> objects) throws Exception
-    {
-        for (Object object : objects)
-        {
-            verify((Stoppable) object).stop();
-        }
-    }
-
-    public static void verifyAllDisposed(Collection<? extends Object> objects) throws Exception
-    {
-        for (Object object : objects)
-        {
-            verify((Disposable) object).dispose();
-        }
-    }
-
 }

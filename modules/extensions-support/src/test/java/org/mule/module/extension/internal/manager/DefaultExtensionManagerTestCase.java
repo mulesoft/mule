@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.module.extension.internal.manager;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,13 +12,22 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.assertRegisteredWithUniqueMadeKey;
+import org.mule.api.MuleContext;
+import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.Operation;
+import org.mule.extension.runtime.OperationExecutor;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
+import org.mule.module.extension.internal.runtime.DelegatingOperationExecutor;
+import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -45,6 +54,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     private DefaultExtensionManager extensionsManager;
 
     private static final String EXTENSION1_NAME = "extension1";
+    private static final String EXTENSION1_CONFIG_NAME = "extension1Config";
+    private static final String EXTENSION1_CONFIG_INSTANCE_NAME = "extension1ConfigInstanceName";
+    private static final String EXTENSION1_OPERATION_NAME = "extension1OperationName";
     private static final String EXTENSION2_NAME = "extension2";
     private static final String EXTENSION1_VERSION = "3.6.0";
     private static final String EXTENSION2_VERSION = "3.6.0";
@@ -60,6 +72,15 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     @Mock
     private Extension extension2;
 
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private MuleContext muleContext;
+
+    @Mock
+    private Configuration extension1Configuration;
+
+    @Mock
+    private Operation extension1Operation;
+
     private ClassLoader classLoader;
 
     @Before
@@ -67,12 +88,19 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     {
         extensionsManager = new DefaultExtensionManager();
         extensionsManager.setExtensionsDiscoverer(discoverer);
+        extensionsManager.setMuleContext(muleContext);
 
         when(extension1.getName()).thenReturn(EXTENSION1_NAME);
         when(extension2.getName()).thenReturn(EXTENSION2_NAME);
 
         when(extension1.getVersion()).thenReturn(EXTENSION1_VERSION);
         when(extension2.getVersion()).thenReturn(EXTENSION2_VERSION);
+
+        when(extension1Configuration.getName()).thenReturn(EXTENSION1_CONFIG_NAME);
+        when(extension1.getConfiguration(EXTENSION1_CONFIG_NAME)).thenReturn(extension1Configuration);
+        when(extension1.getOperation(EXTENSION1_OPERATION_NAME)).thenReturn(extension1Operation);
+        when(extension1Operation.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
+
 
         classLoader = getClass().getClassLoader();
 
@@ -84,6 +112,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
                 return getTestExtensions();
             }
         });
+
+        ExtensionsTestUtils.stubRegistryKey(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME);
     }
 
     @Test
@@ -217,6 +247,48 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         {
             assertThat(classLoader, sameInstance(Thread.currentThread().getContextClassLoader()));
         }
+    }
+
+    @Test
+    public void registerConfigurationInstance() throws Exception
+    {
+        discover();
+
+        Object configurationInstance = new Object();
+        extensionsManager.registerConfigurationInstance(extension1Configuration, EXTENSION1_CONFIG_INSTANCE_NAME, configurationInstance);
+        extensionsManager.initialise();
+        assertRegisteredWithUniqueMadeKey(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, configurationInstance);
+    }
+
+    @Test
+    public void getOperationExecutor() throws Exception
+    {
+        discover();
+
+        final Object configInstance = new Object();
+        extensionsManager.registerConfigurationInstance(extension1Configuration, EXTENSION1_CONFIG_INSTANCE_NAME, configInstance);
+
+        final Object executorDelegate = new Object();
+        DelegatingOperationExecutor executor = mock(DelegatingOperationExecutor.class);
+        when(executor.getExecutorDelegate()).thenReturn(executorDelegate);
+
+        when(extension1Operation.getExecutor(configInstance)).thenReturn(executor);
+        OperationExecutor managedExecutor = extensionsManager.getOperationExecutor(extension1Operation, configInstance);
+        assertThat(managedExecutor, is(sameInstance((OperationExecutor) executor)));
+
+        // ask for the same executor again and check that it's still the same instance
+        managedExecutor = extensionsManager.getOperationExecutor(extension1Operation, configInstance);
+        assertThat(managedExecutor, is(sameInstance((OperationExecutor) executor)));
+
+        verify(muleContext.getRegistry()).registerObject(anyString(), same(executorDelegate));
+        verify(extension1Operation.getExecutor(configInstance));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getOperationExecutorForUnregisteredConfigurationInstance() throws Exception
+    {
+        discover();
+        extensionsManager.getOperationExecutor(extension1Operation, new Object());
     }
 
     private List<Extension> getTestExtensions()

@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.config;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.setNoRecurseOnDefinition;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
@@ -65,6 +66,7 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         builder.addConstructorArgValue(operation);
         builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
         builder.addConstructorArgValue(parseNestedOperations(element, parserContext));
+        builder.addConstructorArgReference(MuleProperties.OBJECT_MULE_CONTEXT);
 
         BeanDefinition definition = builder.getBeanDefinition();
         setNoRecurseOnDefinition(definition);

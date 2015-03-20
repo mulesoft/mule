@@ -8,9 +8,6 @@ package org.mule.module.extension.internal.runtime.resolver;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.lifecycle.Stoppable;
 
 /**
  * A wrapper for an instance of {@link ValueResolver} in which
@@ -67,32 +64,6 @@ public class CachingValueResolverWrapper<T> extends BaseValueResolverWrapper<T>
     public boolean isDynamic()
     {
         return false;
-    }
-
-    /**
-     * Invokes {@link Stoppable#stop()} on the stored value
-     * and the {@link #delegate} if they implement that interface
-     *
-     * @throws MuleException
-     */
-    @Override
-    public void stop() throws MuleException
-    {
-        LifecycleUtils.stopIfNeeded(value);
-        super.stop();
-    }
-
-    /**
-     * Invokes {@link Disposable#dispose()} ()} on the stored value
-     * and the {@link #delegate} if they implement that interface
-     *
-     * @throws MuleException
-     */
-    @Override
-    public void dispose()
-    {
-        LifecycleUtils.disposeIfNeeded(value, logger);
-        super.dispose();
     }
 
     private interface CachingDelegate

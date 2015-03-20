@@ -6,26 +6,16 @@
  */
 package org.mule.module.extension.internal.config;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.module.extension.internal.runtime.resolver.ConfigurationValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-abstract class BaseResolverFactoryBean<T extends ValueResolver> implements FactoryBean<T> , MuleContextAware, Initialisable
+abstract class BaseResolverFactoryBean<T extends ValueResolver> implements FactoryBean<T>
 {
-    protected final Logger logger = LoggerFactory.getLogger(getObjectType());
-
     protected final String name;
     protected ElementDescriptor element;
     protected T valueResolver;
-    protected MuleContext muleContext;
 
     BaseResolverFactoryBean(String name, ElementDescriptor element)
     {
@@ -51,27 +41,5 @@ abstract class BaseResolverFactoryBean<T extends ValueResolver> implements Facto
     public boolean isSingleton()
     {
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
-    }
-
-    /**
-     * Propagates the {@link #muleContext} and initialisation event
-     * to the underlying {@link #valueResolver} in case it implements the
-     * {@link MuleContextAware} and/or {@link Initialisable} interfaces
-     *
-     * @throws InitialisationException
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        LifecycleUtils.initialiseIfNeeded(valueResolver, muleContext);
     }
 }
