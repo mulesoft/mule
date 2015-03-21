@@ -7,8 +7,8 @@
 
 package org.mule.transport.file;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -24,9 +24,8 @@ public class RecursiveWorkDirectoryTestCase extends FunctionalTestCase
     @Rule
     public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder("temp");
 
-
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return  "recursive-work-directory-config.xml";
     }
