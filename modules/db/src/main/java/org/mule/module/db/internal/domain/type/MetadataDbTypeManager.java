@@ -42,10 +42,12 @@ public class MetadataDbTypeManager implements DbTypeManager
         String typeKey = dbType.getName() + dbType.getId();
         if (typesById.containsKey(typeKey))
         {
-            throw new IllegalArgumentException(String.format("There is already a registered type with ID %s and name %s", dbType.getId(), dbType.getName()));
+            logger.warn(String.format("There is already a registered type with ID %s and name %s", dbType.getId(), dbType.getName()));
         }
-
-        typesById.put(typeKey, dbType);
+        else
+        {
+            typesById.put(typeKey, dbType);
+        }
     }
 
     @Override
