@@ -33,3 +33,5 @@ MULE-7536: Mule distribution does not provide a lib/shared/default domain for sh
 MULE-7524: Encoded mule expressions in dynamic endpoints address components are not supported anymore (ie: %23[expression] must be #[expression])
 MULE-7546: Implementations of org.mule.api.MuleMessage now need to implement clearAttachments() which was added to the interface. Implementations that extend org.mule.el.context.AbstractMapContext must now implement clear() given this method has been removed from the abstract implementation.
 MULE-7612: maps returned by queries using the Database connector can have different keys as now column's aliases are used instead of column's names
+MULE-8430: in previous versions of Mule, domain home folders where created relative to current working directory instead of relative to <MULE_HOME> folder.
+           Now that this is fixed, if your Mule instance was started from a folder other than <MULE_HOME> then folder <WORKING_DIRECTORY>/.mule/<DOMAIN_NAME> must be moved to <MULE_HOME>/.mule/<DOMAIN_NAME>
