@@ -245,10 +245,6 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             if (transformer != null)
             {
-                // clear transformation parameters before returning transformer to the
-                // pool
-                transformer.clearParameters();
-
                 transformerPool.returnObject(transformer);
             }
         }
@@ -362,6 +358,20 @@ public class XsltTransformer extends AbstractXmlTransformer
             factory.setURIResolver(getUriResolver());
 
             return factory.newTransformer(source);
+        }
+
+        @Override
+        public void passivateObject(Object object) throws Exception
+        {
+            javax.xml.transform.Transformer transformer = (javax.xml.transform.Transformer) object;
+
+            // Clear transformation parameters before returning transformer to the pool
+            transformer.clearParameters();
+
+            // Clean up transformer before return it to the pool
+            transformer.reset();
+
+            super.passivateObject(transformer);
         }
     }
 
