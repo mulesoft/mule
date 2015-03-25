@@ -52,7 +52,7 @@ public class XsltResultDocumentTestCase extends FunctionalTestCase
     private void executeFlowAndValidateOutput(String payload, File outputFile) throws Exception
     {
         outputFile.delete();
-        runFlow(FLOW_NAME, createEventWithPayloadAndSessionProperty(payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()));
+        testFlow(FLOW_NAME, createEventWithPayloadAndSessionProperty(payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()));
         assertThat(FileUtils.readFileToString(outputFile), is(EXPECTED_OUTPUT));
     }
 
