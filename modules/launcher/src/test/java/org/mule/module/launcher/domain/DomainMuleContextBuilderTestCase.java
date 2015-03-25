@@ -7,7 +7,7 @@
 
 package org.mule.module.launcher.domain;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
