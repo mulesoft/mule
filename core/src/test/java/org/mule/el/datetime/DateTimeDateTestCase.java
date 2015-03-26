@@ -92,7 +92,7 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     @Test
     public void withLocale()
     {
-        SimpleDateFormat df = new SimpleDateFormat("E");
+        SimpleDateFormat df = new SimpleDateFormat("E", "en_US");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         assertEquals(df.format(new Date()), now.withLocale("en_US").format("E"));
     }
