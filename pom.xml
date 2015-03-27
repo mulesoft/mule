@@ -206,6 +206,7 @@
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <log4jVersion>1.2.16</log4jVersion>
         <mockobjectsVersion>0.09</mockobjectsVersion>
+        <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
@@ -1457,7 +1458,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.6-MULE-4</version>
+                    <version>${maven.surefire.plugin.version}</version>
                     <configuration>
                         <argLine>-Xms64m -Xmx512m</argLine>
                         <excludes>
