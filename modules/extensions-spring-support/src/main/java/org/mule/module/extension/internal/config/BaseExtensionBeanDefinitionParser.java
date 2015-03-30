@@ -6,7 +6,6 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.applyLifecycle;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.setNoRecurseOnDefinition;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -33,7 +32,6 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
 
         doParse(builder, element);
 
-        applyLifecycle(builder);
         BeanDefinition definition = builder.getBeanDefinition();
         setNoRecurseOnDefinition(definition);
 

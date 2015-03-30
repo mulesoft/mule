@@ -10,7 +10,6 @@ import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleC
 import static org.mule.repackaged.internal.org.springframework.util.ReflectionUtils.invokeMethod;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleException;
-import org.mule.extension.annotations.Parameters;
 import org.mule.extension.introspection.Capable;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
@@ -28,7 +27,7 @@ import java.util.Map;
  * An implementation of {@link ValueSetter} for parameter groups.
  * Parameter groups are a set of parameters defined inside a Pojo in order to reference them
  * as a group and avoid code repetition. The parameter groups are defined by applying
- * the {@link Parameters} annotation to a field.
+ * the {@link org.mule.extension.annotations.ParameterGroup} annotation to a field.
  * <p/>
  * This {@link ValueSetter} knows how to map a {@link ResolverSetResult} to an object
  * which acts as a group. Because group nesting is allowed, this class is a composite
@@ -55,10 +54,10 @@ public final class GroupValueSetter implements ValueSetter
         return groupValueSetters.build();
     }
 
-    private final ParameterGroup group;
+    private final org.mule.module.extension.internal.introspection.ParameterGroup group;
     private List<ValueSetter> childSetters;
 
-    public GroupValueSetter(ParameterGroup group)
+    public GroupValueSetter(org.mule.module.extension.internal.introspection.ParameterGroup group)
     {
         this.group = group;
         childSetters = settersFor(group);

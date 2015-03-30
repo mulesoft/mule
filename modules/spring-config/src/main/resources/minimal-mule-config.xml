@@ -91,6 +91,10 @@
             <spring:constructor-arg  ref="_muleContext"/>
         </spring:bean>
 
+        <spring:bean name="_muleExtensionManager" class="org.mule.config.spring.factories.ExtensionManagerFactoryBean">
+            <spring:constructor-arg  ref="_muleContext"/>
+        </spring:bean>
+
         <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
         the transformers will be available even when using the TransientRegistry only -->
 

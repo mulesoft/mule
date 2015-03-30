@@ -109,35 +109,6 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase
         assertThat(builder.isDynamic(), is(true));
     }
 
-    @Test
-    public void initialise() throws Exception
-    {
-        builder.setMuleContext(muleContext);
-        builder.initialise();
-        ExtensionsTestUtils.verifyAllInitialised(resolvers, muleContext);
-    }
-
-    @Test
-    public void start() throws Exception
-    {
-        builder.start();
-        ExtensionsTestUtils.verifyAllStarted(resolvers);
-    }
-
-    @Test
-    public void stop() throws Exception
-    {
-        builder.stop();
-        ExtensionsTestUtils.verifyAllStopped(resolvers);
-    }
-
-    @Test
-    public void dispose() throws Exception
-    {
-        builder.dispose();
-        ExtensionsTestUtils.verifyAllDisposed(resolvers);
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void buildInterface() throws Exception
     {

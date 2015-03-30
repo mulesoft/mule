@@ -79,6 +79,7 @@
                 <heisenberg:kill-with-custom-message config-ref="heisenberg" victim="Nazi dudes" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operations>
         </heisenberg:kill-many>
+
     </flow>
 
     <flow name="killOne">
@@ -89,8 +90,12 @@
         </heisenberg:kill-one>
     </flow>
 
+    <flow name="injectedExtensionManager">
+        <heisenberg:get-injected-extension-manager config-ref="heisenberg" />
+    </flow>
+
     <flow name="alias">
-        <heisenberg:alias config-ref="heisenberg" myName="Walter White" age="53" />
+        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52" config-ref="heisenberg" />
     </flow>
 
 </mule>

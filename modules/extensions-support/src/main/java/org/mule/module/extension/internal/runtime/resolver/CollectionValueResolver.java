@@ -8,13 +8,9 @@ package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -24,9 +20,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ValueResolver} that takes a list of {@link ValueResolver}s
@@ -39,14 +32,11 @@ import org.slf4j.LoggerFactory;
  * @param <T>
  * @since 3.7.0
  */
-public final class CollectionValueResolver<T> implements ValueResolver<Collection<T>>, Lifecycle, MuleContextAware
+public final class CollectionValueResolver<T> implements ValueResolver<Collection<T>>
 {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     private final List<ValueResolver<T>> resolvers;
     private final Class<? extends Collection> collectionType;
-    private MuleContext muleContext;
 
     public static <T> CollectionValueResolver<T> of(Class<? extends Collection> collectionType, List<ValueResolver<T>> resolvers)
     {
@@ -118,43 +108,5 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
         {
             throw new RuntimeException("Could not create instance of " + collectionType.getName(), e);
         }
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        for (ValueResolver resolver : resolvers)
-        {
-            if (resolver instanceof MuleContextAware)
-            {
-                ((MuleContextAware) resolver).setMuleContext(muleContext);
-            }
-        }
-
-        LifecycleUtils.initialiseIfNeeded(resolvers);
-    }
-
-    @Override
-    public void start() throws MuleException
-    {
-        LifecycleUtils.startIfNeeded(resolvers);
-    }
-
-    @Override
-    public void stop() throws MuleException
-    {
-        LifecycleUtils.stopIfNeeded(resolvers);
-    }
-
-    @Override
-    public void dispose()
-    {
-        LifecycleUtils.disposeAllIfNeeded(resolvers, LOGGER);
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
     }
 }

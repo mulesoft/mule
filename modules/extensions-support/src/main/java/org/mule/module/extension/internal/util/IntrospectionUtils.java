@@ -271,12 +271,20 @@ public class IntrospectionUtils
 
     public static void checkInstantiable(Class<?> declaringClass)
     {
+        checkInstantiable(declaringClass, true);
+    }
+
+    public static void checkInstantiable(Class<?> declaringClass, boolean requireDefaultConstructor)
+    {
         checkArgument(declaringClass != null, "declaringClass cannot be null");
-        checkArgument(hasDefaultConstructor(declaringClass),
-                      String.format("Class %s must have a default constructor", declaringClass.getName()));
+
+        if (requireDefaultConstructor)
+        {
+            checkArgument(hasDefaultConstructor(declaringClass), String.format("Class %s cannot be instantiated since it doesn't have a default constructor", declaringClass.getName()));
+        }
+
         checkArgument(!declaringClass.isInterface(), String.format("Class %s cannot be instantiated since it's an interface", declaringClass.getName()));
         checkArgument(!Modifier.isAbstract(declaringClass.getModifiers()), String.format("Class %s cannot be instantiated since it's abstract", declaringClass.getName()));
-        checkArgument(hasDefaultConstructor(declaringClass), String.format("Class %s cannot be instantiated since it doesn't have a default constructor", declaringClass.getName()));
     }
 
     public static boolean isIgnored(AccessibleObject object)
@@ -298,5 +306,11 @@ public class IntrospectionUtils
     {
         org.mule.extension.annotations.Parameter parameter = object.getAnnotation(org.mule.extension.annotations.Parameter.class);
         return parameter != null ? parameter.isDynamic() : true;
+    }
+
+    public static boolean isVoid(Method method)
+    {
+        Class<?> returnType = method.getReturnType();
+        return returnType.equals(void.class) || returnType.equals(Void.class);
     }
 }

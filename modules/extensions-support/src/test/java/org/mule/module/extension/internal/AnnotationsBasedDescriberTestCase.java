@@ -36,9 +36,9 @@ import org.mule.extension.introspection.declaration.OperationDeclaration;
 import org.mule.extension.introspection.declaration.ParameterDeclaration;
 import org.mule.module.extension.Door;
 import org.mule.module.extension.HealthStatus;
-import org.mule.module.extension.HeisenbergAliasOperations;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
+import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.Ricin;
 import org.mule.module.extension.internal.capability.metadata.ImplementedTypeCapability;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
@@ -77,6 +77,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     private static final String DIE = "die";
     private static final String KILL_MANY = "killMany";
     private static final String KILL_ONE = "killOne";
+    private static final String LAUNDER_MONEY = "launder";
+    private static final String INJECTED_EXTENSION_MANAGER = "getInjectedExtensionManager";
     private static final String ALIAS = "alias";
 
     private Describer describer;
@@ -136,10 +138,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void aliasImplementsOperations() throws Exception
+    public void operationIsImplementionOf() throws Exception
     {
         Declaration declaration = describer.describe().getRootConstruct().getDeclaration();
-        OperationDeclaration operation = getOperation(declaration, "alias");
+        OperationDeclaration operation = getOperation(declaration, LAUNDER_MONEY);
         assertThat(operation.getCapabilities(), is(not(emptyIterable())));
 
         List<ImplementedTypeCapability> capabilities = new ArrayList<>();
@@ -194,7 +196,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
 
     private void assertTestModuleOperations(Declaration declaration) throws Exception
     {
-        assertThat(declaration.getOperations(), hasSize(10));
+        assertThat(declaration.getOperations(), hasSize(12));
         assertOperation(declaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(declaration, GET_ENEMY_OPERATION, "");
         assertOperation(declaration, KILL_OPERATION, "");
@@ -204,6 +206,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
         assertOperation(declaration, DIE, "");
         assertOperation(declaration, KILL_MANY, "");
         assertOperation(declaration, KILL_ONE, "");
+        assertOperation(declaration, LAUNDER_MONEY, "");
+        assertOperation(declaration, INJECTED_EXTENSION_MANAGER, "");
         assertOperation(declaration, ALIAS, "");
 
         OperationDeclaration operation = getOperation(declaration, SAY_MY_NAME_OPERATION);
@@ -235,7 +239,15 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters().isEmpty(), is(true));
 
+        operation = getOperation(declaration, LAUNDER_MONEY);
+        assertParameter(operation.getParameters(), "amount", "", DataType.of(long.class), true, true, null);
+
+        operation = getOperation(declaration, INJECTED_EXTENSION_MANAGER);
+        assertThat(operation, is(notNullValue()));
+        assertThat(operation.getParameters().isEmpty(), is(true));
+
         operation = getOperation(declaration, ALIAS);
+        assertParameter(operation.getParameters(), "greeting", "", DataType.of(String.class), true, true, null);
         assertParameter(operation.getParameters(), "myName", "", DataType.of(String.class), false, true, HEISENBERG);
         assertParameter(operation.getParameters(), "age", "", DataType.of(Integer.class), false, true, AGE);
     }
@@ -301,7 +313,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
     @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
     @Configurations(HeisenbergExtension.class)
-    @Operations({HeisenbergOperations.class, HeisenbergAliasOperations.class})
+    @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     public static class HeisenbergPointer extends HeisenbergExtension
     {
 
@@ -310,14 +322,14 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
     @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
     @Configurations({HeisenbergExtension.class, NamedHeisenbergAlternateConfig.class})
-    @Operations({HeisenbergOperations.class, HeisenbergAliasOperations.class})
+    @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     public static class HeisengergPointerPlusExternalConfig
     {
 
     }
 
     @org.mule.extension.annotations.Configuration(name = EXTENDED_CONFIG_NAME, description = EXTENDED_CONFIG_DESCRIPTION)
-    @Operations({HeisenbergOperations.class, HeisenbergAliasOperations.class})
+    @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     public static class NamedHeisenbergAlternateConfig extends HeisenbergAlternateConfig
     {
 
