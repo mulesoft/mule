@@ -83,6 +83,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final String MULE_CONFIG_XML_FILE = "mule-config.xml";
     private static final String EMPTY_APP_CONFIG_XML = "/empty-config.xml";
     private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
+    private static final String PROPERTIES_APP_CONFIG_XML = "/app-properties-config.xml";
 
     //APP constants
     private static final ArtifactDescriptor dummyAppDescriptor = new ArtifactDescriptor("dummy-app", "/dummy-app.zip", "/dummy-app", null, null);
@@ -173,6 +174,25 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // mule-app.properties from the zip archive must have loaded properly
         assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+    }
+
+    @Test
+    public void appHomePropertyIsPresent() throws Exception
+    {
+        addExplodedAppFromResource(dummyAppDescriptor.zipPath);
+        doRedeployAppByChangingConfigFile(dummyAppDescriptor.path, PROPERTIES_APP_CONFIG_XML);
+
+        deploymentService.start();
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+
+        final Application app = findApp(dummyAppDescriptor.id, 1);
+        final MuleRegistry registry = getMuleRegistry(app);
+
+        Map<String, Object> appProperties = registry.get("appProperties");
+        assertThat(appProperties, is(notNullValue()));
+
+        String appHome = (String) appProperties.get("appHome");
+        assertThat(new File(appHome).exists(), is(true));
     }
 
     @Test
