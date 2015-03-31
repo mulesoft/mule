@@ -7,20 +7,10 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ValueResolver} which wraps an {@link ObjectBuilder}
@@ -33,13 +23,10 @@ import org.slf4j.LoggerFactory;
  * @param <T>
  * @since 3.7.0
  */
-public class ObjectBuilderValueResolver<T> implements ValueResolver<T>, Lifecycle, MuleContextAware
+public class ObjectBuilderValueResolver<T> implements ValueResolver<T>
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectBuilderValueResolver.class);
-
     private final ObjectBuilder<T> builder;
-    private MuleContext muleContext;
 
     public ObjectBuilderValueResolver(ObjectBuilder<T> builder)
     {
@@ -67,49 +54,5 @@ public class ObjectBuilderValueResolver<T> implements ValueResolver<T>, Lifecycl
     public boolean isDynamic()
     {
         return builder.isDynamic();
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (builder instanceof MuleContextAware)
-        {
-            ((MuleContextAware) builder).setMuleContext(muleContext);
-        }
-
-        if (builder instanceof Initialisable)
-        {
-            ((Initialisable) builder).initialise();
-        }
-    }
-
-    @Override
-    public void start() throws MuleException
-    {
-        if (builder instanceof Startable)
-        {
-            ((Startable) builder).start();
-        }
-    }
-
-    @Override
-    public void stop() throws MuleException
-    {
-        if (builder instanceof Stoppable)
-        {
-            ((Stoppable) builder).stop();
-        }
-    }
-
-    @Override
-    public void dispose()
-    {
-        LifecycleUtils.disposeIfNeeded(builder, LOGGER);
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
     }
 }

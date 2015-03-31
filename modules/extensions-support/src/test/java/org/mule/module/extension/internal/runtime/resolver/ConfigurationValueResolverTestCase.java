@@ -6,10 +6,13 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -17,9 +20,11 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -29,6 +34,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -50,22 +56,26 @@ public class ConfigurationValueResolverTestCase extends AbstractMuleTestCase
     @Mock
     private ResolverSet resolverSet;
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
 
     @Mock
     private MuleEvent event;
 
-    private HeisenbergExtension config;
+    @Mock
+    private ResolverSetResult resolverSetResult;
 
     @Mock
-    private ResolverSetResult resolverSetResult = mock(ResolverSetResult.class);
+    private ExtensionManager extensionManager;
 
     private ConfigurationValueResolver resolver;
 
     @Before
     public void before() throws Exception
     {
+        when(muleContext.getExtensionManager()).thenReturn(extensionManager);
+        ExtensionsTestUtils.stubRegistryKey(muleContext, CONFIG_NAME);
+
         when(configuration.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
         when(configuration.getInstantiator().newInstance()).thenAnswer(new Answer<Object>()
         {
@@ -88,13 +98,35 @@ public class ConfigurationValueResolverTestCase extends AbstractMuleTestCase
     {
         resolver = getStaticConfigResolver();
         assertSameInstancesResolved();
+        assertConfigInstanceRegistered(resolver.resolve(event));
     }
 
     @Test
-    public void resolveDynamicConfig() throws Exception
+    public void resolveDynamicConfigWithEquivalentEvent() throws Exception
     {
         resolver = getDynamicConfigResolver();
         assertSameInstancesResolved();
+    }
+
+    @Test
+    public void resolveDynamicConfigWithDifferentEvent() throws Exception
+    {
+        resolver = getDynamicConfigResolver();
+        Object config1 = resolver.resolve(event);
+
+        when(resolverSet.resolve(event)).thenReturn(mock(ResolverSetResult.class));
+        Object config2 = resolver.resolve(event);
+
+        assertThat(config1, is(not(sameInstance(config2))));
+        assertConfigInstanceRegistered(config1);
+        assertConfigInstanceRegistered(config2);
+    }
+
+    private void assertConfigInstanceRegistered(Object instance)
+    {
+        ArgumentCaptor<String> key = ArgumentCaptor.forClass(String.class);
+        verify(extensionManager).registerConfigurationInstance(same(configuration), key.capture(), same(instance));
+        assertThat(key.getValue(), containsString(CONFIG_NAME));
     }
 
     private void assertSameInstancesResolved() throws Exception
@@ -106,6 +138,8 @@ public class ConfigurationValueResolverTestCase extends AbstractMuleTestCase
         {
             assertThat(resolver.resolve(event), is(sameInstance(config)));
         }
+
+        assertConfigInstanceRegistered(config);
     }
 
     @Test
@@ -136,94 +170,6 @@ public class ConfigurationValueResolverTestCase extends AbstractMuleTestCase
         assertThat(resolver.getName(), is(CONFIG_NAME));
     }
 
-    @Test
-    public void staticConfigInitialisation() throws Exception
-    {
-        resolver = getStaticConfigResolver();
-        assertInitialisation();
-    }
-
-    @Test
-    public void dynamicConfigInitialisation() throws Exception
-    {
-        resolver = getDynamicConfigResolver();
-        assertInitialisation();
-    }
-
-    @Test
-    public void staticConfigStart() throws Exception
-    {
-        resolver = getStaticConfigResolver();
-        assertStarted();
-    }
-
-    @Test
-    public void dynamicConfigStart() throws Exception
-    {
-        resolver = getDynamicConfigResolver();
-        assertStarted();
-    }
-
-    @Test
-    public void staticConfigStop() throws Exception
-    {
-        resolver = getStaticConfigResolver();
-        assertStopped();
-    }
-
-    @Test
-    public void dynamicConfigStop() throws Exception
-    {
-        resolver = getDynamicConfigResolver();
-        assertStopped();
-    }
-
-    @Test
-    public void staticConfigDispose() throws Exception
-    {
-        resolver = getStaticConfigResolver();
-        assertDisposed();
-    }
-
-    @Test
-    public void dynamicConfigDispose() throws Exception
-    {
-        resolver = getDynamicConfigResolver();
-        assertDisposed();
-    }
-
-    private void assertInitialisation() throws Exception
-    {
-        config = (HeisenbergExtension) resolver.resolve(event);
-        assertThat(config.getMuleContext(), is(sameInstance(muleContext)));
-        assertThat(config.getInitialise(), is(1));
-    }
-
-    private void assertStopped() throws Exception
-    {
-        config = (HeisenbergExtension) resolver.resolve(event);
-
-        resolver.stop();
-        verify(resolverSet).stop();
-        assertThat(config.getStop(), is(1));
-    }
-
-    private void assertDisposed() throws Exception
-    {
-        config = (HeisenbergExtension) resolver.resolve(event);
-
-        resolver.dispose();
-        verify(resolverSet).dispose();
-        assertThat(config.getDispose(), is(1));
-    }
-
-    private void assertStarted() throws Exception
-    {
-        config = (HeisenbergExtension) resolver.resolve(event);
-        verify(resolverSet).start();
-        assertThat(config.getStart(), is(1));
-    }
-
     private ConfigurationValueResolver getStaticConfigResolver() throws Exception
     {
         when(resolverSet.isDynamic()).thenReturn(false);
@@ -240,11 +186,6 @@ public class ConfigurationValueResolverTestCase extends AbstractMuleTestCase
 
     private ConfigurationValueResolver getConfigResolver() throws Exception
     {
-        ConfigurationValueResolver resolver = new ConfigurationValueResolver(CONFIG_NAME, configuration, resolverSet);
-        resolver.setMuleContext(muleContext);
-        resolver.initialise();
-        resolver.start();
-
-        return resolver;
+        return new ConfigurationValueResolver(CONFIG_NAME, configuration, resolverSet, muleContext);
     }
 }

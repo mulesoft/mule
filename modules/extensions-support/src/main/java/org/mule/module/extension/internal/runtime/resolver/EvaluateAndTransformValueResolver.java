@@ -10,7 +10,6 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -37,12 +36,13 @@ import org.apache.commons.lang.StringUtils;
  * @param <T>
  * @since 3.7.0
  */
-public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>, MuleContextAware
+public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>
 {
 
     private final DataType expectedType;
-    private AttributeEvaluator evaluator;
+    private final AttributeEvaluator evaluator;
     private MuleContext muleContext;
+    private EvaluatorDelegate delegate = new CaptureContextEvaluatorDelegate();
 
     public EvaluateAndTransformValueResolver(String expression, DataType expectedType)
     {
@@ -56,7 +56,7 @@ public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>, M
     @Override
     public T resolve(MuleEvent event) throws MuleException
     {
-        T evaluated = (T) evaluator.resolveValue(event);
+        T evaluated = (T) delegate.resolveValue(event);
         return evaluated != null ? transform(evaluated, event) : null;
     }
 
@@ -111,10 +111,36 @@ public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>, M
         return true;
     }
 
-    @Override
-    public void setMuleContext(MuleContext context)
+    private interface EvaluatorDelegate
     {
-        muleContext = context;
-        evaluator.initialize(muleContext.getExpressionManager());
+
+        Object resolveValue(MuleEvent event);
+    }
+
+    private class CaptureContextEvaluatorDelegate implements EvaluatorDelegate
+    {
+
+        @Override
+        public synchronized Object resolveValue(MuleEvent event)
+        {
+            if (muleContext == null)
+            {
+                muleContext = event.getMuleContext();
+                evaluator.initialize(muleContext.getExpressionManager());
+                delegate = new PassThroughEvaluatorDelegate();
+            }
+
+            return delegate.resolveValue(event);
+        }
+    }
+
+    private class PassThroughEvaluatorDelegate implements EvaluatorDelegate
+    {
+
+        @Override
+        public synchronized Object resolveValue(MuleEvent event)
+        {
+            return evaluator.resolveValue(event);
+        }
     }
 }

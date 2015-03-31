@@ -9,8 +9,9 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.OperationImplementation;
+import org.mule.extension.runtime.OperationExecutor;
 import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.declaration.OperationExecutorFactory;
 
 import java.util.List;
 import java.util.Set;
@@ -24,18 +25,18 @@ final class ImmutableOperation extends AbstractImmutableCapableDescribed impleme
 {
 
     private final List<Parameter> parameters;
-    private final OperationImplementation implementation;
+    private final OperationExecutorFactory executorFactory;
 
     ImmutableOperation(String name,
                        String description,
-                       OperationImplementation implementation,
+                       OperationExecutorFactory executorFactory,
                        List<Parameter> parameters,
                        Set<Object> capabilities)
     {
         super(name, description, capabilities);
 
-        checkArgument(implementation != null, String.format("Operation %s cannot have a null implementation", name));
-        this.implementation = implementation;
+        checkArgument(executorFactory != null, String.format("Operation %s cannot have a null executor factory", name));
+        this.executorFactory = executorFactory;
         this.parameters = immutableList(parameters);
     }
 
@@ -52,8 +53,8 @@ final class ImmutableOperation extends AbstractImmutableCapableDescribed impleme
      * {@inheritDoc}
      */
     @Override
-    public OperationImplementation getImplementation()
+    public <T> OperationExecutor getExecutor(T configurationInstance)
     {
-        return implementation;
+        return executorFactory.getExecutor(configurationInstance);
     }
 }

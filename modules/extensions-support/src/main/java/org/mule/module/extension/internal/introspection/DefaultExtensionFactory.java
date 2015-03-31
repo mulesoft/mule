@@ -125,7 +125,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         List<Parameter> parameters = toOperationParameters(declaration.getParameters());
         return new ImmutableOperation(declaration.getName(),
                                       declaration.getDescription(),
-                                      declaration.getImplementation(),
+                                      declaration.getExecutorFactory(),
                                       parameters,
                                       declaration.getCapabilities());
     }

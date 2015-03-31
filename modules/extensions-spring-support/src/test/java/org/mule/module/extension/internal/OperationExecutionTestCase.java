@@ -8,21 +8,19 @@ package org.mule.module.extension.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.extension.introspection.Describer;
+import org.mule.extension.ExtensionManager;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.HeisenbergOperations;
-import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import org.junit.Test;
 
-public class OperationParserTestCase extends ExtensionsFunctionalTestCase
+public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
 {
 
     private static final String GUSTAVO_FRING = "Gustavo Fring";
@@ -32,9 +30,9 @@ public class OperationParserTestCase extends ExtensionsFunctionalTestCase
     private static final String VICTIM = "Skyler";
 
     @Override
-    protected Describer[] getManagedDescribers()
+    protected Class<?>[] getAnnotatedExtensionClasses()
     {
-        return new Describer[] {new AnnotationsBasedDescriber(HeisenbergExtension.class)};
+        return new Class<?>[] {HeisenbergExtension.class};
     }
 
     @Override
@@ -80,7 +78,6 @@ public class OperationParserTestCase extends ExtensionsFunctionalTestCase
     public void operationWithInjectedEvent() throws Exception
     {
         MuleEvent event = getTestEvent(EMPTY);
-        HeisenbergOperations.eventHolder.set(event);
         event = runFlow("hideInEvent", event);
         assertThat((String) event.getFlowVariable(SECRET_PACKAGE), is(METH));
     }
@@ -89,10 +86,8 @@ public class OperationParserTestCase extends ExtensionsFunctionalTestCase
     public void operationWithInjectedMessage() throws Exception
     {
         MuleEvent event = getTestEvent(EMPTY);
-        MuleMessage message = event.getMessage();
-        HeisenbergOperations.messageHolder.set(message);
-        runFlow("hideInMessage", getTestEvent(EMPTY));
-        assertThat((String) message.getInvocationProperty(SECRET_PACKAGE), is(METH));
+        runFlow("hideInMessage", event);
+        assertThat((String) event.getMessage().getInvocationProperty(SECRET_PACKAGE), is(METH));
     }
 
     @Test
@@ -140,11 +135,17 @@ public class OperationParserTestCase extends ExtensionsFunctionalTestCase
     }
 
     @Test
-    public void operationWithParameterGroups() throws Exception
+    public void getInjectedDependency() throws Exception
     {
-        MuleEvent event = runFlow("alias");
-        String expected = "Hello, my name is Walter White. I'm 53 years old";
-        assertThat(expected, is(event.getMessageAsString()));
+        ExtensionManager extensionManager = (ExtensionManager) runFlow("injectedExtensionManager").getMessage().getPayload();
+        assertThat(extensionManager, is(sameInstance(muleContext.getExtensionManager())));
+    }
+
+    @Test
+    public void alias() throws Exception
+    {
+        String alias = runFlow("alias").getMessageAsString();
+        assertThat(alias, is("Howdy!, my name is Walter White and I'm 52 years old"));
     }
 
     private void assertKillPayload(MuleEvent event) throws MuleException

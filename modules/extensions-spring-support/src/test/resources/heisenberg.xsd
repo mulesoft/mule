@@ -123,6 +123,7 @@
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="alias"></xs:element>
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="die"></xs:element>
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="get-enemy"></xs:element>
+            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="get-injected-extension-manager"></xs:element>
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="hide-meth-in-event"></xs:element>
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="hide-meth-in-message"></xs:element>
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill"></xs:element>
@@ -131,6 +132,7 @@
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill-one"></xs:element>
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill-one"></xs:element>
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill-with-custom-message"></xs:element>
+            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="launder"></xs:element>
             <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="say-my-name"></xs:element>
         </xs:choice>
     </xs:group>
@@ -143,6 +145,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="greeting"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="myName"></xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="optional" name="age"></xs:attribute>
             </xs:extension>
@@ -170,6 +173,18 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="required" name="index"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" type="GetInjectedExtensionManagerType" substitutionGroup="heisenberg-empire" name="get-injected-extension-manager"></xs:element>
+    <xs:complexType name="GetInjectedExtensionManagerType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -261,6 +276,19 @@
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="victim"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="goodbyeMessage"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" type="LaunderType" substitutionGroup="heisenberg-empire" name="launder"></xs:element>
+    <xs:complexType name="LaunderType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="required" name="amount"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

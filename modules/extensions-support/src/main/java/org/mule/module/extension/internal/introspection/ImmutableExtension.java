@@ -12,8 +12,8 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.NoSuchConfigurationException;
-import org.mule.extension.introspection.NoSuchOperationException;
+import org.mule.extension.exception.NoSuchConfigurationException;
+import org.mule.extension.exception.NoSuchOperationException;
 import org.mule.extension.introspection.Operation;
 
 import com.google.common.collect.ImmutableList;

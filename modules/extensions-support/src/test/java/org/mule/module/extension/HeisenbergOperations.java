@@ -10,13 +10,13 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.transport.PropertyScope;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.annotations.ImplementationOf;
 import org.mule.extension.annotations.Operation;
+import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.RestrictedTo;
-import org.mule.extension.annotations.WithConfig;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.Payload;
-import org.mule.util.ValueHolder;
 
 import java.util.List;
 
@@ -29,24 +29,15 @@ public class HeisenbergOperations
     private static final String SECRET_PACKAGE = "secretPackage";
     private static final String METH = "meth";
 
-    public static ValueHolder<MuleEvent> eventHolder = new ValueHolder<>();
-    public static ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
+    private final HeisenbergExtension config;
 
-    @WithConfig
-    private HeisenbergExtension config;
-
-    @Inject
-    private MuleEvent event;
-
-    @Inject
-    private MuleMessage message;
-
-    public HeisenbergOperations()
+    public HeisenbergOperations(HeisenbergExtension config)
     {
-        // remove when injector is in place
-        event = eventHolder.get();
-        message = messageHolder.get();
+        this.config = config;
     }
+
+    @Inject
+    private ExtensionManager extensionManager;
 
     @Operation
     public String sayMyName()
@@ -100,13 +91,25 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public void hideMethInEvent()
+    public ExtensionManager getInjectedExtensionManager()
+    {
+        return extensionManager;
+    }
+
+    @Operation
+    public void hideMethInEvent(MuleEvent event)
     {
         event.setFlowVariable(SECRET_PACKAGE, METH);
     }
 
     @Operation
-    public void hideMethInMessage()
+    public String alias(String greeting, @ParameterGroup PersonalInfo info)
+    {
+        return String.format("%s, my name is %s and I'm %d years old", greeting, info.getMyName(), info.getAge());
+    }
+
+    @Operation
+    public void hideMethInMessage(MuleMessage message)
     {
         message.setProperty(SECRET_PACKAGE, METH, PropertyScope.INVOCATION);
     }

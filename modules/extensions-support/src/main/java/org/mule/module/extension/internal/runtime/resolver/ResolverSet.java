@@ -7,17 +7,10 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 
@@ -25,9 +18,6 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ValueResolver} which is based on associating a set of
@@ -45,14 +35,11 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public class ResolverSet implements ValueResolver<Object>, Lifecycle, MuleContextAware
+public class ResolverSet implements ValueResolver<Object>
 {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResolverSet.class);
 
     private Map<Parameter, ValueResolver> resolvers = new LinkedHashMap<>();
     private boolean dynamic = false;
-    private MuleContext muleContext;
 
     /**
      * Links the given {@link ValueResolver} to the given {@link Parameter}.
@@ -119,69 +106,5 @@ public class ResolverSet implements ValueResolver<Object>, Lifecycle, MuleContex
     public Map<Parameter, ValueResolver> getResolvers()
     {
         return ImmutableMap.copyOf(resolvers);
-    }
-
-    /**
-     * For each registered {@link ValueResolver}, orderly invokes
-     * {@link MuleContextAware#setMuleContext(MuleContext)} and
-     * {@link Initialisable#initialise()} if each implements either of
-     * those interfaces
-     *
-     * @throws InitialisationException
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        for (ValueResolver resolver : resolvers.values())
-        {
-            if (resolver instanceof MuleContextAware)
-            {
-                ((MuleContextAware) resolver).setMuleContext(muleContext);
-            }
-        }
-        LifecycleUtils.initialiseIfNeeded(resolvers.values());
-    }
-
-    /**
-     * For each registered {@link ValueResolver}, it invokes
-     * {@link Startable#start()} if each implements that interface
-     *
-     * @throws MuleException
-     */
-    @Override
-    public void start() throws MuleException
-    {
-        LifecycleUtils.startIfNeeded(resolvers.values());
-    }
-
-    /**
-     * For each registered {@link ValueResolver}, it invokes
-     * {@link Stoppable#stop()} if each implements that interface
-     *
-     * @throws MuleException
-     */
-    @Override
-    public void stop() throws MuleException
-    {
-        LifecycleUtils.stopIfNeeded(resolvers.values());
-    }
-
-    /**
-     * For each registered {@link ValueResolver}, it invokes
-     * {@link Disposable#dispose()} if each implements that interface
-     */
-    @Override
-    public void dispose()
-    {
-        LifecycleUtils.disposeAllIfNeeded(resolvers.values(), LOGGER);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
     }
 }
