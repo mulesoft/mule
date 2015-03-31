@@ -218,7 +218,7 @@ public abstract class MessageFactory
     /**
      * @throws MissingResourceException if resource is missing
      */
-    private ResourceBundle getBundle(String bundlePath)
+    protected ResourceBundle getBundle(String bundlePath)
     {
         Locale locale = Locale.getDefault();
         if (logger.isTraceEnabled())
