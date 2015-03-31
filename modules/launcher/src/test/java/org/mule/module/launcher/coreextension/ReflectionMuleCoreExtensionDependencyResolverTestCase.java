@@ -8,16 +8,19 @@ package org.mule.module.launcher.coreextension;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.CoreExtensionsAware;
 import org.mule.MuleCoreExtension;
 import org.mule.MuleCoreExtensionDependency;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.IllegalDependencyInjectionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -29,8 +32,12 @@ import org.junit.Test;
 import org.mockito.Matchers;
 
 @SmallTest
-    public class ReflectionMuleCoreExtensionDependencyResolverTestCase extends AbstractMuleTestCase
+public class ReflectionMuleCoreExtensionDependencyResolverTestCase extends AbstractMuleTestCase
 {
+
+    public static final String EXTENSION1 = "extension1";
+    public static final String EXTENSION2 = "extension2";
+    public static final String DEPENDANT_EXTENSION = "dependantCoreExtension";
 
     private MuleCoreExtensionDependencyDiscoverer dependencyDiscoverer = mock(MuleCoreExtensionDependencyDiscoverer.class);
     private ReflectionMuleCoreExtensionDependencyResolver dependencyResolver = new ReflectionMuleCoreExtensionDependencyResolver(dependencyDiscoverer);
@@ -44,16 +51,21 @@ import org.mockito.Matchers;
     }
 
     @Test
-    public void resolvesIndependentExtension() throws Exception
+    public void resolvesIndependentExtensions() throws Exception
     {
-        List<MuleCoreExtension> coreExtensions = new LinkedList<MuleCoreExtension>();
-        coreExtensions.add(new TestCoreExtension());
+        MuleCoreExtension extension1 = mockCoreExtension(EXTENSION1);
+        MuleCoreExtension extension2 = mockCoreExtension(EXTENSION2);
+
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
+        coreExtensions.add(extension2);
+        coreExtensions.add(extension1);
 
         final List<MuleCoreExtension> resolvedCoreExtensions = dependencyResolver.resolveDependencies(coreExtensions);
-        verify(dependencyDiscoverer).findDependencies(Matchers.<MuleCoreExtension>anyObject());
+        verify(dependencyDiscoverer, times(2)).findDependencies(Matchers.<MuleCoreExtension>anyObject());
 
-        assertThat(resolvedCoreExtensions.size(), equalTo(1));
-        assertThat(resolvedCoreExtensions.get(0), is(instanceOf(TestCoreExtension.class)));
+        assertThat(resolvedCoreExtensions.size(), equalTo(2));
+        assertThat(resolvedCoreExtensions.get(0), sameInstance(extension1));
+        assertThat(resolvedCoreExtensions.get(1), sameInstance(extension2));
     }
 
     @Test
@@ -61,12 +73,13 @@ import org.mockito.Matchers;
     {
         TestCoreExtension testCoreExtension = new TestCoreExtension();
         TestCoreExtensionDependency dependantCoreExtension = mock(TestCoreExtensionDependency.class);
+        when(dependantCoreExtension.getName()).thenReturn(DEPENDANT_EXTENSION);
 
-        List<MuleCoreExtension> coreExtensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
         coreExtensions.add(testCoreExtension);
         coreExtensions.add(dependantCoreExtension);
 
-        final List<LinkedMuleCoreExtensionDependency> dependencies = new LinkedList<LinkedMuleCoreExtensionDependency>();
+        final List<LinkedMuleCoreExtensionDependency> dependencies = new LinkedList<>();
         final LinkedMuleCoreExtensionDependency linkedMuleCoreExtensionDependency = new LinkedMuleCoreExtensionDependency(TestCoreExtension.class, TestCoreExtensionDependency.class.getMethod("setTestCoreExtension", TestCoreExtension.class));
         dependencies.add(linkedMuleCoreExtensionDependency);
 
@@ -86,12 +99,13 @@ import org.mockito.Matchers;
     {
         TestCoreExtension testCoreExtension = new TestCoreExtension();
         TestCoreExtensionDependency dependantCoreExtension = mock(TestCoreExtensionDependency.class);
+        when(dependantCoreExtension.getName()).thenReturn(DEPENDANT_EXTENSION);
 
-        List<MuleCoreExtension> coreExtensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
         coreExtensions.add(dependantCoreExtension);
         coreExtensions.add(testCoreExtension);
 
-        final List<LinkedMuleCoreExtensionDependency> dependencies = new LinkedList<LinkedMuleCoreExtensionDependency>();
+        final List<LinkedMuleCoreExtensionDependency> dependencies = new LinkedList<>();
         final LinkedMuleCoreExtensionDependency linkedMuleCoreExtensionDependency = new LinkedMuleCoreExtensionDependency(TestCoreExtension.class, TestCoreExtensionDependency.class.getMethod("setTestCoreExtension", TestCoreExtension.class));
         dependencies.add(linkedMuleCoreExtensionDependency);
 
@@ -106,19 +120,110 @@ import org.mockito.Matchers;
         assertThat(resolvedCoreExtensions.get(1), is(instanceOf(TestCoreExtensionDependency.class)));
     }
 
+    @Test
+    public void resolvesCoreExtensionAwareAndStandardExtensions() throws Exception
+    {
+        MuleCoreExtension coreExtensionsAwareExtension = mockCoreExtension(EXTENSION1);
+        MuleCoreExtension testCoreExtension = new TestCoreExtension();
+
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
+        coreExtensions.add(testCoreExtension);
+        coreExtensions.add(coreExtensionsAwareExtension);
+
+        final List<MuleCoreExtension> resolvedCoreExtensions = dependencyResolver.resolveDependencies(coreExtensions);
+
+        assertThat(resolvedCoreExtensions.size(), equalTo(2));
+        assertThat(resolvedCoreExtensions.get(0), sameInstance(testCoreExtension));
+        assertThat(resolvedCoreExtensions.get(1), sameInstance(coreExtensionsAwareExtension));
+    }
+
+    @Test
+    public void resolvesStandardAndCoreExtensionAwareExtensions() throws Exception
+    {
+        MuleCoreExtension coreExtensionsAwareExtension = mockCoreExtension("coreExtensionsAwareExtension");
+        MuleCoreExtension testCoreExtension = new TestCoreExtension();
+
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
+        coreExtensions.add(coreExtensionsAwareExtension);
+        coreExtensions.add(testCoreExtension);
+
+        final List<MuleCoreExtension> resolvedCoreExtensions = dependencyResolver.resolveDependencies(coreExtensions);
+
+        assertThat(resolvedCoreExtensions.size(), equalTo(2));
+        assertThat(resolvedCoreExtensions.get(0), sameInstance(testCoreExtension));
+        assertThat(resolvedCoreExtensions.get(1), sameInstance(coreExtensionsAwareExtension));
+    }
+
+    @Test
+    public void resolvesOrderedCoreExtensionAwareExtensions() throws Exception
+    {
+        MuleCoreExtension coreExtensionsAwareExtension1 = mockCoreExtension(EXTENSION1);
+        MuleCoreExtension coreExtensionsAwareExtension2 = mockCoreExtension(EXTENSION2);
+
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
+        coreExtensions.add(coreExtensionsAwareExtension1);
+        coreExtensions.add(coreExtensionsAwareExtension2);
+
+        final List<MuleCoreExtension> resolvedCoreExtensions = dependencyResolver.resolveDependencies(coreExtensions);
+
+        assertThat(resolvedCoreExtensions.size(), equalTo(2));
+        assertThat(resolvedCoreExtensions.get(0), sameInstance(coreExtensionsAwareExtension1));
+        assertThat(resolvedCoreExtensions.get(1), sameInstance(coreExtensionsAwareExtension2));
+    }
+
+    @Test
+    public void resolvesDisorderedCoreExtensionAwareExtensions() throws Exception
+    {
+        MuleCoreExtension coreExtensionsAwareExtension1 = mockCoreExtension(EXTENSION1);
+        MuleCoreExtension coreExtensionsAwareExtension2 = mockCoreExtension(EXTENSION2);
+
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
+        coreExtensions.add(coreExtensionsAwareExtension2);
+        coreExtensions.add(coreExtensionsAwareExtension1);
+
+        final List<MuleCoreExtension> resolvedCoreExtensions = dependencyResolver.resolveDependencies(coreExtensions);
+
+        assertThat(resolvedCoreExtensions.size(), equalTo(2));
+        assertThat(resolvedCoreExtensions.get(0), sameInstance(coreExtensionsAwareExtension1));
+        assertThat(resolvedCoreExtensions.get(1), sameInstance(coreExtensionsAwareExtension2));
+    }
+
     @Test(expected = UnresolveableDependencyException.class)
     public void throwsExceptionOnUnresolvedDependency() throws Exception
     {
-        List<MuleCoreExtension> coreExtensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
         TestCoreExtensionDependency dependantCoreExtension = mock(TestCoreExtensionDependency.class);
         coreExtensions.add(dependantCoreExtension);
 
-        final List<LinkedMuleCoreExtensionDependency> dependencies = new LinkedList<LinkedMuleCoreExtensionDependency>();
+        final List<LinkedMuleCoreExtensionDependency> dependencies = new LinkedList<>();
         final LinkedMuleCoreExtensionDependency linkedMuleCoreExtensionDependency = new LinkedMuleCoreExtensionDependency(TestCoreExtension.class, TestCoreExtensionDependency.class.getMethod("setTestCoreExtension", TestCoreExtension.class));
         dependencies.add(linkedMuleCoreExtensionDependency);
         when(dependencyDiscoverer.findDependencies(dependantCoreExtension)).thenReturn(dependencies);
 
         dependencyResolver.resolveDependencies(coreExtensions);
+    }
+
+    @Test(expected = IllegalDependencyInjectionException.class)
+    public void throwsExceptionOnIllegalDependency() throws Exception
+    {
+        List<MuleCoreExtension> coreExtensions = new LinkedList<>();
+        TestIllegalCoreExtensionDependency dependantCoreExtension = mock(TestIllegalCoreExtensionDependency.class);
+        coreExtensions.add(dependantCoreExtension);
+
+        final List<LinkedMuleCoreExtensionDependency> dependencies = new LinkedList<>();
+        final LinkedMuleCoreExtensionDependency linkedMuleCoreExtensionDependency = new LinkedMuleCoreExtensionDependency(TestCoreExtension.class, TestCoreExtensionDependency.class.getMethod("setTestCoreExtension", TestCoreExtension.class));
+        dependencies.add(linkedMuleCoreExtensionDependency);
+        when(dependencyDiscoverer.findDependencies(dependantCoreExtension)).thenReturn(dependencies);
+
+        dependencyResolver.resolveDependencies(coreExtensions);
+    }
+
+    private MuleCoreExtension mockCoreExtension(String extension11)
+    {
+        MuleCoreExtension extension1 = mock(CoreExtensionsAwareExtension.class);
+        when(extension1.getName()).thenReturn(extension11);
+
+        return extension1;
     }
 
     public static class AbstractTestCoreExtension implements MuleCoreExtension
@@ -154,11 +259,27 @@ import org.mockito.Matchers;
     public static class TestCoreExtension extends AbstractTestCoreExtension
     {
 
+        @Override
+        public String getName()
+        {
+            return "testCoreExtension";
+        }
     }
 
-    public static interface TestCoreExtensionDependency extends MuleCoreExtension
+    public interface TestCoreExtensionDependency extends MuleCoreExtension
     {
         @MuleCoreExtensionDependency
         void setTestCoreExtension(TestCoreExtension coreExtension);
+    }
+
+    public interface TestIllegalCoreExtensionDependency extends MuleCoreExtension, CoreExtensionsAware
+    {
+        @MuleCoreExtensionDependency
+        void setTestCoreExtension(TestCoreExtension coreExtension);
+    }
+
+    public interface CoreExtensionsAwareExtension extends MuleCoreExtension, CoreExtensionsAware
+    {
+
     }
 }

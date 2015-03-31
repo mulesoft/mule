@@ -10,6 +10,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.CoreExtensionsAware;
 import org.mule.MuleCoreExtension;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
@@ -44,7 +45,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     @Test
     public void injectsDeploymentServiceAwareCoreExtension() throws Exception
     {
-        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> extensions = new LinkedList<>();
         TestDeploymentServiceAwareExtension extension = mock(TestDeploymentServiceAwareExtension.class);
         extensions.add(extension);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
@@ -61,7 +62,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     @Test
     public void initializesDeploymentListenerCoreExtension() throws Exception
     {
-        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> extensions = new LinkedList<>();
         TestDeploymentListenerExtension extension = mock(TestDeploymentListenerExtension.class);
         extensions.add(extension);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
@@ -78,7 +79,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     @Test
     public void injectsPluginClassLoaderAwareCoreExtension() throws Exception
     {
-        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> extensions = new LinkedList<>();
         TestPluginClassLoaderManagerAwareExtension extension = mock(TestPluginClassLoaderManagerAwareExtension.class);
         extensions.add(extension);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
@@ -93,16 +94,30 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     }
 
     @Test
+    public void injectsCoreExtensionsAwareCoreExtension() throws Exception
+    {
+        List<MuleCoreExtension> extensions = new LinkedList<>();
+        TestCoreExtensionsAwareExtension extension = mock(TestCoreExtensionsAwareExtension.class);
+        extensions.add(extension);
+        when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+        when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
+
+        coreExtensionManager.initialise();
+
+        verify(extension).setCoreExtensions(extensions);
+    }
+
+    @Test
     public void startsCoreExtensionsInOrder() throws Exception
     {
-        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> extensions = new LinkedList<>();
         MuleCoreExtension extension1 = mock(MuleCoreExtension.class);
         MuleCoreExtension extension2 = mock(MuleCoreExtension.class);
         extensions.add(extension1);
         extensions.add(extension2);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
 
-        List<MuleCoreExtension> orderedExtensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> orderedExtensions = new LinkedList<>();
         orderedExtensions.add(extension2);
         orderedExtensions.add(extension1);
         when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(orderedExtensions);
@@ -118,14 +133,14 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     @Test
     public void stopsCoreExtensionsInOrder() throws Exception
     {
-        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> extensions = new LinkedList<>();
         MuleCoreExtension extension1 = mock(MuleCoreExtension.class);
         MuleCoreExtension extension2 = mock(MuleCoreExtension.class);
         extensions.add(extension1);
         extensions.add(extension2);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
 
-        List<MuleCoreExtension> orderedExtensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> orderedExtensions = new LinkedList<>();
         orderedExtensions.add(extension1);
         orderedExtensions.add(extension2);
         when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(orderedExtensions);
@@ -141,14 +156,14 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     @Test
     public void initializesCoreExtensionsInOrder() throws Exception
     {
-        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> extensions = new LinkedList<>();
         MuleCoreExtension extension1 = mock(MuleCoreExtension.class);
         MuleCoreExtension extension2 = mock(MuleCoreExtension.class);
         extensions.add(extension1);
         extensions.add(extension2);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
 
-        List<MuleCoreExtension> orderedExtensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> orderedExtensions = new LinkedList<>();
         orderedExtensions.add(extension2);
         orderedExtensions.add(extension1);
         when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(orderedExtensions);
@@ -162,14 +177,14 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     @Test
     public void disposesCoreExtensions() throws Exception
     {
-        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> extensions = new LinkedList<>();
         TestDeploymentServiceAwareExtension extension1 = mock(TestDeploymentServiceAwareExtension.class);
         MuleCoreExtension extension2 = mock(MuleCoreExtension.class);
         extensions.add(extension1);
         extensions.add(extension2);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
 
-        List<MuleCoreExtension> orderedExtensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> orderedExtensions = new LinkedList<>();
         orderedExtensions.add(extension1);
         orderedExtensions.add(extension2);
         when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(orderedExtensions);
@@ -186,7 +201,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     public void resolvesCoreExtensionDependencies() throws Exception
     {
 
-        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> extensions = new LinkedList<>();
         MuleCoreExtension extension = mock(MuleCoreExtension.class);
         extensions.add(extension);
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
@@ -196,17 +211,22 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         verify(coreExtensionDependencyResolver).resolveDependencies(extensions);
     }
 
-    public static interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware
+    public interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware
     {
 
     }
 
-    public static interface TestDeploymentListenerExtension extends MuleCoreExtension, DeploymentListener
+    public interface TestDeploymentListenerExtension extends MuleCoreExtension, DeploymentListener
     {
 
     }
 
-    public static interface TestPluginClassLoaderManagerAwareExtension extends MuleCoreExtension, PluginClassLoaderManagerAware
+    public interface TestPluginClassLoaderManagerAwareExtension extends MuleCoreExtension, PluginClassLoaderManagerAware
+    {
+
+    }
+
+    public interface TestCoreExtensionsAwareExtension extends MuleCoreExtension, CoreExtensionsAware
     {
 
     }
