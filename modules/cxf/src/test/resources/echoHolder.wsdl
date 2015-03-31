@@ -43,7 +43,7 @@
             </xs:complexType>
             <xs:complexType name="echo3Response">
                 <xs:sequence>
-                    <xs:element minOccurs="0" name="return1" type="xs:string"/>
+                    <xs:element minOccurs="0" name="return0" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
