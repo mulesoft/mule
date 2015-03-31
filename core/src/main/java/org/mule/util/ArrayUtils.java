@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import static org.mule.util.Preconditions.checkArgument;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,18 +83,18 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
      * Creates a copy of the given array, but with the given <code>Class</code> as
      * element type. Useful for arrays of objects that implement multiple interfaces
      * and a "typed view" onto these objects is required.
-     * 
+     *
      * @param objects the array of objects
-     * @param clazz the desired service type of the new array
+     * @param clazz   the desired service type of the new array
      * @return <code>null</code> when objects is <code>null</code>, or a new
-     *         array containing the elements of the source array which is typed to
-     *         the given <code>clazz</code> parameter. If <code>clazz</code> is
-     *         already the service type of the source array, the source array is
-     *         returned (i.e. no copy is created).
+     * array containing the elements of the source array which is typed to
+     * the given <code>clazz</code> parameter. If <code>clazz</code> is
+     * already the service type of the source array, the source array is
+     * returned (i.e. no copy is created).
      * @throws IllegalArgumentException if the <code>clazz</code> argument is
-     *             <code>null</code>.
-     * @throws ArrayStoreException if the elements in <code>objects</code> cannot
-     *             be cast to <code>clazz</code>.
+     *                                  <code>null</code>.
+     * @throws ArrayStoreException      if the elements in <code>objects</code> cannot
+     *                                  be cast to <code>clazz</code>.
      */
     public static Object[] toArrayOfComponentType(Object[] objects, Class clazz)
     {
@@ -121,7 +123,7 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
 
     public static String[] setDifference(String[] a, String[] b)
     {
-        Object[] ugly = setDifference((Object[])a, b);
+        Object[] ugly = setDifference((Object[]) a, b);
         String[] copy = new String[ugly.length];
         System.arraycopy(ugly, 0, copy, 0, ugly.length);
         return copy;
@@ -129,6 +131,7 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
 
     /**
      * Calculates the intersection between two arrays, as if they were sets.
+     *
      * @return A new array with the intersection.
      */
     public static String[] intersection(String[] a, String[] b)
@@ -138,5 +141,57 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
         result.retainAll(Arrays.asList(b));
         return result.toArray(new String[result.size()]);
     }
-    
+
+    public static int getLength(Object array)
+    {
+        if (array == null)
+        {
+            return 0;
+        }
+
+        checkArgument(array.getClass().isArray(), String.format("Object of type %s is not an array", array.getClass().getName()));
+
+        Class<?> componentType = array.getClass().getComponentType();
+        if (!componentType.isPrimitive())
+        {
+            return ((Object[]) array).length;
+        }
+        else if (componentType.equals(Boolean.TYPE))
+        {
+            return ((boolean[]) array).length;
+        }
+        else if (componentType.equals(Byte.TYPE))
+        {
+            return ((byte[]) array).length;
+        }
+        else if (componentType.equals(Character.TYPE))
+        {
+            return ((char[]) array).length;
+        }
+        else if (componentType.equals(Short.TYPE))
+        {
+            return ((short[]) array).length;
+        }
+        else if (componentType.equals(Integer.TYPE))
+        {
+            return ((int[]) array).length;
+        }
+        else if (componentType.equals(Long.TYPE))
+        {
+            return ((long[]) array).length;
+        }
+        else if (componentType.equals(Float.TYPE))
+        {
+            return ((float[]) array).length;
+        }
+        else if (componentType.equals(Double.TYPE))
+        {
+            return ((double[]) array).length;
+        }
+        else
+        {
+            throw new IllegalArgumentException("Cannot determine length for array of " + componentType.getName());
+        }
+    }
+
 }

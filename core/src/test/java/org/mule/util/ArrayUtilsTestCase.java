@@ -6,18 +6,17 @@
  */
 package org.mule.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @SmallTest
 public class ArrayUtilsTestCase extends AbstractMuleTestCase
@@ -79,4 +78,9 @@ public class ArrayUtilsTestCase extends AbstractMuleTestCase
         assertEquals(9, StringUtils.countMatches(result, ","));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void getLengthOfNonArray()
+    {
+        ArrayUtils.getLength(new Object());
+    }
 }
