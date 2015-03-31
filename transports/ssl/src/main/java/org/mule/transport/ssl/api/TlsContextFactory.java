@@ -57,5 +57,9 @@ public interface TlsContextFactory
      */
     boolean isTrustStoreConfigured();
 
+    /**
+     * @return if a trust store was specified, return true if it was configured and false if not
+     */
+    boolean isTrustStoreValid();
 
 }

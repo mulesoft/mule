@@ -45,6 +45,7 @@ public class DefaultHttpListenerConfigTestCase extends AbstractMuleTestCase
     {
         when(mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)).thenReturn(mockHttpListenerConnectionManager);
         when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
+        when(mockTlsContextFactory.isTrustStoreValid()).thenReturn(true);
         listenerConfig = createBaseListener();
     }
 

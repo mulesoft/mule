@@ -155,6 +155,7 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
     public void createListenerSslConfigIfThereIsNoMatch() throws Exception
     {
         when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
+        when(mockTlsContextFactory.isTrustStoreValid()).thenReturn(true);
 
         new HttpListenerBuilder(createMuleContext())
                 .setTlsContextFactory(mockTlsContextFactory)

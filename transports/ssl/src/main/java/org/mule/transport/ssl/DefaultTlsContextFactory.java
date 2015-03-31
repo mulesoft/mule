@@ -29,6 +29,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     private TlsConfiguration tlsConfiguration = new TlsConfiguration(null);
 
     private boolean initialized = false;
+    private boolean trustStorePathSpecified;
 
     public String getName()
     {
@@ -97,6 +98,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory
 
     public void setTrustStorePath(String trustStorePath) throws IOException
     {
+        trustStorePathSpecified = trustStorePath != null;
         tlsConfiguration.setTrustStore(trustStorePath);
     }
 
@@ -167,6 +169,12 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     public boolean isTrustStoreConfigured()
     {
         return tlsConfiguration.getTrustStore() != null;
+    }
+
+    @Override
+    public boolean isTrustStoreValid()
+    {
+        return isTrustStoreConfigured() || !trustStorePathSpecified;
     }
 
     @Override

@@ -167,6 +167,10 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         {
             throw new InitialisationException(CoreMessages.createStaticMessage("KeyStore must be configured for server side SSL"), this);
         }
+        if (tlsContext != null && !tlsContext.isTrustStoreValid())
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("Specified TrustStore could not be configured"), this);
+        }
 
         verifyConnectionsParameters();
 
