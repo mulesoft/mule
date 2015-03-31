@@ -170,11 +170,11 @@ public class DefaultMuleApplication implements Application
             if (!cfgBuilder.isConfigured())
             {
                 List<ConfigurationBuilder> builders = new LinkedList<>();
-                builders.add(cfgBuilder);
                 builders.add(createConfigurationBuilderFromApplicationProperties());
 
                 // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
                 addAnnotationsConfigBuilderIfPresent(builders);
+                builders.add(cfgBuilder);
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
                 if (deploymentListener != null)
