@@ -21,7 +21,7 @@ Application-level logging supports 2 modes:
        by Mule and app has a full control (and responsibility) to configure logging.
 
 
-*** TIP: use ${sys:mule.home} placeholder in log4j.properties to resolve the Mule's directory (e.g. for file appenders). ***
+*** TIP: use ${sys:mule.home} placeholder in log4j2.xml to resolve the Mule's directory (e.g. for file appenders). ***
 
 In addition to the application's output, the wrapper also sends any JVM-level or 
 OS-level errors/warnings to the log file.  This means that if the JVM crashes 
