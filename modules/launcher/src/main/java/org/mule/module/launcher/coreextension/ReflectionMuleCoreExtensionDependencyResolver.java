@@ -6,10 +6,13 @@
  */
 package org.mule.module.launcher.coreextension;
 
+import org.mule.CoreExtensionsAware;
 import org.mule.MuleCoreExtension;
 import org.mule.api.MuleRuntimeException;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,8 +38,22 @@ public class ReflectionMuleCoreExtensionDependencyResolver implements MuleCoreEx
     @Override
     public List<MuleCoreExtension> resolveDependencies(Collection<MuleCoreExtension> coreExtensions)
     {
-        List<MuleCoreExtension> unresolvedExtensions = new LinkedList<MuleCoreExtension>(coreExtensions);
-        List<MuleCoreExtension> resolvedExtensions = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> sortedCoreExtensions = new LinkedList<>(coreExtensions);
+        sortCoreExtensionsByName(sortedCoreExtensions);
+
+        List<MuleCoreExtension> coreExtensionAwareExtensions = findCoreExtensionAwareExtensions(sortedCoreExtensions);
+        sortedCoreExtensions.removeAll(coreExtensionAwareExtensions);
+
+        List<MuleCoreExtension> resolvedExtensions = resolveCoreExtensionDependenciesOrder(sortedCoreExtensions);
+        resolvedExtensions.addAll(coreExtensionAwareExtensions);
+
+        return resolvedExtensions;
+    }
+
+    private List<MuleCoreExtension> resolveCoreExtensionDependenciesOrder(List<MuleCoreExtension> sortedCoreExtensions)
+    {
+        List<MuleCoreExtension> unresolvedExtensions = new LinkedList<>(sortedCoreExtensions);
+        List<MuleCoreExtension> resolvedExtensions = new LinkedList<>();
 
         boolean continueResolution = true;
 
@@ -44,13 +61,11 @@ public class ReflectionMuleCoreExtensionDependencyResolver implements MuleCoreEx
         {
             int initialResolvedCount = resolvedExtensions.size();
 
-            List<MuleCoreExtension> pendingUnresolvedExtensions = new LinkedList<MuleCoreExtension>();
+            List<MuleCoreExtension> pendingUnresolvedExtensions = new LinkedList<>();
 
             for (MuleCoreExtension muleCoreExtension : unresolvedExtensions)
             {
-                boolean resolvedDependency = isResolvedDependency(resolvedExtensions, muleCoreExtension);
-
-                if (resolvedDependency)
+                if (isResolvedCoreExtension(muleCoreExtension, resolvedExtensions))
                 {
                     resolvedExtensions.add(muleCoreExtension);
                 }
@@ -74,23 +89,55 @@ public class ReflectionMuleCoreExtensionDependencyResolver implements MuleCoreEx
         return resolvedExtensions;
     }
 
-    private boolean isResolvedDependency(List<MuleCoreExtension> resolvedExtensions, MuleCoreExtension muleCoreExtension)
+    private boolean isResolvedCoreExtension(MuleCoreExtension muleCoreExtension, List<MuleCoreExtension> resolvedExtensions)
     {
-        boolean resolvedDependency = false;
-
         final List<LinkedMuleCoreExtensionDependency> dependencies = dependencyDiscoverer.findDependencies(muleCoreExtension);
 
-        if (dependencies.size() == 0)
-        {
-            resolvedDependency = true;
-        }
-        else if (satisfiedDependencies(dependencies, resolvedExtensions))
+        boolean resolvedCoreExtension = dependencies.size() == 0;
+
+        if (!resolvedCoreExtension && satisfiedDependencies(dependencies, resolvedExtensions))
         {
             injectDependencies(muleCoreExtension, resolvedExtensions, dependencies);
-            resolvedDependency = true;
+            resolvedCoreExtension = true;
         }
 
-        return resolvedDependency;
+        return resolvedCoreExtension;
+    }
+
+    private List<MuleCoreExtension> findCoreExtensionAwareExtensions(List<MuleCoreExtension> sortedCoreExtensions)
+    {
+        List<MuleCoreExtension> coreExtensionAwareExtensions = new LinkedList<>();
+
+        for (MuleCoreExtension muleCoreExtension : sortedCoreExtensions)
+        {
+            if (muleCoreExtension instanceof CoreExtensionsAware)
+            {
+                final List<LinkedMuleCoreExtensionDependency> dependencies = dependencyDiscoverer.findDependencies(muleCoreExtension);
+
+                if (dependencies.isEmpty())
+                {
+
+                    coreExtensionAwareExtensions.add(muleCoreExtension);
+                }
+                else
+                {
+                    throw new IllegalDependencyException("A class cannot implement CoreExtensionAware when is also using MuleCoreExtensionDependency");
+                }
+            }
+        }
+        return coreExtensionAwareExtensions;
+    }
+
+    private void sortCoreExtensionsByName(List<MuleCoreExtension> coreExtensionAwareExtensions1)
+    {
+        Collections.sort(coreExtensionAwareExtensions1, new Comparator<MuleCoreExtension>()
+        {
+            @Override
+            public int compare(MuleCoreExtension coreExtension1, MuleCoreExtension coreExtension2)
+            {
+                return coreExtension1.getName().compareTo(coreExtension2.getName());
+            }
+        });
     }
 
     private void injectDependencies(MuleCoreExtension muleCoreExtension, List<MuleCoreExtension> resolvedExtensions, List<LinkedMuleCoreExtensionDependency> dependencies)
