@@ -22,7 +22,6 @@ import java.util.Map;
 
 import javax.xml.ws.Holder;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -117,7 +116,6 @@ public class HolderTestCase extends FunctionalTestCase
     }
 
     @Test
-    @Ignore("MULE-8350: This scenario was broken by the CXF upgrade to 2.7.15")
     public void testClientProxyEcho3Holder() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
