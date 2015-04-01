@@ -10,6 +10,7 @@ package org.mule.transport.ssl;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.util.FileUtils;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -97,6 +98,11 @@ public class DefaultTlsContextFactory implements TlsContextFactory
 
     public void setTrustStorePath(String trustStorePath) throws IOException
     {
+        String trustStoreResource = FileUtils.getResourcePath(trustStorePath, getClass());
+        if (trustStoreResource == null)
+        {
+            throw new IOException(String.format("Resource %s could not be found", trustStorePath));
+        }
         tlsConfiguration.setTrustStore(trustStorePath);
     }
 
