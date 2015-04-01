@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -37,8 +38,19 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
     @Test
     public void requestBodyFromCustomSource() throws Exception
     {
+        sendRequestFromCustomSourceAndAssertResponse(TEST_MESSAGE);
+    }
+
+    @Test
+    public void requestBodyFromCustomSourceAndNullPayload() throws Exception
+    {
+        sendRequestFromCustomSourceAndAssertResponse(NullPayload.getInstance());
+    }
+
+    private void sendRequestFromCustomSourceAndAssertResponse(Object payload) throws Exception
+    {
         Flow flow = (Flow) getFlowConstruct("customSourceFlow");
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        MuleEvent event = getTestEvent(payload);
         event.setFlowVariable("customSource", "customValue");
         flow.process(event);
         assertThat(body, equalTo("customValue"));

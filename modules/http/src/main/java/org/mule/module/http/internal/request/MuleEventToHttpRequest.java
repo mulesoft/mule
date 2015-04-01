@@ -7,13 +7,16 @@
 package org.mule.module.http.internal.request;
 
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
+import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
@@ -82,32 +85,33 @@ public class MuleEventToHttpRequest
 
     private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod) throws MessagingException
     {
+        boolean customSource = false;
+        Object oldPayload = null;
+        HttpEntity entity;
+
+        if (!StringUtils.isEmpty(requester.getSource()) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getSource())))
+        {
+            Object newPayload = muleContext.getExpressionManager().evaluate(requester.getSource(), muleEvent);
+            oldPayload = muleEvent.getMessage().getPayload();
+            muleEvent.getMessage().setPayload(newPayload);
+            customSource = true;
+        }
+
         if (isEmptyBody(muleEvent, resolvedMethod))
         {
-            return new EmptyHttpEntity();
+            entity = new EmptyHttpEntity();
         }
         else
         {
-            boolean customSource = false;
-            Object oldPayload = null;
-
-            if (!StringUtils.isEmpty(requester.getSource()) && !(DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getSource())))
-            {
-                Object newPayload = muleContext.getExpressionManager().evaluate(requester.getSource(), muleEvent);
-                oldPayload = muleEvent.getMessage().getPayload();
-                muleEvent.getMessage().setPayload(newPayload);
-                customSource = true;
-            }
-
-            HttpEntity entity = createRequestEntityFromPayload(requestBuilder, muleEvent);
-
-            if (customSource)
-            {
-                muleEvent.getMessage().setPayload(oldPayload);
-            }
-
-            return entity;
+            entity = createRequestEntityFromPayload(requestBuilder, muleEvent);
         }
+
+        if (customSource)
+        {
+            muleEvent.getMessage().setPayload(oldPayload);
+        }
+
+        return entity;
     }
 
     private boolean isEmptyBody(MuleEvent event, String method)
@@ -122,7 +126,7 @@ public class MuleEventToHttpRequest
         }
         else
         {
-            emptyBody = DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS.contains(method);
+            emptyBody = DEFAULT_EMPTY_BODY_METHODS.contains(method);
 
             if (sendBodyMode != HttpSendBodyMode.AUTO)
             {
@@ -171,14 +175,14 @@ public class MuleEventToHttpRequest
         }
         else
         {
-            String contentType = requestBuilder.getHeaders().get(HttpHeaders.Names.CONTENT_TYPE);
+            String contentType = requestBuilder.getHeaders().get(CONTENT_TYPE);
 
-            if (contentType == null || contentType.equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
+            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED))
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
                     String body = HttpParser.encodeString(muleEvent.getEncoding(), (Map) payload);
-                    requestBuilder.addHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED);
+                    requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
                     return new ByteArrayHttpEntity(body.getBytes());
                 }
             }
