@@ -14,6 +14,10 @@
         mule distributions we publish
     </description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.patterns</groupId>
