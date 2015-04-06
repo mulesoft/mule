@@ -6,6 +6,8 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.module.extension.internal.util.NameUtils.getGlobalPojoTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
@@ -32,13 +34,12 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.TemplateParser;
 import org.mule.util.ValueHolder;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -241,17 +242,15 @@ final class XmlExtensionParserUtils
     {
         ObjectBuilder builder = new DefaultObjectBuilder(declaringClass);
 
-        for (Map.Entry<Method, DataType> entry : IntrospectionUtils.getSettersDataTypes(declaringClass).entrySet())
+        for (Field field : getParameterFields(declaringClass))
         {
-            Method setter = entry.getKey();
-
-            if (IntrospectionUtils.isIgnored(setter))
+            if (IntrospectionUtils.isIgnored(field))
             {
                 continue;
             }
 
-            String parameterName = NameUtils.getFieldNameFromSetter(setter.getName());
-            DataType dataType = entry.getValue();
+            String parameterName = field.getName();
+            DataType dataType = getFieldDataType(field);
 
             ValueResolver resolver = getResolverFromAttribute(element, parameterName, dataType, null);
 
@@ -268,7 +267,7 @@ final class XmlExtensionParserUtils
 
             if (resolver != null)
             {
-                builder.addPropertyResolver(setter, resolver);
+                builder.addPropertyResolver(field, resolver);
             }
         }
 

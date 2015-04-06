@@ -78,8 +78,8 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

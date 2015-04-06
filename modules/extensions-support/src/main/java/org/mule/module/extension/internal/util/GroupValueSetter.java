@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.util;
 
 import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
-import static org.mule.repackaged.internal.org.springframework.util.ReflectionUtils.invokeMethod;
+import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.introspection.Capable;
@@ -19,7 +19,7 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import com.google.common.collect.ImmutableList;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -68,13 +68,13 @@ public final class GroupValueSetter implements ValueSetter
     {
         ObjectBuilder<?> groupBuilder = new DefaultObjectBuilder<>(group.getType());
 
-        for (Map.Entry<String, Method> parameter : group.getParameters().entrySet())
+        for (Map.Entry<String, Field> parameter : group.getParameters().entrySet())
         {
             groupBuilder.addPropertyValue(parameter.getValue(), result.get(parameter.getKey()));
         }
 
         Object object = groupBuilder.build(VoidMuleEvent.getInstance());
-        invokeMethod(group.getSetter(), target, object);
+        setField(group.getField(), target, object);
 
         for (ValueSetter childSetter : childSetters)
         {

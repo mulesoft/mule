@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -17,11 +18,10 @@ import org.mule.module.extension.ExtendedPersonalInfo;
 import org.mule.module.extension.LifetimeInfo;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.repackaged.internal.org.springframework.util.ReflectionUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,9 +48,9 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase
     private MuleContext muleContext;
 
     private DefaultObjectBuilder<ExtendedPersonalInfo> builder;
-    private Method nameSetter;
-    private Method ageSetter;
-    private Method lifetimeInfoSetter;
+    private Field nameField;
+    private Field ageField;
+    private Field lifetimeInfoField;
     private List<ValueResolver> resolvers = new ArrayList<>();
 
     @Before
@@ -58,9 +58,9 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase
     {
         builder = new DefaultObjectBuilder(PROTOTYPE_CLASS);
 
-        nameSetter = ReflectionUtils.findMethod(PROTOTYPE_CLASS, "setMyName", String.class);
-        ageSetter = ReflectionUtils.findMethod(PROTOTYPE_CLASS, "setAge", Integer.class);
-        lifetimeInfoSetter = ReflectionUtils.findMethod(PROTOTYPE_CLASS, "setLifetimeInfo", LifetimeInfo.class);
+        nameField = getField(PROTOTYPE_CLASS, "myName", String.class);
+        ageField = getField(PROTOTYPE_CLASS, "age", Integer.class);
+        lifetimeInfoField = getField(PROTOTYPE_CLASS, "lifetimeInfo", LifetimeInfo.class);
     }
 
     @Test
@@ -103,8 +103,8 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void isDynamic() throws Exception
     {
-        builder.addPropertyResolver(nameSetter, getResolver(NAME, false));
-        builder.addPropertyResolver(ageSetter, getResolver(AGE, true));
+        builder.addPropertyResolver(nameField, getResolver(NAME, false));
+        builder.addPropertyResolver(ageField, getResolver(AGE, true));
 
         assertThat(builder.isDynamic(), is(true));
     }
@@ -139,9 +139,9 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase
 
     private void populate(boolean dynamic) throws Exception
     {
-        builder.addPropertyResolver(nameSetter, getResolver(NAME, dynamic));
-        builder.addPropertyResolver(ageSetter, getResolver(AGE, dynamic));
-        builder.addPropertyResolver(lifetimeInfoSetter, getResolver(LIFETIME_INFO, dynamic));
+        builder.addPropertyResolver(nameField, getResolver(NAME, dynamic));
+        builder.addPropertyResolver(ageField, getResolver(AGE, dynamic));
+        builder.addPropertyResolver(lifetimeInfoField, getResolver(LIFETIME_INFO, dynamic));
     }
 
     private ValueResolver getResolver(Object value, boolean dynamic) throws Exception

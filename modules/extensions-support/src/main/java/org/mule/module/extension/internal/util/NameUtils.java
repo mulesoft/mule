@@ -125,11 +125,6 @@ public class NameUtils
         return "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    public static String getFieldNameFromSetter(String setterName)
-    {
-        return setterName.substring(3, 4).toLowerCase() + setterName.substring(4);
-    }
-
     public static String hyphenize(String camelCaseName)
     {
         if (StringUtils.isBlank(camelCaseName))

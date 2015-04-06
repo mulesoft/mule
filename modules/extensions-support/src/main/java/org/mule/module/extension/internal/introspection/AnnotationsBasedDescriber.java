@@ -9,10 +9,10 @@ package org.mule.module.extension.internal.introspection;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getDefaultValue;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getExtension;
-import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterGroupFields;
-import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getOperationMethods;
-import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterFields;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getSetter;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.SPIServiceRegistry;
 import org.mule.extension.annotations.Configuration;
@@ -144,13 +144,13 @@ public final class AnnotationsBasedDescriber implements Describer
 
             if (!parameters.isEmpty())
             {
-                ParameterGroup group = new ParameterGroup(field.getType(), getSetter(extensionType, field.getName(), field.getType()));
+                ParameterGroup group = new ParameterGroup(field.getType(), field);
                 groups.add(group);
 
                 for (ParameterConstruct construct : parameters)
                 {
                     ParameterDeclaration parameter = construct.getDeclaration();
-                    group.addParameter(construct.getDeclaration().getName(), getSetter(field.getType(), parameter.getName(), parameter.getType().getRawType()));
+                    group.addParameter(parameter.getName(), getField(field.getType(), parameter.getName(), parameter.getType().getRawType()));
                 }
 
                 List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), configuration);
