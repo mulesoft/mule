@@ -6,10 +6,14 @@
  */
 package org.mule.module.extension;
 
+import org.mule.extension.annotations.Parameter;
+
 public class Ricin
 {
-
+    @Parameter
     private Long microgramsPerKilo;
+
+    @Parameter
     private Door destination;
 
     public Long getMicrogramsPerKilo()
@@ -17,19 +21,9 @@ public class Ricin
         return microgramsPerKilo;
     }
 
-    public void setMicrogramsPerKilo(Long microgramsPerKilo)
-    {
-        this.microgramsPerKilo = microgramsPerKilo;
-    }
-
     public Door getDestination()
     {
         return destination;
-    }
-
-    public void setDestination(Door destination)
-    {
-        this.destination = destination;
     }
 
     @Override

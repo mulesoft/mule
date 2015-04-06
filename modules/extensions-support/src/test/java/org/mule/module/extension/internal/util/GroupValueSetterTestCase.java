@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getSetter;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.module.extension.ExtendedPersonalInfo;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.LifetimeInfo;
@@ -47,12 +47,12 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        ParameterGroup group = new ParameterGroup(ExtendedPersonalInfo.class, getSetter(HeisenbergExtension.class, "personalInfo", ExtendedPersonalInfo.class));
-        group.addParameter("myName", getSetter(ExtendedPersonalInfo.class, "myName", String.class));
-        group.addParameter("age", getSetter(ExtendedPersonalInfo.class, "age", Integer.class));
+        ParameterGroup group = new ParameterGroup(ExtendedPersonalInfo.class, getField(HeisenbergExtension.class, "personalInfo", ExtendedPersonalInfo.class));
+        group.addParameter("myName", getField(ExtendedPersonalInfo.class, "myName", String.class));
+        group.addParameter("age", getField(ExtendedPersonalInfo.class, "age", Integer.class));
 
-        ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getSetter(ExtendedPersonalInfo.class, "lifetimeInfo", LifetimeInfo.class));
-        child.addParameter("dateOfBirth", getSetter(LifetimeInfo.class, "dateOfBirth", Date.class));
+        ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, "lifetimeInfo", LifetimeInfo.class));
+        child.addParameter("dateOfBirth", getField(LifetimeInfo.class, "dateOfBirth", Date.class));
         group.addCapability(new ParameterGroupCapability(Arrays.asList(child)));
 
         when(result.get("myName")).thenReturn(NAME);

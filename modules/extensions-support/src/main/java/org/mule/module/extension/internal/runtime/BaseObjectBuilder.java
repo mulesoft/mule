@@ -13,7 +13,7 @@ import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.repackaged.internal.org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +28,8 @@ import java.util.Map;
 abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
 {
 
-    private final Map<Method, ValueResolver<Object>> resolvers = new HashMap<>();
-    private final Map<Method, Object> values = new HashMap<>();
+    private final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
+    private final Map<Field, Object> values = new HashMap<>();
 
     /**
      * Returns the instance to be returned before the properties have
@@ -41,21 +41,21 @@ abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
      * {@inheritDoc}
      */
     @Override
-    public ObjectBuilder<T> addPropertyResolver(Method method, ValueResolver<? extends Object> resolver)
+    public ObjectBuilder<T> addPropertyResolver(Field field, ValueResolver<? extends Object> resolver)
     {
-        checkArgument(method != null, "method cannot be null");
+        checkArgument(field != null, "field cannot be null");
         checkArgument(resolver != null, "resolver cannot be null");
 
-        resolvers.put(method, (ValueResolver<Object>) resolver);
+        resolvers.put(field, (ValueResolver<Object>) resolver);
         return this;
     }
 
     @Override
-    public ObjectBuilder<T> addPropertyValue(Method method, Object value)
+    public ObjectBuilder<T> addPropertyValue(Field field, Object value)
     {
-        checkArgument(method != null, "method cannot be null");
+        checkArgument(field != null, "field cannot be null");
 
-        values.put(method, value);
+        values.put(field, value);
         return this;
     }
 
@@ -76,14 +76,18 @@ abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
     {
         T object = instantiateObject();
 
-        for (Map.Entry<Method, ValueResolver<Object>> entry : resolvers.entrySet())
+        for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet())
         {
-            ReflectionUtils.invokeMethod(entry.getKey(), object, entry.getValue().resolve(event));
+            Field field = entry.getKey();
+            field.setAccessible(true);
+            ReflectionUtils.setField(field, object, entry.getValue().resolve(event));
         }
 
-        for (Map.Entry<Method, Object> entry : values.entrySet())
+        for (Map.Entry<Field, Object> entry : values.entrySet())
         {
-            ReflectionUtils.invokeMethod(entry.getKey(), object, entry.getValue());
+            Field field = entry.getKey();
+            field.setAccessible(true);
+            ReflectionUtils.setField(field, object, entry.getValue());
         }
 
         return object;

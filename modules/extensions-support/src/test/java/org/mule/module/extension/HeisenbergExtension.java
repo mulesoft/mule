@@ -136,19 +136,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return cancer;
     }
 
-    public void setCancer(boolean cancer)
-    {
-        this.cancer = cancer;
-    }
-
     public BigDecimal getMoney()
     {
         return money;
-    }
-
-    public void setMoney(BigDecimal money)
-    {
-        this.money = money;
     }
 
     public Map<String, Long> getRecipe()
@@ -156,19 +146,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return recipe;
     }
 
-    public void setRecipe(Map<String, Long> recipe)
-    {
-        this.recipe = recipe;
-    }
-
     public Set<Ricin> getRicinPacks()
     {
         return ricinPacks;
-    }
-
-    public void setRicinPacks(Set<Ricin> ricinPacks)
-    {
-        this.ricinPacks = ricinPacks;
     }
 
     public Door getNextDoor()
@@ -176,19 +156,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return nextDoor;
     }
 
-    public void setNextDoor(Door nextDoor)
-    {
-        this.nextDoor = nextDoor;
-    }
-
     public Map<String, Door> getCandidateDoors()
     {
         return candidateDoors;
-    }
-
-    public void setCandidateDoors(Map<String, Door> candidateDoors)
-    {
-        this.candidateDoors = candidateDoors;
     }
 
     public int getInitialise()
@@ -216,11 +186,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return initialHealth;
     }
 
-    public void setInitialHealth(HealthStatus initialHealth)
-    {
-        this.initialHealth = initialHealth;
-    }
-
     public HealthStatus getFinalHealth()
     {
         return finalHealth;
@@ -231,14 +196,14 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return personalInfo;
     }
 
-    public void setPersonalInfo(ExtendedPersonalInfo personalInfo)
-    {
-        this.personalInfo = personalInfo;
-    }
-
-    public void setFinalHealth(HealthStatus finalHealth)
+    void setFinalHealth(HealthStatus finalHealth)
     {
         this.finalHealth = finalHealth;
+    }
+
+    void setMoney(BigDecimal money)
+    {
+        this.money = money;
     }
 
     @Override

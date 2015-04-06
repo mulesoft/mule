@@ -13,9 +13,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
-import static org.reflections.ReflectionUtils.withParametersCount;
-import static org.reflections.ReflectionUtils.withPrefix;
-import static org.reflections.ReflectionUtils.withReturnType;
+import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 import org.mule.api.NestedProcessor;
 import org.mule.extension.annotations.param.Ignore;
 import org.mule.extension.annotations.param.Optional;
@@ -29,14 +27,13 @@ import org.mule.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMap;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Comparator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,13 +117,6 @@ public class IntrospectionUtils
         return toDataType(ResolvableType.forMethodReturnType(method));
     }
 
-    public static DataType getMethodArgumentDataType(Method method, int argumentIndex)
-    {
-        checkArgument(method != null, "Can't introspect a null method");
-        return toDataType(ResolvableType.forMethodParameter(method, argumentIndex));
-    }
-
-
     public static Map<Field, DataType> getAnnotatedFieldsDataTypes(Class<?> declaringClass, Class<? extends Annotation> annotationClass)
     {
         Set<Field> fields = getAllFields(declaringClass, withAnnotation(annotationClass));
@@ -149,39 +139,20 @@ public class IntrospectionUtils
         return map.build();
     }
 
-    public static Map<Method, DataType> getSettersDataTypes(Class<?> declaringClass)
-    {
-        Set<Method> setters = getSetters(declaringClass);
-
-        if (CollectionUtils.isEmpty(setters))
-        {
-            return ImmutableMap.of();
-        }
-
-        ImmutableMap.Builder<Method, DataType> map = ImmutableSortedMap.orderedBy(new Comparator<Method>()
-        {
-            @Override
-            public int compare(Method method1, Method method2)
-            {
-                return method1.getName().compareTo(method2.getName());
-            }
-        });
-        for (Method setter : setters)
-        {
-            if (isIgnored(setter))
-            {
-                continue;
-            }
-
-            map.put(setter, getMethodArgumentDataType(setter, 0));
-        }
-
-        return map.build();
-    }
-
     public static Set<Field> getFieldsAnnotatedWith(Class<?> clazz, Class<? extends Annotation> annotation)
     {
         return getAllFields(clazz, withAnnotation(annotation));
+    }
+
+    public static Field getField(Class<?> clazz, Parameter parameter)
+    {
+        return getField(clazz, parameter.getName(), parameter.getType().getRawType());
+    }
+
+    public static Field getField(Class<?> clazz, String name, Class<?> type)
+    {
+        Collection<Field> candidates = getAllFields(clazz, withName(name), withTypeAssignableTo(type));
+        return CollectionUtils.isEmpty(candidates) ? null : candidates.iterator().next();
     }
 
     public static Set<Class<?>> getImplementedTypes(Class<?> clazz, Class<?>... types)
@@ -196,35 +167,6 @@ public class IntrospectionUtils
         }
 
         return implemented.build();
-    }
-
-    public static Set<Method> getSetters(Class<?> clazz)
-    {
-        return getAllMethods(clazz, withModifier(Modifier.PUBLIC),
-                             withPrefix("set"),
-                             withParametersCount(1),
-                             withReturnType(void.class));
-    }
-
-    public static Method getSetter(Class<?> declaringClass, Parameter parameter)
-    {
-        return getSetter(declaringClass, parameter.getName(), parameter.getType().getRawType());
-    }
-
-    public static Method getSetter(Class<?> declaringClass, String attributeName, Class<?> attributeType)
-    {
-        Set<Method> setters = getAllMethods(declaringClass, withModifier(Modifier.PUBLIC),
-                                            withName(NameUtils.getSetterName(attributeName)),
-                                            withParametersCount(1),
-                                            withParameters(attributeType),
-                                            withReturnType(void.class));
-
-        return CollectionUtils.isEmpty(setters) ? null : setters.iterator().next();
-    }
-
-    public static boolean hasSetter(Class<?> declaringClass, Parameter parameter)
-    {
-        return getSetter(declaringClass, parameter) != null;
     }
 
     public static boolean hasDefaultConstructor(Class<?> clazz)
@@ -312,5 +254,49 @@ public class IntrospectionUtils
     {
         Class<?> returnType = method.getReturnType();
         return returnType.equals(void.class) || returnType.equals(Void.class);
+    }
+
+    public static Collection<Field> getParameterFields(Class<?> extensionType)
+    {
+        return getAllFields(extensionType, withAnnotation(org.mule.extension.annotations.Parameter.class));
+    }
+
+    public static Collection<Field> getParameterGroupFields(Class<?> extensionType)
+    {
+        return getAllFields(extensionType, withAnnotation(org.mule.extension.annotations.ParameterGroup.class));
+    }
+
+    public static Collection<Method> getOperationMethods(Class<?> declaringClass)
+    {
+        return getAllMethods(declaringClass, withAnnotation(org.mule.extension.annotations.Operation.class), withModifier(Modifier.PUBLIC));
+    }
+
+    public static Method getOperationMethod(Class<?> declaringClass, Operation operation)
+    {
+        Class<?>[] parameterTypes;
+        if (operation.getParameters().isEmpty())
+        {
+            parameterTypes = org.apache.commons.lang.ArrayUtils.EMPTY_CLASS_ARRAY;
+        }
+        else
+        {
+            parameterTypes = new Class<?>[operation.getParameters().size()];
+            int i = 0;
+            for (Parameter parameter : operation.getParameters())
+            {
+                parameterTypes[i++] = parameter.getType().getRawType();
+            }
+        }
+
+        Collection<Method> methods = getAllMethods(declaringClass,
+                                                   withAnnotation(org.mule.extension.annotations.Operation.class),
+                                                   withModifier(Modifier.PUBLIC),
+                                                   withName(operation.getName()),
+                                                   withParameters(parameterTypes));
+
+        checkArgument(!methods.isEmpty(), String.format("Could not find method %s in class %s", operation.getName(), declaringClass.getName()));
+        checkArgument(methods.size() == 1, String.format("More than one matching method was found in class %s for operation %s", declaringClass.getName(), operation.getName()));
+
+        return methods.iterator().next();
     }
 }

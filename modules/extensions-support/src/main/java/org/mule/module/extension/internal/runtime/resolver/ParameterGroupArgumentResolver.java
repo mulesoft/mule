@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterFields;
-import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterGroupFields;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.api.MuleRuntimeException;
 import org.mule.extension.annotations.Parameter;
