@@ -6,16 +6,21 @@
  */
 package org.mule.module.extension.internal.introspection;
 
+import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.extension.annotations.Extension;
+import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.RestrictedTo;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.Payload;
+import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataType;
+import org.mule.extension.introspection.declaration.CapableDeclaration;
+import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ParamReader;
 
@@ -49,6 +54,29 @@ public final class MuleExtensionAnnotationParser
             .add(MuleEvent.class)
             .add(MuleMessage.class)
             .build();
+
+    static String getParameterName(Field field, Parameter parameterAnnotation)
+    {
+        return getParameterName(field.getName(), parameterAnnotation);
+    }
+
+    static String getParameterName(String defaultName, Parameter parameterAnnotation)
+    {
+        String alias = parameterAnnotation != null ? parameterAnnotation.alias() : null;
+        return StringUtils.isEmpty(alias) ? defaultName : alias;
+    }
+
+    static String getMemberName(CapableDeclaration<?> capable, String defaultName)
+    {
+        MemberNameCapability memberNameCapability = getSingleCapability(capable.getCapabilities(), MemberNameCapability.class);
+        return memberNameCapability != null ? memberNameCapability.getName() : defaultName;
+    }
+
+    public static String getMemberName(Capable capable, String defaultName)
+    {
+        MemberNameCapability memberNameCapability = getSingleCapability(capable, MemberNameCapability.class);
+        return memberNameCapability != null ? memberNameCapability.getName() : defaultName;
+    }
 
     static Extension getExtension(Class<?> extensionType)
     {
@@ -123,7 +151,7 @@ public final class MuleExtensionAnnotationParser
         DataType dataType = parameterType;
 
         ParameterDescriptor parameter = new ParameterDescriptor();
-        parameter.setName(paramName);
+        parameter.setName(getParameterName(paramName, (Parameter) annotations.get(Parameter.class)));
         parameter.setType(dataType);
 
         Optional optional = (Optional) annotations.get(Optional.class);

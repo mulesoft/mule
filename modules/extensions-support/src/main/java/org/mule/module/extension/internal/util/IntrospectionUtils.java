@@ -6,6 +6,8 @@
  */
 package org.mule.module.extension.internal.util;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
@@ -37,6 +39,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Set of utility operations to get insights about objects and their operations
@@ -146,7 +150,7 @@ public class IntrospectionUtils
 
     public static Field getField(Class<?> clazz, Parameter parameter)
     {
-        return getField(clazz, parameter.getName(), parameter.getType().getRawType());
+        return getField(clazz, getMemberName(parameter, parameter.getName()), parameter.getType().getRawType());
     }
 
     public static Field getField(Class<?> clazz, String name, Class<?> type)
@@ -298,5 +302,12 @@ public class IntrospectionUtils
         checkArgument(methods.size() == 1, String.format("More than one matching method was found in class %s for operation %s", declaringClass.getName(), operation.getName()));
 
         return methods.iterator().next();
+    }
+
+    public static String getAlias(Field field)
+    {
+        org.mule.extension.annotations.Parameter parameter = field.getAnnotation(org.mule.extension.annotations.Parameter.class);
+        String alias = parameter != null ? parameter.alias() : EMPTY;
+        return StringUtils.isEmpty(alias) ? field.getName() : alias;
     }
 }

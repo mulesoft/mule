@@ -9,6 +9,8 @@ package org.mule.module.extension.internal.introspection;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getDefaultValue;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getExtension;
+import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
+import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterName;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
@@ -33,6 +35,7 @@ import org.mule.extension.introspection.declaration.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.WithParameters;
 import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.ImplementedTypeCapability;
+import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
 import org.mule.module.extension.internal.runtime.ReflectiveDelegateFactory;
@@ -150,7 +153,9 @@ public final class AnnotationsBasedDescriber implements Describer
                 for (ParameterConstruct construct : parameters)
                 {
                     ParameterDeclaration parameter = construct.getDeclaration();
-                    group.addParameter(parameter.getName(), getField(field.getType(), parameter.getName(), parameter.getType().getRawType()));
+                    group.addParameter(parameter.getName(), getField(field.getType(),
+                                                                     getMemberName(parameter, parameter.getName()),
+                                                                     parameter.getType().getRawType()));
                 }
 
                 List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), configuration);
@@ -173,15 +178,16 @@ public final class AnnotationsBasedDescriber implements Describer
             Parameter parameter = field.getAnnotation(Parameter.class);
             Optional optional = field.getAnnotation(Optional.class);
 
+            String parameterName = getParameterName(field, parameter);
             ParameterConstruct parameterConstruct;
             DataType dataType = IntrospectionUtils.getFieldDataType(field);
             if (optional == null)
             {
-                parameterConstruct = with.requiredParameter(field.getName());
+                parameterConstruct = with.requiredParameter(parameterName);
             }
             else
             {
-                parameterConstruct = with.optionalParameter(field.getName()).defaultingTo(getDefaultValue(optional, dataType));
+                parameterConstruct = with.optionalParameter(parameterName).defaultingTo(getDefaultValue(optional, dataType));
             }
 
             parameterConstruct.ofType(dataType);
@@ -191,11 +197,14 @@ public final class AnnotationsBasedDescriber implements Describer
                 parameterConstruct.whichIsNotDynamic();
             }
 
+            parameterConstruct.withCapability(new MemberNameCapability(field.getName()));
+
             parameters.add(parameterConstruct);
         }
 
         return parameters.build();
     }
+
 
     private void declareOperations(DeclarationConstruct declaration, Class<?> extensionType)
     {
