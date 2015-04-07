@@ -16,12 +16,42 @@
         <http:config useTransportForUris="${useTransportForUris}"/>
     </configuration>
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/#[message.inboundProperties['path']]" wsdlLocation="Test.wsdl"
-                        service="TestService" port="TestPort" name="globalConfig" />
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[message.inboundProperties['pathInboundProperty']]" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfigInboundProperty" />
 
-    <flow name="client">
-        <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
-        <ws:consumer operation="echo"/>
+    <flow name="clientInboundProperty">
+        <inbound-endpoint address="vm://clientInboundProperty" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="globalConfigInboundProperty"/>
+    </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[message.outboundProperties['pathOutboundProperty']]" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfigOutboundProperty" />
+
+    <flow name="clientOutboundProperty">
+        <inbound-endpoint address="vm://clientOutboundProperty" exchange-pattern="request-response"/>
+        <set-property propertyName="pathOutboundProperty" value="services/Test" />
+        <ws:consumer operation="echo" config-ref="globalConfigOutboundProperty"/>
+    </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[pathFlowVar]" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfigFlowVar" />
+
+    <flow name="clientFlowVar">
+        <inbound-endpoint address="vm://clientFlowVar" exchange-pattern="request-response"/>
+        <set-variable variableName="pathFlowVar" value="services/Test" />
+        <ws:consumer operation="echo" config-ref="globalConfigFlowVar"/>
+    </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[pathSessionVar]" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfigSessionVar" />
+
+    <flow name="clientSessionVar">
+        <inbound-endpoint address="vm://clientSessionVar" exchange-pattern="request-response"/>
+        <set-session-variable variableName="pathSessionVar" value="services/Test" />
+        <ws:consumer operation="echo" config-ref="globalConfigSessionVar"/>
     </flow>
 
 

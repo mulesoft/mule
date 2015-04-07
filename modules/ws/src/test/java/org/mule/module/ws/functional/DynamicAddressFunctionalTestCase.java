@@ -22,24 +22,42 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     }
 
     @Test
-    public void returnsExpectedResponseWhenValidPathIsProvided() throws Exception
+    public void returnsExpectedResponseWhenValidPathIsProvidedInboundProperty() throws Exception
     {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("path", "services/Test");
-        assertValidResponse("vm://in", properties);
+        properties.put("pathInboundProperty", "services/Test");
+        assertValidResponse("vm://clientInboundProperty", properties);
+    }
+
+    @Test
+    public void returnsExpectedResponseWhenValidPathIsProvidedOutboundProperty() throws Exception
+    {
+        assertValidResponse("vm://clientOutboundProperty", new HashMap<String, Object>());
+    }
+
+    @Test
+    public void returnsExpectedResponseWhenValidPathIsProvidedFlowVar() throws Exception
+    {
+        assertValidResponse("vm://clientFlowVar", new HashMap<String, Object>());
+    }
+
+    @Test
+    public void returnsExpectedResponseWhenValidPathIsProvidedSessionVar() throws Exception
+    {
+        assertValidResponse("vm://clientSessionVar", new HashMap<String, Object>());
     }
 
     @Test
     public void failsWhenInvalidPathIsProvided() throws Exception
     {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("path", "invalid");
-        assertSoapFault("vm://in", ECHO_REQUEST, properties, "Client");
+        properties.put("clientInboundProperty", "invalid");
+        assertSoapFault("vm://clientInboundProperty", ECHO_REQUEST, properties, "Client");
     }
 
     @Test
     public void failsWhenNoPathIsDefined() throws Exception
     {
-        assertSoapFault("vm://in", ECHO_REQUEST, "Client");
+        assertSoapFault("vm://clientInboundProperty", ECHO_REQUEST, "Client");
     }
 }
