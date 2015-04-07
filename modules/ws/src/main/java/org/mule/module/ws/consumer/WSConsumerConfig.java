@@ -7,14 +7,15 @@
 package org.mule.module.ws.consumer;
 
 
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.connector.ConnectorOperationLocator;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -121,9 +122,9 @@ public class WSConsumerConfig implements MuleContextAware
             @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
-                final MuleMessage responseMessage = muleContext.getClient().send(serviceAddress, event.getMessage(), getRequestOptions());
-                event.setMessage(responseMessage);
-                return event;
+                ConnectorOperationLocator connectorOperationLocator = muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
+                MessageProcessor messageProcessor = connectorOperationLocator.locateConnectorOperation(serviceAddress, getRequestOptions(), REQUEST_RESPONSE);
+                return messageProcessor.process(event);
             }
 
             private HttpRequestOptions getRequestOptions()
