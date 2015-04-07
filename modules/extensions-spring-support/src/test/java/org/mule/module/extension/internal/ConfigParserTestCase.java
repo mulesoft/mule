@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEvent;
-import org.mule.module.extension.Door;
+import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.Ricin;
@@ -194,10 +194,10 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
 
     private void assertDoors(HeisenbergExtension heisenberg)
     {
-        Door door = heisenberg.getNextDoor();
+        KnockeableDoor door = heisenberg.getNextDoor();
         assertDoor(door, GUSTAVO_FRING, POLLOS_HERMANOS);
 
-        Door previous = door.getPrevious();
+        KnockeableDoor previous = door.getPrevious();
         assertDoor(door.getPrevious(), KRAZY_8, JESSE_S);
         assertNull(previous.getPrevious());
     }
@@ -239,7 +239,7 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
 
     private void assertCandidateDoors(HeisenbergExtension heisenberg)
     {
-        Map<String, Door> candidates = heisenberg.getCandidateDoors();
+        Map<String, KnockeableDoor> candidates = heisenberg.getCandidateDoors();
         assertNotNull(candidates);
         assertEquals(2, candidates.size());
 
@@ -247,7 +247,7 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
         assertDoor(candidates.get(SAUL.toLowerCase()), SAUL, SHOPPING_MALL);
     }
 
-    private void assertDoor(Door door, String victim, String address)
+    private void assertDoor(KnockeableDoor door, String victim, String address)
     {
         assertNotNull(door);
         assertEquals(victim, door.getVictim());

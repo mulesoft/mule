@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.util;
 
+import org.mule.extension.annotations.Alias;
 import org.mule.extension.introspection.DataType;
 
 import java.util.ArrayList;
@@ -217,7 +218,11 @@ public class NameUtils
 
     public static String getGlobalPojoTypeName(DataType type)
     {
-        return hyphenize(type.getRawType().getSimpleName());
+        Alias alias = type.getRawType().getAnnotation(Alias.class);
+        String name = alias != null ? alias.value() : type.getRawType().getSimpleName();
+        return hyphenize(name);
+
+        //return hyphenize(type.getRawType().getSimpleName());
     }
 
     private static class Inflection
