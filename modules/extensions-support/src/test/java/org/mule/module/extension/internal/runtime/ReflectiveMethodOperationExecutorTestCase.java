@@ -78,7 +78,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {});
         executor = new ReflectiveMethodOperationExecutor(method, operations, VoidReturnDelegate.INSTANCE);
         assertSameInstance(executor.execute(operationContext), muleEvent);
-        assertThat(config.getFinalHealth(), is(DEAD));
+        assertThat(config.getEndingHealth(), is(DEAD));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     private void initHeisenberg()
     {
         config = new HeisenbergExtension();
-        config.getPersonalInfo().setMyName(HEISENBERG);
+        config.getPersonalInfo().setName(HEISENBERG);
         config.setEnemies(Arrays.asList("Hank"));
         operations = new HeisenbergOperations(config);
     }

@@ -21,6 +21,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isDynamic;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
@@ -274,7 +275,7 @@ public class SchemaBuilder
                 continue;
             }
 
-            final String name = field.getName();
+            final String name = getAlias(field);
             final DataType fieldType = getFieldDataType(field);
             final boolean required = isRequired(field);
             final boolean dynamic = isDynamic(field);

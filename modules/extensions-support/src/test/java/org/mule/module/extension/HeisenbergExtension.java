@@ -89,8 +89,8 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Parameter
     private HealthStatus initialHealth;
 
-    @Parameter
-    private HealthStatus finalHealth;
+    @Parameter(alias = "finalHealth")
+    private HealthStatus endingHealth;
 
     @Override
     public void initialise() throws InitialisationException
@@ -186,9 +186,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return initialHealth;
     }
 
-    public HealthStatus getFinalHealth()
+    public HealthStatus getEndingHealth()
     {
-        return finalHealth;
+        return endingHealth;
     }
 
     public ExtendedPersonalInfo getPersonalInfo()
@@ -196,9 +196,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return personalInfo;
     }
 
-    void setFinalHealth(HealthStatus finalHealth)
+    void setEndingHealth(HealthStatus endingHealth)
     {
-        this.finalHealth = finalHealth;
+        this.endingHealth = endingHealth;
     }
 
     void setMoney(BigDecimal money)

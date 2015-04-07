@@ -42,7 +42,7 @@ public class SingleValueResolverTestCase extends AbstractMuleTestCase
     public void before()
     {
         when(result.get(parameter)).thenReturn(NAME);
-        valueSetter = new SingleValueSetter(parameter, getField(PersonalInfo.class, "myName", String.class));
+        valueSetter = new SingleValueSetter(parameter, getField(PersonalInfo.class, "name", String.class));
     }
 
     @Test
@@ -50,6 +50,6 @@ public class SingleValueResolverTestCase extends AbstractMuleTestCase
     {
         PersonalInfo info = new PersonalInfo();
         valueSetter.set(info, result);
-        assertThat(info.getMyName(), is(NAME));
+        assertThat(info.getName(), is(NAME));
     }
 }
