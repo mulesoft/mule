@@ -51,7 +51,7 @@ import javax.tools.Diagnostic;
  *
  * @since 3.7.0
  */
-@SupportedAnnotationTypes(value = {"org.mule.extensions.api.annotation.Extension"})
+@SupportedAnnotationTypes(value = {"org.mule.extension.annotations.Extension"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor
 {
