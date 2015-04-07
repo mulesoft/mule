@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime;
 
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getSetter;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.introspection.Configuration;
@@ -19,7 +19,7 @@ import org.mule.module.extension.internal.util.ValueSetter;
 
 import com.google.common.collect.ImmutableList;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -56,12 +56,12 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
         Class<?> prototypeClass = configuration.getInstantiator().getObjectType();
         for (Parameter parameter : resolverSet.getResolvers().keySet())
         {
-            Method setter = getSetter(prototypeClass, parameter);
+            Field field = getField(prototypeClass, parameter);
 
             // if no setter, then it means this is a group attribute
-            if (setter != null)
+            if (field != null)
             {
-                singleValueSetters.add(new SingleValueSetter(parameter, setter));
+                singleValueSetters.add(new SingleValueSetter(parameter, field));
             }
         }
 

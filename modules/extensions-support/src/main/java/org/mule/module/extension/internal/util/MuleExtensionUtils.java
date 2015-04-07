@@ -10,7 +10,6 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Described;
 import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.util.TemplateParser;
 
@@ -117,31 +116,6 @@ public final class MuleExtensionUtils
         }
 
         return map.build();
-    }
-
-    public static void checkSetters(Class<?> declaringClass, Collection<Parameter> parameters)
-    {
-        Set<Parameter> faultParameters = new HashSet<>(parameters.size());
-        for (Parameter parameter : parameters)
-        {
-            if (!IntrospectionUtils.hasSetter(declaringClass, parameter))
-            {
-                faultParameters.add(parameter);
-            }
-        }
-
-        if (!faultParameters.isEmpty())
-        {
-            StringBuilder message = new StringBuilder("The following attributes don't have a valid setter on class ")
-                    .append(declaringClass.getName()).append(":\n");
-
-            for (Parameter parameter : faultParameters)
-            {
-                message.append(parameter.getName()).append("\n");
-            }
-
-            throw new IllegalArgumentException(message.toString());
-        }
     }
 
     public static <T extends Object> boolean hasAnyDynamic(Iterable<ValueResolver<T>> resolvers)

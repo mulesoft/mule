@@ -10,6 +10,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -41,21 +42,21 @@ public interface ObjectBuilder<T>
      * Adds a property which value is to be obtained from
      * a {@link ValueResolver}
      *
-     * @param method   the setter to be used as an accessor
+     * @param field   the {@link Field} in which the value is to be assigned
      * @param resolver a {@link ValueResolver} used to provide the actual value
      * @return this builder
      * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
      */
-    ObjectBuilder<T> addPropertyResolver(Method method, ValueResolver<? extends Object> resolver);
+    ObjectBuilder<T> addPropertyResolver(Field field, ValueResolver<? extends Object> resolver);
 
     /**
      * Adds a property which value is given as a constant
      *
-     * @param method the setter to be used as an accessor
+     * @param field   the {@link Field} in which the value is to be assigned
      * @param value  the value to be set
      * @return this builder
      */
-    ObjectBuilder<T> addPropertyValue(Method method, Object value);
+    ObjectBuilder<T> addPropertyValue(Field field, Object value);
 
     /**
      * Whether any of the registered {@link ValueResolver}s are dynamic

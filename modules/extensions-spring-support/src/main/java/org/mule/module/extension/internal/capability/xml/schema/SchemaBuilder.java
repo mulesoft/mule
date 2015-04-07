@@ -21,6 +21,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isDynamic;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
@@ -69,7 +70,7 @@ import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.ArrayUtils;
 import org.mule.util.StringUtils;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -266,38 +267,37 @@ public class SchemaBuilder
         final ExplicitGroup all = new ExplicitGroup();
         extension.setSequence(all);
 
-        for (Map.Entry<Method, DataType> entry : IntrospectionUtils.getSettersDataTypes(type.getRawType()).entrySet())
+        for (Field field : IntrospectionUtils.getParameterFields(type.getRawType()))
         {
-            final Method method = entry.getKey();
-            if (isIgnored(method))
+            if (isIgnored(field))
             {
                 continue;
             }
 
-            final String name = NameUtils.getFieldNameFromSetter(method.getName());
-            final DataType methodType = entry.getValue();
-            final boolean required = isRequired(method);
-            final boolean dynamic = isDynamic(method);
+            final String name = field.getName();
+            final DataType fieldType = getFieldDataType(field);
+            final boolean required = isRequired(field);
+            final boolean dynamic = isDynamic(field);
 
-            methodType.getQualifier().accept(new BaseDataQualifierVisitor()
+            fieldType.getQualifier().accept(new BaseDataQualifierVisitor()
             {
 
                 @Override
                 public void onList()
                 {
-                    generateCollectionElement(all, name, EMPTY, methodType, required);
+                    generateCollectionElement(all, name, EMPTY, fieldType, required);
                 }
 
                 @Override
                 public void onPojo()
                 {
-                    registerComplexTypeChildElement(all, name, EMPTY, methodType, false);
+                    registerComplexTypeChildElement(all, name, EMPTY, fieldType, false);
                 }
 
                 @Override
                 protected void defaultOperation()
                 {
-                    Attribute attribute = createAttribute(name, methodType, required, dynamic);
+                    Attribute attribute = createAttribute(name, fieldType, required, dynamic);
                     extension.getAttributeOrAttributeGroup().add(attribute);
                 }
             });

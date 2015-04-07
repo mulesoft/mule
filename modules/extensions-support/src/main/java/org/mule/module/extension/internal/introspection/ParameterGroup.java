@@ -15,7 +15,7 @@ import org.mule.module.extension.internal.util.CapabilityUtils;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,16 +45,16 @@ public class ParameterGroup implements Capable
     private final Class<?> type;
 
     /**
-     * The setter that allows assigning the group of type
-     * {@link #type} into its owner.
+     * The {@link Field} in which the generated value of
+     * {@link #type} is to be assigned
      */
-    private final Method setter;
+    private final Field field;
 
     /**
      * A {@link Map} in which the keys are parameter names
      * and the values are their corresponding setter methods
      */
-    private final Map<String, Method> parameters = new HashMap<>();
+    private final Map<String, Field> parameters = new HashMap<>();
 
     /**
      * The capabilities set
@@ -62,25 +62,26 @@ public class ParameterGroup implements Capable
     private Set<Object> capabilities = new HashSet<>();
 
 
-    public ParameterGroup(Class<?> type, Method setter)
+    public ParameterGroup(Class<?> type, Field field)
     {
         checkArgument(type != null, "type cannot be null");
-        checkArgument(setter != null, "setter cannot be null");
+        checkArgument(field != null, "field cannot be null");
 
         this.type = type;
-        this.setter = setter;
+        this.field = field;
+        field.setAccessible(true);
     }
 
     /**
      * Adds a parameter to the group
      *
-     * @param name   the name of the parameter
-     * @param method the parameter's setter
+     * @param name  the name of the parameter
+     * @param field the parameter's {@link Field}
      * @return {@value this}
      */
-    public ParameterGroup addParameter(String name, Method method)
+    public ParameterGroup addParameter(String name, Field field)
     {
-        parameters.put(name, method);
+        parameters.put(name, field);
         return this;
     }
 
@@ -89,12 +90,12 @@ public class ParameterGroup implements Capable
         return type;
     }
 
-    public Method getSetter()
+    public Field getField()
     {
-        return setter;
+        return field;
     }
 
-    public Map<String, Method> getParameters()
+    public Map<String, Field> getParameters()
     {
         return ImmutableMap.copyOf(parameters);
     }

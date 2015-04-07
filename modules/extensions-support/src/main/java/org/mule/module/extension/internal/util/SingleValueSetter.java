@@ -6,12 +6,12 @@
  */
 package org.mule.module.extension.internal.util;
 
-import static org.mule.repackaged.internal.org.springframework.util.ReflectionUtils.invokeMethod;
+import static org.mule.repackaged.internal.org.springframework.util.ReflectionUtils.setField;
 import org.mule.api.MuleException;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 
 /**
  * An implementation of {@link ValueSetter} for assigning
@@ -30,18 +30,19 @@ public final class SingleValueSetter implements ValueSetter
     private final Parameter parameter;
 
     /**
-     * The setter to be used when assigning the value
+     * The {@link Field} in which the value is to be assigned
      */
-    private final Method setter;
+    private final Field field;
 
-    public SingleValueSetter(Parameter parameter, Method setter)
+    public SingleValueSetter(Parameter parameter, Field field)
     {
         this.parameter = parameter;
-        this.setter = setter;
+        this.field = field;
+        field.setAccessible(true);
     }
 
     /**
-     * Invokes {@link #setter} over {@code target}, obtaining the value
+     * Invokes {@link #field} over {@code target}, obtaining the value
      * from {@code result}
      *
      * @param target the object on which the value is being set
@@ -51,6 +52,6 @@ public final class SingleValueSetter implements ValueSetter
     @Override
     public void set(Object target, ResolverSetResult result) throws MuleException
     {
-        invokeMethod(setter, target, result.get(parameter));
+        setField(field, target, result.get(parameter));
     }
 }

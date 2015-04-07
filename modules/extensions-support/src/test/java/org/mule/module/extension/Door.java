@@ -6,11 +6,17 @@
  */
 package org.mule.module.extension;
 
+import org.mule.extension.annotations.Parameter;
+
 public class Door
 {
-
+    @Parameter
     private String victim;
+
+    @Parameter
     private String address;
+
+    @Parameter
     private Door previous;
 
     public String getVictim()
@@ -18,29 +24,14 @@ public class Door
         return victim;
     }
 
-    public void setVictim(String victim)
-    {
-        this.victim = victim;
-    }
-
     public String getAddress()
     {
         return address;
     }
 
-    public void setAddress(String address)
-    {
-        this.address = address;
-    }
-
     public Door getPrevious()
     {
         return previous;
-    }
-
-    public void setPrevious(Door previous)
-    {
-        this.previous = previous;
     }
 
     @Override
