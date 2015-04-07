@@ -6,12 +6,12 @@
  */
 package org.mule.module.extension.internal.runtime;
 
+import static org.mule.repackaged.internal.org.springframework.util.ReflectionUtils.setField;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.MuleExtensionUtils;
-import org.mule.repackaged.internal.org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -46,6 +46,7 @@ abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
         checkArgument(field != null, "field cannot be null");
         checkArgument(resolver != null, "resolver cannot be null");
 
+        field.setAccessible(true);
         resolvers.put(field, (ValueResolver<Object>) resolver);
         return this;
     }
@@ -55,6 +56,7 @@ abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
     {
         checkArgument(field != null, "field cannot be null");
 
+        field.setAccessible(true);
         values.put(field, value);
         return this;
     }
@@ -76,18 +78,14 @@ abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
     {
         T object = instantiateObject();
 
-        for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet())
+        for (Map.Entry<Field, ValueResolver<Object>> resolver : resolvers.entrySet())
         {
-            Field field = entry.getKey();
-            field.setAccessible(true);
-            ReflectionUtils.setField(field, object, entry.getValue().resolve(event));
+            setField(resolver.getKey(), object, resolver.getValue().resolve(event));
         }
 
-        for (Map.Entry<Field, Object> entry : values.entrySet())
+        for (Map.Entry<Field, Object> value : values.entrySet())
         {
-            Field field = entry.getKey();
-            field.setAccessible(true);
-            ReflectionUtils.setField(field, object, entry.getValue());
+            setField(value.getKey(), object, value.getValue());
         }
 
         return object;
