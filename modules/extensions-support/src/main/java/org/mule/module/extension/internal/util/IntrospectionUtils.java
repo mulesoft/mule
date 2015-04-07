@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.util;
 
+import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
@@ -146,7 +147,7 @@ public class IntrospectionUtils
 
     public static Field getField(Class<?> clazz, Parameter parameter)
     {
-        return getField(clazz, parameter.getName(), parameter.getType().getRawType());
+        return getField(clazz, getMemberName(parameter, parameter.getName()), parameter.getType().getRawType());
     }
 
     public static Field getField(Class<?> clazz, String name, Class<?> type)

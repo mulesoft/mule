@@ -7,9 +7,10 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getAlias;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.api.MuleRuntimeException;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.ParameterGroup;
@@ -71,7 +72,7 @@ public class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T>
             T group = type.newInstance();
             for (Field parameterField : parameterFields)
             {
-                Object value = operationContext.getParameterValue(parameterField.getName());
+                Object value = operationContext.getParameterValue(getAlias(parameterField));
                 if (value != null)
                 {
                     parameterField.set(group, value);

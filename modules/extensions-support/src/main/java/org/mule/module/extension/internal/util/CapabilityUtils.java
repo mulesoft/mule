@@ -74,7 +74,6 @@ public final class CapabilityUtils
     public static <T> T getSingleCapability(Capable capable, Class<T> capabilityType)
     {
         Set<T> capabilities = capable.getCapabilities(capabilityType);
-
         if (CollectionUtils.isEmpty(capabilities))
         {
             return null;
@@ -83,5 +82,23 @@ public final class CapabilityUtils
         checkArgument(capabilities.size() == 1, String.format("Only once instance of capability %s was expected but %d found instead", capabilityType.getName(), capabilities.size()));
 
         return capabilities.iterator().next();
+
+    }
+
+    public static <T> T getSingleCapability(Set<?> capabilities, Class<T> capabilityType) {
+        if (CollectionUtils.isEmpty(capabilities))
+        {
+            return null;
+        }
+
+        for (Object capability : capabilities)
+        {
+            if (capabilityType.isInstance(capability))
+            {
+                return (T) capability;
+            }
+        }
+
+        return null;
     }
 }

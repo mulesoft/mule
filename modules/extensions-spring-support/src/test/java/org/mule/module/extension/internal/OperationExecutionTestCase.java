@@ -53,7 +53,7 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
         MuleEvent originalEvent = getTestEvent(EMPTY);
         MuleEvent responseEvent = runFlow("die", originalEvent);
         assertThat(responseEvent.getMessageAsString(), is(EMPTY));
-        assertThat(getConfig("heisenberg").getFinalHealth(), is(DEAD));
+        assertThat(getConfig("heisenberg").getEndingHealth(), is(DEAD));
     }
 
     @Test

@@ -56,9 +56,10 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
         Class<?> prototypeClass = configuration.getInstantiator().getObjectType();
         for (Parameter parameter : resolverSet.getResolvers().keySet())
         {
+
             Field field = getField(prototypeClass, parameter);
 
-            // if no setter, then it means this is a group attribute
+            // if no field, then it means this is a group attribute
             if (field != null)
             {
                 singleValueSetters.add(new SingleValueSetter(parameter, field));
