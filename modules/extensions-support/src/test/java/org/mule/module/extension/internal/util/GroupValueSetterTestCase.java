@@ -48,7 +48,7 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase
     public void before() throws Exception
     {
         ParameterGroup group = new ParameterGroup(ExtendedPersonalInfo.class, getField(HeisenbergExtension.class, "personalInfo", ExtendedPersonalInfo.class));
-        group.addParameter("myName", getField(ExtendedPersonalInfo.class, "myName", String.class));
+        group.addParameter("myName", getField(ExtendedPersonalInfo.class, "name", String.class));
         group.addParameter("age", getField(ExtendedPersonalInfo.class, "age", Integer.class));
 
         ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, "lifetimeInfo", LifetimeInfo.class));
@@ -68,7 +68,7 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase
         HeisenbergExtension extension = new HeisenbergExtension();
         valueSetter.set(extension, result);
 
-        assertThat(extension.getPersonalInfo().getMyName(), is(NAME));
+        assertThat(extension.getPersonalInfo().getName(), is(NAME));
         assertThat(extension.getPersonalInfo().getAge(), is(AGE));
         assertThat(extension.getPersonalInfo().getLifetimeInfo().getDateOfBirth(), is(sameInstance(DATE)));
     }

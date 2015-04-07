@@ -214,7 +214,7 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
 
     private void assertSimpleProperties(HeisenbergExtension heisenberg)
     {
-        assertEquals(HeisenbergExtension.HEISENBERG, heisenberg.getPersonalInfo().getMyName());
+        assertEquals(HeisenbergExtension.HEISENBERG, heisenberg.getPersonalInfo().getName());
         assertEquals(Integer.valueOf(HeisenbergExtension.AGE), heisenberg.getPersonalInfo().getAge());
 
         List<String> enemies = heisenberg.getEnemies();
@@ -225,7 +225,7 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
 
         assertTrue(heisenberg.isCancer());
         assertThat(heisenberg.getInitialHealth(), is(INITIAL_HEALTH));
-        assertThat(heisenberg.getFinalHealth(), is(FINAL_HEALTH));
+        assertThat(heisenberg.getEndingHealth(), is(FINAL_HEALTH));
 
         Calendar dayOfBirth = Calendar.getInstance();
         dayOfBirth.setTime(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfBirth());

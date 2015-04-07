@@ -42,13 +42,13 @@ public class HeisenbergOperations
     @Operation
     public String sayMyName()
     {
-        return config.getPersonalInfo().getMyName();
+        return config.getPersonalInfo().getName();
     }
 
     @Operation
     public void die()
     {
-        config.setFinalHealth(HealthStatus.DEAD);
+        config.setEndingHealth(HealthStatus.DEAD);
     }
 
     @Operation
@@ -105,7 +105,7 @@ public class HeisenbergOperations
     @Operation
     public String alias(String greeting, @ParameterGroup PersonalInfo info)
     {
-        return String.format("%s, my name is %s and I'm %d years old", greeting, info.getMyName(), info.getAge());
+        return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
     }
 
     @Operation
