@@ -14,22 +14,22 @@ import org.mule.extension.annotations.param.Optional;
 public class PersonalInfo
 {
 
-    @Parameter
+    @Parameter(alias = "myName")
     @Optional(defaultValue = HEISENBERG)
-    private String myName;
+    private String name;
 
     @Parameter
     @Optional(defaultValue = AGE)
     private Integer age;
 
-    public String getMyName()
+    public String getName()
     {
-        return myName;
+        return name;
     }
 
-    public void setMyName(String myName)
+    public void setName(String name)
     {
-        this.myName = myName;
+        this.name = name;
     }
 
     public Integer getAge()

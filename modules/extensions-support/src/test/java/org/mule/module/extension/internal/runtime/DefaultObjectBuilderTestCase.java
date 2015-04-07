@@ -58,7 +58,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase
     {
         builder = new DefaultObjectBuilder(PROTOTYPE_CLASS);
 
-        nameField = getField(PROTOTYPE_CLASS, "myName", String.class);
+        nameField = getField(PROTOTYPE_CLASS, "name", String.class);
         ageField = getField(PROTOTYPE_CLASS, "age", Integer.class);
         lifetimeInfoField = getField(PROTOTYPE_CLASS, "lifetimeInfo", LifetimeInfo.class);
     }
@@ -88,7 +88,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase
 
     private void verify(ExtendedPersonalInfo personalInfo)
     {
-        assertThat(personalInfo.getMyName(), is(NAME));
+        assertThat(personalInfo.getName(), is(NAME));
         assertThat(personalInfo.getAge(), is(AGE));
         assertThat(personalInfo.getLifetimeInfo(), is(sameInstance(LIFETIME_INFO)));
     }
