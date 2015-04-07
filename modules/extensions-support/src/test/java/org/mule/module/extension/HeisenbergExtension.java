@@ -77,14 +77,14 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     @Parameter
     @Optional
-    private Door nextDoor;
+    private KnockeableDoor nextDoor;
 
     /**
      * Doors I might knock on but still haven't made up mind about
      */
     @Parameter
     @Optional
-    private Map<String, Door> candidateDoors;
+    private Map<String, KnockeableDoor> candidateDoors;
 
     @Parameter
     private HealthStatus initialHealth;
@@ -151,12 +151,12 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return ricinPacks;
     }
 
-    public Door getNextDoor()
+    public KnockeableDoor getNextDoor()
     {
         return nextDoor;
     }
 
-    public Map<String, Door> getCandidateDoors()
+    public Map<String, KnockeableDoor> getCandidateDoors()
     {
         return candidateDoors;
     }
