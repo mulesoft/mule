@@ -34,7 +34,7 @@ import org.mule.extension.introspection.declaration.Construct;
 import org.mule.extension.introspection.declaration.Declaration;
 import org.mule.extension.introspection.declaration.OperationDeclaration;
 import org.mule.extension.introspection.declaration.ParameterDeclaration;
-import org.mule.module.extension.Door;
+import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
@@ -178,8 +178,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
         assertParameter(parameters, "dateOfDeath", "", DataType.of(Calendar.class), true, true, null);
         assertParameter(parameters, "recipe", "", DataType.of(Map.class, String.class, Long.class), false, true, null);
         assertParameter(parameters, "ricinPacks", "", DataType.of(Set.class, Ricin.class), false, true, null);
-        assertParameter(parameters, "nextDoor", "", DataType.of(Door.class), false, true, null);
-        assertParameter(parameters, "candidateDoors", "", DataType.of(Map.class, String.class, Door.class), false, true, null);
+        assertParameter(parameters, "nextDoor", "", DataType.of(KnockeableDoor.class), false, true, null);
+        assertParameter(parameters, "candidateDoors", "", DataType.of(Map.class, String.class, KnockeableDoor.class), false, true, null);
         assertParameter(parameters, "initialHealth", "", DataType.of(HealthStatus.class), true, true, null);
         assertParameter(parameters, "finalHealth", "", DataType.of(HealthStatus.class), true, true, null);
 

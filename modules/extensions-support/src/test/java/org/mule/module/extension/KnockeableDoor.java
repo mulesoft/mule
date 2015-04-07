@@ -6,9 +6,11 @@
  */
 package org.mule.module.extension;
 
+import org.mule.extension.annotations.Alias;
 import org.mule.extension.annotations.Parameter;
 
-public class Door
+@Alias("door")
+public class KnockeableDoor
 {
     @Parameter
     private String victim;
@@ -17,7 +19,7 @@ public class Door
     private String address;
 
     @Parameter
-    private Door previous;
+    private KnockeableDoor previous;
 
     public String getVictim()
     {
@@ -29,7 +31,7 @@ public class Door
         return address;
     }
 
-    public Door getPrevious()
+    public KnockeableDoor getPrevious()
     {
         return previous;
     }
@@ -37,9 +39,9 @@ public class Door
     @Override
     public boolean equals(Object obj)
     {
-        if (obj instanceof Door)
+        if (obj instanceof KnockeableDoor)
         {
-            return victim.equals(((Door) obj).victim);
+            return victim.equals(((KnockeableDoor) obj).victim);
         }
 
         return false;

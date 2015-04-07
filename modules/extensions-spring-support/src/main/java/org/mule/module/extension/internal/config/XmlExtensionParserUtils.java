@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.isExpression;
@@ -249,7 +250,7 @@ final class XmlExtensionParserUtils
                 continue;
             }
 
-            String parameterName = field.getName();
+            String parameterName = getAlias(field);
             DataType dataType = getFieldDataType(field);
 
             ValueResolver resolver = getResolverFromAttribute(element, parameterName, dataType, null);

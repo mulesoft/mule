@@ -14,14 +14,14 @@ public class Ricin
     private Long microgramsPerKilo;
 
     @Parameter
-    private Door destination;
+    private KnockeableDoor destination;
 
     public Long getMicrogramsPerKilo()
     {
         return microgramsPerKilo;
     }
 
-    public Door getDestination()
+    public KnockeableDoor getDestination()
     {
         return destination;
     }
