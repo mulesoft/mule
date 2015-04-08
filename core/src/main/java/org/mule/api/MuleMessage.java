@@ -390,9 +390,6 @@ public interface MuleMessage extends Serializable
     @Deprecated
     void setStringProperty(String name, String value);
 
-
-
-
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
      * components in the system to manage message relations <p/> transport protocol.
@@ -663,6 +660,14 @@ public interface MuleMessage extends Serializable
      * @param payload the object to assign as the message payload
      */
     void setPayload(Object payload);
+
+    /**
+     * Updates the message payload.
+     *
+     * @param payload the object to assign as the message payload
+     * @param dataType payloads's dataType. Not null.
+     */
+    void setPayload(Object payload, DataType<?> dataType);
 
     /**
      * Will attempt to obtain the payload of this message with the desired Class type. This will

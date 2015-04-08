@@ -6,6 +6,8 @@
  */
 package org.mule.el;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -49,8 +51,8 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     public void setup() throws InitialisationException
     {
         expressionManager = new DefaultExpressionManager();
-        muleContext = Mockito.mock(MuleContext.class);
-        MuleRegistry muleRegistry = Mockito.mock(MuleRegistry.class);
+        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+        MuleRegistry muleRegistry = mock(MuleRegistry.class);
         Mockito.when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
         Mockito.when(muleContext.getRegistry()).thenReturn(muleRegistry);
         Mockito.when(muleRegistry.lookupObjectsForLifecycle(Mockito.any(Class.class))).thenReturn(
@@ -62,7 +64,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     @Test
     public void enrichReplacePayload()
     {
-        MuleMessage message = new DefaultMuleMessage("foo", Mockito.mock(MuleContext.class));
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
         expressionManager.enrich("message.payload", message, "bar");
         Assert.assertEquals("bar", message.getPayload());
     }
@@ -83,15 +85,14 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
 
             }
         };
-        expressionManager.enrich("message.payload.appleCleaner",
-            new DefaultMuleMessage(apple, Mockito.mock(MuleContext.class)), fruitCleaner);
+        expressionManager.enrich("message.payload.appleCleaner", new DefaultMuleMessage(apple, muleContext), fruitCleaner);
         Assert.assertEquals(apple.getAppleCleaner(), fruitCleaner);
     }
 
     @Test
     public void enrichMessageProperty()
     {
-        MuleMessage message = new DefaultMuleMessage("foo", Mockito.mock(MuleContext.class));
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
         expressionManager.enrich("message.outboundProperties.foo", message, "bar");
         Assert.assertEquals("bar", message.getOutboundProperty("foo"));
     }
@@ -100,7 +101,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     public void enrichMessageAttachment()
     {
         DataHandler dataHandler = new DataHandler(new Object(), "test/xml");
-        MuleMessage message = new DefaultMuleMessage("foo", Mockito.mock(MuleContext.class));
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
         expressionManager.enrich("message.outboundAttachments.foo", message, dataHandler);
         Assert.assertEquals(dataHandler, message.getOutboundAttachment("foo"));
     }
@@ -128,7 +129,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     @Test
     public void enrichWithDolarPlaceholder()
     {
-        MuleMessage message = new DefaultMuleMessage("", Mockito.mock(MuleContext.class));
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
         expressionManager.enrich("message.outboundProperties.put('foo', $)", message, "bar");
         Assert.assertEquals("bar", message.getOutboundProperty("foo"));
     }

@@ -9,6 +9,7 @@ package org.mule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,13 +53,14 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
 
     }
 
-    private MuleContext muleContext = mock(MuleContext.class);
+    private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     private DataTypeConversionResolver conversionResolver = mock(DataTypeConversionResolver.class);
 
     @Before
     public void setUp() throws Exception
     {
         when(muleContext.getDataTypeConverterResolver()).thenReturn(conversionResolver);
+        when(muleContext.getConfiguration().useExtendedTransformations()).thenReturn(true);
     }
 
     private static final DataType<Object> dataTypeB = new SimpleDataType<Object>(B.class);
