@@ -12,10 +12,6 @@
 	<description>Tests infrastructure library for creating mule automated test cases.</description>
 	<packaging>jar</packaging>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
 	<dependencies>
         <dependency>
             <groupId>org.mule</groupId>

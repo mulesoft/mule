@@ -11,10 +11,6 @@
     <name>Jersey Module</name>
     <description>A module for Jersey, the JAX-RS RI.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

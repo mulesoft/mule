@@ -16,10 +16,6 @@
         backed by the spring framework
     </description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
 		<!-- Mule Dependencies -->
         <dependency>

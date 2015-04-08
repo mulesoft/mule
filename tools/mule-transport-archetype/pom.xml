@@ -12,10 +12,6 @@
     <artifactId>mule-transport-archetype</artifactId>
     <description>Archetype for Mule 2.0 and above transport projects.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

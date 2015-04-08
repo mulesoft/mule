@@ -12,10 +12,6 @@
     <name>Web Services</name>
     <description>Provides components for working with Web Services.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

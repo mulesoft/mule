@@ -13,10 +13,6 @@
         queues can be persistent or transient.
     </description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

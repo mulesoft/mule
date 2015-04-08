@@ -11,10 +11,6 @@
     <name>Quartz Transport</name>
     <description>A Mule transport for Quartz. This transport supplies a receiver for jobs scheduled with Quartz.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>

@@ -19,7 +19,6 @@
         <archetype>org.mule.tools:mule-transport-archetype</archetype>
         <!-- this string will be appended to the archetype's commandline -->
         <archetypeParams>-DtransportId=foo -DhasCustomSchema=y -DhasDispatcher=y -DhasCustomMessageFactory=y -DhasReceiver=y -DhasTransactions=y -DhasCustomTransactions=y -DinboundTransformer=FooInboundTransformer -DoutboundTransformer=FooOutboundTransformer -DendpointBuilder=c</archetypeParams>
-        <licensePath>../../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <dependencies>

@@ -11,10 +11,6 @@
     <name>OGNL Filter</name>
     <description>Support for filtering events using OGNL notation.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

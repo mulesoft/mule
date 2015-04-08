@@ -11,10 +11,6 @@
     <name>JSR-223 Scripting</name>
     <description>Support for Scripting Mule Services and embedding Mule inside scripts</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

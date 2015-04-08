@@ -15,10 +15,6 @@
         Default implementation of the Mule Extension API.
     </description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
 		<!-- Mule Dependencies -->
         <dependency>

@@ -10,10 +10,6 @@
     <artifactId>mule-module-oauth</artifactId>
     <name>Mule OAuth module</name>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

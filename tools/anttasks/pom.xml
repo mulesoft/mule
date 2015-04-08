@@ -14,10 +14,6 @@
         Ant tasks used to build and deploy Mule applications.
     </description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.ant</groupId>

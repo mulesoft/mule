@@ -12,10 +12,6 @@
     <name>BPM Support - JBoss jBPM</name>
     <description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Module.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <!-- Generic BPM Support -->
         <dependency>

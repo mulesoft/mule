@@ -10,10 +10,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <properties>
-        <licensePath>../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <groupId>org.mule.extensions</groupId>
     <artifactId>mule-extensions</artifactId>
     <version>3.7.0-M2-SNAPSHOT</version>
