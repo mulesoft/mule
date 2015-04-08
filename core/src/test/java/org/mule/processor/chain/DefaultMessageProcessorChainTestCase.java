@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -56,7 +57,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 {
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     protected MuleContext muleContext;
 
     @Test
@@ -537,7 +538,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         AppendingMP mp1 = new AppendingInterceptingMP("1");
         AppendingMP mp2 = new AppendingInterceptingMP("2");
         MessageProcessor chain = builder.chain(mp1, mp2).build();
-        ((MuleContextAware) chain).setMuleContext(Mockito.mock(MuleContext.class));
+        ((MuleContextAware) chain).setMuleContext(Mockito.mock(MuleContext.class, Mockito.RETURNS_DEEP_STUBS));
         ((FlowConstructAware) chain).setFlowConstruct(Mockito.mock(FlowConstruct.class));
         ((Lifecycle) chain).initialise();
         ((Lifecycle) chain).start();
@@ -557,7 +558,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         AppendingMP mpa = new AppendingInterceptingMP("a");
         AppendingMP mpb = new AppendingInterceptingMP("b");
         MessageProcessor chain = builder.chain(mp1, nestedBuilder.chain(mpa, mpb).build(), mp2).build();
-        ((MuleContextAware) chain).setMuleContext(Mockito.mock(MuleContext.class));
+        ((MuleContextAware) chain).setMuleContext(Mockito.mock(MuleContext.class, Mockito.RETURNS_DEEP_STUBS));
         ((FlowConstructAware) chain).setFlowConstruct(Mockito.mock(FlowConstruct.class));
         ((Lifecycle) chain).initialise();
         ((Lifecycle) chain).start();

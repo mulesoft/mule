@@ -7,6 +7,7 @@
 package org.mule.registry;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
 import org.mule.DefaultMuleMessage;
@@ -40,7 +41,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 {
 
     private boolean threadSafeEvent;
-    private MuleContext muleContext = mock(MuleContext.class);
+    private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
 
     @Test
     public void testSetExceptionPayloadAcrossThreads() throws InterruptedException

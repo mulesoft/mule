@@ -6,6 +6,10 @@
  */
 package org.mule.routing.filters;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -16,14 +20,10 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-
 public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase
 {
 
-    private MuleContext muleContext = mock(MuleContext.class);
+    private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
 
     @Test
     public void testExceptionTypeFilter()
