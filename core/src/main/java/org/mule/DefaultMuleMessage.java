@@ -29,6 +29,7 @@ import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.ObjectUtils;
@@ -510,12 +511,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public void setProperty(String key, Object value, PropertyScope scope)
     {
+        DataType dataType = DataTypeFactory.create(value == null ? Object.class : value.getClass());
+        setProperty(key, value, scope, dataType);
+    }
+
+    @Override
+    public void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType)
+    {
         assertAccess(WRITE);
         if (key != null)
         {
             if (value != null)
             {
-                properties.setProperty(key, value, scope);
+                properties.setProperty(key, value, scope, dataType);
             }
             else
             {
@@ -2027,6 +2035,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         setOutboundProperty(name, value);
     }
 
+    @Override
+    public DataType<?> getPropertyDataType(String name, PropertyScope scope)
+    {
+        return properties.getPropertyDataType(name, scope);
+    }
+
     /**
      * Find property in one of the specified scopes, in order
      */
@@ -2097,12 +2111,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         newMessage.setEncoding(getEncoding());
     }
     
-    void setSessionProperties(Map<String, Object> sessionProperties)
+    void setSessionProperties(Map<String, TypedValue> sessionProperties)
     {
         properties.sessionMap = sessionProperties;
     }
 
-    void setInvocationProperties(Map<String, Object> invocationProperties)
+    void setInvocationProperties(Map<String, TypedValue> invocationProperties)
     {
         properties.invocationMap = invocationProperties;
     }
@@ -2123,7 +2137,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return id.hashCode();
     }
     
-    protected Map<String, Object> getOrphanFlowVariables()
+    protected Map<String, TypedValue> getOrphanFlowVariables()
     {
         return properties.getOrphanFlowVariables();
     }

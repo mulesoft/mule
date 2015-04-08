@@ -27,9 +27,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 import javax.activation.DataHandler;
 
@@ -43,6 +45,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     public static final String DEFAULT_ENCODING = "UTF-8";
     public static final String CUSTOM_ENCODING = "UTF-16";
+    public static final String TEST_PROPERTY = "testProperty";
     public static final String TEST = "test";
 
     private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
@@ -221,6 +224,64 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         doSetsDataTypeTest(new MuleMessageDataTypeWrapper<>(null, dataType));
     }
 
+    @Test
+    public void setsDefaultPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setProperty(TEST_PROPERTY, TEST);
+
+        assertDefaultPropertyDataType(muleMessage, PropertyScope.OUTBOUND);
+    }
+
+    @Test
+    public void setsDefaultOutboundPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.OUTBOUND);
+
+        assertDefaultPropertyDataType(muleMessage, PropertyScope.OUTBOUND);
+    }
+
+    @Test
+    public void setsDefaultInboundPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.INBOUND);
+
+        assertDefaultPropertyDataType(muleMessage, PropertyScope.INBOUND);
+    }
+
+    @Test
+    public void setsDefaultInvocationPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.INVOCATION);
+
+        assertDefaultPropertyDataType(muleMessage, PropertyScope.INVOCATION);
+    }
+
+    @Test
+    public void setsDefaultSessionPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setSessionProperties(new HashMap<String, TypedValue>());
+        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.SESSION);
+
+        assertDefaultPropertyDataType(muleMessage, PropertyScope.SESSION);
+    }
+
+    @Test
+    public void setsCustomPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
+        dataType.setEncoding(CUSTOM_ENCODING);
+
+        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.OUTBOUND, dataType);
+
+        assertPropertyDataType(muleMessage, PropertyScope.OUTBOUND, dataType);
+    }
+
     private void doSetsDataTypeTest(DataType<?> dataType)
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
@@ -242,5 +303,16 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     private void assertDataType(MuleMessage muleMessage, DataType<?> dataType)
     {
         assertThat(muleMessage.getDataType(), like(dataType));
+    }
+
+    private void assertDefaultPropertyDataType(DefaultMuleMessage muleMessage, PropertyScope scope)
+    {
+        assertPropertyDataType(muleMessage, scope, DataType.STRING_DATA_TYPE);
+    }
+
+    private void assertPropertyDataType(DefaultMuleMessage muleMessage, PropertyScope scope, DataType dataType)
+    {
+        DataType<?> actualDataType = muleMessage.getPropertyDataType(TEST_PROPERTY, scope);
+        assertThat(actualDataType, like(dataType));
     }
 }

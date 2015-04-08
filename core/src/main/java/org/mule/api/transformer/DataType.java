@@ -19,7 +19,10 @@ import java.io.Serializable;
  */
 public interface DataType<T> extends Serializable, Cloneable
 {
-    public static final String ANY_MIME_TYPE = "*/*";
+    String ANY_MIME_TYPE = "*/*";
+    DataType<byte[]> BYTE_ARRAY_DATA_TYPE = DataTypeFactory.createImmutable(byte[].class);
+    DataType<String> STRING_DATA_TYPE = DataTypeFactory.createImmutable(String.class);
+    DataType<Object> OBJECT_DATA_TYPE = DataTypeFactory.createImmutable(Object.class);
 
     /**
      * The object type of the source object to transform.
@@ -67,8 +70,4 @@ public interface DataType<T> extends Serializable, Cloneable
      * Create an exact copy of this datatype
      */
     DataType cloneDataType();
-
-    DataType<byte[]> BYTE_ARRAY_DATA_TYPE = DataTypeFactory.createImmutable(byte[].class);
-
-    DataType<String> STRING_DATA_TYPE = DataTypeFactory.createImmutable(String.class);
 }
