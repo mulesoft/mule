@@ -15,10 +15,6 @@
     <name>Full Distribution</name>
     <description>Includes the Mule server with all of its modules and transports.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <build>
         <plugins>
             <plugin>

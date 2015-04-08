@@ -13,10 +13,6 @@
     <name>Embedded (Single jar file)</name>
     <description>Assembles the Mule core, modules, and transports into a single library (jar). This is useful for embedding Mule into an existing project.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
