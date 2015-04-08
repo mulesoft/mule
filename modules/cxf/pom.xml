@@ -13,9 +13,7 @@
 
     <properties>
         <skipExportTests>false</skipExportTests>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
-
 
     <build>
         <plugins>

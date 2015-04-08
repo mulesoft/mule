@@ -11,10 +11,6 @@
 
     <artifactId>mule-module-schedulers</artifactId>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
      <dependencies>
          <dependency>
              <groupId>org.quartz-scheduler</groupId>

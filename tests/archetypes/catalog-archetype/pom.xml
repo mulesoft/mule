@@ -22,7 +22,6 @@
         <!-- the following defines an optional goal and related params to run in the generated project dir before calling compile -->
         <preCompileArchetypeGoal>new-pattern</preCompileArchetypeGoal>
         <preCompileArchetypeParams>-DpatternTagName=foo-pattern -DpatternFQCN=org.mule.test.FooPattern -DpatternType=siso</preCompileArchetypeParams>
-        <licensePath>../../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <dependencies>

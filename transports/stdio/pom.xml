@@ -11,10 +11,6 @@
     <name>System IO Transport</name>
     <description>A Mule transport used as the interface to Java's System.out and System.in objects, typically for testing purposes.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

@@ -12,10 +12,6 @@
     <name>Mule Tools</name>
     <description>Tools for building and working with Mule projects.</description>
 
-    <properties>
-        <licensePath>../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <modules>
         <module>bobberplus</module>
         <module>mule-transport-archetype</module>

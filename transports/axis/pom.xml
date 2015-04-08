@@ -11,10 +11,6 @@
     <name>SOAP Transport - Axis</name>
     <description>A Mule transport for Soap Connectivity using Axis.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <!-- we use some common classes from the CXF module -->
         <dependency>

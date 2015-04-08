@@ -13,7 +13,6 @@
 
     <properties>
         <abderaVersion>0.4.0-incubating</abderaVersion>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <!-- Common Dependencies -->

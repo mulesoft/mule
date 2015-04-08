@@ -19,7 +19,6 @@
         <archetype>org.mule.tools:mule-module-archetype</archetype>
         <!-- this string will be appended to the archetype's commandline -->
         <archetypeParams>-DartifactId=foo -DhasCustomSchema=y</archetypeParams>
-        <licensePath>../../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <dependencies>

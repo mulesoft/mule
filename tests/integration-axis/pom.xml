@@ -15,7 +15,6 @@
     <description>Integration Tests for the Axis transport</description>
 
     <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
         <skipTests>${skipIntegrationTests}</skipTests>
     </properties>
 

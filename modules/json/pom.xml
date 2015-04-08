@@ -11,10 +11,6 @@
     <name>JSON Module</name>
     <description>Implementation of JSON transformers for Mule</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <build>
         <pluginManagement>
             <plugins>

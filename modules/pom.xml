@@ -13,10 +13,6 @@
     <name>Mule Modules</name>
     <description>Modules which extend the Mule Core but do not qualify as Transports</description>
 
-    <properties>
-        <licensePath>../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <modules>
         <module>atom</module>
         <module>annotations</module>

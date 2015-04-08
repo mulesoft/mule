@@ -11,10 +11,6 @@
     <name>Multicast Transport</name>
     <description>A Mule transport for Udp Multicasting. This transport supplies a Multicast Data Packet dispatcher and client implementation.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
