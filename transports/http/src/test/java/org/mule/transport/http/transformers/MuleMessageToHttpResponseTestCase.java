@@ -9,6 +9,7 @@ package org.mule.transport.http.transformers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
@@ -104,7 +105,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         final String wrongContentType = "text/json";
         Map<String, Object> outboundProperties =  new HashMap<String, Object>();
         outboundProperties.put(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
-        MuleContext muleContext = mock(MuleContext.class);
+        MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
         MuleMessage msg = new DefaultMuleMessage(null,outboundProperties, muleContext);
         //Making sure that the outbound property overrides both invocation and inbound
         msg.setInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);

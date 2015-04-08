@@ -6,6 +6,11 @@
  */
 package org.mule.routing.filters.xml;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.module.xml.filters.IsXmlFilter;
@@ -19,11 +24,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-
 public class IsXmlFilterTestCase extends AbstractMuleTestCase
 {
     private IsXmlFilter filter;
@@ -33,7 +33,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase
     public void setUp()
     {
         filter = new IsXmlFilter();
-        muleContext = mock(MuleContext.class);
+        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     }
 
     @Test

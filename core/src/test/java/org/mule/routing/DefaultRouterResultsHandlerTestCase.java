@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -39,13 +39,12 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTestCase
 {
 
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
-    protected MuleContext muleContext = mock(MuleContext.class);
+    protected MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     protected MuleSession session = mock(MuleSession.class);
     protected InboundEndpoint endpoint = mock(InboundEndpoint.class);
     protected Flow flow = mock(Flow.class);
@@ -64,7 +63,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     public void aggregateNoEvent()
     {
         MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent> singletonList(null),
-            mock(MuleEvent.class), mock(MuleContext.class));
+            mock(MuleEvent.class), muleContext);
         assertNull(result);
     }
 
@@ -84,7 +83,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         event2.getSession().setProperty("key1", "value1");
 
         MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent> singletonList(event2),
-            event1, mock(MuleContext.class));
+            event1, muleContext);
         assertSame(event2, result);
 
         // Because same event instance is returned rather than MessageCollection
@@ -120,7 +119,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         events.add(event2);
         events.add(event3);
 
-        MuleEvent result = resultsHandler.aggregateResults(events, event1, mock(MuleContext.class));
+        MuleEvent result = resultsHandler.aggregateResults(events, event1, muleContext);
         assertNotNull(result);
         assertEquals(DefaultMessageCollection.class, result.getMessage().getClass());
         assertEquals(2, ((MuleMessageCollection) result.getMessage()).size());
@@ -158,7 +157,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         events.add(null);
         events.add(event2);
 
-        MuleEvent result = resultsHandler.aggregateResults(events, event1, mock(MuleContext.class));
+        MuleEvent result = resultsHandler.aggregateResults(events, event1, muleContext);
         assertSame(event2, result);
 
         // Because same event instance is returned rather than MessageCollection
@@ -177,15 +176,14 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
 
-        MuleMessageCollection messageCollection = new DefaultMessageCollection(
-            mock(MuleContext.class));
+        MuleMessageCollection messageCollection = new DefaultMessageCollection(muleContext);
         messageCollection.setInvocationProperty("key2", "value2");
         messageCollection.addMessage(message2);
         messageCollection.addMessage(message3);
         MuleEvent event2 = new DefaultMuleEvent(messageCollection, endpoint, flow);
 
         MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent> singletonList(event2),
-            event1, mock(MuleContext.class));
+            event1, muleContext);
         assertSame(event2, result);
 
         // Because same event instance is returned rather than MessageCollection
@@ -206,15 +204,13 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         MuleMessage message4 = new DefaultMuleMessage("test event D", muleContext);
         MuleMessage message5 = new DefaultMuleMessage("test event E", muleContext);
 
-        MuleMessageCollection messageCollection = new DefaultMessageCollection(
-            mock(MuleContext.class));
+        MuleMessageCollection messageCollection = new DefaultMessageCollection(muleContext);
         messageCollection.setInvocationProperty("key2", "value2");
         messageCollection.addMessage(message2);
         messageCollection.addMessage(message3);
         MuleEvent event2 = new DefaultMuleEvent(messageCollection, endpoint, flow);
 
-        MuleMessageCollection messageCollection2 = new DefaultMessageCollection(
-            mock(MuleContext.class));
+        MuleMessageCollection messageCollection2 = new DefaultMessageCollection(muleContext);
         messageCollection.setInvocationProperty("key3", "value3");
         messageCollection.addMessage(message4);
         messageCollection.addMessage(message5);
@@ -224,7 +220,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         events.add(event2);
         events.add(event3);
 
-        MuleEvent result = resultsHandler.aggregateResults(events, event1, mock(MuleContext.class));
+        MuleEvent result = resultsHandler.aggregateResults(events, event1, muleContext);
         assertNotNull(result);
         assertEquals(DefaultMessageCollection.class, result.getMessage().getClass());
         assertEquals(2, ((MuleMessageCollection) result.getMessage()).size());

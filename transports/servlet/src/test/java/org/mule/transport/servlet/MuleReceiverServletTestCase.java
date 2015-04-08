@@ -6,6 +6,9 @@
  */
 package org.mule.transport.servlet;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -17,13 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.httpclient.Header;
 import org.junit.Test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 public class MuleReceiverServletTestCase extends AbstractMuleTestCase
 {
     private static final String KEY = "key";
-    private MuleContext mockContext = mock(MuleContext.class);
+    private MuleContext mockContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
 
     @Test
     public void responseWithSingleValueForHeaderShouldWriteSingleValueToServletResponse() throws Exception

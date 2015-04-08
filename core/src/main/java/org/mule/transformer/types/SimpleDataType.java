@@ -22,7 +22,7 @@ import org.apache.commons.beanutils.MethodUtils;
  */
 public class SimpleDataType<T> implements DataType<T>, Cloneable
 {
-    protected Class<?> type;
+    protected final Class<?> type;
     protected String mimeType = ANY_MIME_TYPE;
     protected String encoding;
 
@@ -179,8 +179,9 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
     public String toString()
     {
         return "SimpleDataType{" +
-                "type=" + type.getName() +
+                "type=" + (type == null ? null : type.getName())+
                 ", mimeType='" + mimeType + '\'' +
+                ", encoding='" + encoding + '\'' +
                 '}';
     }
 

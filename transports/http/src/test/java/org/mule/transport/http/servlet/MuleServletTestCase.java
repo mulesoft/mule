@@ -9,6 +9,7 @@ package org.mule.transport.http.servlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,7 +51,7 @@ public class MuleServletTestCase extends AbstractMuleTestCase
         savedTimeZone = TimeZone.getDefault();
         TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
 
-        muleContext = mock(MuleContext.class);
+        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
         registry = mock(MuleRegistry.class);
 
         when(muleContext.getRegistry()).thenReturn(registry);

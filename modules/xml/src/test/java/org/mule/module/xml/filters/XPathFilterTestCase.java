@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -66,7 +65,6 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     public void testAcceptMessage() throws Exception
     {
         final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        MuleContext muleContext = Mockito.mock(MuleContext.class);
         DefaultMuleMessage message = new DefaultMuleMessage(null, muleContext);
         XPathFilter filter = new XPathFilter()
         {

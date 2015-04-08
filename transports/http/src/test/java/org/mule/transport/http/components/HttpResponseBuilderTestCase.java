@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
@@ -78,7 +79,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     @Before
     public void setUp()
     {
-        muleContext = mock(MuleContext.class);
+        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
         mockEvent = mock(MuleEvent.class);
         mockMuleMessage = mock(MuleMessage.class);
         mockExpressionManager = mock(ExpressionManager.class);
