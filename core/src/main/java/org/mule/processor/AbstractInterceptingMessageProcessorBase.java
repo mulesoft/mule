@@ -6,8 +6,8 @@
  */
 package org.mule.processor;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.VoidMuleEvent;
-import org.mule.api.AnnotatedObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -24,11 +24,6 @@ import org.mule.util.NotificationUtils;
 import org.mule.util.ObjectUtils;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,8 +34,8 @@ import org.apache.commons.logging.LogFactory;
  * This simply provides an implementation of setNext and holds the next message processor as an
  * attribute.
  */
-public abstract class AbstractInterceptingMessageProcessorBase
-        implements MessageProcessor, MuleContextAware, AnnotatedObject, MessageProcessorContainer
+public abstract class AbstractInterceptingMessageProcessorBase extends AbstractAnnotatedObject
+        implements MessageProcessor, MuleContextAware, MessageProcessorContainer
 {
 
     protected Log logger = LogFactory.getLog(getClass());
@@ -49,7 +44,6 @@ public abstract class AbstractInterceptingMessageProcessorBase
     private MessageProcessorExecutionTemplate messageProcessorExecutorWithoutNotifications = MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate();
     private MessageProcessorExecutionTemplate messageProcessorExecutorWithNotifications = MessageProcessorExecutionTemplate.createExecutionTemplate();
     protected MuleContext muleContext;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public void setMuleContext(MuleContext context)
     {
@@ -118,22 +112,6 @@ public abstract class AbstractInterceptingMessageProcessorBase
     public String toString()
     {
         return ObjectUtils.toString(this);
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 
     protected boolean isEventValid(MuleEvent event)
