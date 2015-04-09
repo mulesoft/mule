@@ -57,7 +57,11 @@ MULE-7588: Lifecycle has been fixed. Please have the following considerations:
     * For further technical details, you can read the full spec at https://github.com/mulesoft/mule/wiki/%5BMule-3.7.0-M1%5D-Registry-Consolidation,-Lifecycle-fix,-and-Dependency-Injection
 MULE-8430: in previous versions of Mule, domain home folders where created relative to current working directory instead of relative to <MULE_HOME> folder.
            Now that this is fixed, if your Mule instance was started from a folder other than <MULE_HOME> then folder <WORKING_DIRECTORY>/.mule/<DOMAIN_NAME> must be moved to <MULE_HOME>/.mule/<DOMAIN_NAME>
-
+MULE-8457: set-payload element is now implemented using a plain MessageProcessor instead of using a MessageTransformer. This means that <set-payload> will continue working as before unless is used as a transformer. (for example, inside an endpoint)
+           To use SetPayloadTransformer in the mule configuration file as a transformer, it must be defined as a <custom-transformer> like this:
+           <custom-transformer class="org.mule.transformer.simple.SetPayloadTransformer">
+               <spring:property name="value" value="someValue"/>
+           </custom-transformer>
 
 Migration changes from 3.5.x to 3.6.x
 
