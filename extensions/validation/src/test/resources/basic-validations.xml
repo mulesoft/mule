@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-extension-validation.xsd">
+
+    <spring:beans>
+        <spring:bean id="customValidator" class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" />
+    </spring:beans>
+
+    <validation:config name="validation"/>
+
+    <flow name="domain">
+        <validation:domain config-ref="validation" domain="#[payload]"/>
+    </flow>
+
+    <flow name="topLevelDomain">
+        <validation:top-level-domain topLevelDomain="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="toplevelDomainCountryCode">
+        <validation:top-level-domain-country-code countryCode="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="creditCardNumber">
+        <validation:credit-card-number creditCardNumber="#[payload]" creditCardType="MASTERCARD" config-ref="validation"/>
+    </flow>
+
+    <flow name="email">
+        <validation:email email="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="ip">
+        <validation:ip ip="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="isbn10">
+        <validation:isbn10 isbn="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="isbn13">
+        <validation:isbn13 isbn="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="url">
+        <validation:url url="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="time">
+        <validation:time time="#[payload]" pattern="#[pattern]" locale="US" config-ref="validation"/>
+    </flow>
+
+    <flow name="date">
+        <validation:date date="#[payload]" pattern="#[pattern]" locale="US" config-ref="validation"/>
+    </flow>
+
+    <flow name="matchesRegex">
+        <validation:matches-regex value="#[payload]" regex="#[regexp]" caseSensitive="#[caseSensitive]"
+                                  config-ref="validation"/>
+    </flow>
+
+    <flow name="size">
+        <validation:size value="#[payload]" min="#[minLength]" max="#[maxLength]" config-ref="validation"/>
+    </flow>
+
+    <flow name="isTrue">
+        <validation:is-true expression="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="isFalse">
+        <validation:is-false expression="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="notEmpty">
+        <validation:not-empty value="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="empty">
+        <validation:is-empty value="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="isNull">
+        <validation:is-null value="#[payload]" config-ref="validation"/>
+    </flow>
+
+    <flow name="long">
+        <validation:is-long value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
+    </flow>
+
+    <flow name="integer">
+        <validation:is-integer value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]"
+                               config-ref="validation"/>
+    </flow>
+
+    <flow name="short">
+        <validation:is-short value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
+    </flow>
+
+    <flow name="double">
+        <validation:is-double value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
+    </flow>
+
+    <flow name="float">
+        <validation:is-float value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
+    </flow>
+
+    <flow name="all">
+        <validation:all throwsException="#[throwsException]" config-ref="validation">
+            <validation:validations>
+                <validation:credit-card-number creditCardNumber="#[creditCardNumber]" creditCardType="MASTERCARD" config-ref="validation"/>
+                <validation:email email="#[email]" config-ref="validation"/>
+            </validation:validations>
+        </validation:all>
+    </flow>
+
+    <flow name="customValidationByClass">
+        <validation:custom-validator class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" config-ref="validation" />
+    </flow>
+
+    <flow name="customValidationByRef">
+        <validation:custom-validator ref="customValidator" config-ref="validation" />
+    </flow>
+
+</mule>

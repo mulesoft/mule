@@ -19,7 +19,7 @@
     <description>Mule extensions that augment the core Mule functionality through the Mule Extension API</description>
 
     <modules>
-        <!-- <module>validation</module> -->
+         <module>validation</module>
     </modules>
 
     <dependencies>
