@@ -135,6 +135,15 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
     }
 
     @Test
+    public void manyNestedOperationsSupportedButOnlyOneProvided() throws Exception
+    {
+        MuleEvent event = runFlow("killManyButOnlyOneProvided");
+        String expected = "Killed the following because I'm the one who knocks:\n" +
+                          "bye bye, Gustavo Fring\n";
+
+        assertThat(expected, is(event.getMessageAsString()));
+    }
+    @Test
     public void getInjectedDependency() throws Exception
     {
         ExtensionManager extensionManager = (ExtensionManager) runFlow("injectedExtensionManager").getMessage().getPayload();
