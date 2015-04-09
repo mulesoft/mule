@@ -6,13 +6,7 @@
  */
 package org.mule.api.processor;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -32,7 +26,7 @@ import org.apache.log4j.Level;
  * level to the 'org.mule.api.processor.LoggerMessageProcessor' category. The level and
  * category can both be configured to suit your needs.
  */
-public class LoggerMessageProcessor extends AnnotatedObject implements MessageProcessor, Initialisable, MuleContextAware
+public class LoggerMessageProcessor extends AbstractAnnotatedObject implements MessageProcessor, Initialisable, MuleContextAware
 {
     protected transient Log logger;
 
