@@ -144,6 +144,7 @@
             <xsd:element ref="custom-processor"/>
             <xsd:element ref="abstract-empty-processor"/>
             <xsd:element ref="invoke"/>
+            <xsd:element ref="set-payload"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
             <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
@@ -4745,7 +4746,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="abstract-transformer">
+    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that sets the paylaod with the provided value
@@ -4755,7 +4756,43 @@
 
     <xsd:complexType name="setPayloadTransformerType">
         <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the message processor so that other elements can reference it. Required if the message processor is defined at the global level.
+                            Deprecated. Provided only to maintain backwards compatibility at XML level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="returnClass" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The class of the value assigned to the payload
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreBadInput" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Deprecated. Provided only to maintain backwards compatibility at XML level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attributeGroup ref="mimeTypeAttributes">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The mime type of the value assigned to the payload
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attributeGroup>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The encoding of the value assigned to the payload
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="value" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>

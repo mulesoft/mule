@@ -153,6 +153,22 @@ public class AttributeEvaluator
         }
         return Boolean.valueOf(value.toString());
     }
+    public Class resolveClass(MuleEvent event)
+    {
+        final Object value = resolveValue(event);
+        if (value == null || value instanceof Class)
+        {
+            return (Class) value;
+        }
+        try
+        {
+            return Class.forName(value.toString());
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Cannot class attribute"), e);
+        }
+    }
 
     public String getRawValue()
     {
