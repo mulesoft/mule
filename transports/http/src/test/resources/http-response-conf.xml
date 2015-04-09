@@ -41,7 +41,9 @@
             <http:header name="Cache-Control" value="no-transform"/>
             <http:header name="header1" value="value1"/>
             <http:header name="header2" value="value2"/>
-            <set-payload value="Custom body"/>
+            <custom-transformer class="org.mule.transformer.simple.SetPayloadTransformer">
+                <spring:property name="value" value="Custom body"/>
+            </custom-transformer>
         </http:response-builder>
         <echo-component/>
     </flow>
