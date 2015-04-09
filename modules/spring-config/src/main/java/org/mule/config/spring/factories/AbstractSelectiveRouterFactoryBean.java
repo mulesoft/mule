@@ -6,24 +6,19 @@
  */
 package org.mule.config.spring.factories;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.AbstractSelectiveRouter;
 import org.mule.routing.MessageProcessorFilterPair;
+
+import java.util.Collection;
+
 import org.springframework.beans.factory.FactoryBean;
 
-public abstract class AbstractSelectiveRouterFactoryBean implements FactoryBean, AnnotatedObject
+public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotatedObject implements FactoryBean
 {
     private MessageProcessor defaultProcessor;
     private Collection<MessageProcessorFilterPair> conditionalMessageProcessors;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public AbstractSelectiveRouterFactoryBean()
     {
@@ -59,21 +54,5 @@ public abstract class AbstractSelectiveRouterFactoryBean implements FactoryBean,
     public boolean isSingleton()
     {
         return true;
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 }

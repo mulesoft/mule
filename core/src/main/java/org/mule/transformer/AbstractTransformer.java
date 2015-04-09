@@ -6,10 +6,10 @@
  */
 package org.mule.transformer;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -33,13 +33,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
@@ -50,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer implements Transformer, AnnotatedObject
+public abstract class AbstractTransformer extends AbstractAnnotatedObject implements Transformer
 {
     public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
 
@@ -97,7 +94,6 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
      */
     protected String mimeType;
     protected String encoding;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     /**
      * default constructor required for discovery
@@ -564,24 +560,5 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-    }
-
-    @Override
-    public final Object getAnnotation(QName qName)
-    {
-        return annotations.get(qName);
-    }
-
-    @Override
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    @Override
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 }

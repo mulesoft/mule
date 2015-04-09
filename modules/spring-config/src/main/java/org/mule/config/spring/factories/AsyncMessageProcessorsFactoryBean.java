@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.NameableObject;
 import org.mule.api.context.MuleContextAware;
@@ -16,16 +16,11 @@ import org.mule.api.processor.ProcessingStrategy;
 import org.mule.processor.AsyncDelegateMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware, NameableObject, AnnotatedObject
+public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware, NameableObject
 {
 
     protected MuleContext muleContext;
@@ -33,7 +28,6 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     protected List messageProcessors;
     protected ProcessingStrategy processingStrategy;
     protected String name;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public Class getObjectType()
     {
@@ -95,21 +89,5 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     public void setProcessingStrategy(ProcessingStrategy processingStrategy)
     {
         this.processingStrategy = processingStrategy;
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 }

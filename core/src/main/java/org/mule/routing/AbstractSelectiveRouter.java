@@ -6,7 +6,7 @@
  */
 package org.mule.routing;
 
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -36,16 +36,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.xml.namespace.QName;
 
 import org.apache.commons.collections.ListUtils;
 
-public abstract class AbstractSelectiveRouter
-        implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, AnnotatedObject, MessageProcessorContainer
+public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
+        implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorContainer
 {
 
     private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<MessageProcessorFilterPair>();
@@ -58,7 +54,6 @@ public abstract class AbstractSelectiveRouter
     final AtomicBoolean started = new AtomicBoolean(false);
     private FlowConstruct flowConstruct;
     private MuleContext muleContext;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public AbstractSelectiveRouter()
     {
@@ -346,22 +341,6 @@ public abstract class AbstractSelectiveRouter
     public void setRouterStatistics(RouterStatistics routerStatistics)
     {
         this.routerStatistics = routerStatistics;
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 
     @Override

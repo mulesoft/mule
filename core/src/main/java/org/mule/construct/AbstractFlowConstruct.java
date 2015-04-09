@@ -6,7 +6,7 @@
  */
 package org.mule.construct;
 
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -34,11 +34,6 @@ import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
  * {@link #doStop()} and {@link #doDispose()} if they need to perform any action on
  * lifecycle transitions.
  */
-public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle, AnnotatedObject
+public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject implements FlowConstruct, Lifecycle
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -71,8 +66,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     protected final MuleContext muleContext;
     protected FlowConstructStatistics statistics;
     protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
-    
+
     /**
      * The initial states that the flow can be started in
      */
@@ -346,22 +340,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         {
             ((Disposable) candidate).dispose();
         }
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 
     /**

@@ -7,8 +7,8 @@
 package org.mule.endpoint;
 
 import static org.mule.util.ObjectNameHelper.getEndpointNameFor;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
-import org.mule.api.AnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
@@ -58,11 +58,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,7 +72,7 @@ import org.apache.commons.logging.LogFactory;
  * repeatable fashion (global endpoints), ii) Allow for much more extensibility in
  * endpoint creation for transport specific endpoints, streaming endpoints etc.<br/>
  */
-public abstract class AbstractEndpointBuilder implements EndpointBuilder, AnnotatedObject
+public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject implements EndpointBuilder
 {
 
     public static final String PROPERTY_RESPONSE_TIMEOUT = "responseTimeout";
@@ -102,8 +100,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     protected Boolean disableTransportTransformer;
     protected String mimeType;
     protected AbstractRedeliveryPolicy redeliveryPolicy;
-
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     // not included in equality/hash
     protected String registryId = null;
@@ -1002,21 +998,5 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         }
 
         return result;
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 }

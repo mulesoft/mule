@@ -6,7 +6,7 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -28,14 +28,10 @@ import org.mule.module.cxf.support.WSDLQueryHandler;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
@@ -60,7 +56,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
  * this and control how the Server is created and how the {@link CxfInboundMessageProcessor}
  * is configured.
  */
-public abstract class AbstractInboundMessageProcessorBuilder implements MuleContextAware, MessageProcessorBuilder, AnnotatedObject
+public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnnotatedObject implements MuleContextAware, MessageProcessorBuilder
 {
     private CxfConfiguration configuration;
     private Server server;
@@ -81,8 +77,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private Map<String,Object> properties = new HashMap<String, Object>();
     private boolean validationEnabled;
     private List<String> schemaLocations;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
-
     private WsSecurity wsSecurity;
 
     @Override
@@ -500,22 +494,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         this.schemaLocations = schemaLocations;
     }
 
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
-    }
-    
     public void setWsSecurity(WsSecurity wsSecurity)
     {
         this.wsSecurity = wsSecurity;
