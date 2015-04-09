@@ -182,7 +182,7 @@ import org.mule.transformer.simple.RemoveFlowVariableTransformer;
 import org.mule.transformer.simple.RemovePropertyTransformer;
 import org.mule.transformer.simple.RemoveSessionVariableTransformer;
 import org.mule.transformer.simple.SerializableToByteArray;
-import org.mule.transformer.simple.SetPayloadTransformer;
+import org.mule.transformer.simple.SetPayloadMessageProcessor;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 import org.mule.util.store.InMemoryObjectStore;
@@ -311,7 +311,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("byte-array-to-string-transformer", new MessageProcessorDefinitionParser(ObjectToString.class));
         registerBeanDefinitionParser("string-to-byte-array-transformer", new MessageProcessorDefinitionParser(ObjectToByteArray.class));
         registerBeanDefinitionParser("parse-template", new MessageProcessorDefinitionParser(ParseTemplateTransformer.class));
-        registerBeanDefinitionParser("set-payload", new MessageProcessorDefinitionParser(SetPayloadTransformer.class));
+        registerBeanDefinitionParser("set-payload", new MessageProcessorDefinitionParser(SetPayloadMessageProcessor.class));
 
         registerBeanDefinitionParser("append-string-transformer", new MessageProcessorDefinitionParser(StringAppendTransformer.class));
 
