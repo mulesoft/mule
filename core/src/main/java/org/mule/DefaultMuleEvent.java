@@ -28,6 +28,7 @@ import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -91,7 +92,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     private transient Map<String, Object> serializedData = null;
 
-    private CopyOnWriteCaseInsensitiveMap<String, Object> flowVariables = new CopyOnWriteCaseInsensitiveMap<String, Object>();
+    private CopyOnWriteCaseInsensitiveMap<String, TypedValue> flowVariables = new CopyOnWriteCaseInsensitiveMap<>();
 
     // Constructors
 
@@ -931,7 +932,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                 out.writeObject(getFlowConstruct() != null ? getFlowConstruct().getName() : "null");
             }
         }
-        for (Map.Entry<String, Object> entry : flowVariables.entrySet())
+        for (Map.Entry<String, TypedValue> entry : flowVariables.entrySet())
         {
             Object value = entry.getValue();
             if (value != null && !(value instanceof Serializable))
@@ -992,11 +993,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             // only copy invocation properties over if MuleMessage had invocation properties set on it before
             // MuleEvent was created.
             flowVariables.putAll(((DefaultMuleMessage) message).getOrphanFlowVariables());
-            
+
             ((DefaultMuleMessage) message).setInvocationProperties(flowVariables);
             if (session instanceof DefaultMuleSession)
             {
-                ((DefaultMuleMessage) message).setSessionProperties(((DefaultMuleSession) session).getProperties());
+                ((DefaultMuleMessage) message).setSessionProperties(((DefaultMuleSession) session).getExtendedProperties());
             }
         }
     }
@@ -1037,13 +1038,16 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @SuppressWarnings("unchecked")
     public <T> T getFlowVariable(String key)
     {
-        return (T) flowVariables.get(key);
+        TypedValue typedValue = flowVariables.get(key);
+
+        return typedValue == null ? null : (T) typedValue.getValue();
     }
 
     @Override
     public void setFlowVariable(String key, Object value)
     {
-        flowVariables.put(key, value);
+        DataType<?> propertyDataType = DataTypeFactory.create(value == null ? Object.class : value.getClass());
+        flowVariables.put(key, new TypedValue(value, propertyDataType));
     }
 
     @Override

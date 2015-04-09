@@ -8,6 +8,7 @@ package org.mule.api;
 
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;
@@ -126,17 +127,24 @@ public interface MuleSession extends Serializable
     void clearProperties();
     
     /**
-     * WANRING: This method will always return null unless you created the DefaultMuleSession with a
+     * WARNING: This method will always return null unless you created the DefaultMuleSession with a
      * flowConstruct or set one using the setter. This method should not be used, and is only here for
-     * bacwards compatability
+     * backwards compatibility
      */
     @Deprecated
     FlowConstruct getFlowConstruct();
 
     /**
-     * WANRING: This method should not be used, and is only here for bacwards compatability
+     * WARNING: This method should not be used, and is only here for backwards compatibility
      */
     @Deprecated
     void setFlowConstruct(FlowConstruct flowConstruct);
 
+    /**
+     * Retrieves a session scope property data type
+     *
+     * @param name the name for the session property
+     * @return the property data type or null if the property does not exist
+     */
+    DataType<?> getPropertyDataType(String name);
 }
