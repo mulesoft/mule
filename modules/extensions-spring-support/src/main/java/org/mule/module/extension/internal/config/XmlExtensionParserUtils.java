@@ -17,6 +17,7 @@ import org.mule.api.NestedProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataQualifierVisitor;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Parameter;
@@ -447,18 +448,18 @@ final class XmlExtensionParserUtils
 
     private static void addNestedProcessorResolver(ResolverSet resolverSet, Parameter parameter, List<MessageProcessor> nestedProcessors)
     {
-        if (nestedProcessors.size() == 1)
+        List<ValueResolver<NestedProcessor>> nestedProcessorResolvers = new ArrayList<>(nestedProcessors.size());
+        for (MessageProcessor nestedProcessor : nestedProcessors)
+        {
+            nestedProcessorResolvers.add(new NestedProcessorValueResolver(nestedProcessor));
+        }
+
+        if (nestedProcessors.size() == 1 && parameter.getType().getQualifier() != DataQualifier.LIST)
         {
             resolverSet.add(parameter, new NestedProcessorValueResolver(nestedProcessors.get(0)));
         }
         else
         {
-            List<ValueResolver<NestedProcessor>> nestedProcessorResolvers = new ArrayList<>(nestedProcessors.size());
-            for (MessageProcessor nestedProcessor : nestedProcessors)
-            {
-                nestedProcessorResolvers.add(new NestedProcessorValueResolver(nestedProcessor));
-            }
-
             resolverSet.add(parameter, CollectionValueResolver.of(ArrayList.class, nestedProcessorResolvers));
         }
     }

@@ -79,7 +79,14 @@
                 <heisenberg:kill-with-custom-message config-ref="heisenberg" victim="Nazi dudes" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operations>
         </heisenberg:kill-many>
+    </flow>
 
+    <flow name="killManyButOnlyOneProvided">
+        <heisenberg:kill-many config-ref="heisenberg" reason="I'm the one who knocks">
+            <heisenberg:kill-operations>
+                <heisenberg:kill-with-custom-message config-ref="heisenberg" victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+            </heisenberg:kill-operations>
+        </heisenberg:kill-many>
     </flow>
 
     <flow name="killOne">
