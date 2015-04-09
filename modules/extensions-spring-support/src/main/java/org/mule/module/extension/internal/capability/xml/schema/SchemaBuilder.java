@@ -601,11 +601,11 @@ public class SchemaBuilder
             schema.getSimpleTypeOrComplexTypeOrGroup().add(group);
 
             substitutionGroups.put(name, group);
-        }
 
-        TopLevelElement element = new TopLevelElement();
-        element.setRef(new QName(schema.getTargetNamespace(), getOperationName(operation)));
-        group.getChoice().getParticle().add(objectFactory.createElement(element));
+            element = new TopLevelElement();
+            element.setRef(new QName(schema.getTargetNamespace(), name));
+            group.getChoice().getParticle().add(objectFactory.createElement(element));
+        }
 
         return name;
     }

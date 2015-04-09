@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/extension/heisenberg" attributeFormDefault="unqualified" elementFormDefault="qualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
     <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
@@ -118,20 +120,7 @@
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-message-processor" abstract="true" name="heisenberg-empire"></xs:element>
     <xs:group name="heisenberg-empire-group">
         <xs:choice>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="alias"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="die"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="get-enemy"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="get-injected-extension-manager"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="hide-meth-in-event"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="hide-meth-in-message"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill-many"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill-many"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill-one"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill-one"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="kill-with-custom-message"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="launder"></xs:element>
-            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="say-my-name"></xs:element>
+            <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" ref="heisenberg-empire"></xs:element>
         </xs:choice>
     </xs:group>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/extension/heisenberg" type="AliasType" substitutionGroup="heisenberg-empire" name="alias"></xs:element>
