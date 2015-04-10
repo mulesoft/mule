@@ -68,10 +68,10 @@ public class HttpParser
         return queryString;
     }
 
-    public static Collection<Part> parseMultipartContent(InputStream content, String contentType) throws IOException
+    public static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException
     {
         MimeMultipart mimeMultipart = null;
-        List<Part> parts = Lists.newArrayList();
+        List<HttpPart> parts = Lists.newArrayList();
 
         try
         {
