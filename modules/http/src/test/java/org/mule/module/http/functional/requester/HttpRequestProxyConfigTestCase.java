@@ -130,7 +130,7 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
         catch (MessagingException e)
         {
             assertThat(e.getCauseException(), is(instanceOf(IOException.class)));
-            assertThat(e.getCauseException().getMessage(), is("Remotely Closed"));
+            assertThat(e.getCauseException().getMessage(), is("Remotely closed"));
         }
         latch.await(1, TimeUnit.SECONDS);
     }

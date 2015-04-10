@@ -8,6 +8,8 @@ package org.mule.module.http.internal.multipart;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.message.ds.ByteArrayDataSource;
+import org.mule.message.ds.StringDataSource;
+import org.mule.module.http.internal.HttpParam;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -27,10 +29,10 @@ import javax.servlet.http.Part;
 public class HttpPartDataSource implements DataSource
 {
 
-    private final Part part;
+    private final HttpPart part;
     private byte[] content;
 
-    private HttpPartDataSource(Part part)
+    private HttpPartDataSource(HttpPart part)
     {
         try
         {
@@ -71,40 +73,35 @@ public class HttpPartDataSource implements DataSource
         return part.getHeader(headerName);
     }
 
-    public long getSize()
-    {
-        return part.getSize();
-    }
-
     @Override
     public String getName()
     {
         return part.getName();
     }
 
-    public static Collection<HttpPartDataSource> createFrom(Collection<Part> parts)
+    public static Collection<HttpPartDataSource> createFrom(Collection<HttpPart> parts)
     {
         final ArrayList<HttpPartDataSource> httpParts = new ArrayList<>(parts.size());
-        for (Part part : parts)
+        for (HttpPart part : parts)
         {
             httpParts.add(new HttpPartDataSource(part));
         }
         return httpParts;
     }
 
-    public static Map<String, DataHandler> createDataHandlerFrom(Collection<Part> parts)
+    public static Map<String, DataHandler> createDataHandlerFrom(Collection<HttpPart> parts)
     {
         final Map<String, DataHandler> httpParts = new HashMap<>(parts.size());
-        for (Part part : parts)
+        for (HttpPart part : parts)
         {
             httpParts.put(part.getName(), new DataHandler(new HttpPartDataSource(part)));
         }
         return httpParts;
     }
 
-    public static Collection<Part> createFrom(Map<String, DataHandler> parts) throws IOException
+    public static Collection<HttpPart> createFrom(Map<String, DataHandler> parts) throws IOException
     {
-        final ArrayList<Part> httpParts = new ArrayList<>(parts.size());
+        final ArrayList<HttpPart> httpParts = new ArrayList<>(parts.size());
         for (String partName : parts.keySet())
         {
             final DataHandler dataHandlerPart = parts.get(partName);
@@ -127,7 +124,7 @@ public class HttpPartDataSource implements DataSource
         return httpParts;
     }
 
-    public Part getPart()
+    public HttpPart getPart()
     {
         return part;
     }

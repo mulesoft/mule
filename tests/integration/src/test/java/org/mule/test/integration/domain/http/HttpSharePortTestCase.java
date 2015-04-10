@@ -8,11 +8,10 @@ package org.mule.test.integration.domain.http;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.ConnectorException;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.DomainFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -73,16 +72,21 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase
     public void bothServicesBindCorrectly() throws Exception
     {
         MuleMessage helloWorldServiceResponse = getMuleContextForApp(HELLO_WORLD_SERVICE_APP).getClient().send(String.format("%s://localhost:%d/service/helloWorld",
-                                 endpointScheme.getValue(), dynamicPort.getNumber()), new DefaultMuleMessage("test-data", getMuleContextForApp(HELLO_WORLD_SERVICE_APP)));
+                                 endpointScheme.getValue(), dynamicPort.getNumber()), new DefaultMuleMessage("test-data", getMuleContextForApp(HELLO_WORLD_SERVICE_APP)), getOptionsBuilder().build());
         assertThat(helloWorldServiceResponse.getPayloadAsString(), is("hello world"));
         MuleMessage helloMuleServiceResponse = getMuleContextForApp(HELLO_MULE_SERVICE_APP).getClient().send(String.format("%s://localhost:%d/service/helloMule",
-                                 endpointScheme.getValue(), dynamicPort.getNumber()), "test-data", null);
+                                 endpointScheme.getValue(), dynamicPort.getNumber()), new DefaultMuleMessage("test-data", getMuleContextForApp(HELLO_MULE_SERVICE_APP)), getOptionsBuilder().build());
         assertThat(helloMuleServiceResponse.getPayloadAsString(), is("hello mule"));
     }
 
     protected SystemProperty getEndpointSchemeSystemProperty()
     {
         return new SystemProperty("scheme", "http");
+    }
+
+    protected HttpRequestOptionsBuilder getOptionsBuilder()
+    {
+        return newOptions();
     }
 
 }
