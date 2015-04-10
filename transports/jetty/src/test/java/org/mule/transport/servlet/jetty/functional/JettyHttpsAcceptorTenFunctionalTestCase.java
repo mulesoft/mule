@@ -12,7 +12,7 @@ import org.junit.Test;
  * Functional tests that underlying Jetty acceptor threads may be changed in Mule Jetty HTTPS (TLS) connector.
  * Verifies the number of acceptor threads may be modified through configuration.
  */
-public class JettyHttpsAcceptorTenFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase
+public class JettyHttpsAcceptorTenFunctionalTestCase extends AbstractJettyHttpsAcceptorFunctionalTestCase
 {
     @Override
     protected String getConfigFile()

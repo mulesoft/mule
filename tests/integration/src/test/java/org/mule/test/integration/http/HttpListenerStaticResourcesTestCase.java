@@ -14,13 +14,16 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.util.ClassUtils.getClassPathRoot;
-
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.transport.ssl.DefaultTlsContextFactory;
 
+import java.io.IOException;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,11 +46,22 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     private int responseCode;
     private String payload;
     private MuleMessage response;
+    private DefaultTlsContextFactory tlsContextFactory;
 
     @Override
     protected String getConfigFile()
     {
         return "http-listener-static-resource-test.xml";
+    }
+
+    @Before
+    public void setup() throws IOException
+    {
+        tlsContextFactory = new DefaultTlsContextFactory();
+
+        // Configure trust store in the client with the certificate of the server.
+        tlsContextFactory.setTrustStorePath("trustStore");
+        tlsContextFactory.setTrustStorePassword("mulepassword");
     }
 
     @Test
@@ -174,6 +188,10 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
         if (!followRedirects)
         {
             optionsBuilder.disableFollowsRedirect();
+        }
+        if (url.startsWith("https"))
+        {
+            optionsBuilder.tlsContextFactory(tlsContextFactory);
         }
         response = muleContext.getClient().send(url, getTestMuleMessage(), optionsBuilder.build());
         responseCode = response.getInboundProperty(HTTP_STATUS_PROPERTY);

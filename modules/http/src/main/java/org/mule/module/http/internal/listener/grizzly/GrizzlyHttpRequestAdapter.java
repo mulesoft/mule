@@ -16,12 +16,11 @@ import org.mule.module.http.internal.domain.HttpProtocol;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
+import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.Collection;
-
-import javax.servlet.http.Part;
 
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpContent;
@@ -150,7 +149,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
                 final String contentTypeValue = getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
                 if (contentTypeValue != null && contentTypeValue.contains("multipart"))
                 {
-                    final Collection<Part> parts = HttpParser.parseMultipartContent(requestContent, contentTypeValue);
+                    final Collection<HttpPart> parts = HttpParser.parseMultipartContent(requestContent, contentTypeValue);
                     this.body = new MultipartHttpEntity(parts);
                 }
                 else
