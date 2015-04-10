@@ -129,7 +129,7 @@ public class MessagingException extends MuleException
         setMessage(generateMessage(getI18nMessage()));
     }
 
-    private String generateMessage(Message message)
+    protected String generateMessage(Message message)
     {
         StringBuilder buf = new StringBuilder(80);
 

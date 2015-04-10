@@ -66,6 +66,11 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.extensions</groupId>
+            <artifactId>mule-extension-validation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- JSON deps, pulls in core and mapper -->
         <dependency>
