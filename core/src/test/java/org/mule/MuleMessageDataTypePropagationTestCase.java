@@ -237,6 +237,27 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsDefaultOutboundPropertyDataType() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setOutboundProperty(TEST_PROPERTY, TEST);
+
+        assertDefaultPropertyDataType(muleMessage, PropertyScope.OUTBOUND);
+    }
+
+    @Test
+    public void setsCustomOutboundPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
+        dataType.setEncoding(CUSTOM_ENCODING);
+
+        muleMessage.setOutboundProperty(TEST_PROPERTY, TEST, dataType);
+
+        assertPropertyDataType(muleMessage, PropertyScope.OUTBOUND, dataType);
+    }
+
+    @Test
+    public void setsDefaultOutboundScopePropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.OUTBOUND);
 
         assertDefaultPropertyDataType(muleMessage, PropertyScope.OUTBOUND);
@@ -246,6 +267,27 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsDefaultInboundPropertyDataType() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setInboundProperty(TEST_PROPERTY, TEST);
+
+        assertDefaultPropertyDataType(muleMessage, PropertyScope.INBOUND);
+    }
+
+    @Test
+    public void setsCustomInboundPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
+        dataType.setEncoding(CUSTOM_ENCODING);
+
+        muleMessage.setInboundProperty(TEST_PROPERTY, TEST, dataType);
+
+        assertPropertyDataType(muleMessage, PropertyScope.INBOUND, dataType);
+    }
+
+    @Test
+    public void setsDefaultInboundScopePropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.INBOUND);
 
         assertDefaultPropertyDataType(muleMessage, PropertyScope.INBOUND);
@@ -253,6 +295,27 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     @Test
     public void setsDefaultInvocationPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setInvocationProperty(TEST_PROPERTY, TEST);
+
+        assertDefaultPropertyDataType(muleMessage, PropertyScope.INVOCATION);
+    }
+
+    @Test
+    public void setsCustomInvocationPropertyDataType() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
+        dataType.setEncoding(CUSTOM_ENCODING);
+
+        muleMessage.setInvocationProperty(TEST_PROPERTY, TEST, dataType);
+
+        assertPropertyDataType(muleMessage, PropertyScope.INVOCATION, dataType);
+    }
+
+    @Test
+    public void setsDefaultInvocationScopePropertyDataType() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.INVOCATION);
@@ -268,6 +331,20 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.SESSION);
 
         assertDefaultPropertyDataType(muleMessage, PropertyScope.SESSION);
+    }
+
+    @Test
+    public void setsDataTypeWhenCreatesInboundMessage() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
+        dataType.setEncoding(CUSTOM_ENCODING);
+
+        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.OUTBOUND, dataType);
+
+        DefaultMuleMessage inboundMessage = (DefaultMuleMessage) muleMessage.createInboundMessage();
+
+        assertPropertyDataType(inboundMessage, PropertyScope.INBOUND, dataType);
     }
 
     @Test

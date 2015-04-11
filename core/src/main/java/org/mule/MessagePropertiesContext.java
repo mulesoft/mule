@@ -224,7 +224,7 @@ public class MessagePropertiesContext implements Serializable
     @Deprecated
     public void setProperty(String key, Object value)
     {
-        getScopedProperties(DEFAULT_SCOPE).put(key, new TypedValue(value, createPropertyDataType(value)));
+        getScopedProperties(DEFAULT_SCOPE).put(key, new TypedValue(value, DataTypeFactory.createFromObject(value)));
     }
 
     /**
@@ -237,7 +237,7 @@ public class MessagePropertiesContext implements Serializable
      */
     public void setProperty(String key, Object value, PropertyScope scope)
     {
-        setProperty(key, value, scope, createPropertyDataType(value));
+        setProperty(key, value, scope, DataTypeFactory.createFromObject(value));
     }
 
     /**
@@ -334,11 +334,6 @@ public class MessagePropertiesContext implements Serializable
         buf.append(MapUtils.toString(inboundMap, false));
         buf.append("}");
         return buf.toString();
-    }
-
-    private DataType createPropertyDataType(Object value)
-    {
-        return value == null ? DataType.OBJECT_DATA_TYPE : DataTypeFactory.create(value.getClass());
     }
 
     /**

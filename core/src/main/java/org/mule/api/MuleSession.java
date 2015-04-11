@@ -74,6 +74,15 @@ public interface MuleSession extends Serializable
      * @param value the value of the session data
      */
     void setProperty(String key, Serializable value);
+
+    /**
+     * Will set a session scope property.
+     *
+     * @param key the key for the object data being stored on the session
+     * @param value the value of the session data
+     * @param dataType the data type for the property value
+     */
+    void setProperty(String key, Serializable value, DataType<?> dataType);
     
     @Deprecated
     void setProperty(String key, Object value);

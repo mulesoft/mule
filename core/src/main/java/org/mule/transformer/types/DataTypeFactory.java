@@ -99,28 +99,35 @@ public class DataTypeFactory
 
     /**
      * Will create a {@link org.mule.api.transformer.DataType} object from an object instance. This method will check
-     * if the object o is a {@link org.mule.api.MuleMessage} instance and will take the type from the message payload
+     * if the object value is a {@link org.mule.api.MuleMessage} instance and will take the type from the message payload
      * and check if a mime type is set on the message and used that when constructing the {@link org.mule.api.transformer.DataType}
      * object.
      *
-     * @param o an object instance.  This can be a {@link org.mule.api.MuleMessage}, a collection, a proxy instance or any other
+     * @param value an object instance.  This can be a {@link org.mule.api.MuleMessage}, a collection, a proxy instance or any other
      *          object
      * @return a data type that represents the object type.
      */
-    public static DataType<?> createFromObject(Object o)
+    public static DataType<?> createFromObject(Object value)
     {
-        Class<?> type = o.getClass();
-        String mime = null;
-        if (o instanceof DataType)
+        if (value instanceof DataType)
         {
-            return (DataType<?>)o;
+            return (DataType<?>) value;
         }
-        else if (o instanceof MuleMessage)
+
+        Class<?> type = getObjectType(value);
+        String mime = getObjectMimeType(value);
+
+        return create(type, mime);
+    }
+
+    private static String getObjectMimeType(Object value)
+    {
+        String mime = null;
+        if (value instanceof MuleMessage)
         {
-            MuleMessage mm = (MuleMessage) o;
-            type = mm.getPayload().getClass();
             //TODO better mime handling, see MULE-4639
             //case insensitive
+            MuleMessage mm = (MuleMessage) value;
             mime = mm.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY);
             if (mime == null)
             {
@@ -128,13 +135,13 @@ public class DataTypeFactory
                 mime = mm.getInboundProperty("ContentType");
             }
         }
-        else if (o instanceof DataHandler)
+        else if (value instanceof DataHandler)
         {
-            mime = ((DataHandler) o).getContentType();
+            mime = ((DataHandler) value).getContentType();
         }
-        else if (o instanceof DataSource)
+        else if (value instanceof DataSource)
         {
-            mime = ((DataSource) o).getContentType();
+            mime = ((DataSource) value).getContentType();
         }
 
         if (mime != null)
@@ -148,7 +155,29 @@ public class DataTypeFactory
             mime = MimeTypes.ANY;
         }
 
-        return create(type, mime);
+        return mime;
+    }
+
+    private static Class<?> getObjectType(Object value)
+    {
+        Class<?> type;
+        if (value == null)
+        {
+            type = Object.class;
+        }
+        else
+        {
+            if (value instanceof MuleMessage)
+            {
+                MuleMessage mm = (MuleMessage) value;
+                type = mm.getPayload().getClass();
+            }
+            else
+            {
+                type = value.getClass();
+            }
+        }
+        return type;
     }
 
     public static DataType<?> createFromReturnType(Method m)

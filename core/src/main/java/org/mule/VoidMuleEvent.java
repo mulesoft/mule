@@ -21,6 +21,7 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Set;
 
@@ -244,7 +245,19 @@ public class VoidMuleEvent implements MuleEvent
     }
 
     @Override
+    public DataType<?> getFlowVariableDataType(String key)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setFlowVariable(String key, Object value)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setFlowVariable(String key, Object value, DataType dataType)
     {
         throw new UnsupportedOperationException();
     }
@@ -274,7 +287,19 @@ public class VoidMuleEvent implements MuleEvent
     }
 
     @Override
+    public DataType<?> getSessionVariableDataType(String key)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setSessionVariable(String key, Object value)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setSessionVariable(String key, Serializable value, DataType dataType)
     {
         throw new UnsupportedOperationException();
     }

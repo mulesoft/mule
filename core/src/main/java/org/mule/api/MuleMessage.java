@@ -93,7 +93,17 @@ public interface MuleMessage extends Serializable
     /**
      * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
      */
+    void setInvocationProperty(String key, Object value, DataType<?> dataType);
+
+    /**
+     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     */
     void setOutboundProperty(String key, Object value);
+
+    /**
+     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     */
+    void setOutboundProperty(String key, Object value, DataType<?> dataType);
 
     /**
      * Set a property on the message. End-users should prefer more
@@ -684,7 +694,7 @@ public interface MuleMessage extends Serializable
      * Updates the message payload.
      *
      * @param payload the object to assign as the message payload
-     * @param dataType payloads's dataType. Not null.
+     * @param dataType payload's dataType. Not null.
      */
     void setPayload(Object payload, DataType<?> dataType);
 
