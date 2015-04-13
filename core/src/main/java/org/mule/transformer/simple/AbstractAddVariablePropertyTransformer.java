@@ -8,6 +8,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -60,7 +61,9 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             }
             else
             {
-                message.setProperty(key, value, getScope());
+                DataType<?> dataType = DataTypeFactory.create(value.getClass(), getMimeType());
+                dataType.setEncoding(getEncoding());
+                message.setProperty(key, value, getScope(), dataType);
             }
         }
         return message;
