@@ -292,7 +292,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     private boolean validateConnections = true;
 
-    private Lock lock = new ReentrantLock();
+    private Lock connectionLock = new ReentrantLock();
 
     public AbstractConnector(MuleContext context)
     {
@@ -1218,7 +1218,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                                  MessageProcessor messageProcessorChain,
                                  FlowConstruct flowConstruct) throws Exception
     {
-        lock.lock();
+        connectionLock.lock();
         try
         {
             if (endpoint == null)
@@ -1266,7 +1266,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
         finally
         {
-            lock.unlock();
+            connectionLock.unlock();
         }
     }
 
@@ -1561,7 +1561,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             @Override
             public void doWork(RetryContext context) throws Exception
             {
-                lock.lock();
+                connectionLock.lock();
                 try
                 {
                     // Try validateConnection() rather than connect() which may be a less expensive operation while we're retrying.
@@ -1623,7 +1623,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 }
                 finally
                 {
-                    lock.unlock();
+                    connectionLock.unlock();
                 }
             }
 

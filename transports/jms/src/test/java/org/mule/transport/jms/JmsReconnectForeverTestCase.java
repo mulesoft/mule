@@ -60,7 +60,7 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
     @Test
     public void reconnectAllConsumers() throws Exception
     {
-        connector = muleContext.getRegistry().lookupObject("activemqconnector");
+        connector = muleContext.getRegistry().lookupObject("activeMQConnector");
 
         Collection<MessageReceiver> receivers = connector.getReceivers().values();
         assertTrue(receivers != null && receivers.size() == 2);
@@ -86,8 +86,8 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
             }
         });
         this.assertConsumersConnected();
-        this.assertMessageRouted("1");
-        this.assertMessageRouted("2");
+        this.assertMessageRouted("put1");
+        this.assertMessageRouted("put2");
     }
 
     private void assertConsumersConnected()
@@ -103,10 +103,10 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
 
     }
 
-    private void assertMessageRouted(String flow) throws Exception
+    private void assertMessageRouted(String entryFlow) throws Exception
     {
-        this.runFlow("put" + flow, PAYLOAD);
-        MuleMessage message = muleContext.getClient().request("vm://out" + flow, TIMEOUT_MILLIS);
+        this.runFlow(entryFlow, PAYLOAD);
+        MuleMessage message = muleContext.getClient().request("vm://out" + entryFlow, TIMEOUT_MILLIS);
         assertThat(message, notNullValue());
         assertThat(message.getPayloadAsString(), is(PAYLOAD));
     }
