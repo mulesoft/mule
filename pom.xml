@@ -158,7 +158,7 @@
         -->
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
-        <activemqVersion>5.7.0</activemqVersion>
+        <activemqVersion>5.11.1</activemqVersion>
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
@@ -554,7 +554,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-core</artifactId>
+                <artifactId>activemq-broker</artifactId>
                 <version>${activemqVersion}</version>
                 <exclusions>
                     <exclusion>
@@ -624,6 +624,10 @@
                     <exclusion>
                         <groupId>geronimo</groupId>
                         <artifactId>geronimo-j2ee</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>activesoap</groupId>

@@ -12,7 +12,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
-import org.apache.activemq.spring.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.jms.support.JmsUtils;
 
 public class JmsOutboundMessagesCounter implements TransactionScenarios.OutboundMessagesCounter
