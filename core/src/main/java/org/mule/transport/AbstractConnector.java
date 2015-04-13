@@ -96,6 +96,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
@@ -289,6 +291,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * Whether to test a connection on each take.
      */
     private boolean validateConnections = true;
+
+    private Lock connectionLock = new ReentrantLock();
 
     public AbstractConnector(MuleContext context)
     {
@@ -1214,47 +1218,55 @@ public abstract class AbstractConnector implements Connector, WorkListener
                                  MessageProcessor messageProcessorChain,
                                  FlowConstruct flowConstruct) throws Exception
     {
-        if (endpoint == null)
+        connectionLock.lock();
+        try
         {
-            throw new IllegalArgumentException("The endpoint cannot be null when registering a listener");
+            if (endpoint == null)
+            {
+                throw new IllegalArgumentException("The endpoint cannot be null when registering a listener");
+            }
+
+            if (messageProcessorChain == null)
+            {
+                throw new IllegalArgumentException("The messageProcessorChain cannot be null when registering a listener");
+            }
+
+            EndpointURI endpointUri = endpoint.getEndpointURI();
+            if (endpointUri == null)
+            {
+                throw new ConnectorException(CoreMessages.endpointIsNullForListener(), this);
+            }
+
+            logger.info("Registering listener: " + flowConstruct.getName() + " on endpointUri: "
+                    + endpointUri.toString());
+
+            if (getReceiver(flowConstruct, endpoint) != null)
+            {
+                throw new ConnectorException(CoreMessages.listenerAlreadyRegistered(endpointUri), this);
+            }
+
+            MessageReceiver receiver = createReceiver(flowConstruct, endpoint);
+            receiver.setListener(messageProcessorChain);
+
+            Object receiverKey = getReceiverKey(flowConstruct, endpoint);
+            receiver.setReceiverKey(receiverKey.toString());
+            // Since we're managing the creation we also need to initialise
+            receiver.initialise();
+            receivers.put(receiverKey, receiver);
+
+            if (isConnected())
+            {
+                receiver.connect();
+            }
+
+            if (isStarted())
+            {
+                receiver.start();
+            }
         }
-
-        if (messageProcessorChain == null)
+        finally
         {
-            throw new IllegalArgumentException("The messageProcessorChain cannot be null when registering a listener");
-        }
-
-        EndpointURI endpointUri = endpoint.getEndpointURI();
-        if (endpointUri == null)
-        {
-            throw new ConnectorException(CoreMessages.endpointIsNullForListener(), this);
-        }
-
-        logger.info("Registering listener: " + flowConstruct.getName() + " on endpointUri: "
-                + endpointUri.toString());
-
-        if (getReceiver(flowConstruct, endpoint) != null)
-        {
-            throw new ConnectorException(CoreMessages.listenerAlreadyRegistered(endpointUri), this);
-        }
-
-        MessageReceiver receiver = createReceiver(flowConstruct, endpoint);
-        receiver.setListener(messageProcessorChain);
-
-        Object receiverKey = getReceiverKey(flowConstruct, endpoint);
-        receiver.setReceiverKey(receiverKey.toString());
-        // Since we're managing the creation we also need to initialise
-        receiver.initialise();
-        receivers.put(receiverKey, receiver);
-
-        if (isConnected())
-        {
-            receiver.connect();
-        }
-
-        if (isStarted())
-        {
-            receiver.start();
+            connectionLock.unlock();
         }
     }
 
@@ -1549,61 +1561,69 @@ public abstract class AbstractConnector implements Connector, WorkListener
             @Override
             public void doWork(RetryContext context) throws Exception
             {
-                // Try validateConnection() rather than connect() which may be a less expensive operation while we're retrying.
-                if (validateConnections && context.getLastFailure() instanceof ConnectException)
+                connectionLock.lock();
+                try
                 {
-                    Connectable failed = ((ConnectException) context.getLastFailure()).getFailed();
-                    if (!failed.validateConnection(context).isOk())
+                    // Try validateConnection() rather than connect() which may be a less expensive operation while we're retrying.
+                    if (validateConnections && context.getLastFailure() instanceof ConnectException)
                     {
-                        throw new ConnectException(
-                                MessageFactory.createStaticMessage("Still unable to connect to resource " + failed.getClass().getName()),
-                                context.getLastFailure(), failed);
-                    }
-                }
-                doConnect();
-
-                if (receivers != null)
-                {
-                    for (MessageReceiver receiver : receivers.values())
-                    {
-                        final List<MuleException> errors = new ArrayList<MuleException>();
-                        try
+                        Connectable failed = ((ConnectException) context.getLastFailure()).getFailed();
+                        if (!failed.validateConnection(context).isOk())
                         {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
-                            }
-                            receiver.connect();
-                            if (isStarted())
-                            {
-                                receiver.start();
-                            }
-                        }
-                        catch (MuleException e)
-                        {
-                            logger.error(e);
-                            errors.add(e);
-                        }
-
-                        if (!errors.isEmpty())
-                        {
-                            // throw the first one in order not to break the reconnection
-                            // strategy logic,
-                            // every exception has been logged above already
-                            // api needs refactoring to support the multi-cause exception
-                            // here
-                            throw errors.get(0);
+                            throw new ConnectException(
+                                    MessageFactory.createStaticMessage("Still unable to connect to resource " + failed.getClass().getName()),
+                                    context.getLastFailure(), failed);
                         }
                     }
+                    doConnect();
+
+                    if (receivers != null)
+                    {
+                        for (MessageReceiver receiver : receivers.values())
+                        {
+                            final List<MuleException> errors = new ArrayList<MuleException>();
+                            try
+                            {
+                                if (logger.isDebugEnabled())
+                                {
+                                    logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                                }
+                                receiver.connect();
+                                if (isStarted())
+                                {
+                                    receiver.start();
+                                }
+                            }
+                            catch (MuleException e)
+                            {
+                                logger.error(e);
+                                errors.add(e);
+                            }
+
+                            if (!errors.isEmpty())
+                            {
+                                // throw the first one in order not to break the reconnection
+                                // strategy logic,
+                                // every exception has been logged above already
+                                // api needs refactoring to support the multi-cause exception
+                                // here
+                                throw errors.get(0);
+                            }
+                        }
+                    }
+
+                    setConnected(true);
+                    setConnecting(false);
+                    logger.info("Connected: " + getWorkDescription());
+
+                    if (startOnConnect && !isStarted() && !isStarting())
+                    {
+                        startAfterConnect();
+                    }
                 }
-
-                setConnected(true);
-                setConnecting(false);
-                logger.info("Connected: " + getWorkDescription());
-
-                if (startOnConnect && !isStarted() && !isStarting())
+                finally
                 {
-                    startAfterConnect();
+                    connectionLock.unlock();
                 }
             }
 
