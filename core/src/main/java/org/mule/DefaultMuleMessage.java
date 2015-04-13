@@ -487,6 +487,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         setProperty(key, value, PropertyScope.INBOUND);
     }
 
+    public void setInboundProperty(String key, Object value, DataType<?> dataType)
+    {
+        setProperty(key, value, PropertyScope.INBOUND, dataType);
+    }
+
     @Override
     public void setInvocationProperty(String key, Object value)
     {
@@ -494,9 +499,21 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     @Override
+    public void setInvocationProperty(String key, Object value, DataType<?> dataType)
+    {
+        setProperty(key, value, PropertyScope.INVOCATION, dataType);
+    }
+
+    @Override
     public void setOutboundProperty(String key, Object value)
     {
-        setProperty(key, value, PropertyScope.OUTBOUND);
+        setProperty(key, value, PropertyScope.OUTBOUND, DataTypeFactory.createFromObject(value));
+    }
+
+    @Override
+    public void setOutboundProperty(String key, Object value, DataType<?> dataType)
+    {
+       setProperty(key, value, PropertyScope.OUTBOUND, dataType);
     }
 
     @Override
@@ -511,7 +528,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public void setProperty(String key, Object value, PropertyScope scope)
     {
-        DataType dataType = DataTypeFactory.create(value == null ? Object.class : value.getClass());
+        DataType dataType = DataTypeFactory.createFromObject(value);
         setProperty(key, value, scope, dataType);
     }
 
@@ -2093,7 +2110,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
         for (Map.Entry<String, Object> s : newInboundProperties.entrySet())
         {
-            newMessage.setInboundProperty(s.getKey(), s.getValue());
+            DataType<?> propertyDataType = getPropertyDataType(s.getKey(), PropertyScope.OUTBOUND);
+
+            newMessage.setInboundProperty(s.getKey(), s.getValue(), propertyDataType);
         }
 
         newMessage.inboundAttachments.clear();

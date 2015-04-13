@@ -174,7 +174,7 @@ public final class DefaultMuleSession implements MuleSession
             logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key));
         }
 
-        DataType dataType = value == null ? DataType.OBJECT_DATA_TYPE : DataTypeFactory.create(value.getClass());
+        DataType dataType = DataTypeFactory.createFromObject(value);
 
         properties.put(key, new TypedValue(value, dataType));
     }
@@ -279,7 +279,13 @@ public final class DefaultMuleSession implements MuleSession
     @Override
     public void setProperty(String key, Serializable value)
     {
-        setProperty(key, (Object) value);
+        setProperty(key, value, DataTypeFactory.createFromObject(value));
+    }
+
+    @Override
+    public void setProperty(String key, Serializable value, DataType<?> dataType)
+    {
+        properties.put(key, new TypedValue(value, dataType));
     }
 
     @Override

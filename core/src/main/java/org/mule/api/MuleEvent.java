@@ -291,7 +291,30 @@ public interface MuleEvent extends Serializable
 
     <T> T getFlowVariable(String key);
 
+    /**
+     * Gets the data type for a given flow variable
+     *
+     * @param name the name or key of the variable. This must be non-null.
+     * @return the property data type or null if the flow variable does not exist
+     */
+    DataType<?> getFlowVariableDataType(String key);
+
+    /**
+     * Sets a session variable value with a default data type
+     *
+     * @param key the name or key of the variable. This must be non-null.
+     ** @param value value for the variable
+     */
     void setFlowVariable(String key, Object value);
+
+    /**
+     * Sets a flow variable value with a given data type
+     *
+     * @param key the name or key of the variable. This must be non-null.
+     * @param value value for the variable
+     * @param dataType value's dataType. Not null.
+     */
+    void setFlowVariable(String key, Object value, DataType dataType);
 
     void removeFlowVariable(String key);
 
@@ -301,7 +324,29 @@ public interface MuleEvent extends Serializable
 
     <T> T getSessionVariable(String key);
 
+    /**
+     * Gets the data type for a given session variable
+     *
+     * @param key the name or key of the variable. This must be non-null.
+     * @return the property data type or null if the flow variable does not exist
+     */
+    DataType<?> getSessionVariableDataType(String key);
+
+    /**
+     * Sets a session variable value with a default data type
+     *
+     * @param key the name or key of the variable. This must be non-null.
+     */
     void setSessionVariable(String key, Object value);
+
+    /**
+     * Sets a session variable value with a given data type
+     *
+     * @param key the name or key of the variable. This must be non-null.
+     * @param value value for the variable
+     * @param dataType value's dataType. Not null.
+     */
+    void setSessionVariable(String key, Serializable value, DataType dataType);
 
     void removeSessionVariable(String key);
 

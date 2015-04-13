@@ -1044,10 +1044,23 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     @Override
+    public DataType<?> getFlowVariableDataType(String key)
+    {
+        TypedValue typedValue = flowVariables.get(key);
+
+        return typedValue == null ? null : typedValue.getDataType();
+    }
+
+    @Override
     public void setFlowVariable(String key, Object value)
     {
-        DataType<?> propertyDataType = DataTypeFactory.create(value == null ? Object.class : value.getClass());
-        flowVariables.put(key, new TypedValue(value, propertyDataType));
+        setFlowVariable(key, value, DataTypeFactory.createFromObject(value));
+    }
+
+    @Override
+    public void setFlowVariable(String key, Object value, DataType dataType)
+    {
+        flowVariables.put(key, new TypedValue(value, dataType));
     }
 
     @Override
@@ -1063,9 +1076,21 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     @Override
+    public DataType<?> getSessionVariableDataType(String key)
+    {
+        return session.getPropertyDataType(key);
+    }
+
+    @Override
     public void setSessionVariable(String key, Object value)
     {
         session.setProperty(key, value);
+    }
+
+    @Override
+    public void setSessionVariable(String key, Serializable value, DataType dataType)
+    {
+        session.setProperty(key, value, dataType);
     }
 
     @Override
