@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/json"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
             xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesoft.org/schema/mule/json"
@@ -15,6 +16,8 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/xml/3.6/mule-xml.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.6/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/validation"
+                schemaLocation="http://www.mulesoft.org/schema/mule/validation/3.7/mule-extension-validation.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -33,7 +36,7 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-    <xsd:element name="validate-schema" type="validateSchemaType" substitutionGroup="mule:abstract-message-processor">
+    <xsd:element name="validate-schema" type="validateSchemaType" substitutionGroup="validation:validator-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Validates that the message payload represents a Json compliant with a
