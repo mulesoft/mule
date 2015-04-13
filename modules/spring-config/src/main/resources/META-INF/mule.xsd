@@ -4392,7 +4392,28 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
+    <xsd:complexType name="abstractAddPropertyTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="commonMessagePartTransformerType">
+                <xsd:attributeGroup ref="mimeTypeAttributes">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The mime type of the value assigned to the property
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attributeGroup>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The encoding of the value assigned to the property
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="set-property" type="setPropertyType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
@@ -4402,7 +4423,7 @@
     </xsd:element>
     <xsd:complexType name="setPropertyType">
         <xsd:complexContent>
-            <xsd:extension base="commonMessagePartTransformerType">
+            <xsd:extension base="abstractAddPropertyTransformerType">
                 <xsd:attribute name="propertyName" type="attributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
@@ -4448,7 +4469,7 @@
     </xsd:element>
     <xsd:complexType name="setVariableType">
         <xsd:complexContent>
-            <xsd:extension base="commonMessagePartTransformerType">
+            <xsd:extension base="abstractAddPropertyTransformerType">
                 <xsd:attribute name="variableName" type="attributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
