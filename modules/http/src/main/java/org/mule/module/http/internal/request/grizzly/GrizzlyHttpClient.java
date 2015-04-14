@@ -151,6 +151,7 @@ public class GrizzlyHttpClient implements HttpClient
         GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
         CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
         compositeTransportCustomizer.addTransportCustomizer(new SameThreadIOStrategyTransportCustomizer(threadNamePrefix));
+        compositeTransportCustomizer.addTransportCustomizer(new LoggerTransportCustomizer());
 
         if (clientSocketProperties != null)
         {
