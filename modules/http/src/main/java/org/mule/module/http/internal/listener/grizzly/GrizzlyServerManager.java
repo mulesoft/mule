@@ -6,10 +6,14 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
+import org.mule.module.http.internal.HttpMessageLogger;
 import org.mule.module.http.internal.listener.HttpServerManager;
 import org.mule.module.http.internal.listener.Server;
 import org.mule.module.http.internal.listener.ServerAddress;
@@ -263,7 +267,9 @@ public class GrizzlyServerManager implements HttpServerManager
             ka.setMaxRequestsCount(MAX_KEEP_ALIVE_REQUESTS);
             ka.setIdleTimeoutInSeconds(convertToSeconds(connectionIdleTimeout));
         }
-        return new HttpServerFilter(true, HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE, ka, idleTimeoutDelayedExecutor);
+        HttpServerFilter httpServerFilter = new HttpServerFilter(true, DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE, ka, idleTimeoutDelayedExecutor);
+        httpServerFilter.getMonitoringConfig().addProbes(new HttpMessageLogger(LISTENER));
+        return httpServerFilter;
     }
 
     private int convertToSeconds(int milliseconds)
