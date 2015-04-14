@@ -64,6 +64,13 @@
             <artifactId>activemq-broker</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Used by ActiveMQ if persistent=true -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-kahadb-store</artifactId>
+            <version>${activemqVersion}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
