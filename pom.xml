@@ -626,10 +626,6 @@
                         <artifactId>geronimo-j2ee</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.apache.geronimo.specs</groupId>
-                        <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>activesoap</groupId>
                         <artifactId>jaxp-api</artifactId>
                     </exclusion>
