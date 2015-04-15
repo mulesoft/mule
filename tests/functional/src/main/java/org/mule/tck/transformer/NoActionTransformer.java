@@ -15,6 +15,7 @@ import org.mule.transformer.types.DataTypeFactory;
  * object and returns the source as the result. This can be used to overload the
  * default transform for an endpoint.
  */
+@Deprecated
 public final class NoActionTransformer extends AbstractTransformer
 {
 
