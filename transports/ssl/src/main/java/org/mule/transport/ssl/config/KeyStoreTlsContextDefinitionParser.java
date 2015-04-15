@@ -19,6 +19,7 @@ public class KeyStoreTlsContextDefinitionParser extends ParentDefinitionParser
         addAlias("password", "keyStorePassword");
         addAlias("keyPassword", "keyManagerPassword");
         addAlias("algorithm", "keyManagerAlgorithm");
+        addAlias("alias", "keyAlias");
     }
 
 }

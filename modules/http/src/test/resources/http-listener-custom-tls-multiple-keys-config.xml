@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!--
+    The clientServerKeystore file contains private keys for both muleclient and muleserver aliases. Muleclient is the first (default)
+    alias, so to use the muleserver private key we need to specify the alias parameter. To validate that this is happening, two
+    client tls contexts are used: one with a truststore that contains certificates for both aliases, and another one that doesn't
+    contain a certificate for the muleserver alias.
+    -->
+
+    <tls:context name="listenerTlsContext" >
+        <tls:key-store path="clientServerKeystore" keyPassword="mulepassword" password="mulepassword" alias="muleserver" />
+    </tls:context>
+
+    <tls:context name="requestTlsContextWithCertificate" >
+        <tls:trust-store path="trustStore" password="mulepassword" />
+    </tls:context>
+
+    <tls:context name="requestTlsContextWithoutCertificate" >
+        <tls:trust-store path="trustStoreWithoutMuleServerCertificate" password="mulepassword" />
+    </tls:context>
+
+    <http:listener-config name="listenerConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="listenerTlsContext" />
+
+    <http:request-config name="requestConfigWithCertificate" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="requestTlsContextWithCertificate" />
+
+    <http:request-config name="requestConfigWithoutCertificate" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="requestTlsContextWithoutCertificate" />
+
+    <flow name="testFlowServer">
+        <http:listener config-ref="listenerConfig" path="/" allowedMethods="POST"/>
+        <echo-component />
+    </flow>
+
+    <flow name="testFlowClientWithCertificate">
+        <http:request config-ref="requestConfigWithCertificate" path="/" method="POST" />
+    </flow>
+
+    <flow name="testFlowClientWithoutCertificate">
+        <http:request config-ref="requestConfigWithoutCertificate" path="/" method="POST" />
+    </flow>
+
+
+</mule>
