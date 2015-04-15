@@ -32,7 +32,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="outbound1" >
-                        <test:no-action-transformer mimeType="text/xml"/>   
+                        <set-property propertyName="Content-Type" value="text/xml;charset=UTF-8"/>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -52,7 +52,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="outbound2" >
-                        <transformer ref="plain"/>   
+                        <set-property propertyName="Content-Type" value="text/plain;charset=UTF-8"/>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
