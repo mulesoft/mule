@@ -62,5 +62,6 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
         assertThat(tlsContextFactory.getKeyStoreType(), equalTo("testKeyStoreType"));
         assertThat(tlsContextFactory.getKeyManagerPassword(), equalTo("testKeyPassword"));
         assertThat(tlsContextFactory.getKeyManagerAlgorithm(), equalTo("testKeyStoreAlgorithm"));
+        assertThat(tlsContextFactory.getKeyAlias(), equalTo("testKeyStoreAlias"));
     }
 }

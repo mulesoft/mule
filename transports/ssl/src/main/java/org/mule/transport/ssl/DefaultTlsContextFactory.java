@@ -61,6 +61,16 @@ public class DefaultTlsContextFactory implements TlsContextFactory
         tlsConfiguration.setKeyStoreType(keyStoreType);
     }
 
+    public String getKeyAlias()
+    {
+        return tlsConfiguration.getKeyAlias();
+    }
+
+    public void setKeyAlias(String keyAlias)
+    {
+        tlsConfiguration.setKeyAlias(keyAlias);
+    }
+
     public String getKeyStorePassword()
     {
         return tlsConfiguration.getKeyStorePassword();

@@ -213,6 +213,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="alias" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    When the key store contains many private keys, this attribute indicates the alias of the key that
+                    should be used. If not defined, the first key in the file will be used by default.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="keyPassword" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
