@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
@@ -9,11 +8,11 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
     <jetty:connector name="httpConnector"/>
 
-    <message-properties-transformer name="setResponseType" mimeType="text/baz" encoding="UTF-16BE">
+    <message-properties-transformer name="setResponseType">
+        <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
     </message-properties-transformer>
 
     <jetty:endpoint name="serverEndpoint" address="http://localhost:${port1}/" exchange-pattern="request-response"/>

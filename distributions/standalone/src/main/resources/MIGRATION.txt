@@ -62,6 +62,15 @@ MULE-8457: set-payload element is now implemented using a plain MessageProcessor
            <custom-transformer class="org.mule.transformer.simple.SetPayloadTransformer">
                <spring:property name="value" value="someValue"/>
            </custom-transformer>
+MULE-8469: applying a message transformer does not changes message's data type if the payload was not replaced during the transformation.
+           In particular, this changes affects usages of message properties transformer configured like this:
+           <message-properties-transformer name="setResponseType" mimeType="text/baz" encoding="UTF-16BE"/>
+           That now must be configure in this way:
+           <message-properties-transformer name="setResponseType">
+               <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
+           </message-properties-transformer>
+           or like this:
+           <set-property propertyName="Content-Type" value="text/baz;charset=UTF-16BE"/>
 
 Migration changes from 3.5.x to 3.6.x
 
