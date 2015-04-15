@@ -28,6 +28,7 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.junit.Test;
 
@@ -35,6 +36,8 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
 {
 
     private static final String KEY = "key";
+    private static final String KEY2 = "key2";
+    private static final String EXTENDED_KEY = "extendedKey";
 
     @Override
     protected String[] getConfigFiles()
@@ -78,11 +81,21 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void injectWithInheritance() throws Exception {
-        TestLifecycleObject object = new ExtendedTestLifecycleObject();
-        muleContext.getRegistry().registerObject(KEY, object);
+    public void injectWithInheritance() throws Exception
+    {
+        TestLifecycleObject child1 = new TestLifecycleObject();
+        TestLifecycleObject child2 = new TestLifecycleObject();
+        muleContext.getRegistry().registerObject(KEY, child1);
+        muleContext.getRegistry().registerObject(KEY2, child2);
 
+        assertThat(muleContext.getRegistry().lookupByType(TestLifecycleObject.class).size(), is(2));
+
+        ExtendedTestLifecycleObject object = new ExtendedTestLifecycleObject();
+
+        muleContext.getRegistry().registerObject(EXTENDED_KEY, object);
         assertInjection(object);
+        assertThat(object.getKeyChild(), is(sameInstance(child1)));
+        assertThat(object.getKey2Child(), is(sameInstance(child2)));
     }
 
     @Test
@@ -212,5 +225,27 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
     public static class ExtendedTestLifecycleObject extends TestLifecycleObject
     {
 
+        @Inject
+        @Named(KEY)
+        private TestLifecycleObject keyChild;
+
+        private TestLifecycleObject key2Child;
+
+        public TestLifecycleObject getKeyChild()
+        {
+            return keyChild;
+        }
+
+        public TestLifecycleObject getKey2Child()
+        {
+            return key2Child;
+        }
+
+        @Inject
+        @Named(KEY2)
+        public void setKey2Child(TestLifecycleObject key2Child)
+        {
+            this.key2Child = key2Child;
+        }
     }
 }

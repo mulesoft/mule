@@ -22,6 +22,7 @@ import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.declaration.CapableDeclaration;
 import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.util.ClassUtils;
 import org.mule.util.ParamReader;
 
 import com.google.common.collect.ImmutableList;
@@ -31,7 +32,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -232,22 +232,10 @@ public final class MuleExtensionAnnotationParser
 
         for (Annotation annotation : annotations)
         {
-            map.put(resolveAnnotationClass(annotation), annotation);
+            map.put(ClassUtils.resolveAnnotationClass(annotation), annotation);
         }
 
         return map;
-    }
-
-    private static Class<? extends Annotation> resolveAnnotationClass(Annotation annotation)
-    {
-        if (Proxy.isProxyClass(annotation.getClass()))
-        {
-            return (Class<Annotation>) annotation.getClass().getInterfaces()[0];
-        }
-        else
-        {
-            return annotation.getClass();
-        }
     }
 
 
