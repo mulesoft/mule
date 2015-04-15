@@ -12,11 +12,13 @@ import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
@@ -1050,5 +1052,17 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     {
         CodeSource cs = clazz.getProtectionDomain().getCodeSource();
         return (cs != null ? cs.getLocation() : null);
+    }
+
+    public static Class<? extends Annotation> resolveAnnotationClass(Annotation annotation)
+    {
+        if (Proxy.isProxyClass(annotation.getClass()))
+        {
+            return (Class<Annotation>) annotation.getClass().getInterfaces()[0];
+        }
+        else
+        {
+            return annotation.getClass();
+        }
     }
 }

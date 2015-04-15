@@ -81,6 +81,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         this.springResources = springResources;
     }
 
+
+
     @Override
     protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory)
     {
@@ -221,7 +223,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected DefaultListableBeanFactory createBeanFactory()
     {
         //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
-        DefaultListableBeanFactory beanFactory = super.createBeanFactory();
+        DefaultListableBeanFactory beanFactory = new MuleBeanFactory(getInternalParentBeanFactory());
         beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(), optionalObjectsController));
 
         if (getParent() != null)
