@@ -144,6 +144,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that has no effect.
+                Deprecated. Transformer has an effect on the message as it can change mime type and encoding. Replace it with a transformer that makes this change explicit.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

@@ -52,8 +52,6 @@
         <spring:property name="containerProperty" value="myString"/>
     </custom-transformer>
 
-    <test:no-action-transformer name="Default"/>
-
     <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ" exchange-pattern="one-way">
          <message-property-filter pattern="foo=bar"/>
     </endpoint>

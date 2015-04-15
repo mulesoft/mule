@@ -165,7 +165,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public DefaultMuleMessage(MuleMessage message)
     {
-        this(message.getPayload(), message, message.getMuleContext(), true, getCloningMessageDataType(message));
+        this(message.getPayload(), message, message.getMuleContext(), getCloningMessageDataType(message));
     }
 
     public DefaultMuleMessage(Object message, MuleContext muleContext)
@@ -218,10 +218,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext)
     {
-        this(message, previous, muleContext, false, getMessageDataType(previous, message));
+        this(message, previous, muleContext, getMessageDataType(previous, message));
     }
 
-    private DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, boolean isCloningMessage, DataType<?> dataType)
+    private DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, DataType<?> dataType)
     {
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
@@ -1582,6 +1582,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private void transformMessage(MuleEvent event, Transformer transformer) throws TransformerMessagingException, TransformerException
     {
         Object result;
+        final Object payloadBeforeTransformation = payload;
+
         if (transformer instanceof MessageTransformer)
         {
             result = ((MessageTransformer) transformer).transform(this, event);
@@ -1619,7 +1621,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             setPayload(result);
         }
-        setDataType(transformer.getReturnDataType());
+
+        if (!payloadBeforeTransformation.equals(payload))
+        {
+            setDataType(transformer.getReturnDataType());
+        }
     }
 
     protected void setDataType(DataType<?> dt)

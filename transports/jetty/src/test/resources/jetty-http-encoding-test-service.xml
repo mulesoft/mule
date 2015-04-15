@@ -13,7 +13,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
     <jetty:connector name="httpConnector"/>
 
-    <message-properties-transformer name="setResponseType" mimeType="text/baz" encoding="UTF-16BE">
+    <message-properties-transformer name="setResponseType">
+        <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
     </message-properties-transformer>
 
     <jetty:endpoint name="serverEndpoint" address="http://localhost:${port1}/" exchange-pattern="request-response"/>

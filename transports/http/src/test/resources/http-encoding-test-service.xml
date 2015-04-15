@@ -29,8 +29,9 @@
             <inbound>
                 <http:inbound-endpoint ref="clientEndpoint">
                     <response>
-                        <message-properties-transformer name="setResponseType" 
-                            mimeType="text/baz" encoding="UTF-16BE"/>
+                        <message-properties-transformer name="setResponseType">
+                            <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
+                        </message-properties-transformer>
                     </response>
                 </http:inbound-endpoint>
             </inbound>
