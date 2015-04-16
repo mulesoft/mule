@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="${useTransportForUris}"/>
+    </configuration>
+
+    <tls:context name="tlsContextValidCertificate">
+        <tls:trust-store path="trustStore" password="mulepassword" type="jks" />
+    </tls:context>
+
+    <tls:context name="tlsContextInvalidCertificate">
+        <tls:trust-store path="trustStoreWithoutMuleServerCertificate" password="mulepassword" type="jks" />
+    </tls:context>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/TestWithSignature" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configWithValidSignature">
+        <ws:security>
+            <ws:wss-verify-signature tlsContext-ref="tlsContextValidCertificate" />
+        </ws:security>
+    </ws:consumer-config>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/TestWithSignature" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configWithInvalidSignature">
+        <ws:security>
+            <ws:wss-verify-signature tlsContext-ref="tlsContextInvalidCertificate" />
+        </ws:security>
+    </ws:consumer-config>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/TestWithoutSignature" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configWithoutSignature">
+        <ws:security>
+            <ws:wss-verify-signature tlsContext-ref="tlsContextValidCertificate" />
+        </ws:security>
+    </ws:consumer-config>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/TestWithSignature" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configWithInvalidSignatureDefaultCertificates">
+        <ws:security>
+            <ws:wss-verify-signature />
+        </ws:security>
+    </ws:consumer-config>
+
+
+    <flow name="responseWithValidSignature">
+        <inbound-endpoint address="vm://responseWithValidSignature" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="configWithValidSignature" />
+    </flow>
+
+    <flow name="responseWithInvalidSignature">
+        <inbound-endpoint address="vm://responseWithInvalidSignature" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="configWithInvalidSignature" />
+    </flow>
+
+    <flow name="responseWithoutSignature">
+        <inbound-endpoint address="vm://responseWithoutSignature" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="configWithoutSignature" />
+    </flow>
+
+    <flow name="responseWithInvalidSignatureDefaultCertificates">
+        <inbound-endpoint address="vm://responseWithInvalidSignatureDefaultCertificates" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="configWithInvalidSignatureDefaultCertificates" />
+    </flow>
+
+
+
+    <flow name="serverWithSignature">
+        <inbound-endpoint address="http://localhost:${port}/services/TestWithSignature"
+                          exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+                <cxf:outInterceptors>
+                    <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                        <spring:constructor-arg>
+                            <spring:map>
+                                <spring:entry key="action" value="Signature" />
+                                <spring:entry key="signatureUser" value="muleserver" />
+                                <spring:entry key="passwordCallbackClass" value="org.mule.module.ws.functional.VerifySignatureSecurityFunctionalTestCase$ServerPasswordCallback" />
+                                <spring:entry key="signaturePropRefId" value="serverOutSecurityProperties" />
+                                <spring:entry key="serverOutSecurityProperties">
+                                    <spring:props>
+                                        <spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.password">mulepassword</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.private.password">mulepassword</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.alias">muleserver</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.file">serverKeystore</spring:prop>
+                                    </spring:props>
+                                </spring:entry>
+                            </spring:map>
+                        </spring:constructor-arg>
+                    </spring:bean>
+                </cxf:outInterceptors>
+
+            </cxf:jaxws-service>
+        </inbound-endpoint>
+        <component class="org.mule.module.ws.consumer.TestService"/>
+    </flow>
+
+    <flow name="serverWithoutSignature">
+        <inbound-endpoint address="http://localhost:${port}/services/TestWithoutSignature" exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService" />
+        </inbound-endpoint>
+        <component class="org.mule.module.ws.consumer.TestService"/>
+    </flow>
+
+</mule>

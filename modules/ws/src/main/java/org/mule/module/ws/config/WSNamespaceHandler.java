@@ -14,8 +14,10 @@ import org.mule.module.ws.config.spring.parsers.specific.WSProxyDefinitionParser
 import org.mule.module.ws.consumer.WSConsumer;
 import org.mule.module.ws.consumer.WSConsumerConfig;
 import org.mule.module.ws.security.WSSecurity;
+import org.mule.module.ws.security.WssSignSecurityStrategy;
 import org.mule.module.ws.security.WssTimestampSecurityStrategy;
 import org.mule.module.ws.security.WssUsernameTokenSecurityStrategy;
+import org.mule.module.ws.security.WssVerifySignatureSecurityStrategy;
 
 /**
  * Registers a Bean Definition Parser for handling <code><ws:*></code> elements.
@@ -31,6 +33,8 @@ public class WSNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("security", new ChildDefinitionParser("security", WSSecurity.class));
         registerBeanDefinitionParser("wss-username-token", new ChildDefinitionParser("strategy", WssUsernameTokenSecurityStrategy.class));
         registerBeanDefinitionParser("wss-timestamp", new ChildDefinitionParser("strategy", WssTimestampSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-sign", new ChildDefinitionParser("strategy", WssSignSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-verify-signature", new ChildDefinitionParser("strategy", WssVerifySignatureSecurityStrategy.class));
 
     }
 }

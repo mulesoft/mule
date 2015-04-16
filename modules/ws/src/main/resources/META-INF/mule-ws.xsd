@@ -243,6 +243,41 @@
                                         </xsd:attribute>
                                     </xsd:complexType>
                                 </xsd:element>
+                                <xsd:element name="wss-sign" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Signs the SOAP request, adding the signature as a security header in the SOAP envelope.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="tlsContext-ref" type="xsd:string" use="required" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Reference to a TLS context that will be used to sign the request. This context must have a
+                                                    key store defined. The private key of this store will be used to sign the request.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
+                                <xsd:element name="wss-verify-signature" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Verifies the signature of the SOAP response.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="tlsContext-ref" type="xsd:string" use="optional" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Reference to a TLS context that will be used to verify the signature of the response. The certificates in the
+                                                    trust store of this context will be used to validate the signature. If no TLS context is provided, the default
+                                                    certificates of the JVM will be used.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>

@@ -57,5 +57,13 @@ public interface TlsContextFactory
      */
     boolean isTrustStoreConfigured();
 
+    /**
+     * @return An object with the configuration of the key store.
+     */
+    TlsContextKeyStoreConfiguration getKeyStoreConfiguration();
 
+    /**
+     * @return An object with the configuration of the trust store.
+     */
+    TlsContextTrustStoreConfiguration getTrustStoreConfiguration();
 }

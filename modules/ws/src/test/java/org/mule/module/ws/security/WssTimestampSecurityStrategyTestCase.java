@@ -6,6 +6,10 @@
  */
 package org.mule.module.ws.security;
 
+import static org.apache.ws.security.handler.WSHandlerConstants.ACTION;
+import static org.apache.ws.security.handler.WSHandlerConstants.TIMESTAMP;
+import static org.apache.ws.security.handler.WSHandlerConstants.TTL_TIMESTAMP;
+import static org.apache.ws.security.handler.WSHandlerConstants.USERNAME_TOKEN;
 import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -13,7 +17,6 @@ import org.mule.tck.size.SmallTest;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.junit.Test;
 
 @SmallTest
@@ -28,24 +31,24 @@ public class WssTimestampSecurityStrategyTestCase extends AbstractMuleTestCase
     {
         Map<String, Object> properties = new HashMap<String, Object>();
         strategy.setExpires(EXPIRES);
-        strategy.apply(properties);
+        strategy.apply(properties, null);
 
-        assertEquals(WSHandlerConstants.TIMESTAMP, properties.get(WSHandlerConstants.ACTION));
-        assertEquals(String.valueOf(EXPIRES), properties.get(WSHandlerConstants.TTL_TIMESTAMP));
+        assertEquals(TIMESTAMP, properties.get(ACTION));
+        assertEquals(String.valueOf(EXPIRES), properties.get(TTL_TIMESTAMP));
     }
 
     @Test
     public void actionIsAppendedAfterExistingAction()
     {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        properties.put(ACTION, USERNAME_TOKEN);
 
         strategy.setExpires(EXPIRES);
-        strategy.apply(properties);
+        strategy.apply(properties, null);
 
-        String expectedAction = WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP;
-        assertEquals(expectedAction, properties.get(WSHandlerConstants.ACTION));
-        assertEquals(String.valueOf(EXPIRES), properties.get(WSHandlerConstants.TTL_TIMESTAMP));
+        String expectedAction = USERNAME_TOKEN + " " + TIMESTAMP;
+        assertEquals(expectedAction, properties.get(ACTION));
+        assertEquals(String.valueOf(EXPIRES), properties.get(TTL_TIMESTAMP));
     }
 
 

@@ -60,6 +60,7 @@ import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -247,7 +248,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private CxfOutboundMessageProcessor createCxfOutboundMessageProcessor(WSSecurity security) throws MuleException
     {
         ProxyClientMessageProcessorBuilder cxfBuilder = new ProxyClientMessageProcessorBuilder();
-        Map<String, Object> configProperties = new HashMap<String, Object>();
+        Map<String, Object> outConfigProperties = new HashMap<>();
+        Map<String, Object> inConfigProperties = new HashMap<>();
 
         cxfBuilder.setMtomEnabled(mtomEnabled);
         cxfBuilder.setMuleContext(muleContext);
@@ -257,14 +259,25 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         {
             for (SecurityStrategy strategy : security.getStrategies())
             {
-                strategy.apply(configProperties);
+                strategy.apply(outConfigProperties, inConfigProperties);
             }
             if (cxfBuilder.getOutInterceptors() == null)
             {
                 cxfBuilder.setOutInterceptors(new ArrayList<Interceptor<? extends Message>>());
             }
+            if (cxfBuilder.getInInterceptors() == null)
+            {
+                cxfBuilder.setInInterceptors(new ArrayList<Interceptor<? extends Message>>());
+            }
 
-            cxfBuilder.getOutInterceptors().add(new WSS4JOutInterceptor(configProperties));
+            if (!outConfigProperties.isEmpty())
+            {
+                cxfBuilder.getOutInterceptors().add(new WSS4JOutInterceptor(outConfigProperties));
+            }
+            if (!inConfigProperties.isEmpty())
+            {
+                cxfBuilder.getInInterceptors().add(new WSS4JInInterceptor(inConfigProperties));
+            }
         }
 
 
