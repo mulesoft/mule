@@ -798,6 +798,49 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="ntlm-authentication" type="ntlmAuthenticationType" substitutionGroup="abstract-http-request-authentication-provider">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures NTLM authentication for the requests.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="ntlmAuthenticationType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractHttpRequestAuthenticationProvider">
+                <xsd:attribute name="username" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The username to authenticate.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password to authenticate.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="domain" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The domain to authenticate.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="workstation" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The workstation to authenticate.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="httpHeaderType">
         <xsd:attribute name="headerName" type="xsd:string" use="required">
             <xsd:annotation>

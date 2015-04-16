@@ -17,6 +17,8 @@ public class DefaultHttpAuthentication implements HttpAuthentication
 
     private String username;
     private String password;
+    private String domain;
+    private String workstation;
 
     public DefaultHttpAuthentication(HttpAuthenticationType type)
     {
@@ -43,9 +45,29 @@ public class DefaultHttpAuthentication implements HttpAuthentication
         this.password = password;
     }
 
+    public String getDomain()
+    {
+        return domain;
+    }
+
+    public void setDomain(String domain)
+    {
+        this.domain = domain;
+    }
+
     public HttpAuthenticationType getType()
     {
         return type;
+    }
+
+    public String getWorkstation()
+    {
+        return workstation;
+    }
+
+    public void setWorkstation(String workstation)
+    {
+        this.workstation = workstation;
     }
 
     @Override

@@ -40,6 +40,7 @@ import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -227,6 +228,17 @@ public class GrizzlyHttpClient implements HttpClient
             else if (defaultHttpAuthentication.getType() == HttpAuthenticationType.DIGEST)
             {
                 realmBuilder.setScheme(Realm.AuthScheme.DIGEST);
+            }
+            else if (defaultHttpAuthentication.getType() == HttpAuthenticationType.NTLM)
+            {
+                String domain = defaultHttpAuthentication.getDomain();
+                if (domain != null)
+                {
+                    realmBuilder.setNtlmDomain(domain);
+                }
+                String workstation = defaultHttpAuthentication.getWorkstation();
+                String ntlmHost = workstation != null ? workstation : InetAddress.getLocalHost().getHostName();
+                realmBuilder.setNtlmHost(ntlmHost).setScheme(Realm.AuthScheme.NTLM);
             }
 
             builder.setRealm(realmBuilder.build());
