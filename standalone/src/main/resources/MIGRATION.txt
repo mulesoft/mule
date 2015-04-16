@@ -71,6 +71,9 @@ MULE-8469: applying a message transformer does not changes message's data type i
            </message-properties-transformer>
            or like this:
            <set-property propertyName="Content-Type" value="text/baz;charset=UTF-16BE"/>
+MULE-8498: applying a message transformer that changes message's payload will update the message data type, but instead of using transformer's output data type it will use a merge between payload's and transformer data types.
+           If transformer's output data type does not provides mime type and/or encoding, then the original payload data type mime type and/or encoding will be used.
+           This can cause that different transformers are applied on an application after the upgrade. In case there is a failure use <set-payload> to set encoding and mime type while maintaining the same payload.
 
 Migration changes from 3.5.x to 3.6.x
 
