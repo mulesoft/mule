@@ -177,6 +177,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void extensionManagerPresent() throws Exception
+    {
+        addPackedAppFromResource(dummyAppDescriptor.zipPath);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+
+        final Application app = findApp(dummyAppDescriptor.id, 1);
+        assertThat(app.getMuleContext().getExtensionManager(), is(notNullValue()));
+    }
+
+    @Test
     public void appHomePropertyIsPresent() throws Exception
     {
         addExplodedAppFromResource(dummyAppDescriptor.zipPath);
