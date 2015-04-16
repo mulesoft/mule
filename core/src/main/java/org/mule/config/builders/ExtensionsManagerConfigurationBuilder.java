@@ -22,7 +22,7 @@ import org.mule.util.ClassUtils;
 public class ExtensionsManagerConfigurationBuilder extends AbstractConfigurationBuilder
 {
 
-    private static final String EXTENSIONS_MANAGER_CLASS_NAME = "org.mule.module.extensions.internal.DefaultExtensionsManager";
+    private static final String EXTENSIONS_MANAGER_CLASS_NAME = "org.mule.module.extension.internal.manager.DefaultExtensionManager";
 
     @Override
     protected void doConfigure(MuleContext muleContext) throws Exception
