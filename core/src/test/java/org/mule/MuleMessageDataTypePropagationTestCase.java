@@ -15,6 +15,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.transformer.types.MimeTypes.ANY;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -198,13 +199,33 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void updatesDataTypeOnTransformation() throws Exception
+    public void updatesTypeOnTransformation() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setMimeType(APPLICATION_XML);
 
         Transformer transformer = mock(Transformer.class);
         when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
-        DataType outputDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML);
+        DataType outputDataType = DataTypeFactory.create(Integer.class, ANY);
+        outputDataType.setEncoding(null);
+        when(transformer.getReturnDataType()).thenReturn(outputDataType);
+
+        MuleEvent muleEvent = mock(MuleEvent.class);
+
+        muleMessage.applyAllTransformers(muleEvent, Collections.singletonList(transformer));
+
+        assertDataType(muleMessage, Integer.class, APPLICATION_XML, DEFAULT_ENCODING);
+    }
+
+    @Test
+    public void updatesEncodingOnTransformation() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setMimeType(APPLICATION_XML);
+
+        Transformer transformer = mock(Transformer.class);
+        when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
+        DataType outputDataType = DataTypeFactory.create(Integer.class, null);
         outputDataType.setEncoding(CUSTOM_ENCODING);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
 
@@ -212,7 +233,27 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         muleMessage.applyAllTransformers(muleEvent, Collections.singletonList(transformer));
 
-        assertDataType(muleMessage, outputDataType);
+        assertDataType(muleMessage, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
+    }
+
+    @Test
+    public void updatesMimeTypeOnTransformation() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        muleMessage.setMimeType(ANY);
+        muleMessage.setEncoding(CUSTOM_ENCODING);
+
+        Transformer transformer = mock(Transformer.class);
+        when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
+        DataType outputDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML);
+        outputDataType.setEncoding(null);
+        when(transformer.getReturnDataType()).thenReturn(outputDataType);
+
+        MuleEvent muleEvent = mock(MuleEvent.class);
+
+        muleMessage.applyAllTransformers(muleEvent, Collections.singletonList(transformer));
+
+        assertDataType(muleMessage, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
     }
 
     @Test
