@@ -8,20 +8,19 @@ package org.mule.config.spring.processors;
 
 import java.beans.PropertyDescriptor;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Specialization of {@link AutowiredAnnotationBeanPostProcessor} which only considers
+ * Specialization of {@link SelectiveInjectorProcessor} which only considers
  * beans which are defined on a given {@link ApplicationContext}. This is useful
  * to avoid exceptions related to unsatisfied dependencies when using parent context
  * which also define a {@link AutowiredAnnotationBeanPostProcessor}
  *
  * @since 3.7.0
  */
-public class ContextExclusiveInjectorProcessor extends AutowiredAnnotationBeanPostProcessor
+public final class ContextExclusiveInjectorProcessor extends SelectiveInjectorProcessor
 {
 
     private ApplicationContext applicationContext;
@@ -32,13 +31,8 @@ public class ContextExclusiveInjectorProcessor extends AutowiredAnnotationBeanPo
     }
 
     @Override
-    public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException
+    protected boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
     {
-        if (applicationContext.containsBean(beanName))
-        {
-            return super.postProcessPropertyValues(pvs, pds, bean, beanName);
-        }
-
-        return pvs;
+        return applicationContext.containsBean(beanName);
     }
 }
