@@ -7,7 +7,6 @@
 package org.mule.util.journal.queue;
 
 import org.mule.api.MuleContext;
-import org.mule.util.journal.JournalEntry;
 import org.mule.util.journal.JournalEntrySerializer;
 
 import java.io.DataInputStream;
@@ -39,7 +38,7 @@ public class LocalTxQueueTransactionJournal extends AbstractQueueTransactionJour
             @Override
             public void serialize(LocalQueueTxJournalEntry journalEntry, DataOutputStream dataOutputStream)
             {
-                journalEntry.write(dataOutputStream);
+                journalEntry.write(dataOutputStream, muleContext);
             }
         };
     }

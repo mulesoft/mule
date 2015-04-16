@@ -10,6 +10,7 @@ package org.mule.util.store;
 import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ExpirableObjectStore;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -20,7 +21,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FileUtils;
-import org.mule.util.SerializationUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -51,6 +51,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
     private static final String PARTITION_DESCRIPTOR_FILE = "partition-descriptor";
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
+    private final ObjectSerializer serializer;
 
     private boolean loaded = false;
 
@@ -62,6 +63,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
     PersistentObjectStorePartition(MuleContext muleContext, String partitionName, File partitionDirectory)
     {
         this.muleContext = muleContext;
+        serializer = muleContext.getObjectSerializer();
         this.partitionName = partitionName;
         this.partitionDirectory = partitionDirectory;
     }
@@ -70,6 +72,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
         throws ObjectStoreNotAvaliableException
     {
         this.muleContext = muleContext;
+        serializer = muleContext.getObjectSerializer();
         this.partitionDirectory = partitionDirectory;
         this.partitionName = readPartitionFileName(partitionDirectory);
     }
@@ -367,7 +370,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
         {
             out = new FileOutputStream(outputFile);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
-            SerializationUtils.serialize(storeValue, objectOutputStream);
+            serializer.serialize(storeValue, objectOutputStream);
         }
         catch (Exception se)
         {
@@ -396,8 +399,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
         try
         {
             objectInputStream = new ObjectInputStream(new FileInputStream(file));
-            StoreValue<T> storedValue = (StoreValue<T>) SerializationUtils.deserialize(objectInputStream,
-                muleContext);
+            StoreValue<T> storedValue = serializer.deserialize(objectInputStream);
             if (storedValue.getValue() instanceof DeserializationPostInitialisable)
             {
                 DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);

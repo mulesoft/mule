@@ -9,7 +9,6 @@ package org.mule.util.journal.queue;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.SerializationUtils;
 import org.mule.util.journal.JournalEntry;
 
 import java.io.DataInputStream;
@@ -89,10 +88,10 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T>
         byte[] valueAsBytes = new byte[valueSize];
         inputStream.read(valueAsBytes, 0, valueSize);
         queueName = new String(queueNameAsBytes);
-        value =  (Serializable) SerializationUtils.deserialize(valueAsBytes, muleContext);
+        value = muleContext.getObjectSerializer().deserialize(valueAsBytes);
     }
 
-    public void write(DataOutputStream outputStream)
+    public void write(DataOutputStream outputStream, MuleContext muleContext)
     {
         try
         {
@@ -105,7 +104,7 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T>
             }
             outputStream.write(queueName.length());
             outputStream.write(queueName.getBytes());
-            byte[] serializedValue = SerializationUtils.serialize(value);
+            byte[] serializedValue = muleContext.getObjectSerializer().serialize(value);
             outputStream.writeInt(serializedValue.length);
             outputStream.write(serializedValue);
             outputStream.flush();

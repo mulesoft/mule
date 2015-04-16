@@ -8,7 +8,6 @@ package org.mule.transformer.compression;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
@@ -54,7 +53,10 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     @Override
     public Transformer getTransformer()
     {
-        return new GZipCompressTransformer();
+        GZipCompressTransformer transformer = new GZipCompressTransformer();
+        transformer.setMuleContext(muleContext);
+
+        return transformer;
     }
 
     @Override

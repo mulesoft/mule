@@ -9,8 +9,8 @@ package org.mule.module.client;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -24,6 +24,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.security.Credentials;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.api.transport.DispatchException;
 import org.mule.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
@@ -37,7 +38,6 @@ import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
-import org.mule.util.SerializationUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -72,6 +72,7 @@ public class RemoteDispatcher implements Disposable
     private OutboundEndpoint syncServerEndpoint;
     private Credentials credentials = null;
     private MuleContext muleContext;
+    private ObjectSerializer serializer;
 
     /**
      * an ExecutorService for async messages (optional)
@@ -92,6 +93,7 @@ public class RemoteDispatcher implements Disposable
     protected RemoteDispatcher(String endpoint, MuleContext muleContext) throws MuleException
     {
         this.muleContext = muleContext;
+        serializer = muleContext.getObjectSerializer();
         EndpointFactory endpointFactory = muleContext.getEndpointFactory();
         asyncServerEndpoint = endpointFactory.getOutboundEndpoint(endpoint);
 
@@ -124,7 +126,7 @@ public class RemoteDispatcher implements Disposable
         try
         {
             ByteArrayInputStream in = new ByteArrayInputStream(result.getPayloadAsBytes());
-            handshake = (ServerHandshake) SerializationUtils.deserialize(in, muleContext);
+            handshake = serializer.deserialize(in);
         }
         catch (Exception e)
         {

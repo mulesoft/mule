@@ -9,8 +9,9 @@ package org.mule.util.store;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
@@ -25,7 +26,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
-import org.mockito.Mockito;
 
 /**
  *
@@ -35,7 +35,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
 
     public static final String OBJECT_KEY = "key";
     public static final String OBJECT_BASE_VALUE = "value";
-    private MuleContext mockMuleContext = Mockito.mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+    private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
     private PartitionedPersistentObjectStore<Serializable> os;
     private int numberOfPartitions = 3;
 
@@ -45,12 +45,15 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         numberOfPartitions = 3;
         when(mockMuleContext.getConfiguration().getWorkingDirectory()).thenReturn(".");
         when(mockMuleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
-        os = new PartitionedPersistentObjectStore<Serializable>(mockMuleContext);
+        os = new PartitionedPersistentObjectStore<>(mockMuleContext);
         File objectStorePersistDir = new File(PartitionedPersistentObjectStore.OBJECT_STORE_DIR);
         if (objectStorePersistDir.exists())
         {
             FileUtils.deleteDirectory(objectStorePersistDir);
         }
+
+        addJavaSerializerToMockMuleContext(mockMuleContext);
+        when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
     }
 
     @Test

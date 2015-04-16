@@ -11,18 +11,17 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.serialization.SerializationException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.CorrelationSequenceComparator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.util.SerializationUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.SerializationException;
 
 public class MessageChunkAggregator extends AbstractAggregator
 {
@@ -83,10 +82,8 @@ public class MessageChunkAggregator extends AbstractAggregator
                     try
                     {
                         // must deserialize in correct classloader
-                        final Object deserialized = SerializationUtils.deserialize(baos.toByteArray(),
-                            muleContext);
+                        final Object deserialized = muleContext.getObjectSerializer().deserialize(baos.toByteArray());
                         message = new DefaultMuleMessage(deserialized, firstEvent.getMessage(), muleContext);
-
                     }
                     catch (SerializationException e)
                     {

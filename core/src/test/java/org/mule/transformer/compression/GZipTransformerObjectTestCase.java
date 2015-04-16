@@ -7,10 +7,8 @@
 package org.mule.transformer.compression;
 
 import static org.junit.Assert.fail;
-
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
-import org.mule.util.SerializationUtils;
 
 import java.io.Serializable;
 
@@ -26,7 +24,7 @@ public class GZipTransformerObjectTestCase extends GZipTransformerTestCase
     {
         try
         {
-            return strat.compressByteArray(SerializationUtils.serialize(TEST_OBJECT));
+            return strat.compressByteArray(muleContext.getObjectSerializer().serialize(TEST_OBJECT));
         }
         catch (Exception e)
         {
