@@ -39,10 +39,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
     private static final String PLAIN_TEXT = "This is a plain text";
     private static final String EXPRESSION = "#[testVariable]";
-    public static final String CUSTOM_ENCODING = "UTF-16";
-    public static final String ENCODING_EXPRESSION = "#['" + CUSTOM_ENCODING + "']";
-    public static final String CLASS_NAME_EXPRESSION = "#['java.lang.Long']";
-    public static final String MIME_TYPE_EXPRESSION = "#['" + MimeTypes.APPLICATION_XML + "']";
+    private static final String CUSTOM_ENCODING = "UTF-16";
 
     private SetPayloadMessageProcessor setPayloadMessageProcessor;
     private MuleContext muleContext;
@@ -173,23 +170,6 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void setsCustomEncodingFromExpression() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.setEncoding(ENCODING_EXPRESSION);
-        setPayloadMessageProcessor.initialise();
-
-        when(expressionManager.isExpression(ENCODING_EXPRESSION)).thenReturn(true);
-        when(expressionManager.evaluate(ENCODING_EXPRESSION, muleEvent)).thenReturn(CUSTOM_ENCODING);
-
-        setPayloadMessageProcessor.process(muleEvent);
-
-        verify(muleMessage).setPayload(any(), actualDataType.capture());
-
-        assertThat(actualDataType.getValue(), DataTypeMatcher.like(String.class, MimeTypes.ANY, CUSTOM_ENCODING));
-    }
-
-    @Test
     public void setsCustomMimeType() throws MuleException
     {
         setPayloadMessageProcessor.setValue(PLAIN_TEXT);
@@ -202,23 +182,4 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
         assertThat(actualDataType.getValue(), DataTypeMatcher.like(String.class, MimeTypes.APPLICATION_XML, null));
     }
-
-    @Test
-    public void setsCustomMimeTypeFromExpression() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.setMimeType(MIME_TYPE_EXPRESSION);
-        setPayloadMessageProcessor.initialise();
-
-        when(expressionManager.isExpression(MIME_TYPE_EXPRESSION)).thenReturn(true);
-        when(expressionManager.evaluate(MIME_TYPE_EXPRESSION, muleEvent)).thenReturn(MimeTypes.APPLICATION_XML);
-
-        setPayloadMessageProcessor.process(muleEvent);
-
-        verify(muleMessage).setPayload(any(), actualDataType.capture());
-
-        assertThat(actualDataType.getValue(), DataTypeMatcher.like(String.class, MimeTypes.APPLICATION_XML, null));
-    }
-
-
 }

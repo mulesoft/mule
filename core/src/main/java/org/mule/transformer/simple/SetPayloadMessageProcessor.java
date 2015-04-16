@@ -27,8 +27,8 @@ import org.mule.util.AttributeEvaluator;
 public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implements MessageProcessor, MuleContextAware, Initialisable
 {
 
-    private AttributeEvaluator mimeTypeEvaluator = new AttributeEvaluator(null);
-    private AttributeEvaluator encodingEvaluator = new AttributeEvaluator(null);
+    private String mimeType;
+    private String encoding;
     private AttributeEvaluator valueEvaluator = new AttributeEvaluator(null);
     private MuleContext muleContext;
 
@@ -62,8 +62,8 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     {
         Class type = (value == null || value instanceof NullPayload) ? Object.class : value.getClass();
 
-        SimpleDataType simpleDataType = new SimpleDataType(type, mimeTypeEvaluator.resolveStringValue(event));
-        simpleDataType.setEncoding(encodingEvaluator.resolveStringValue(event));
+        SimpleDataType simpleDataType = new SimpleDataType(type, mimeType);
+        simpleDataType.setEncoding(encoding);
 
         return simpleDataType;
     }
@@ -94,12 +94,12 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
 
     public void setMimeType(String mimeType)
     {
-        this.mimeTypeEvaluator = new AttributeEvaluator(mimeType);
+        this.mimeType = mimeType;
     }
 
     public void setEncoding(String encoding)
     {
-        this.encodingEvaluator = new AttributeEvaluator(encoding);
+        this.encoding = encoding;
     }
 
     /**
@@ -126,7 +126,5 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     public void initialise() throws InitialisationException
     {
         valueEvaluator.initialize(muleContext.getExpressionManager());
-        mimeTypeEvaluator.initialize(muleContext.getExpressionManager());
-        encodingEvaluator.initialize(muleContext.getExpressionManager());
     }
 }
