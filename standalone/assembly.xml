@@ -171,11 +171,11 @@
                 <include>org.mule.modules:mule-module-spring-security</include>
                 <include>org.mule.modules:mule-module-sxc</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
+                <include>org.mule.modules:mule-module-validation</include>
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
                 <include>org.mule.patterns:mule-pattern-core</include>
-                <!-- Extensions -->
-                <include>org.mule.extensions:mule-extension-validation</include>
+
                 <!-- Tools -->
                 <include>org.mule.tools:mule-tools-anttasks</include>
                 <!-- Shared libs -->
@@ -255,11 +255,11 @@
                 <exclude>org.mule.modules:mule-module-spring-security</exclude>
                 <exclude>org.mule.modules:mule-module-sxc</exclude>
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
+                <exclude>org.mule.modules:mule-module-validation</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
                 <exclude>org.mule.patterns:mule-patterns-all</exclude>
                 <exclude>org.mule.patterns:mule-pattern-core</exclude>
-                <exclude>org.mule.extensions:mule-extension-validation</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
 
                 <!-- mule-tests-functional dependencies -->

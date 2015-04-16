@@ -124,7 +124,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-extension-validation-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-atom-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-bpm-${productVersion}.jar
@@ -155,6 +154,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-sxc-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-validation-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-005.jar
