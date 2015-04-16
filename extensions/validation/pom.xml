@@ -10,8 +10,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mule.extensions</groupId>
-    <artifactId>mule-extension-validation</artifactId>
+    <groupId>org.mule.modules</groupId>
+    <artifactId>mule-module-validation</artifactId>
     <packaging>jar</packaging>
 
     <name>Mule Validation Extension</name>
