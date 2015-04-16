@@ -59,6 +59,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("basic-authentication", new HttpAuthenticationDefinitionParser(HttpAuthenticationType.BASIC));
         registerBeanDefinitionParser("digest-authentication", new HttpAuthenticationDefinitionParser(HttpAuthenticationType.DIGEST));
+        registerBeanDefinitionParser("ntlm-authentication", new HttpAuthenticationDefinitionParser(HttpAuthenticationType.NTLM));
 
         registerBeanDefinitionParser("success-status-code-validator", new ChildDefinitionParser("responseValidator", SuccessStatusCodeValidator.class));
         registerBeanDefinitionParser("failure-status-code-validator", new ChildDefinitionParser("responseValidator", FailureStatusCodeValidator.class));
