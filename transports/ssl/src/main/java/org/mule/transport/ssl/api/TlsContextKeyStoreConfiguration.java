@@ -12,8 +12,14 @@ package org.mule.transport.ssl.api;
 public interface TlsContextKeyStoreConfiguration extends TlsContextTrustStoreConfiguration
 {
 
+    /**
+     * @return The alias of the private key to use.
+     */
     public String getAlias();
 
+    /**
+     * @return The password used to access the private key.
+     */
     public String getKeyPassword();
 
 }

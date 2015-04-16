@@ -12,12 +12,24 @@ package org.mule.transport.ssl.api;
 public interface TlsContextTrustStoreConfiguration
 {
 
+    /**
+     * @return The location of the store.
+     */
     public String getPath();
 
+    /**
+     * @return The password to access the store.
+     */
     public String getPassword();
 
+    /**
+     * @return The type of store ("jks", "pkcs12", "jceks", or any other).
+     */
     public String getType();
 
+    /**
+     * @return The algorithm used by the store.
+     */
     public String getAlgorithm();
 
 }
