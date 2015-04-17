@@ -30,7 +30,7 @@ public class HttpMultipartEncoder
     public static MimeMultipart createMultpartContent(MultipartHttpEntity body, String contentType)
     {
         MimeMultipart mimeMultipartContent = new HttpMimeMultipart(contentType, HttpParser.getContentTypeSubType(contentType));
-        final Collection<Part> parts = body.getParts();
+        final Collection<HttpPart> parts = body.getParts();
 
         for (Part part : parts)
         {
