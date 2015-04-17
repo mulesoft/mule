@@ -13,6 +13,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
+import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
 
 import org.junit.Test;
 
@@ -64,4 +67,33 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
         assertThat(tlsContextFactory.getKeyManagerAlgorithm(), equalTo("testKeyStoreAlgorithm"));
         assertThat(tlsContextFactory.getKeyAlias(), equalTo("testKeyStoreAlias"));
     }
+
+    @Test
+    public void testTlsContextKeyStoreProperties() throws Exception
+    {
+        TlsContextFactory tlsContextFactory = muleContext.getRegistry().get("tlsContext");
+        TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
+
+        assertThat(keyStoreConfig.getPath(), endsWith("serverKeystore"));
+        assertThat(keyStoreConfig.getPassword(), equalTo("testKeyStorePassword"));
+        assertThat(keyStoreConfig.getType(), equalTo("testKeyStoreType"));
+        assertThat(keyStoreConfig.getKeyPassword(), equalTo("testKeyPassword"));
+        assertThat(keyStoreConfig.getAlgorithm(), equalTo("testKeyStoreAlgorithm"));
+        assertThat(keyStoreConfig.getAlias(), equalTo("testKeyStoreAlias"));
+    }
+
+    @Test
+    public void testTlsContextTrustStoreProperties() throws Exception
+    {
+        TlsContextFactory tlsContextFactory = muleContext.getRegistry().get("tlsContext");
+        TlsContextTrustStoreConfiguration trustStoreConfig = tlsContextFactory.getTrustStoreConfiguration();
+
+        assertThat(trustStoreConfig.getPath(), endsWith("trustStore"));
+        assertThat(trustStoreConfig.getPassword(), equalTo("testTrustStorePassword"));
+        assertThat(trustStoreConfig.getType(), equalTo("testTrustStoreType"));
+        assertThat(trustStoreConfig.getAlgorithm(), equalTo("testTrustStoreAlgorithm"));
+    }
+
+
+
 }

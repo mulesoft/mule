@@ -6,19 +6,20 @@
  */
 package org.mule.module.ws.security;
 
-import java.util.Map;
+import static org.apache.ws.security.handler.WSHandlerConstants.TIMESTAMP;
+import static org.apache.ws.security.handler.WSHandlerConstants.TTL_TIMESTAMP;
 
-import org.apache.ws.security.handler.WSHandlerConstants;
+import java.util.Map;
 
 public class WssTimestampSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy
 {
     private long expires;
 
     @Override
-    public void apply(Map<String, Object> configProperties)
+    public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
     {
-        appendAction(configProperties, WSHandlerConstants.TIMESTAMP);
-        configProperties.put(WSHandlerConstants.TTL_TIMESTAMP, String.valueOf(expires));
+        appendAction(outConfigProperties, TIMESTAMP);
+        outConfigProperties.put(TTL_TIMESTAMP, String.valueOf(expires));
     }
 
     public long getExpires()

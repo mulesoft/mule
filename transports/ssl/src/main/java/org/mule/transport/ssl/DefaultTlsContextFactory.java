@@ -10,6 +10,8 @@ package org.mule.transport.ssl;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
+import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
 import org.mule.util.FileUtils;
 
 import java.io.IOException;
@@ -183,6 +185,80 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     public boolean isTrustStoreConfigured()
     {
         return tlsConfiguration.getTrustStore() != null;
+    }
+
+    @Override
+    public TlsContextKeyStoreConfiguration getKeyStoreConfiguration()
+    {
+        return new TlsContextKeyStoreConfiguration()
+        {
+            @Override
+            public String getAlias()
+            {
+                return getKeyAlias();
+            }
+
+            @Override
+            public String getKeyPassword()
+            {
+                return getKeyManagerPassword();
+            }
+
+            @Override
+            public String getPath()
+            {
+                return getKeyStorePath();
+            }
+
+            @Override
+            public String getPassword()
+            {
+                return getKeyStorePassword();
+            }
+
+            @Override
+            public String getType()
+            {
+                return getKeyStoreType();
+            }
+
+            @Override
+            public String getAlgorithm()
+            {
+                return getKeyManagerAlgorithm();
+            }
+        };
+    }
+
+    @Override
+    public TlsContextTrustStoreConfiguration getTrustStoreConfiguration()
+    {
+        return new TlsContextTrustStoreConfiguration()
+        {
+            @Override
+            public String getPath()
+            {
+                return getTrustStorePath();
+            }
+
+            @Override
+            public String getPassword()
+            {
+                return getTrustStorePassword();
+            }
+
+            @Override
+            public String getType()
+            {
+                return getTrustStoreType();
+            }
+
+            @Override
+            public String getAlgorithm()
+            {
+                return getTrustManagerAlgorithm();
+            }
+        };
     }
 
     @Override

@@ -6,7 +6,15 @@
  */
 package org.mule.module.ws.security;
 
+import static org.apache.ws.security.WSConstants.CREATED_LN;
+import static org.apache.ws.security.WSConstants.NONCE_LN;
+import static org.apache.ws.security.WSPasswordCallback.USERNAME_TOKEN;
+import static org.apache.ws.security.handler.WSHandlerConstants.ADD_UT_ELEMENTS;
+import static org.apache.ws.security.handler.WSHandlerConstants.PASSWORD_TYPE;
+import static org.apache.ws.security.handler.WSHandlerConstants.PW_CALLBACK_REF;
+import static org.apache.ws.security.handler.WSHandlerConstants.USER;
 import static org.junit.Assert.assertEquals;
+import static org.mule.module.ws.security.PasswordType.TEXT;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -16,9 +24,7 @@ import java.util.Map;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.junit.Test;
 
 @SmallTest
@@ -37,14 +43,14 @@ public class WssUsernameTokenSecurityStrategyTestCase extends AbstractMuleTestCa
 
         strategy.setUsername(username);
         strategy.setPassword(password);
-        strategy.setPasswordType(PasswordType.TEXT);
-        strategy.apply(properties);
+        strategy.setPasswordType(TEXT);
+        strategy.apply(properties, null);
 
-        assertEquals(username, properties.get(WSHandlerConstants.USER));
-        assertEquals("PasswordText", properties.get(WSHandlerConstants.PASSWORD_TYPE));
+        assertEquals(username, properties.get(USER));
+        assertEquals("PasswordText", properties.get(PASSWORD_TYPE));
 
-        CallbackHandler handler = (CallbackHandler) properties.get(WSHandlerConstants.PW_CALLBACK_REF);
-        WSPasswordCallback passwordCallback = new WSPasswordCallback(username, 1);
+        CallbackHandler handler = (CallbackHandler) properties.get(PW_CALLBACK_REF);
+        WSPasswordCallback passwordCallback = new WSPasswordCallback(username, USERNAME_TOKEN);
         handler.handle(new Callback[] { passwordCallback });
 
         assertEquals(password, passwordCallback.getPassword());
@@ -57,9 +63,9 @@ public class WssUsernameTokenSecurityStrategyTestCase extends AbstractMuleTestCa
 
         strategy.setAddNonce(true);
         strategy.setAddCreated(true);
-        strategy.apply(properties);
+        strategy.apply(properties, null);
 
-        assertEquals(WSConstants.NONCE_LN + " " + WSConstants.CREATED_LN, properties.get(WSHandlerConstants.ADD_UT_ELEMENTS));
+        assertEquals(NONCE_LN + " " + CREATED_LN, properties.get(ADD_UT_ELEMENTS));
     }
 
 }

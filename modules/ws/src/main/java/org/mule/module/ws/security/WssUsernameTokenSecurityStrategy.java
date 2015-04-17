@@ -7,20 +7,21 @@
 
 package org.mule.module.ws.security;
 
+import static org.apache.ws.security.WSConstants.CREATED_LN;
+import static org.apache.ws.security.WSConstants.NONCE_LN;
+import static org.apache.ws.security.handler.WSHandlerConstants.ADD_UT_ELEMENTS;
+import static org.apache.ws.security.handler.WSHandlerConstants.PASSWORD_TYPE;
+import static org.apache.ws.security.handler.WSHandlerConstants.USER;
+import static org.apache.ws.security.handler.WSHandlerConstants.USERNAME_TOKEN;
+import static org.mule.module.ws.security.PasswordType.DIGEST;
+import static org.mule.module.ws.security.PasswordType.TEXT;
 import org.mule.util.StringUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.handler.WSHandlerConstants;
 
 public class WssUsernameTokenSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy
 {
@@ -32,47 +33,45 @@ public class WssUsernameTokenSecurityStrategy extends AbstractSecurityStrategy i
     private boolean addCreated;
 
     @Override
-    public void apply(Map<String, Object> configProperties)
+    public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
     {
-        appendAction(configProperties, WSHandlerConstants.USERNAME_TOKEN);
-        configProperties.put(WSHandlerConstants.USER, username);
+        appendAction(outConfigProperties, USERNAME_TOKEN);
+        outConfigProperties.put(USER, username);
 
-        if (passwordType == PasswordType.TEXT)
+        if (passwordType == TEXT)
         {
-            configProperties.put(WSHandlerConstants.PASSWORD_TYPE, "PasswordText");
+            outConfigProperties.put(PASSWORD_TYPE, "PasswordText");
         }
-        else if (passwordType == PasswordType.DIGEST)
+        else if (passwordType == DIGEST)
         {
-            configProperties.put(WSHandlerConstants.PASSWORD_TYPE, "PasswordDigest");
+            outConfigProperties.put(PASSWORD_TYPE, "PasswordDigest");
         }
 
         List<String> additionalElements = new ArrayList<String>(2);
         if (addNonce)
         {
-            additionalElements.add(WSConstants.NONCE_LN);
+            additionalElements.add(NONCE_LN);
         }
         if (addCreated)
         {
-            additionalElements.add(WSConstants.CREATED_LN);
+            additionalElements.add(CREATED_LN);
         }
         if (!additionalElements.isEmpty())
         {
-            configProperties.put(WSHandlerConstants.ADD_UT_ELEMENTS, StringUtils.join(additionalElements, " "));
+            outConfigProperties.put(ADD_UT_ELEMENTS, StringUtils.join(additionalElements, " "));
         }
 
-        configProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new CallbackHandler()
+        addPasswordCallbackHandler(outConfigProperties, new WSPasswordCallbackHandler(WSPasswordCallback.USERNAME_TOKEN)
         {
             @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
+            public void handle(WSPasswordCallback passwordCallback)
             {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-                if (pc.getIdentifier().equals(username))
+                if (passwordCallback.getIdentifier().equals(username))
                 {
-                    pc.setPassword(password);
+                    passwordCallback.setPassword(password);
                 }
             }
         });
-
     }
 
     public void setUsername(String username)
