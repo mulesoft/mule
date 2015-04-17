@@ -101,7 +101,7 @@ MULE-7990: A new API for object serialization has been added through the ObjectS
      * Instead, if you want a specific named serializer (whether it's the default or not) you can also
        do it like this:
 
-       public clss MyClass {
+       public class MyClass {
 
         @Inject
         @Named("mySerializer")
@@ -109,7 +109,7 @@ MULE-7990: A new API for object serialization has been added through the ObjectS
 
        }
 
-     * Finally, you can always pull it from the muleContext but depedency injection is preferred:
+     * Finally, you can always pull it from the muleContext but dependency injection is preferred:
 
         // returns the default object serializer
         muleContext.getObjectSerializer();
