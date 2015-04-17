@@ -29,6 +29,7 @@ import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
@@ -1624,8 +1625,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
         if (!payloadBeforeTransformation.equals(payload))
         {
-            setDataType(transformer.getReturnDataType());
+            setDataType(mergeDataType(dataType, transformer.getReturnDataType()));
         }
+    }
+
+    private DataType<?> mergeDataType(MuleMessageDataTypeWrapper<?> original, DataType<?> transformed)
+    {
+        String mimeType = transformed.getMimeType() == null || MimeTypes.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
+        String encoding = transformed.getEncoding() == null ? original.getEncoding() : transformed.getEncoding();
+
+        DataType mergedDataType = DataTypeFactory.create(transformed.getType(), mimeType);
+        mergedDataType.setEncoding(encoding);
+        return mergedDataType;
     }
 
     protected void setDataType(DataType<?> dt)
