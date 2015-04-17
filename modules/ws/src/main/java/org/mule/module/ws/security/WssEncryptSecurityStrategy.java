@@ -6,8 +6,9 @@
  */
 package org.mule.module.ws.security;
 
-import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
-import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
+import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
+import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPTION_USER;
+import static org.apache.ws.security.handler.WSHandlerConstants.ENC_PROP_REF_ID;
 import static org.mule.module.ws.security.WSCryptoUtils.createDefaultTrustStoreProperties;
 import static org.mule.module.ws.security.WSCryptoUtils.createTrustStoreProperties;
 import org.mule.transport.ssl.api.TlsContextFactory;
@@ -18,31 +19,33 @@ import java.util.Properties;
 /**
  * Verifies the signature of a SOAP response, using certificates of the trust-store in the provided TLS context.
  */
-public class WssVerifySignatureSecurityStrategy extends AbstractSecurityStrategy
+public class WssEncryptSecurityStrategy extends AbstractSecurityStrategy
 {
 
-    private static final String WS_VERIFY_SIGNATURE_PROPERTIES_KEY = "verifySignatureProperties";
+    private static final String WS_ENCRYPT_PROPERTIES_KEY = "encryptProperties";
 
     private TlsContextFactory tlsContextFactory;
+    private String alias;
 
     @Override
     public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
     {
-        appendAction(inConfigProperties, SIGNATURE);
+        appendAction(outConfigProperties, ENCRYPT);
 
-        Properties signatureProperties;
+        Properties encryptionProperties;
 
         if (tlsContextFactory == null)
         {
-            signatureProperties = createDefaultTrustStoreProperties();
+            encryptionProperties = createDefaultTrustStoreProperties();
         }
         else
         {
-            signatureProperties = createTrustStoreProperties(tlsContextFactory.getTrustStoreConfiguration());
+            encryptionProperties = createTrustStoreProperties(tlsContextFactory.getTrustStoreConfiguration());
         }
 
-        inConfigProperties.put(SIG_PROP_REF_ID, WS_VERIFY_SIGNATURE_PROPERTIES_KEY);
-        inConfigProperties.put(WS_VERIFY_SIGNATURE_PROPERTIES_KEY, signatureProperties);
+        outConfigProperties.put(ENC_PROP_REF_ID, WS_ENCRYPT_PROPERTIES_KEY);
+        outConfigProperties.put(WS_ENCRYPT_PROPERTIES_KEY, encryptionProperties);
+        outConfigProperties.put(ENCRYPTION_USER, alias);
     }
 
 
@@ -56,4 +59,13 @@ public class WssVerifySignatureSecurityStrategy extends AbstractSecurityStrategy
         this.tlsContextFactory = tlsContextFactory;
     }
 
+    public String getAlias()
+    {
+        return alias;
+    }
+
+    public void setAlias(String alias)
+    {
+        this.alias = alias;
+    }
 }
