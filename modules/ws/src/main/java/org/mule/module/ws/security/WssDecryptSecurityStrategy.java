@@ -6,9 +6,9 @@
  */
 package org.mule.module.ws.security;
 
-import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
-import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE_USER;
-import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
+import static org.apache.ws.security.WSPasswordCallback.DECRYPT;
+import static org.apache.ws.security.handler.WSHandlerConstants.DEC_PROP_REF_ID;
+import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
 import static org.mule.module.ws.security.WSCryptoUtils.createKeyStoreProperties;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
@@ -19,12 +19,12 @@ import java.util.Properties;
 import org.apache.ws.security.WSPasswordCallback;
 
 /**
- * Signs the SOAP request that is being sent, using the private key of the key-store in the provided TLS context.
+ * Decrypts an encrypted SOAP response, using the private key of the key-store in the provided TLS context.
  */
-public class WssSignSecurityStrategy extends AbstractSecurityStrategy
+public class WssDecryptSecurityStrategy extends AbstractSecurityStrategy
 {
 
-    private static final String WS_SIGN_PROPERTIES_KEY = "signProperties";
+    private static final String WS_DECRYPT_PROPERTIES_KEY = "decryptProperties";
 
     private TlsContextFactory tlsContextFactory;
 
@@ -33,15 +33,14 @@ public class WssSignSecurityStrategy extends AbstractSecurityStrategy
     {
         final TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
 
-        appendAction(outConfigProperties, SIGNATURE);
+        appendAction(inConfigProperties, ENCRYPT);
 
-        Properties signProperties = createKeyStoreProperties(keyStoreConfig);
+        Properties decryptionProperties = createKeyStoreProperties(keyStoreConfig);
 
-        outConfigProperties.put(SIG_PROP_REF_ID, WS_SIGN_PROPERTIES_KEY);
-        outConfigProperties.put(WS_SIGN_PROPERTIES_KEY, signProperties);
-        outConfigProperties.put(SIGNATURE_USER, keyStoreConfig.getAlias());
+        inConfigProperties.put(DEC_PROP_REF_ID, WS_DECRYPT_PROPERTIES_KEY);
+        inConfigProperties.put(WS_DECRYPT_PROPERTIES_KEY, decryptionProperties);
 
-        addPasswordCallbackHandler(outConfigProperties, new WSPasswordCallbackHandler(WSPasswordCallback.SIGNATURE)
+        addPasswordCallbackHandler(inConfigProperties, new WSPasswordCallbackHandler(DECRYPT)
         {
             @Override
             public void handle(WSPasswordCallback passwordCallback)

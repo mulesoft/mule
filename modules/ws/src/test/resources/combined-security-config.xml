@@ -20,9 +20,14 @@
         <http:config useTransportForUris="${useTransportForUris}"/>
     </configuration>
 
-    <tls:context name="tlsContext">
+    <tls:context name="tlsContextSignature">
         <tls:trust-store path="trustStore" password="mulepassword" type="jks" />
         <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword" alias="muleclient" type="jks" />
+    </tls:context>
+
+    <tls:context name="tlsContextEncryption">
+        <tls:trust-store path="ssltest-cacerts.jks" password="changeit" type="jks" />
+        <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit" alias="s1as" type="jks" />
     </tls:context>
 
     <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
@@ -30,8 +35,10 @@
         <ws:security>
             <ws:wss-username-token username="admin" password="textPassword" passwordType="TEXT" addCreated="true" addNonce="true"/>
             <ws:wss-timestamp expires="60" />
-            <ws:wss-sign tlsContext-ref="tlsContext" />
-            <ws:wss-verify-signature tlsContext-ref="tlsContext" />
+            <ws:wss-sign tlsContext-ref="tlsContextSignature" />
+            <ws:wss-verify-signature tlsContext-ref="tlsContextSignature" />
+            <ws:wss-encrypt tlsContext-ref="tlsContextEncryption" alias="s1as" />
+            <ws:wss-decrypt tlsContext-ref="tlsContextEncryption" />
         </ws:security>
     </ws:consumer-config>
 
@@ -50,14 +57,25 @@
                     <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
                         <spring:constructor-arg>
                             <spring:map>
-                                <spring:entry key="action" value="UsernameToken Timestamp Signature" />
+                                <spring:entry key="action" value="UsernameToken Timestamp Signature Encrypt" />
                                 <spring:entry key="passwordCallbackClass" value="org.mule.module.ws.functional.CombinedSecurityFunctionalTestCase$ServerPasswordCallback" />
-                                <spring:entry key="signaturePropRefId" value="serverInSecurityProperties" />
-                                <spring:entry key="serverInSecurityProperties">
+                                <spring:entry key="signaturePropRefId" value="signatureProperties" />
+                                <spring:entry key="signatureProperties">
                                     <spring:props>
                                         <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
                                         <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.password">mulepassword</spring:prop>
                                         <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.file">trustStore</spring:prop>
+                                    </spring:props>
+                                </spring:entry>
+                                <spring:entry key="decryptionPropRefId" value="decryptionProperties" />
+                                <spring:entry key="decryptionProperties">
+                                    <spring:props>
+                                        <spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.password">changeit</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.private.password">changeit</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.alias">s1as</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.file">ssltest-keystore.jks</spring:prop>
                                     </spring:props>
                                 </spring:entry>
                             </spring:map>
@@ -68,11 +86,11 @@
                     <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                         <spring:constructor-arg>
                             <spring:map>
-                                <spring:entry key="action" value="Signature" />
+                                <spring:entry key="action" value="Signature Encrypt" />
                                 <spring:entry key="signatureUser" value="muleserver" />
                                 <spring:entry key="passwordCallbackClass" value="org.mule.module.ws.functional.CombinedSecurityFunctionalTestCase$ServerPasswordCallback" />
-                                <spring:entry key="signaturePropRefId" value="serverOutSecurityProperties" />
-                                <spring:entry key="serverOutSecurityProperties">
+                                <spring:entry key="signaturePropRefId" value="signatureProperties" />
+                                <spring:entry key="signatureProperties">
                                     <spring:props>
                                         <spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin</spring:prop>
                                         <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
@@ -80,6 +98,15 @@
                                         <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.private.password">mulepassword</spring:prop>
                                         <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.alias">muleserver</spring:prop>
                                         <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.file">serverKeystore</spring:prop>
+                                    </spring:props>
+                                </spring:entry>
+                                <spring:entry key="encryptionUser" value="s1as" />
+                                <spring:entry key="encryptionPropRefId" value="encryptionProperties" />
+                                <spring:entry key="encryptionProperties">
+                                    <spring:props>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.password">changeit</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.file">ssltest-cacerts.jks</spring:prop>
                                     </spring:props>
                                 </spring:entry>
                             </spring:map>

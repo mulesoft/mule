@@ -7,10 +7,6 @@
 
 package org.mule.module.ws.functional;
 
-import static org.apache.ws.security.WSPasswordCallback.DECRYPT;
-import static org.apache.ws.security.WSPasswordCallback.SIGNATURE;
-import static org.apache.ws.security.WSPasswordCallback.USERNAME_TOKEN;
-
 import java.io.IOException;
 
 import javax.security.auth.callback.Callback;
@@ -21,19 +17,31 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.junit.Test;
 
 
-public class CombinedSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
+public class EncryptSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
 
     @Override
     protected String getConfigFile()
     {
-        return "combined-security-config.xml";
+        return "encrypt-security-config.xml";
     }
 
     @Test
-    public void validRequestReturnsExpectedResult() throws Exception
+    public void requestEncryptedWithValidKeyReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://request");
+        assertValidResponse("vm://requestEncryptedWithValidKey");
+    }
+
+    @Test
+    public void requestEncryptedWithInvalidKeyFails() throws Exception
+    {
+        assertSoapFault("vm://requestEncryptedWithInvalidKey", "Client");
+    }
+
+    @Test
+    public void requestNotEncryptedFails() throws Exception
+    {
+        assertSoapFault("vm://requestNotEncrypted", "InvalidSecurity");
     }
 
 
@@ -43,19 +51,8 @@ public class CombinedSecurityFunctionalTestCase extends AbstractWSConsumerFuncti
         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
         {
             WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-
-            if (pc.getUsage() == USERNAME_TOKEN)
-            {
-                pc.setPassword("textPassword");
-            }
-            else if (pc.getUsage() == SIGNATURE)
-            {
-                pc.setPassword("mulepassword");
-            }
-            else if (pc.getUsage() == DECRYPT)
-            {
-                pc.setPassword("changeit");
-            }
+            pc.setPassword("changeit");
         }
     }
+
 }

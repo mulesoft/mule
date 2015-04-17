@@ -278,6 +278,48 @@
                                         </xsd:attribute>
                                     </xsd:complexType>
                                 </xsd:element>
+                                <xsd:element name="wss-encrypt" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Encrypts the SOAP request.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="tlsContext-ref" type="xsd:string" use="optional" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Reference to a TLS context that will be used to encrypt the request. The public key for the specified
+                                                    alias will be used to encrypt the request. If no TLS context is provided, the default
+                                                    certificates of the JVM will be used.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                        <xsd:attribute name="alias" type="xsd:string" use="required" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Alias of the certificate to use for encryption. An entry in the trust store must exist for this alias.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
+                                <xsd:element name="wss-decrypt" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Decrypts the SOAP response.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="tlsContext-ref" type="xsd:string" use="required" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Reference to a TLS context that will be used. The private key of this key store
+                                                    will be used to decrypt the response.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
