@@ -7,6 +7,7 @@
 package org.mule.routing;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
@@ -64,5 +65,13 @@ public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter
     public void setMessageDigestAlgorithm(String messageDigestAlgorithm)
     {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(context);
+        objectToByteArray.setMuleContext(muleContext);
+        byteArrayToHexString.setMuleContext(muleContext);
     }
 }

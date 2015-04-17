@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -20,6 +21,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.Credentials;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.serialization.SerializationException;
 import org.mule.api.transport.SessionHandler;
 import org.mule.security.DefaultMuleAuthentication;
 import org.mule.security.DefaultSecurityContextFactory;
@@ -35,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.SerializationException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -56,6 +57,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         when(configuration.getDefaultEncoding()).thenReturn(Charsets.UTF_8.name());
         when(muleContext.getConfiguration()).thenReturn(configuration);
         when(muleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+        addJavaSerializerToMockMuleContext(muleContext);
     }
 
     @BeforeClass

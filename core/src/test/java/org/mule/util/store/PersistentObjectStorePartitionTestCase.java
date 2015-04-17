@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
@@ -43,6 +44,7 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
     public void setUp() throws Exception
     {
         when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
+        addJavaSerializerToMockMuleContext(muleContext);
         partition = new PersistentObjectStorePartition(muleContext, "test", objectStoreFolder.getRoot());
         partition.open();
     }

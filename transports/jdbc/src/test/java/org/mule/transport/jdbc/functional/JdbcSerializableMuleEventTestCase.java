@@ -12,7 +12,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
-import org.mule.util.SerializationUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,7 +49,7 @@ public class JdbcSerializableMuleEventTestCase extends AbstractJdbcFunctionalTes
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            SerializationUtils.serialize(event);
+            event.getMuleContext().getObjectSerializer().serialize(event);
             return super.process(event);
         }
 

@@ -9,10 +9,12 @@ package org.mule.transport.tcp.protocols;
 
 import org.mule.ResponseOutputStream;
 import org.mule.api.MuleMessage;
+import org.mule.api.serialization.DefaultObjectSerializer;
+import org.mule.api.serialization.ObjectSerializer;
+import org.mule.api.serialization.ObjectSerializerAware;
 import org.mule.transport.tcp.TcpProtocol;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
-import org.mule.util.SerializationUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,8 +24,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This Abstract class has been introduced so as to have the byte protocols (i.e. the
@@ -37,9 +41,9 @@ import org.apache.commons.logging.LogFactory;
  * will, via {@link #write(java.io.OutputStream, Object)}, dispatch to
  * {@link #writeByteArray(java.io.OutputStream, byte[])}.</p>.
  */
-public abstract class AbstractByteProtocol implements TcpProtocol
+public abstract class AbstractByteProtocol implements TcpProtocol, ObjectSerializerAware
 {
-    private static final Log logger = LogFactory.getLog(DirectProtocol.class);
+    private static final Logger logger = LoggerFactory.getLogger(DirectProtocol.class);
     private static final long PAUSE_PERIOD = 100;
     public static final int EOF = -1;
 
@@ -48,6 +52,7 @@ public abstract class AbstractByteProtocol implements TcpProtocol
     public static final boolean NO_STREAM = false;
     private boolean streamOk;
     private boolean rethrowExceptionOnRead = false;
+    private ObjectSerializer objectSerializer;
 
     public AbstractByteProtocol(boolean streamOk)
     {
@@ -88,7 +93,7 @@ public abstract class AbstractByteProtocol implements TcpProtocol
         }
         else if (data instanceof Serializable)
         {
-            writeByteArray(os, SerializationUtils.serialize((Serializable) data));
+            writeByteArray(os, objectSerializer.serialize(data));
         }
         else
         {
@@ -236,4 +241,11 @@ public abstract class AbstractByteProtocol implements TcpProtocol
         this.rethrowExceptionOnRead = rethrowExceptionOnRead;
     }
 
+    @Override
+    @Inject
+    @DefaultObjectSerializer
+    public void setObjectSerializer(ObjectSerializer objectSerializer)
+    {
+        this.objectSerializer = objectSerializer;
+    }
 }

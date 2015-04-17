@@ -57,6 +57,7 @@ import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.registry.RegistryDelegatingInjector;
+import org.mule.serialization.internal.JavaObjectSerializer;
 import org.mule.util.ClassUtils;
 import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
@@ -105,7 +106,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setworkListener(getWorkListener());
         muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
         muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
-        muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(),muleContext));
+        muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(), muleContext));
 
         DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
         muleContext.setRegistryBroker(registryBroker);
@@ -116,6 +117,11 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
         muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
+
+        JavaObjectSerializer defaultObjectSerializer = new JavaObjectSerializer();
+        defaultObjectSerializer.setMuleContext(muleContext);
+        muleContext.setObjectSerializer(defaultObjectSerializer);
+
         return muleContext;
     }
 
