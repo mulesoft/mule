@@ -6,23 +6,24 @@
  */
 package org.mule.module.http.internal.domain;
 
-import org.mule.module.http.internal.multipart.HttpPart;
-
 import java.util.Collection;
+
+import javax.servlet.http.Part;
 
 public class MultipartHttpEntity implements HttpEntity
 {
 
-    private final Collection<HttpPart> parts;
+    private final Collection<Part> parts;
 
-    public MultipartHttpEntity(final Collection<HttpPart> parts)
+    public MultipartHttpEntity(final Collection<Part> parts)
     {
         this.parts = parts;
     }
 
-    public Collection<HttpPart> getParts()
+    public Collection<Part> getParts()
     {
         return this.parts;
     }
+
 
 }
