@@ -45,7 +45,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     private static final String SCHEMA_LOCATION = "mulesoft.com/extension";
     private static final String UNSCAPED_LOCATION_PREFIX = "http://";
     private static final String ESCAPED_LOCATION_PREFIX = "http\\://";
-    private static final String SCHEMA_NAME = "mule-extension-extension.xsd";
+    private static final String SCHEMA_NAME = "mule-extension.xsd";
 
     @Mock
     private Extension extension;

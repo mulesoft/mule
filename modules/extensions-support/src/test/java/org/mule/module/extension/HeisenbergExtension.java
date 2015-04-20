@@ -35,7 +35,7 @@ import javax.inject.Inject;
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
 {
 
-    public static final String SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/extension/heisenberg";
+    public static final String SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/heisenberg";
     public static final String NAMESPACE = "heisenberg";
     public static final String SCHEMA_VERSION = "1.0-blue";
 
