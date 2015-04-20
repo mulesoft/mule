@@ -65,6 +65,7 @@ import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.session.AbstractSessionHandler;
 import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.TransformerUtils;
@@ -364,7 +365,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 {
                     if (retryPolicyTemplate == null)
                     {
-                        retryPolicyTemplate = (RetryPolicyTemplate) muleContext.getRegistry().lookupObject(
+                        retryPolicyTemplate = muleContext.getRegistry().lookupObject(
                                 MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
                     }
 
@@ -379,6 +380,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
                     // Initialise the structure of this connector
                     initFromServiceDescriptor();
+
+                    initSessionHandler();
 
                     configureDispatcherPool();
                     setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
@@ -407,6 +410,14 @@ public abstract class AbstractConnector implements Connector, WorkListener
         catch (MuleException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private void initSessionHandler()
+    {
+        if (sessionHandler instanceof AbstractSessionHandler)
+        {
+            ((AbstractSessionHandler) sessionHandler).setObjectSerializer(muleContext.getObjectSerializer());
         }
     }
 

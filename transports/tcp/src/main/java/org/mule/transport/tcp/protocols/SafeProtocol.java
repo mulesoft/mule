@@ -9,7 +9,6 @@ package org.mule.transport.tcp.protocols;
 import org.mule.ResponseOutputStream;
 import org.mule.api.serialization.DefaultObjectSerializer;
 import org.mule.api.serialization.ObjectSerializer;
-import org.mule.api.serialization.ObjectSerializerAware;
 import org.mule.transport.tcp.TcpProtocol;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import javax.inject.Inject;
  * You should probably change to LengthProtocol.
  * Remember - both sender and receiver must use the same protocol.
  */
-public class SafeProtocol implements TcpProtocol, ObjectSerializerAware
+public class SafeProtocol implements TcpProtocol
 {
 
     public static final String COOKIE = "You are using SafeProtocol";
@@ -119,7 +118,6 @@ public class SafeProtocol implements TcpProtocol, ObjectSerializerAware
         delegate = new LengthProtocol(maxMessageLength);
     }
 
-    @Override
     @Inject
     @DefaultObjectSerializer
     public void setObjectSerializer(ObjectSerializer objectSerializer)
@@ -130,9 +128,9 @@ public class SafeProtocol implements TcpProtocol, ObjectSerializerAware
 
     private void propagateObjectSerializerIfNecessary(TcpProtocol protocol, ObjectSerializer objectSerializer)
     {
-        if (protocol instanceof ObjectSerializerAware)
+        if (protocol instanceof AbstractByteProtocol)
         {
-            ((ObjectSerializerAware) protocol).setObjectSerializer(objectSerializer);
+            ((AbstractByteProtocol) protocol).setObjectSerializer(objectSerializer);
         }
     }
 }
