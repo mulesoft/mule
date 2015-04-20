@@ -17,7 +17,7 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.6/mule-schemadoc.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/validation"
-                schemaLocation="http://www.mulesoft.org/schema/mule/validation/3.7/mule-extension-validation.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/validation/3.7/mule-validation.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
