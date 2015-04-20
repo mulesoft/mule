@@ -10,6 +10,7 @@ import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
 
+import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class HttpMessagePropertiesResolver
     private String remoteHostAddress;
     private ListenerPath listenerPath;
     private String scheme;
+    private Certificate clientCertificate;
 
     public HttpMessagePropertiesResolver setUri(String uri)
     {
@@ -59,6 +61,12 @@ public class HttpMessagePropertiesResolver
         return this;
     }
 
+    public HttpMessagePropertiesResolver setClientCertificate(Certificate clientCertificate)
+    {
+        this.clientCertificate = clientCertificate;
+        return this;
+    }
+
     public void addPropertiesTo(Map<String, Object> propertiesMap)
     {
         final String resolvedListenerPath = listenerPath.getResolvedPath();
@@ -76,6 +84,9 @@ public class HttpMessagePropertiesResolver
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, resolvedListenerPath);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH, listenerPath.getRelativePath(path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_SCHEME, scheme);
+        if (clientCertificate != null)
+        {
+            propertiesMap.put(HttpConstants.RequestProperties.HTTP_CLIENT_CERTIFICATE, clientCertificate);
+        }
     }
-
 }
