@@ -75,7 +75,7 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
 
     private String getXsdFileName(Extension extension)
     {
-        return String.format("mule-extension-%s%s", extension.getName(), SchemaConstants.XSD_EXTENSION);
+        return String.format("mule-%s%s", extension.getName(), SchemaConstants.XSD_EXTENSION);
     }
 
 
