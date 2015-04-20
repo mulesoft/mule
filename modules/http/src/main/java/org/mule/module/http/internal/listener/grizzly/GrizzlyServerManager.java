@@ -22,10 +22,13 @@ import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.concurrent.NamedThreadFactory;
 
 import java.io.IOException;
+import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -37,6 +40,7 @@ import org.glassfish.grizzly.http.KeepAlive;
 import org.glassfish.grizzly.nio.RoundRobinConnectionDistributor;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.glassfish.grizzly.ssl.SSLConnectionContext;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
@@ -242,15 +246,7 @@ public class GrizzlyServerManager implements HttpServerManager
                 serverConfig.setEnabledCipherSuites(enabledCipherSuites);
             }
             final SSLEngineConfigurator clientConfig = serverConfig.copy().setClientMode(true);
-            final SSLFilter sslBaseFilter = new SSLFilter(serverConfig, clientConfig) {
-                @Override
-                public NextAction handleRead(FilterChainContext ctx) throws IOException
-                {
-                    ctx.getAttributes().setAttribute(HTTPS.getScheme(), true);
-                    return super.handleRead(ctx);
-                }
-            };
-            return sslBaseFilter;
+            return new MuleSslFilter(serverConfig, clientConfig);
         }
         catch (Exception e)
         {
