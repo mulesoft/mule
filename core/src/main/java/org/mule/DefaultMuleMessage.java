@@ -63,6 +63,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,7 +120,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private transient AtomicReference<Thread> ownerThread = null;
     private transient AtomicBoolean mutable = null;
 
-    private MuleMessageDataTypeWrapper<?> dataType;
+    private DataType<?> dataType;
 
     static
     {
@@ -228,7 +230,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
         
-        MuleMessageDataTypeWrapper newDataType  = createDataTypeWrapper(dataType); 
+        DataType newDataType  = dataType.cloneDataType();
 
         if (message instanceof MuleMessage)
         {
@@ -259,18 +261,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         copyAttachments(previous);
 
         resetAccessControl();
-    }
-
-    private MuleMessageDataTypeWrapper<?> createDataTypeWrapper(DataType<?> dataType)
-    {
-        if (dataType instanceof MuleMessageDataTypeWrapper)
-        {
-            return new MuleMessageDataTypeWrapper<>(this, ((MuleMessageDataTypeWrapper) dataType).getDelegate());
-        }
-        else
-        {
-            return new MuleMessageDataTypeWrapper<>(this, dataType);
-        }
     }
 
     private void copyMessagePropertiesContext(MuleMessage muleMessage)
@@ -341,12 +331,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    private MuleMessageDataTypeWrapper<?> createDefaultDataType()
+    private DataType<?> createDefaultDataType()
     {
         DataType<?> dataType = DataTypeFactory.create(Object.class);
         dataType.setEncoding(SystemUtils.getDefaultEncoding(muleContext));
 
-        return createDataTypeWrapper(dataType);
+        return dataType;
     }
 
     public void setMuleContext(MuleContext context)
@@ -552,7 +542,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 properties.removeProperty(key);
             }
 
-            updateProperties(key, value);
+            updateDataTypeWithProperty(key, value);
         }
         else
         {
@@ -563,12 +553,29 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    private void updateProperties(String key, Object value)
+    private void updateDataTypeWithProperty(String key, Object value)
     {
         // updates dataType when encoding is updated using a property instead of using #setEncoding
         if (MuleProperties.MULE_ENCODING_PROPERTY.equals(key))
         {
-            dataType.getDelegate().setEncoding((String) value);
+            dataType.setEncoding((String) value);
+        }
+        else if (MuleProperties.CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
+        {
+            try
+            {
+                MimeType mimeType = new MimeType((String) value);
+                dataType.setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
+                String encoding = mimeType.getParameter("charset");
+                if (!StringUtils.isEmpty(encoding))
+                {
+                    dataType.setEncoding(encoding);
+                }
+            }
+            catch (MimeTypeParseException e)
+            {
+                throw new IllegalArgumentException("Invalid Content-Type property value", e);
+            }
         }
     }
 
@@ -635,7 +642,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 properties.removeProperty(key);
             }
 
-            updateProperties(key, value);
+            updateDataTypeWithProperty(key, value);
         }
         else
         {
@@ -1356,7 +1363,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public void addInboundProperties(Map<String, Object> props)
     {
-        properties.addInboundProperties(props);
+        addProperties(props, PropertyScope.INBOUND);
     }
 
     /**
@@ -1434,7 +1441,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             this.payload = payload;
         }
 
-        this.dataType = createDataTypeWrapper(dataType);
+        this.dataType = dataType.cloneDataType();
 
         cache = null;
     }
@@ -1629,7 +1636,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    private DataType<?> mergeDataType(MuleMessageDataTypeWrapper<?> original, DataType<?> transformed)
+    private DataType<?> mergeDataType(DataType<?> original, DataType<?> transformed)
     {
         String mimeType = transformed.getMimeType() == null || MimeTypes.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
         String encoding = transformed.getEncoding() == null ? original.getEncoding() : transformed.getEncoding();
@@ -1641,7 +1648,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     protected void setDataType(DataType<?> dt)
     {
-        dataType = createDataTypeWrapper(dt);
+        dataType = dt.cloneDataType();
 
         setEncoding(dt == null ? null : dt.getEncoding());
         setMimeType(dt == null ? null : dt.getMimeType());

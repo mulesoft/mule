@@ -6,9 +6,12 @@
  */
 package org.mule.transport.http.functional;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,15 +20,10 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 
 public class HttpOutboundHeadersPropagationTestCase extends HttpFunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
-    private static String TEST_JAPANESE_MESSAGE = "\u3042";
 
     public HttpOutboundHeadersPropagationTestCase(ConfigVariant variant, String configResources)
     {
@@ -55,7 +53,7 @@ public class HttpOutboundHeadersPropagationTestCase extends HttpFunctionalTestCa
         msgProps.put("custom-header", "value-custom-header");
         client.dispatch("vm://in", "HelloWorld!", msgProps);
 
-        MuleMessage reply = client.request("vm://out", 120000);
+        MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
         Map<String, Object> headers = (Map<String, Object>) reply.getPayload();
 
         for (String header : HttpConstants.REQUEST_HEADER_NAMES.values())

@@ -76,7 +76,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         assertSame(responseMessage, result.getMessage());
 
-        assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
+        assertEqualMessages(responseMessage, result.getMessage());
     }
 
     @Test
@@ -114,7 +114,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         assertSame(responseMessage, result.getMessage());
 
-        assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
+        assertEqualMessages(responseMessage, result.getMessage());
     }
 
     @Test
@@ -269,18 +269,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(endpoint, objectAware.endpoint);
     }
 
-    @Test
-    public void testTransaction()
-    {
-        // TODO
-    }
-
-    @Test
-    public void testExceptionHandling()
-    {
-        // TODO
-    }
-
     protected MuleEvent assertMessageSent(boolean sync) throws MuleException
     {
         MuleEvent event;
@@ -319,16 +307,16 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertNull(dispacher.sensedDispatchEvent);
     }
 
-    protected void assertMessageEqualEncodingPropertyAdded(MuleMessage expect, MuleMessage actual)
+    protected void assertEqualMessages(MuleMessage expect, MuleMessage actual)
     {
         assertEquals(expect.getPayload(), actual.getPayload());
         assertEquals(expect.getEncoding(), actual.getEncoding());
         assertEquals(expect.getUniqueId(), actual.getUniqueId());
         assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());
 
-        // Outbound endcodin property is added
-        assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
-                     actual.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
+        //// Outbound endcodin property is added
+        //assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
+        //             actual.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
 
     }
 

@@ -71,7 +71,7 @@
 				<add-message-property key="Content-Location" value="gzip"/>
 				<add-message-property key="Content-MD5" value="gzip"/>
 				<add-message-property key="Content-Range" value="gzip"/>
-				<add-message-property key="Content-Type" value="gzip"/>
+				<add-message-property key="Content-Type" value="application/gzip"/>
 				<add-message-property key="Expires" value="gzip"/>
 				<add-message-property key="Last-Modified" value="gzip"/>
 				
