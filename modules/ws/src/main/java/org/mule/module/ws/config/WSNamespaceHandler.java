@@ -26,6 +26,9 @@ import org.mule.module.ws.security.WssVerifySignatureSecurityStrategy;
  */
 public class WSNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
+    private static final String STRATEGY_PROPERTY = "strategy";
+
     public void init()
     {
         // Flow Constructs
@@ -33,11 +36,11 @@ public class WSNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("consumer-config", (OrphanDefinitionParser) new OrphanDefinitionParser(WSConsumerConfig.class, true).addReference("connectorConfig"));
         registerBeanDefinitionParser("consumer", new MessageProcessorDefinitionParser(WSConsumer.class));
         registerBeanDefinitionParser("security", new ChildDefinitionParser("security", WSSecurity.class));
-        registerBeanDefinitionParser("wss-username-token", new ChildDefinitionParser("strategy", WssUsernameTokenSecurityStrategy.class));
-        registerBeanDefinitionParser("wss-timestamp", new ChildDefinitionParser("strategy", WssTimestampSecurityStrategy.class));
-        registerBeanDefinitionParser("wss-sign", new ChildDefinitionParser("strategy", WssSignSecurityStrategy.class));
-        registerBeanDefinitionParser("wss-verify-signature", new ChildDefinitionParser("strategy", WssVerifySignatureSecurityStrategy.class));
-        registerBeanDefinitionParser("wss-encrypt", new ChildDefinitionParser("strategy", WssEncryptSecurityStrategy.class));
-        registerBeanDefinitionParser("wss-decrypt", new ChildDefinitionParser("strategy", WssDecryptSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-username-token", new ChildDefinitionParser(STRATEGY_PROPERTY, WssUsernameTokenSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-timestamp", new ChildDefinitionParser(STRATEGY_PROPERTY, WssTimestampSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-sign", new ChildDefinitionParser(STRATEGY_PROPERTY, WssSignSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-verify-signature", new ChildDefinitionParser(STRATEGY_PROPERTY, WssVerifySignatureSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-encrypt", new ChildDefinitionParser(STRATEGY_PROPERTY, WssEncryptSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-decrypt", new ChildDefinitionParser(STRATEGY_PROPERTY, WssDecryptSecurityStrategy.class));
     }
 }
