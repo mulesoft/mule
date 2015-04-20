@@ -13,6 +13,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
 
 import java.text.MessageFormat;
@@ -48,7 +49,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
         else
         {
             Object value = valueEvaluator.resolveValue(message);
-            if (value == null)
+            if (value == null || value instanceof NullPayload)
             {
                 message.removeProperty(key, getScope());
 
