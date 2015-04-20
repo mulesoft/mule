@@ -36,7 +36,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
             byte[] serializedSession = Base64.decode(serializedEncodedSession);            
             if (serializedSession != null)
             {
-                session = message.getMuleContext().getObjectSerializer().deserialize(serializedSession, message.getMuleContext().getExecutionClassLoader());
+                session = deserialize(message, serializedSession);
             }
         }
         return session;
@@ -46,7 +46,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {        
         session = removeNonSerializableProperties(session, message.getMuleContext());
-        byte[] serializedSession = message.getMuleContext().getObjectSerializer().serialize(session);
+        byte[] serializedSession = serialize(message, session);
 
         String serializedEncodedSession;
         try

@@ -11,7 +11,6 @@ import org.mule.ResponseOutputStream;
 import org.mule.api.MuleMessage;
 import org.mule.api.serialization.DefaultObjectSerializer;
 import org.mule.api.serialization.ObjectSerializer;
-import org.mule.api.serialization.ObjectSerializerAware;
 import org.mule.transport.tcp.TcpProtocol;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
@@ -41,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * will, via {@link #write(java.io.OutputStream, Object)}, dispatch to
  * {@link #writeByteArray(java.io.OutputStream, byte[])}.</p>.
  */
-public abstract class AbstractByteProtocol implements TcpProtocol, ObjectSerializerAware
+public abstract class AbstractByteProtocol implements TcpProtocol
 {
     private static final Logger logger = LoggerFactory.getLogger(DirectProtocol.class);
     private static final long PAUSE_PERIOD = 100;
@@ -241,7 +240,6 @@ public abstract class AbstractByteProtocol implements TcpProtocol, ObjectSeriali
         this.rethrowExceptionOnRead = rethrowExceptionOnRead;
     }
 
-    @Override
     @Inject
     @DefaultObjectSerializer
     public void setObjectSerializer(ObjectSerializer objectSerializer)

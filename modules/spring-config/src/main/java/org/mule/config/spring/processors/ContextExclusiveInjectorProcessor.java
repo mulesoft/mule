@@ -6,6 +6,8 @@
  */
 package org.mule.config.spring.processors;
 
+import org.mule.api.Injector;
+
 import java.beans.PropertyDescriptor;
 
 import org.springframework.beans.PropertyValues;
@@ -30,9 +32,16 @@ public final class ContextExclusiveInjectorProcessor extends SelectiveInjectorPr
         this.applicationContext = applicationContext;
     }
 
+    /**
+     * Only returns {@code true} if {@code beanName} is a key currently registered
+     * in the {@link #applicationContext} or if {@code beanName} equals
+     * the {@code bean} classname, which in spring jargon means that
+     * we're injecting a non registered object (most likely through
+     * {@link Injector#inject(Object)}
+     */
     @Override
     protected boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
     {
-        return applicationContext.containsBean(beanName);
+        return applicationContext.containsBean(beanName) || beanName.equals(bean.getClass().getName());
     }
 }
