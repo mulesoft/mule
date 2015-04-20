@@ -12,7 +12,10 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
+import static org.mule.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
+
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.request.ClientConnection;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.listener.RequestHandlerProvider;
@@ -22,6 +25,8 @@ import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+
+import javax.net.ssl.SSLSession;
 
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -73,7 +78,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         }
 
         final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(ctx, httpContent);
-        HttpRequestContext requestContext = new HttpRequestContext(httpRequest, (InetSocketAddress) ctx.getConnection().getPeerAddress(), scheme);
+        HttpRequestContext requestContext = createRequestContext(ctx, scheme, httpRequest);
         final RequestHandler requestHandler = requestHandlerProvider.getRequestHandler(ip, port, httpRequest);
         requestHandler.handleRequest(requestContext, new HttpResponseReadyCallback()
         {
@@ -99,4 +104,20 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         });
         return ctx.getSuspendAction();
     }
+
+    private HttpRequestContext createRequestContext(FilterChainContext ctx, String scheme, GrizzlyHttpRequestAdapter httpRequest)
+    {
+        ClientConnection clientConnection;
+        SSLSession sslSession = (SSLSession) ctx.getAttributes().getAttribute(SSL_SESSION_ATTRIBUTE_KEY);
+        if (sslSession != null)
+        {
+            clientConnection = new ClientConnection(sslSession, (InetSocketAddress) ctx.getConnection().getPeerAddress());
+        }
+        else
+        {
+            clientConnection = new ClientConnection((InetSocketAddress) ctx.getConnection().getPeerAddress());
+        }
+        return new HttpRequestContext(httpRequest, clientConnection, scheme);
+    }
+
 }

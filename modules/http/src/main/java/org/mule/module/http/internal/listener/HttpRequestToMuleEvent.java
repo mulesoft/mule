@@ -64,6 +64,7 @@ public class HttpRequestToMuleEvent
                 .setListenerPath(listenerPath)
                 .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
                 .setScheme(requestContext.getScheme())
+                .setClientCertificate(requestContext.getClientConnection().getClientCertificate())
                 .addPropertiesTo(inboundProperties);
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
@@ -116,6 +117,7 @@ public class HttpRequestToMuleEvent
                 payload = inputStreamEntity.getInputStream();
             }
         }
+
         final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
         return new DefaultMuleEvent(defaultMuleMessage, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
     }
@@ -124,6 +126,6 @@ public class HttpRequestToMuleEvent
     {
         return StringUtils.defaultIfEmpty(
                 requestContext.getRequest().getHeaderValue(HttpHeaders.Names.X_FORWARDED_FOR),
-                requestContext.getRemoteHostAddress().toString());
+                requestContext.getClientConnection().getRemoteHostAddress().toString());
     }
 }

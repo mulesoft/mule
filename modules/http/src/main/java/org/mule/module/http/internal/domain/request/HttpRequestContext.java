@@ -6,22 +6,20 @@
  */
 package org.mule.module.http.internal.domain.request;
 
-import java.net.InetSocketAddress;
-
 /**
  * Holds the input from an http request.
  */
 public class HttpRequestContext
 {
 
-    private final InetSocketAddress remoteHostAddress;
+    private final ClientConnection clientConnection;
     private HttpRequest request;
     private String scheme;
 
-    public HttpRequestContext(HttpRequest httpRequest, InetSocketAddress remoteHostAddress, String scheme)
+    public HttpRequestContext(HttpRequest httpRequest, ClientConnection clientConnection, String scheme)
     {
         this.request = httpRequest;
-        this.remoteHostAddress = remoteHostAddress;
+        this.clientConnection = clientConnection;
         this.scheme = scheme;
     }
 
@@ -34,11 +32,11 @@ public class HttpRequestContext
     }
 
     /**
-     * @return the host address from the client
+     * @return client connection descriptor
      */
-    public InetSocketAddress getRemoteHostAddress()
+    public ClientConnection getClientConnection()
     {
-        return remoteHostAddress;
+        return clientConnection;
     }
 
     /**
