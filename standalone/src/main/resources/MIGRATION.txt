@@ -116,6 +116,7 @@ MULE-7990: A new API for object serialization has been added through the ObjectS
 
         // returns a named object serializer
         muleContext.getRegistry().get("mySerializer")
+MULE-8510: setting a message property/variable with the message's payload when it is NullPayload will remove the given property/variable instead of storing NullPayload.
 
 Migration changes from 3.5.x to 3.6.x
 
