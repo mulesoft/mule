@@ -21,7 +21,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -57,7 +56,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.context.notification.OptimisedNotificationHandler;
+import org.mule.context.notification.NotificationHelper;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AbstractRedeliveryPolicy;
@@ -222,7 +221,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * notifications.
      */
     private boolean dynamicNotification = false;
-    private ServerNotificationHandler cachedNotificationHandler;
+    private NotificationHelper notificationHelper;
 
     private final List<String> supportedProtocols;
 
@@ -1488,7 +1487,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public void fireNotification(ServerNotification notification)
     {
-        cachedNotificationHandler.fireNotification(notification);
+        notificationHelper.fireNotification(notification);
     }
 
     @Override
@@ -1832,21 +1831,13 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         if (null != muleContext)
         {
-            if (dynamicNotification)
-            {
-                cachedNotificationHandler = muleContext.getNotificationManager();
-            }
-            else
-            {
-                cachedNotificationHandler = new OptimisedNotificationHandler(
-                        muleContext.getNotificationManager(), EndpointMessageNotification.class);
-            }
+            notificationHelper = new NotificationHelper(muleContext.getNotificationManager(), EndpointMessageNotification.class, dynamicNotification);
         }
     }
 
     public boolean isEnableMessageEvents()
     {
-        return cachedNotificationHandler.isNotificationEnabled(EndpointMessageNotification.class);
+        return notificationHelper.isNotificationEnabled();
     }
 
     /**
