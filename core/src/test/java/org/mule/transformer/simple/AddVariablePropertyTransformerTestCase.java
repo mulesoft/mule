@@ -13,6 +13,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -25,6 +26,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.MimeTypes;
+import org.mule.transport.NullPayload;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -82,8 +84,8 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
         addVariableTransformer.setEncoding(null);
         addVariableTransformer.setMimeType(null);
 
-        Mockito.when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-        Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleMessage.class))).thenAnswer(
+        when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+        when(mockExpressionManager.parse(anyString(), Mockito.any(MuleMessage.class))).thenAnswer(
             new Answer<String>()
             {
                 @Override
@@ -93,7 +95,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
                     return (String) invocation.getArguments()[0];
                 }
             });
-        Mockito.when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(EXPRESSION_VALUE);
+        when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(EXPRESSION_VALUE);
         addVariableTransformer.setMuleContext(mockMuleContext);
     }
 
@@ -179,7 +181,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
         addVariableTransformer.setValue(PLAIN_STRING_VALUE);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
-        Mockito.verify(mockMessage, VerificationModeFactory.times(0)).setProperty((String) isNull(), anyString(),
+        verify(mockMessage, VerificationModeFactory.times(0)).setProperty((String) isNull(), anyString(),
             Matchers.<PropertyScope> anyObject());
     }
 
@@ -191,7 +193,20 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
         addVariableTransformer.setValue(NULL_EXPRESSION);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
-        Mockito.verify(mockMessage, VerificationModeFactory.times(1)).removeProperty(PLAIN_STRING_KEY, scope);
+        verify(mockMessage, VerificationModeFactory.times(1)).removeProperty(PLAIN_STRING_KEY, scope);
     }
 
+    @Test
+    public void testAddVariableWithNullPayloadExpressionValueResult()
+            throws InitialisationException, TransformerException
+    {
+        addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
+        addVariableTransformer.setValue(EXPRESSION);
+        when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(NullPayload.getInstance());
+        addVariableTransformer.initialise();
+
+        addVariableTransformer.transform(mockMessage, ENCODING);
+
+        verify(mockMessage, VerificationModeFactory.times(1)).removeProperty(PLAIN_STRING_KEY, scope);
+    }
 }

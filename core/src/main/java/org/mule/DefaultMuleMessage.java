@@ -539,17 +539,17 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         assertAccess(WRITE);
         if (key != null)
         {
-            if (value != null)
-            {
-                properties.setProperty(key, value, scope, dataType);
-            }
-            else
+            if (value == null || value instanceof NullPayload)
             {
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("setProperty(key, value) called with null value; removing key: " + key);
                 }
                 properties.removeProperty(key);
+            }
+            else
+            {
+                properties.setProperty(key, value, scope, dataType);
             }
 
             updateProperties(key, value);
