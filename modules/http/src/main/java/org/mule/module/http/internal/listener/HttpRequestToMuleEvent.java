@@ -124,19 +124,19 @@ public class HttpRequestToMuleEvent
         final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
         return new DefaultMuleEvent(
                 defaultMuleMessage,
-                resolveUri(requestContext, listenerPath),
+                resolveUri(requestContext),
                 MessageExchangePattern.REQUEST_RESPONSE,
                 flowConstruct,
                 new DefaultMuleSession());
     }
 
-    private static URI resolveUri(final HttpRequestContext requestContext, final ListenerPath listenerPath)
+    private static URI resolveUri(final HttpRequestContext requestContext)
     {
         URIBuilder uriBuilder = new URIBuilder();
         uriBuilder.setProtocol(requestContext.getScheme());
         uriBuilder.setHost(requestContext.getRequest().getHeaderValue("host"));
-        uriBuilder.setPath(listenerPath.getResolvedPath());
-        return URI.create(uriBuilder.toString());
+        uriBuilder.setPath(requestContext.getRequest().getPath());
+        return uriBuilder.getEndpoint().getUri();
     }
 
     private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)
