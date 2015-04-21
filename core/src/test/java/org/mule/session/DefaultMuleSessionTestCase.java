@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
@@ -166,7 +167,7 @@ public class DefaultMuleSessionTestCase
     @Test
     public void serialization() throws MuleException
     {
-        Flow flow = new Flow("flow", Mockito.mock(MuleContext.class));
+        Flow flow = new Flow("flow", Mockito.mock(MuleContext.class, RETURNS_DEEP_STUBS));
         DefaultMuleSession before = new DefaultMuleSession();
         before.setValid(false);
         before.setSecurityContext(createTestAuthentication());

@@ -9,12 +9,6 @@ package org.mule.construct;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -24,12 +18,19 @@ import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
 @RunWith(MockitoJUnitRunner.class)
 public class FlowValidationTestCase extends AbstractMuleTestCase
 {
 
     public static final String FLOW_NAME = "flowName";
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     public MuleContext mockMuleContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     public InboundEndpoint inboundEndpoint;
@@ -42,6 +43,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase
     @Before
     public void setUp()
     {
+        when(mockMuleContext.getConfiguration().getDefaultProcessingStrategy()).thenReturn(null);
         this.flow = new Flow(FLOW_NAME, mockMuleContext);
     }
 

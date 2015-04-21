@@ -1387,6 +1387,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="defaultProcessingStrategy" type="flowProcessingStrategyType" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default processing strategy to use in all flows which don't specify otherwise
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2434,6 +2441,68 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+
+    <xsd:simpleType name="flowProcessingStrategyType">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of a globally configured processing strategy
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="default">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This processing strategy uses the 'queued-asynchronous' strategy where possible, but if an event is synchronous it processes it synchronously rather than failing.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="synchronous">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Processes all message processors in the calling thread.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="asynchronous">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Uses a thread pool to process the pipeline of message processors asynchronously.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="queued-asynchronous">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Decouples the recieving of a new message from it's processing using a queue.
+                                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="thread-per-processor">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                EXPERIMENTAL: Uses a thread pool to process each message processors asynchronously. (each processor has it's own thread pool currently)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="queued-thread-per-processor">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                EXPERIMENTAL:  Decouples the processing of each message processor using a queue.
+                                The queue is polled and use a thread pool to process each message processor asynchronously. (each processor has it's own thread pool currently)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
     <xsd:complexType name="flowType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
@@ -2475,74 +2544,16 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                 <xsd:attribute name="processingStrategy" use="optional" default="default">
+                 <xsd:attribute name="processingStrategy" use="optional" type="flowProcessingStrategyType">
                     <xsd:annotation>
                         <xsd:documentation>
                             Strategy used to process the configured message processors when exchange pattern is 'one-way'.  
-                            This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a gloablly defined strategy.
+                            This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a globally defined strategy.
+                            If not specified, it will be taken from the defaultProcessingStrategy attribute of the &lt;configuration&gt; element. If that one
+                            is not defined either, then the mule.default.processing.strategy system property will be checked. If that's not setup
+                            either, then the value 'default' will be used
                         </xsd:documentation>
                     </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:union>
-                            <xsd:simpleType>
-                                <xsd:restriction base="xsd:string">
-                                    <xsd:annotation>
-                                        <xsd:documentation>
-                                            The name of a globally configured processing strategy
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:restriction>
-                            </xsd:simpleType>
-                            <xsd:simpleType>
-                                <xsd:restriction base="xsd:NMTOKEN">
-                                    <xsd:enumeration value="default">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                This processing strategy uses the 'queued-asynchronous' strategy where possible, but if an event is synchronous it processes it synchronously rather than failing.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="synchronous">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Processes all message processors in the calling thread.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="asynchronous">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Uses a thread pool to process the pipeline of message processors asynchronously.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="queued-asynchronous">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Decouples the recieving of a new message from it's processing using a queue. 
-                                                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="thread-per-processor">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                EXPERIMENTAL: Uses a thread pool to process each message processors asynchronously. (each processor has it's own thread pool currently)
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="queued-thread-per-processor">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                EXPERIMENTAL:  Decouples the processing of each message processor using a queue. 
-                                                The queue is polled and use a thread pool to process each message processor asynchronously. (each processor has it's own thread pool currently)
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                </xsd:restriction>
-                            </xsd:simpleType>
-                        </xsd:union>
-                    </xsd:simpleType>
                 </xsd:attribute>
                 <xsd:attribute name="initialState" default="started">
                     <xsd:annotation>

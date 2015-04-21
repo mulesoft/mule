@@ -11,6 +11,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleConfiguration;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -68,7 +70,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     public AbstractPipeline(String name, MuleContext muleContext)
     {
         super(name, muleContext);
-        processingStrategy = new SynchronousProcessingStrategy();
     }
 
     /**
@@ -89,6 +90,34 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         configureMessageProcessors(builder);
         configurePostProcessors(builder);
         return builder.build();
+    }
+
+    /**
+     * A fallback method for creating a {@link ProcessingStrategy} to
+     * be used in case the user hasn't specified one through either
+     * {@link #setProcessingStrategy(ProcessingStrategy)},
+     * through {@link MuleConfiguration#getDefaultProcessingStrategy()}
+     * or the {@link MuleProperties#MULE_DEFAULT_PROCESSING_STRATEGY}
+     * system property
+     *
+     * @return a {@link SynchronousProcessingStrategy}
+     */
+    protected ProcessingStrategy createDefaultProcessingStrategy()
+    {
+        return new SynchronousProcessingStrategy();
+    }
+
+    protected void initialiseProcessingStrategy()
+    {
+        if (processingStrategy == null)
+        {
+            processingStrategy = muleContext.getConfiguration().getDefaultProcessingStrategy();
+
+            if (processingStrategy == null)
+            {
+                processingStrategy = createDefaultProcessingStrategy();
+            }
+        }
     }
 
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
@@ -194,6 +223,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     {
         super.doInitialise();
 
+        initialiseProcessingStrategy();
+
         pipeline = createPipeline();
 
         if (messageSource != null)
@@ -220,14 +251,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         getProcessingStrategy().configureProcessors(getMessageProcessors(),
-                new StageNameSource()
-                {
-                    @Override
-                    public String getName()
-                    {
-                        return AbstractPipeline.this.getName();
-                    }
-                }, builder, muleContext);
+                                                    new StageNameSource()
+                                                    {
+                                                        @Override
+                                                        public String getName()
+                                                        {
+                                                            return AbstractPipeline.this.getName();
+                                                        }
+                                                    }, builder, muleContext);
     }
 
     @Override
