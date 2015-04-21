@@ -68,7 +68,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     public AbstractPipeline(String name, MuleContext muleContext)
     {
         super(name, muleContext);
-        processingStrategy = new SynchronousProcessingStrategy();
     }
 
     /**
@@ -89,6 +88,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         configureMessageProcessors(builder);
         configurePostProcessors(builder);
         return builder.build();
+    }
+
+    protected ProcessingStrategy createDefaultProcessingStrategy()
+    {
+        return new SynchronousProcessingStrategy();
+    }
+
+    protected void initialiseProcessingStrategy()
+    {
+        if (processingStrategy == null)
+        {
+            processingStrategy = muleContext.getConfiguration().getDefaultProcessingStrategy();
+
+            if (processingStrategy == null)
+            {
+                processingStrategy = createDefaultProcessingStrategy();
+            }
+        }
     }
 
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
@@ -194,6 +211,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     {
         super.doInitialise();
 
+        initialiseProcessingStrategy();
+
         pipeline = createPipeline();
 
         if (messageSource != null)
@@ -220,14 +239,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         getProcessingStrategy().configureProcessors(getMessageProcessors(),
-                new StageNameSource()
-                {
-                    @Override
-                    public String getName()
-                    {
-                        return AbstractPipeline.this.getName();
-                    }
-                }, builder, muleContext);
+                                                    new StageNameSource()
+                                                    {
+                                                        @Override
+                                                        public String getName()
+                                                        {
+                                                            return AbstractPipeline.this.getName();
+                                                        }
+                                                    }, builder, muleContext);
     }
 
     @Override

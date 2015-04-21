@@ -11,17 +11,21 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.config.spring.util.ProcessingStrategyUtils;
 import org.mule.serialization.internal.JavaObjectSerializer;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
@@ -73,6 +77,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setEnricherPropagatesSessionVariableChanges(config.isEnricherPropagatesSessionVariableChanges());
             defaultConfig.setExtensions(config.getExtensions());
 
+            determineDefaultProcessingStrategy(defaultConfig);
             validateDefaultExceptionStrategy();
             applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
@@ -81,6 +86,22 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         else
         {
             throw new ConfigurationException(MessageFactory.createStaticMessage("Unable to set properties on read-only MuleConfiguration: " + configuration.getClass()));
+        }
+    }
+
+    private void determineDefaultProcessingStrategy(DefaultMuleConfiguration defaultConfig)
+    {
+        if (config.getDefaultProcessingStrategy() != null)
+        {
+            defaultConfig.setDefaultProcessingStrategy(config.getDefaultProcessingStrategy());
+        }
+        else
+        {
+            String processingStrategyFromSystemProperty = System.getProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY);
+            if (!StringUtils.isBlank(processingStrategyFromSystemProperty))
+            {
+                defaultConfig.setDefaultProcessingStrategy(ProcessingStrategyUtils.parseProcessingStrategy(processingStrategyFromSystemProperty));
+            }
         }
     }
 
@@ -178,6 +199,11 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setDefaultObjectSerializer(ObjectSerializer objectSerializer)
     {
         config.setDefaultObjectSerializer(objectSerializer);
+    }
+
+    public void setDefaultProcessingStrategy(ProcessingStrategy processingStrategy)
+    {
+        config.setDefaultProcessingStrategy(processingStrategy);
     }
 
     public void setExtensions(List<Object> extensions)

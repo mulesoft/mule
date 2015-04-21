@@ -7,7 +7,9 @@
 package org.mule.api.config;
 
 import org.mule.api.MuleContext;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.serialization.ObjectSerializer;
+import org.mule.construct.Flow;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
@@ -106,5 +108,14 @@ public interface MuleConfiguration
      * @since 3.7.0
      */
     ObjectSerializer getDefaultObjectSerializer();
+
+    /**
+     * The default {@link ProcessingStrategy} to be used by
+     * all {@link Flow}s which doesn't specify otherwise
+     *
+     * @return a {@link ProcessingStrategy}
+     * @since 3.7.0
+     */
+    ProcessingStrategy getDefaultProcessingStrategy();
 
 }

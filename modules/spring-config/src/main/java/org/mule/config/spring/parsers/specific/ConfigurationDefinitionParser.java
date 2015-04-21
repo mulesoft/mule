@@ -6,9 +6,11 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import static org.mule.config.spring.util.ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.config.spring.util.ProcessingStrategyUtils;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -45,6 +47,8 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser
     {
         parseExceptionStrategy(element, builder);
         parseObjectSerializer(element, builder);
+        ProcessingStrategyUtils.configureProcessingStrategy(element, builder, DEFAULT_PROCESSING_STRATEGY);
+
         super.doParse(element,context,builder);
     }
 
