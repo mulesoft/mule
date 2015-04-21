@@ -117,6 +117,8 @@ MULE-7990: A new API for object serialization has been added through the ObjectS
         // returns a named object serializer
         muleContext.getRegistry().get("mySerializer")
 MULE-8510: setting a message property/variable with the message's payload when it is NullPayload will remove the given property/variable instead of storing NullPayload.
+MULE-8483: MULE_ENCODING and Content-Type properties are not added on the outbound scope when message encoding or mimeType are updated. This was done in order to maintain consistency on MuleMessage data type and properties.
+           In case any of these properties is needed, use <set-property> indicating the expected value.
 
 Migration changes from 3.5.x to 3.6.x
 
