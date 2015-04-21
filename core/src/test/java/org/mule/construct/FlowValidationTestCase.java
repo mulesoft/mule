@@ -12,9 +12,13 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.MessageSource;
+import org.mule.api.source.NonBlockingMessageSource;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -52,6 +56,34 @@ public class FlowValidationTestCase extends AbstractMuleTestCase
     {
         configureFlowForRedelivery();
         flow.setProcessingStrategy(new AsynchronousProcessingStrategy());
+        flow.validateConstruct();
+    }
+
+    @Test
+    public void testProcessingStrategyNonBlockingSupported() throws Exception
+    {
+        flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+        flow.setMessageSource(new NonBlockingMessageSource()
+        {
+            @Override
+            public void setListener(MessageProcessor listener)
+            {
+            }
+        });
+        flow.validateConstruct();
+    }
+
+    @Test(expected = FlowConstructInvalidException.class)
+    public void testProcessingStrategyNonBlockingNotSupported() throws Exception
+    {
+        flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+        flow.setMessageSource(new MessageSource()
+        {
+            @Override
+            public void setListener(MessageProcessor listener)
+            {
+            }
+        });
         flow.validateConstruct();
     }
 

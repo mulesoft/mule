@@ -9,6 +9,7 @@ package org.mule.config.spring.util;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
@@ -26,6 +27,7 @@ public class ProcessingStrategyUtils
 
     public static String DEFAULT_PROCESSING_STRATEGY = "default";
     public static String SYNC_PROCESSING_STRATEGY = "synchronous";
+    public static String NON_BLOCKING_PROCESSING_STRATEGY = "non-blocking";
     public static String ASYNC_PROCESSING_STRATEGY = "asynchronous";
     public static String QUEUED_ASYNC_PROCESSING_STRATEGY = "queued-asynchronous";
     public static String THREAD_PER_PROCESSOR_PROCESSING_STRATEGY = "thread-per-processor";
@@ -58,6 +60,10 @@ public class ProcessingStrategyUtils
         else if (SYNC_PROCESSING_STRATEGY.equals(processingStrategy))
         {
             return new SynchronousProcessingStrategy();
+        }
+        else if (NON_BLOCKING_PROCESSING_STRATEGY.equals(processingStrategy))
+        {
+            builder.addPropertyValue(PROCESSING_STRATEGY_ATTRIBUTE_NAME, new NonBlockingProcessingStrategy());
         }
         else if (ASYNC_PROCESSING_STRATEGY.equals(processingStrategy))
         {

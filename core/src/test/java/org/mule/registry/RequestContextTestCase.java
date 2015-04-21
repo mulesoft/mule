@@ -412,6 +412,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public void setEnableNotifications(boolean enabled)
         {
         }
+
+        @Override
+        public boolean isAllowNonBlocking()
+        {
+            return false;
+        }
     }
 
 }
