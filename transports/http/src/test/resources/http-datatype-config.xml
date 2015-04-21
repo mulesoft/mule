@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+
+    <flow name="fromMessage">
+        <vm:inbound-endpoint path="testInput" exchange-pattern="one-way"/>
+
+        <http:outbound-endpoint address="http://localhost:${httpPort}"/>
+    </flow>
+
+    <flow name="fromEndpointContentType">
+        <http:inbound-endpoint address="http://localhost:${httpPort}"/>
+
+        <flow-ref name="setProperties"/>
+        <vm:outbound-endpoint path="testOutput"/>
+    </flow>
+
+    <sub-flow name="setProperties">
+        <set-property propertyName="encoding" value="#[message.getDataType().encoding]"/>
+        <set-property propertyName="mimeType" value="#[message.getDataType().mimeType]"/>
+    </sub-flow>
+</mule>

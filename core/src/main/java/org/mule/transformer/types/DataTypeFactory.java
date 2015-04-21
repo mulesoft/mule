@@ -7,7 +7,6 @@
 package org.mule.transformer.types;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.DataType;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
@@ -125,15 +124,8 @@ public class DataTypeFactory
         String mime = null;
         if (value instanceof MuleMessage)
         {
-            //TODO better mime handling, see MULE-4639
-            //case insensitive
             MuleMessage mm = (MuleMessage) value;
-            mime = mm.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY);
-            if (mime == null)
-            {
-                //case insensitive
-                mime = mm.getInboundProperty("ContentType");
-            }
+            mm.getDataType().getMimeType();
         }
         else if (value instanceof DataHandler)
         {

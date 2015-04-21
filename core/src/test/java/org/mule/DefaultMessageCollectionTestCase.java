@@ -120,6 +120,7 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
         DefaultMessageCollection original = mock(DefaultMessageCollection.class);
         MuleMessage message = mock(MuleMessage.class);
         DataType dataType = mock(DataType.class);
+        when(dataType.cloneDataType()).thenReturn(dataType);
         when(message.getDataType()).thenReturn(dataType);
         when(original.getMessagesAsArray()).thenReturn(new MuleMessage[] {message});
 

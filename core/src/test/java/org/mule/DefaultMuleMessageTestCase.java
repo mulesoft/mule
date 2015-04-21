@@ -14,7 +14,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -212,8 +211,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 
         MuleMessage copy = new DefaultMuleMessage(original);
         assertInboundAndOutboundMessageProperties(copy);
-        assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
-                     copy.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
+        assertEquals(muleContext.getConfiguration().getDefaultEncoding(), copy.getEncoding());
         
         // Mutate original
         original.setProperty("FOO", "OTHER", PropertyScope.OUTBOUND);
