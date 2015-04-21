@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,7 +22,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 
-public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProcessor implements Lifecycle, FlowConstructAware
+public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMessageProcessor implements Lifecycle, FlowConstructAware
 {
 
     protected MessageProcessor responseProcessor;
@@ -44,6 +45,12 @@ public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProc
     }
 
     @Override
+    protected MuleEvent processRequest(MuleEvent event) throws MuleException
+    {
+        return event;
+    }
+
+    @Override
     protected MuleEvent processResponse(MuleEvent event) throws MuleException
     {
         if (responseProcessor == null || !isEventValid(event))
@@ -52,7 +59,7 @@ public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProc
         }
         else
         {
-            MuleEvent copy = (MuleEvent) ((ThreadSafeAccess) event).newThreadCopy();
+            MuleEvent copy = OptimizedRequestContext.criticalSetEvent(event);
             MuleEvent result = responseProcessor.process(event);
             if (result == null || VoidMuleEvent.getInstance().equals(result))
             {

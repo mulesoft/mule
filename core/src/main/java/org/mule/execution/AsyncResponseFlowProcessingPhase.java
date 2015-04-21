@@ -8,11 +8,16 @@ package org.mule.execution;
 
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
+
 import org.mule.DefaultMuleEvent;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.transport.ErrorHandlingNonBlockingResponseReplyToHandler;
+import org.mule.api.CompletionHandler;
 import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.context.notification.NotificationHelper;
 import org.mule.context.notification.ServerNotificationManager;
@@ -60,12 +65,46 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                     {
                         MuleEvent muleEvent = template.getMuleEvent();
                         fireNotification(muleEvent, MESSAGE_RECEIVED);
-                        muleEvent = template.routeEvent(muleEvent);
-                        return muleEvent;
+                        if (muleEvent.isAllowNonBlocking())
+                        {
+                            muleEvent = new DefaultMuleEvent(muleEvent, new ErrorHandlingNonBlockingResponseReplyToHandler(new CompletionHandler<MuleEvent, MessagingException>()
+                            {
+                                @Override
+                                public void onCompletion(MuleEvent event)
+                                {
+                                    try
+                                    {
+                                        fireNotification(event, MESSAGE_RESPONSE);
+                                        template.sendResponseToClient(event, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
+                                    }
+                                    catch (MuleException e)
+                                    {
+                                        onFailure(new MessagingException(event, e));
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(MessagingException exception)
+                                {
+                                    try
+                                    {
+                                        template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback(phaseResultNotifier));
+                                    }
+                                    catch (MuleException e)
+                                    {
+                                        phaseResultNotifier.phaseFailure(e);
+                                    }
+                                }
+                            }, messageProcessContext.getFlowConstruct().getExceptionListener()));
+                        }
+                        return template.routeEvent(muleEvent);
                     }
                 });
-                fireNotification(response, MESSAGE_RESPONSE);
-                template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
+                if (response != NonBlockingVoidMuleEvent.getInstance())
+                {
+                    fireNotification(response, MESSAGE_RESPONSE);
+                    template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
+                }
             }
             catch (final MessagingException e)
             {

@@ -6,6 +6,7 @@
  */
 package org.mule.construct;
 
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Lifecycle;
@@ -34,7 +35,7 @@ import java.util.List;
  * If more than one client tries to use the functionality the 2nd one will fail due to
  * pipeline ID verification.
  */
-public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessageProcessor implements DynamicPipeline
+public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessageProcessor implements DynamicPipeline, NonBlockingSupported
 {
 
     private String pipelineId;

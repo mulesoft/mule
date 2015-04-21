@@ -11,6 +11,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -131,6 +132,13 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
                 replyToEvent, endpoint, e);
         }
 
+    }
+
+    @Override
+    public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+    {
+       // DefaultReplyToHandler does not send a reply message when an exception errors, this is rather handled by
+       // using an exception strategy.
     }
 
     protected synchronized OutboundEndpoint getEndpoint(MuleEvent event, String endpointUri) throws MuleException
