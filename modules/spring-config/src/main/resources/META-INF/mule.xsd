@@ -1535,6 +1535,7 @@
             <xsd:enumeration value="SECURITY"/>
             <xsd:enumeration value="ASYNC-MESSAGE"/>
             <xsd:enumeration value="ENDPOINT-MESSAGE"/>
+            <xsd:enumeration value="CONNECTOR-MESSAGE"/>
             <xsd:enumeration value="COMPONENT-MESSAGE"/>
             <xsd:enumeration value="PIPELINE-MESSAGE"/>
             <xsd:enumeration value="MANAGEMENT"/>

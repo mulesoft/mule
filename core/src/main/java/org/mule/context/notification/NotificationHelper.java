@@ -26,9 +26,6 @@ public class NotificationHelper
 
     private Class<? extends ServerNotification> notificationClass;
 
-    private final boolean dynamicNotifications;
-    private boolean notificationEnabled;
-
     /**
      * Creates a new {@link org.mule.context.notification.NotificationHelper} that emits notifications of the specified
      * class over the passed {@link org.mule.api.context.notification.ServerNotificationHandler}.
@@ -41,19 +38,13 @@ public class NotificationHelper
      */
     public NotificationHelper(ServerNotificationHandler serverNotificationHandler, Class<? extends ServerNotification> notificationClass, boolean dynamicNotifications)
     {
-        this.dynamicNotifications = dynamicNotifications;
         this.notificationClass = notificationClass;
-        this.serverNotificationHandler = serverNotificationHandler;
-        if (!dynamicNotifications)
-        {
-            serverNotificationHandler = new OptimisedNotificationHandler(serverNotificationHandler, notificationClass);
-            notificationEnabled = serverNotificationHandler.isNotificationEnabled(notificationClass);
-        }
+        this.serverNotificationHandler = dynamicNotifications ? serverNotificationHandler : new OptimisedNotificationHandler(serverNotificationHandler, notificationClass);
     }
 
     public boolean isNotificationEnabled()
     {
-        return notificationEnabled || (dynamicNotifications && serverNotificationHandler.isNotificationEnabled(notificationClass));
+        return serverNotificationHandler.isNotificationEnabled(notificationClass);
     }
 
     public void fireNotification(MuleMessage message, String uri, FlowConstruct flowConstruct, int action)
