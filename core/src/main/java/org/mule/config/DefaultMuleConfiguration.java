@@ -13,8 +13,10 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.Flow;
 import org.mule.util.FileUtils;
 import org.mule.util.NetworkUtils;
 import org.mule.util.NumberUtils;
@@ -185,6 +187,14 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      * @since 3.7.0
      */
     private ObjectSerializer defaultObjectSerializer;
+
+    /**
+     * The default {@link ProcessingStrategy} to be used by all
+     * {@link Flow}s which doesn't specify otherwise
+     *
+     * @since 3.7.0
+     */
+    private ProcessingStrategy defaultProcessingStrategy;
 
     public DefaultMuleConfiguration()
     {
@@ -738,6 +748,20 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public ObjectSerializer getDefaultObjectSerializer()
     {
         return defaultObjectSerializer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ProcessingStrategy getDefaultProcessingStrategy()
+    {
+        return defaultProcessingStrategy;
+    }
+
+    public void setDefaultProcessingStrategy(ProcessingStrategy defaultProcessingStrategy)
+    {
+        this.defaultProcessingStrategy = defaultProcessingStrategy;
     }
 
     public void setDefaultObjectSerializer(ObjectSerializer defaultObjectSerializer)
