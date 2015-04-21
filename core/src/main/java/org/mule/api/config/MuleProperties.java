@@ -198,6 +198,7 @@ public class MuleProperties
     public static final String MULE_STREAMING_BUFFER_SIZE = SYSTEM_PROPERTY_PREFIX + "streaming.bufferSize";
     public static final String MULE_SIMPLE_LOG = SYSTEM_PROPERTY_PREFIX + "simpleLog";
     public static final String MULE_FORCE_CONSOLE_LOG = SYSTEM_PROPERTY_PREFIX + "forceConsoleLog";
+    public static final String MULE_DEFAULT_PROCESSING_STRATEGY = SYSTEM_PROPERTY_PREFIX + "default.processing.strategy";
 
     /**
      * Property to enable compatibility with components build with Devkit versions prior to 3.6.2

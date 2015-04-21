@@ -9,6 +9,7 @@ package org.mule.config.spring.editors;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.construct.SimpleService.Type;
 import org.mule.endpoint.URIBuilder;
@@ -51,6 +52,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
             new MessageExchangePatternPropertyEditor());
         registry.registerCustomEditor(Type.class, new SimpleServiceTypePropertyEditor());
         registry.registerCustomEditor(Date.class, new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), new SimpleDateFormat("yyyy-MM-dd"), true));
+        registry.registerCustomEditor(ProcessingStrategy.class, new ProcessingStrategyEditor());
 
         if (customPropertyEditorsCache == null)
         {

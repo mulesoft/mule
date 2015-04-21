@@ -59,8 +59,8 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
-        processingStrategy = new DefaultFlowProcessingStrategy();
         this.sequentialStageNameSource = new SequentialStageNameSource(name);
+        initialiseProcessingStrategy();
     }
 
     @Override
@@ -129,6 +129,12 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     {
         builder.chain(new AsyncReplyToPropertyRequestReplyReplier());
         super.configurePostProcessors(builder);
+    }
+
+    @Override
+    protected ProcessingStrategy createDefaultProcessingStrategy()
+    {
+        return new DefaultFlowProcessingStrategy();
     }
 
     /**
