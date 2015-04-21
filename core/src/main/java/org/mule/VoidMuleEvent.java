@@ -40,7 +40,12 @@ public class VoidMuleEvent implements MuleEvent
         return instance;
     }
 
-    private VoidMuleEvent()
+    public static boolean isVoid(MuleEvent event)
+    {
+        return event instanceof VoidMuleEvent;
+    }
+
+    protected VoidMuleEvent()
     {
         super();
     }

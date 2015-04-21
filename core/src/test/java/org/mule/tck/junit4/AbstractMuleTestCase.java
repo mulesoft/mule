@@ -55,6 +55,11 @@ public abstract class AbstractMuleTestCase
     public static final String TEST_TIMEOUT_SYSTEM_PROPERTY = "mule.test.timeoutSecs";
 
     /**
+     * Default timeout for waiting for responses
+     */
+    public static final int RECEIVE_TIMEOUT = 5000;
+
+    /**
      * Indicates whether the text boxes will be logged when starting each test case.
      */
     private static final boolean verbose;

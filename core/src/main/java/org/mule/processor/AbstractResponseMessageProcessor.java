@@ -6,15 +6,53 @@
  */
 package org.mule.processor;
 
+import org.mule.api.NonBlockingSupported;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.NonBlockingResponseReplyToHandler;
+import org.mule.processor.chain.DefaultMessageProcessorChain;
 
-public abstract class AbstractResponseMessageProcessor extends AbstractInterceptingMessageProcessor
+/**
+ * Asbtract implementation of a {@link org.mule.api.processor.MessageProcessor} that performs processing during the
+ * response procesing phase.  Non-blocking processing is supported by implementors seperating the response processing
+ * into a seperate {@link org.mule.api.processor.MessageProcessor} returned by {@link #getResponseProcessor()}.
+ */
+public abstract class AbstractResponseMessageProcessor extends AbstractInterceptingMessageProcessor implements
+        NonBlockingSupported
 {
+
+    private DefaultMessageProcessorChain chain;
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        return processResponse(processNext(event));
+        if (event.getReplyToHandler() != null && event.getReplyToHandler() instanceof NonBlockingResponseReplyToHandler)
+        {
+            ((NonBlockingResponseReplyToHandler) event.getReplyToHandler()).addResponseMessageProcessor
+                    (getResponseProcessor());
+        }
+        MuleEvent result = processNext(event);
+        if (result != null && !VoidMuleEvent.isVoid(result))
+        {
+            return getResponseProcessor().process(result);
+        }
+        else
+        {
+            return result;
+        }
+    }
+
+    protected MessageProcessor getResponseProcessor()
+    {
+        return new MessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return processResponse(event);
+            }
+        };
     }
 
     protected abstract MuleEvent processResponse(MuleEvent processNext) throws MuleException;

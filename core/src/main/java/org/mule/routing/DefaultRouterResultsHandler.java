@@ -76,7 +76,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             {
                 return null;
             }
-            else if (event instanceof VoidMuleEvent)
+            else if (VoidMuleEvent.isVoid(event))
             {
                 return event;
             }
