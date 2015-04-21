@@ -40,7 +40,7 @@ public class VoidMuleEvent implements MuleEvent
         return instance;
     }
 
-    private VoidMuleEvent()
+    protected VoidMuleEvent()
     {
         super();
     }
@@ -334,4 +334,9 @@ public class VoidMuleEvent implements MuleEvent
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean isAllowNonBlocking()
+    {
+        throw new UnsupportedOperationException();
+    }
 }
