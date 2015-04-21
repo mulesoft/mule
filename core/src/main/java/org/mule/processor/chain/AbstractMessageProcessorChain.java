@@ -12,6 +12,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
@@ -26,6 +27,7 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.endpoint.EndpointAware;
+import org.mule.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.util.NotificationUtils;
 import org.mule.util.StringUtils;
 
@@ -41,13 +43,14 @@ import org.apache.commons.logging.LogFactory;
  * this chain is nested in another chain the next MessageProcessor in the parent chain is not injected into
  * the first in the nested chain.
  */
-public abstract class AbstractMessageProcessorChain
+public abstract class AbstractMessageProcessorChain extends AbstractNonBlockingMessageProcessor
         implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer, MessagingExceptionHandlerAware
 {
 
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
     protected List<MessageProcessor> processors;
+    protected FlowConstruct flowConstruct;
 
     public AbstractMessageProcessorChain(String name, List<MessageProcessor> processors)
     {
@@ -55,7 +58,7 @@ public abstract class AbstractMessageProcessorChain
         this.processors = processors;
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public MuleEvent processBlocking(MuleEvent event) throws MuleException
     {
         if (log.isDebugEnabled())
         {
@@ -67,7 +70,6 @@ public abstract class AbstractMessageProcessorChain
         }
 
         return  doProcess(event);
-
     }
 
     protected abstract MuleEvent doProcess(MuleEvent event) throws MuleException;
@@ -229,5 +231,17 @@ public abstract class AbstractMessageProcessorChain
                 ((MuleContextAware) processor).setMuleContext(context);
             }
         }
+    }
+
+    @Override
+    public boolean isNonBlocking(MuleEvent event)
+    {
+        return false;
+    }
+
+    @Override
+    protected void processNonBlocking(MuleEvent event, NonBlockingCompletionHandler completionHandler) throws MuleException
+    {
+        processBlocking(event);
     }
 }

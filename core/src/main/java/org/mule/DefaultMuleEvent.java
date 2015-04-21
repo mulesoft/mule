@@ -15,6 +15,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
@@ -23,7 +24,9 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.Flow;
 import org.mule.management.stats.ProcessingTime;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
@@ -83,7 +86,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     /** Mutable MuleEvent state **/
     private boolean stopFurtherProcessing = false;
     private int timeout = TIMEOUT_NOT_SET_VALUE;
-    private transient ResponseOutputStream outputStream;
+    private transient OutputStream outputStream;
     private final ProcessingTime processingTime;
     private Object replyToDestination;
 
@@ -116,6 +119,17 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this(message, exchangePattern, flowConstruct, new DefaultMuleSession(), message.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, null);
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            MessageExchangePattern exchangePattern,
+                            ReplyToHandler replyToHandler,
+                            FlowConstruct flowConstruct)
+    {
+        this(message, URI.create("none"), exchangePattern, flowConstruct, new DefaultMuleSession(), message
+                .getMuleContext()
+                .getConfiguration()
+                .getDefaultResponseTimeout(), null, null, replyToHandler);
     }
 
     /**
@@ -189,7 +203,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             MuleSession session,
                             int timeout,
                             Credentials credentials,
-                            ResponseOutputStream outputStream)
+                            ResponseOutputStream outputStream,
+                            ReplyToHandler replyToHandler)
     {
         this.id = generateEventId(message.getMuleContext());
         this.flowConstruct = flowConstruct;
@@ -203,11 +218,23 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.messageSourceName = messageSourceURI.toString();
         this.messageSourceURI = messageSourceURI;
         this.processingTime = ProcessingTime.newInstance(this);
-        this.replyToHandler = null;
+        this.replyToHandler = replyToHandler;
         this.replyToDestination = null;
         this.timeout = timeout;
         this.transacted = false;
         this.synchronous = resolveEventSynchronicity();
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
+                            MuleSession session,
+                            int timeout,
+                            Credentials credentials,
+                            ResponseOutputStream outputStream)
+    {
+        this(message,messageSourceURI,exchangePattern,flowConstruct,session,timeout,credentials,outputStream, null);
     }
 
     // Constructors for inbound endpoint
@@ -272,6 +299,16 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             rewriteEvent.isSynchronous());
     }
 
+    /**
+     * Copy constructor used when ReplyToHandler instance needs switching out
+     * @param rewriteEvent
+     * @param replyToHandler
+     */
+    public DefaultMuleEvent(MuleEvent rewriteEvent, ReplyToHandler replyToHandler)
+    {
+        this(rewriteEvent, rewriteEvent.getFlowConstruct(), replyToHandler, null);
+    }
+
     public DefaultMuleEvent(MuleEvent rewriteEvent, FlowConstruct flowConstruct, ReplyToHandler replyToHandler, Object replyToDestination)
     {
         this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),
@@ -287,6 +324,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus, shareFlowVars);
     }
+
 
     /**
      * A helper constructor used to rewrite an event payload
@@ -336,7 +374,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.exchangePattern = rewriteEvent.getExchangePattern();
         this.messageSourceName = rewriteEvent.getMessageSourceName();
         this.messageSourceURI = rewriteEvent.getMessageSourceURI();
-        this.outputStream = (ResponseOutputStream) rewriteEvent.getOutputStream();
+        this.outputStream = rewriteEvent.getOutputStream();
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
@@ -400,16 +438,35 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     protected boolean resolveEventSynchronicity()
     {
-        boolean syncProcessingStrategy = false;
+        return transacted
+               || isSynchronousProcessingStrategy()
+               || exchangePattern.hasResponse() && !isNonBlockingProcessingStrategy()
+               || message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
+                                      PropertyScope.INBOUND, Boolean.FALSE);
+    }
+
+    private boolean isSynchronousProcessingStrategy()
+    {
         if (flowConstruct != null && flowConstruct instanceof ProcessingDescriptor)
         {
-            syncProcessingStrategy = ((ProcessingDescriptor) flowConstruct).isSynchronous();
+            return ((ProcessingDescriptor) flowConstruct).isSynchronous();
         }
-        
-        return transacted
-               || exchangePattern.hasResponse()
-               || message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
-                   PropertyScope.INBOUND, Boolean.FALSE) || syncProcessingStrategy;
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean isNonBlockingProcessingStrategy()
+    {
+        if (flowConstruct != null && flowConstruct instanceof Pipeline)
+        {
+            return ((Pipeline) flowConstruct).getProcessingStrategy() instanceof NonBlockingProcessingStrategy;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     protected void fillProperties(InboundEndpoint endpoint)

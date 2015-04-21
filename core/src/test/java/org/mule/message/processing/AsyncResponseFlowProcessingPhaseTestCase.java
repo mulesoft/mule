@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -26,8 +27,12 @@ import org.mule.execution.PhaseResultNotifier;
 import org.mule.execution.ResponseCompletionCallback;
 import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ValidationPhase;
+import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.concurrent.Latch;
+
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -123,6 +128,28 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     }
 
     @Test
+    public void runPhaseWithSuccessfulFlowProcessingNonBlocking() throws Exception
+    {
+        final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
+        when(mockMuleEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+        when(mockMuleEvent.isSynchronous()).thenReturn(false);
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenAnswer(new Answer<MuleEvent>()
+        {
+            @Override
+            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
+            {
+                return sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]);
+            }
+        });
+
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
+        sensingMessageProcessor.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        verify(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
+        verifyOnlySuccessfulWasCalled();
+    }
+
+    @Test
     public void sendResponseWhenFlowExecutionFailsAndExceptionIsHandled() throws MuleException
     {
         when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
@@ -133,11 +160,42 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     }
 
     @Test
+    public void sendResponseWhenFlowExecutionFailsAndExceptionIsHandledNonBlocking() throws Exception
+    {
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+        when(mockMessagingException.handled()).thenReturn(true);
+
+        final Latch latch = new Latch();
+        when(mockMuleEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+        when(mockMuleEvent.isSynchronous()).thenReturn(false);
+
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
+        verify(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
+        verifyOnlySuccessfulWasCalled();
+    }
+
+    @Test
     public void sendFailureResponseWhenFlowExecutionFailsAndExceptionIsNotHandled() throws MuleException
     {
         when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
         when(mockMessagingException.handled()).thenReturn(false);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
+        verify(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(ResponseCompletionCallback.class));
+        verifyOnlySuccessfulWasCalled();
+    }
+
+    @Test
+    public void sendFailureResponseWhenFlowExecutionFailsAndExceptionIsNotHandledNonBlocking() throws Exception
+    {
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+        when(mockMessagingException.handled()).thenReturn(false);
+
+        when(mockMuleEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+        when(mockMuleEvent.isSynchronous()).thenReturn(false);
+
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
         verify(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(ResponseCompletionCallback.class));
         verifyOnlySuccessfulWasCalled();
     }
@@ -162,6 +220,39 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     }
 
     @Test
+    public void callExceptionHandlerWhenSuccessfulExecutionFailsWritingResponseNonBlocking() throws Exception
+    {
+        final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
+                callback.responseSentWithFailure(mockException, mockMuleEvent);
+                return null;
+            }
+        }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
+        when(mockMuleEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+        when(mockMuleEvent.isSynchronous()).thenReturn(false);
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenAnswer(new Answer<MuleEvent>()
+        {
+            @Override
+            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
+            {
+                return sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]);
+            }
+        });
+
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
+        sensingMessageProcessor.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
+        verify(mockMuleEvent).resetAccessControl();
+        verifyOnlySuccessfulWasCalled();
+    }
+
+    @Test
     public void doNotCallExceptionHandlerWhenFailureExecutionFailsWritingResponse() throws Exception
     {
         doAnswer(new Answer()
@@ -176,6 +267,30 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         }).when(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(ResponseCompletionCallback.class));
         when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
+        verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
+        verifyOnlyFailureWasCalled(mockException);
+    }
+
+    @Test
+    public void doNotCallExceptionHandlerWhenFailureExecutionFailsWritingResponseNonBlocking() throws Exception
+    {
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
+                callback.responseSentWithFailure(mockException, ((MessagingException)invocationOnMock.getArguments()[0]).getEvent());
+                return null;
+            }
+        }).when(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any
+                (ResponseCompletionCallback.class));
+        when(mockMuleEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+        when(mockMuleEvent.isSynchronous()).thenReturn(false);
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
         verifyOnlyFailureWasCalled(mockException);
     }

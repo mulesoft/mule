@@ -2478,7 +2478,7 @@
                  <xsd:attribute name="processingStrategy" use="optional" default="default">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.  
+                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.
                             This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a gloablly defined strategy.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -2505,7 +2505,15 @@
                                     <xsd:enumeration value="synchronous">
                                         <xsd:annotation>
                                             <xsd:documentation>
-                                                Processes all message processors in the calling thread.
+                                                Processes all message processors in the calling thread, waiting for any IO operations (e.g. http request) before continueing processing.  This is also known as 'blocking'.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
+                                    <xsd:enumeration value="non-blocking">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                Processes message processors in the calling thread but releasing calling thread in the case of IO operations that support non-blocking.  Once IO operations are complete the Flow processing contiusing in a selector thread.
+                                                NOTE: This processing strategy is only currently supported with a single 'HTTP Listener' message source.  Also your Flow must be non-blocking to take advantage of this processing strategy, see documentation for futher details.
                                             </xsd:documentation>
                                         </xsd:annotation>
                                     </xsd:enumeration>
@@ -2519,7 +2527,7 @@
                                     <xsd:enumeration value="queued-asynchronous">
                                         <xsd:annotation>
                                             <xsd:documentation>
-                                                Decouples the recieving of a new message from it's processing using a queue. 
+                                                Decouples the recieving of a new message from it's processing using a queue.
                                                 The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
                                             </xsd:documentation>
                                         </xsd:annotation>
@@ -2534,7 +2542,7 @@
                                     <xsd:enumeration value="queued-thread-per-processor">
                                         <xsd:annotation>
                                             <xsd:documentation>
-                                                EXPERIMENTAL:  Decouples the processing of each message processor using a queue. 
+                                                EXPERIMENTAL:  Decouples the processing of each message processor using a queue.
                                                 The queue is polled and use a thread pool to process each message processor asynchronously. (each processor has it's own thread pool currently)
                                             </xsd:documentation>
                                         </xsd:annotation>
@@ -2556,11 +2564,11 @@
                             <xsd:enumeration value="stopped"/>
                         </xsd:restriction>
                     </xsd:simpleType>
-                </xsd:attribute>                
+                </xsd:attribute>
            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <!--  Processing Strategies -->
     
     <xsd:element name="abstract-processing-strategy" type="processingStrategyType" abstract="true">

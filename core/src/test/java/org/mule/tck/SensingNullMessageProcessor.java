@@ -6,34 +6,53 @@
  */
 package org.mule.tck;
 
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
+import org.mule.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.util.ObjectUtils;
 import org.mule.util.concurrent.Latch;
 
-public class SensingNullMessageProcessor implements MessageProcessor
+import java.util.concurrent.Executors;
+
+public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProcessor implements MessageProcessor
 {
     public MuleEvent event;
     protected InternalMessageSource source = new InternalMessageSource();
     private long waitTime = 0;
     public Latch latch = new Latch();
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    @Override
+    protected void processNonBlocking(final MuleEvent event, NonBlockingCompletionHandler completionHandler) throws MuleException
     {
-        if (waitTime > 0)
+        sleepIfNeeded();
+        this.event = event;
+        Executors.newSingleThreadExecutor().execute(new Runnable()
         {
-            try
+            @Override
+            public void run()
             {
-                Thread.sleep(waitTime);
+                try
+                {
+                    event.getReplyToHandler().processReplyTo(event, null, null);
+                    latch.countDown();
+                }
+                catch (MuleException e)
+                {
+                    event.getReplyToHandler().processExceptionReplyTo(event, new MessagingException(event, e), null);
+                }
             }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
+        });
+    }
+
+    @Override
+    protected MuleEvent processBlocking(MuleEvent event) throws MuleException
+    {
+        sleepIfNeeded();
         this.event = event;
         latch.countDown();
         if (source.listener != null)
@@ -49,6 +68,21 @@ public class SensingNullMessageProcessor implements MessageProcessor
             else
             {
                 return VoidMuleEvent.getInstance();
+            }
+        }
+    }
+
+    private void sleepIfNeeded()
+    {
+        if (waitTime > 0)
+        {
+            try
+            {
+                Thread.sleep(waitTime);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
             }
         }
     }
