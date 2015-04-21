@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -20,8 +21,16 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessors;
+import org.mule.execution.MessageProcessorExecutionTemplate;
+import org.mule.processor.chain.ProcessorExecutorFactory;
 
-public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProcessor implements Lifecycle, FlowConstructAware
+import java.util.Collections;
+import java.util.List;
+
+public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMessageProcessor implements Lifecycle,
+        FlowConstructAware
 {
 
     protected MessageProcessor responseProcessor;
@@ -52,20 +61,26 @@ public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProc
         }
         else
         {
-            MuleEvent copy = (MuleEvent) ((ThreadSafeAccess) event).newThreadCopy();
-            MuleEvent result = responseProcessor.process(event);
-            if (result == null || VoidMuleEvent.getInstance().equals(result))
-            {
-                // If <response> returns null then it acts as an implicit branch like in flows, the different
-                // here is that what's next, it's not another message processor that follows this one in the
-                // configuration file but rather the response phase of the inbound endpoint, or optionally
-                // other response processing on the way back to the inbound endpoint.
-                return copy;
-            }
-            else
-            {
-                return result;
-            }
+            return new CopyOnNullNonBlockingProcessorExecutor(event, Collections.singletonList(responseProcessor),
+                                                              MessageProcessorExecutionTemplate
+                                                                      .createExecutionTemplate(), true).execute();
+        }
+    }
+
+    class CopyOnNullNonBlockingProcessorExecutor extends NonBlockingProcessorExecutor
+    {
+
+        public CopyOnNullNonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
+                                                      MessageProcessorExecutionTemplate executionTemplate, boolean
+                copyOnVoidEvent)
+        {
+            super(event, processors, executionTemplate, copyOnVoidEvent);
+        }
+
+        @Override
+        protected boolean isUseEventCopy(MuleEvent result)
+        {
+            return super.isUseEventCopy(result) || result == null;
         }
     }
 

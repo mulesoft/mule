@@ -10,9 +10,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
+import org.mule.api.source.NonBlockingMessageSource;
 import org.mule.util.ObjectUtils;
 
-public class TriggerableMessageSource implements MessageSource
+public class TriggerableMessageSource implements NonBlockingMessageSource
 {
     protected MessageProcessor listener;
 

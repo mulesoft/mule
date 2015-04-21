@@ -367,4 +367,11 @@ public interface MuleEvent extends Serializable
      * @param enabled
      */
     void setEnableNotifications(boolean enabled);
+
+    /**
+     * Indicates if the current event allows non-blocking execution and IO.
+     *
+     * @return true if non-blocking execution and IO is allowed. False otherwise.
+     */
+    boolean isAllowNonBlocking();
 }
