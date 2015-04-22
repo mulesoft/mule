@@ -9,10 +9,20 @@ package org.mule.module.launcher.log4j2;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.logging.TestAppender;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.async.AsyncLoggerConfig;
+import org.apache.logging.log4j.core.config.AppenderRef;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,6 +34,10 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
 {
 
     private static final String DEFAULT_CONTEXT_NAME = "Default";
+    private static final String MESSAGE = "Do you wanna build a snowman?";
+    private static final String CATEGORY = MuleLoggerContextTestCase.class.getName();
+    private static final String TEST_APPENDER = "testAppender";
+    private static final Level LEVEL = Level.ERROR;
 
     @Mock
     private ContextSelector contextSelector;
@@ -31,12 +45,69 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
     @Mock
     private MessageFactory messageFactory;
 
+    private MuleLoggerContext context;
+
+    @Before
+    public void before()
+    {
+        context = getDefaultContext();
+        Appender appender = new TestAppender(TEST_APPENDER, null, null);
+        context.getConfiguration().addAppender(appender);
+
+        LoggerConfig loggerConfig = AsyncLoggerConfig.createLogger("false",
+                                                                   LEVEL.name(),
+                                                                   CATEGORY,
+                                                                   "true",
+                                                                   new AppenderRef[] {AppenderRef.createAppenderRef(TEST_APPENDER, null, null)},
+                                                                   null,
+                                                                   context.getConfiguration(),
+                                                                   null);
+
+        loggerConfig.addAppender(appender, null, null);
+        loggerConfig.start();
+        context.getConfiguration().addLogger(CATEGORY, loggerConfig);
+        context.updateLoggers();
+    }
 
     @Test
     public void dispatchingLogger()
     {
-        MuleLoggerContext ctx = getDefaultContext();
-        assertThat(ctx.newInstance(ctx, "", messageFactory), instanceOf(DispatchingLogger.class));
+        assertThat(context.newInstance(context, "", messageFactory), instanceOf(DispatchingLogger.class));
+    }
+
+    @Test
+    public void reconfigureAsyncLoggers()
+    {
+        Logger logger = context.getLogger(CATEGORY);
+        logger.error(MESSAGE);
+
+        assertLogged();
+        TestAppender.clear();
+
+        context.updateLoggers(context.getConfiguration());
+        logger.error(MESSAGE);
+        assertLogged();
+    }
+
+    private void assertLogged()
+    {
+        PollingProber pollingProber = new PollingProber(5000, 500);
+        pollingProber.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                TestAppender.ensure(new TestAppender.Expectation(LEVEL.name(), CATEGORY, MESSAGE));
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "message was not logged";
+            }
+        });
+
     }
 
     private MuleLoggerContext getDefaultContext()

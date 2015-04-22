@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.pattern.core.config;
+package org.mule.tck.logging;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -26,15 +26,11 @@ import org.apache.logging.log4j.core.appender.AbstractAppender;
 public class TestAppender extends AbstractAppender
 {
 
-    private static ThreadLocal<Set<Expectation>> expectations = new ThreadLocal<>();
+    private static Set<Expectation> expectations = new HashSet<>();
 
     private static Set<Expectation> expectationsInstance()
     {
-        if (expectations.get() == null)
-        {
-            expectations.set(new HashSet<Expectation>());
-        }
-        return expectations.get();
+        return expectations;
     }
 
     public static void clear()

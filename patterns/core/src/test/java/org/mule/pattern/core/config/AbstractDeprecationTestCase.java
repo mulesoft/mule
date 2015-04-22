@@ -7,6 +7,7 @@
 package org.mule.pattern.core.config;
 
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.logging.TestAppender;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
