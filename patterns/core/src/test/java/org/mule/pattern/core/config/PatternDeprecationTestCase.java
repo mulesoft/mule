@@ -7,6 +7,7 @@
 package org.mule.pattern.core.config;
 
 import org.mule.config.spring.handlers.MuleNamespaceHandler;
+import org.mule.tck.logging.TestAppender;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.config.HttpNamespaceHandler;
 
@@ -28,6 +29,6 @@ public class PatternDeprecationTestCase extends AbstractDeprecationTestCase
         TestAppender.ensure(
                 new TestAppender.Expectation(Level.WARN.toString(), CorePatternNamespaceHandler.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE),
                 new TestAppender.Expectation(Level.WARN.toString(), HttpConnector.class.getName(), HttpNamespaceHandler.HTTP_TRANSPORT_DEPRECATION_MESSAGE)
-                );
+        );
     }
 }
