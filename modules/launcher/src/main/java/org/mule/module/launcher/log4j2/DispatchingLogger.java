@@ -7,11 +7,8 @@
 package org.mule.module.launcher.log4j2;
 
 import static org.mule.module.launcher.log4j2.MuleLoggerContext.NO_CCL_CLASSLOADER;
-import static org.reflections.ReflectionUtils.withName;
-import static org.reflections.ReflectionUtils.withParameters;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -27,7 +24,6 @@ import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
 import org.apache.logging.log4j.spi.ExtendedLogger;
-import org.reflections.ReflectionUtils;
 
 /**
  * Suppose that class X is used in applications Y and Z. If X
@@ -114,12 +110,16 @@ abstract class DispatchingLogger extends Logger
     {
         if (updateConfigurationMethod == null)
         {
-            Collection<Method> candidateMethods = ReflectionUtils.getAllMethods(originalLogger.getClass(), withName("updateConfiguration"), withParameters(Configuration.class));
-            if (candidateMethods.size() == 1)
+            try
             {
-                updateConfigurationMethod = candidateMethods.iterator().next();
-                updateConfigurationMethod.setAccessible(true);
+                updateConfigurationMethod = originalLogger.getClass().getDeclaredMethod("updateConfiguration", Configuration.class);
             }
+            catch (NoSuchMethodException e)
+            {
+                return false;
+            }
+
+            updateConfigurationMethod.setAccessible(true);
         }
 
         return updateConfigurationMethod != null;
