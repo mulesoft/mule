@@ -51,18 +51,23 @@ public class HttpRequestNtlmAuthTestCase extends AbstractHttpRequestTestCase
     @Parameterized.Parameter(1)
     public String domain;
 
+    @Parameterized.Parameter(2)
+    public String workstation;
+
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {"ntlmAuthRequestWithDomain", "Ursa-Minor"},
-                {"ntlmAuthRequestWithoutDomain", ""}});
+                {"ntlmAuthRequestWithDomain", "Ursa-Minor", null},
+                {"ntlmAuthRequestWithoutDomain", "", null},
+                {"ntlmAuthRequestWithWorkstation", "Ursa-Minor", "LightCity"}});
     }
 
     @Before
     public void setUp() throws Exception
     {
-        String type3Challenge = NTLMEngine.INSTANCE.generateType3Msg(USER, PASSWORD, domain, NetworkUtils.getLocalHost().getHostName(), TYPE_2_MESSAGE_CHALLENGE);
+        String ntlmHost = workstation != null ? workstation : NetworkUtils.getLocalHost().getHostName();
+        String type3Challenge = NTLMEngine.INSTANCE.generateType3Msg(USER, PASSWORD, domain, ntlmHost, TYPE_2_MESSAGE_CHALLENGE);
         type3Message = "NTLM " + type3Challenge;
     }
 

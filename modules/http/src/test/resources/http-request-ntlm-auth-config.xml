@@ -22,4 +22,12 @@
         <http:request config-ref="ntlmConfigWithoutDomain" path="" method="GET"/>
     </flow>
 
+    <http:request-config name="ntlmConfigWithWorkstation" host="localhost" port="${httpPort}">
+        <http:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor" workstation="LightCity"/>
+    </http:request-config>
+
+    <flow name="ntlmAuthRequestWithWorkstation">
+        <http:request config-ref="ntlmConfigWithWorkstation" path="" method="GET"/>
+    </flow>
+
 </mule>

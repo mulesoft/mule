@@ -228,7 +228,8 @@ public class GrizzlyHttpClient implements HttpClient
                 {
                     realmBuilder.setNtlmDomain(domain);
                 }
-                String ntlmHost = InetAddress.getLocalHost().getHostName();
+                String workstation = defaultHttpAuthentication.getWorkstation();
+                String ntlmHost = workstation != null ? workstation : InetAddress.getLocalHost().getHostName();
                 realmBuilder.setNtlmHost(ntlmHost).setScheme(Realm.AuthScheme.NTLM);
             }
 

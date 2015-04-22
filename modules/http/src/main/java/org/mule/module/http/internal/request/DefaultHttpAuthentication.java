@@ -18,6 +18,7 @@ public class DefaultHttpAuthentication implements HttpAuthentication
     private String username;
     private String password;
     private String domain;
+    private String workstation;
 
     public DefaultHttpAuthentication(HttpAuthenticationType type)
     {
@@ -57,6 +58,16 @@ public class DefaultHttpAuthentication implements HttpAuthentication
     public HttpAuthenticationType getType()
     {
         return type;
+    }
+
+    public String getWorkstation()
+    {
+        return workstation;
+    }
+
+    public void setWorkstation(String workstation)
+    {
+        this.workstation = workstation;
     }
 
     @Override
