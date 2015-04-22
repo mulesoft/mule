@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.request;
 
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -16,8 +18,11 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.ConnectorMessageNotification;
+import org.mule.context.notification.NotificationHelper;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.internal.HttpParser;
+import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.util.AttributeEvaluator;
@@ -61,6 +66,8 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
     private MuleEventToHttpRequest muleEventToHttpRequest;
     private HttpResponseToMuleEvent httpResponseToMuleEvent;
 
+    private NotificationHelper notificationHelper;
+
     @Override
     public void initialise() throws InitialisationException
     {
@@ -83,6 +90,8 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
 
         initializeAttributeEvaluators(host, port, method, path, basePath, url, followRedirects,
                                       requestStreamingMode, sendBodyMode, parseResponse, responseTimeout);
+
+        notificationHelper = new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false );
     }
 
     private void setEmptyAttributesFromConfig()  throws InitialisationException
@@ -182,8 +191,10 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
 
         try
         {
-            response = httpClient.send(builder.build(), resolveResponseTimeout(muleEvent),
-                                       followRedirects.resolveBooleanValue(muleEvent), authentication);
+            HttpRequest httpRequest = builder.build();
+            notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
+            response = httpClient.send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), authentication);
+            notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
         }
         catch (Exception e)
         {

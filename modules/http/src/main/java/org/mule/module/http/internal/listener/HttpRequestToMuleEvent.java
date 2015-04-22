@@ -13,6 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.endpoint.URIBuilder;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
@@ -22,12 +23,14 @@ import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import com.google.common.net.MediaType;
 
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
@@ -117,7 +120,21 @@ public class HttpRequestToMuleEvent
             }
         }
         final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
-        return new DefaultMuleEvent(defaultMuleMessage, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
+        return new DefaultMuleEvent(
+                defaultMuleMessage,
+                resolveUri(requestContext, listenerPath),
+                MessageExchangePattern.REQUEST_RESPONSE,
+                flowConstruct,
+                new DefaultMuleSession());
+    }
+
+    private static URI resolveUri(final HttpRequestContext requestContext, final ListenerPath listenerPath)
+    {
+        URIBuilder uriBuilder = new URIBuilder();
+        uriBuilder.setProtocol(requestContext.getScheme());
+        uriBuilder.setHost(requestContext.getRequest().getHeaderValue("host"));
+        uriBuilder.setPath(listenerPath.getResolvedPath());
+        return URI.create(uriBuilder.toString());
     }
 
     private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)

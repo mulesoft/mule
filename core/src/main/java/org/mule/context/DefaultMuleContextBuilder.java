@@ -283,6 +283,11 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected ServerNotificationManager createNotificationManager()
     {
+        return createDefaultNotificationManager();
+    }
+
+    public static ServerNotificationManager createDefaultNotificationManager()
+    {
         ServerNotificationManager manager = new ServerNotificationManager();
         manager.addInterfaceToType(MuleContextNotificationListener.class,
                                    MuleContextNotification.class);
