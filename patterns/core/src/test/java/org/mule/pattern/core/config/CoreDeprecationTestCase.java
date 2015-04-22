@@ -8,6 +8,7 @@ package org.mule.pattern.core.config;
 
 import org.mule.config.spring.handlers.MuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
+import org.mule.tck.logging.TestAppender;
 
 import org.apache.logging.log4j.Level;
 import org.junit.Test;
