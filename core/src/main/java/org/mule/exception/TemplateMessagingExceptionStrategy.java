@@ -47,7 +47,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             processOutboundRouterStatistics(flowConstruct);
             event = afterRouting(exception, event);
             markExceptionAsHandledIfRequired(exception);
-            if (event != null && !VoidMuleEvent.getInstance().equals(event))
+            if (event != null && !VoidMuleEvent.getInstance().equals(event)  && !event.getExchangePattern().hasResponse())
             {
                 processReplyTo(event, exception);
                 closeStream(event.getMessage());

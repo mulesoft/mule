@@ -30,6 +30,7 @@ import org.mule.api.processor.StageNameSource;
 import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
+import org.mule.api.source.NonBlockingMessageSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.context.notification.PipelineMessageNotification;
@@ -39,6 +40,7 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.util.NotificationUtils;
@@ -230,7 +232,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         if (messageSource != null)
         {
             // Wrap chain to decouple lifecycle
-            messageSource.setListener(new AbstractInterceptingMessageProcessor()
+            messageSource.setListener(new MessageProcessor()
             {
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
@@ -278,6 +280,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         {
             throw new FlowConstructInvalidException(
                     CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not compatible with an asynchronous processing strategy.  Either because it is request-response, has a transaction defined, or messaging redelivered is configured."),
+                    this);
+        }
+
+        if (processingStrategy instanceof NonBlockingProcessingStrategy && !(messageSource instanceof
+                NonBlockingMessageSource))
+        {
+            throw new FlowConstructInvalidException(
+                    CoreMessages.createStaticMessage("The non-blocking processing strategy currently only supports non-blocking messages sources"),
                     this);
         }
 
