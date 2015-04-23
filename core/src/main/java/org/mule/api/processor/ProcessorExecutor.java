@@ -8,6 +8,8 @@ import org.mule.api.MuleEvent;
  * of the first processor to invoke the second and so on.  MessageProcessor implementations aside from simply iterating
  * over processors implement rules regarding if and when iteration should stop early or even stop temporarily and be
  * continued later.
+ *
+ * @since 3.7
  */
 public interface ProcessorExecutor
 {

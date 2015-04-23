@@ -24,9 +24,10 @@ import org.mule.util.concurrent.ThreadNameHelper;
 import java.util.List;
 
 /**
- * This strategy uses a {@link javax.resource.spi.work.WorkManager} to schedule the processing of the pipeline of
- * message processors
- * in a single worker thread.
+ * This strategy allows Mule to use non-blocking execution model where possible and free up threads when performing IO
+ * operations.
+ *
+ * @since 3.7
  */
 public class NonBlockingProcessingStrategy extends SynchronousProcessingStrategy
 {

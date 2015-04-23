@@ -19,6 +19,8 @@ import org.mule.api.processor.MessageProcessor;
  *
  * Alternatively if the {@link org.mule.api.MuleEvent} is synchronous, then the response should be returned and the
  * {@link org.mule.api.transport.ReplyToHandler} not used.
+ *
+ * @since 3.7
  */
 public interface NonBlockingMessageProcessor extends MessageProcessor
 {

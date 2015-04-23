@@ -16,7 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.transport.ErrorHandlingNonBlockingResponseReplyToHandler;
+import org.mule.api.transport.ErrorHandlingCompletionHandlerReplyToHandlerAdaptor;
 import org.mule.api.CompletionHandler;
 import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.context.notification.NotificationHelper;
@@ -67,7 +67,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                         fireNotification(muleEvent, MESSAGE_RECEIVED);
                         if (muleEvent.isAllowNonBlocking())
                         {
-                            muleEvent = new DefaultMuleEvent(muleEvent, new ErrorHandlingNonBlockingResponseReplyToHandler(new CompletionHandler<MuleEvent, MessagingException>()
+                            muleEvent = new DefaultMuleEvent(muleEvent, new ErrorHandlingCompletionHandlerReplyToHandlerAdaptor(new CompletionHandler<MuleEvent, MessagingException>()
                             {
                                 @Override
                                 public void onCompletion(MuleEvent event)

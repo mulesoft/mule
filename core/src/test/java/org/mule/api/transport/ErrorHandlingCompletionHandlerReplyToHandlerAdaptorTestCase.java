@@ -14,18 +14,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.exception.ExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.tck.SensingNullCompletionHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -34,7 +30,7 @@ import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class ErrorHandlingNonBlockingResponseReplyToHandlerTestCase extends AbstractMuleTestCase
+public class ErrorHandlingCompletionHandlerReplyToHandlerAdaptorTestCase extends AbstractMuleTestCase
 {
 
     @Mock
@@ -48,8 +44,8 @@ public class ErrorHandlingNonBlockingResponseReplyToHandlerTestCase extends Abst
     public void handleException()
     {
         SensingNullCompletionHandler completionHandler = new SensingNullCompletionHandler();
-        ErrorHandlingNonBlockingResponseReplyToHandler replyToHandler = new
-                ErrorHandlingNonBlockingResponseReplyToHandler(completionHandler, messagingExceptionHandler);
+        ErrorHandlingCompletionHandlerReplyToHandlerAdaptor replyToHandler = new
+                ErrorHandlingCompletionHandlerReplyToHandlerAdaptor(completionHandler, messagingExceptionHandler);
         MessagingException messagingException = new MessagingException(sourceEvent, new RuntimeException());
 
         when(messagingExceptionHandler.handleException(messagingException, sourceEvent)).thenAnswer(new Answer<MuleEvent>()
@@ -73,8 +69,8 @@ public class ErrorHandlingNonBlockingResponseReplyToHandlerTestCase extends Abst
     public void handleExceptionAndMarkHandled()
     {
         SensingNullCompletionHandler completionHandler = new SensingNullCompletionHandler();
-        ErrorHandlingNonBlockingResponseReplyToHandler replyToHandler = new
-                ErrorHandlingNonBlockingResponseReplyToHandler(completionHandler, messagingExceptionHandler);
+        ErrorHandlingCompletionHandlerReplyToHandlerAdaptor replyToHandler = new
+                ErrorHandlingCompletionHandlerReplyToHandlerAdaptor(completionHandler, messagingExceptionHandler);
         MessagingException messagingException = new MessagingException(sourceEvent, new RuntimeException());
 
         when(messagingExceptionHandler.handleException(messagingException, sourceEvent)).thenAnswer(new Answer<MuleEvent>()

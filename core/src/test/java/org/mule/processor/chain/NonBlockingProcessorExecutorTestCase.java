@@ -14,8 +14,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.ProcessorExecutor;
-import org.mule.api.transport.NonBlockingResponseReplyToHandler;
-import org.mule.processor.BlockingProcessorExecutor;
+import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.processor.NonBlockingProcessorExecutor;
 import org.mule.tck.SensingNullCompletionHandler;
 
@@ -38,7 +37,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     public void before() throws MessagingException
     {
         super.before();
-        when(event.getReplyToHandler()).thenReturn(new NonBlockingResponseReplyToHandler(completionHandler));
+        when(event.getReplyToHandler()).thenReturn(new CompletionHandlerReplyToHandlerAdaptor(completionHandler));
     }
 
     @Test

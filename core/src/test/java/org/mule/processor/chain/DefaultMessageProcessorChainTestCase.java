@@ -44,7 +44,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.service.Service;
-import org.mule.api.transport.NonBlockingResponseReplyToHandler;
+import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.construct.Flow;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
@@ -69,7 +69,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.RandomStringUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -960,7 +959,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         if (nonBlocking && exchangePattern.hasResponse())
         {
             SensingNullCompletionHandler responseCallback = new SensingNullCompletionHandler();
-            event = new DefaultMuleEvent(event, new NonBlockingResponseReplyToHandler(responseCallback));
+            event = new DefaultMuleEvent(event, new CompletionHandlerReplyToHandlerAdaptor(responseCallback));
             result = messageProcessor.process(event);
             if (NonBlockingVoidMuleEvent.getInstance() == result)
             {
@@ -1066,7 +1065,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
         public MuleEvent process(final MuleEvent event) throws MuleException
         {
-            if (nonBlocking && exchangePattern.hasResponse() && !event.isSynchronous())
+            if (nonBlocking && event.isAllowNonBlocking())
             {
                 executor.execute(new Runnable()
                 {
@@ -1290,6 +1289,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
         when(event.getSession()).thenReturn(mock(MuleSession.class));
         when(event.isSynchronous()).thenReturn(synchronous);
+        when(event.isAllowNonBlocking()).thenReturn(!synchronous && exchangePattern.hasResponse());
         return event;
     }
 

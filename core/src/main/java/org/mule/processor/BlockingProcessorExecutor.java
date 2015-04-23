@@ -72,7 +72,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
         {
             MuleEvent copy = OptimizedRequestContext.criticalSetEvent(event);
             MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
-            if (VoidMuleEvent.getInstance().equals(result))
+            if (isUseEventCopy(result))
             {
                 result = copy;
             }
@@ -82,6 +82,11 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
         {
             return messageProcessorExecutionTemplate.execute(processor, event);
         }
+    }
+
+    protected boolean isUseEventCopy(MuleEvent result)
+    {
+        return VoidMuleEvent.getInstance().equals(result);
     }
 
     protected void preProcess(MessageProcessor processor)

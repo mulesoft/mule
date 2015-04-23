@@ -10,6 +10,8 @@ package org.mule;
  * A {@link NonBlockingVoidMuleEvent} represents a void return, but in contrast to {@link org.mule.VoidMuleEvent}
  * while the return up the stack is void, an asynchronous response is expected.  Because Mule supports both blocking and
  * non-blocking then it is the return of this event instance that signals that a callback is to be expected.
+ *
+ * @since 3.7
  */
 public class NonBlockingVoidMuleEvent extends VoidMuleEvent
 {

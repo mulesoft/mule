@@ -10,6 +10,8 @@ import org.mule.api.MessagingException;
 
 /**
  * A handler for handling the result of asynchronous processing.
+ *
+ * @since 3.7
  */
 public interface CompletionHandler<T, E>
 {

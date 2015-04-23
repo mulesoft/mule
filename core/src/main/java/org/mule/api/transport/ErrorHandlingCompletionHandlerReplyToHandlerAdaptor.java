@@ -12,15 +12,16 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.CompletionHandler;
 
 /**
- * Specialized version of {@link org.mule.api.transport.NonBlockingResponseReplyToHandler} that uses a {@link org.mule.api.MessagingException}
+ * Specialized version of {@link CompletionHandlerReplyToHandlerAdaptor} that uses a {@link org.mule.api.MessagingException}
  * to handle exceptions.
  */
-public class ErrorHandlingNonBlockingResponseReplyToHandler extends NonBlockingResponseReplyToHandler
+public class ErrorHandlingCompletionHandlerReplyToHandlerAdaptor extends CompletionHandlerReplyToHandlerAdaptor
 {
 
     final private MessagingExceptionHandler messagingExceptionHandler;
 
-    public ErrorHandlingNonBlockingResponseReplyToHandler(CompletionHandler completionHandler, MessagingExceptionHandler exceptionHandler)
+    public ErrorHandlingCompletionHandlerReplyToHandlerAdaptor(CompletionHandler completionHandler,
+                                                               MessagingExceptionHandler exceptionHandler)
     {
         super(completionHandler);
         this.messagingExceptionHandler = exceptionHandler;

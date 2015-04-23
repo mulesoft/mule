@@ -19,6 +19,8 @@ import org.mule.api.processor.MessageProcessor;
  * <p/>
  * Note: All standard {@link org.mule.api.processor.MessageProcessor}
  * implementations that aren't one of the two types mentioned above are implicitly supported.
+ *
+ * @since 3.7
  */
 public interface NonBlockingSupported
 {
