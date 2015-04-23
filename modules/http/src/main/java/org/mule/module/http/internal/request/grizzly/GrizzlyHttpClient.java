@@ -109,8 +109,14 @@ public class GrizzlyHttpClient implements HttpClient
             // This sets all the TLS configuration needed, except for the enabled protocols and cipher suites.
             builder.setSSLContext(sslContext);
             //These complete the set up
-            builder.setEnabledCipherSuites(tlsContextFactory.getEnabledCipherSuites());
-            builder.setEnabledProtocols(tlsContextFactory.getEnabledProtocols());
+            if (tlsContextFactory.getEnabledCipherSuites() != null)
+            {
+                builder.setEnabledCipherSuites(tlsContextFactory.getEnabledCipherSuites());
+            }
+            if (tlsContextFactory.getEnabledProtocols() != null)
+            {
+                builder.setEnabledProtocols(tlsContextFactory.getEnabledProtocols());
+            }
 
         }
     }
@@ -155,6 +161,7 @@ public class GrizzlyHttpClient implements HttpClient
         }
 
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, compositeTransportCustomizer);
+        //Grizzly now decompresses encoded responses, this flag maintains the previous behaviour
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.DECOMPRESS_RESPONSE, Boolean.FALSE);
         builder.setAsyncHttpClientProviderConfig(providerConfig);
     }

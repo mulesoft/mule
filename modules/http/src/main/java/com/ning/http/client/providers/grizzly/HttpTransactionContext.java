@@ -38,6 +38,8 @@ import org.glassfish.grizzly.websockets.ProtocolHandler;
 /**
  *
  * @author Grizzly team
+ *
+ * This is a modified version from the original file from AHC.
  */
 public final class HttpTransactionContext {
     private static final Attribute<HttpTransactionContext> REQUEST_STATE_ATTR =
