@@ -204,7 +204,7 @@ public class MuleProperties
      * Property to enable compatibility with components build with Devkit versions prior to 3.6.2
      * which make illegal use of the {@link Inject} annotation
      */
-    public static final String MULE_LEGACY_DEVKIT_COMPATIBILITY = SYSTEM_PROPERTY_PREFIX + "legacy.devkit.compatibility";
+    public static final String MULE_DEVKIT_PARTICIPATES_DI = SYSTEM_PROPERTY_PREFIX + "devkit.participates.di";
 
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
 }
