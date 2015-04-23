@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring;
 
-import static org.mule.api.config.MuleProperties.MULE_LEGACY_DEVKIT_COMPATIBILITY;
+import static org.mule.api.config.MuleProperties.MULE_DEVKIT_PARTICIPATES_DI;
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.COMMON_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -190,8 +190,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     protected void registerInjectorProcessor(BeanDefinitionRegistry registry)
     {
-        BackwardsCompatibilityPropertyChecker checker = new BackwardsCompatibilityPropertyChecker(MULE_LEGACY_DEVKIT_COMPATIBILITY);
-        Class<?> processorType = checker.isEnabled() ? LegacyDevkitCompatibleInjectorProcessor.class : AutowiredAnnotationBeanPostProcessor.class;
+        BackwardsCompatibilityPropertyChecker checker = new BackwardsCompatibilityPropertyChecker(MULE_DEVKIT_PARTICIPATES_DI);
+        Class<?> processorType = checker.isEnabled() ? AutowiredAnnotationBeanPostProcessor.class : LegacyDevkitCompatibleInjectorProcessor.class;
 
         registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, processorType, null);
     }

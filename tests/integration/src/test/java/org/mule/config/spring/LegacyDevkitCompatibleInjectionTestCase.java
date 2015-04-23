@@ -26,7 +26,7 @@ public class LegacyDevkitCompatibleInjectionTestCase extends FunctionalTestCase
 {
 
     @Rule
-    public SystemProperty legacyProperty = new SystemProperty(MuleProperties.MULE_LEGACY_DEVKIT_COMPATIBILITY, "true");
+    public SystemProperty legacyProperty = new SystemProperty(MuleProperties.MULE_DEVKIT_PARTICIPATES_DI, "false");
 
     @Override
     protected String[] getConfigFiles()
