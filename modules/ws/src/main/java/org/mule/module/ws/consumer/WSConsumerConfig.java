@@ -25,8 +25,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.internal.config.HttpConfiguration;
-import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.Preconditions;
@@ -42,7 +42,7 @@ public class WSConsumerConfig implements MuleContextAware
     private String port;
     private String serviceAddress;
     private Connector connector;
-    private DefaultHttpRequesterConfig connectorConfig;
+    private HttpRequesterConfig connectorConfig;
     private WSSecurity security;
 
     @Override
@@ -208,12 +208,12 @@ public class WSConsumerConfig implements MuleContextAware
         this.connector = connector;
     }
 
-    public DefaultHttpRequesterConfig getConnectorConfig()
+    public HttpRequesterConfig getConnectorConfig()
     {
         return connectorConfig;
     }
 
-    public void setConnectorConfig(DefaultHttpRequesterConfig connectorConfig)
+    public void setConnectorConfig(HttpRequesterConfig connectorConfig)
     {
         this.connectorConfig = connectorConfig;
     }
