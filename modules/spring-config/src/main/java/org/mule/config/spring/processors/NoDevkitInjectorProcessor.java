@@ -6,8 +6,6 @@
  */
 package org.mule.config.spring.processors;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleRuntimeException;
 import org.mule.util.ClassUtils;
 
 import java.beans.PropertyDescriptor;
@@ -27,14 +25,14 @@ import org.springframework.beans.PropertyValues;
  *
  * @since 3.7.0
  */
-public final class LegacyDevkitCompatibleInjectorProcessor extends SelectiveInjectorProcessor
+public final class NoDevkitInjectorProcessor extends SelectiveInjectorProcessor
 {
 
     private static final String PROCESS_ADAPTER_CLASS_NAME = "org.mule.api.devkit.ProcessAdapter";
 
-    private final Class<?> exclusionClass;
+    private Class<?> exclusionClass;
 
-    public LegacyDevkitCompatibleInjectorProcessor()
+    public NoDevkitInjectorProcessor()
     {
         try
         {
@@ -44,15 +42,13 @@ public final class LegacyDevkitCompatibleInjectorProcessor extends SelectiveInje
         }
         catch (ClassNotFoundException e)
         {
-            throw new MuleRuntimeException(
-                    createStaticMessage(String.format("Cannot start in Devkit legacy mode because %s class is not in classpath", PROCESS_ADAPTER_CLASS_NAME))
-                    , e);
+            exclusionClass = null;
         }
     }
 
     @Override
     protected boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
     {
-        return !exclusionClass.isInstance(bean);
+        return exclusionClass != null && !exclusionClass.isInstance(bean);
     }
 }
