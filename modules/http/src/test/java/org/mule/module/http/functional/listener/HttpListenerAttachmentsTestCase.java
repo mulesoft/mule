@@ -20,6 +20,7 @@ import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpParser;
+import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -129,7 +130,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
                 final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
                 assertThat(contentType, Matchers.containsString(expectedResponseContentType));
 
-                final Collection<Part> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
+                final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
                 assertThat(parts.size(), Is.is(2));
                 Map<String, Part> partsAsMap = convertPartsToMap(parts);
                 assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), IsNull.notNullValue());
@@ -179,7 +180,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
         return format("http://localhost:%s/%s", listenPort.getNumber(), pathToCall);
     }
 
-    private Map<String, Part> convertPartsToMap(Collection<Part> parts)
+    private Map<String, Part> convertPartsToMap(Collection<HttpPart> parts)
     {
         final Map<String, Part> partsAsMap = new HashMap<>();
         for (Part part : parts)

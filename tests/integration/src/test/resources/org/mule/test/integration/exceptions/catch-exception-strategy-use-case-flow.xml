@@ -23,9 +23,7 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <https:connector name="httpsConnector">
-        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
         <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
-        <https:tls-server path="trustStore" storePassword="mulepassword"/>
     </https:connector>
 
     <jms:activemq-connector name="activeMq"/>
@@ -62,7 +60,6 @@
             <json:object-to-json-transformer/>
         </catch-exception-strategy>
     </flow>
-
 
     <flow name="jmsContinueProcessingActualMessage">
         <jms:inbound-endpoint queue="in" exchange-pattern="request-response"/>
