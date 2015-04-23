@@ -11,13 +11,14 @@ import org.mule.tck.logging.TestAppender;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
 public class AbstractDeprecationTestCase extends FunctionalTestCase
 {
+
+    protected TestAppender testAppender;
 
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
@@ -26,9 +27,10 @@ public class AbstractDeprecationTestCase extends FunctionalTestCase
 
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
         LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
-        Appender appender = new TestAppender("testAppender", null, null);
-        context.getConfiguration().addAppender(appender);
-        rootLogger.addAppender(appender, Level.WARN, null);
+
+        testAppender = new TestAppender("testAppender", null, null);
+        context.getConfiguration().addAppender(testAppender);
+        rootLogger.addAppender(testAppender, Level.WARN, null);
 
         context.updateLoggers();
     }
