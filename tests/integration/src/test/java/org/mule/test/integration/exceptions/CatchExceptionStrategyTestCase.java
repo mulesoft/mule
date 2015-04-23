@@ -17,7 +17,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.ssl.DefaultTlsContextFactory;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -29,6 +31,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -47,6 +50,8 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
+    private DefaultTlsContextFactory tlsContextFactory;
+
     public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -57,6 +62,16 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     {
         return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-service.xml"},
                 {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml"}});
+    }
+
+    @Before
+    public void setup() throws IOException
+    {
+        tlsContextFactory = new DefaultTlsContextFactory();
+
+        // Configure trust store in the client with the certificate of the server.
+        tlsContextFactory.setTrustStorePath("trustStore");
+        tlsContextFactory.setTrustStorePassword("mulepassword");
     }
 
     @Test
@@ -86,13 +101,13 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Test
     public void testTcpJsonErrorResponse() throws Exception
     {
-        testJsonErrorResponse(String.format("tcp://localhost:%s",dynamicPort2.getNumber()));
+        testJsonErrorResponse(String.format("tcp://localhost:%s", dynamicPort2.getNumber()));
     }
 
     private void testJsonErrorResponse(String endpointUri) throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).responseTimeout(TIMEOUT).build();
+        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).responseTimeout(TIMEOUT).build();
         MuleMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions);
         assertThat(response, IsNull.<Object>notNullValue());
         // compare the structure and values but not the attributes' order

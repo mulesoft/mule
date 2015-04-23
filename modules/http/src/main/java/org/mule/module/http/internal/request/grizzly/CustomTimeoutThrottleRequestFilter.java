@@ -48,7 +48,7 @@ public class CustomTimeoutThrottleRequestFilter implements RequestFilter
             {
                 logger.debug("Current Throttling Status {}", available.availablePermits());
             }
-            if (!available.tryAcquire(ctx.getRequest().getPerRequestConfig().getRequestTimeoutInMs(), MILLISECONDS))
+            if (!available.tryAcquire(ctx.getRequest().getRequestTimeout(), MILLISECONDS))
             {
                 throw new FilterException(
                         String.format("No slot available for processing Request %s with AsyncHandler %s",
