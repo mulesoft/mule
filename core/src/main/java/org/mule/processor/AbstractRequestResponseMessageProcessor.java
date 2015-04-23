@@ -137,6 +137,9 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     }
 
     /**
+     * Use to perform post processing after both request and response phased have been processed both in the case of a
+     * successful result and in the case of an exception being thrown.
+     *
      * @param event     the result of request and response processing. Note that this includes the request and response
      *                  processing of the rest of the Flow following this message processor too.
      * @param exception the exception thrown during processing if any. If not exception was thrown then this parameter

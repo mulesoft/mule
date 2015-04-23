@@ -17,7 +17,7 @@ import org.mule.api.transport.ReplyToHandler;
 
 /**
  * Abstract implementation of {@link org.mule.processor.NonBlockingMessageProcessor} that determines if processing should
- * be performed blocking or non-blocking and defines two template methods for each mode of processing.
+ * be performed blocking or non-blocking..
  */
 public abstract class AbstractNonBlockingMessageProcessor implements NonBlockingMessageProcessor, MessagingExceptionHandlerAware
 {
@@ -38,7 +38,7 @@ public abstract class AbstractNonBlockingMessageProcessor implements NonBlocking
         }
     }
 
-    public boolean isNonBlocking(MuleEvent event)
+    protected boolean isNonBlocking(MuleEvent event)
     {
         return event.isAllowNonBlocking() && event.getReplyToHandler() != null;
     }

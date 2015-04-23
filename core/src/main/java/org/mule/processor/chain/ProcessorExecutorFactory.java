@@ -19,9 +19,8 @@ import org.mule.service.processor.ServiceProcessorExecutor;
 import java.util.List;
 
 /**
- * Create correct instance of {@link org.mule.processor.BlockingProcessorExecutor} based on the current {@link org.mule
- * .api.MuleEvent}
- * and {@link org.mule.api.construct.FlowConstruct}.
+ * Creates an appropriate instance of {@link org.mule.processor.BlockingProcessorExecutor} based on the current
+ * {@link org.mule.api.MuleEvent} and {@link org.mule.api.construct.FlowConstruct}.
  */
 public class ProcessorExecutorFactory
 {

@@ -61,16 +61,16 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
         }
         else
         {
-            return new CopyOnNullNonBlockingProcessorExceutor(event, Collections.singletonList(responseProcessor),
+            return new CopyOnNullNonBlockingProcessorExecutor(event, Collections.singletonList(responseProcessor),
                                                               MessageProcessorExecutionTemplate
                                                                       .createExecutionTemplate(), true).execute();
         }
     }
 
-    class CopyOnNullNonBlockingProcessorExceutor extends NonBlockingProcessorExecutor
+    class CopyOnNullNonBlockingProcessorExecutor extends NonBlockingProcessorExecutor
     {
 
-        public CopyOnNullNonBlockingProcessorExceutor(MuleEvent event, List<MessageProcessor> processors,
+        public CopyOnNullNonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
                                                       MessageProcessorExecutionTemplate executionTemplate, boolean
                 copyOnVoidEvent)
         {

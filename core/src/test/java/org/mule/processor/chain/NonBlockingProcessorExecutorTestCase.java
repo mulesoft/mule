@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.processor.chain;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -47,7 +53,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         when(event.isSynchronous()).thenReturn(false);
         when(event.isAllowNonBlocking()).thenReturn(true);
-        assertNonBlocking();
+        assertNonBlockingExecution();
     }
 
     @Override
@@ -56,7 +62,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         return new NonBlockingProcessorExecutor(event, processors, executionTemplate, true);
     }
 
-    private void assertNonBlocking() throws MuleException, InterruptedException
+    private void assertNonBlockingExecution() throws MuleException, InterruptedException
     {
         ProcessorExecutor executor = createProcessorExecutor();
 

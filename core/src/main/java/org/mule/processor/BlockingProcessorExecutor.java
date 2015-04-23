@@ -34,8 +34,8 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
     protected final boolean copyOnVoidEvent;
     protected final List<MessageProcessor> processors;
 
-    protected volatile int index;
     protected MuleEvent event;
+    private int index;
 
     public BlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
                                      MessageProcessorExecutionTemplate messageProcessorExecutionTemplate, boolean
@@ -59,7 +59,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
 
     protected boolean continueExecuting()
     {
-        return index < processors.size() && event != null && !(event instanceof VoidMuleEvent);
+        return getIndex() < processors.size() && event != null && !(event instanceof VoidMuleEvent);
     }
 
     protected MuleEvent executeNext() throws MessagingException
@@ -95,7 +95,19 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
 
     protected MessageProcessor nextProcessor()
     {
-        return processors.get(index++);
+        MessageProcessor next = processors.get(getIndex());
+        incrementIndex();
+        return next;
+    }
+
+    protected int getIndex()
+    {
+        return index;
+    }
+
+    protected int incrementIndex()
+    {
+        return index++;
     }
 
     private boolean processorMayReturnVoidEvent(MessageProcessor processor)
@@ -105,15 +117,8 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
             MessageExchangePattern exchangePattern = ((OutboundEndpoint) processor).getExchangePattern();
             return exchangePattern == null ? true : !exchangePattern.hasResponse();
         }
-        else if (processor instanceof Component || processor instanceof Transformer
-                 || processor instanceof MessageFilter)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return !(processor instanceof Component || processor instanceof Transformer
+                 || processor instanceof MessageFilter);
     }
 
 }

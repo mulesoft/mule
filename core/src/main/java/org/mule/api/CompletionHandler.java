@@ -9,22 +9,24 @@ package org.mule.api;
 import org.mule.api.MessagingException;
 
 /**
- * A handler for handling the result of asynchronous processing.
+ * Handles the result of asynchronous processing.
  *
  * @since 3.7
  */
-public interface CompletionHandler<T, E>
+public interface CompletionHandler<R, E extends Throwable>
 {
 
     /**
      * Invoked on sucessful completion of asynchronous processing
-     * @param t the result of processing
+     *
+     * @param result the result of processing
      */
-    public void onCompletion(T t);
+    public void onCompletion(R result);
 
     /**
      * Invoked when a failure occurs during asynchronous processing
-     * @param t the exception thrown during processing
+     *
+     * @param exception the exception thrown during processing
      */
     public void onFailure(E exception);
 

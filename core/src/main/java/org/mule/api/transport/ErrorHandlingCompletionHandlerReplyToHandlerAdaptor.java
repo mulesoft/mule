@@ -12,7 +12,7 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.CompletionHandler;
 
 /**
- * Specialized version of {@link CompletionHandlerReplyToHandlerAdaptor} that uses a {@link org.mule.api.MessagingException}
+ * Specialized version of {@link CompletionHandlerReplyToHandlerAdaptor} that uses a {@link org.mule.api.exception.MessagingExceptionHandler}
  * to handle exceptions.
  */
 public class ErrorHandlingCompletionHandlerReplyToHandlerAdaptor extends CompletionHandlerReplyToHandlerAdaptor

@@ -81,7 +81,6 @@ import org.mockito.Mockito;
 public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 {
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
     protected MuleContext muleContext;
 
     protected MessageExchangePattern exchangePattern;

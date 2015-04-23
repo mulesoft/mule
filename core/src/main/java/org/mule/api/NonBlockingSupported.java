@@ -14,7 +14,7 @@ import org.mule.api.processor.MessageProcessor;
  * implementations will cause Mule to fall back to synchronous blocking processing.  Supporting non blocking means that
  * i) This components does not require synchronous processing ii) That any response porcessing (processing done on the
  * result after invoking a child/next {@link org.mule.api.processor.MessageProcessor will also be processed when running
- * non-blocking.  One easy way of supporting non-blocking if a components needs to do reponse porcessing is to extend
+ * non-blocking.  One easy way of supporting non-blocking if a components needs to do reponse processing is to extend
  * {@link org.mule.processor.AbstractRequestResponseMessageProcessor}
  * <p/>
  * Note: All standard {@link org.mule.api.processor.MessageProcessor}

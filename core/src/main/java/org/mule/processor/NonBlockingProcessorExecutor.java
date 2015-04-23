@@ -7,7 +7,6 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.MessagingException;
@@ -18,7 +17,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageRouter;
 import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.api.transport.ReplyToHandler;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.api.CompletionHandler;
 
@@ -39,6 +37,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
 
     private static final Logger logger = LoggerFactory.getLogger(NonBlockingProcessorExecutor.class);
     private final ReplyToHandler replyToHandler;
+    private volatile int index;
 
     public NonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
                                         MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent)
@@ -55,38 +54,18 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             if ((processor instanceof MessageRouter || processor instanceof InterceptingMessageProcessor) && !
                     (processor instanceof NonBlockingSupported))
             {
-                if (logger.isDebugEnabled())
+                if (logger.isInfoEnabled())
                 {
-                    logger.debug("The message processor {} does not currenlty support non-blocking.  Floe execution " +
-                                 "will now fall back to blocking mode", processor);
+                    logger.info("The message processor {} does not currenlty support non-blocking execution and processing " +
+                                "will now fall back to blocking.  The 'non-blocking' processing strategy is not " +
+                                "recommened if unsupported message processors are being used.  ", processor);
                 }
                 event = new DefaultMuleEvent(event.getMessage(), event, true);
             }
 
             if (processor instanceof NonBlockingMessageProcessor)
             {
-                event = new DefaultMuleEvent(event, new CompletionHandlerReplyToHandlerAdaptor(new CompletionHandler<MuleEvent, MessagingException>()
-                {
-                    @Override
-                    public void onCompletion(MuleEvent event)
-                    {
-                        NonBlockingProcessorExecutor.this.event = new DefaultMuleEvent(event, replyToHandler);
-                        try
-                        {
-                            resume();
-                        }
-                        catch (MessagingException e)
-                        {
-                            onFailure(e);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(MessagingException exception)
-                    {
-                        replyToHandler.processExceptionReplyTo(event, exception, null);
-                    }
-                }));
+                event = new DefaultMuleEvent(event, new CompletionHandlerReplyToHandlerAdaptor(new NonBlockingProcessingCompletionHandler()));
             }
         }
     }
@@ -107,4 +86,39 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
         }
     }
 
+    @Override
+    protected int getIndex()
+    {
+        return index;
+    }
+
+    @Override
+    protected int incrementIndex()
+    {
+        return index++;
+    }
+
+    class NonBlockingProcessingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException>
+    {
+
+        @Override
+        public void onCompletion(MuleEvent event)
+        {
+            NonBlockingProcessorExecutor.this.event = new DefaultMuleEvent(event, replyToHandler);
+            try
+            {
+                resume();
+            }
+            catch (MessagingException e)
+            {
+                onFailure(e);
+            }
+        }
+
+        @Override
+        public void onFailure(MessagingException exception)
+        {
+            replyToHandler.processExceptionReplyTo(event, exception, null);
+        }
+    }
 }

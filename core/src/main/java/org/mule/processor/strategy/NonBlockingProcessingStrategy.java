@@ -24,7 +24,7 @@ import org.mule.util.concurrent.ThreadNameHelper;
 import java.util.List;
 
 /**
- * This strategy allows Mule to use non-blocking execution model where possible and free up threads when performing IO
+ * Allows Mule to use non-blocking execution model where possible and free up threads when performing IO
  * operations.
  *
  * @since 3.7
