@@ -8,5 +8,5 @@ package org.mule.module.http.internal.request;
 
 public enum HttpAuthenticationType
 {
-    BASIC, DIGEST;
+    BASIC, DIGEST, NTLM;
 }
