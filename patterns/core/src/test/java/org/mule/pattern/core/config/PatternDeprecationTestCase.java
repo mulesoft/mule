@@ -26,7 +26,7 @@ public class PatternDeprecationTestCase extends AbstractDeprecationTestCase
     @Test
     public void ensurePatternsDeprecation()
     {
-        TestAppender.ensure(
+        testAppender.ensure(
                 new TestAppender.Expectation(Level.WARN.toString(), CorePatternNamespaceHandler.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE),
                 new TestAppender.Expectation(Level.WARN.toString(), HttpConnector.class.getName(), HttpNamespaceHandler.HTTP_TRANSPORT_DEPRECATION_MESSAGE)
         );

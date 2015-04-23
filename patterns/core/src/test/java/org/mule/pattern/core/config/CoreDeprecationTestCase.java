@@ -25,6 +25,6 @@ public class CoreDeprecationTestCase extends AbstractDeprecationTestCase
     @Test
     public void ensureCoreDeprecation()
     {
-        TestAppender.ensure(new TestAppender.Expectation(Level.WARN.toString(), BridgeDefinitionParser.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE));
+        testAppender.ensure(new TestAppender.Expectation(Level.WARN.toString(), BridgeDefinitionParser.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE));
     }
 }

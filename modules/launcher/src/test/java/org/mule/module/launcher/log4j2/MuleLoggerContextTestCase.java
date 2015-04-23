@@ -16,7 +16,6 @@ import org.mule.tck.size.SmallTest;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.async.AsyncLoggerConfig;
 import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.LoggerConfig;
@@ -46,13 +45,14 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
     private MessageFactory messageFactory;
 
     private MuleLoggerContext context;
+    private TestAppender testAppender;
 
     @Before
     public void before()
     {
         context = getDefaultContext();
-        Appender appender = new TestAppender(TEST_APPENDER, null, null);
-        context.getConfiguration().addAppender(appender);
+        testAppender = new TestAppender(TEST_APPENDER, null, null);
+        context.getConfiguration().addAppender(testAppender);
 
         LoggerConfig loggerConfig = AsyncLoggerConfig.createLogger("false",
                                                                    LEVEL.name(),
@@ -63,7 +63,7 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
                                                                    context.getConfiguration(),
                                                                    null);
 
-        loggerConfig.addAppender(appender, null, null);
+        loggerConfig.addAppender(testAppender, null, null);
         loggerConfig.start();
         context.getConfiguration().addLogger(CATEGORY, loggerConfig);
         context.updateLoggers();
@@ -82,7 +82,7 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
         logger.error(MESSAGE);
 
         assertLogged();
-        TestAppender.clear();
+        testAppender.clear();
 
         context.updateLoggers(context.getConfiguration());
         logger.error(MESSAGE);
@@ -97,7 +97,7 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
             @Override
             protected boolean test() throws Exception
             {
-                TestAppender.ensure(new TestAppender.Expectation(LEVEL.name(), CATEGORY, MESSAGE));
+                testAppender.ensure(new TestAppender.Expectation(LEVEL.name(), CATEGORY, MESSAGE));
                 return true;
             }
 

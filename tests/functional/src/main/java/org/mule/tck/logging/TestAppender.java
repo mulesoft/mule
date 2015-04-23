@@ -26,34 +26,29 @@ import org.apache.logging.log4j.core.appender.AbstractAppender;
 public class TestAppender extends AbstractAppender
 {
 
-    private static Set<Expectation> expectations = new HashSet<>();
+    private Set<Expectation> expectations = new HashSet<>();
 
-    private static Set<Expectation> expectationsInstance()
+    public void clear()
     {
-        return expectations;
+        expectations.clear();
     }
 
-    public static void clear()
-    {
-        expectationsInstance().clear();
-    }
-
-    public static void ensure(Expectation... expectationsToCheck)
+    public void ensure(Expectation... expectationsToCheck)
     {
         Set s = new HashSet();
         s.addAll(Arrays.asList(expectationsToCheck));
         ensure(s);
     }
 
-    public static void ensure(Set<Expectation> expectationsToCheck)
+    public void ensure(Set<Expectation> expectationsToCheck)
     {
-        if (!expectationsInstance().equals(expectationsToCheck))
+        if (!expectations.equals(expectationsToCheck))
         {
-            throw new RuntimeException(difference(expectationsToCheck, expectationsInstance()));
+            throw new RuntimeException(difference(expectationsToCheck, expectations));
         }
     }
 
-    private static String difference(Set<Expectation> expected, Set<Expectation> actual)
+    private String difference(Set<Expectation> expected, Set<Expectation> actual)
     {
         StringBuilder builder = new StringBuilder();
         addCollection(builder, CollectionUtils.subtract(actual, expected), "Not expected but received:");
@@ -61,7 +56,7 @@ public class TestAppender extends AbstractAppender
         return builder.toString();
     }
 
-    private static void addCollection(StringBuilder builder, Collection items, String description)
+    private void addCollection(StringBuilder builder, Collection items, String description)
     {
         if (items != null && !items.isEmpty())
         {
@@ -86,7 +81,7 @@ public class TestAppender extends AbstractAppender
     @Override
     public void append(LogEvent event)
     {
-        expectationsInstance().add(new Expectation(event.getLevel().toString(), event.getLoggerName(), event.getMessage().getFormattedMessage()));
+        expectations.add(new Expectation(event.getLevel().toString(), event.getLoggerName(), event.getMessage().getFormattedMessage()));
     }
 
     public static class Expectation
