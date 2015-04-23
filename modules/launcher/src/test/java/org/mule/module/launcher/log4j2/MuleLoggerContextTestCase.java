@@ -22,6 +22,7 @@ import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +51,7 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
+        cleanUp();
         context = getDefaultContext();
         Appender appender = new TestAppender(TEST_APPENDER, null, null);
         context.getConfiguration().addAppender(appender);
@@ -69,6 +71,12 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
         context.updateLoggers();
     }
 
+    @After
+    public void after()
+    {
+        cleanUp();
+    }
+
     @Test
     public void dispatchingLogger()
     {
@@ -82,7 +90,7 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
         logger.error(MESSAGE);
 
         assertLogged();
-        TestAppender.clear();
+        cleanUp();
 
         context.updateLoggers(context.getConfiguration());
         logger.error(MESSAGE);
@@ -113,5 +121,10 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase
     private MuleLoggerContext getDefaultContext()
     {
         return new MuleLoggerContext(DEFAULT_CONTEXT_NAME, null, Thread.currentThread().getContextClassLoader(), contextSelector, true);
+    }
+
+    private void cleanUp()
+    {
+        TestAppender.clear();
     }
 }
