@@ -30,6 +30,7 @@ import org.mule.api.processor.StageNameSource;
 import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
+import org.mule.api.source.NonBlockingMessageSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.context.notification.PipelineMessageNotification;
@@ -37,8 +38,10 @@ import org.mule.exception.ChoiceMessagingExceptionStrategy;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.util.NotificationUtils;
@@ -122,33 +125,23 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
-        builder.chain(new AbstractInterceptingMessageProcessor()
+        builder.chain(new AbstractRequestResponseMessageProcessor()
         {
             @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
+            protected MuleEvent processRequest(MuleEvent event) throws MuleException
             {
                 muleContext.getNotificationManager().fireNotification(
                         new PipelineMessageNotification(AbstractPipeline.this, event,
-                                PipelineMessageNotification.PROCESS_START));
+                                                        PipelineMessageNotification.PROCESS_START));
+                return super.processRequest(event);
+            }
 
-                MuleEvent result = null;
-                MessagingException exceptionThrown = null;
-                try
-                {
-                    return processNext(event);
-                }
-                catch (MessagingException me)
-                {
-                    exceptionThrown = me;
-                    throw me;
-                }
-                finally
-                {
-                    MuleEvent notificationEvent = result != null ? result : event;
-                    muleContext.getNotificationManager().fireNotification(
-                            new PipelineMessageNotification(AbstractPipeline.this, notificationEvent,
-                                    PipelineMessageNotification.PROCESS_COMPLETE, exceptionThrown));
-                }
+            @Override
+            protected void processFinallly(MuleEvent event, MessagingException exception)
+            {
+                muleContext.getNotificationManager().fireNotification(
+                        new PipelineMessageNotification(AbstractPipeline.this, event,
+                                                        PipelineMessageNotification.PROCESS_COMPLETE, exception));
             }
         });
     }
@@ -199,7 +192,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             this.messageSource = messageSource;
         }
     }
-    
+
     @Override
     public boolean isSynchronous()
     {
@@ -274,10 +267,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
 
         if (userConfiguredAsyncProcessingStrategy
-                && (!isMessageSourceCompatibleWithAsync(messageSource) || (redeliveryHandlerConfigured)))
+            && (!isMessageSourceCompatibleWithAsync(messageSource) || (redeliveryHandlerConfigured)))
         {
             throw new FlowConstructInvalidException(
-                    CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not compatible with an asynchronous processing strategy.  Either because it is request-response, has a transaction defined, or messaging redelivered is configured."),
+                    CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not " +
+                                                     "compatible with an asynchronous processing strategy.  Either " +
+                                                     "because it is request-response, has a transaction defined, or " +
+                                                     "messaging redelivered is configured."),
+                    this);
+        }
+
+        if (processingStrategy instanceof NonBlockingProcessingStrategy && !(messageSource instanceof
+                NonBlockingMessageSource))
+        {
+            throw new FlowConstructInvalidException(
+                    CoreMessages.createStaticMessage("The non-blocking processing strategy currently only supports " +
+                                                     "non-blocking messages sources"),
                     this);
         }
 
@@ -377,8 +382,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         for (MessageProcessor messageProcessor : getMessageProcessors())
         {
             if(messageProcessor instanceof InterceptingMessageProcessor){
+            {
                 filteredMessageProcessorList.add(messageProcessor);
                 break;
+            }
             }else{
                 filteredMessageProcessorList.add(messageProcessor);
             }
