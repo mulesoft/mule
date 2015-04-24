@@ -72,11 +72,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         else if (results.size() == 1)
         {
             MuleEvent event = results.get(0);
-            if (event == null)
-            {
-                return null;
-            }
-            else if (event instanceof VoidMuleEvent)
+            if (event == null || event instanceof VoidMuleEvent)
             {
                 return event;
             }
