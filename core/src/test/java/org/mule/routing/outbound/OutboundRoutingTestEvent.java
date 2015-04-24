@@ -367,4 +367,10 @@ public class OutboundRoutingTestEvent implements MuleEvent
     public void setEnableNotifications(boolean enabled)
     {
     }
+
+    @Override
+    public boolean isAllowNonBlocking()
+    {
+        return false;
+    }
 }

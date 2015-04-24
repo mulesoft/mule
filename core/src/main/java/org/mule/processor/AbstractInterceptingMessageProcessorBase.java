@@ -20,10 +20,12 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.execution.MessageProcessorExecutionTemplate;
+import org.mule.processor.chain.ProcessorExecutorFactory;
 import org.mule.util.NotificationUtils;
 import org.mule.util.ObjectUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,11 +91,12 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
                 logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
             }
 
-            MessageProcessorExecutionTemplate executionTemplateToUse = (!(next instanceof MessageProcessorChain)) ? messageProcessorExecutorWithNotifications : messageProcessorExecutorWithoutNotifications;
+            MessageProcessorExecutionTemplate executionTemplate = (!(next instanceof MessageProcessorChain)) ? messageProcessorExecutorWithNotifications : messageProcessorExecutorWithoutNotifications;
 
             try
             {
-                return executionTemplateToUse.execute(next, event);
+                return new ProcessorExecutorFactory().createProcessorExecutor(event, Collections.singletonList(next),
+                                                                              executionTemplate, false).execute();
             }
             catch (MessagingException e)
             {
@@ -116,7 +119,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
 
     protected boolean isEventValid(MuleEvent event)
     {
-        return event != null && !VoidMuleEvent.getInstance().equals(event);
+        return event != null && !(event instanceof VoidMuleEvent);
     }
 
     @Override
