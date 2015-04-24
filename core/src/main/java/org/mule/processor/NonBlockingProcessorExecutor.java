@@ -37,7 +37,6 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
 
     private static final Logger logger = LoggerFactory.getLogger(NonBlockingProcessorExecutor.class);
     private final ReplyToHandler replyToHandler;
-    private volatile int index;
 
     public NonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
                                         MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent)
@@ -84,18 +83,6 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
                 replyToHandler.processExceptionReplyTo(event, new MessagingException(event, e), null);
             }
         }
-    }
-
-    @Override
-    protected int getIndex()
-    {
-        return index;
-    }
-
-    @Override
-    protected int incrementIndex()
-    {
-        return index++;
     }
 
     class NonBlockingProcessingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException>

@@ -48,18 +48,29 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
     }
 
     @Override
-    public MuleEvent execute() throws MessagingException
+    public final MuleEvent execute() throws MessagingException
     {
-        while (continueExecuting())
+        MuleEvent result = event;
+        while (hasNext())
         {
-            event = executeNext();
+            result = executeNext();
+            if (!isEventValid(result))
+            {
+                break;
+            }
+            event = result;
         }
-        return event;
+        return result;
     }
 
-    protected boolean continueExecuting()
+    private boolean isEventValid(MuleEvent result)
     {
-        return getIndex() < processors.size() && event != null && !(event instanceof VoidMuleEvent);
+        return result != null && !(result instanceof VoidMuleEvent);
+    }
+
+    protected boolean hasNext()
+    {
+        return index < processors.size();
     }
 
     protected MuleEvent executeNext() throws MessagingException
@@ -95,19 +106,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
 
     protected MessageProcessor nextProcessor()
     {
-        MessageProcessor next = processors.get(getIndex());
-        incrementIndex();
-        return next;
-    }
-
-    protected int getIndex()
-    {
-        return index;
-    }
-
-    protected int incrementIndex()
-    {
-        return index++;
+        return processors.get(index++);
     }
 
     private boolean processorMayReturnVoidEvent(MessageProcessor processor)
