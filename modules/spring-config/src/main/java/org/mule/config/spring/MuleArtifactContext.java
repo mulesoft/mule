@@ -6,7 +6,6 @@
  */
 package org.mule.config.spring;
 
-import static org.mule.api.config.MuleProperties.MULE_DEVKIT_PARTICIPATES_DI;
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.COMMON_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -19,12 +18,11 @@ import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor
 import org.mule.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.FilteringCommonAnnotationBeanPostProcessor;
-import org.mule.config.spring.processors.NoDevkitInjectorProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
+import org.mule.config.spring.processors.NoDevkitInjectorProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.registry.MuleRegistryHelper;
-import org.mule.util.BackwardsCompatibilityPropertyChecker;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -32,7 +30,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -190,10 +187,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     protected void registerInjectorProcessor(BeanDefinitionRegistry registry)
     {
-        BackwardsCompatibilityPropertyChecker checker = new BackwardsCompatibilityPropertyChecker(MULE_DEVKIT_PARTICIPATES_DI);
-        Class<?> processorType = checker.isEnabled() ? AutowiredAnnotationBeanPostProcessor.class : NoDevkitInjectorProcessor.class;
-
-        registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, processorType, null);
+        registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, NoDevkitInjectorProcessor.class, null);
     }
 
     private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source)

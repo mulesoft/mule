@@ -10,24 +10,17 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.devkit.ProcessAdapter;
 import org.mule.api.devkit.ProcessTemplate;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import javax.inject.Inject;
 
-import org.junit.Rule;
 import org.junit.Test;
 
-public class LegacyDevkitCompatibleInjectionTestCase extends FunctionalTestCase
+public class NoDevkitInjectionTestCase extends FunctionalTestCase
 {
-
-    @Rule
-    public SystemProperty legacyProperty = new SystemProperty(MuleProperties.MULE_DEVKIT_PARTICIPATES_DI, "false");
-
     @Override
     protected String[] getConfigFiles()
     {

@@ -10,18 +10,13 @@ import org.mule.util.ClassUtils;
 
 import java.beans.PropertyDescriptor;
 
-import javax.inject.Inject;
-
 import org.springframework.beans.PropertyValues;
 
 /**
- * A {@link SelectiveInjectorProcessor} used to provide backwards
- * compatibility with artifacts with Devkit versions prior
- * to 3.6.2, which make an illegal use of the {@link Inject}
- * annotation.
- * <p/>
- * This class fixes the issue by skipping injection of objects
- * which are instances of {@link }org.mule.api.devkit.ProcessAdapter}
+ * A {@link SelectiveInjectorProcessor} used to keep
+ * mule from injecting dependencies into components
+ * built with Devkit, by skipping injection of objects
+ * which are instances of {@link org.mule.api.devkit.ProcessAdapter}
  *
  * @since 3.7.0
  */
@@ -49,6 +44,11 @@ public final class NoDevkitInjectorProcessor extends SelectiveInjectorProcessor
     @Override
     protected boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
     {
-        return exclusionClass != null && !exclusionClass.isInstance(bean);
+        if (exclusionClass != null)
+        {
+            return !exclusionClass.isInstance(bean);
+        }
+
+        return true;
     }
 }

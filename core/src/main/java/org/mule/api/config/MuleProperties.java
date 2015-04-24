@@ -7,8 +7,6 @@
 package org.mule.api.config;
 
 
-import javax.inject.Inject;
-
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule properties.
  */
@@ -199,12 +197,5 @@ public class MuleProperties
     public static final String MULE_SIMPLE_LOG = SYSTEM_PROPERTY_PREFIX + "simpleLog";
     public static final String MULE_FORCE_CONSOLE_LOG = SYSTEM_PROPERTY_PREFIX + "forceConsoleLog";
     public static final String MULE_DEFAULT_PROCESSING_STRATEGY = SYSTEM_PROPERTY_PREFIX + "default.processing.strategy";
-
-    /**
-     * Property to enable compatibility with components build with Devkit versions prior to 3.6.2
-     * which make illegal use of the {@link Inject} annotation
-     */
-    public static final String MULE_DEVKIT_PARTICIPATES_DI = SYSTEM_PROPERTY_PREFIX + "devkit.participates.di";
-
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
 }
