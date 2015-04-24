@@ -18,7 +18,7 @@ import org.mule.api.CompletionHandler;
 public class ErrorHandlingCompletionHandlerReplyToHandlerAdaptor extends CompletionHandlerReplyToHandlerAdaptor
 {
 
-    final private MessagingExceptionHandler messagingExceptionHandler;
+    private final MessagingExceptionHandler messagingExceptionHandler;
 
     public ErrorHandlingCompletionHandlerReplyToHandlerAdaptor(CompletionHandler completionHandler,
                                                                MessagingExceptionHandler exceptionHandler)

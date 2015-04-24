@@ -100,7 +100,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     // Constructors
 
     /**
-     * Constructor used to create a message with no message source with minimal arguments
+     * Constructor used to create an event with no message source with minimal arguments and a {@link org.mule.api.MuleSession}
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
@@ -112,6 +112,9 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             .getDefaultResponseTimeout(), null, null);
     }
 
+    /**
+     * Constructor used to create an event with no message source with minimal arguments
+     */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
                             FlowConstruct flowConstruct)
@@ -121,6 +124,10 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             .getDefaultResponseTimeout(), null, null);
     }
 
+    /**
+     * Constructor used to create an event with no message source with minimal arguments and a
+     * {@link org.mule.api.transport.ReplyToHandler}
+     */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
                             ReplyToHandler replyToHandler,
@@ -133,7 +140,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     /**
-     * Constructor used to create a message with no message source with minimal arguments and
+     * Constructor used to create an event with no message source with minimal arguments and
      * OutputStream
      */
     public DefaultMuleEvent(MuleMessage message,
@@ -148,7 +155,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     /**
-     * Constructor used to create a message with no message source with all additional arguments
+     * Constructor used to create an event with no message source with all additional arguments
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
@@ -163,7 +170,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     /**
-     * Constructor used to create a message with a uri that idendifies the message source with minimal
+     * Constructor used to create an event with a uri that idendifies the message source with minimal
      * arguments
      */
     public DefaultMuleEvent(MuleMessage message,
@@ -178,7 +185,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     /**
-     * Constructor used to create a message with a uri that idendifies the message source with minimal
+     * Constructor used to create an event with a uri that idendifies the message source with minimal
      * arguments and OutputStream
      */
     public DefaultMuleEvent(MuleMessage message,
@@ -194,7 +201,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     /**
-     * Constructor used to create a message with a identifiable message source with all additional arguments
+     * Constructor used to create an event with a identifiable message source with all additional arguments
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
@@ -225,6 +232,10 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.synchronous = resolveEventSynchronicity();
     }
 
+    /**
+     *  Constructor used to create an event with a identifiable message source with all additional arguments except
+     *  a {@link org.mule.api.transport.ReplyToHandler}
+     */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
                             MessageExchangePattern exchangePattern,
@@ -301,6 +312,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * Copy constructor used when ReplyToHandler instance needs switching out
+     *
      * @param rewriteEvent
      * @param replyToHandler
      */
@@ -326,6 +338,9 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
              shareFlowVars, rewriteEvent.getExchangePattern());
     }
 
+    /**
+     * Copy constructor to be used when synchronicity and {@link org.mule.MessageExchangePattern} both need changing.
+     */
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareFlowVars,
                             MessageExchangePattern messageExchangePattern)
     {

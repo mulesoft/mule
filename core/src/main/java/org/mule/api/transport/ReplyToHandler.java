@@ -21,7 +21,7 @@ public interface ReplyToHandler
     void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
 
     /**
-     * Processes replyTo in the case an exception errored.  Not all implementations will implement this if for example
+     * Processes replyTo in the case an exception occurred.  Not all implementations will implement this if for example
      * they should only send a reply message in the sucess case.
      *
      * @param event the current event when the exception was caught.
