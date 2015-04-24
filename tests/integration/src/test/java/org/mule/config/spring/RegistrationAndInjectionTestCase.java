@@ -15,16 +15,11 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.LifecycleStateAware;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.store.ObjectStoreManager;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import javax.inject.Inject;
@@ -151,75 +146,6 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
     {
         assertThat(object.getStop(), is(1));
         assertThat(object.getDispose(), is(1));
-    }
-
-    public static class TestLifecycleObject implements Lifecycle
-    {
-
-        private int initialise = 0;
-        private int start = 0;
-        private int stop = 0;
-        private int dispose = 0;
-
-        @Inject
-        private ObjectStoreManager objectStoreManager;
-
-        @Inject
-        private MuleContext muleContext;
-
-        @Override
-        public void initialise() throws InitialisationException
-        {
-            initialise++;
-        }
-
-        @Override
-        public void start() throws MuleException
-        {
-            start++;
-        }
-
-        @Override
-        public void stop() throws MuleException
-        {
-            stop++;
-        }
-
-        @Override
-        public void dispose()
-        {
-            dispose++;
-        }
-
-        public int getInitialise()
-        {
-            return initialise;
-        }
-
-        public int getStart()
-        {
-            return start;
-        }
-
-        public int getStop()
-        {
-            return stop;
-        }
-
-        public int getDispose()
-        {
-            return dispose;
-        }
-
-        public ObjectStoreManager getObjectStoreManager()
-        {
-            return objectStoreManager;
-        }
-
-        public MuleContext getMuleContext()
-        {
-            return muleContext;
-        }
     }
 
     public static class ExtendedTestLifecycleObject extends TestLifecycleObject
