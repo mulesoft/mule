@@ -42,7 +42,7 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
     {
         Map<String, Object> objects = getSpringRegistry().lookupEntriesForLifecycle(lo.getType());
 
-        final DependencyNode root = new DependencyNode(null, null);
+        final DependencyNode root = new DependencyNode(null);
 
         for (Map.Entry<String, Object> entry : objects.entrySet())
         {
@@ -80,7 +80,7 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
 
     private void addDependency(DependencyNode parent, String key, Object object)
     {
-        final DependencyNode node = new DependencyNode(key, object);
+        final DependencyNode node = new DependencyNode(object);
         parent.addChild(node);
 
         for (Map.Entry<String, Object> dependency : getSpringRegistry().getDepencies(key).entrySet())
@@ -92,13 +92,11 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
     private class DependencyNode
     {
 
-        private final String key;
         private final Object value;
         private final List<DependencyNode> childs = new LinkedList<>();
 
-        private DependencyNode(String key, Object value)
+        private DependencyNode(Object value)
         {
-            this.key = key;
             this.value = value;
         }
 

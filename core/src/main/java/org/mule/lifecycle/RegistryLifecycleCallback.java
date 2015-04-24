@@ -8,17 +8,16 @@ package org.mule.lifecycle;
 
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleCallback;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.registry.Registry;
 import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,40 +56,50 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>
         // overlapping interfaces can cause duplicates
         // TODO: each LifecycleManager should keep this set per executing phase
         // and clear it when the phase is fully applied
-        Set<Object> duplicates = new HashSet<Object>();
+        Set<Object> duplicates = new HashSet<>();
 
         for (LifecycleObject lifecycleObject : phase.getOrderedLifecycleObjects())
         {
+            lifecycleObject.firePreNotification(registryLifecycleManager.muleContext);
+
             // TODO Collection -> List API refactoring
             Collection<?> targetsObj = lookupObjectsForLifecycle(lifecycleObject);
-            if (targetsObj.size() == 0)
+            doApplyLifecycle(phase, duplicates, lifecycleObject, targetsObj);
+            lifecycleObject.firePostNotification(registryLifecycleManager.muleContext);
+        }
+    }
+
+    private void doApplyLifecycle(LifecyclePhase phase, Set<Object> duplicates, LifecycleObject lifecycleObject, Collection<?> targetObjects) throws LifecycleException
+    {
+        if (CollectionUtils.isEmpty(targetObjects))
+        {
+            return;
+        }
+
+        for (Object target : targetObjects)
+        {
+            if (duplicates.contains(target))
             {
                 continue;
             }
 
-            List<Object> targets = new LinkedList<>(targetsObj);
-            lifecycleObject.firePreNotification(registryLifecycleManager.muleContext);
-
-            for (Iterator<Object> target = targets.iterator(); target.hasNext();)
+            if (LOGGER.isDebugEnabled())
             {
-                Object o = target.next();
-                if (duplicates.contains(o))
-                {
-                    target.remove();
-                }
-                else
-                {
-                    if (LOGGER.isDebugEnabled())
-                    {
-                        LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + o);
-                    }
-                    phase.applyLifecycle(o);
-                    target.remove();
-                    duplicates.add(o);
-                }
+                LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + target);
             }
 
-            lifecycleObject.firePostNotification(registryLifecycleManager.muleContext);
+            phase.applyLifecycle(target);
+            duplicates.add(target);
+        }
+
+        // the target object might have created and registered a new object
+        // (e.g.: an endpoint which registers a connector)
+        // check if there're new objects for the phase
+        int originalTargetCount = targetObjects.size();
+        targetObjects = lookupObjectsForLifecycle(lifecycleObject);
+        if (targetObjects.size() > originalTargetCount)
+        {
+            doApplyLifecycle(phase, duplicates, lifecycleObject, targetObjects);
         }
     }
 
