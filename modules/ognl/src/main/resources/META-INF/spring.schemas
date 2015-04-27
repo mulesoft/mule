@@ -4,4 +4,5 @@ http\://www.mulesoft.org/schema/mule/ognl/3.3/mule-ognl.xsd=META-INF/mule-ognl.x
 http\://www.mulesoft.org/schema/mule/ognl/3.4/mule-ognl.xsd=META-INF/mule-ognl.xsd
 http\://www.mulesoft.org/schema/mule/ognl/3.5/mule-ognl.xsd=META-INF/mule-ognl.xsd
 http\://www.mulesoft.org/schema/mule/ognl/3.6/mule-ognl.xsd=META-INF/mule-ognl.xsd
+http\://www.mulesoft.org/schema/mule/ognl/3.7/mule-ognl.xsd=META-INF/mule-ognl.xsd
 http\://www.mulesoft.org/schema/mule/ognl/current/mule-ognl.xsd=META-INF/mule-ognl.xsd

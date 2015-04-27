@@ -4,4 +4,5 @@ http\://www.mulesoft.org/schema/mule/management/3.3/mule-management.xsd=META-INF
 http\://www.mulesoft.org/schema/mule/management/3.4/mule-management.xsd=META-INF/mule-management.xsd
 http\://www.mulesoft.org/schema/mule/management/3.5/mule-management.xsd=META-INF/mule-management.xsd
 http\://www.mulesoft.org/schema/mule/management/3.6/mule-management.xsd=META-INF/mule-management.xsd
+http\://www.mulesoft.org/schema/mule/management/3.7/mule-management.xsd=META-INF/mule-management.xsd
 http\://www.mulesoft.org/schema/mule/management/current/mule-management.xsd=META-INF/mule-management.xsd
