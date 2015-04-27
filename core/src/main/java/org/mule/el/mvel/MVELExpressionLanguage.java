@@ -345,17 +345,17 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
     }
 
-    protected Map<String, String> getAliases()
+    public Map<String, String> getAliases()
     {
         return aliases;
     }
 
-    protected Map<String, Function> getGlobalFunctions()
+    public Map<String, Function> getGlobalFunctions()
     {
         return globalFunctions;
     }
 
-    protected ParserConfiguration getParserConfiguration()
+    public ParserConfiguration getParserConfiguration()
     {
         return parserConfiguration;
     }
