@@ -246,6 +246,15 @@ public class BasicValidationTestCase extends ValidationTestCase
         assertCustomValidator("customValidationByRef");
     }
 
+    @Test
+    public void usesValidatorAsRouter() throws Exception
+    {
+        final String flowName = "choice";
+
+        assertThat(runFlow(flowName, getTestEvent(VALID_EMAIL)).getMessage().getPayloadAsString(), is("valid"));
+        assertThat(runFlow(flowName, getTestEvent(INVALID_EMAIL)).getMessage().getPayloadAsString(), is("invalid"));
+    }
+
     private void assertCustomValidator(String flowName) throws Exception
     {
         try
