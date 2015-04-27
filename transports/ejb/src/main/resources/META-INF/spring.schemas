@@ -4,4 +4,5 @@ http\://www.mulesoft.org/schema/mule/ejb/3.3/mule-ejb.xsd=META-INF/mule-ejb.xsd
 http\://www.mulesoft.org/schema/mule/ejb/3.4/mule-ejb.xsd=META-INF/mule-ejb.xsd
 http\://www.mulesoft.org/schema/mule/ejb/3.5/mule-ejb.xsd=META-INF/mule-ejb.xsd
 http\://www.mulesoft.org/schema/mule/ejb/3.6/mule-ejb.xsd=META-INF/mule-ejb.xsd
+http\://www.mulesoft.org/schema/mule/ejb/3.7/mule-ejb.xsd=META-INF/mule-ejb.xsd
 http\://www.mulesoft.org/schema/mule/ejb/current/mule-ejb.xsd=META-INF/mule-ejb.xsd

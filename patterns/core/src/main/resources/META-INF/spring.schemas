@@ -4,4 +4,5 @@ http\://www.mulesoft.org/schema/mule/pattern/3.3/mule-pattern.xsd=META-INF/mule-
 http\://www.mulesoft.org/schema/mule/pattern/3.4/mule-pattern.xsd=META-INF/mule-pattern.xsd
 http\://www.mulesoft.org/schema/mule/pattern/3.5/mule-pattern.xsd=META-INF/mule-pattern.xsd
 http\://www.mulesoft.org/schema/mule/pattern/3.6/mule-pattern.xsd=META-INF/mule-pattern.xsd
+http\://www.mulesoft.org/schema/mule/pattern/3.7/mule-pattern.xsd=META-INF/mule-pattern.xsd
 http\://www.mulesoft.org/schema/mule/pattern/current/mule-pattern.xsd=META-INF/mule-pattern.xsd

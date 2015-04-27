@@ -10,11 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.6/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/email"
-                schemaLocation="http://www.mulesoft.org/schema/mule/email/3.6/mule-email.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/email/3.7/mule-email.xsd"/>
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.6/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
         
     <xsd:annotation>
         <xsd:documentation>The IMAP transport can be used for receiving messages from IMAP inboxes using the javax.mail API. The [IMAPS Transport] is similar but uses secure connections over SSL/TLS.</xsd:documentation>

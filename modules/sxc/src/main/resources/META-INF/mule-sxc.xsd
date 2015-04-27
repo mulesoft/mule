@@ -12,11 +12,11 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.6/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/xml"
-                schemaLocation="http://www.mulesoft.org/schema/mule/xml/3.6/mule-xml.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/xml/3.7/mule-xml.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.6/mule-schemadoc.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>

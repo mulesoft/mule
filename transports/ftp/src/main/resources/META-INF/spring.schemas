@@ -4,4 +4,5 @@ http\://www.mulesoft.org/schema/mule/ftp/3.3/mule-ftp.xsd=META-INF/mule-ftp.xsd
 http\://www.mulesoft.org/schema/mule/ftp/3.4/mule-ftp.xsd=META-INF/mule-ftp.xsd
 http\://www.mulesoft.org/schema/mule/ftp/3.5/mule-ftp.xsd=META-INF/mule-ftp.xsd
 http\://www.mulesoft.org/schema/mule/ftp/3.6/mule-ftp.xsd=META-INF/mule-ftp.xsd
+http\://www.mulesoft.org/schema/mule/ftp/3.7/mule-ftp.xsd=META-INF/mule-ftp.xsd
 http\://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd=META-INF/mule-ftp.xsd

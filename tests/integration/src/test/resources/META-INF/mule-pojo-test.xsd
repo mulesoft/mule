@@ -5,7 +5,7 @@
     elementFormDefault="qualified" attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/3.6/mule.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
     <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd" />
 
     <xsd:element name="config" substitutionGroup="mule:abstract-extension">

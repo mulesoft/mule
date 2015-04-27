@@ -2,14 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd">
-
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <spring:bean class="org.mule.test.integration.exceptions.ExceptionStrategyWithCustomExpressionEvaluatorTestCase$FooExpressionEvaluator"/>
 

@@ -4,9 +4,9 @@
     xmlns:http="http://www.mulesoft.org/schema/mule/http" 
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xsi:schemaLocation="
-          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
-          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
-          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
           
     <http:connector name="connector" enableCookies="true"/>
 	<flow name="gzipContentType">	    

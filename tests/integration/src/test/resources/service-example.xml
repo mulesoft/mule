@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:nest="http://www.mulesoft.org/schema/mule/nest-example-base"
        xmlns:ext="http://www.mulesoft.org/schema/mule/nest-example-extension"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/nest-example-base http://www.mulesoft.org/schema/mule/nest-example-base/3.2/nest-example-base.xsd
-       http://www.mulesoft.org/schema/mule/nest-example-extension http://www.mulesoft.org/schema/mule/nest-example-extension/3.2/nest-example-extension.xsd">
+       http://www.mulesoft.org/schema/mule/nest-example-extension http://www.mulesoft.org/schema/mule/nest-example-extension/current/nest-example-extension.xsd">
 
     <ext:service>
         <ext:component/>
