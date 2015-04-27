@@ -177,50 +177,47 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void successfulAll() throws Exception
     {
-        MuleEvent responseEvent = runFlow("all", getAllEvent(VALID_EMAIL, VALID_URL, true));
-        assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(MultipleValidationResult.class)));
-        MultipleValidationResult result = (MultipleValidationResult) responseEvent.getMessage().getPayload();
-        assertThat(result.isError(), is(false));
-        assertThat(result.getFailedValidationResults(), hasSize(0));
+        MuleEvent event = getAllEvent(VALID_EMAIL, VALID_URL);
+        MuleEvent responseEvent = runFlow("all", event);
+
+        // validation was successful and payload was untouched
+        assertThat(event.getMessage().getPayload(), is(sameInstance(responseEvent.getMessage().getPayload())));
     }
 
     @Test
-    public void oneFailureInAllWithoutException() throws Exception
+    public void twoFailuresInAllWithoutException() throws Exception
     {
-        MuleEvent responseEvent = runFlow("all", getAllEvent(INVALID_EMAIL, VALID_URL, false));
-        assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(MultipleValidationResult.class)));
-        MultipleValidationResult result = (MultipleValidationResult) responseEvent.getMessage().getPayload();
-        assertThat(result.isError(), is(true));
-        assertThat(result.getMessage(), is(messages.invalidEmail(INVALID_EMAIL).getMessage()));
-        assertThat(result.getFailedValidationResults(), hasSize(1));
-        assertThat(result.getFailedValidationResults().get(0).isError(), is(true));
-    }
-
-    @Test
-    public void twoFailureInAllWithoutException() throws Exception
-    {
-        MuleEvent responseEvent = runFlow("all", getAllEvent(INVALID_EMAIL, INVALID_URL, false));
-        assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(ValidationResult.class)));
-        MultipleValidationResult result = (MultipleValidationResult) responseEvent.getMessage().getPayload();
-        assertThat(result.isError(), is(true));
-
-        String expectedMessage = Joiner.on('\n').join(messages.invalidUrl(INVALID_URL),
-                                                      messages.invalidEmail(INVALID_EMAIL));
-
-        assertThat(result.getMessage(), is(expectedMessage));
-
-        for (ValidationResult failedValidationResult : result.getFailedValidationResults())
+        try
         {
-            assertThat(failedValidationResult.isError(), is(true));
+            runFlow("all", getAllEvent(INVALID_EMAIL, INVALID_URL));
+            fail("was expecting a failure");
+        }
+        catch (Exception e)
+        {
+            Throwable root = ExceptionUtils.getRootCause(e);
+            assertThat(root, is(instanceOf(MultipleValidationException.class)));
+            MultipleValidationResult result = ((MultipleValidationException) root).getMultipleValidationResult();
+            assertThat(result.getFailedValidationResults(), hasSize(2));
+            assertThat(result.isError(), is(true));
+
+            String expectedMessage = Joiner.on('\n').join(messages.invalidUrl(INVALID_URL),
+                                                          messages.invalidEmail(INVALID_EMAIL));
+
+            assertThat(result.getMessage(), is(expectedMessage));
+
+            for (ValidationResult failedValidationResult : result.getFailedValidationResults())
+            {
+                assertThat(failedValidationResult.isError(), is(true));
+            }
         }
     }
 
     @Test
-    public void failureInAllThrowsException() throws Exception
+    public void oneFailInAll() throws Exception
     {
         try
         {
-            runFlow("all", getAllEvent(INVALID_EMAIL, VALID_URL, true));
+            runFlow("all", getAllEvent(INVALID_EMAIL, VALID_URL));
             fail("was expecting a failure");
         }
         catch (Exception e)
@@ -269,12 +266,11 @@ public class BasicValidationTestCase extends ValidationTestCase
         }
     }
 
-    private MuleEvent getAllEvent(String email, String url, boolean throwsException) throws Exception
+    private MuleEvent getAllEvent(String email, String url) throws Exception
     {
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("url", url);
         event.setFlowVariable("email", email);
-        event.setFlowVariable("throwsException", throwsException);
 
         return event;
     }

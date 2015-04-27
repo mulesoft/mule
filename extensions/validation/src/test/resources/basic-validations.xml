@@ -59,7 +59,7 @@
     </flow>
 
     <flow name="all">
-        <validation:all throwsException="#[throwsException]" config-ref="validation">
+        <validation:all config-ref="validation">
             <validation:validations>
                 <validation:is-url url="#[url]" config-ref="validation"/>
                 <validation:is-email email="#[email]" config-ref="validation"/>
