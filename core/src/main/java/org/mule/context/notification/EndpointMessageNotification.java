@@ -17,6 +17,20 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 public class EndpointMessageNotification extends BaseConnectorMessageNotification
 {
 
+    public static final int MESSAGE_DISPATCH_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 2;
+    public static final int MESSAGE_SEND_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 3;
+    public static final int MESSAGE_DISPATCH_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 1;
+    public static final int MESSAGE_SEND_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 2;
+
+    static
+    {
+        registerAction("begin dispatch", MESSAGE_DISPATCH_BEGIN);
+        registerAction("begin send", MESSAGE_SEND_BEGIN);
+
+        registerAction("end dispatch", MESSAGE_DISPATCH_END);
+        registerAction("end send", MESSAGE_SEND_END);
+    }
+
     /**
      * For backwards compatibility.  BEGIN is chosen where it contains the message sent, and END where it contains the message
      * received, again for backwards compatibility.
