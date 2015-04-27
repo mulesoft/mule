@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime;
 
-import static org.mule.repackaged.internal.org.springframework.util.ReflectionUtils.setField;
 import static org.mule.util.Preconditions.checkArgument;
+import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
