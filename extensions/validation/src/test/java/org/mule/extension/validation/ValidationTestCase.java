@@ -6,9 +6,20 @@
  */
 package org.mule.extension.validation;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import org.mule.api.MuleEvent;
+import org.mule.config.i18n.Message;
+import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
 {
@@ -33,5 +44,28 @@ abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
     protected void doSetUp() throws Exception
     {
         messages = new ValidationMessages();
+    }
+
+    protected void assertValid(String flowName, MuleEvent event) throws Exception
+    {
+        MuleEvent responseEvent = runFlow(flowName, event);
+        assertThat(responseEvent.getMessage().getExceptionPayload(), is(nullValue()));
+    }
+
+    protected void assertInvalid(String flowName, MuleEvent event, Message expectedMessage) throws Exception
+    {
+        try
+        {
+            runFlow(flowName, event);
+            fail("Was expecting a failure");
+        }
+        catch (Exception e)
+        {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            assertThat(rootCause, is(instanceOf(ValidationException.class)));
+            assertThat(rootCause.getMessage(), is(expectedMessage.getMessage()));
+            // assert that all placeholders were replaced in message
+            assertThat(rootCause.getMessage(), not(containsString("${")));
+        }
     }
 }

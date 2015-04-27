@@ -14,6 +14,7 @@ import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
 import org.mule.api.MuleEvent;
 import org.mule.api.el.ExpressionLanguage;
+import org.mule.extension.validation.internal.validator.NumberType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
 
@@ -156,33 +157,15 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void isLong() throws Exception
+    public void isNumber() throws Exception
     {
-        assertNumberValue("#[validator.isLong(payload, minValue, maxValue)]", Long.MAX_VALUE / 2, Long.MIN_VALUE + 1, Long.MAX_VALUE - 1, Long.MIN_VALUE, Long.MAX_VALUE);
-    }
+        final String expression = "#[validator.isNumber(payload, numberType, minValue, maxValue)]";
+        assertNumberValue(expression, NumberType.LONG, Long.MAX_VALUE / 2, Long.MIN_VALUE + 1, Long.MAX_VALUE - 1, Long.MIN_VALUE, Long.MAX_VALUE);
+        assertNumberValue(expression, NumberType.INTEGER, Integer.MAX_VALUE / 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
-    @Test
-    public void isInteger() throws Exception
-    {
-        assertNumberValue("#[validator.isInteger(payload, minValue, maxValue)]", Integer.MAX_VALUE / 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
-    }
-
-    @Test
-    public void isShort() throws Exception
-    {
-        assertNumberValue("#[validator.isShort(payload, minValue, maxValue)]", new Short("100"), new Integer(Short.MIN_VALUE + 1).shortValue(), new Integer(Short.MAX_VALUE - 1).shortValue(), Short.MIN_VALUE, Short.MAX_VALUE);
-    }
-
-    @Test
-    public void isDouble() throws Exception
-    {
-        assertNumberValue("#[validator.isDouble(payload, minValue, maxValue)]", 10D, 1D, 10D, Double.MIN_VALUE, Double.MAX_VALUE);
-    }
-
-    @Test
-    public void isFloat() throws Exception
-    {
-        assertNumberValue("#[validator.isFloat(payload, minValue, maxValue)]", 10F, 1F, 10F, 0F, 20F);
+        assertNumberValue(expression, NumberType.SHORT, new Short("100"), new Integer(Short.MIN_VALUE + 1).shortValue(), new Integer(Short.MAX_VALUE - 1).shortValue(), Short.MIN_VALUE, Short.MAX_VALUE);
+        assertNumberValue(expression, NumberType.DOUBLE, 10D, 1D, 10D, Double.MIN_VALUE, Double.MAX_VALUE);
+        assertNumberValue(expression, NumberType.FLOAT, 10F, 1F, 10F, 0F, 20F);
     }
 
     @Test
@@ -202,23 +185,25 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
     }
 
     private <T extends Number> void assertNumberValue(String expression,
+                                                      NumberType numberType,
                                                       T value,
                                                       T minValue,
                                                       T maxValue,
                                                       T lowerBoundaryViolation,
                                                       T upperBoundaryViolation) throws Exception
     {
-        assertValid(expression, getNumberValidationEvent(value, minValue, maxValue));
+        assertValid(expression, getNumberValidationEvent(value, numberType, minValue, maxValue));
         final String invalid = "unparseable";
-        assertInvalid(expression, getNumberValidationEvent(invalid, minValue, maxValue));
+        assertInvalid(expression, getNumberValidationEvent(invalid, numberType, minValue, maxValue));
 
-        assertInvalid(expression, getNumberValidationEvent(upperBoundaryViolation, minValue, maxValue));
-        assertInvalid(expression, getNumberValidationEvent(lowerBoundaryViolation, minValue, maxValue));
+        assertInvalid(expression, getNumberValidationEvent(upperBoundaryViolation, numberType, minValue, maxValue));
+        assertInvalid(expression, getNumberValidationEvent(lowerBoundaryViolation, numberType, minValue, maxValue));
     }
 
-    private MuleEvent getNumberValidationEvent(Object value, Object minValue, Object maxValue) throws Exception
+    private MuleEvent getNumberValidationEvent(Object value, NumberType numberType, Object minValue, Object maxValue) throws Exception
     {
         MuleEvent event = getTestEvent(value);
+        event.setFlowVariable("numberType", numberType);
         event.setFlowVariable("minValue", minValue);
         event.setFlowVariable("maxValue", maxValue);
 

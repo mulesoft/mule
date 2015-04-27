@@ -58,27 +58,6 @@
         <validation:is-null value="#[payload]" config-ref="validation"/>
     </flow>
 
-    <flow name="long">
-        <validation:is-long value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
-    </flow>
-
-    <flow name="integer">
-        <validation:is-integer value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]"
-                               config-ref="validation"/>
-    </flow>
-
-    <flow name="short">
-        <validation:is-short value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
-    </flow>
-
-    <flow name="double">
-        <validation:is-double value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
-    </flow>
-
-    <flow name="float">
-        <validation:is-float value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
-    </flow>
-
     <flow name="all">
         <validation:all throwsException="#[throwsException]" config-ref="validation">
             <validation:validations>

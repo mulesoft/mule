@@ -10,8 +10,10 @@ import org.mule.api.MuleEvent;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
+import org.mule.util.StringUtils;
 
-import org.springframework.util.StringUtils;
+import java.util.Locale;
+
 
 /**
  * Base class for validation operations with common
@@ -51,5 +53,11 @@ abstract class ValidationSupport
     protected ValidationContext createContext(ValidationOptions options, MuleEvent muleEvent)
     {
         return new ValidationContext(messages, options, muleEvent);
+    }
+
+    protected Locale parseLocale(String locale)
+    {
+        locale = StringUtils.isBlank(locale) ? ValidationExtension.DEFAULT_LOCALE : locale;
+        return new Locale(locale);
     }
 }

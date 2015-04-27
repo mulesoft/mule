@@ -87,12 +87,12 @@ public final class ValidationMessages extends MessageFactory
      * Generates a {@link Message} for a number type validation that failed
      *
      * @param value      the value that was tested
-     * @param numberType the {@Class} of a type that extends {@link Number}
+     * @param numberType the type that the tested value was expected to have
      * @return a {@link Message}
      */
-    public Message invalidNumberType(Object value, Class<? extends Number> numberType)
+    public Message invalidNumberType(Object value, String numberType)
     {
-        return createMessage(bundlePath, 2, value, numberType.getName());
+        return createMessage(bundlePath, 2, value, numberType);
     }
 
     /**

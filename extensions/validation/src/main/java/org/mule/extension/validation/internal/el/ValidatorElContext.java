@@ -13,19 +13,15 @@ import org.mule.extension.validation.internal.ValidationContext;
 import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.extension.validation.internal.ValidationOptions;
-import org.mule.extension.validation.internal.validator.DoubleValidator;
 import org.mule.extension.validation.internal.validator.EmailValidator;
 import org.mule.extension.validation.internal.validator.EmptyValidator;
-import org.mule.extension.validation.internal.validator.FloatValidator;
-import org.mule.extension.validation.internal.validator.IntegerValidator;
 import org.mule.extension.validation.internal.validator.IpValidator;
-import org.mule.extension.validation.internal.validator.LongValidator;
 import org.mule.extension.validation.internal.validator.MatchesRegexValidator;
 import org.mule.extension.validation.internal.validator.NotEmptyValidator;
 import org.mule.extension.validation.internal.validator.NotNullValidator;
 import org.mule.extension.validation.internal.validator.NullValidator;
-import org.mule.extension.validation.internal.validator.NumberValidationOptions;
-import org.mule.extension.validation.internal.validator.ShortValidator;
+import org.mule.extension.validation.internal.validator.NumberType;
+import org.mule.extension.validation.internal.validator.NumberValidator;
 import org.mule.extension.validation.internal.validator.SizeValidator;
 import org.mule.extension.validation.internal.validator.TimeValidator;
 import org.mule.extension.validation.internal.validator.UrlValidator;
@@ -182,164 +178,52 @@ public final class ValidatorElContext
     }
 
     /**
-     * Validates that {@code value} represents a valid {@link Long}
-     * with default locale of {@link ValidationExtension#DEFAULT_LOCALE)
-     * by using a {@link LongValidator}
+     * Validates that {@code value} can be parsed into a {@link Number},
+     * by the rules of a {@link NumberValidator}.
+     * <p/>
+     * No boundaries are checked. Default system pattern and {@link Locale} are used
      *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
+     * @param value      the value to test
+     * @param numberType the type of number to validate against
      * @return {@code true} if the validation succeeded. {@code false} otherwise
      */
-    public boolean isLong(String value, Number minValue, Number maxValue)
+    public boolean isNumber(String value, NumberType numberType)
     {
-        return isLong(value, minValue, maxValue, null, DEFAULT_LOCALE);
-    }
-
-
-    /**
-     * Validates that {@code value} represents a valid {@link Long}
-     * by using a {@link LongValidator}
-     *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
-     * @param pattern  the pattern to use when parsing {@code value}
-     * @param locale   a valid key as defined in {@link Locale}
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isLong(String value, Number minValue, Number maxValue, String pattern, String locale)
-    {
-        NumberValidationOptions options = new NumberValidationOptions(value, locale, pattern, minValue, maxValue);
-        return validate(new LongValidator(options, validationContext));
+        return isNumber(value, numberType, null, null);
     }
 
     /**
-     * Validates that {@code value} represents a valid {@link Double}
-     * with default locale of {@link ValidationExtension#DEFAULT_LOCALE)
-     * by using a {@link DoubleValidator}
+     * Validates that {@code value} can be parsed into a {@link Number},
+     * by the rules of a {@link NumberValidator}.
+     * <p/>
+     * Default system pattern and {@link Locale} are used
      *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
+     * @param value      the value to test
+     * @param numberType the type of number to validate against
+     * @param minValue   if not {@code null}, the parsed number is checked to be greater or equal than this
+     * @param minValue   if not {@code null}, the parsed number is checked to be lower or equal than this
      * @return {@code true} if the validation succeeded. {@code false} otherwise
      */
-    public boolean isDouble(String value, Number minValue, Number maxValue)
+    public boolean isNumber(String value, NumberType numberType, Number minValue, Number maxValue)
     {
-        return isDouble(value, minValue, maxValue, null, DEFAULT_LOCALE);
+        return isNumber(value, numberType, minValue, maxValue, null, DEFAULT_LOCALE);
     }
 
     /**
-     * Validates that {@code value} represents a valid {@link Double}
-     * by using a {@link DoubleValidator}
+     * Validates that {@code value} can be parsed into a {@link Number},
+     * by the rules of a {@link NumberValidator}.
      *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
-     * @param pattern  the pattern to use when parsing {@code value}
-     * @param locale   a valid key as defined in {@link Locale}
+     * @param value      the value to test
+     * @param numberType the type of number to validate against
+     * @param minValue   if not {@code null}, the parsed number is checked to be greater or equal than this
+     * @param minValue   if not {@code null}, the parsed number is checked to be lower or equal than this
+     * @param pattern    the pattern to use when parsing the {@code value}
+     * @param locale     the locale as a {@link String} to use when parsing the {@code value}
      * @return {@code true} if the validation succeeded. {@code false} otherwise
      */
-    public boolean isDouble(String value, Number minValue, Number maxValue, String pattern, String locale)
+    public boolean isNumber(String value, NumberType numberType, Number minValue, Number maxValue, String pattern, String locale)
     {
-        NumberValidationOptions options = new NumberValidationOptions(value, locale, pattern, minValue, maxValue);
-        return validate(new DoubleValidator(options, validationContext));
-    }
-
-    /**
-     * Validates that {@code value} represents a valid {@link Integer}
-     * with default locale of {@link ValidationExtension#DEFAULT_LOCALE)
-     * by using a {@link IntegerValidator}
-     *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isInteger(String value, Number minValue, Number maxValue)
-    {
-        return isInteger(value, minValue, maxValue, null, DEFAULT_LOCALE);
-    }
-
-    /**
-     * Validates that {@code value} represents a valid {@link Integer}
-     * by using a {@link IntegerValidator}
-     *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
-     * @param pattern  the pattern to use when parsing {@code value}
-     * @param locale   a valid key as defined in {@link Locale}
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isInteger(String value, Number minValue, Number maxValue, String pattern, String locale)
-    {
-        NumberValidationOptions options = new NumberValidationOptions(value, locale, pattern, minValue, maxValue);
-        return validate(new IntegerValidator(options, validationContext));
-    }
-
-    /**
-     * Validates that {@code value} represents a valid {@link Short}
-     * with default locale of {@link ValidationExtension#DEFAULT_LOCALE)
-     * by using a {@link ShortValidator}
-     *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isShort(String value, Number minValue, Number maxValue)
-    {
-        return isShort(value, minValue, maxValue, null, DEFAULT_LOCALE);
-    }
-
-    /**
-     * Validates that {@code value} represents a valid {@link Short}
-     * by using a {@link ShortValidator}
-     *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
-     * @param pattern  the pattern to use when parsing {@code value}
-     * @param locale   a valid key as defined in {@link Locale}
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isShort(String value, Number minValue, Number maxValue, String pattern, String locale)
-    {
-        NumberValidationOptions options = new NumberValidationOptions(value, locale, pattern, minValue, maxValue);
-        return validate(new ShortValidator(options, validationContext));
-    }
-
-    /**
-     * Validates that {@code value} represents a valid {@link Float}
-     * with default locale of {@link ValidationExtension#DEFAULT_LOCALE)
-     * by using a {@link FloatValidator}
-     *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isFloat(String value, Number minValue, Number maxValue)
-    {
-        return isFloat(value, minValue, maxValue, null, DEFAULT_LOCALE);
-    }
-
-    /**
-     * Validates that {@code value} represents a valid {@link Float}
-     * by using a {@link FloatValidator}
-     *
-     * @param value    the value to test
-     * @param minValue An inclusive minimum that {@code value} is expected to meet
-     * @param maxValue An inclusive maximum that {@code value} is expected to meet
-     * @param pattern  the pattern to use when parsing {@code value}
-     * @param locale   a valid key as defined in {@link Locale}
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isFloat(String value, Number minValue, Number maxValue, String pattern, String locale)
-    {
-        NumberValidationOptions options = new NumberValidationOptions(value, locale, pattern, minValue, maxValue);
-        return validate(new FloatValidator(options, validationContext));
+        return validate(new NumberValidator(value, new Locale(locale), pattern, minValue, maxValue, numberType, validationContext));
     }
 
     /**

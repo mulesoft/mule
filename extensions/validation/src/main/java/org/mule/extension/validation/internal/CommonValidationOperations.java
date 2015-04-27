@@ -13,19 +13,13 @@ import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.validator.BooleanValidator;
-import org.mule.extension.validation.internal.validator.DoubleValidator;
 import org.mule.extension.validation.internal.validator.EmailValidator;
 import org.mule.extension.validation.internal.validator.EmptyValidator;
-import org.mule.extension.validation.internal.validator.FloatValidator;
-import org.mule.extension.validation.internal.validator.IntegerValidator;
 import org.mule.extension.validation.internal.validator.IpValidator;
-import org.mule.extension.validation.internal.validator.LongValidator;
 import org.mule.extension.validation.internal.validator.MatchesRegexValidator;
 import org.mule.extension.validation.internal.validator.NotEmptyValidator;
 import org.mule.extension.validation.internal.validator.NotNullValidator;
 import org.mule.extension.validation.internal.validator.NullValidator;
-import org.mule.extension.validation.internal.validator.NumberValidationOptions;
-import org.mule.extension.validation.internal.validator.ShortValidator;
 import org.mule.extension.validation.internal.validator.SizeValidator;
 import org.mule.extension.validation.internal.validator.TimeValidator;
 import org.mule.extension.validation.internal.validator.UrlValidator;
@@ -83,21 +77,6 @@ public final class CommonValidationOperations extends ValidationSupport
     }
 
     /**
-     * Receives a numeric {@code value} as a {@link String} and validates that it can be parsed as a {@link Double}
-     *
-     * @param numberValidationOptions the number options
-     * @param options                 the {@link ValidationOptions}
-     * @param event                   the current {@link MuleEvent
-     */
-    @Operation
-    public void isDouble(@ParameterGroup NumberValidationOptions numberValidationOptions,
-                         @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
-    {
-        ValidationContext context = createContext(options, event);
-        validateWith(new DoubleValidator(numberValidationOptions, context), context, event);
-    }
-
-    /**
      * Validates that the {@code email} address is valid
      *
      * @param email   an email address
@@ -109,36 +88,6 @@ public final class CommonValidationOperations extends ValidationSupport
     {
         ValidationContext context = createContext(options, event);
         validateWith(new EmailValidator(email, context), context, event);
-    }
-
-    /**
-     * Receives a numeric {@code value} as a {@link String} and validates that it can be parsed as a {@link Float}
-     *
-     * @param numberValidationOptions the number options
-     * @param options                 the {@link ValidationOptions}
-     * @param event                   the current {@link MuleEvent
-     */
-    @Operation
-    public void isFloat(@ParameterGroup NumberValidationOptions numberValidationOptions,
-                        @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
-    {
-        ValidationContext context = createContext(options, event);
-        validateWith(new FloatValidator(numberValidationOptions, context), context, event);
-    }
-
-    /**
-     * Receives a numeric {@code value} as a {@link String} and validates that it can be parsed as a {@link Integer}
-     *
-     * @param numberValidationOptions the number options
-     * @param options                 the {@link ValidationOptions}
-     * @param event                   the current {@link MuleEvent
-     */
-    @Operation
-    public void isInteger(@ParameterGroup NumberValidationOptions numberValidationOptions,
-                          @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
-    {
-        ValidationContext context = createContext(options, event);
-        validateWith(new IntegerValidator(numberValidationOptions, context), context, event);
     }
 
     /**
@@ -175,21 +124,6 @@ public final class CommonValidationOperations extends ValidationSupport
     {
         ValidationContext context = createContext(options, event);
         validateWith(new SizeValidator(value, min, max, context), context, event);
-    }
-
-    /**
-     * Receives a numeric {@code value} as a {@link String} and validates that it can be parsed as a {@link Long}
-     *
-     * @param numberValidationOptions the number options
-     * @param options                 the {@link ValidationOptions}
-     * @param event                   the current {@link MuleEvent
-     */
-    @Operation
-    public void isLong(@ParameterGroup NumberValidationOptions numberValidationOptions,
-                       @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
-    {
-        ValidationContext context = createContext(options, event);
-        validateWith(new LongValidator(numberValidationOptions, context), context, event);
     }
 
     /**
@@ -257,21 +191,6 @@ public final class CommonValidationOperations extends ValidationSupport
     {
         ValidationContext context = createContext(options, event);
         validateWith(new NullValidator(value, context), context, event);
-    }
-
-    /**
-     * Receives a numeric {@code value} as a {@link String} and validates that it can be parsed as a {@link Short}
-     *
-     * @param numberValidationOptions the number options
-     * @param options                 the {@link ValidationOptions}
-     * @param event                   the current {@link MuleEvent
-     */
-    @Operation
-    public void isShort(@ParameterGroup NumberValidationOptions numberValidationOptions,
-                        @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
-    {
-        ValidationContext context = createContext(options, event);
-        validateWith(new ShortValidator(numberValidationOptions, context), context, event);
     }
 
     /**

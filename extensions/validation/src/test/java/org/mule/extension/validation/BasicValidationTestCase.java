@@ -6,21 +6,16 @@
  */
 package org.mule.extension.validation;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
 import org.mule.api.MuleEvent;
-import org.mule.config.i18n.Message;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
-import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.mvel2.compiler.BlankLiteral;
@@ -120,36 +115,6 @@ public class BasicValidationTestCase extends ValidationTestCase
         map.put("c", "c");
 
         assertSize(map);
-    }
-
-    @Test
-    public void isLong() throws Exception
-    {
-        assertNumberValue("long", Long.class, Long.MAX_VALUE / 2, Long.MIN_VALUE + 1, Long.MAX_VALUE - 1, Long.MIN_VALUE, Long.MAX_VALUE);
-    }
-
-    @Test
-    public void isInteger() throws Exception
-    {
-        assertNumberValue("integer", Integer.class, Integer.MAX_VALUE / 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
-    }
-
-    @Test
-    public void isShort() throws Exception
-    {
-        assertNumberValue("short", Short.class, new Short("100"), new Integer(Short.MIN_VALUE + 1).shortValue(), new Integer(Short.MAX_VALUE - 1).shortValue(), Short.MIN_VALUE, Short.MAX_VALUE);
-    }
-
-    @Test
-    public void isDouble() throws Exception
-    {
-        assertNumberValue("double", Double.class, 10D, 1D, 10D, Double.MIN_VALUE, Double.MAX_VALUE);
-    }
-
-    @Test
-    public void isFloat() throws Exception
-    {
-        assertNumberValue("float", Float.class, 10F, 1F, 10F, 0F, 20F);
     }
 
     @Test
@@ -305,21 +270,7 @@ public class BasicValidationTestCase extends ValidationTestCase
         return event;
     }
 
-    private <T extends Number> void assertNumberValue(String flowName,
-                                                      Class<T> numberType,
-                                                      T value,
-                                                      T minValue,
-                                                      T maxValue,
-                                                      T lowerBoundaryViolation,
-                                                      T upperBoundaryViolation) throws Exception
-    {
-        assertValid(flowName, getNumberValidationEvent(value, minValue, maxValue));
-        final String invalid = "unparseable";
-        assertInvalid(flowName, getNumberValidationEvent(invalid, minValue, maxValue), messages.invalidNumberType(invalid, numberType));
 
-        assertInvalid(flowName, getNumberValidationEvent(upperBoundaryViolation, minValue, maxValue), messages.greaterThan(upperBoundaryViolation, maxValue));
-        assertInvalid(flowName, getNumberValidationEvent(lowerBoundaryViolation, minValue, maxValue), messages.lowerThan(lowerBoundaryViolation, minValue));
-    }
 
     private void assertSize(Object value) throws Exception
     {
@@ -345,38 +296,6 @@ public class BasicValidationTestCase extends ValidationTestCase
         event.setFlowVariable("maxLength", maxLength);
 
         return event;
-    }
-
-    private MuleEvent getNumberValidationEvent(Object value, Object minValue, Object maxValue) throws Exception
-    {
-        MuleEvent event = getTestEvent(value);
-        event.setFlowVariable("minValue", minValue);
-        event.setFlowVariable("maxValue", maxValue);
-
-        return event;
-    }
-
-    private void assertValid(String flowName, MuleEvent event) throws Exception
-    {
-        MuleEvent responseEvent = runFlow(flowName, event);
-        assertThat(responseEvent.getMessage().getExceptionPayload(), is(nullValue()));
-    }
-
-    private void assertInvalid(String flowName, MuleEvent event, Message expectedMessage) throws Exception
-    {
-        try
-        {
-            runFlow(flowName, event);
-            fail("Was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable rootCause = ExceptionUtils.getRootCause(e);
-            assertThat(rootCause, is(instanceOf(ValidationException.class)));
-            assertThat(rootCause.getMessage(), is(expectedMessage.getMessage()));
-            // assert that all placeholders were replaced in message
-            assertThat(rootCause.getMessage(), not(containsString("${")));
-        }
     }
 
     public static class TestCustomValidator implements Validator
