@@ -15,6 +15,11 @@ import org.junit.Test;
 public class HttpRequestBuilderCompositionTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestBuilderCompositionTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

@@ -39,6 +39,11 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     private static final String DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME = "requestConfigHttp";
     private static final String DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME = "requestConfigHttps";
 
+    public HttpRequestFunctionalTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

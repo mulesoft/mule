@@ -22,6 +22,11 @@ import org.junit.Test;
 public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestValidateCertificateTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

@@ -27,6 +27,11 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
 {
     private static final String URL_ENCODED_STRING = "testName1=testValue1&testName2=testValue2";
 
+    public HttpRequestFormParamsTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

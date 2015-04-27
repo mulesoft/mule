@@ -19,6 +19,11 @@ import org.junit.Test;
 public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestQueryParamsTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

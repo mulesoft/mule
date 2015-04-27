@@ -6,8 +6,11 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static org.mule.context.DefaultMuleContextBuilder.MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE;
+import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.FileUtils;
 import org.mule.util.CaseInsensitiveMapWrapper;
 import org.mule.util.IOUtils;
@@ -18,6 +21,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -36,14 +40,19 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-public class AbstractHttpRequestTestCase extends FunctionalTestCase
+@RunWith(Parameterized.class)
+public abstract class AbstractHttpRequestTestCase extends FunctionalTestCase
 {
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
     @Rule
     public DynamicPort httpsPort = new DynamicPort("httpsPort");
+    @Rule
+    public SystemProperty systemProperty;
 
     public static final String DEFAULT_RESPONSE = "<h1>Response</h1>";
 
@@ -62,6 +71,17 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
             });
 
     protected String body;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {{false}, {true}});
+    }
+
+    public AbstractHttpRequestTestCase(boolean nonBlocking)
+    {
+        systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY, Boolean.toString(nonBlocking));
+    }
 
     @Before
     public void startServer() throws Exception

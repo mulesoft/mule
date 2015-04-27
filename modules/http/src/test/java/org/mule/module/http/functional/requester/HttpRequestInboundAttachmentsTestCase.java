@@ -30,6 +30,11 @@ import org.junit.Test;
 public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestInboundAttachmentsTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

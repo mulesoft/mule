@@ -24,6 +24,11 @@ import org.junit.Test;
 public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestNotificationsTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

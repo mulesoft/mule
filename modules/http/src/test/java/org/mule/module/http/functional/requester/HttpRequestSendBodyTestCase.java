@@ -19,6 +19,11 @@ import org.junit.Test;
 public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestSendBodyTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

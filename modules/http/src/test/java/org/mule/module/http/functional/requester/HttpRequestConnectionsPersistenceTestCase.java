@@ -28,6 +28,11 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
 
     private int remotePort;
 
+    public HttpRequestConnectionsPersistenceTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

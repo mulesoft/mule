@@ -6,14 +6,17 @@
  */
 package org.mule.module.http.functional.proxy;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
+import org.mule.MessageExchangePattern;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.functional.TestInputStream;
 import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
+import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 import org.mule.util.concurrent.Latch;
@@ -25,6 +28,8 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,9 +42,12 @@ import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
+import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
 {
@@ -47,8 +55,17 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     @Rule
     public DynamicPort proxyPort = new DynamicPort("proxyPort");
 
+    private static String SENSING_REQUEST_RESPONSE_PROCESSOR_NAME = "sensingRequestResponseProcessor";
+
     private RequestHandlerExtender handlerExtender;
     private boolean consumeAllRequest = true;
+    private boolean nonBlocking;
+
+    public HttpProxyTemplateTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+        this.nonBlocking = nonBlocking;
+    }
 
     @Override
     protected String getConfigFile()
@@ -253,6 +270,34 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
 
         assertThat(getFirstReceivedHeader(X_FORWARDED_FOR), startsWith("/127.0.0.1:"));
+    }
+
+    @Test
+    public void requestThreadWorkerThread() throws Exception
+    {
+        assertRequestOk(getProxyUrl(""), null);
+        SensingNullRequestResponseMessageProcessor requestResponseProcessor = getSensingNullRequestResponseMessageProcessor();
+        assertThat(requestResponseProcessor.requestThread, not(equalTo(Thread.currentThread())));
+    }
+
+    @Test
+    public void responseThread() throws Exception
+    {
+        assertRequestOk(getProxyUrl(""), null);
+        SensingNullRequestResponseMessageProcessor requestResponseProcessor = getSensingNullRequestResponseMessageProcessor();
+        if (nonBlocking)
+        {
+            assertThat(requestResponseProcessor.requestThread, not(equalTo(requestResponseProcessor.responseThread)));
+        }
+        else
+        {
+            assertThat(requestResponseProcessor.requestThread, equalTo(requestResponseProcessor.responseThread));
+        }
+    }
+
+    private SensingNullRequestResponseMessageProcessor getSensingNullRequestResponseMessageProcessor()
+    {
+        return muleContext.getRegistry().lookupObject(SENSING_REQUEST_RESPONSE_PROCESSOR_NAME);
     }
 
     private void assertRequestOk(String url, String expectedResponse) throws IOException
