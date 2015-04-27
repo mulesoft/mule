@@ -9,7 +9,6 @@ package org.mule.extension.validation.internal;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.extension.validation.api.Validator;
-import org.mule.extension.validation.internal.validator.CreditCardType;
 import org.mule.mvel2.compiler.BlankLiteral;
 
 import java.util.Collection;
@@ -85,18 +84,6 @@ public final class ValidationMessages extends MessageFactory
     }
 
     /**
-     * Generates a {@link Message} for a credit card number validation that failed
-     *
-     * @param creditCardNumber the credit card number
-     * @param creditCardType   the credit card type
-     * @return a {@link Message}
-     */
-    public Message invalidCreditCard(String creditCardNumber, CreditCardType creditCardType)
-    {
-        return createMessage(bundlePath, 2, creditCardNumber, creditCardType);
-    }
-
-    /**
      * Generates a {@link Message} for a number type validation that failed
      *
      * @param value      the value that was tested
@@ -105,7 +92,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message invalidNumberType(Object value, Class<? extends Number> numberType)
     {
-        return createMessage(bundlePath, 3, value, numberType.getName());
+        return createMessage(bundlePath, 2, value, numberType.getName());
     }
 
     /**
@@ -118,7 +105,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message lowerThan(Object value, Object boundary)
     {
-        return createMessage(bundlePath, 4, value, boundary);
+        return createMessage(bundlePath, 3, value, boundary);
     }
 
     /**
@@ -131,34 +118,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message greaterThan(Object value, Object boundary)
     {
-        return createMessage(bundlePath, 5, value, boundary);
-    }
-
-    /**
-     * Generates a {@link Message} for a {@code date} represented
-     * in {@link String} format which cannot be parsed
-     * using the given {@code pattern} and {@code locale}
-     *
-     * @param date    the input {@link String}
-     * @param locale  the locale
-     * @param pattern the pattern that was used
-     * @return a {@link Message}
-     */
-    public Message invalidDate(String date, String locale, String pattern)
-    {
-        return createMessage(bundlePath, 6, date, pattern, locale);
-    }
-
-    /**
-     * Generates a {@link Message} for a domain validation
-     * that failed
-     *
-     * @param domain the validated domain
-     * @return a {@link Message}
-     */
-    public Message invalidDomain(String domain)
-    {
-        return createMessage(bundlePath, 7, domain);
+        return createMessage(bundlePath, 4, value, boundary);
     }
 
     /**
@@ -170,7 +130,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message invalidEmail(String email)
     {
-        return createMessage(bundlePath, 8, email);
+        return createMessage(bundlePath, 5, email);
     }
 
     /**
@@ -182,31 +142,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message invalidIp(String ip)
     {
-        return createMessage(bundlePath, 9, ip);
-    }
-
-    /**
-     * Generates a {@link Message} for a ISBN10
-     * validation that failed
-     *
-     * @param isbn the validated isbn code
-     * @return a {@link Message}
-     */
-    public Message invalidISBN10(String isbn)
-    {
-        return createMessage(bundlePath, 10, isbn);
-    }
-
-    /**
-     * Generates a {@link Message} for a ISBN13
-     * validation that failed
-     *
-     * @param isbn the validated isbn code
-     * @return a {@link Message}
-     */
-    public Message invalidISBN13(String isbn)
-    {
-        return createMessage(bundlePath, 11, isbn);
+        return createMessage(bundlePath, 6, ip);
     }
 
     /**
@@ -220,7 +156,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message lowerThanMinSize(Object value, int minSize, int actualSize)
     {
-        return createMessage(bundlePath, 12, value, minSize, actualSize);
+        return createMessage(bundlePath, 7, value, minSize, actualSize);
     }
 
     /**
@@ -234,7 +170,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message greaterThanMaxSize(Object value, int maxSize, int actualSize)
     {
-        return createMessage(bundlePath, 13, value, maxSize, actualSize);
+        return createMessage(bundlePath, 8, value, maxSize, actualSize);
     }
 
     /**
@@ -245,7 +181,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message valueIsNull()
     {
-        return createMessage(bundlePath, 14);
+        return createMessage(bundlePath, 9);
     }
 
     /**
@@ -256,7 +192,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message collectionIsEmpty()
     {
-        return createMessage(bundlePath, 15);
+        return createMessage(bundlePath, 10);
     }
 
     /**
@@ -268,7 +204,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message stringIsBlank()
     {
-        return createMessage(bundlePath, 16);
+        return createMessage(bundlePath, 11);
     }
 
     /**
@@ -280,7 +216,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message mapIsEmpty()
     {
-        return createMessage(bundlePath, 17);
+        return createMessage(bundlePath, 12);
     }
 
     /**
@@ -291,7 +227,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message valueIsBlankLiteral()
     {
-        return createMessage(bundlePath, 18);
+        return createMessage(bundlePath, 13);
     }
 
     /**
@@ -302,7 +238,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message wasExpectingNull()
     {
-        return createMessage(bundlePath, 19);
+        return createMessage(bundlePath, 14);
     }
 
     /**
@@ -317,31 +253,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message invalidTime(String time, String locale, String pattern)
     {
-        return createMessage(bundlePath, 20, time, pattern, locale);
-    }
-
-    /**
-     * Generates a {@link Message} for a {@code countryCode} which
-     * is not a valid domain country code
-     *
-     * @param countryCode the tested country code
-     * @return a {@link Message}
-     */
-    public Message invalidDomainCountryCode(String countryCode)
-    {
-        return createMessage(bundlePath, 21, countryCode);
-    }
-
-    /**
-     * Generates a {@link Message} for a {@code domain} that was expected
-     * to be a valid top level domain but wasn't
-     *
-     * @param domain the tested domain
-     * @return a {@link Message}
-     */
-    public Message invalidTopLevelDomain(String domain)
-    {
-        return createMessage(bundlePath, 22, domain);
+        return createMessage(bundlePath, 15, time, pattern, locale);
     }
 
     /**
@@ -352,7 +264,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message invalidUrl(String url)
     {
-        return createMessage(bundlePath, 23, url);
+        return createMessage(bundlePath, 16, url);
     }
 
     /**
@@ -365,7 +277,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message regexDoesNotMatch(String value, String regex)
     {
-        return createMessage(bundlePath, 24, value, regex);
+        return createMessage(bundlePath, 17, value, regex);
     }
 
     /**
@@ -376,7 +288,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message arrayIsEmpty()
     {
-        return createMessage(bundlePath, 25);
+        return createMessage(bundlePath, 18);
     }
 
     /**
@@ -387,7 +299,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message stringIsNotBlank()
     {
-        return createMessage(bundlePath, 26);
+        return createMessage(bundlePath, 19);
     }
 
     /**
@@ -398,7 +310,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message collectionIsNotEmpty()
     {
-        return createMessage(bundlePath, 27);
+        return createMessage(bundlePath, 20);
     }
 
     /**
@@ -409,7 +321,7 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message mapIsNotEmpty()
     {
-        return createMessage(bundlePath, 28);
+        return createMessage(bundlePath, 21);
     }
 
     /**
@@ -420,6 +332,6 @@ public final class ValidationMessages extends MessageFactory
      */
     public Message arrayIsNotEmpty()
     {
-        return createMessage(bundlePath, 29);
+        return createMessage(bundlePath, 22);
     }
 }

@@ -8,15 +8,9 @@ package org.mule.extension.validation;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.validation.ValidationTestCase.INVALID_CREDIT_CARD_NUMBER;
 import static org.mule.extension.validation.ValidationTestCase.INVALID_EMAIL;
-import static org.mule.extension.validation.ValidationTestCase.INVALID_ISBN10;
-import static org.mule.extension.validation.ValidationTestCase.INVALID_ISBN13;
 import static org.mule.extension.validation.ValidationTestCase.INVALID_URL;
-import static org.mule.extension.validation.ValidationTestCase.VALID_CREDIT_CARD_NUMBER;
 import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
-import static org.mule.extension.validation.ValidationTestCase.VALID_ISBN10;
-import static org.mule.extension.validation.ValidationTestCase.VALID_ISBN13;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
 import org.mule.api.MuleEvent;
 import org.mule.api.el.ExpressionLanguage;
@@ -90,21 +84,6 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
 
         assertInvalid("#[validator.isTime(payload, invalidPattern)]", event);
         assertInvalid("#[validator.isTime(payload, invalidPattern, 'US')]", event);
-    }
-
-    @Test
-    public void isDate() throws Exception
-    {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("validDate", "1983-04-20");
-        event.setFlowVariable("invalidDate", "Wed, Jul 4, '01");
-        event.setFlowVariable("pattern", "yyyy-MM-dd");
-
-        assertValid("#[validator.isDate(validDate, pattern)]", event);
-        assertValid("#[validator.isDate(validDate, pattern, 'US')]", event);
-
-        assertInvalid("#[validator.isDate(invalidDate, pattern)]", event);
-        assertInvalid("#[validator.isDate(invalidDate, pattern, 'US')]", event);
     }
 
     @Test
@@ -207,52 +186,11 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void creditCardNumber() throws Exception
-    {
-        final String expression = "#[validator.validateCreditCardNumber(payload, 'MASTERCARD')]";
-
-        assertValid(expression, getTestEvent(VALID_CREDIT_CARD_NUMBER));
-        assertInvalid(expression, getTestEvent(INVALID_CREDIT_CARD_NUMBER));
-    }
-
-    @Test
-    public void validateTopLevelDomainCountryCode() throws Exception
-    {
-        final String expression = "#[validator.validateTopLevelDomainCountryCode(payload)]";
-        assertValid(expression, getTestEvent("ar"));
-        assertInvalid(expression, getTestEvent("invalid"));
-    }
-
-    @Test
-    public void topLevelDomain() throws Exception
-    {
-        final String expression = "#[validator.validateTopLevelDomain(payload)]";
-        assertValid(expression, getTestEvent("com"));
-        assertInvalid(expression, getTestEvent("invalid"));
-    }
-
-    @Test
     public void ip() throws Exception
     {
         final String expression = "#[validator.validateIp(payload)]";
         assertValid(expression, getTestEvent("127.0.0.1"));
         assertInvalid(expression, getTestEvent("ET phone home"));
-    }
-
-    @Test
-    public void isbn13() throws Exception
-    {
-        final String expression = "#[validator.validateIsbn13(payload)]";
-        assertValid(expression, getTestEvent(VALID_ISBN13));
-        assertInvalid(expression, getTestEvent(INVALID_ISBN13));
-    }
-
-    @Test
-    public void isbn10() throws Exception
-    {
-        final String expression = "#[validator.validateIsbn10(payload)]";
-        assertValid(expression, getTestEvent(VALID_ISBN10));
-        assertInvalid(expression, getTestEvent(INVALID_ISBN10));
     }
 
     @Test

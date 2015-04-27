@@ -7,23 +7,16 @@
 package org.mule.extension.validation.internal.el;
 
 import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
-import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
-import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.ValidationContext;
+import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.extension.validation.internal.ValidationOptions;
-import org.mule.extension.validation.internal.validator.CreditCardNumberValidator;
-import org.mule.extension.validation.internal.validator.CreditCardType;
-import org.mule.extension.validation.internal.validator.DateValidator;
-import org.mule.extension.validation.internal.validator.DomainCountryCodeValidator;
 import org.mule.extension.validation.internal.validator.DoubleValidator;
 import org.mule.extension.validation.internal.validator.EmailValidator;
 import org.mule.extension.validation.internal.validator.EmptyValidator;
 import org.mule.extension.validation.internal.validator.FloatValidator;
-import org.mule.extension.validation.internal.validator.ISBN10Validator;
-import org.mule.extension.validation.internal.validator.ISBN13Validator;
 import org.mule.extension.validation.internal.validator.IntegerValidator;
 import org.mule.extension.validation.internal.validator.IpValidator;
 import org.mule.extension.validation.internal.validator.LongValidator;
@@ -35,12 +28,8 @@ import org.mule.extension.validation.internal.validator.NumberValidationOptions;
 import org.mule.extension.validation.internal.validator.ShortValidator;
 import org.mule.extension.validation.internal.validator.SizeValidator;
 import org.mule.extension.validation.internal.validator.TimeValidator;
-import org.mule.extension.validation.internal.validator.TopLevelDomainValidator;
 import org.mule.extension.validation.internal.validator.UrlValidator;
 import org.mule.transport.NullPayload;
-
-import com.google.common.base.Enums;
-import com.google.common.base.Optional;
 
 import java.util.Locale;
 
@@ -128,39 +117,6 @@ public final class ValidatorElContext
     public boolean isTime(String time, String pattern, String locale)
     {
         return validate(new TimeValidator(time, locale, pattern, validationContext));
-    }
-
-    /**
-     * Validates that {@code date} represents a valid date
-     * according to the given {@code pattern} and an the
-     * default locale {@link ValidationExtension#DEFAULT_LOCALE)
-     * by using a {@link DateValidator}
-     *
-     * @param date    A date in String format
-     * @param pattern the pattern for the {@code date}
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isDate(String date, String pattern)
-    {
-        return isDate(date, pattern, DEFAULT_LOCALE);
-    }
-
-    /**
-     * Validates that {@code date} represents a valid date
-     * according to the given {@code pattern} and {@code locale}
-     * by using a {@link DateValidator}.
-     * <p/>
-     * {@code locale} is expected to be a valid key as defined in
-     * {@link Locale}
-     *
-     * @param date    A date in String format
-     * @param locale  the locale of the String
-     * @param pattern the pattern for the {@code date}
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean isDate(String date, String pattern, String locale)
-    {
-        return validate(new DateValidator(date, locale, pattern, validationContext));
     }
 
     /**
@@ -387,60 +343,6 @@ public final class ValidatorElContext
     }
 
     /**
-     * Validates that {@code creditCardNumber} is valid
-     * for the given {@code creditCardType} by using a
-     * {@link CreditCardNumberValidator}
-     *
-     * @param creditCardNumber the credit card number to validate
-     * @param creditCardType   a valid key defined in {@link CreditCardType}
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean validateCreditCardNumber(String creditCardNumber, String creditCardType)
-    {
-        Optional<CreditCardType> ccType = Enums.getIfPresent(CreditCardType.class, creditCardType);
-        checkArgument(ccType.isPresent(), "unknown credit card type " + creditCardType);
-        return validateCreditCardNumber(creditCardNumber, ccType.get());
-    }
-
-    /**
-     * Validates that {@code creditCardNumber} is valid
-     * for the given {@code creditCardType} by using a
-     * {@link CreditCardNumberValidator}
-     *
-     * @param creditCardNumber the credit card number to validate
-     * @param creditCardType   the card's type
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean validateCreditCardNumber(String creditCardNumber, CreditCardType creditCardType)
-    {
-        return validate(new CreditCardNumberValidator(creditCardNumber, creditCardType, validationContext));
-    }
-
-    /**
-     * Validates that {@code countryCode} matches any IANA-defined
-     * top-level domain country code by using a {@link DomainCountryCodeValidator}
-     *
-     * @param countryCode the country code to validate
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean validateTopLevelDomainCountryCode(String countryCode)
-    {
-        return validate(new DomainCountryCodeValidator(countryCode, validationContext));
-    }
-
-    /**
-     * Validates that {@code domain} matches any IANA-defined
-     * top-level domain by using a {@link TopLevelDomainValidator}
-     *
-     * @param topLevelDomain the domain to validate
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean validateTopLevelDomain(String topLevelDomain)
-    {
-        return validate(new TopLevelDomainValidator(topLevelDomain, validationContext));
-    }
-
-    /**
      * Validates that an {@code ip} address represented as a {@link String} is valid
      * by using a {@link IpValidator}
      *
@@ -450,30 +352,6 @@ public final class ValidatorElContext
     public boolean validateIp(String ip)
     {
         return validate(new IpValidator(ip, validationContext));
-    }
-
-    /**
-     * Validates that the supplied {@code isbn} is a valid ISBN13 code
-     * by using a {@link ISBN13Validator}
-     *
-     * @param isbn the code to validate
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean validateIsbn13(String isbn)
-    {
-        return validate(new ISBN13Validator(isbn, validationContext));
-    }
-
-    /**
-     * Validates that the supplied {@code isbn} is a valid ISBN10 code
-     * by using a {@link ISBN10Validator}
-     *
-     * @param isbn the code to validate
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean validateIsbn10(String isbn)
-    {
-        return validate(new ISBN10Validator(isbn, validationContext));
     }
 
     /**
