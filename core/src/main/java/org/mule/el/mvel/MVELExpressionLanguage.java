@@ -355,4 +355,9 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         return globalFunctions;
     }
 
+    protected ParserConfiguration getParserConfiguration()
+    {
+        return parserConfiguration;
+    }
+
 }
