@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.config;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.config.DirectThreadingProfile;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
@@ -66,6 +67,8 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("raml-api-configuration", new ChildDefinitionParser("apiConfiguration", RamlApiConfiguration.class));
         registerBeanDefinitionParser("worker-threading-profile", new ThreadingProfileDefinitionParser("workerThreadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
+        registerBeanDefinitionParser("selector-threading-profile", new ThreadingProfileDefinitionParser("workerThreadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
+                                                                                                        DirectThreadingProfile.class));
         registerBeanDefinitionParser("config", new ChildDefinitionParser("extension", HttpConfiguration.class));
     }
 }

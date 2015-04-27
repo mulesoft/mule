@@ -19,7 +19,12 @@ public class ThreadingProfileDefinitionParser extends ChildDefinitionParser
 
     public ThreadingProfileDefinitionParser(String propertyName, String defaults)
     {
-        super(propertyName, ChainedThreadingProfile.class);
+        this(propertyName, defaults, ChainedThreadingProfile.class);
+    }
+
+    public ThreadingProfileDefinitionParser(String propertyName, String defaults, Class<? extends ThreadingProfile> threadingProfileClass)
+    {
+        super(propertyName, threadingProfileClass);
         addMapping("poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS);
         registerPostProcessor(new ConstructorReference(defaults));
     }
