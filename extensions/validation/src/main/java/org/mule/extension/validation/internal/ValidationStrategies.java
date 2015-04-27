@@ -59,8 +59,7 @@ public final class ValidationStrategies
      * @throws MultipleValidationException if at least one validator fails and {@code throwsException} is {@code true}
      */
     @Operation
-    public MuleEvent all(@RestrictedTo(ValidationExtension.class) List<NestedProcessor> validations,
-                         @Optional(defaultValue = "true") boolean throwsException,
+    public void all(@RestrictedTo(ValidationExtension.class) List<NestedProcessor> validations,
                          MuleEvent muleEvent) throws MultipleValidationException
     {
         List<ValidationResult> results = new ArrayList<>(validations.size());
@@ -78,12 +77,9 @@ public final class ValidationStrategies
 
         MultipleValidationResult result = ImmutableMultipleValidationResult.of(results);
 
-        if (result.isError() && throwsException)
+        if (result.isError())
         {
             throw new MultipleValidationException(result, muleEvent);
         }
-
-        muleEvent.getMessage().setPayload(result);
-        return muleEvent;
     }
 }

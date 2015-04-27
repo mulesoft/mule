@@ -59,12 +59,23 @@
     </flow>
 
     <flow name="all">
-        <validation:all throwsException="#[throwsException]" config-ref="validation">
+        <validation:all config-ref="validation">
             <validation:validations>
                 <validation:is-url url="#[url]" config-ref="validation"/>
                 <validation:is-email email="#[email]" config-ref="validation"/>
             </validation:validations>
         </validation:all>
+    </flow>
+
+    <flow name="choice">
+        <choice>
+            <when expression="#[validator.validateEmail(payload)]">
+                <set-payload value="valid" />
+            </when>
+            <otherwise>
+                <set-payload value="invalid" />
+            </otherwise>
+        </choice>
     </flow>
 
     <flow name="customValidationByClass">

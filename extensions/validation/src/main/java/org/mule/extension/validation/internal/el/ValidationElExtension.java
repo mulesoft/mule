@@ -35,6 +35,6 @@ public final class ValidationElExtension implements ExpressionLanguageExtension
     @Override
     public void configureContext(ExpressionLanguageContext context)
     {
-        context.addAlias("validator", "new org.mule.extension.validation.internal.el.ValidatorElContext(_muleEvent)");
+        context.addFinalVariable("validator", new ValidatorElContext());
     }
 }

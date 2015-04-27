@@ -10,7 +10,7 @@
     <validation:config name="validation" />
 
     <flow name="validate">
-        <validation:all throwsException="true" config-ref="validation">
+        <validation:all config-ref="validation">
             <validation:validations>
                 <json:validate-schema schemaLocation="schema/fstab-bad.json" />
             </validation:validations>
