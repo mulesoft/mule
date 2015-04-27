@@ -22,25 +22,19 @@ import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
-import org.mule.repackaged.internal.org.springframework.core.ResolvableType;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their operations
@@ -115,39 +109,6 @@ public class IntrospectionUtils
         return toDataType(ResolvableType.forField(field));
     }
 
-    public static DataType getMethodDataType(Method method)
-    {
-        checkArgument(method != null, "Can't introspect a null method");
-        return toDataType(ResolvableType.forMethodReturnType(method));
-    }
-
-    public static Map<Field, DataType> getAnnotatedFieldsDataTypes(Class<?> declaringClass, Class<? extends Annotation> annotationClass)
-    {
-        Set<Field> fields = getAllFields(declaringClass, withAnnotation(annotationClass));
-        if (CollectionUtils.isEmpty(fields))
-        {
-            return ImmutableMap.of();
-        }
-
-        ImmutableMap.Builder<Field, DataType> map = ImmutableMap.builder();
-        for (Field field : fields)
-        {
-            if (isIgnored(field))
-            {
-                continue;
-            }
-
-            map.put(field, getFieldDataType(field));
-        }
-
-        return map.build();
-    }
-
-    public static Set<Field> getFieldsAnnotatedWith(Class<?> clazz, Class<? extends Annotation> annotation)
-    {
-        return getAllFields(clazz, withAnnotation(annotation));
-    }
-
     public static Field getField(Class<?> clazz, Parameter parameter)
     {
         return getField(clazz, getMemberName(parameter, parameter.getName()), parameter.getType().getRawType());
@@ -157,20 +118,6 @@ public class IntrospectionUtils
     {
         Collection<Field> candidates = getAllFields(clazz, withName(name), withTypeAssignableTo(type));
         return CollectionUtils.isEmpty(candidates) ? null : candidates.iterator().next();
-    }
-
-    public static Set<Class<?>> getImplementedTypes(Class<?> clazz, Class<?>... types)
-    {
-        ImmutableSet.Builder<Class<?>> implemented = ImmutableSet.builder();
-        for (Class<?> type : types)
-        {
-            if (type.isAssignableFrom(clazz))
-            {
-                implemented.add(type);
-            }
-        }
-
-        return implemented.build();
     }
 
     public static boolean hasDefaultConstructor(Class<?> clazz)
