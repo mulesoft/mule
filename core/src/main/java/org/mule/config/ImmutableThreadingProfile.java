@@ -162,7 +162,7 @@ public class ImmutableThreadingProfile implements ThreadingProfile
 
     public WorkManager createWorkManager(String name, int shutdownTimeout)
     {
-        return workManagerFactory.createWorkManager(new ImmutableThreadingProfile(this), name, shutdownTimeout);
+        return workManagerFactory.createWorkManager(this, name, shutdownTimeout);
     }
 
     public ExecutorService createPool()
@@ -172,7 +172,7 @@ public class ImmutableThreadingProfile implements ThreadingProfile
 
     public ExecutorService createPool(String name)
     {
-        return poolFactory.createPool(name, new ImmutableThreadingProfile(this));
+        return poolFactory.createPool(name, (this));
     }
 
     public boolean isDoThreading()
@@ -193,7 +193,7 @@ public class ImmutableThreadingProfile implements ThreadingProfile
     @Override
     public ScheduledExecutorService createScheduledPool(String name)
     {
-        return poolFactory.createScheduledPool(name, new ImmutableThreadingProfile(this));
+        return poolFactory.createScheduledPool(name, this);
     }
 
     public void setMuleContext(MuleContext context)
