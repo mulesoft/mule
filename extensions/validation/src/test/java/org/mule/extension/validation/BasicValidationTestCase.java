@@ -105,6 +105,7 @@ public class BasicValidationTestCase extends ValidationTestCase
     public void url() throws Exception
     {
         assertValid("url", getTestEvent(VALID_URL));
+        assertValid("url", getTestEvent("http://username:password@example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose"));
         assertInvalid("url", getTestEvent(INVALID_URL), messages.invalidUrl("here"));
     }
 

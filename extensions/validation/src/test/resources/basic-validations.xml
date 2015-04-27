@@ -46,7 +46,7 @@
     </flow>
 
     <flow name="url">
-        <validation:is-url url="#[payload]" config-ref="validation"/>
+        <validation:is-url url="#[payload]" config-ref="validation" />
     </flow>
 
     <flow name="time">

@@ -418,23 +418,14 @@ public final class CommonValidationOperations extends ValidationSupport
      * Validates that {@code url} is a valid one
      *
      * @param url             the URL to validate as a {@link String}
-     * @param allowTwoSlashes Whether to allow two slashes in the path component of the URL
-     * @param allowAllSchemes Whether to allow all validly formatted schemes to pass validation
-     * @param allowLocalUrls  Whether to allow local URLs, such as http://localhost/
-     * @param noFragments     Enabling this options disallows any URL fragment
      * @param options         the {@link ValidationOptions}
      * @param event           the current {@link MuleEvent
      */
     @Operation
-    public void isUrl(String url,
-                      @Optional(defaultValue = "true") boolean allowTwoSlashes,
-                      @Optional(defaultValue = "true") boolean allowAllSchemes,
-                      @Optional(defaultValue = "true") boolean allowLocalUrls,
-                      @Optional(defaultValue = "false") boolean noFragments,
-                      @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isUrl(String url, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
     {
         ValidationContext context = createContext(options, event);
-        validateWith(new UrlValidator(url, allowTwoSlashes, allowAllSchemes, allowLocalUrls, noFragments, context), context, event);
+        validateWith(new UrlValidator(url, context), context, event);
     }
 
     /**

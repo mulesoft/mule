@@ -478,35 +478,14 @@ public final class ValidatorElContext
 
     /**
      * Validates that {@code url} is a valid one
-     * by using a {@link UrlValidator}. Double slashes,
-     * all schemas and local urls and fragments are allowed.
+     * by using a {@link UrlValidator}.
      *
      * @param url the URL to validate as a {@link String}
      * @return {@code true} if the validation succeeded. {@code false} otherwise
      */
     public boolean validateUrl(String url)
     {
-        return validateUrl(url, true, true, true, false);
-    }
-
-    /**
-     * Validates that {@code url} is a valid one
-     * by using a {@link UrlValidator}
-     *
-     * @param url             the URL to validate as a {@link String}
-     * @param allowTwoSlashes Whether to allow two slashes in the path component of the URL
-     * @param allowAllSchemes Whether to allow all validly formatted schemes to pass validation
-     * @param allowLocalUrls  Whether to allow local URLs, such as http://localhost/
-     * @param noFragments     Enabling this options disallows any URL fragment
-     * @return {@code true} if the validation succeeded. {@code false} otherwise
-     */
-    public boolean validateUrl(String url,
-                               boolean allowTwoSlashes,
-                               boolean allowAllSchemes,
-                               boolean allowLocalUrls,
-                               boolean noFragments)
-    {
-        return validate(new UrlValidator(url, allowTwoSlashes, allowAllSchemes, allowLocalUrls, noFragments, validationContext));
+        return validate(new UrlValidator(url, validationContext));
     }
 
     private boolean validate(Validator validator)
