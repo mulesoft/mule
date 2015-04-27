@@ -49,7 +49,7 @@
                         </xs:element>
                     </xs:choice>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                    <xs:attribute type="mule:expressionLong" use="optional" name="age"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="optional" name="age"></xs:attribute>
                     <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="required" name="dateOfBirth"></xs:attribute>
@@ -104,7 +104,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionInt" use="required" name="microgramsPerKilo"></xs:attribute>
+                <xs:attribute type="mule:expressionLong" use="required" name="microgramsPerKilo"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -134,7 +134,7 @@
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="greeting"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="myName"></xs:attribute>
-                <xs:attribute type="mule:expressionLong" use="optional" name="age"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="age"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -159,7 +159,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionLong" use="required" name="index"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="required" name="index"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -275,7 +275,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="required" name="amount"></xs:attribute>
+                <xs:attribute type="mule:expressionLong" use="required" name="amount"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

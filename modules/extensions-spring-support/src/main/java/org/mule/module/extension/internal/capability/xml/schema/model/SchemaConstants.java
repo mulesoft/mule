@@ -38,9 +38,9 @@ public final class SchemaConstants
     public static final QName SUBSTITUTABLE_NAME = new QName(MULE_NAMESPACE, "substitutableName", MULE_PREFIX);
     public static final QName STRING = new QName(XSD_NAMESPACE, "string", "xs");
     public static final QName EXPRESSION_STRING = new QName(MULE_NAMESPACE, "expressionString", MULE_PREFIX);
-    public static final QName EXPRESSION_LONG = new QName(MULE_NAMESPACE, "expressionInt", MULE_PREFIX);
+    public static final QName EXPRESSION_LONG = new QName(MULE_NAMESPACE, "expressionLong", MULE_PREFIX);
     public static final QName EXPRESSION_BOOLEAN = new QName(MULE_NAMESPACE, "expressionBoolean", MULE_PREFIX);
-    public static final QName EXPRESSION_INTEGER = new QName(MULE_NAMESPACE, "expressionLong", MULE_PREFIX);
+    public static final QName EXPRESSION_INTEGER = new QName(MULE_NAMESPACE, "expressionInt", MULE_PREFIX);
     public static final QName EXPRESSION_DOUBLE = new QName(MULE_NAMESPACE, "expressionDouble", MULE_PREFIX);
     public static final QName EXPRESSION_DECIMAL = new QName(MULE_NAMESPACE, "expressionDecimal", MULE_PREFIX);
     public static final QName EXPRESSION_OBJECT = new QName(MULE_NAMESPACE, "expressionObject", MULE_PREFIX);
