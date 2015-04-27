@@ -6,12 +6,13 @@
  */
 package org.mule.module.extension.internal.util;
 
-import static org.mule.repackaged.internal.org.springframework.util.ReflectionUtils.setField;
 import org.mule.api.MuleException;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.lang.reflect.Field;
+
+import org.springframework.util.ReflectionUtils;
 
 /**
  * An implementation of {@link ValueSetter} for assigning
@@ -52,6 +53,6 @@ public final class SingleValueSetter implements ValueSetter
     @Override
     public void set(Object target, ResolverSetResult result) throws MuleException
     {
-        setField(field, target, result.get(parameter));
+        ReflectionUtils.setField(field, target, result.get(parameter));
     }
 }
