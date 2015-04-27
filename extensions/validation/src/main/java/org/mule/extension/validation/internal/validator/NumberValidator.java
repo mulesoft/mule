@@ -15,86 +15,84 @@ import org.mule.extension.validation.internal.ValidationContext;
 
 import java.util.Locale;
 
-import org.springframework.util.StringUtils;
-
 /**
- * Base class for validators that test that a String can be parsed into a numeric value
- * and is compliant with settings defined in a {@link NumberValidationOptions} object
+ * A validator which tets that a given {@link String} {@link #value}
+ * can be parsed into a {@link Number} per the rules of a
+ * {@link NumberType}, and that the resulting number
+ * is between two inclusive {@link #minValue} and {@link #maxValue}
+ * boundaries.
  *
  * @since 3.7.0
  */
-abstract class NumberValidator extends AbstractValidator
+public class NumberValidator extends AbstractValidator
 {
 
-    private final NumberValidationOptions options;
+    /**
+     * Value to validate
+     */
+    private String value;
+
+    /**
+     * The locale to use for the format
+     */
+    private Locale locale;
+
+    /**
+     * The pattern used to format the value
+     */
+    private String pattern;
+
+    /**
+     * The minimum value
+     */
+    private Number minValue;
+
+    /**
+     * The maximum value
+     */
+    private Number maxValue;
+
+    private NumberType numberType;
+
     private Message errorMessage;
 
-    public NumberValidator(NumberValidationOptions options, ValidationContext validationContext)
+    public NumberValidator(String value, Locale locale, String pattern, Number minValue, Number maxValue, NumberType numberType, ValidationContext validationContext)
     {
         super(validationContext);
-        this.options = options;
+        this.value = value;
+        this.locale = locale;
+        this.pattern = pattern;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.numberType = numberType;
     }
-
-    /**
-     * Implement this method to perform the validation using a specific {@code pattern}
-     *
-     * @param value   the value to be tested
-     * @param pattern the pattern to test against
-     * @param locale  a {@link Locale} key to use when parsing
-     * @return the parsed {@link Number\}
-     */
-    protected abstract Number validateWithPattern(String value, String pattern, Locale locale);
-
-    /**
-     * Implement this method to perform the validation without using a specific {@code pattern}
-     *
-     * @param value  the value to be tested
-     * @param locale a {@link Locale} key to use when parsing
-     * @return the parsed {@link Number\}
-     */
-    protected abstract Number validateWithoutPattern(String value, Locale locale);
-
-    /**
-     * The {@link Class} of the {@link Number} type this validator tests
-     *
-     * @return
-     */
-    protected abstract Class<? extends Number> getNumberType();
 
     @Override
     public ValidationResult validate(MuleEvent event)
     {
-        Comparable<Number> newValue;
+        Comparable<Number> newValue = (Comparable<Number>) numberType.toNumber(value, pattern, locale);
 
-        if (StringUtils.isEmpty(options.getPattern()))
-        {
-            newValue = (Comparable<Number>) validateWithoutPattern(options.getValue(), new Locale(options.getLocale()));
-        }
-        else
-        {
-            newValue = (Comparable<Number>) validateWithPattern(options.getValue(), options.getPattern(), new Locale(options.getLocale()));
-        }
 
         if (newValue == null)
         {
-            errorMessage = getMessages().invalidNumberType(options.getValue(), getNumberType());
+            errorMessage = getMessages().invalidNumberType(value, numberType.name());
             return fail();
         }
 
-        if (options.getMinValue() != null)
+        if (minValue != null)
         {
-            if (newValue.compareTo(options.getMinValue()) < 0)
+            if (newValue.compareTo(minValue) < 0)
             {
-                errorMessage = getMessages().lowerThan(newValue, options.getMinValue());
+                errorMessage = getMessages().lowerThan(newValue, minValue);
                 return fail();
             }
         }
 
-        if (options.getMaxValue() != null)
+        if (maxValue != null)
         {
-            if (newValue.compareTo(options.getMaxValue()) > 0)
+            if (newValue.compareTo(maxValue) > 0)
             {
-                errorMessage = getMessages().greaterThan(newValue, options.getMaxValue());
+                errorMessage = getMessages().greaterThan(newValue, maxValue);
                 return fail();
             }
         }

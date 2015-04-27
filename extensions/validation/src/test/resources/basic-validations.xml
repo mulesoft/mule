@@ -13,22 +13,6 @@
 
     <validation:config name="validation"/>
 
-    <flow name="domain">
-        <validation:is-domain config-ref="validation" domain="#[payload]"/>
-    </flow>
-
-    <flow name="topLevelDomain">
-        <validation:is-top-level-domain topLevelDomain="#[payload]" config-ref="validation"/>
-    </flow>
-
-    <flow name="toplevelDomainCountryCode">
-        <validation:is-top-level-domain-country-code countryCode="#[payload]" config-ref="validation"/>
-    </flow>
-
-    <flow name="creditCardNumber">
-        <validation:is-credit-card-number creditCardNumber="#[payload]" creditCardType="MASTERCARD" config-ref="validation"/>
-    </flow>
-
     <flow name="email">
         <validation:is-email email="#[payload]" config-ref="validation"/>
     </flow>
@@ -37,24 +21,12 @@
         <validation:is-ip ip="#[payload]" config-ref="validation"/>
     </flow>
 
-    <flow name="isbn10">
-        <validation:is-isbn10 isbn="#[payload]" config-ref="validation"/>
-    </flow>
-
-    <flow name="isbn13">
-        <validation:is-isbn13 isbn="#[payload]" config-ref="validation"/>
-    </flow>
-
     <flow name="url">
-        <validation:is-url url="#[payload]" config-ref="validation"/>
+        <validation:is-url url="#[payload]" config-ref="validation" />
     </flow>
 
     <flow name="time">
         <validation:is-time time="#[payload]" pattern="#[pattern]" locale="#[java.util.Locale.getDefault().getLanguage()]" config-ref="validation"/>
-    </flow>
-
-    <flow name="date">
-        <validation:is-date date="#[payload]" pattern="#[pattern]" locale="#[java.util.Locale.getDefault().getLanguage()]" config-ref="validation"/>
     </flow>
 
     <flow name="matchesRegex">
@@ -86,31 +58,10 @@
         <validation:is-null value="#[payload]" config-ref="validation"/>
     </flow>
 
-    <flow name="long">
-        <validation:is-long value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
-    </flow>
-
-    <flow name="integer">
-        <validation:is-integer value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]"
-                               config-ref="validation"/>
-    </flow>
-
-    <flow name="short">
-        <validation:is-short value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
-    </flow>
-
-    <flow name="double">
-        <validation:is-double value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
-    </flow>
-
-    <flow name="float">
-        <validation:is-float value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" config-ref="validation"/>
-    </flow>
-
     <flow name="all">
         <validation:all throwsException="#[throwsException]" config-ref="validation">
             <validation:validations>
-                <validation:is-credit-card-number creditCardNumber="#[creditCardNumber]" creditCardType="MASTERCARD" config-ref="validation"/>
+                <validation:is-url url="#[url]" config-ref="validation"/>
                 <validation:is-email email="#[email]" config-ref="validation"/>
             </validation:validations>
         </validation:all>

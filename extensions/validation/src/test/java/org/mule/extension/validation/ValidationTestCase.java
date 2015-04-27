@@ -6,9 +6,20 @@
  */
 package org.mule.extension.validation;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import org.mule.api.MuleEvent;
+import org.mule.config.i18n.Message;
+import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
 {
@@ -16,21 +27,8 @@ abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
     static final String VALID_URL = "http://localhost:8080";
     static final String INVALID_URL = "here";
 
-    static final String VALID_ISBN13 = "978-1-56619-909-4 ";
-    static final String INVALID_ISBN13 = "88";
-    static final String VALID_ISBN10 = "1-56619-909-3";
-    static final String INVALID_ISBN10 = "88";
-
     static final String VALID_EMAIL = "mariano.gonzalez@mulesoft.com";
     static final String INVALID_EMAIL = "@mulesoft.com";
-
-    /**
-     * number obtained from
-     * <a href="http://www.paypalobjects.com/en_US/vhelp/paypalmanager_help/credit_card_numbers.htm">
-     * this link</a>
-     */
-    static final String VALID_CREDIT_CARD_NUMBER = "5555555555554444";
-    static final String INVALID_CREDIT_CARD_NUMBER = "5555444433332222";
 
     static final RuntimeException CUSTOM_VALIDATOR_EXCEPTION = new RuntimeException();
 
@@ -46,5 +44,28 @@ abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
     protected void doSetUp() throws Exception
     {
         messages = new ValidationMessages();
+    }
+
+    protected void assertValid(String flowName, MuleEvent event) throws Exception
+    {
+        MuleEvent responseEvent = runFlow(flowName, event);
+        assertThat(responseEvent.getMessage().getExceptionPayload(), is(nullValue()));
+    }
+
+    protected void assertInvalid(String flowName, MuleEvent event, Message expectedMessage) throws Exception
+    {
+        try
+        {
+            runFlow(flowName, event);
+            fail("Was expecting a failure");
+        }
+        catch (Exception e)
+        {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            assertThat(rootCause, is(instanceOf(ValidationException.class)));
+            assertThat(rootCause.getMessage(), is(expectedMessage.getMessage()));
+            // assert that all placeholders were replaced in message
+            assertThat(rootCause.getMessage(), not(containsString("${")));
+        }
     }
 }

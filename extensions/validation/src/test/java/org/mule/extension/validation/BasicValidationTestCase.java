@@ -6,24 +6,18 @@
  */
 package org.mule.extension.validation;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
 import org.mule.api.MuleEvent;
-import org.mule.config.i18n.Message;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
-import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
-import org.mule.extension.validation.internal.validator.CreditCardType;
 import org.mule.mvel2.compiler.BlankLiteral;
 import org.mule.util.ExceptionUtils;
 
@@ -46,34 +40,6 @@ public class BasicValidationTestCase extends ValidationTestCase
     }
 
     @Test
-    public void domain() throws Exception
-    {
-        assertValid("domain", getTestEvent("mulesoft.com"));
-        assertInvalid("domain", getTestEvent("xxx.yy"), messages.invalidDomain("xxx.yy"));
-    }
-
-    @Test
-    public void topLevelDomain() throws Exception
-    {
-        assertValid("topLevelDomain", getTestEvent("com"));
-        assertInvalid("topLevelDomain", getTestEvent("abc"), messages.invalidTopLevelDomain("abc"));
-    }
-
-    @Test
-    public void toplevelDomainCountryCode() throws Exception
-    {
-        assertValid("toplevelDomainCountryCode", getTestEvent("ar"));
-        assertInvalid("toplevelDomainCountryCode", getTestEvent("ppp"), messages.invalidDomainCountryCode("ppp"));
-    }
-
-    @Test
-    public void creditCardNumber() throws Exception
-    {
-        assertValid("creditCardNumber", getTestEvent(VALID_CREDIT_CARD_NUMBER));
-        assertInvalid("creditCardNumber", getTestEvent(INVALID_CREDIT_CARD_NUMBER), messages.invalidCreditCard("5555444433332222", CreditCardType.MASTERCARD));
-    }
-
-    @Test
     public void email() throws Exception
     {
         assertValid("email", getTestEvent(VALID_EMAIL));
@@ -88,23 +54,10 @@ public class BasicValidationTestCase extends ValidationTestCase
     }
 
     @Test
-    public void isbn10() throws Exception
-    {
-        assertValid("isbn10", getTestEvent(VALID_ISBN10));
-        assertInvalid("isbn10", getTestEvent(INVALID_ISBN10), messages.invalidISBN10("88"));
-    }
-
-    @Test
-    public void isbn13() throws Exception
-    {
-        assertValid("isbn13", getTestEvent(VALID_ISBN13));
-        assertInvalid("isbn13", getTestEvent(INVALID_ISBN13), messages.invalidISBN13("88"));
-    }
-
-    @Test
     public void url() throws Exception
     {
         assertValid("url", getTestEvent(VALID_URL));
+        assertValid("url", getTestEvent("http://username:password@example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose"));
         assertInvalid("url", getTestEvent(INVALID_URL), messages.invalidUrl("here"));
     }
 
@@ -112,27 +65,19 @@ public class BasicValidationTestCase extends ValidationTestCase
     public void time() throws Exception
     {
         final String time = "12:08 PM";
-        MuleEvent event = getTestEvent(time);
-        event.setFlowVariable("pattern", "h:mm a");
-        assertValid("time", event);
+
+        assertValid("time", getTimeEvent(time, "h:mm a"));
+        assertValid("time", getTimeEvent("Wed, Jul 4, '01", "EEE, MMM d, ''yy"));
 
         final String invalidPattern = "yyMMddHHmmssZ";
-        event.setFlowVariable("pattern", invalidPattern);
-        assertInvalid("time", event, messages.invalidTime(time, DEFAULT_LOCALE.toString(), invalidPattern));
+        assertInvalid("time", getTimeEvent(time, invalidPattern), messages.invalidTime(time, DEFAULT_LOCALE.toString(), invalidPattern));
     }
 
-    @Test
-    public void date() throws Exception
-    {
-        final String pattern = "yyyy-MM-dd";
-        MuleEvent event = getTestEvent("1983-04-20");
+    private MuleEvent getTimeEvent(String time, String pattern) throws Exception {
+        MuleEvent event = getTestEvent(time);
         event.setFlowVariable("pattern", pattern);
 
-        assertValid("date", event);
-
-        final String invalidDate = "Wed, Jul 4, '01";
-        event.getMessage().setPayload(invalidDate);
-        assertInvalid("date", event, messages.invalidDate(invalidDate, DEFAULT_LOCALE.toString(), pattern));
+        return event;
     }
 
     @Test
@@ -170,36 +115,6 @@ public class BasicValidationTestCase extends ValidationTestCase
         map.put("c", "c");
 
         assertSize(map);
-    }
-
-    @Test
-    public void isLong() throws Exception
-    {
-        assertNumberValue("long", Long.class, Long.MAX_VALUE / 2, Long.MIN_VALUE + 1, Long.MAX_VALUE - 1, Long.MIN_VALUE, Long.MAX_VALUE);
-    }
-
-    @Test
-    public void isInteger() throws Exception
-    {
-        assertNumberValue("integer", Integer.class, Integer.MAX_VALUE / 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
-    }
-
-    @Test
-    public void isShort() throws Exception
-    {
-        assertNumberValue("short", Short.class, new Short("100"), new Integer(Short.MIN_VALUE + 1).shortValue(), new Integer(Short.MAX_VALUE - 1).shortValue(), Short.MIN_VALUE, Short.MAX_VALUE);
-    }
-
-    @Test
-    public void isDouble() throws Exception
-    {
-        assertNumberValue("double", Double.class, 10D, 1D, 10D, Double.MIN_VALUE, Double.MAX_VALUE);
-    }
-
-    @Test
-    public void isFloat() throws Exception
-    {
-        assertNumberValue("float", Float.class, 10F, 1F, 10F, 0F, 20F);
     }
 
     @Test
@@ -262,7 +177,7 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void successfulAll() throws Exception
     {
-        MuleEvent responseEvent = runFlow("all", getAllEvent(VALID_EMAIL, VALID_CREDIT_CARD_NUMBER, true));
+        MuleEvent responseEvent = runFlow("all", getAllEvent(VALID_EMAIL, VALID_URL, true));
         assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(MultipleValidationResult.class)));
         MultipleValidationResult result = (MultipleValidationResult) responseEvent.getMessage().getPayload();
         assertThat(result.isError(), is(false));
@@ -272,7 +187,7 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void oneFailureInAllWithoutException() throws Exception
     {
-        MuleEvent responseEvent = runFlow("all", getAllEvent(INVALID_EMAIL, VALID_CREDIT_CARD_NUMBER, false));
+        MuleEvent responseEvent = runFlow("all", getAllEvent(INVALID_EMAIL, VALID_URL, false));
         assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(MultipleValidationResult.class)));
         MultipleValidationResult result = (MultipleValidationResult) responseEvent.getMessage().getPayload();
         assertThat(result.isError(), is(true));
@@ -284,12 +199,12 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void twoFailureInAllWithoutException() throws Exception
     {
-        MuleEvent responseEvent = runFlow("all", getAllEvent(INVALID_EMAIL, INVALID_CREDIT_CARD_NUMBER, false));
+        MuleEvent responseEvent = runFlow("all", getAllEvent(INVALID_EMAIL, INVALID_URL, false));
         assertThat(responseEvent.getMessage().getPayload(), is(instanceOf(ValidationResult.class)));
         MultipleValidationResult result = (MultipleValidationResult) responseEvent.getMessage().getPayload();
         assertThat(result.isError(), is(true));
 
-        String expectedMessage = Joiner.on('\n').join(messages.invalidCreditCard(INVALID_CREDIT_CARD_NUMBER, CreditCardType.MASTERCARD),
+        String expectedMessage = Joiner.on('\n').join(messages.invalidUrl(INVALID_URL),
                                                       messages.invalidEmail(INVALID_EMAIL));
 
         assertThat(result.getMessage(), is(expectedMessage));
@@ -305,7 +220,7 @@ public class BasicValidationTestCase extends ValidationTestCase
     {
         try
         {
-            runFlow("all", getAllEvent(INVALID_EMAIL, VALID_CREDIT_CARD_NUMBER, true));
+            runFlow("all", getAllEvent(INVALID_EMAIL, VALID_URL, true));
             fail("was expecting a failure");
         }
         catch (Exception e)
@@ -345,31 +260,17 @@ public class BasicValidationTestCase extends ValidationTestCase
         }
     }
 
-    private MuleEvent getAllEvent(String email, String creditCardNumber, boolean throwsException) throws Exception
+    private MuleEvent getAllEvent(String email, String url, boolean throwsException) throws Exception
     {
         MuleEvent event = getTestEvent("");
-        event.setFlowVariable("creditCardNumber", creditCardNumber);
+        event.setFlowVariable("url", url);
         event.setFlowVariable("email", email);
         event.setFlowVariable("throwsException", throwsException);
 
         return event;
     }
 
-    private <T extends Number> void assertNumberValue(String flowName,
-                                                      Class<T> numberType,
-                                                      T value,
-                                                      T minValue,
-                                                      T maxValue,
-                                                      T lowerBoundaryViolation,
-                                                      T upperBoundaryViolation) throws Exception
-    {
-        assertValid(flowName, getNumberValidationEvent(value, minValue, maxValue));
-        final String invalid = "unparseable";
-        assertInvalid(flowName, getNumberValidationEvent(invalid, minValue, maxValue), messages.invalidNumberType(invalid, numberType));
 
-        assertInvalid(flowName, getNumberValidationEvent(upperBoundaryViolation, minValue, maxValue), messages.greaterThan(upperBoundaryViolation, maxValue));
-        assertInvalid(flowName, getNumberValidationEvent(lowerBoundaryViolation, minValue, maxValue), messages.lowerThan(lowerBoundaryViolation, minValue));
-    }
 
     private void assertSize(Object value) throws Exception
     {
@@ -395,38 +296,6 @@ public class BasicValidationTestCase extends ValidationTestCase
         event.setFlowVariable("maxLength", maxLength);
 
         return event;
-    }
-
-    private MuleEvent getNumberValidationEvent(Object value, Object minValue, Object maxValue) throws Exception
-    {
-        MuleEvent event = getTestEvent(value);
-        event.setFlowVariable("minValue", minValue);
-        event.setFlowVariable("maxValue", maxValue);
-
-        return event;
-    }
-
-    private void assertValid(String flowName, MuleEvent event) throws Exception
-    {
-        MuleEvent responseEvent = runFlow(flowName, event);
-        assertThat(responseEvent.getMessage().getExceptionPayload(), is(nullValue()));
-    }
-
-    private void assertInvalid(String flowName, MuleEvent event, Message expectedMessage) throws Exception
-    {
-        try
-        {
-            runFlow(flowName, event);
-            fail("Was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable rootCause = ExceptionUtils.getRootCause(e);
-            assertThat(rootCause, is(instanceOf(ValidationException.class)));
-            assertThat(rootCause.getMessage(), is(expectedMessage.getMessage()));
-            // assert that all placeholders were replaced in message
-            assertThat(rootCause.getMessage(), not(containsString("${")));
-        }
     }
 
     public static class TestCustomValidator implements Validator
