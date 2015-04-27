@@ -9,6 +9,7 @@ package org.mule.module.http.internal.request;
 import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -21,7 +22,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.api.requester.HttpSendBodyMode;
 import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClientConfiguration;
 import org.mule.transport.ssl.api.TlsContextFactory;
@@ -324,4 +327,5 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     {
         this.protocol = protocol;
     }
+
 }

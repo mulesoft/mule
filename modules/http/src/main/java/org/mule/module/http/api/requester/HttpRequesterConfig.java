@@ -6,31 +6,81 @@
  */
 package org.mule.module.http.api.requester;
 
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 /**
  * Configuration object for an {@code HttpRequester}.
+ *
+ * Some of the configuration attributes can be dynamic meaning that the
+ * configuration value to use will change based on the message at the moment
+ * of the request execution.
+ *
+ * This object represents the XML request-config elements in the configuration.
+ *
+ * If a new HttpRequesterConfig needs to be created programmatically then use
+ * {@link org.mule.module.http.api.requester.HttpRequesterConfigBuilder}
  */
-public interface HttpRequesterConfig
+public interface HttpRequesterConfig extends Startable, Stoppable
 {
 
-    public String getBasePath();
+    /**
+     * @return the base path
+     */
+    String getBasePath();
 
-    public String getHost();
+    /**
+     * @return the host to be called
+     */
+    String getHost();
 
-    public String getPort();
+    /**
+     * @return the port to connect to
+     */
+    String getPort();
 
-    public String getFollowRedirects();
+    /**
+     * @return configuration for enabling or disabling follow redirects. It may be dynamic.
+     */
+    String getFollowRedirects();
 
-    public String getRequestStreamingMode();
+    /**
+     * @return the streaming mode for making the request.
+     * Defines if the request will be sent using Transfer-Encoding: chunked. It may be dynamic
+     */
+    String getRequestStreamingMode();
 
-    public String getSendBodyMode();
+    /**
+     * @return if the request will contain or not a body. It may be dynamic.
+     */
+    String getSendBodyMode();
 
-    public String getParseResponse();
+    /**
+     * @return mode for parsing a response. It may contain an expression if it's dynamic.
+     */
+    String getParseResponse();
 
-    public String getResponseTimeout();
+    /**
+     * @return maximum time to wait for a response
+     */
+    String getResponseTimeout();
 
-    public HttpAuthentication getAuthentication();
+    /**
+     * @return authentication mechanism when making request
+     */
+    HttpAuthentication getAuthentication();
 
+    /**
+     * @return the tls configuration when using HTTPS
+     */
+    TlsContextFactory getTlsContext();
+
+    /**
+     * @return http proxy configuration to be used
+     */
+    ProxyConfig getProxyConfig();
 
 }

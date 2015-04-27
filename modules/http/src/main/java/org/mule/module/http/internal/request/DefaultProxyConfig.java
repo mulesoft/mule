@@ -6,15 +6,17 @@
  */
 package org.mule.module.http.internal.request;
 
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
+
 /**
  * Basic HTTP Proxy configuration based on host and port, and optionally a username and password for proxy authentication.
  */
-public class ProxyConfig
+public class DefaultProxyConfig implements ProxyConfig
 {
 
     private String name;
     private String host;
-    private String port;
+    private int port = Integer.MAX_VALUE;
     private String username;
     private String password;
 
@@ -38,12 +40,12 @@ public class ProxyConfig
         this.host = host;
     }
 
-    public String getPort()
+    public int getPort()
     {
         return port;
     }
 
-    public void setPort(String port)
+    public void setPort(int port)
     {
         this.port = port;
     }

@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.api.MessagingException;
 import org.mule.construct.Flow;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.http.internal.request.ProxyConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -106,7 +106,7 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
         ProxyConfig proxyConfig = httpRequester.getConfig().getProxyConfig();
 
         assertThat(proxyConfig.getHost(), is(PROXY_HOST));
-        assertThat(proxyConfig.getPort(), is(proxyPort.getValue()));
+        assertThat(proxyConfig.getPort(), is(Integer.valueOf(proxyPort.getValue())));
 
         if (proxyType == ProxyType.USER_PASS || proxyType == ProxyType.NTLM)
         {

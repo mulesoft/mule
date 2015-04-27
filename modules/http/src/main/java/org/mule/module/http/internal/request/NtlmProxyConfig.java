@@ -9,7 +9,7 @@ package org.mule.module.http.internal.request;
 /**
  * A Proxy configuration for NTLM authentication proxies.
  */
-public class NtlmProxyConfig extends ProxyConfig
+public class NtlmProxyConfig extends DefaultProxyConfig
 {
     private String ntlmDomain;
 

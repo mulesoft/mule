@@ -23,7 +23,7 @@ import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.FailureStatusCodeValidator;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.http.internal.request.ProxyConfig;
+import org.mule.module.http.internal.request.DefaultProxyConfig;
 import org.mule.module.http.internal.request.RamlApiConfiguration;
 import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
 
@@ -54,7 +54,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("request-config", new HttpRequestConfigDefinitionParser());
 
-        registerBeanDefinitionParser("proxy", new RootOrNestedElementBeanDefinitionParser(ProxyConfig.class, "proxyConfig"));
+        registerBeanDefinitionParser("proxy", new RootOrNestedElementBeanDefinitionParser(DefaultProxyConfig.class, "proxyConfig"));
         registerBeanDefinitionParser("ntlm-proxy", new RootOrNestedElementBeanDefinitionParser(NtlmProxyConfig.class, "proxyConfig"));
 
         registerBeanDefinitionParser("basic-authentication", new HttpAuthenticationDefinitionParser(HttpAuthenticationType.BASIC));

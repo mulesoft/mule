@@ -9,6 +9,7 @@ package org.mule.module.http.internal.request.grizzly;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
@@ -21,7 +22,6 @@ import org.mule.module.http.internal.request.DefaultHttpAuthentication;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.http.internal.request.ProxyConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
@@ -131,7 +131,7 @@ public class GrizzlyHttpClient implements HttpClient
             {
                 proxyServer = new ProxyServer(
                         proxyConfig.getHost(),
-                        Integer.parseInt(proxyConfig.getPort()),
+                        proxyConfig.getPort(),
                         proxyConfig.getUsername(),
                         proxyConfig.getPassword());
                 if (proxyConfig instanceof NtlmProxyConfig)
@@ -141,9 +141,7 @@ public class GrizzlyHttpClient implements HttpClient
             }
             else
             {
-                proxyServer = new ProxyServer(
-                        proxyConfig.getHost(),
-                        Integer.parseInt(proxyConfig.getPort()));
+                proxyServer = new ProxyServer(proxyConfig.getHost(),proxyConfig.getPort());
             }
             builder.setProxyServer(proxyServer);
         }
