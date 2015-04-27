@@ -4,4 +4,5 @@ http\://www.mulesoft.org/schema/mule/rss/3.3/mule-rss.xsd=META-INF/mule-rss.xsd
 http\://www.mulesoft.org/schema/mule/rss/3.4/mule-rss.xsd=META-INF/mule-rss.xsd
 http\://www.mulesoft.org/schema/mule/rss/3.5/mule-rss.xsd=META-INF/mule-rss.xsd
 http\://www.mulesoft.org/schema/mule/rss/3.6/mule-rss.xsd=META-INF/mule-rss.xsd
+http\://www.mulesoft.org/schema/mule/rss/3.7/mule-rss.xsd=META-INF/mule-rss.xsd
 http\://www.mulesoft.org/schema/mule/rss/current/mule-rss.xsd=META-INF/mule-rss.xsd

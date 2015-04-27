@@ -4,4 +4,5 @@ http\://www.mulesoft.org/schema/mule/json/3.3/mule-json.xsd=META-INF/mule-json.x
 http\://www.mulesoft.org/schema/mule/json/3.4/mule-json.xsd=META-INF/mule-json.xsd
 http\://www.mulesoft.org/schema/mule/json/3.5/mule-json.xsd=META-INF/mule-json.xsd
 http\://www.mulesoft.org/schema/mule/json/3.6/mule-json.xsd=META-INF/mule-json.xsd
+http\://www.mulesoft.org/schema/mule/json/3.7/mule-json.xsd=META-INF/mule-json.xsd
 http\://www.mulesoft.org/schema/mule/json/current/mule-json.xsd=META-INF/mule-json.xsd
