@@ -27,6 +27,11 @@ import org.junit.Test;
 public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestStatusCodesTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

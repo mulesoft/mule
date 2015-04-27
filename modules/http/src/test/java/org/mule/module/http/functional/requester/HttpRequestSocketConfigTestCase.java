@@ -14,6 +14,11 @@ import org.junit.Test;
 public class HttpRequestSocketConfigTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestSocketConfigTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

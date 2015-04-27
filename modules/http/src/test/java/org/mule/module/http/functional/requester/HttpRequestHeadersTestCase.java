@@ -22,6 +22,11 @@ import org.junit.Test;
 public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestHeadersTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

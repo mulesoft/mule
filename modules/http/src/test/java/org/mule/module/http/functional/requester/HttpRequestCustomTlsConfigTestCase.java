@@ -15,6 +15,11 @@ import org.junit.Test;
 public class HttpRequestCustomTlsConfigTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestCustomTlsConfigTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

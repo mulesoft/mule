@@ -39,6 +39,11 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     private static final String TEST_FILE_NAME = "realm.properties";
     private static final String TEST_PART_NAME = "partName";
 
+    public HttpRequestOutboundAttachmentsTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

@@ -35,6 +35,11 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
     private String transferEncodingHeader;
     private String contentLengthHeader;
 
+    public HttpRequestStreamingTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

@@ -16,6 +16,11 @@ import org.junit.Test;
 public class HttpRequestPathsTestCase extends AbstractHttpRequestTestCase
 {
 
+    public HttpRequestPathsTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {

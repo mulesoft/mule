@@ -38,6 +38,11 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
     private MuleEvent testEvent;
     private boolean addParams = false;
 
+    public HttpRequestFollowRedirectsTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Before
     public void setUp() throws Exception
     {

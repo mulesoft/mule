@@ -32,25 +32,38 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase
     private static final String CYRILLIC_MESSAGE = "\u0416";
     private static final String SIMPLE_MESSAGE = "A";
 
-    @Parameterized.Parameter(0)
-    public String encoding;
+    private String encoding;
+    private String testMessage;
 
-    @Parameterized.Parameter(1)
-    public String testMessage;
+    public HttpRequestEncodingTestCase(String encoding, String testMessage, boolean nonBlocking)
+    {
+        super(nonBlocking);
+        this.encoding = encoding;
+        this.testMessage = testMessage;
+    }
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {"EUC-JP", JAPANESE_MESSAGE},
-                {"Windows-31J", JAPANESE_MESSAGE},
-                {"ISO-2022-JP", JAPANESE_MESSAGE},
-                {"UTF-8", JAPANESE_MESSAGE},
-                {"Arabic", ARABIC_MESSAGE},
-                {"Windows-1256", ARABIC_MESSAGE},
-                {"Windows-1251", CYRILLIC_MESSAGE},
-                {"Cyrillic", CYRILLIC_MESSAGE},
-                {"US-ASCII", SIMPLE_MESSAGE}});
+                {"EUC-JP", JAPANESE_MESSAGE, false},
+                {"Windows-31J", JAPANESE_MESSAGE, false},
+                {"ISO-2022-JP", JAPANESE_MESSAGE, false},
+                {"UTF-8", JAPANESE_MESSAGE, false},
+                {"Arabic", ARABIC_MESSAGE, false},
+                {"Windows-1256", ARABIC_MESSAGE, false},
+                {"Windows-1251", CYRILLIC_MESSAGE, false},
+                {"Cyrillic", CYRILLIC_MESSAGE, false},
+                {"US-ASCII", SIMPLE_MESSAGE, false},
+                {"EUC-JP", JAPANESE_MESSAGE, true},
+                {"Windows-31J", JAPANESE_MESSAGE, true},
+                {"ISO-2022-JP", JAPANESE_MESSAGE, true},
+                {"UTF-8", JAPANESE_MESSAGE, true},
+                {"Arabic", ARABIC_MESSAGE, true},
+                {"Windows-1256", ARABIC_MESSAGE, true},
+                {"Windows-1251", CYRILLIC_MESSAGE, true},
+                {"Cyrillic", CYRILLIC_MESSAGE, true},
+                {"US-ASCII", SIMPLE_MESSAGE, true}});
     }
 
     @Override

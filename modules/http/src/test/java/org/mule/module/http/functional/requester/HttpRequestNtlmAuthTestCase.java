@@ -15,6 +15,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.NetworkUtils;
 
 import com.ning.http.client.ntlm.NTLMEngine;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,23 +46,28 @@ public class HttpRequestNtlmAuthTestCase extends AbstractHttpRequestTestCase
     private static final String AUTHORIZED = "Authorized";
 
     private String type3Message;
-
-    @Parameterized.Parameter(0)
-    public String flowName;
-
-    @Parameterized.Parameter(1)
-    public String domain;
-
-    @Parameterized.Parameter(2)
-    public String workstation;
+    private String flowName;
+    private String domain;
+    private String workstation;
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {"ntlmAuthRequestWithDomain", "Ursa-Minor", null},
-                {"ntlmAuthRequestWithoutDomain", "", null},
-                {"ntlmAuthRequestWithWorkstation", "Ursa-Minor", "LightCity"}});
+                {"ntlmAuthRequestWithDomain", "Ursa-Minor", null, false},
+                {"ntlmAuthRequestWithoutDomain", "", null, false},
+                {"ntlmAuthRequestWithWorkstation", "Ursa-Minor", "LightCity", false},
+                {"ntlmAuthRequestWithDomain", "Ursa-Minor", null, true},
+                {"ntlmAuthRequestWithoutDomain", "", null, true},
+                {"ntlmAuthRequestWithWorkstation", "Ursa-Minor", "LightCity", true}});
+    }
+
+    public HttpRequestNtlmAuthTestCase(String flowName, String domain, String workstation, boolean nonBlocking)
+    {
+        super(nonBlocking);
+        this.flowName = flowName;
+        this.domain = domain;
+        this.workstation = workstation;
     }
 
     @Before

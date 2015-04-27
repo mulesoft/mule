@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.FileUtils;
 
 import java.io.IOException;
@@ -30,6 +31,11 @@ import org.junit.Test;
 
 public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
 {
+
+    public HttpRequestAuthTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
 
     @Override
     protected String getConfigFile()

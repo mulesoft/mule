@@ -29,6 +29,11 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
     private Latch messageArrived = new Latch();
     private Latch messageHold = new Latch();
 
+    public HttpRequestMaxConnectionsTestCase(boolean nonBlocking)
+    {
+        super(nonBlocking);
+    }
+
     @Override
     protected String getConfigFile()
     {
