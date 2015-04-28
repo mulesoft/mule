@@ -45,6 +45,7 @@ import org.mule.util.Predicate;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
+import org.mule.util.collection.DuplicatesFreeListWrapper;
 
 import com.google.common.collect.ImmutableList;
 
@@ -91,14 +92,14 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * Transformer transformerResolvers are registered on context start, then they are not unregistered.
      */
-    private List<TransformerResolver> transformerResolvers = new ArrayList<TransformerResolver>();
+    private List<TransformerResolver> transformerResolvers = new DuplicatesFreeListWrapper<>(new ArrayList<TransformerResolver>());
 
     private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
 
     /**
      * Transformers are registered on context start, then they are usually not unregistered
      */
-    private Collection<Transformer> transformers = new CopyOnWriteArrayList<Transformer>();
+    private Collection<Transformer> transformers = new DuplicatesFreeListWrapper<>(new CopyOnWriteArrayList<Transformer>());
 
     public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext)
     {
