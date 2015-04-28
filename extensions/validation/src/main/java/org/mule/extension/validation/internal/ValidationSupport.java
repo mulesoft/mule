@@ -6,6 +6,7 @@
  */
 package org.mule.extension.validation.internal;
 
+import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import org.mule.api.MuleEvent;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
@@ -38,6 +39,7 @@ abstract class ValidationSupport
         ValidationResult result = validator.validate(event);
         if (result.isError())
         {
+            result = evaluateCustomMessage(result, validationContext);
             String customExceptionClass = validationContext.getOptions().getExceptionClass();
             if (StringUtils.isEmpty(customExceptionClass))
             {
@@ -48,6 +50,17 @@ abstract class ValidationSupport
                 throw config.getExceptionFactory().createException(result, customExceptionClass, event);
             }
         }
+    }
+
+    private ValidationResult evaluateCustomMessage(ValidationResult result, ValidationContext validationContext)
+    {
+        String customMessage = validationContext.getOptions().getMessage();
+        if (!StringUtils.isBlank(customMessage))
+        {
+            result = error(validationContext.getMuleEvent().getMuleContext().getExpressionManager().parse(customMessage, validationContext.getMuleEvent()));
+        }
+
+        return result;
     }
 
     protected ValidationContext createContext(ValidationOptions options, MuleEvent muleEvent)

@@ -30,8 +30,6 @@ abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
     static final String VALID_EMAIL = "mariano.gonzalez@mulesoft.com";
     static final String INVALID_EMAIL = "@mulesoft.com";
 
-    static final RuntimeException CUSTOM_VALIDATOR_EXCEPTION = new RuntimeException();
-
     protected ValidationMessages messages;
 
     @Override

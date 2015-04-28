@@ -79,7 +79,7 @@
     </flow>
 
     <flow name="customValidationByClass">
-        <validation:custom-validator class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" config-ref="validation" />
+        <validation:custom-validator class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" message="#[customMessage]" config-ref="validation" />
     </flow>
 
     <flow name="customValidationByRef">

@@ -40,7 +40,7 @@ import com.google.common.cache.LoadingCache;
  * @since 3.7.0
  */
 @ImplementationOf(ValidationExtension.class)
-public final class CustomValidatorOperation
+public final class CustomValidatorOperation extends ValidationSupport
 {
 
     private final LoadingCache<ValidatorSource, Validator> class2ValidatorCache = CacheBuilder.newBuilder().build(new CacheLoader<ValidatorSource, Validator>()
@@ -52,18 +52,18 @@ public final class CustomValidatorOperation
         }
     });
 
-    private final ValidationExtension config;
-
     public CustomValidatorOperation(ValidationExtension config)
     {
-        this.config = config;
+        super(config);
     }
 
     @Operation
-    public void customValidator(@ParameterGroup ObjectSource<Validator> source, MuleEvent event) throws Exception
+    public void customValidator(@ParameterGroup ObjectSource<Validator> source, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
     {
         ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
-        validatorSource.getObject(event.getMuleContext()).validate(event);
+        Validator validator = validatorSource.getObject(event.getMuleContext());
+
+        validateWith(validator, createContext(options, event), event);
     }
 
 

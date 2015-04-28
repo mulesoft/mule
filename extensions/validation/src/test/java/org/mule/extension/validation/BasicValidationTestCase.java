@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
 import org.mule.api.MuleEvent;
 import org.mule.extension.validation.api.MultipleValidationException;
@@ -32,6 +33,8 @@ import org.junit.Test;
 
 public class BasicValidationTestCase extends ValidationTestCase
 {
+
+    private static final String CUSTOM_VALIDATOR_MESSAGE = "Do you wanna build a snowman?";
 
     @Override
     protected String getConfigFile()
@@ -234,13 +237,20 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void customValidationByClass() throws Exception
     {
-        assertCustomValidator("customValidationByClass");
+        assertCustomValidator("customValidationByClass", null, CUSTOM_VALIDATOR_MESSAGE);
     }
 
     @Test
     public void customValidationByRef() throws Exception
     {
-        assertCustomValidator("customValidationByRef");
+        assertCustomValidator("customValidationByRef", null, CUSTOM_VALIDATOR_MESSAGE);
+    }
+
+    @Test
+    public void customValidatorWithCustomMessage() throws Exception
+    {
+        final String customMessage = "doesn't have to be a snowman";
+        assertCustomValidator("customValidationByClass", customMessage, customMessage);
     }
 
     @Test
@@ -252,17 +262,19 @@ public class BasicValidationTestCase extends ValidationTestCase
         assertThat(runFlow(flowName, getTestEvent(INVALID_EMAIL)).getMessage().getPayloadAsString(), is("invalid"));
     }
 
-    private void assertCustomValidator(String flowName) throws Exception
+    private void assertCustomValidator(String flowName,String customMessage, String expectedMessage) throws Exception
     {
+        MuleEvent event = getTestEvent("");
+        event.setFlowVariable("customMessage", customMessage);
         try
         {
-            runFlow(flowName, getTestEvent(""));
+            runFlow(flowName, event);
             fail("was expecting a failure");
         }
         catch (Exception e)
         {
             Throwable cause = ExceptionUtils.getRootCause(e);
-            assertThat(CUSTOM_VALIDATOR_EXCEPTION, is(sameInstance(cause)));
+            assertThat(cause.getMessage(), is(expectedMessage));
         }
     }
 
@@ -309,7 +321,7 @@ public class BasicValidationTestCase extends ValidationTestCase
         @Override
         public ValidationResult validate(MuleEvent event)
         {
-            throw CUSTOM_VALIDATOR_EXCEPTION;
+            return error(CUSTOM_VALIDATOR_MESSAGE);
         }
     }
 }

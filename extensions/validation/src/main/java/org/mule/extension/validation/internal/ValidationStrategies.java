@@ -12,7 +12,6 @@ import org.mule.api.NestedProcessor;
 import org.mule.extension.annotations.ImplementationOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.RestrictedTo;
-import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationException;
@@ -53,7 +52,6 @@ public final class ValidationStrategies
      * substitution group.
      *
      * @param validations     the nested validation operations
-     * @param throwsException if {@code true}, then a {@link ValidationException} is thrown if any validator fails.
      * @param muleEvent       the current {@link MuleEvent}
      * @return the same {@code muleEvent} that was passed as argument
      * @throws MultipleValidationException if at least one validator fails and {@code throwsException} is {@code true}
