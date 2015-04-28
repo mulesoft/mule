@@ -27,7 +27,7 @@ public class XmlEntityEncoder extends AbstractTransformer
         registerSourceType(DataTypeFactory.STRING);
         registerSourceType(DataTypeFactory.BYTE_ARRAY);
         registerSourceType(DataTypeFactory.INPUT_STREAM);
-        setReturnDataType(DataTypeFactory.TEXT_STRING);
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
     @Override

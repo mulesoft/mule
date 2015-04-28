@@ -9,7 +9,6 @@ package org.mule.module.ws.functional;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.api.MuleEvent;
@@ -134,7 +133,7 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
         }
         catch (TransformerMessagingException e)
         {
-            assertNull(e.getTransformer());
+            // Expected as header can't be converted to XML
         }
     }
 
