@@ -14,6 +14,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,8 +62,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         registerSourceType(DataTypeFactory.create(org.mule.api.transport.OutputHandler.class));
         registerSourceType(DataTypeFactory.create(javax.xml.stream.XMLStreamReader.class));
         registerSourceType(DataTypeFactory.create(org.mule.module.xml.transformer.DelayedResult.class));
-        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
-        
+        setReturnDataType(DataTypeFactory.create(byte[].class, MimeTypes.XML));
     }
 
     @Override
