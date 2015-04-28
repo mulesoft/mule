@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request.grizzly;
 
+import org.mule.api.CompletionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
@@ -27,11 +28,13 @@ import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
+import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
+import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
@@ -151,7 +154,8 @@ public class GrizzlyHttpClient implements HttpClient
     {
         GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
         CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
-        compositeTransportCustomizer.addTransportCustomizer(new SameThreadIOStrategyTransportCustomizer(threadNamePrefix));
+        compositeTransportCustomizer.addTransportCustomizer(new SameThreadIOStrategyTransportCustomizer
+                                                                    (threadNamePrefix));
         compositeTransportCustomizer.addTransportCustomizer(new LoggerTransportCustomizer());
 
         if (clientSocketProperties != null)
@@ -180,12 +184,82 @@ public class GrizzlyHttpClient implements HttpClient
 
         builder.setConnectionTTL(MAX_CONNECTION_LIFETIME);
         builder.setPooledConnectionIdleTimeout(connectionIdleTimeout);
+
+        builder.setIOThreadMultiplier(1);
     }
 
     @Override
     public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication) throws IOException, TimeoutException
     {
 
+        Request grizzlyRequest= createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);;
+        ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
+        try
+        {
+            return createMuleResponse(future.get(responseTimeout, TimeUnit.MILLISECONDS));
+        }
+        catch (InterruptedException e)
+        {
+            throw new IOException(e);
+        }
+        catch (ExecutionException e)
+        {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication
+            authentication, final CompletionHandler<HttpResponse, Exception> completionHandler)
+    {
+        try
+        {
+            final ListenableFuture<Response> future = asyncHttpClient.executeRequest(createGrizzlyRequest(request,
+                                                                                                          responseTimeout, followRedirects, authentication), new AsyncCompletionHandler<Response>()
+            {
+                @Override
+                public Response onCompleted(Response response) throws Exception
+                {
+                    completionHandler.onCompletion(createMuleResponse(response));
+                    return null;
+                }
+
+                @Override
+                public void onThrowable(Throwable t)
+                {
+                    completionHandler.onFailure((Exception) t);
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            completionHandler.onFailure(e);
+        }
+    }
+
+    private HttpResponse createMuleResponse(Response response) throws IOException
+    {
+        HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
+        responseBuilder.setStatusCode(response.getStatusCode());
+        responseBuilder.setReasonPhrase(response.getStatusText());
+        responseBuilder.setEntity(new InputStreamHttpEntity(response.getResponseBodyAsStream()));
+
+        if (response.hasResponseHeaders())
+        {
+            for (String header : response.getHeaders().keySet())
+            {
+                for (String headerValue : response.getHeaders(header))
+                {
+                    responseBuilder.addHeader(header, headerValue);
+                }
+            }
+        }
+        return responseBuilder.build();
+    }
+
+    private Request createGrizzlyRequest(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                         HttpAuthentication authentication) throws IOException
+    {
         RequestBuilder builder = new RequestBuilder();
 
         builder.setMethod(request.getMethod());
@@ -276,40 +350,7 @@ public class GrizzlyHttpClient implements HttpClient
         // if the maxConnections attribute is configured in the requester.
         builder.setRequestTimeout(responseTimeout);
 
-        ListenableFuture<Response> future = asyncHttpClient.executeRequest(builder.build());
-        Response response = null;
-
-        try
-        {
-            response = future.get(responseTimeout, TimeUnit.MILLISECONDS);
-        }
-        catch (InterruptedException e)
-        {
-            throw new IOException(e);
-        }
-        catch (ExecutionException e)
-        {
-            throw new IOException(e);
-        }
-
-        HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
-        responseBuilder.setStatusCode(response.getStatusCode());
-        responseBuilder.setReasonPhrase(response.getStatusText());
-        responseBuilder.setEntity(new InputStreamHttpEntity(response.getResponseBodyAsStream()));
-
-        if (response.hasResponseHeaders())
-        {
-            for (String header : response.getHeaders().keySet())
-            {
-                for (String headerValue : response.getHeaders(header))
-                {
-                    responseBuilder.addHeader(header, headerValue);
-                }
-            }
-        }
-
-        return responseBuilder.build();
-
+        return builder.build();
     }
 
     @Override

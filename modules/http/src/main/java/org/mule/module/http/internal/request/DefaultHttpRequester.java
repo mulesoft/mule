@@ -8,6 +8,7 @@ package org.mule.module.http.internal.request;
 
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -17,7 +18,6 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.context.notification.NotificationHelper;
@@ -26,6 +26,8 @@ import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.processor.AbstractNonBlockingMessageProcessor;
+import org.mule.api.CompletionHandler;
 import org.mule.util.AttributeEvaluator;
 
 import com.google.common.collect.Lists;
@@ -34,7 +36,7 @@ import java.io.InputStream;
 import java.util.List;
 
 
-public class DefaultHttpRequester implements MessageProcessor, Initialisable, MuleContextAware
+public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware
 {
 
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
@@ -172,30 +174,81 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
     }
 
     @Override
-    public MuleEvent process(final MuleEvent muleEvent) throws MuleException
+    protected MuleEvent processBlocking(final MuleEvent muleEvent) throws MuleException
     {
         return innerProcess(muleEvent, true);
     }
 
+    @Override
+    protected void processNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler) throws
+                                                                                                            MuleException
+    {
+        innerProcessNonBlocking(muleEvent, completionHandler, true);
+    }
+
+    protected void innerProcessNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler,
+                                           final boolean checkRetry) throws MuleException
+    {
+        final HttpAuthentication authentication = requestConfig.getAuthentication();
+        final HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
+
+        notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
+        getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), authentication,
+                             new CompletionHandler<HttpResponse, Exception>()
+                             {
+                                 @Override
+                                 public void onFailure(Exception exception)
+                                 {
+                                     MessagingException msgException = new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"),
+                                                                                              DefaultMuleEvent.copy(muleEvent),
+                                                                                              exception,
+                                                                                              DefaultHttpRequester.this);
+                                     completionHandler.onFailure(msgException);
+                                 }
+
+                                 @Override
+                                 public void onCompletion(HttpResponse httpResponse)
+                                 {
+                                     try
+                                     {
+
+                                         notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(),
+                                                                             muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
+                                         httpResponseToMuleEvent.convert(muleEvent, httpResponse);
+
+                                         if (resendRequest(muleEvent, checkRetry, authentication))
+                                         {
+                                             consumePayload(muleEvent);
+                                             innerProcessNonBlocking(muleEvent, completionHandler, false);
+                                         }
+                                         else
+                                         {
+                                             validateResponse(muleEvent);
+                                             completionHandler.onCompletion(muleEvent);
+                                         }
+                                     }
+                                     catch (MessagingException messagingException)
+                                     {
+                                         completionHandler.onFailure(messagingException);
+                                     }
+                                     catch (MuleException muleException)
+                                     {
+                                         completionHandler.onFailure(new MessagingException(muleEvent, muleException, DefaultHttpRequester.this));
+                                     }
+                                 }
+                             });
+    }
+
     private MuleEvent innerProcess(MuleEvent muleEvent, boolean checkRetry) throws MuleException
     {
-        HttpRequestBuilder builder = muleEventToHttpRequest.create(muleEvent, method.resolveStringValue(muleEvent), resolveURI(muleEvent));
-
         HttpAuthentication authentication = requestConfig.getAuthentication();
+        HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
 
-        if (authentication != null)
-        {
-            authentication.authenticate(muleEvent, builder);
-        }
-
-        HttpClient httpClient = requestConfig.getHttpClient();
         HttpResponse response;
-
         try
         {
-            HttpRequest httpRequest = builder.build();
             notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
-            response = httpClient.send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), authentication);
+            response = getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), authentication);
             notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
         }
         catch (Exception e)
@@ -205,16 +258,42 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
 
         httpResponseToMuleEvent.convert(muleEvent, response);
 
-        if (checkRetry && authentication != null && authentication.shouldRetry(muleEvent))
+        if (resendRequest(muleEvent, checkRetry, authentication))
         {
             consumePayload(muleEvent);
             muleEvent = innerProcess(muleEvent, false);
         }
         else
         {
-            responseValidator.validate(muleEvent);
+            validateResponse(muleEvent);
         }
         return muleEvent;
+    }
+
+    private HttpClient getHttpClient()
+    {
+        return requestConfig.getHttpClient();
+    }
+
+    private void validateResponse(MuleEvent muleEvent) throws ResponseValidatorException
+    {
+        responseValidator.validate(muleEvent);
+    }
+
+    private boolean resendRequest(MuleEvent muleEvent, boolean retry, HttpAuthentication authentication) throws MuleException
+    {
+        return retry && authentication != null && authentication.shouldRetry(muleEvent);
+    }
+
+    private HttpRequest createHttpRequest(MuleEvent muleEvent, HttpAuthentication authentication) throws MuleException
+    {
+        HttpRequestBuilder builder = muleEventToHttpRequest.create(muleEvent, method.resolveStringValue(muleEvent), resolveURI(muleEvent));
+
+        if (authentication != null)
+        {
+            authentication.authenticate(muleEvent, builder);
+        }
+        return builder.build();
     }
 
     private int resolveResponseTimeout(MuleEvent muleEvent)
