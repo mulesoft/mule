@@ -38,7 +38,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -169,7 +169,7 @@ public class DefaultMuleApplication implements Application
             ConfigurationBuilder cfgBuilder = domain.createApplicationConfigurationBuilder(this);
             if (!cfgBuilder.isConfigured())
             {
-                List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
+                List<ConfigurationBuilder> builders = new LinkedList<>();
                 builders.add(createConfigurationBuilderFromApplicationProperties());
 
                 // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder

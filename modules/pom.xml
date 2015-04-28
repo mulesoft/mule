@@ -28,6 +28,7 @@
         <module>db</module>
         <module>devkit-support</module>
         <module>drools</module>
+        <module>extensions-support</module>
         <module>launcher</module>
         <module>client</module>
         <module>guice</module>
@@ -47,6 +48,10 @@
         <module>scripting</module>
         <module>spring-extras</module>
         <module>spring-config</module>
+
+        <!-- depends on spring-config so it has to go after it -->
+        <module>extensions-spring-support</module>
+        
         <module>spring-security</module>
         <module>sxc</module>
         <module>tomcat</module>

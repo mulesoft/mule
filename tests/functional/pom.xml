@@ -102,6 +102,13 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- needed for org.springframework.beans.factory.FactoryBean interface -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -156,6 +163,12 @@
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
             <version>${commonsDbUtilsVersion}</version>
+        </dependency>
+
+        <!-- Needed for ExtensionsFunctionalTestCase -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
         </dependency>
 
 
