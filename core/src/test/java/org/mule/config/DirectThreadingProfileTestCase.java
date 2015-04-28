@@ -18,6 +18,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import junit.framework.Assert;
 import org.hamcrest.CoreMatchers;
@@ -27,8 +28,6 @@ import org.mockito.Mockito;
 @SmallTest
 public class DirectThreadingProfileTestCase extends AbstractMuleTestCase
 {
-
-    private Thread workThread;
 
     @Test
     public void testDirectThreadingProfile()
@@ -43,17 +42,19 @@ public class DirectThreadingProfileTestCase extends AbstractMuleTestCase
         assertThat(threadingProfile.getThreadWaitTimeout(), equalTo(0l));
         assertFalse(threadingProfile.isDoThreading());
 
+        final AtomicReference<Thread> workThread = new AtomicReference<>();
+
         threadingProfile.createPool().submit(new Callable<Object>()
         {
             @Override
             public Object call() throws Exception
             {
-                workThread = Thread.currentThread();
+                workThread.set(Thread.currentThread());
                 return null;
             }
         });
 
-        assertThat(workThread, equalTo(Thread.currentThread()));
+        assertThat(workThread.get(), equalTo(Thread.currentThread()));
     }
 
 }
