@@ -241,7 +241,7 @@
 /mule-standalone-${productVersion}/lib/opt/jibx-schema-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/jibx-run-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/xpp3-1.1.3.4.O.jar
-/mule-standalone-${productVersion}/lib/opt/c3p0-0.9.1.2.jar
+/mule-standalone-${productVersion}/lib/opt/c3p0-0.9.5.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-frontend-jaxws-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-frontend-simple-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-transports-local-2.7.15.jar
@@ -362,6 +362,7 @@
 /mule-standalone-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
+/mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.9.jar
 /mule-standalone-${productVersion}/lib/opt/msg-simple-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/msv-core-2011.1.jar
 /mule-standalone-${productVersion}/lib/opt/mvel2-2.0.10.jar
