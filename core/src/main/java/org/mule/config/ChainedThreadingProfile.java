@@ -76,13 +76,17 @@ public class ChainedThreadingProfile implements ThreadingProfile
     /**
      * Generate a mutable threading profile.  Default values are taken from the "delegate"
      * argument.  If dynamic is true then changes in the delegate instance are reflected in
-     * this instance.
+     * this instance.  DirectThreadingProfile instances cannot be chained.
      * 
      * @param delegate Source of default values.
      * @param dynamic If true, changes in delegate are reflected in this instance
      */
     public ChainedThreadingProfile(ThreadingProfile delegate, boolean dynamic)
     {
+        if (delegate instanceof DirectThreadingProfile)
+        {
+            throw new UnsupportedOperationException("DirectThreadingProfile instances cannot be chained.");
+        }
         if (!dynamic)
         {
             // for static dependencies, we delegate to a fixed copy
@@ -183,8 +187,7 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public WorkManager createWorkManager(String name, int shutdownTimeout)
     {
-        // we deliberately don't instantiate the chained profile as we just want a cloned copy, not recursion
-        return workManagerFactory.createWorkManager(new ImmutableThreadingProfile(this), name, shutdownTimeout);
+        return workManagerFactory.createWorkManager(this, name, shutdownTimeout);
     }
 
     public ExecutorService createPool()
@@ -194,8 +197,7 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public ExecutorService createPool(String name)
     {
-        // we deliberately don't instantiate the chained profile as we just want a cloned copy, not recursion
-        return poolFactory.createPool(name, new ImmutableThreadingProfile(this));
+        return poolFactory.createPool(name, this);
     }
 
     public boolean isDoThreading()
@@ -216,7 +218,7 @@ public class ChainedThreadingProfile implements ThreadingProfile
     @Override
     public ScheduledExecutorService createScheduledPool(String name)
     {
-        return poolFactory.createScheduledPool(name, new ImmutableThreadingProfile(this));
+        return poolFactory.createScheduledPool(name, this);
     }
 
     public MuleContext getMuleContext()

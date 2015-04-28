@@ -60,7 +60,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private HttpListenerConnectionManager connectionManager;
     private TlsContextFactory tlsContext;
     private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
-    private ThreadingProfile workerThreadingProfile;
+    private ThreadingProfile threadingProfile;
     private boolean started = false;
     private Server server;
     private WorkManager workManager;
@@ -78,9 +78,9 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         this.connectionManager = connectionManager;
     }
 
-    public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile)
+    public void setThreadingProfile(ThreadingProfile threadingProfile)
     {
-        this.workerThreadingProfile = workerThreadingProfile;
+        this.threadingProfile = threadingProfile;
     }
 
     public void setName(String name)
@@ -143,10 +143,10 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             return;
         }
         basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
-        if (workerThreadingProfile == null)
+        if (threadingProfile == null)
         {
-            workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
-            workerThreadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
+            threadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
+            threadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
         }
 
         if (port == null)
@@ -216,7 +216,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
     private WorkManager createWorkManager()
     {
-        final WorkManager workManager = workerThreadingProfile.createWorkManager(format("%s%s.%s", ThreadNameHelper.getPrefix(muleContext), name, "worker"), muleContext.getConfiguration().getShutdownTimeout());
+        final WorkManager workManager = threadingProfile.createWorkManager(format("%s%s.%s", ThreadNameHelper.getPrefix(muleContext), name, "worker"), muleContext.getConfiguration().getShutdownTimeout());
         if (workManager instanceof MuleContextAware)
         {
             ((MuleContextAware) workManager).setMuleContext(muleContext);
