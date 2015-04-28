@@ -6,10 +6,12 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.module.http.api.requester.HttpStreamingType.NEVER;
 import org.mule.api.DefaultMuleException;
@@ -21,9 +23,11 @@ import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.api.requester.HttpRequesterConfigBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
@@ -42,8 +46,11 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
 
     public static final String PUT_HTTP_METHOD = "PUT";
     private static final long RESPONSE_TIMEOUT = 100;
+    public static final String TEST_RESPONSE = "test-response";
     @Rule
     public DynamicPort port = new DynamicPort("port");
+    @Rule
+    public DynamicPort httpsPort = new DynamicPort("httpsPort");
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -127,7 +134,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         final MuleMessage message = getTestMuleMessage(NullPayload.class);
         final HttpRequestOptions options = newOptions().method(PUT_HTTP_METHOD).requestConfig(getRequestConfig()).build();
         final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), message, options);
-        assertThat(response.getPayloadAsString(), is("test-response"));
+        assertThat(response.getPayloadAsString(), is(TEST_RESPONSE));
     }
 
     @Test
@@ -137,6 +144,17 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         final HttpRequestOptions options = newOptions().disableStatusCodeValidation().build();
         final MuleMessage response = muleContext.getClient().send(getFailureUrl(), message, options);
         assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(500));
+    }
+
+    @Test
+    public void customRequestConfig() throws Exception
+    {
+        final MuleMessage message = getTestMuleMessage(NullPayload.class);
+        final HttpRequesterConfig requestConfig = new HttpRequesterConfigBuilder(muleContext).setProtocol(HTTPS).setTlsContext(muleContext.getRegistry().<TlsContextFactory>get("tlsContext")).build();
+        final HttpRequestOptions options = newOptions().disableStatusCodeValidation().requestConfig(requestConfig).build();
+        final MuleMessage response = muleContext.getClient().send(format("https://localhost:%s/", httpsPort.getNumber()), message, options);
+        assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(200));
+        assertThat(response.getPayloadAsString(), is(TEST_RESPONSE));
     }
 
     public static class LatchMessageProcessor implements MessageProcessor
@@ -170,21 +188,21 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
 
     private String getUrl()
     {
-        return String.format("http://localhost:%s/path", port.getNumber());
+        return format("http://localhost:%s/path", port.getNumber());
     }
 
     private String getRedirectUrl()
     {
-        return String.format("http://localhost:%s/redirectPath", port.getNumber());
+        return format("http://localhost:%s/redirectPath", port.getNumber());
     }
 
     private String getTimeoutUrl()
     {
-        return String.format("http://localhost:%s/timeoutPath", port.getNumber());
+        return format("http://localhost:%s/timeoutPath", port.getNumber());
     }
 
     private String getFailureUrl()
     {
-        return String.format("http://localhost:%s/failurePath", port.getNumber());
+        return format("http://localhost:%s/failurePath", port.getNumber());
     }
 }
