@@ -123,12 +123,6 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         this.parseRequest = parseRequest;
     }
 
-    public String resolvePath(String listenerPath)
-    {
-        Preconditions.checkArgument(listenerPath.startsWith("/"), "listenerPath must start with /");
-        return this.basePath == null ? listenerPath : this.basePath + listenerPath;
-    }
-
     public ListenerPath getFullListenerPath(String listenerPath)
     {
         Preconditions.checkArgument(listenerPath.startsWith("/"), "listenerPath must start with /");

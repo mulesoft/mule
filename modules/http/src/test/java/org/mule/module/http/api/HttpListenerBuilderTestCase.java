@@ -128,7 +128,6 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
         when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
         when(mockListenerConfig.getPort()).thenReturn(PORT);
         when(mockListenerConfig.getHost()).thenReturn(HOST);
-        when(mockListenerConfig.resolvePath(anyString())).thenCallRealMethod();
 
         final HttpListener httpListener = new HttpListenerBuilder(mockMuleContext)
                 .setFlow(mockFlow)
@@ -170,7 +169,6 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
     public void useConfiguredListenerConfig() throws Exception
     {
         when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(mockMessageProcessingManager);
-        when(mockListenerConfig.resolvePath(anyString())).thenCallRealMethod();
 
         final HttpListener httpListener = new HttpListenerBuilder(mockMuleContext)
                 .setFlow(mockFlow)
