@@ -53,7 +53,14 @@ public class BasicValidationTestCase extends ValidationTestCase
     public void ip() throws Exception
     {
         assertValid("ip", getTestEvent("127.0.0.1"));
-        assertInvalid("ip", getTestEvent("12.1.2"), messages.invalidIp("12.1.2"));
+        assertValid("ip", getTestEvent("FE80:0000:0000:0000:0202:B3FF:FE1E:8329"));
+        assertValid("ip", getTestEvent("FE80::0202:B3FF:FE1E:8329"));
+
+        String invalidIp = "12.1.2";
+        assertInvalid("ip", getTestEvent(invalidIp), messages.invalidIp(invalidIp));
+
+        invalidIp = "FE80:0000:0000";
+        assertInvalid("ip", getTestEvent(invalidIp), messages.invalidIp(invalidIp));
     }
 
     @Test
