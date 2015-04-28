@@ -7,6 +7,8 @@
 package org.mule.config.pool;
 
 import org.mule.api.config.ThreadingProfile;
+import org.mule.config.DirectThreadingProfile;
+import org.mule.config.ImmutableThreadingProfile;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitPolicy;
@@ -28,19 +30,21 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
 
     public ThreadPoolExecutor createPool(String name, ThreadingProfile tp)
     {
+        // Clone threading profile if it is not DirectThreadingProfile
+        ThreadingProfile threadingProfileCopy = tp instanceof DirectThreadingProfile ? tp : new ImmutableThreadingProfile(tp);
         BlockingQueue buffer;
 
-        if (tp.getMaxBufferSize() > 0 && tp.getMaxThreadsActive() > 1)
+        if (threadingProfileCopy.getMaxBufferSize() > 0 && threadingProfileCopy.getMaxThreadsActive() > 1)
         {
-            buffer = new LinkedBlockingDeque(tp.getMaxBufferSize());
+            buffer = new LinkedBlockingDeque(threadingProfileCopy.getMaxBufferSize());
         }
         else
         {
             buffer = new SynchronousQueue();
         }
 
-        ThreadPoolExecutor pool = internalCreatePool(name, tp, buffer);
-        configureThreadPoolExecutor(name, tp, pool);
+        ThreadPoolExecutor pool = internalCreatePool(name, threadingProfileCopy, buffer);
+        configureThreadPoolExecutor(name, threadingProfileCopy, pool);
         return pool;
 
     }
@@ -81,8 +85,10 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
     @Override
     public ScheduledThreadPoolExecutor createScheduledPool(String name, ThreadingProfile tp)
     {
-        ScheduledThreadPoolExecutor pool = internalCreateScheduledPool(tp);
-        configureThreadPoolExecutor(name, tp, pool);
+        // Clone threading profile if it is not DirectThreadingProfile
+        ThreadingProfile threadingProfileCopy = tp instanceof DirectThreadingProfile ? tp : new ImmutableThreadingProfile(tp);
+        ScheduledThreadPoolExecutor pool = internalCreateScheduledPool(threadingProfileCopy);
+        configureThreadPoolExecutor(name, threadingProfileCopy, pool);
         return pool;
     }
 
