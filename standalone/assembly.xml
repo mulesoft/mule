@@ -115,8 +115,8 @@
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <!-- extensions API -->
-                <include>org.mule:mule-extensions-api</include>
-                <include>org.mule:mule-extensions-annotations</include>
+                <include>org.mule.extensions:mule-extensions-api</include>
+                <include>org.mule.extensions:mule-extensions-annotations</include>
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
@@ -195,8 +195,8 @@
     because they are already in a different directory). -->
             <excludes>
                 <!--extensions API-->
-                <exclude>org.mule:mule-extensions-api</exclude>
-                <exclude>org.mule:mule-extensions-annotations</exclude>
+                <exclude>org.mule.extensions:mule-extensions-api</exclude>
+                <exclude>org.mule.extensions:mule-extensions-annotations</exclude>
                 <!-- lib/mule -->
                 <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
