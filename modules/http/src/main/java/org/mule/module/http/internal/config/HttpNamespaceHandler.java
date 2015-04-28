@@ -66,8 +66,8 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("failure-status-code-validator", new ChildDefinitionParser("responseValidator", FailureStatusCodeValidator.class));
 
         registerBeanDefinitionParser("raml-api-configuration", new ChildDefinitionParser("apiConfiguration", RamlApiConfiguration.class));
-        registerBeanDefinitionParser("worker-threading-profile", new ThreadingProfileDefinitionParser("workerThreadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-        registerBeanDefinitionParser("direct-threading-profile", new ThreadingProfileDefinitionParser("workerThreadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
+        registerBeanDefinitionParser("worker-threading-profile", new ThreadingProfileDefinitionParser("threadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
+        registerBeanDefinitionParser("direct-threading-profile", new ThreadingProfileDefinitionParser("threadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
                                                                                                         DirectThreadingProfile.class));
         registerBeanDefinitionParser("config", new ChildDefinitionParser("extension", HttpConfiguration.class));
     }

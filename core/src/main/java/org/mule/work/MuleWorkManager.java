@@ -82,7 +82,7 @@ public class MuleWorkManager implements WorkManager, MuleContextAware
         {
             name = "WorkManager#" + hashCode();
         }
-
+        // Clone threading profile if it is not DirectThreadingProfile
         this.threadingProfile = profile instanceof DirectThreadingProfile ? profile : new ImmutableThreadingProfile(profile);
         this.name = name;
         gracefulShutdownTimeout = shutdownTimeout;

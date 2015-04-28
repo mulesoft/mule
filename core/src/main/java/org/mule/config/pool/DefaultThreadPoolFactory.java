@@ -30,6 +30,7 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
 
     public ThreadPoolExecutor createPool(String name, ThreadingProfile tp)
     {
+        // Clone threading profile if it is not DirectThreadingProfile
         ThreadingProfile threadingProfileCopy = tp instanceof DirectThreadingProfile ? tp : new ImmutableThreadingProfile(tp);
         BlockingQueue buffer;
 
@@ -84,6 +85,7 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
     @Override
     public ScheduledThreadPoolExecutor createScheduledPool(String name, ThreadingProfile tp)
     {
+        // Clone threading profile if it is not DirectThreadingProfile
         ThreadingProfile threadingProfileCopy = tp instanceof DirectThreadingProfile ? tp : new ImmutableThreadingProfile(tp);
         ScheduledThreadPoolExecutor pool = internalCreateScheduledPool(threadingProfileCopy);
         configureThreadPoolExecutor(name, threadingProfileCopy, pool);

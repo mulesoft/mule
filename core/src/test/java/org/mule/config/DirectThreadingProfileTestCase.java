@@ -14,6 +14,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.concurrent.Callable;
 
@@ -22,7 +24,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class DirectThreadingProfileTestCase extends AbstractMuleContextTestCase
+@SmallTest
+public class DirectThreadingProfileTestCase extends AbstractMuleTestCase
 {
 
     private Thread workThread;

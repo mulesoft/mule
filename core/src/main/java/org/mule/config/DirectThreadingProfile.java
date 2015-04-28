@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * {@link org.mule.api.config.ThreadingProfile} implementation that executes work in the callee thread.
+ * {@link org.mule.api.config.ThreadingProfile} implementation that executes work in the caller thread.
  */
 public class DirectThreadingProfile extends ImmutableThreadingProfile
 {
@@ -36,7 +36,7 @@ public class DirectThreadingProfile extends ImmutableThreadingProfile
 
     public DirectThreadingProfile(ThreadingProfile delegate)
     {
-        // Ignore delegate threading profie
+        // Ignore delegate threading profie.  This constructor is used by Spring.
         this();
     }
 
