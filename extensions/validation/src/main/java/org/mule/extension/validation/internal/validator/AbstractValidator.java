@@ -13,8 +13,6 @@ import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.ValidationContext;
 import org.mule.extension.validation.internal.ValidationMessages;
 
-import org.springframework.util.StringUtils;
-
 /**
  * Base class for all {@link Validator}s provided out of the box.
  * Because this module provides out of the box validators which contain
@@ -59,16 +57,6 @@ abstract class AbstractValidator implements Validator
      */
     protected ValidationResult fail()
     {
-        String message = validationContext.getOptions().getMessage();
-        if (StringUtils.isEmpty(message))
-        {
-            message = getDefaultErrorMessage().getMessage();
-        }
-        else
-        {
-            validationContext.getMuleEvent().getMuleContext().getExpressionManager().parse(message, validationContext.getMuleEvent());
-        }
-
-        return error(message);
+        return error(getDefaultErrorMessage().getMessage());
     }
 }
