@@ -32,6 +32,11 @@ public class EmailValidator extends AbstractValidator
     @Override
     public ValidationResult validate(MuleEvent event)
     {
+        if (!email.trim().equals(email))
+        {
+            return fail();
+        }
+
         return org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(email)
                ? ok()
                : fail();
