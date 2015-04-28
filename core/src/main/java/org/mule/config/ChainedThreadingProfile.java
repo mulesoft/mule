@@ -76,14 +76,18 @@ public class ChainedThreadingProfile implements ThreadingProfile
     /**
      * Generate a mutable threading profile.  Default values are taken from the "delegate"
      * argument.  If dynamic is true then changes in the delegate instance are reflected in
-     * this instance.
+     * this instance.  DirectThreadingProfile instances cannot be chained.
      * 
      * @param delegate Source of default values.
      * @param dynamic If true, changes in delegate are reflected in this instance
      */
     public ChainedThreadingProfile(ThreadingProfile delegate, boolean dynamic)
     {
-        if (!(dynamic || delegate instanceof DirectThreadingProfile))
+        if (delegate instanceof DirectThreadingProfile)
+        {
+            throw new UnsupportedOperationException("DirectThreadingProfile instances cannot be chained.");
+        }
+        if (!dynamic)
         {
             // for static dependencies, we delegate to a fixed copy
             delegate = new ImmutableThreadingProfile(delegate);
