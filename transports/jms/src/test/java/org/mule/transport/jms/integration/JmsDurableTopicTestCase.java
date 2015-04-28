@@ -12,6 +12,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.Topic;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
@@ -25,6 +26,7 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky test")
     public void testProviderDurableSubscriber() throws Exception
     {
         setClientId("Client1");

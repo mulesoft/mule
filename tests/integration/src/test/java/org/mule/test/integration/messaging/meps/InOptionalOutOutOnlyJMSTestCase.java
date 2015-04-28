@@ -8,8 +8,6 @@ package org.mule.test.integration.messaging.meps;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.junit.*;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -22,6 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.activemq.broker.BrokerService;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("MULE-6926: Flaky test")
@@ -64,6 +67,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky test")
     public void testExchange() throws Exception
     {
         MuleClient client = muleContext.getClient();

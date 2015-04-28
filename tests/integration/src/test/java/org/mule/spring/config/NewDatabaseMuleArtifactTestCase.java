@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -93,6 +94,7 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky test")
     public void validatesDbDerbyConnectorTemplateQueryRefResolution() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<db:select config-ref=\"derby-config\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template\"/></db:select>";
