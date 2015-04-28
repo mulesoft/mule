@@ -6,6 +6,7 @@
  */
 package org.mule.exception;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -42,6 +43,12 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             logException(exception);
             processStatistics(event);
             event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
+
+            // MULE-8551 Still need to add support for non-blocking components in excepton strategies.
+            if(event.isAllowNonBlocking())
+            {
+                event = new DefaultMuleEvent(event.getMessage(), event, true);
+            }
             event = beforeRouting(exception, event);
             event = route(event, exception);
             processOutboundRouterStatistics(flowConstruct);
@@ -49,7 +56,11 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             markExceptionAsHandledIfRequired(exception);
             if (event != null && !VoidMuleEvent.getInstance().equals(event))
             {
-                processReplyTo(event, exception);
+                // Only handle ONE_WAY. With REQUEST_RESPONSE response is sent by message source
+                if (!event.getExchangePattern().hasResponse())
+                {
+                    processReplyTo(event, exception);
+                }
                 closeStream(event.getMessage());
                 nullifyExceptionPayloadIfRequired(event);
             }

@@ -7,18 +7,27 @@
 package org.mule.module.http.functional.proxy;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.config.spring.util.ProcessingStrategyUtils;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.functional.TestInputStream;
 import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.MessageExchangePattern;
+import org.mule.module.http.api.HttpHeaders;
+import org.mule.module.http.functional.TestInputStream;
+import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
+import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 import org.mule.util.concurrent.Latch;
 
@@ -44,6 +53,7 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,22 +67,38 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     @Rule
     public DynamicPort proxyPort = new DynamicPort("proxyPort");
 
+    @Rule
+    public SystemProperty systemProperty;
+
+    private static String SENSING_REQUEST_RESPONSE_PROCESSOR_NAME = "sensingRequestResponseProcessor";
     private RequestHandlerExtender handlerExtender;
     private boolean consumeAllRequest = true;
     private String configFile;
     private String requestThreadNameSubString;
+    private String responeThreadNameSubString;
+    private boolean nonBlocking;
+
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "worker"},
-                {"http-proxy-template-selectors-config.xml", "SelectorRunner"}});
+        return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "worker", "worker", false},
+                {"http-proxy-template-selectors-config.xml", "SelectorRunner", "SelectorRunner", false},
+                {"http-proxy-template-config.xml", "worker", "SelectorRunner", true},
+                {"http-proxy-template-selectors-config.xml", "SelectorRunner", "SelectorRunner", true}});
     }
 
-    public HttpProxyTemplateTestCase(String configFile, String requestThreadNameSubString)
+    public HttpProxyTemplateTestCase(String configFile, String requestThreadNameSubString, String responeThreadNameSubString, boolean nonBlocking)
     {
         this.configFile = configFile;
         this.requestThreadNameSubString = requestThreadNameSubString;
+        this.responeThreadNameSubString = responeThreadNameSubString;
+        this.nonBlocking = nonBlocking;
+        if(nonBlocking)
+        {
+            systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
+                                                ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
+        }
     }
 
     @Override
@@ -284,8 +310,29 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     public void requestThread() throws Exception
     {
         Request.Get(getProxyUrl("")).connectTimeout(RECEIVE_TIMEOUT).execute();
-        SensingNullMessageProcessor sensingMessageProcessor = muleContext.getRegistry().lookupObject("sensingMessageProcessor");
-        assertThat(sensingMessageProcessor.thread.getName(), containsString(requestThreadNameSubString));
+        SensingNullRequestResponseMessageProcessor sensingMessageProcessor = getSensingNullRequestResponseMessageProcessor();
+        assertThat(sensingMessageProcessor.requestThread.getName(), containsString(requestThreadNameSubString));
+    }
+
+    @Test
+    public void responseThread() throws Exception
+    {
+        assertRequestOk(getProxyUrl(""), null);
+        SensingNullRequestResponseMessageProcessor requestResponseProcessor = getSensingNullRequestResponseMessageProcessor();
+        if (nonBlocking)
+        {
+            assertThat(requestResponseProcessor.requestThread, not(equalTo(requestResponseProcessor.responseThread)));
+            assertThat(requestResponseProcessor.responseThread.getName(), containsString(responeThreadNameSubString));
+        }
+        else
+        {
+            assertThat(requestResponseProcessor.requestThread, equalTo(requestResponseProcessor.responseThread));
+        }
+    }
+
+    private SensingNullRequestResponseMessageProcessor getSensingNullRequestResponseMessageProcessor()
+    {
+        return muleContext.getRegistry().lookupObject(SENSING_REQUEST_RESPONSE_PROCESSOR_NAME);
     }
 
     private void assertRequestOk(String url, String expectedResponse) throws IOException

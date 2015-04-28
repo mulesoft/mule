@@ -11,6 +11,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.api.CompletionHandler;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -21,6 +22,14 @@ import java.util.concurrent.TimeoutException;
 public interface HttpClient extends Initialisable, Stoppable
 {
 
+    /**
+     * Sends a HttpRequest blocking the current thread until a response is available for the request times out.
+     */
     public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication) throws IOException, TimeoutException;
+
+    /**
+     * Sends a HttpRequest without blocking the current thread.  When a response is available or the request times out the provided CompletionHandler will be invoked.
+     */
+    public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication, final CompletionHandler<HttpResponse, Exception> handler);
 
 }
