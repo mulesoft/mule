@@ -35,6 +35,7 @@ public class BasicValidationTestCase extends ValidationTestCase
 {
 
     private static final String CUSTOM_VALIDATOR_MESSAGE = "Do you wanna build a snowman?";
+    private static final String EMAIL_VALIDATION_FLOW = "email";
 
     @Override
     protected String getConfigFile()
@@ -45,8 +46,11 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void email() throws Exception
     {
-        assertValid("email", getTestEvent(VALID_EMAIL));
-        assertInvalid("email", getTestEvent(INVALID_EMAIL), messages.invalidEmail("@mulesoft.com"));
+        assertValid(EMAIL_VALIDATION_FLOW, getTestEvent(VALID_EMAIL));
+
+        assertInvalidEmail(INVALID_EMAIL);
+        assertInvalidEmail(" " + VALID_EMAIL);
+        assertInvalidEmail(VALID_EMAIL + " ");
     }
 
     @Test
@@ -289,12 +293,15 @@ public class BasicValidationTestCase extends ValidationTestCase
     {
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("url", url);
-        event.setFlowVariable("email", email);
+        event.setFlowVariable(EMAIL_VALIDATION_FLOW, email);
 
         return event;
     }
 
-
+    private void assertInvalidEmail(String address) throws Exception
+    {
+        assertInvalid(EMAIL_VALIDATION_FLOW, getTestEvent(address), messages.invalidEmail(address));
+    }
 
     private void assertSize(Object value) throws Exception
     {
