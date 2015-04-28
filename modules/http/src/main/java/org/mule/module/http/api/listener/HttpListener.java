@@ -9,11 +9,12 @@ package org.mule.module.http.api.listener;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.source.MessageSource;
+import org.mule.api.source.NonBlockingMessageSource;
 
 /**
  * Represents an listener for HTTP requests.
  */
-public interface HttpListener extends MessageSource, Lifecycle
+public interface HttpListener extends NonBlockingMessageSource, Lifecycle
 {
 
     /**

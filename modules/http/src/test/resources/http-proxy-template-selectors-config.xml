@@ -9,7 +9,7 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
 
-    <spring:bean name="sensingMessageProcessor" class="org.mule.tck.SensingNullMessageProcessor"/>
+    <spring:bean name="sensingRequestResponseProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
 
     <http:listener-config name="proxyConfig" host="localhost" port="${proxyPort}" >
         <http:direct-threading-profile />
@@ -28,7 +28,7 @@
 
         <set-property propertyName="X-Forwarded-For" value="#[message.inboundProperties['http.remote.address']]" />
 
-        <processor ref="sensingMessageProcessor"/>
+        <processor ref="sensingRequestResponseProcessor"/>
 
         <http:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false" >
             <http:request-builder>
