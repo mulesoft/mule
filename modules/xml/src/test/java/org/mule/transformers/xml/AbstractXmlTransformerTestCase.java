@@ -9,6 +9,7 @@ package org.mule.transformers.xml;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformerTestCase;
 
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
@@ -53,6 +54,23 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
             catch (Exception ex)
             {
                 return false;
+            }
+        }
+        else if (expected instanceof XMLStreamReader && result instanceof XMLStreamReader)
+        {
+            XMLStreamReader expectedStream = (XMLStreamReader) expected;
+            XMLStreamReader resultStream = (XMLStreamReader) result;
+
+            try
+            {
+                Document expectedDocument = XMLUtils.toW3cDocument(expectedStream);
+                Document resultDocument = XMLUtils.toW3cDocument(resultStream);
+
+                return XMLUnit.compareXML(expectedDocument, resultDocument).similar();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
             }
         }
 
