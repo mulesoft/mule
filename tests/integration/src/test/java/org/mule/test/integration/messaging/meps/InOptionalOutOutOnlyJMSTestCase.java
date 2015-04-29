@@ -27,7 +27,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-//START SNIPPET: full-class
+@Ignore("MULE-6926: Flaky test")
 public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
 {
     @ClassRule
@@ -67,7 +67,6 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
     }
 
     @Test
-    @Ignore("MULE-6926: Flaky test")
     public void testExchange() throws Exception
     {
         MuleClient client = muleContext.getClient();
