@@ -25,7 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-//START SNIPPET: full-class
+@Ignore("MULE-6926: Flaky test")
 public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
