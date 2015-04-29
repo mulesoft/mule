@@ -25,6 +25,7 @@ import org.mule.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -210,6 +211,19 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         processingCallback.execute(cb);
     }
 
+    private void handlePossibleDisconnectingException(Exception e) throws Exception
+    {
+        boolean isJMSException =
+                (e instanceof JMSException) ||
+                (e instanceof UndeclaredThrowableException &&
+                 ((UndeclaredThrowableException) e).getUndeclaredThrowable().getCause() instanceof JMSException);
+        if (isJMSException && !this.isConnected())
+        {
+            return; // If we're being disconnected, ignore the exception
+        }
+        throw e;
+    }
+
     @Override
     protected List<MuleMessage> getMessages() throws Exception
     {
@@ -223,17 +237,9 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         {
             message = consumer.receive(timeout);
         }
-        catch (JMSException e)
+        catch (Exception e)
         {
-            // If we're being disconnected, ignore the exception
-            if (!this.isConnected())
-            {
-                // ignore
-            }
-            else
-            {
-                throw e;
-            }
+            handlePossibleDisconnectingException(e);
         }
 
         if (message == null)

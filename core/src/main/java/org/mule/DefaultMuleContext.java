@@ -680,6 +680,7 @@ public class DefaultMuleContext implements MuleContext
                     try
                     {
                         transactionManager = (((TransactionManagerFactory) temp.iterator().next()).create(config));
+                        registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, transactionManager);
                     }
                     catch (Exception e)
                     {
