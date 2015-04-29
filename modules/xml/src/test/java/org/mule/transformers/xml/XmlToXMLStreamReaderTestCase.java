@@ -13,7 +13,6 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToXMLStreamReader;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.AbstractTransformerTestCase;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,11 +21,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
-public class XmlToXMLStreamReaderTestCase extends AbstractTransformerTestCase
+public class XmlToXMLStreamReaderTestCase extends AbstractXmlTransformerTestCase
 {
 
     private static final String TEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>TEST_MESSAGE</test>";
@@ -62,29 +59,6 @@ public class XmlToXMLStreamReaderTestCase extends AbstractTransformerTestCase
         {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public boolean compareResults(Object expected, Object result)
-    {
-        if (expected instanceof XMLStreamReader && result instanceof XMLStreamReader)
-        {
-            XMLStreamReader expectedStream = (XMLStreamReader) expected;
-            XMLStreamReader resultStream = (XMLStreamReader) result;
-
-            try
-            {
-                Document expectedDocument = XMLUtils.toW3cDocument(expectedStream);
-                Document resultDocument = XMLUtils.toW3cDocument(resultStream);
-
-                return XMLUnit.compareXML(expectedDocument, resultDocument).similar();
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-        return super.compareResults(expected, result);
     }
 
     @Test
