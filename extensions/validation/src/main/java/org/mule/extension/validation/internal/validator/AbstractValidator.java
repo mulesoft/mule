@@ -22,7 +22,9 @@ import org.mule.extension.validation.internal.ValidationMessages;
 abstract class AbstractValidator implements Validator
 {
 
-    private final ValidationContext validationContext;
+    // This field is transient so that it doesn't get logged when a successful validation is performed (the
+    // validator instance fields are logged using reflection).
+    private transient final ValidationContext validationContext;
 
     AbstractValidator(ValidationContext validationContext)
     {

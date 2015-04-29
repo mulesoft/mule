@@ -15,6 +15,9 @@ import org.mule.util.StringUtils;
 
 import java.util.Locale;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for validation operations with common
@@ -24,6 +27,7 @@ import java.util.Locale;
  */
 abstract class ValidationSupport
 {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected final ValidationExtension config;
     private final ValidationMessages messages;
@@ -50,6 +54,10 @@ abstract class ValidationSupport
                 throw config.getExceptionFactory().createException(result, customExceptionClass, event);
             }
         }
+        else
+        {
+             logSuccessfulValidation(validator, event);
+        }
     }
 
     private ValidationResult evaluateCustomMessage(ValidationResult result, ValidationContext validationContext)
@@ -72,5 +80,13 @@ abstract class ValidationSupport
     {
         locale = StringUtils.isBlank(locale) ? ValidationExtension.DEFAULT_LOCALE : locale;
         return new Locale(locale);
+    }
+
+    protected void logSuccessfulValidation(Validator validator, MuleEvent event)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
+        }
     }
 }
