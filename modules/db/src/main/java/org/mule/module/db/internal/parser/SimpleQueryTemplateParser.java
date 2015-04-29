@@ -51,6 +51,7 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
     private final Pattern insertMatcher = Pattern.compile("(?ms)INSERT\\s* \\s*.+");
     private final Pattern deleteMatcher = Pattern.compile("(?ms)DELETE\\s* \\s*.+");
     private final Pattern truncateMatcher = Pattern.compile("(?ms)TRUNCATE TABLE \\s*.+");
+    private final Pattern mergeMatcher = Pattern.compile("(?ms)MERGE\\s*.+");
 
     @Override
     public QueryTemplate parse(String sql)
@@ -91,6 +92,10 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
         else if (isTruncate(sql))
         {
             queryType = QueryType.TRUNCATE;
+        }
+        else if (isMerge(sql))
+        {
+            queryType = QueryType.MERGE;
         }
         else
         {
@@ -223,6 +228,13 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
     private boolean isTruncate(String sqlText)
     {
         Matcher m = truncateMatcher.matcher(sqlText);
+
+        return m.matches();
+    }
+
+    private boolean isMerge(String sqlText)
+    {
+        Matcher m = mergeMatcher.matcher(sqlText);
 
         return m.matches();
     }

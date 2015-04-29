@@ -60,7 +60,7 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void detectsUpdatewithLineBreak() throws Exception
+    public void detectsUpdateWithLineBreak() throws Exception
     {
         String sql = "update PLANET set NAME='Mercury' \nwhere ID=1";
         QueryTemplate queryTemplate = parser.parse(sql);
@@ -119,6 +119,26 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase
         assertThat(queryTemplate.getType(), equalTo(QueryType.DDL));
         assertThat(queryTemplate.getSqlText(), equalTo(sql));
         assertThat(queryTemplate.getParams().size(), equalTo(0));
+    }
+
+    @Test
+    public void detectsMerge() throws Exception
+    {
+        String sql = "merge into PLANET USING ALIEN";
+        QueryTemplate queryTemplate = parser.parse(sql);
+        assertEquals(QueryType.MERGE, queryTemplate.getType());
+        assertEquals(sql, queryTemplate.getSqlText());
+        assertEquals(0, queryTemplate.getInputParams().size());
+    }
+
+    @Test
+    public void detectsMergeWithLineBreak() throws Exception
+    {
+        String sql = "merge into PLANET\n USING ALIEN";
+        QueryTemplate queryTemplate = parser.parse(sql);
+        assertEquals(QueryType.MERGE, queryTemplate.getType());
+        assertEquals(sql, queryTemplate.getSqlText());
+        assertEquals(0, queryTemplate.getInputParams().size());
     }
 
     @Test

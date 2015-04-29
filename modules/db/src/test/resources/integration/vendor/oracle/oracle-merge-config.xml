@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="merge">
+        <inbound-endpoint address="vm://merge" exchange-pattern="request-response"/>
+
+        <db:update config-ref="dbConfig">
+            <db:parameterized-query>
+                MERGE INTO PLANET p1
+                USING (SELECT * FROM PLANET) p2
+                ON (p1.Id = p2.ID)
+                WHEN MATCHED THEN UPDATE SET p1.name = 'merged'
+            </db:parameterized-query>
+        </db:update>
+    </flow>
+</mule>
