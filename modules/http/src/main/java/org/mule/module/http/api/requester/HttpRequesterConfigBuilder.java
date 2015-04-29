@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.api.requester;
 
+import static java.lang.String.valueOf;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -81,7 +83,7 @@ public class HttpRequesterConfigBuilder
      */
     public HttpRequesterConfigBuilder setResponseTimeout(int responseTimeout)
     {
-        this.setResponseTimeoutExpression(String.valueOf(responseTimeout));
+        this.setResponseTimeoutExpression(valueOf(responseTimeout));
         return this;
     }
 
@@ -123,6 +125,36 @@ public class HttpRequesterConfigBuilder
     public HttpRequesterConfigBuilder setProtocol(HttpConstants.Protocols protocol)
     {
         defaultHttpRequesterConfig.setProtocol(protocol);
+        return this;
+    }
+
+    /**
+     * @param host the default host to connect to. It may be an expression
+     * @return the builder
+     */
+    public HttpRequesterConfigBuilder setHostExpression(String host)
+    {
+        defaultHttpRequesterConfig.setHost(host);
+        return this;
+    }
+
+    /**
+     * @param port the default port to connect to.
+     * @return the builder
+     */
+    public HttpRequesterConfigBuilder setPortExpression(String port)
+    {
+        defaultHttpRequesterConfig.setPort(port);
+        return this;
+    }
+
+    /**
+     * @param port expression that resolves to the port to connect to.
+     * @return the builder
+     */
+    public HttpRequesterConfigBuilder setPort(int port)
+    {
+        defaultHttpRequesterConfig.setPort(valueOf(port));
         return this;
     }
 
