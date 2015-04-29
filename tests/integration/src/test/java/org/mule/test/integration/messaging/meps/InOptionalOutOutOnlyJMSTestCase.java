@@ -67,7 +67,6 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
     }
 
     @Test
-    @Ignore("MULE-6926: Flaky test")
     public void testExchange() throws Exception
     {
         MuleClient client = muleContext.getClient();
