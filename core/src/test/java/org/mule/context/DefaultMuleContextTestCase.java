@@ -6,6 +6,7 @@
  */
 package org.mule.context;
 
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -25,6 +26,7 @@ import org.mule.config.ClusterConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 import org.mule.transport.PollingController;
 import org.mule.util.SpiUtils;
 import org.mule.util.store.MuleObjectStoreManager;
@@ -34,8 +36,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.transaction.TransactionManager;
+
 import junit.framework.Assert;
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
@@ -181,6 +188,17 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
 
         // verify we're not fetching from registry many times
         verify(registry, times(1)).lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+    }
+
+    @Test
+    public void registerTransactionManager() throws Exception
+    {
+        DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+        context.getRegistry().registerObject("Test Transaction Manager Factory", new TestTransactionManagerFactory());
+        assertThat(context.getRegistry().lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER), is(IsNull.nullValue()));
+        TransactionManager transactionManager = context.getTransactionManager();
+        assertThat(transactionManager, not(is(IsNull.nullValue())));
+        assertThat((TransactionManager)context.getRegistry().lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER), is(CoreMatchers.sameInstance(transactionManager)));
     }
 
 }
