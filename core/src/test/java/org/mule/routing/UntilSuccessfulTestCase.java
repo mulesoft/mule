@@ -6,6 +6,14 @@
  */
 package org.mule.routing;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -13,18 +21,14 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Prober;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
 {
