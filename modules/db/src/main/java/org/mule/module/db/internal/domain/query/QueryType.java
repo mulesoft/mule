@@ -23,6 +23,8 @@ public enum QueryType
 
     TRUNCATE,
 
+    MERGE,
+
     STORE_PROCEDURE_CALL,
 
     DDL
