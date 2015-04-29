@@ -32,13 +32,9 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
     protected static final Log logger = LogFactory.getLog(BaseConnectorMessageNotification.class);
 
     public static final int MESSAGE_RECEIVED = MESSAGE_EVENT_ACTION_START_RANGE + 1;
-    public static final int MESSAGE_DISPATCH_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 2;
-    public static final int MESSAGE_SEND_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 3;
-    public static final int MESSAGE_REQUEST_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 4;
     public static final int MESSAGE_RESPONSE = MESSAGE_EVENT_ACTION_START_RANGE + 5;
 
-    public static final int MESSAGE_DISPATCH_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 1;
-    public static final int MESSAGE_SEND_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 2;
+    public static final int MESSAGE_REQUEST_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 4;
     public static final int MESSAGE_REQUEST_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 3;
 
     static
@@ -46,12 +42,7 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
         registerAction("receive", MESSAGE_RECEIVED);
         registerAction("response", MESSAGE_RESPONSE);
 
-        registerAction("begin dispatch", MESSAGE_DISPATCH_BEGIN);
-        registerAction("begin send", MESSAGE_SEND_BEGIN);
         registerAction("begin request", MESSAGE_REQUEST_BEGIN);
-
-        registerAction("end dispatch", MESSAGE_DISPATCH_END);
-        registerAction("end send", MESSAGE_SEND_END);
         registerAction("end request", MESSAGE_REQUEST_END);
     }
 
