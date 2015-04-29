@@ -66,6 +66,14 @@ public final class CustomValidatorOperation extends ValidationSupport
         validateWith(validator, createContext(options, event), event);
     }
 
+    @Override
+    protected void logSuccessfulValidation(Validator validator, MuleEvent event)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Successfully executed custom validator of type {} on message: {}", validator.getClass().getName(), event.getMessage());
+        }
+    }
 
     private class ValidatorSource extends ObjectSource<Validator>
     {
