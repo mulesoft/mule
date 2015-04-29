@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.activemq.broker.BrokerService;
 import org.junit.runners.Parameterized.Parameters;
 
-//START SNIPPET: full-class
+@Ignore("MULE-6926: Flaky test")
 public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
 {
     @ClassRule
