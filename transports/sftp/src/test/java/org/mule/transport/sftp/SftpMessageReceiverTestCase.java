@@ -6,14 +6,8 @@
  */
 package org.mule.transport.sftp;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
@@ -27,8 +21,9 @@ import org.mule.util.lock.SingleServerLockProvider;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.*;
 
 @SmallTest
 public class SftpMessageReceiverTestCase extends AbstractMuleTestCase
@@ -37,6 +32,7 @@ public class SftpMessageReceiverTestCase extends AbstractMuleTestCase
     private static final String CONNECTOR_NAME = "connector-name";
     private static final String ENDPOINT_URI_PATH = "endpoint-uri-path";
     private static final String[] FILE_NAMES = new String[] {"some-file-1", "some-file-2"};
+    private static final FileDescriptor[] FILES = new FileDescriptor[] { new FileDescriptor(FILE_NAMES[0], null), new FileDescriptor(FILE_NAMES[1], null) };
 
     private MuleLockFactory lockFactory;
     private LockProvider lockProvider;
@@ -53,6 +49,7 @@ public class SftpMessageReceiverTestCase extends AbstractMuleTestCase
 
         when(sftpConnector.getName()).thenReturn(CONNECTOR_NAME);
         when(sftpConnector.createSftpClient(endpoint).listFiles()).thenReturn(FILE_NAMES);
+        when(sftpConnector.createSftpClient(endpoint).getFileDescriptors()).thenReturn(FILES);
         when(endpoint.getMuleContext()).thenReturn(muleContext);
         when(endpoint.getEndpointURI()).thenReturn(endpointURI);
         when(endpoint.getConnector()).thenReturn(sftpConnector);

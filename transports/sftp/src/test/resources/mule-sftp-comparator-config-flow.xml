@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+
+    <spring:beans>
+        <spring:import resource="sftp-properties.xml" />
+    </spring:beans>
+
+    <sftp:connector name="sftpConnector" pollingFrequency="1000"
+                    autoDelete="false">
+    </sftp:connector>
+    <sftp:connector name="sftpConnectorRev" pollingFrequency="1000"
+                    autoDelete="false">
+    </sftp:connector>
+
+    <configuration>
+        <default-threading-profile doThreading="false"/>
+    </configuration>
+
+    <flow name="receiving">
+        <composite-source>
+            <sftp:inbound-endpoint name="inboundEndpoint"
+                                   connector-ref="sftpConnector"
+                                   autoDelete="true"
+                                   path="~/inbound/"
+                                   host="${SFTP_HOST}"
+                                   user="${USER1_NAME}"
+                                   password="${USER1_PASSWORD}"
+                                   port="${SFTP_PORT}"
+                                   comparator="org.mule.transport.sftp.comparator.OlderFirstComparator"
+                                   reverseOrder="false"/>
+            <sftp:inbound-endpoint name="inboundEndpointRev"
+                                   connector-ref="sftpConnectorRev"
+                                   autoDelete="true"
+                                   path="~/inbound/"
+                                   host="${SFTP_HOST}"
+                                   user="${USER1_NAME}"
+                                   password="${USER1_PASSWORD}"
+                                   port="${SFTP_PORT}"
+                                   comparator="org.mule.transport.sftp.comparator.OlderFirstComparator"
+                                   reverseOrder="true"/>
+        </composite-source>
+        <component>
+            <singleton-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
+       </component>
+    </flow>
+
+</mule>

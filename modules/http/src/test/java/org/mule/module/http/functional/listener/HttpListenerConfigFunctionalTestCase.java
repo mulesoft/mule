@@ -24,7 +24,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -47,7 +46,6 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
     private static final int TIMEOUT = 1000;
-    private static final HttpRequestOptions GET_OPTIONS = HttpRequestOptionsBuilder.newOptions().method(HttpConstants.Methods.GET.name()).responseTimeout(TIMEOUT).disableStatusCodeValidation().build();
 
     @Rule
     public DynamicPort fullConfigPort = new DynamicPort("fullConfigPort");
@@ -55,8 +53,6 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     public DynamicPort emptyConfigPort = new DynamicPort("emptyConfigPort");
     @Rule
     public DynamicPort noListenerConfigPort = new DynamicPort("noListenerConfigPort");
-    @Rule
-    public DynamicPort slashConfigPort = new DynamicPort("slashConfigPort");
     @Rule
     public SystemProperty path = new SystemProperty("path","path");
     @Rule
@@ -101,7 +97,7 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     @Test
     public void noListenerConfig() throws Exception
     {
-        final String url = String.format("http://localhost:%s/noListener", noListenerConfigPort.getNumber());
+        final String url = String.format("http://localhost:%s", noListenerConfigPort.getNumber());
         final HttpResponse httpResponse = callAndAssertStatus(url, SC_NOT_FOUND);
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(RESOURCE_NOT_FOUND));
     }
