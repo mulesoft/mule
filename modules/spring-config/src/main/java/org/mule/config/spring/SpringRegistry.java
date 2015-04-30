@@ -18,32 +18,25 @@ import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transformer.Converter;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.StringUtils;
-import org.mule.util.concurrent.ThreadAwareLockWrapper;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-
 
 public class SpringRegistry extends AbstractRegistry implements LifecycleRegistry, Injector
 {
@@ -65,37 +58,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     //This is used to track the Spring context lifecycle since there is no way to confirm the
     //lifecycle phase from the application context
     protected AtomicBoolean springContextInitialised = new AtomicBoolean(false);
-
-    /**
-     * Spring doesn't support concurrently registering and
-     * fetching objects, so we use a {@link ReentrantReadWriteLock}
-     * to synchronize that
-     */
-    private final ReadWriteLock registryLock = new ReentrantReadWriteLock();
-
-    /**
-     * A lookup operation might trigger a {@link FactoryBean#getObject()}
-     * method. Some of mule's {@link FactoryBean} registers additional objects
-     * (e.g.: {@link OutboundEndpointFactoryBean}). For that reason, a deadlock
-     * might occur since the traditional ReadLock/WriteLock model assumes that one
-     * same thread doesn't try to read and write at the same time. Additionally,
-     * because of how these custom factory beans are done, the same thread
-     * might even acquire the same read lock twice and then try to acquire
-     * the write lock before releasing them.
-     * <p/>
-     * For that reason, a {@link ThreadAwareLockWrapper} is used to wrap
-     * the readLock so that these cases can be accounted for.
-     * <p/>
-     * This lock should never be released directly but through the
-     * {@link #releaseReadLock()} method
-     */
-    private final ThreadAwareLockWrapper readLock = new ThreadAwareLockWrapper(registryLock.readLock());
-
-    /**
-     * So that it works in tandem with {@link #readLock} always acquire through
-     * {@link #acquireWriteLock()}
-     */
-    private final Lock writeLock = registryLock.writeLock();
 
     public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext)
     {
@@ -215,7 +177,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             Object object;
             try
             {
-                readLock.lock();
                 object = applicationContext.getBean(key);
             }
             catch (NoSuchBeanDefinitionException e)
@@ -225,10 +186,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                     logger.debug(e.getMessage(), e);
                 }
                 return null;
-            }
-            finally
-            {
-                releaseReadLock();
             }
 
             if (!applicationContext.isSingleton(key))
@@ -353,7 +310,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     {
         try
         {
-            readLock.lock();
             return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
         }
         catch (FatalBeanException fbex)
@@ -367,35 +323,12 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             logger.debug(e.getMessage(), e);
             return Collections.emptyMap();
         }
-        finally
-        {
-            releaseReadLock();
-        }
-    }
-
-    /**
-     * Tries to release the {@link #readLock}
-     * safely accounting for the fact that the
-     * lock might have been upgraded and thus
-     * already released
-     */
-    private void releaseReadLock()
-    {
-        try
-        {
-            readLock.unlock();
-        }
-        catch (IllegalMonitorStateException e)
-        {
-            // ignore. was most likely released by acquireWriteLock()
-        }
     }
 
     protected <T> Map<String, T> internalLookupByTypeWithoutAncestors(Class<T> type, boolean nonSingletons, boolean eagerInit)
     {
         try
         {
-            readLock.lock();
             return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
         }
         catch (FatalBeanException fbex)
@@ -411,10 +344,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                 logger.debug(e.getMessage(), e);
             }
             return Collections.emptyMap();
-        }
-        finally
-        {
-            releaseReadLock();
         }
     }
 
@@ -478,41 +407,31 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         @Override
         public Object unregisterObject(String key) throws RegistrationException
         {
-            try
+            Object object = applicationContext.getBean(key);
+
+            if (applicationContext.getBeanFactory().containsBeanDefinition(key))
             {
-                acquireWriteLock();
-
-                Object object = applicationContext.getBean(key);
-
-                if (applicationContext.getBeanFactory().containsBeanDefinition(key))
-                {
-                    ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
-                }
-
-                ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
-
-                return object;
+                ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
             }
-            finally
-            {
-                writeLock.unlock();
-            }
+
+            ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
+
+            return object;
         }
 
-        private void doRegisterObject(String key, Object value) throws RegistrationException
+        private synchronized void doRegisterObject(String key, Object value) throws RegistrationException
         {
+            if (applicationContext.containsBean(key))
+            {
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
+                }
+                SpringRegistry.this.unregisterObject(key);
+            }
+
             try
             {
-                acquireWriteLock();
-                if (applicationContext.containsBean(key))
-                {
-                    if (logger.isWarnEnabled())
-                    {
-                        logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
-                    }
-                    SpringRegistry.this.unregisterObject(key);
-                }
-
                 value = initialiseObject(applicationContext, key, value);
                 applyLifecycle(value);
                 applicationContext.getBeanFactory().registerSingleton(key, value);
@@ -521,29 +440,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             {
                 throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
             }
-            finally
-            {
-                writeLock.unlock();
-            }
         }
-    }
-
-    /**
-     * Acquires the {@link #writeLock} accounting
-     * for the fact that the same thread might have
-     * acquired the {@link #readLock} N amount of times
-     * which would result in a deadlock. If that's the
-     * case then if invokes {@link #releaseReadLock()}
-     * N times. This is what's usually referred to as
-     * a lock upgrade
-     */
-    private void acquireWriteLock()
-    {
-        while (readLock.isHeldByCurrentThread())
-        {
-            releaseReadLock();
-        }
-        writeLock.lock();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
