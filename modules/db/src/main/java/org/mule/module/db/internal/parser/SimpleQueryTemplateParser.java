@@ -45,13 +45,22 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
 
     private static final Log logger = LogFactory.getLog(SimpleQueryTemplateParser.class);
 
-    private final Pattern storedProcedureMatcher = Pattern.compile("(?ms)(\\{\\s*)?(:\\S+\\s*=)?\\s*CALL\\s* \\s*.*");
-    private final Pattern updateMatcher = Pattern.compile("(?ms)UPDATE\\s* \\s*.+");
-    private final Pattern selectMatcher = Pattern.compile("(?ms)SELECT\\s* \\s*.+");
-    private final Pattern insertMatcher = Pattern.compile("(?ms)INSERT\\s* \\s*.+");
-    private final Pattern deleteMatcher = Pattern.compile("(?ms)DELETE\\s* \\s*.+");
-    private final Pattern truncateMatcher = Pattern.compile("(?ms)TRUNCATE TABLE \\s*.+");
-    private final Pattern mergeMatcher = Pattern.compile("(?ms)MERGE\\s*.+");
+    private static final String STORED_PROCEDURE_REGEX = "(?ms)(\\{\\s*)?(:\\S+\\s*=)?\\s*CALL\\s* \\s*.*";
+    private static final String OPERATION_REGEX_TEMPLATE = "(?ms)%s\\s++.+";
+    private static final String UPDATE_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "UPDATE");
+    private static final String SELECT_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "SELECT");
+    private static final String INSERT_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "INSERT");
+    private static final String DELETE = String.format(OPERATION_REGEX_TEMPLATE, "DELETE");
+    private static final String TRUNCATE = String.format(OPERATION_REGEX_TEMPLATE, "TRUNCATE TABLE");
+    private static final String MERGE_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "MERGE");
+
+    private final Pattern storedProcedureMatcher = Pattern.compile(STORED_PROCEDURE_REGEX);
+    private final Pattern updateMatcher = Pattern.compile(UPDATE_REGEX);
+    private final Pattern selectMatcher = Pattern.compile(SELECT_REGEX);
+    private final Pattern insertMatcher = Pattern.compile(INSERT_REGEX);
+    private final Pattern deleteMatcher = Pattern.compile(DELETE);
+    private final Pattern truncateMatcher = Pattern.compile(TRUNCATE);
+    private final Pattern mergeMatcher = Pattern.compile(MERGE_REGEX);
 
     @Override
     public QueryTemplate parse(String sql)
