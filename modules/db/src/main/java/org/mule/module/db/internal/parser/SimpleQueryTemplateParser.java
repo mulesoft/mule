@@ -46,11 +46,11 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
     private static final Log logger = LogFactory.getLog(SimpleQueryTemplateParser.class);
 
     private final Pattern storedProcedureMatcher = Pattern.compile("(?ms)(\\{\\s*)?(:\\S+\\s*=)?\\s*CALL\\s* \\s*.*");
-    private final Pattern updateMatcher = Pattern.compile("(?ms)UPDATE\\s* \\s*.+");
-    private final Pattern selectMatcher = Pattern.compile("(?ms)SELECT\\s* \\s*.+");
-    private final Pattern insertMatcher = Pattern.compile("(?ms)INSERT\\s* \\s*.+");
-    private final Pattern deleteMatcher = Pattern.compile("(?ms)DELETE\\s* \\s*.+");
-    private final Pattern truncateMatcher = Pattern.compile("(?ms)TRUNCATE TABLE \\s*.+");
+    private final Pattern updateMatcher = Pattern.compile("(?ms)UPDATE\\s++.+");
+    private final Pattern selectMatcher = Pattern.compile("(?ms)SELECT\\s++.+");
+    private final Pattern insertMatcher = Pattern.compile("(?ms)INSERT\\s++.+");
+    private final Pattern deleteMatcher = Pattern.compile("(?ms)DELETE\\s++.+");
+    private final Pattern truncateMatcher = Pattern.compile("(?ms)TRUNCATE TABLE\\s++.+");
     private final Pattern mergeMatcher = Pattern.compile("(?ms)MERGE\\s*.+");
 
     @Override
