@@ -29,9 +29,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -61,10 +58,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     //This is used to track the Spring context lifecycle since there is no way to confirm the
     //lifecycle phase from the application context
     protected AtomicBoolean springContextInitialised = new AtomicBoolean(false);
-
-    private final ReadWriteLock registryLock = new ReentrantReadWriteLock();
-    private final Lock readLock = registryLock.readLock();
-    private final Lock writeLock = registryLock.writeLock();
 
     public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext)
     {
@@ -184,7 +177,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             Object object;
             try
             {
-                readLock.lock();
                 object = applicationContext.getBean(key);
             }
             catch (NoSuchBeanDefinitionException e)
@@ -194,10 +186,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                     logger.debug(e.getMessage(), e);
                 }
                 return null;
-            }
-            finally
-            {
-                readLock.unlock();
             }
 
             if (!applicationContext.isSingleton(key))
@@ -322,7 +310,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     {
         try
         {
-            readLock.lock();
             return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
         }
         catch (FatalBeanException fbex)
@@ -336,17 +323,12 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             logger.debug(e.getMessage(), e);
             return Collections.emptyMap();
         }
-        finally
-        {
-            readLock.unlock();
-        }
     }
 
     protected <T> Map<String, T> internalLookupByTypeWithoutAncestors(Class<T> type, boolean nonSingletons, boolean eagerInit)
     {
         try
         {
-            readLock.lock();
             return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
         }
         catch (FatalBeanException fbex)
@@ -362,10 +344,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                 logger.debug(e.getMessage(), e);
             }
             return Collections.emptyMap();
-        }
-        finally
-        {
-            readLock.unlock();
         }
     }
 
@@ -429,41 +407,31 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         @Override
         public Object unregisterObject(String key) throws RegistrationException
         {
-            try
+            Object object = applicationContext.getBean(key);
+
+            if (applicationContext.getBeanFactory().containsBeanDefinition(key))
             {
-                writeLock.lock();
-
-                Object object = applicationContext.getBean(key);
-
-                if (applicationContext.getBeanFactory().containsBeanDefinition(key))
-                {
-                    ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
-                }
-
-                ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
-
-                return object;
+                ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
             }
-            finally
-            {
-                writeLock.unlock();
-            }
+
+            ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
+
+            return object;
         }
 
-        private void doRegisterObject(String key, Object value) throws RegistrationException
+        private synchronized void doRegisterObject(String key, Object value) throws RegistrationException
         {
+            if (applicationContext.containsBean(key))
+            {
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
+                }
+                SpringRegistry.this.unregisterObject(key);
+            }
+
             try
             {
-                writeLock.lock();
-                if (applicationContext.containsBean(key))
-                {
-                    if (logger.isWarnEnabled())
-                    {
-                        logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
-                    }
-                    SpringRegistry.this.unregisterObject(key);
-                }
-
                 value = initialiseObject(applicationContext, key, value);
                 applyLifecycle(value);
                 applicationContext.getBeanFactory().registerSingleton(key, value);
@@ -471,10 +439,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             catch (Exception e)
             {
                 throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
-            }
-            finally
-            {
-                writeLock.unlock();
             }
         }
     }
