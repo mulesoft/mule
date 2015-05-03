@@ -46,6 +46,10 @@
             <artifactId>grizzly-http-server</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>tls-sni</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
         </dependency>
@@ -109,7 +113,6 @@
             <version>4.3.3</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>
