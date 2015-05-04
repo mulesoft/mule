@@ -18,10 +18,10 @@ import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transformer.Converter;
+import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
-import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
@@ -113,21 +113,16 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         springContextInitialised.set(true);
     }
 
+    /**
+     * Forces prototype instances of {@link TransformerResolver}
+     * and {@link Converter} to be created, so that
+     * {@link PostRegistrationActionsPostProcessor} can work
+     * its magic
+     */
     private void initTransformers()
     {
-        MuleRegistryHelper registryHelper = (MuleRegistryHelper) muleContext.getRegistry();
-
-        Map<String, TransformerResolver> resolvers = registryHelper.lookupByType(TransformerResolver.class);
-        for (TransformerResolver resolver : resolvers.values())
-        {
-            registryHelper.registerTransformerResolver(resolver);
-        }
-
-        Map<String, Converter> converters = registryHelper.lookupByType(Converter.class);
-        for (Converter converter : converters.values())
-        {
-            registryHelper.notifyTransformerResolvers(converter, TransformerResolver.RegistryAction.ADDED);
-        }
+        applicationContext.getBeansOfType(TransformerResolver.class);
+        applicationContext.getBeansOfType(Converter.class);
     }
 
     @Override
