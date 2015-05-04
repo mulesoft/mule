@@ -1350,7 +1350,7 @@
                 <version>${muleExtensionsApiVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule.extensions</groupId>
+                <groupId>org.mule</groupId>
                 <artifactId>mule-extensions-annotations</artifactId>
                 <version>${muleExtensionsApiVersion}</version>
             </dependency>

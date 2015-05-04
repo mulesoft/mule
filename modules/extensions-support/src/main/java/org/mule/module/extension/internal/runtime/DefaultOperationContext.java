@@ -7,41 +7,45 @@
 package org.mule.module.extension.internal.runtime;
 
 import org.mule.api.MuleEvent;
+import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
-import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Default implementation of {@link OperationContext} which
+ * Default implementation of {@link OperationContextAdapter} which
  * adds additional information which is relevant to this implementation
  * of the extensions-api, even though it's not part of the API itself
  *
  * @since 3.7.0
  */
-public final class DefaultOperationContext implements OperationContext
+public class DefaultOperationContext implements OperationContextAdapter
 {
 
+    private final Operation operation;
     private final Map<Parameter, Object> parameters;
     private final Map<String, Object> parametersByName;
-
-    /**
-     * The current {@link MuleEvent}
-     */
     private final MuleEvent event;
 
-    public DefaultOperationContext(ResolverSetResult parameters, MuleEvent event)
+    public DefaultOperationContext(Operation operation, ResolverSetResult parameters, MuleEvent event)
     {
+        this.operation = operation;
+        this.event = event;
+
         this.parameters = parameters.asMap();
         parametersByName = new HashMap<>(this.parameters.size());
         for (Map.Entry<Parameter, Object> parameter : this.parameters.entrySet())
         {
             parametersByName.put(parameter.getKey().getName(), parameter.getValue());
         }
+    }
 
-        this.event = event;
+    @Override
+    public Operation getOperation()
+    {
+        return operation;
     }
 
     @Override
@@ -62,6 +66,7 @@ public final class DefaultOperationContext implements OperationContext
         return parametersByName.get(parameterName);
     }
 
+    @Override
     public MuleEvent getEvent()
     {
         return event;

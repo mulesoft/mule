@@ -5,10 +5,8 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 
-    <validation:config name="validation"/>
-
     <flow name="validateNumber">
-        <validation:is-number value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" numberType="#[numberType]" config-ref="validation"/>
+        <validation:is-number value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" numberType="#[numberType]" />
     </flow>
 
 </mule>

@@ -7,10 +7,8 @@
       http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
-    <validation:config name="validation" />
-
     <flow name="validate">
-        <validation:all config-ref="validation">
+        <validation:all>
             <validation:validations>
                 <json:validate-schema schemaLocation="schema/fstab-bad.json" />
             </validation:validations>

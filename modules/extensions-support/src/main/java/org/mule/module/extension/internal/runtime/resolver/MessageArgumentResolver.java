@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime.resolver;
 
 import org.mule.api.MuleMessage;
 import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
  * An implementation of {@link ArgumentResolver} which
@@ -16,7 +16,7 @@ import org.mule.module.extension.internal.runtime.DefaultOperationContext;
  * {@link OperationContext}.
  *
  * Notice that for this to work, the {@link OperationContext}
- * has to be an instance of {@link DefaultOperationContext}
+ * has to be an instance of {@link OperationContextAdapter}
  *
  * @since 3.7.0
  */
@@ -26,6 +26,6 @@ public class MessageArgumentResolver implements ArgumentResolver<MuleMessage>
     @Override
     public MuleMessage resolve(OperationContext operationContext)
     {
-        return ((DefaultOperationContext) operationContext).getEvent().getMessage();
+        return ((OperationContextAdapter) operationContext).getEvent().getMessage();
     }
 }

@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
+import org.mule.extension.introspection.Operation;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.HeisenbergExtension;
@@ -48,6 +49,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     @Mock
     private ResolverSetResult parameters;
 
+    @Mock
+    private Operation operation;
+
     private Map<Parameter, Object> parameterValues = new HashMap<>();
 
     private ReflectiveMethodOperationExecutor executor;
@@ -60,7 +64,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     public void before()
     {
         initHeisenberg();
-        operationContext = new DefaultOperationContext(parameters, muleEvent);
+        operationContext = new DefaultOperationContext(operation, parameters, muleEvent);
         when(operationContext.getParameters()).thenReturn(parameterValues);
     }
 

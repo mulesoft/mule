@@ -632,7 +632,7 @@ public class SchemaBuilder
         complexContentExtension.setBase(base);
         complexContent.setExtension(complexContentExtension);
 
-        Attribute configAttr = createAttribute(ATTRIBUTE_NAME_CONFIG, ATTRIBUTE_DESCRIPTION_CONFIG, false, SUBSTITUTABLE_NAME);
+        Attribute configAttr = createAttribute(ATTRIBUTE_NAME_CONFIG, ATTRIBUTE_DESCRIPTION_CONFIG, true, SUBSTITUTABLE_NAME);
         complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
 
         final ExplicitGroup all = new ExplicitGroup();

@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -111,10 +110,10 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         String configRef = element.getAttribute(ATTRIBUTE_NAME_CONFIG);
         if (StringUtils.isBlank(configRef))
         {
-            throw new IllegalArgumentException("All operations must provide a config-ref element");
+            configRef = null;
         }
 
-        builder.addConstructorArgValue(new RuntimeBeanReference(configRef));
+        builder.addConstructorArgValue(configRef);
     }
 
 
