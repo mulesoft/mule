@@ -6,6 +6,7 @@
  */
 package org.mule.security.oauth.processor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -48,6 +49,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
 {
 
     private static final String eventId = "eventId";
+    private static final String annotatedPropertyName = "Api-Key";
 
     private OAuth2Manager<OAuth2Adapter> manager;
     private TestAuthorizeMessageProcessor processor;
@@ -157,10 +159,12 @@ public class OAuth2AuthorizeMessageProcessorTestCase
         final String authorizeUrl = "authorizeUrl";
         final String customField = "customField";
         final String anotherCustomField = "anotherCustomField";
+        final String annotatedCustomField = "annotatedCustomField";
 
         this.processor.setState(state);
         this.processor.setCustomField(customField);
         this.processor.setAnotherCustomField(anotherCustomField);
+        this.processor.setAnnotatedCustomField(annotatedCustomField);
 
         Mockito.when(this.manager.getDefaultUnauthorizedConnector().getAuthorizationParameters()).thenReturn(
             this.getAuthorizePropertiesWithoutDefaults());
@@ -179,7 +183,8 @@ public class OAuth2AuthorizeMessageProcessorTestCase
                     Assert.assertEquals(customField.toLowerCase(), parameters.get("customField"));
                     Assert.assertEquals(anotherCustomField.toLowerCase(),
                         parameters.get("anotherCustomField"));
-
+                    Assert.assertEquals(annotatedCustomField.toLowerCase(),
+                            parameters.get(annotatedPropertyName));
                     return authorizeUrl;
                 }
             });
@@ -203,6 +208,8 @@ public class OAuth2AuthorizeMessageProcessorTestCase
             String.class));
         parameters.add(new AuthorizationParameter<String>("anotherCustomField", "anotherCustomField", false,
             null, String.class));
+        parameters.add(new AuthorizationParameter<String>("annotatedCustomField", "annotatedCustomField", false,
+                null, String.class));
 
         return parameters;
     }
@@ -214,6 +221,9 @@ public class OAuth2AuthorizeMessageProcessorTestCase
 
         private String customField;
         private String anotherCustomField;
+
+        @JsonProperty(annotatedPropertyName)
+        private String annotatedCustomField;
 
         @Override
         protected String getAuthCodeRegex()
@@ -279,5 +289,12 @@ public class OAuth2AuthorizeMessageProcessorTestCase
             this.anotherCustomField = anotherCustomField;
         }
 
+        public String getAnnotatedCustomField() {
+            return annotatedCustomField;
+        }
+
+        public void setAnnotatedCustomField(String annotatedCustomField) {
+            this.annotatedCustomField = annotatedCustomField;
+        }
     }
 }

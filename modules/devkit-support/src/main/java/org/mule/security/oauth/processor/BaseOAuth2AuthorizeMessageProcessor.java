@@ -7,6 +7,7 @@
 
 package org.mule.security.oauth.processor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -118,15 +119,16 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         {
             for (AuthorizationParameter<?> parameter : params)
             {
+                String parameterName = parameter.getName();
                 Field field = null;
                 try
                 {
-                    field = this.getClass().getDeclaredField(parameter.getName());
+                    field = this.getClass().getDeclaredField(parameterName);
                 }
                 catch (NoSuchFieldException e)
                 {
                     throw new MessagingException(CoreMessages.createStaticMessage(String.format(
-                        "Code generation error. Field %s should be present in class", parameter.getName())),
+                        "Code generation error. Field %s should be present in class", parameterName)),
                         event, e);
                 }
 
@@ -134,12 +136,16 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 
                 try
                 {
+                    JsonProperty property=field.getAnnotation(JsonProperty.class);
+                    if(property!=null && StringUtils.isNotEmpty(property.value())){
+                        parameterName = property.value();
+                    }
                     Object value = field.get(this);
                     if (value != null)
                     {
                         Object transformed = this.evaluateAndTransform(getMuleContext(), event,
                             parameter.getType(), null, value);
-                        extraParameters.put(parameter.getName(), this.toString(event, transformed)
+                        extraParameters.put(parameterName, this.toString(event, transformed)
                             .toLowerCase());
                     }
                 }
