@@ -81,8 +81,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         this.springResources = springResources;
     }
 
-
-
     @Override
     protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory)
     {
@@ -96,7 +94,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                               new GlobalNamePostProcessor(),
                               new ExpressionEnricherPostProcessor(muleContext),
                               new AnnotatedTransformerObjectPostProcessor(muleContext),
-                              new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
+                              new PostRegistrationActionsPostProcessor(this, (MuleRegistryHelper) muleContext.getRegistry()),
                               new DiscardedOptionalBeanPostProcessor(optionalObjectsController, (DefaultListableBeanFactory) beanFactory),
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
         );
@@ -234,6 +232,26 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
             beanFactory.copyConfigurationFrom(parentBeanFactory);
         }
         return beanFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     * This implementation returns {@code false} if the
+     * context hasn't been initialised yet, in opposition
+     * to the default implementation which throws
+     * an exception
+     */
+    @Override
+    public boolean isRunning()
+    {
+        try
+        {
+            return super.isRunning();
+        }
+        catch (IllegalStateException e)
+        {
+            return false;
+        }
     }
 
     public MuleContext getMuleContext()
