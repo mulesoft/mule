@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.ExtensionManager;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import org.junit.Test;
@@ -180,7 +180,6 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
 
     private HeisenbergExtension getConfig(String name) throws Exception
     {
-        ValueResolver<HeisenbergExtension> config = muleContext.getRegistry().lookupObject(name);
-        return config.resolve(getTestEvent(EMPTY));
+        return ExtensionsTestUtils.getConfigurationInstance(name, getTestEvent(""));
     }
 }

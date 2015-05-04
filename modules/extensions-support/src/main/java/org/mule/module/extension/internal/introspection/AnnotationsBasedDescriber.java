@@ -7,7 +7,6 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getDefaultValue;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterName;
@@ -15,6 +14,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.SPIServiceRegistry;
 import org.mule.extension.annotations.Configuration;
@@ -187,7 +187,7 @@ public final class AnnotationsBasedDescriber implements Describer
             }
             else
             {
-                parameterConstruct = with.optionalParameter(parameterName).defaultingTo(getDefaultValue(optional, dataType));
+                parameterConstruct = with.optionalParameter(parameterName).defaultingTo(getDefaultValue(optional));
             }
 
             parameterConstruct.ofType(dataType);

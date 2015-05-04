@@ -127,7 +127,7 @@
     <xs:complexType name="AliasType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -142,7 +142,7 @@
     <xs:complexType name="DieType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -154,7 +154,7 @@
     <xs:complexType name="GetEnemyType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -167,7 +167,7 @@
     <xs:complexType name="GetInjectedExtensionManagerType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -179,7 +179,7 @@
     <xs:complexType name="HideMethInEventType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -191,7 +191,7 @@
     <xs:complexType name="HideMethInMessageType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -203,7 +203,7 @@
     <xs:complexType name="KillType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -223,7 +223,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -243,7 +243,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -256,7 +256,7 @@
     <xs:complexType name="KillWithCustomMessageType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -270,7 +270,7 @@
     <xs:complexType name="LaunderType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
@@ -283,7 +283,7 @@
     <xs:complexType name="SayMyNameType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>

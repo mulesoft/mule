@@ -33,7 +33,7 @@ final class ConfigurationBeanDefinitionParser extends BaseExtensionBeanDefinitio
 
     ConfigurationBeanDefinitionParser(Configuration configuration)
     {
-        super(ConfigurationFactoryBean.class);
+        super(ConfigurationInstanceProviderFactoryBean.class);
         this.configuration = configuration;
     }
 

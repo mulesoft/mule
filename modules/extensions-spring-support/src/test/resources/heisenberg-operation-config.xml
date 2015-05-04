@@ -35,74 +35,74 @@
     </heisenberg:config>
 
     <flow name="sayMyName">
-        <heisenberg:say-my-name config-ref="heisenberg"/>
+        <heisenberg:say-my-name />
     </flow>
 
     <flow name="die">
-        <heisenberg:die config-ref="heisenberg"/>
+        <heisenberg:die />
     </flow>
 
     <flow name="getFixedEnemy">
-        <heisenberg:get-enemy config-ref="heisenberg" index="0"/>
+        <heisenberg:get-enemy index="0"/>
     </flow>
 
     <flow name="expressionEnemy">
-        <heisenberg:get-enemy config-ref="heisenberg" index="#[flowVars['enemy']]"/>
+        <heisenberg:get-enemy index="#[flowVars['enemy']]"/>
     </flow>
 
     <flow name="hideInEvent">
-        <heisenberg:hide-meth-in-event config-ref="heisenberg"/>
+        <heisenberg:hide-meth-in-event />
     </flow>
 
     <flow name="hideInMessage">
-        <heisenberg:hide-meth-in-message config-ref="heisenberg"/>
+        <heisenberg:hide-meth-in-message />
     </flow>
 
     <flow name="killFromPayload">
-        <heisenberg:kill config-ref="heisenberg" goodbyeMessage="#[flowVars['goodbye']]"/>
+        <heisenberg:kill goodbyeMessage="#[flowVars['goodbye']]"/>
     </flow>
 
     <flow name="customKillWithDefault">
-        <heisenberg:kill-with-custom-message config-ref="heisenberg" goodbyeMessage="#[flowVars['goodbye']]"/>
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[flowVars['goodbye']]"/>
     </flow>
 
     <flow name="customKillWithoutDefault">
-        <heisenberg:kill-with-custom-message config-ref="heisenberg" goodbyeMessage="#[flowVars['goodbye']]"
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[flowVars['goodbye']]"
                                              victim="#[flowVars['victim']]"/>
     </flow>
 
     <flow name="killMany">
-        <heisenberg:kill-many config-ref="heisenberg" reason="I'm the one who knocks">
+        <heisenberg:kill-many  reason="I'm the one who knocks">
             <heisenberg:kill-operations>
-                <heisenberg:kill-with-custom-message config-ref="heisenberg" victim="Gustavo Fring" goodbyeMessage="bye bye"/>
-                <heisenberg:kill-with-custom-message config-ref="heisenberg" victim="Frank" goodbyeMessage="bye bye"/>
-                <heisenberg:kill-with-custom-message config-ref="heisenberg" victim="Nazi dudes" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operations>
         </heisenberg:kill-many>
     </flow>
 
     <flow name="killManyButOnlyOneProvided">
-        <heisenberg:kill-many config-ref="heisenberg" reason="I'm the one who knocks">
+        <heisenberg:kill-many  reason="I'm the one who knocks">
             <heisenberg:kill-operations>
-                <heisenberg:kill-with-custom-message config-ref="heisenberg" victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operations>
         </heisenberg:kill-many>
     </flow>
 
     <flow name="killOne">
-        <heisenberg:kill-one config-ref="heisenberg" reason="I'm the one who knocks">
+        <heisenberg:kill-one  reason="I'm the one who knocks">
             <heisenberg:kill-operation>
-                <heisenberg:kill-with-custom-message config-ref="heisenberg" victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operation>
         </heisenberg:kill-one>
     </flow>
 
     <flow name="injectedExtensionManager">
-        <heisenberg:get-injected-extension-manager config-ref="heisenberg" />
+        <heisenberg:get-injected-extension-manager />
     </flow>
 
     <flow name="alias">
-        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52" config-ref="heisenberg" />
+        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52"  />
     </flow>
 
 </mule>
