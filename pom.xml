@@ -1438,6 +1438,11 @@
                 <artifactId>grizzly-websockets</artifactId>
                 <version>${grizzlyVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>tls-sni</artifactId>
+                <version>${grizzlyVersion}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.ning</groupId>
