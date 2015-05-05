@@ -7,7 +7,6 @@
 package org.mule.module.launcher.domain;
 
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -64,8 +63,12 @@ public class DefaultMuleDomain implements Domain
         this.domainClassLoaderRepository = domainClassLoaderRepository;
         this.deploymentListener = new NullDeploymentListener();
         this.name = name;
+        refreshClassLoaderAndLoadConfigResourceFile();
+    }
+
+    private void refreshClassLoaderAndLoadConfigResourceFile(){
         this.deploymentClassLoader = domainClassLoaderRepository.getDomainClassLoader(name);
-        URL resource = deploymentClassLoader.findLocalResource(this.DOMAIN_CONFIG_FILE_LOCATION);
+        URL resource = deploymentClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION);
         if (resource != null)
         {
             try
@@ -145,6 +148,7 @@ public class DefaultMuleDomain implements Domain
         {
             logger.info(miniSplash(String.format("New domain '%s'", getArtifactName())));
         }
+        refreshClassLoaderAndLoadConfigResourceFile();
     }
 
 
