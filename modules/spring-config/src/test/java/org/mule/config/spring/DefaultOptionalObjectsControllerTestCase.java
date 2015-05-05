@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class OptionalObjectsControllerTestCase extends AbstractMuleTestCase
+public class DefaultOptionalObjectsControllerTestCase extends AbstractMuleTestCase
 {
 
     private static final String OPTIONAL_KEY = "optional";
@@ -31,7 +31,7 @@ public class OptionalObjectsControllerTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
-        optionalObjectsController = new OptionalObjectsController();
+        optionalObjectsController = new DefaultOptionalObjectsController();
         optionalObjectsController.registerOptionalKey(OPTIONAL_KEY);
         optionalObjectsController.discardOptionalObject(DISCARDED_KEY);
     }

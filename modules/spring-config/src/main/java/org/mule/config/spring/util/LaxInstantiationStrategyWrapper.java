@@ -6,6 +6,7 @@
  */
 package org.mule.config.spring.util;
 
+import org.mule.config.spring.DefaultOptionalObjectsController;
 import org.mule.config.spring.OptionalObjectsController;
 import org.mule.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 
@@ -20,7 +21,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 /**
  * A {@link InstantiationStrategy} which doesn't fail if a bean
  * cannot be instantiated, as long as such bean has been marked as optional
- * in a {@link OptionalObjectsController}. In such case, the object
+ * in a {@link DefaultOptionalObjectsController}. In such case, the object
  * is marked as discarded with the controller and a placeholder object is returned.
  * <p/>
  * This object delegates actual instantiation into a {@code delegate} which
