@@ -48,6 +48,8 @@
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
             <artifactId>tls-sni</artifactId>
+            <version>${grizzlyVersion}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
