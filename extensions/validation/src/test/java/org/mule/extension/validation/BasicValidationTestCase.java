@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
+
 import org.mule.api.MuleEvent;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
@@ -24,6 +25,7 @@ import org.mule.util.ExceptionUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,7 +49,6 @@ public class BasicValidationTestCase extends ValidationTestCase
     public void email() throws Exception
     {
         assertValid(EMAIL_VALIDATION_FLOW, getTestEvent(VALID_EMAIL));
-
         assertInvalidEmail(INVALID_EMAIL);
         assertInvalidEmail(" " + VALID_EMAIL);
         assertInvalidEmail(VALID_EMAIL + " ");
@@ -59,10 +60,18 @@ public class BasicValidationTestCase extends ValidationTestCase
         assertValid("ip", getTestEvent("127.0.0.1"));
         assertValid("ip", getTestEvent("FE80:0000:0000:0000:0202:B3FF:FE1E:8329"));
         assertValid("ip", getTestEvent("FE80::0202:B3FF:FE1E:8329"));
-
+        assertValid("ip", getTestEvent("0.0.0.0"));
+        assertValid("ip", getTestEvent("0.0.0.1"));
+        assertValid("ip", getTestEvent("10.0.0.0"));
+        assertValid("ip", getTestEvent("192.168.0.0"));
+        assertValid("ip", getTestEvent("172.16.0.0"));
+        assertInvalid("ip", getTestEvent("1.1.256.0"), messages.invalidIp("1.1.256.0"));
+        assertInvalid("ip", getTestEvent("0.0.0.a"), messages.invalidIp("0.0.0.a"));
+        assertInvalid("ip", getTestEvent("12.1.2."), messages.invalidIp("12.1.2."));
+        assertInvalid("ip", getTestEvent("192.168.100.0/24"), messages.invalidIp("192.168.100.0/24"));
+        assertInvalid("ip", getTestEvent(0), messages.invalidIp("0"));
         String invalidIp = "12.1.2";
         assertInvalid("ip", getTestEvent(invalidIp), messages.invalidIp(invalidIp));
-
         invalidIp = "FE80:0000:0000";
         assertInvalid("ip", getTestEvent(invalidIp), messages.invalidIp(invalidIp));
     }
@@ -82,15 +91,14 @@ public class BasicValidationTestCase extends ValidationTestCase
 
         assertValid("time", getTimeEvent(time, "h:mm a"));
         assertValid("time", getTimeEvent("Wed, Jul 4, '01", "EEE, MMM d, ''yy"));
-
         final String invalidPattern = "yyMMddHHmmssZ";
-        assertInvalid("time", getTimeEvent(time, invalidPattern), messages.invalidTime(time, DEFAULT_LOCALE.toString(), invalidPattern));
+        assertInvalid("time", getTimeEvent(time, invalidPattern), messages.invalidTime(time, DEFAULT_LOCALE, invalidPattern));
     }
 
-    private MuleEvent getTimeEvent(String time, String pattern) throws Exception {
+    private MuleEvent getTimeEvent(String time, String pattern) throws Exception
+    {
         MuleEvent event = getTestEvent(time);
         event.setFlowVariable("pattern", pattern);
-
         return event;
     }
 
@@ -148,53 +156,44 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void notEmpty() throws Exception
     {
-        final String flowName = "notEmpty";
+        final String flow = "notEmpty";
 
-        assertValid(flowName, getTestEvent("a"));
-        assertValid(flowName, getTestEvent(Arrays.asList("a")));
-        assertValid(flowName, getTestEvent(new String[] {"a"}));
-        Map<String, String> map = new HashMap<>();
-        map.put("a", "A");
-        assertValid(flowName, getTestEvent(map));
-
-        map.clear();
-        assertInvalid(flowName, getTestEvent(null), messages.valueIsNull());
-        assertInvalid(flowName, getTestEvent(""), messages.stringIsBlank());
-        assertInvalid(flowName, getTestEvent(ImmutableList.of()), messages.collectionIsEmpty());
-        assertInvalid(flowName, getTestEvent(new String[] {}), messages.arrayIsEmpty());
-        assertInvalid(flowName, getTestEvent(new Object[] {}), messages.arrayIsEmpty());
-        assertInvalid(flowName, getTestEvent(new int[] {}), messages.arrayIsEmpty());
-        assertInvalid(flowName, getTestEvent(map), messages.mapIsEmpty());
-        assertInvalid(flowName, getTestEvent(BlankLiteral.INSTANCE), messages.valueIsBlankLiteral());
+        assertValid(flow, getTestEvent("a"));
+        assertValid(flow, getTestEvent(Arrays.asList("a")));
+        assertValid(flow, getTestEvent(new String[] {"a"}));
+        assertValid(flow, getTestEvent(ImmutableMap.of("a", "A")));
+        assertInvalid(flow, getTestEvent(null), messages.valueIsNull());
+        assertInvalid(flow, getTestEvent(""), messages.stringIsBlank());
+        assertInvalid(flow, getTestEvent(ImmutableList.of()), messages.collectionIsEmpty());
+        assertInvalid(flow, getTestEvent(new String[] {}), messages.arrayIsEmpty());
+        assertInvalid(flow, getTestEvent(new Object[] {}), messages.arrayIsEmpty());
+        assertInvalid(flow, getTestEvent(new int[] {}), messages.arrayIsEmpty());
+        assertInvalid(flow, getTestEvent(new HashMap<String, String>()), messages.mapIsEmpty());
+        assertInvalid(flow, getTestEvent(BlankLiteral.INSTANCE), messages.valueIsBlankLiteral());
     }
 
     @Test
     public void empty() throws Exception
     {
-        final String flowName = "empty";
+        final String flow = "empty";
 
-        assertValid(flowName, getTestEvent(""));
-        assertValid(flowName, getTestEvent(ImmutableList.of()));
-        assertValid(flowName, getTestEvent(new String[] {}));
-        Map<String, String> map = new HashMap<>();
-        assertValid(flowName, getTestEvent(map));
-
-        assertInvalid(flowName, getTestEvent("a"), messages.stringIsNotBlank());
-        assertInvalid(flowName, getTestEvent(Arrays.asList("a")), messages.collectionIsNotEmpty());
-        assertInvalid(flowName, getTestEvent(new String[] {"a"}), messages.arrayIsNotEmpty());
-        assertInvalid(flowName, getTestEvent(new Object[] {new Object()}), messages.arrayIsNotEmpty());
-        assertInvalid(flowName, getTestEvent(new int[] {0}), messages.arrayIsNotEmpty());
-        map.put("a", "a");
-        assertInvalid(flowName, getTestEvent(map), messages.mapIsNotEmpty());
+        assertValid(flow, getTestEvent(""));
+        assertValid(flow, getTestEvent(ImmutableList.of()));
+        assertValid(flow, getTestEvent(new String[] {}));
+        assertValid(flow, getTestEvent(new HashMap<String, String>()));
+        assertInvalid(flow, getTestEvent("a"), messages.stringIsNotBlank());
+        assertInvalid(flow, getTestEvent(Arrays.asList("a")), messages.collectionIsNotEmpty());
+        assertInvalid(flow, getTestEvent(new String[] {"a"}), messages.arrayIsNotEmpty());
+        assertInvalid(flow, getTestEvent(new Object[] {new Object()}), messages.arrayIsNotEmpty());
+        assertInvalid(flow, getTestEvent(new int[] {0}), messages.arrayIsNotEmpty());
+        assertInvalid(flow, getTestEvent(ImmutableMap.of("a", "a")), messages.mapIsNotEmpty());
     }
 
     @Test
-    public void successfulAll() throws Exception
+    public void keepsPayloadWhenAllValidationsPass() throws Exception
     {
         MuleEvent event = getAllEvent(VALID_EMAIL, VALID_URL);
         MuleEvent responseEvent = runFlow("all", event);
-
-        // validation was successful and payload was untouched
         assertThat(event.getMessage().getPayload(), is(sameInstance(responseEvent.getMessage().getPayload())));
     }
 
@@ -310,6 +309,8 @@ public class BasicValidationTestCase extends ValidationTestCase
         int minLength = 0;
         int maxLength = 3;
 
+        assertValid(flowName, getSizeValidationEvent(value, minLength, maxLength));
+        minLength = 3;
         assertValid(flowName, getSizeValidationEvent(value, minLength, maxLength));
 
         maxLength = 2;
