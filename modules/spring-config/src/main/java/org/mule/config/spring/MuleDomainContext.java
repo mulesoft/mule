@@ -29,6 +29,11 @@ final class MuleDomainContext extends MuleArtifactContext
         super(muleContext, configResources);
     }
 
+    MuleDomainContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController) throws BeansException
+    {
+        super(muleContext, configResources, optionalObjectsController);
+    }
+
     @Override
     protected Class<MuleDomainBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass()
     {

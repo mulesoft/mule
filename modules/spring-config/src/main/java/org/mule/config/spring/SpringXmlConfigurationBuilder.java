@@ -101,11 +101,31 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         configured = false;
     }
 
-    protected ApplicationContext createApplicationContext(MuleContext muleContext,
-                                                          ConfigResource[] configResources) throws Exception
+    private ApplicationContext createApplicationContext(MuleContext muleContext,
+                                                        ConfigResource[] configResources) throws Exception
     {
-        return new MuleArtifactContext(muleContext, configResources);
+        OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
+        OptionalObjectsController parentObjectController = null;
+        ApplicationContext parentApplicationContext = parentContext != null ? parentContext : domainContext;
+
+        if (parentApplicationContext instanceof MuleArtifactContext)
+        {
+            parentObjectController = ((MuleArtifactContext) parentApplicationContext).getOptionalObjectsController();
+        }
+
+        if (parentObjectController != null)
+        {
+            applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
+        }
+
+        return doCreateApplicationContext(muleContext, configResources, applicationObjectcontroller);
     }
+
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController)
+    {
+        return new MuleArtifactContext(muleContext, configResources, optionalObjectsController);
+    }
+
 
     protected void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext)
             throws Exception
