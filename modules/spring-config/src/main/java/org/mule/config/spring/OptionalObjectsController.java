@@ -6,11 +6,7 @@
  */
 package org.mule.config.spring;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Keeps track of keys that have been marked as optional
@@ -19,50 +15,34 @@ import java.util.Set;
  *
  * @since 3.7.0
  */
-public class OptionalObjectsController
+public interface OptionalObjectsController
 {
-
-    private final Set<String> optionalKeys = new HashSet<>();
-    private final Set<String> discardedKeys = new HashSet<>();
-    private final Object discardedObjectPlaceholder = new Object();
 
     /**
      * Registers the given {@code key} as optional
      *
      * @param key an object key
      */
-    public void registerOptionalKey(String key)
-    {
-        optionalKeys.add(key);
-    }
+    void registerOptionalKey(String key);
 
     /**
      * Registers the given {@code key} as a discarded object
      *
      * @param key an object key
      */
-    public void discardOptionalObject(String key)
-    {
-        discardedKeys.add(key);
-    }
+    void discardOptionalObject(String key);
 
     /**
      * @param key an object key
      * @return {@code true} if the given key is optional. {@code false} otherwise
      */
-    public boolean isOptional(String key)
-    {
-        return optionalKeys.contains(key);
-    }
+    boolean isOptional(String key);
 
     /**
      * @param key an object key
      * @return {@code true} if the given key is discarded. {@code false} otherwise
      */
-    public boolean isDiscarded(String key)
-    {
-        return discardedKeys.contains(key);
-    }
+    boolean isDiscarded(String key);
 
     /**
      * A placeholder for Spring to temporarily work with.
@@ -72,16 +52,10 @@ public class OptionalObjectsController
      *
      * @return a generic object
      */
-    public Object getDiscardedObjectPlaceholder()
-    {
-        return discardedObjectPlaceholder;
-    }
+    Object getDiscardedObjectPlaceholder();
 
     /**
      * @return an immutable view of all the current optional keys
      */
-    public Collection<String> getAllOptionalKeys()
-    {
-        return ImmutableList.copyOf(optionalKeys);
-    }
+    Collection<String> getAllOptionalKeys();
 }

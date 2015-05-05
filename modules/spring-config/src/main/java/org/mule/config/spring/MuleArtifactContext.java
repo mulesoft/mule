@@ -7,6 +7,7 @@
 package org.mule.config.spring;
 
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.util.Preconditions.checkArgument;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.COMMON_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -59,14 +60,15 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     private MuleContext muleContext;
     private Resource[] springResources;
-    private OptionalObjectsController optionalObjectsController = new OptionalObjectsController();
+    private final OptionalObjectsController optionalObjectsController;
 
     /**
      * Parses configuration files creating a spring ApplicationContext which is used
      * as a parent registry using the SpringRegistry registry implementation to wraps
      * the spring ApplicationContext
      *
-     * @param configResources
+     * @param muleContext     the {@link MuleContext} that own this context
+     * @param configResources the configuration resources to use
      * @see org.mule.config.spring.SpringRegistry
      */
     public MuleArtifactContext(MuleContext muleContext, ConfigResource[] configResources)
@@ -75,10 +77,45 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         this(muleContext, convert(configResources));
     }
 
+    /**
+     * Parses configuration files creating a spring ApplicationContext which is used
+     * as a parent registry using the SpringRegistry registry implementation to wraps
+     * the spring ApplicationContext
+     *
+     * @param muleContext               the {@link MuleContext} that own this context
+     * @param configResources           the configuration resources to use
+     * @param optionalObjectsController the {@link DefaultOptionalObjectsController} to use. Cannot be {@code null}
+     * @see org.mule.config.spring.SpringRegistry
+     * @since 3.7.0
+     */
+    public MuleArtifactContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController)
+            throws BeansException
+    {
+        this(muleContext, convert(configResources), optionalObjectsController);
+    }
+
     public MuleArtifactContext(MuleContext muleContext, Resource[] springResources) throws BeansException
     {
+        this(muleContext, springResources, new DefaultOptionalObjectsController());
+    }
+
+    /**
+     * Parses configuration files creating a spring ApplicationContext which is used
+     * as a parent registry using the SpringRegistry registry implementation to wraps
+     * the spring ApplicationContext
+     *
+     * @param muleContext               the {@link MuleContext} that own this context
+     * @param springResources           the configuration resources to use
+     * @param optionalObjectsController the {@link DefaultOptionalObjectsController} to use. Cannot be {@code null}
+     * @see org.mule.config.spring.SpringRegistry
+     * @since 3.7.0
+     */
+    public MuleArtifactContext(MuleContext muleContext, Resource[] springResources, OptionalObjectsController optionalObjectsController) throws BeansException
+    {
+        checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
         this.muleContext = muleContext;
         this.springResources = springResources;
+        this.optionalObjectsController = optionalObjectsController;
     }
 
     @Override
