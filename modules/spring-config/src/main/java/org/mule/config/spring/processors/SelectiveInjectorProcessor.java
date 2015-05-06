@@ -10,15 +10,14 @@ import java.beans.PropertyDescriptor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 
 /**
- * Base class for specializations of {@link AutowiredAnnotationBeanPostProcessor}
+ * Base class for specializations of {@link MuleInjectorProcessor}
  * which should only perform injection if a certain condition is met.
  *
  * @since 3.7.0
  */
-abstract class SelectiveInjectorProcessor extends AutowiredAnnotationBeanPostProcessor
+abstract class SelectiveInjectorProcessor extends MuleInjectorProcessor
 {
 
     /**
