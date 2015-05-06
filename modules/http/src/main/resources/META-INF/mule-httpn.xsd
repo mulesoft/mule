@@ -774,7 +774,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="preemptive" type="mule:substitutableBoolean" use="optional">
+                <xsd:attribute name="preemptive" type="mule:substitutableBoolean" default="false" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             Configures if authentication should be preemptive or not. Preemptive authentication will send
