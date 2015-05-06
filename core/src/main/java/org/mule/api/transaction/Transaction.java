@@ -49,6 +49,16 @@ public interface Transaction
 
     boolean isCommitted() throws TransactionException;
 
+    /**
+     * @return transaction timeout in milliseconds
+     */
+    int getTimeout();
+
+    /**
+     * @param timeout configures the transactions timeout in milliseconds
+     */
+    void setTimeout(int timeout);
+
     Object getResource(Object key);
 
     boolean hasResource(Object key);

@@ -6,8 +6,6 @@
  */
 package org.mule.execution;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.execution.ExecutionCallback;
@@ -15,6 +13,9 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.TransactionCoordination;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
@@ -38,15 +39,26 @@ class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterceptor<T
     public T execute(ExecutionCallback<T> callback) throws Exception
     {
         byte action = transactionConfig.getAction();
+        int timeout = transactionConfig.getTimeout();
+
         boolean resolveStartedTransaction = false;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (action == TransactionConfig.ACTION_ALWAYS_BEGIN
                 || (action == TransactionConfig.ACTION_BEGIN_OR_JOIN && tx == null))
         {
-            logger.debug("Beginning transaction");
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Beginning transaction");
+            }
             tx = transactionConfig.getFactory().beginTransaction(muleContext);
+            // Timeout is a traversal attribute of all Transaction implementations.
+            // Setting it up here for all of them rather than in every implementation.
+            tx.setTimeout(timeout);
             resolveStartedTransaction = true;
-            logger.debug("Transaction successfully started: " + tx);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Transaction successfully started: " + tx);
+            }
         }
         T result;
         try
