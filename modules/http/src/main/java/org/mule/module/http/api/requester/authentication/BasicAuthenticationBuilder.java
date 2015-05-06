@@ -7,7 +7,10 @@
 package org.mule.module.http.api.requester.authentication;
 
 import static org.mule.module.http.internal.request.HttpAuthenticationType.BASIC;
-
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.internal.request.DefaultHttpAuthentication;
 
@@ -17,7 +20,12 @@ import org.mule.module.http.internal.request.DefaultHttpAuthentication;
 public class BasicAuthenticationBuilder
 {
 
-    private DefaultHttpAuthentication basicAuthentication = new DefaultHttpAuthentication(BASIC);
+    private final DefaultHttpAuthentication basicAuthentication = new DefaultHttpAuthentication(BASIC);
+
+    public BasicAuthenticationBuilder(MuleContext muleContext)
+    {
+        basicAuthentication.setMuleContext(muleContext);
+    }
 
     /**
      * @param username basic authentication username
@@ -46,6 +54,16 @@ public class BasicAuthenticationBuilder
      */
     public BasicAuthenticationBuilder setPreemptive(boolean preemptive)
     {
+        return setPreemptiveExpression(String.valueOf(preemptive));
+    }
+
+    /**
+     * @param preemptive an expression that resolves to a boolean value that defines if preemptive authentication
+     *                   should be used or not (when true, the authentication header is sent in the first request).
+     * @return this
+     */
+    public BasicAuthenticationBuilder setPreemptiveExpression(String preemptive)
+    {
         basicAuthentication.setPreemptive(preemptive);
         return this;
     }
@@ -53,9 +71,17 @@ public class BasicAuthenticationBuilder
     /**
      * @return the authentication configuration
      */
-    public HttpAuthentication build()
+    public HttpAuthentication build() throws MuleException
     {
-        return this.basicAuthentication;
+        try
+        {
+            basicAuthentication.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            throw new DefaultMuleException(e);
+        }
+        return basicAuthentication;
     }
 
 }

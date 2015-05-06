@@ -9,6 +9,7 @@ package org.mule.module.http.internal.request;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
 import org.mule.DefaultMuleEvent;
+import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -24,10 +25,10 @@ import org.mule.context.notification.NotificationHelper;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.request.HttpRequest;
+import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.processor.AbstractNonBlockingMessageProcessor;
-import org.mule.api.CompletionHandler;
 import org.mule.util.AttributeEvaluator;
 
 import com.google.common.collect.Lists;
@@ -193,7 +194,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         final HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
 
         notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
-        getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), authentication,
+        getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent),
                              new CompletionHandler<HttpResponse, Exception>()
                              {
                                  @Override
@@ -248,7 +249,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         try
         {
             notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
-            response = getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), authentication);
+            response = getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent));
             notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
         }
         catch (Exception e)
@@ -294,6 +295,17 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             authentication.authenticate(muleEvent, builder);
         }
         return builder.build();
+    }
+
+    private HttpRequestAuthentication resolveAuthentication(MuleEvent event)
+    {
+        HttpRequestAuthentication requestAuthentication = null;
+
+        if (requestConfig.getAuthentication() instanceof DefaultHttpAuthentication)
+        {
+            requestAuthentication = ((DefaultHttpAuthentication)requestConfig.getAuthentication()).resolveRequestAuthentication(event);
+        }
+        return requestAuthentication;
     }
 
     private int resolveResponseTimeout(MuleEvent muleEvent)

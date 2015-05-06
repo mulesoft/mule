@@ -47,28 +47,32 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
     @Test
     public void validBasicNonPreemptiveAuthentication() throws Exception
     {
-        assertValidRequest("basicAuthNonPreemptiveRequest");
+        assertValidRequest("basicAuthRequest", "user", "password", false);
         assertThat(requestCount, is(2));
     }
 
     @Test
     public void validBasicPreemptiveAuthentication() throws Exception
     {
-        assertValidRequest("basicAuthPreemptiveRequest");
+        assertValidRequest("basicAuthRequest", "user", "password", true);
         assertThat(requestCount, is(1));
     }
 
     @Test
     public void validDigestAuth() throws Exception
     {
-        assertValidRequest("digestAuthRequest");
+        assertValidRequest("digestAuthRequest", "user", "password", false);
     }
 
-    private void assertValidRequest(String flowName) throws Exception
+    private void assertValidRequest(String flowName, String user, String password, boolean preemptive) throws Exception
     {
         Flow flow = (Flow) getFlowConstruct(flowName);
 
         MuleEvent event = getTestEvent(TEST_MESSAGE);
+
+        event.setFlowVariable("user", user);
+        event.setFlowVariable("password", password);
+        event.setFlowVariable("preemptive", preemptive);
 
         event = flow.process(event);
 

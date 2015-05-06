@@ -6,54 +6,72 @@
  */
 package org.mule.module.http.internal.request;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
+import org.mule.util.AttributeEvaluator;
 
 
-public class DefaultHttpAuthentication implements HttpAuthentication
+public class DefaultHttpAuthentication implements HttpAuthentication, MuleContextAware, Initialisable
 {
     private final HttpAuthenticationType type;
 
-    private String username;
-    private String password;
-    private String domain;
-    private String workstation;
-    private boolean preemptive;
+    private AttributeEvaluator username = new AttributeEvaluator(null);
+    private AttributeEvaluator password = new AttributeEvaluator(null);
+    private AttributeEvaluator domain = new AttributeEvaluator(null);
+    private AttributeEvaluator workstation = new AttributeEvaluator(null);
+    private AttributeEvaluator preemptive = new AttributeEvaluator(String.valueOf(false));
+
+    private MuleContext muleContext;
 
     public DefaultHttpAuthentication(HttpAuthenticationType type)
     {
         this.type = type;
     }
 
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        username.initialize(muleContext.getExpressionManager());
+        password.initialize(muleContext.getExpressionManager());
+        domain.initialize(muleContext.getExpressionManager());
+        workstation.initialize(muleContext.getExpressionManager());
+        preemptive.initialize(muleContext.getExpressionManager());
+    }
+
     public String getUsername()
     {
-        return username;
+        return username.getRawValue();
     }
 
     public void setUsername(String username)
     {
-        this.username = username;
+        this.username = new AttributeEvaluator(username);
     }
 
     public String getPassword()
     {
-        return password;
+        return password.getRawValue();
     }
 
     public void setPassword(String password)
     {
-        this.password = password;
+        this.password = new AttributeEvaluator(password);
     }
 
     public String getDomain()
     {
-        return domain;
+        return domain.getRawValue();
     }
 
     public void setDomain(String domain)
     {
-        this.domain = domain;
+        this.domain = new AttributeEvaluator(domain);
     }
 
     public HttpAuthenticationType getType()
@@ -63,22 +81,39 @@ public class DefaultHttpAuthentication implements HttpAuthentication
 
     public String getWorkstation()
     {
-        return workstation;
+        return workstation.getRawValue();
     }
 
     public void setWorkstation(String workstation)
     {
-        this.workstation = workstation;
+        this.workstation = new AttributeEvaluator(workstation);
     }
 
-    public boolean isPreemptive()
+    public String getPreemptive()
     {
-        return preemptive;
+        return preemptive.getRawValue();
     }
 
-    public void setPreemptive(boolean preemptive)
+    public void setPreemptive(String preemptive)
     {
-        this.preemptive = preemptive;
+        this.preemptive = new AttributeEvaluator(preemptive);
+    }
+
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
+    public HttpRequestAuthentication resolveRequestAuthentication(MuleEvent event)
+    {
+        HttpRequestAuthentication authentication = new HttpRequestAuthentication(type);
+        authentication.setUsername(username.resolveStringValue(event));
+        authentication.setPassword(password.resolveStringValue(event));
+        authentication.setDomain(domain.resolveStringValue(event));
+        authentication.setWorkstation(workstation.resolveStringValue(event));
+        authentication.setPreemptive(preemptive.resolveBooleanValue(event));
+        return authentication;
     }
 
     @Override
