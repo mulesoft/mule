@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.resources;
 
+import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.registry.SPIServiceRegistry;
 import org.mule.extension.introspection.Describer;
@@ -16,10 +17,9 @@ import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.module.extension.internal.ImmutableDescribingContext;
 import org.mule.module.extension.internal.capability.xml.XmlCapabilityExtractor;
-import org.mule.module.extension.internal.capability.xml.schema.SchemaDocumenterPostProcessor;
+import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -33,7 +33,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
 
 /**
@@ -55,19 +54,22 @@ import javax.tools.Diagnostic;
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor
 {
+    public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
+    public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
+    public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
+
     private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SPIServiceRegistry());
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)
     {
         log("Starting Resources generator for Extensions");
-
         ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(processingEnv, new SPIServiceRegistry());
         try
         {
             for (TypeElement extensionElement : findExtensions(roundEnv))
             {
-                Extension extension = parseExtension(extensionElement);
+                Extension extension = parseExtension(extensionElement, roundEnv);
                 generator.generateFor(extension);
             }
 
@@ -83,18 +85,19 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         }
     }
 
-    private Extension parseExtension(TypeElement extensionElement)
+    private Extension parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment)
     {
-        Class<?> extensionClass = getClass(extensionElement);
+        Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
         Describer describer = new AnnotationsBasedDescriber(extensionClass);
 
         DescribingContext context = new ImmutableDescribingContext(describer.describe().getRootConstruct());
-        context.getCustomParameters().put(SchemaDocumenterPostProcessor.EXTENSION_ELEMENT, extensionElement);
-        context.getCustomParameters().put(SchemaDocumenterPostProcessor.PROCESSING_ENVIRONMENT, processingEnv);
+        context.getCustomParameters().put(EXTENSION_ELEMENT, extensionElement);
+        context.getCustomParameters().put(PROCESSING_ENVIRONMENT, processingEnv);
+        context.getCustomParameters().put(ROUND_ENVIRONMENT, roundEnvironment);
 
         extractXmlCapability(extensionClass, context);
 
-        return extensionFactory.createFrom(context.getDeclarationConstruct());
+        return extensionFactory.createFrom(context.getDeclarationConstruct(), context);
     }
 
     private XmlCapability extractXmlCapability(Class<?> extensionClass, DescribingContext context)
@@ -109,27 +112,11 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
 
     private List<TypeElement> findExtensions(RoundEnvironment env)
     {
-        return ImmutableList.copyOf(ElementFilter.typesIn(env.getElementsAnnotatedWith(org.mule.extension.annotations.Extension.class)));
+        return ImmutableList.copyOf(getTypeElementsAnnotatedWith(org.mule.extension.annotations.Extension.class, env));
     }
 
     private void log(String message)
     {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, message);
-    }
-
-
-    private Class<?> getClass(TypeElement element)
-    {
-        final String classname = element.getQualifiedName().toString();
-        try
-        {
-            ClassUtils.loadClass(classname, getClass());
-            return ClassUtils.getClass(getClass().getClassLoader(), classname, true);
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new RuntimeException(
-                    String.format("Could not load class %s while trying to generate XML schema", classname), e);
-        }
     }
 }

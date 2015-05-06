@@ -6,11 +6,16 @@
  */
 package org.mule.module.extension.internal.capability.xml.schema;
 
+import static org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_ELEMENT;
+import static org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.PROCESSING_ENVIRONMENT;
+import static org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.ROUND_ENVIRONMENT;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.DescribingContext;
 import org.mule.extension.introspection.spi.DescriberPostProcessor;
+import org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 
 import org.slf4j.Logger;
@@ -37,14 +42,13 @@ public final class SchemaDocumenterPostProcessor implements DescriberPostProcess
 
     private static Logger logger = LoggerFactory.getLogger(SchemaDocumenterPostProcessor.class);
 
-    public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
-    public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
 
     @Override
     public void postProcess(DescribingContext context)
     {
         ProcessingEnvironment processingEnv = getCheckedParameter(context, PROCESSING_ENVIRONMENT, ProcessingEnvironment.class);
         TypeElement extensionElement = getCheckedParameter(context, EXTENSION_ELEMENT, TypeElement.class);
+        RoundEnvironment roundEnvironment = getCheckedParameter(context, ROUND_ENVIRONMENT, RoundEnvironment.class);
 
         if (processingEnv == null || extensionElement == null)
         {
@@ -52,7 +56,7 @@ public final class SchemaDocumenterPostProcessor implements DescriberPostProcess
             return;
         }
 
-        new SchemaDocumenter(processingEnv).document(context.getDeclarationConstruct().getDeclaration(), extensionElement);
+        new SchemaDocumenter(processingEnv).document(context.getDeclarationConstruct().getDeclaration(), extensionElement, roundEnvironment);
     }
 
     private <T> T getCheckedParameter(DescribingContext context, String key, Class<T> expectedType)
