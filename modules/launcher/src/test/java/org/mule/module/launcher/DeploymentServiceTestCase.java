@@ -6,8 +6,11 @@
  */
 package org.mule.module.launcher;
 
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,10 +38,12 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.TestApplicationFactory;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.domain.TestDomainFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -104,6 +109,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor httpSharedDomainBundle = new ArtifactDescriptor("http-shared-domain", "/http-shared-domain.zip", null, null, null);
     private static final ArtifactDescriptor waitDomainDescriptor = new ArtifactDescriptor("wait-domain", "/wait-domain.zip", "/wait-domain", "wait-domain.zip", "mule-domain-config.xml");
 
+    private static final ArtifactDescriptor sharedHttpDomainDescriptor = new ArtifactDescriptor("shared-http-domain", "/shared-http-domain.zip", "/shared-http-domain", "shared-http-domain.zip", "mule-domain-config.xml");
+    private static final ArtifactDescriptor sharedHttpAppADescriptor = new ArtifactDescriptor("shared-http-app-a", "/shared-http-app-a.zip", "/shared-http-app-a", "shared-http-app-a.zip", "mule-config.xml");
+    private static final ArtifactDescriptor sharedHttpAppBDescriptor = new ArtifactDescriptor("shared-http-app-b", "/shared-http-app-b.zip", "/shared-http-app-b", "shared-http-app-b.zip", "mule-config.xml");
 
     protected File muleHome;
     protected File appsDir;
@@ -114,6 +122,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     @Rule
     public SystemProperty changeChangeInterval = new SystemProperty(DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY, "10");
+
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("httpPort");
 
     @Override
     protected void doSetUp() throws Exception
@@ -1849,6 +1860,60 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(domainDeploymentListener, incompleteDomainDescriptor.id);
 
         assertEquals("Failed domain still appears as zombie after a successful redeploy", 0, deploymentService.getZombieDomains().size());
+    }
+
+    @Test
+    public void redeploysZipDomainAfterTouchedredeploysZipDomainAfterTouched() throws Exception
+    {
+        deploymentService.start();
+
+        ArtifactDescriptor domainDescriptor = sharedHttpDomainDescriptor;
+        ArtifactDescriptor appADescriptor = sharedHttpAppADescriptor;
+        ArtifactDescriptor appBDescriptor = sharedHttpAppBDescriptor;
+
+        // Deploy domain and apps and wait until success
+        addPackedDomainFromResource(domainDescriptor.zipPath);
+        addPackedAppFromResource(appADescriptor.zipPath);
+        addPackedAppFromResource(appBDescriptor.zipPath);
+        assertDeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
+
+        // Ensure resources are registered at domain's registry
+        Domain domain = findADomain(domainDescriptor.id, 1);
+        assertThat(domain.getMuleContext().getRegistry().get("http-listener-config"), not(is(nullValue())));
+
+        ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        // Force redeployment by touching the domain's config file
+        File domainFolder = new File(domainsDir.getPath(), domainDescriptor.id);
+        File configFile = new File(domainFolder, domainDescriptor.configFilePath);
+        FileUtils.touch(configFile);
+
+        assertUndeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
+        assertUndeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
+        assertUndeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
+
+        assertDeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
+
+        domain = findADomain(domainDescriptor.id, 1);
+        ArtifactClassLoader artifactClassLoaderAfterRedeployment = domain.getArtifactClassLoader();
+
+        // Ensure that after redeployment the domain's class loader has changed
+        assertThat(artifactClassLoaderAfterRedeployment, not(sameInstance(initialArtifactClassLoader)));
+
+        // Undeploy domain and apps
+        removeAppAnchorFile(appADescriptor.id);
+        removeAppAnchorFile(appBDescriptor.id);
+        removeDomainAnchorFile(domainDescriptor.id);
+        assertUndeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
+        assertUndeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
+        assertUndeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
     }
 
     @Test
