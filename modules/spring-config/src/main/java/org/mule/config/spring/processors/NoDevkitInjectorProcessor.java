@@ -20,7 +20,7 @@ import org.springframework.beans.PropertyValues;
  *
  * @since 3.7.0
  */
-public final class NoDevkitInjectorProcessor extends SelectiveInjectorProcessor
+public class NoDevkitInjectorProcessor extends SelectiveInjectorProcessor
 {
 
     private static final String PROCESS_ADAPTER_CLASS_NAME = "org.mule.api.devkit.ProcessAdapter";
