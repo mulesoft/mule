@@ -1863,7 +1863,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void redeploysZipDomainAfterTouchedredeploysZipDomainAfterTouched() throws Exception
+    public void refreshDomainClassloaderAfterRedeployment() throws Exception
     {
         deploymentService.start();
 
