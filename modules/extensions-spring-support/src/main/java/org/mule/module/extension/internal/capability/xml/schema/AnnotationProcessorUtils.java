@@ -6,17 +6,28 @@
  */
 package org.mule.module.extension.internal.capability.xml.schema;
 
+import org.mule.extension.annotations.Operation;
+import org.mule.extension.annotations.Parameter;
+import org.mule.extension.annotations.ParameterGroup;
+import org.mule.util.ClassUtils;
+
 import com.google.common.collect.ImmutableMap;
+import com.sun.tools.javac.code.Attribute;
+import com.sun.tools.javac.code.Symbol;
 
 import java.lang.annotation.Annotation;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.ElementFilter;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,11 +37,28 @@ import org.apache.commons.lang.StringUtils;
  *
  * @since 3.7.0
  */
-final class AnnotationProcessorUtils
+public final class AnnotationProcessorUtils
 {
 
     private AnnotationProcessorUtils()
     {
+    }
+
+    public static <T> Class<T> classFor(TypeElement typeElement, ProcessingEnvironment processingEnvironment)
+    {
+        try
+        {
+            return ClassUtils.loadClass(processingEnvironment.getElementUtils().getBinaryName(typeElement).toString(), typeElement.getClass());
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Set<TypeElement> getTypeElementsAnnotatedWith(Class<? extends Annotation> annotationType, RoundEnvironment roundEnvironment)
+    {
+        return ElementFilter.typesIn(roundEnvironment.getElementsAnnotatedWith(annotationType));
     }
 
     static Map<String, VariableElement> getFieldsAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation)
@@ -48,26 +76,42 @@ final class AnnotationProcessorUtils
         return fields.build();
     }
 
+    static Map<String, ExecutableElement> getOperationMethods(RoundEnvironment roundEnvironment)
+    {
+        ImmutableMap.Builder<String, ExecutableElement> methods = ImmutableMap.builder();
+        for (Element rootElement : roundEnvironment.getRootElements())
+        {
+            if (!(rootElement instanceof TypeElement))
+            {
+                continue;
+            }
+
+            methods.putAll(getMethodsAnnotatedWith((TypeElement) rootElement, Operation.class));
+        }
+
+        return methods.build();
+    }
+
     static Map<String, ExecutableElement> getMethodsAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation)
     {
-        ImmutableMap.Builder<String, ExecutableElement> fields = ImmutableMap.builder();
+        ImmutableMap.Builder<String, ExecutableElement> methods = ImmutableMap.builder();
 
         for (ExecutableElement executableElement : ElementFilter.methodsIn(typeElement.getEnclosedElements()))
         {
             if (executableElement.getAnnotation(annotation) != null)
             {
-                fields.put(executableElement.getSimpleName().toString(), executableElement);
+                methods.put(executableElement.getSimpleName().toString(), executableElement);
             }
         }
 
-        return fields.build();
+        return methods.build();
     }
 
 
     static MethodDocumentation getMethodDocumentation(ProcessingEnvironment processingEnv, Element element)
     {
         final StringBuilder parsedComment = new StringBuilder();
-        final ImmutableMap.Builder<String, String> parameters = ImmutableMap.builder();
+        final Map<String, String> parameters = new HashMap<>();
         parseJavaDoc(processingEnv, element, new JavadocParseHandler()
         {
             @Override
@@ -83,7 +127,66 @@ final class AnnotationProcessorUtils
             }
         });
 
-        return new MethodDocumentation(stripTags(parsedComment.toString()), parameters.build());
+
+        parseOperationParameterGroups(processingEnv, (Symbol.MethodSymbol) element, parameters);
+
+
+        return new MethodDocumentation(stripTags(parsedComment.toString()), parameters);
+    }
+
+    private static void parseOperationParameterGroups(ProcessingEnvironment processingEnv, Symbol.MethodSymbol element, Map<String, String> parameters)
+    {
+        for (Symbol.VarSymbol parameterSymbol : element.getParameters())
+        {
+            for (Attribute.Compound compound : parameterSymbol.getAnnotationMirrors())
+            {
+                DeclaredType annotationType = compound.getAnnotationType();
+                if (annotationType != null)
+                {
+                    Class<? extends Annotation> annotationClass = classFor((TypeElement) compound.getAnnotationType().asElement(), processingEnv);
+                    if (ParameterGroup.class.isAssignableFrom(annotationClass))
+                    {
+                        try
+                        {
+                            getOperationParameterGroupDocumentation((TypeElement) processingEnv.getTypeUtils().asElement(parameterSymbol.asType()), parameters, processingEnv);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void getOperationParameterGroupDocumentation(TypeElement groupElement,
+                                                                final Map<String, String> parameters,
+                                                                ProcessingEnvironment processingEnvironment)
+    {
+        for (final Map.Entry<String, VariableElement> field : getFieldsAnnotatedWith(groupElement, Parameter.class).entrySet())
+        {
+            parseJavaDoc(processingEnvironment, field.getValue(), new JavadocParseHandler()
+            {
+                @Override
+                void onParam(String param)
+                {
+                }
+
+                @Override
+                void onBodyLine(String bodyLine)
+                {
+                    parameters.put(field.getKey(), bodyLine);
+                }
+            });
+        }
+
+        for (VariableElement field : getFieldsAnnotatedWith(groupElement, ParameterGroup.class).values())
+        {
+
+            getOperationParameterGroupDocumentation((TypeElement) processingEnvironment.getTypeUtils().asElement(field.asType()),
+                                                    parameters, processingEnvironment);
+        }
     }
 
     static String getJavaDocSummary(ProcessingEnvironment processingEnv, Element element)
@@ -159,7 +262,7 @@ final class AnnotationProcessorUtils
         }
     }
 
-    private static void parseMethodParameter(ImmutableMap.Builder<String, String> parameters, String param)
+    private static void parseMethodParameter(Map<String, String> parameters, String param)
     {
         param = param.replaceFirst("@param", StringUtils.EMPTY).trim();
         int descriptionIndex = param.indexOf(" ");
