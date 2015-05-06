@@ -153,7 +153,6 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param value   the value to check
      * @param options the {@link ValidationOptions}
      * @param event   the current {@link MuleEvent}
-     * @param event   the current {@link MuleEvent
      * @throws IllegalArgumentException if {@code value} is something other than a {@link String},{@link Collection} or {@link Map}
      */
     @Operation
