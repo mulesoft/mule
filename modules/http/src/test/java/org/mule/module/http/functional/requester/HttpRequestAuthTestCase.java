@@ -7,12 +7,17 @@
 package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.util.FileUtils;
 
 import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -21,6 +26,7 @@ import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
@@ -30,6 +36,7 @@ import org.junit.Test;
 
 public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
 {
+    private int requestCount = 0;
 
     @Override
     protected String getConfigFile()
@@ -38,9 +45,17 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
     }
 
     @Test
-    public void validBasicAuthentication() throws Exception
+    public void validBasicNonPreemptiveAuthentication() throws Exception
     {
-        assertValidRequest("basicAuthRequest");
+        assertValidRequest("basicAuthNonPreemptiveRequest");
+        assertThat(requestCount, is(2));
+    }
+
+    @Test
+    public void validBasicPreemptiveAuthentication() throws Exception
+    {
+        assertValidRequest("basicAuthPreemptiveRequest");
+        assertThat(requestCount, is(1));
     }
 
     @Test
@@ -88,7 +103,14 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
         basicConstraintMapping.setConstraint(basicConstraint);
         basicConstraintMapping.setPathSpec("/*");
 
-        ConstraintSecurityHandler basicSecurityHandler = new ConstraintSecurityHandler();
+        ConstraintSecurityHandler basicSecurityHandler = new ConstraintSecurityHandler() {
+            @Override
+            public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+            {
+                requestCount++;
+                super.handle(pathInContext, baseRequest, request, response);
+            }
+        };
         basicSecurityHandler.setAuthenticator(new BasicAuthenticator());
         basicSecurityHandler.setConstraintMappings(new ConstraintMapping[] {basicConstraintMapping});
 

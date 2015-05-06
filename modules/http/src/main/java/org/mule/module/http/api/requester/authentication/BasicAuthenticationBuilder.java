@@ -40,6 +40,17 @@ public class BasicAuthenticationBuilder
     }
 
     /**
+     * @param preemptive configures preemptive authentication or not (when true, the authentication
+     *                   header is sent in the first request).
+     * @return this
+     */
+    public BasicAuthenticationBuilder setPreemptive(boolean preemptive)
+    {
+        basicAuthentication.setPreemptive(preemptive);
+        return this;
+    }
+
+    /**
      * @return the authentication configuration
      */
     public HttpAuthentication build()

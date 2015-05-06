@@ -6,12 +6,20 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <http:request-config name="basicConfig" host="localhost" port="${httpPort}">
-        <http:basic-authentication username="user" password="password" />
+    <http:request-config name="basicNonPreemptiveConfig" host="localhost" port="${httpPort}">
+        <http:basic-authentication username="user" password="password" preemptive="false" />
     </http:request-config>
 
-    <flow name="basicAuthRequest">
-        <http:request config-ref="basicConfig" path="/basic" method="GET" />
+    <flow name="basicAuthNonPreemptiveRequest">
+        <http:request config-ref="basicNonPreemptiveConfig" path="/basic" method="GET" />
+    </flow>
+
+    <http:request-config name="basicPreemptiveConfig" host="localhost" port="${httpPort}">
+        <http:basic-authentication username="user" password="password" preemptive="true" />
+    </http:request-config>
+
+    <flow name="basicAuthPreemptiveRequest">
+        <http:request config-ref="basicPreemptiveConfig" path="/basic" method="GET" />
     </flow>
 
 

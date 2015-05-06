@@ -19,6 +19,7 @@ public class DefaultHttpAuthentication implements HttpAuthentication
     private String password;
     private String domain;
     private String workstation;
+    private boolean preemptive;
 
     public DefaultHttpAuthentication(HttpAuthenticationType type)
     {
@@ -68,6 +69,16 @@ public class DefaultHttpAuthentication implements HttpAuthentication
     public void setWorkstation(String workstation)
     {
         this.workstation = workstation;
+    }
+
+    public boolean isPreemptive()
+    {
+        return preemptive;
+    }
+
+    public void setPreemptive(boolean preemptive)
+    {
+        this.preemptive = preemptive;
     }
 
     @Override
