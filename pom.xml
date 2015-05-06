@@ -209,12 +209,8 @@
         <jbpmVersion>4.4</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
-<<<<<<< HEAD
         <jettyVersion>8.1.13.v20130916</jettyVersion>
-=======
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
         <jffiVersion>1.2.9</jffiVersion>
->>>>>>> 0f4d9df... MULE-8564: Fix jffi version
         <jodaTimeVersion>2.5</jodaTimeVersion>
         <jschVersion>0.1.50</jschVersion>
         <jsr181Version>1.0-MR1</jsr181Version>
@@ -1345,21 +1341,16 @@
                 <artifactId>guava</artifactId>
                 <version>${guavaVersion}</version>        
             </dependency>
-
             <dependency>
                 <groupId>commons-dbcp</groupId>
                 <artifactId>commons-dbcp</artifactId>
                 <version>${commonsDbcpVersion}</version>
             </dependency>
-
-<<<<<<< HEAD
-=======
             <dependency>
                 <groupId>com.mchange</groupId>
                 <artifactId>c3p0</artifactId>
                 <version>${c3p0Version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
@@ -1386,7 +1377,6 @@
                 <version>${jffiVersion}</version>
                 <classifier>native</classifier>
             </dependency>
->>>>>>> 0f4d9df... MULE-8564: Fix jffi version
         </dependencies>
     </dependencyManagement>
 
