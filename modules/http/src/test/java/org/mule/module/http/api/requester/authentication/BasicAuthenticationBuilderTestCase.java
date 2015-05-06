@@ -19,16 +19,18 @@ import org.junit.Test;
 public class BasicAuthenticationBuilderTestCase extends AbstractMuleTestCase
 {
 
-    public static final String PASSWORD = "password";
-    public static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String USERNAME = "username";
+    private static final boolean PREEMPTIVE = true;
 
     @Test
     public void basicConfig()
     {
         DefaultHttpAuthentication authentication = (DefaultHttpAuthentication) new BasicAuthenticationBuilder()
-                .setPassword(PASSWORD).setUsername(USERNAME).build();
+                .setPassword(PASSWORD).setUsername(USERNAME).setPreemptive(PREEMPTIVE).build();
         assertThat(authentication.getPassword(), is(PASSWORD));
         assertThat(authentication.getUsername(), is(USERNAME));
+        assertThat(authentication.isPreemptive(), is(PREEMPTIVE));
     }
 
 

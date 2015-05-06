@@ -291,7 +291,7 @@ public class GrizzlyHttpClient implements HttpClient
             Realm.RealmBuilder realmBuilder = new Realm.RealmBuilder()
                         .setPrincipal(defaultHttpAuthentication.getUsername())
                         .setPassword(defaultHttpAuthentication.getPassword())
-                        .setUsePreemptiveAuth(false);
+                        .setUsePreemptiveAuth(defaultHttpAuthentication.isPreemptive());
 
             if (defaultHttpAuthentication.getType() == HttpAuthenticationType.BASIC)
             {

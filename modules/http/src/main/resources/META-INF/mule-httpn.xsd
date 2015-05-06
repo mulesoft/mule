@@ -774,6 +774,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="preemptive" type="mule:substitutableBoolean" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Configures if authentication should be preemptive or not. Preemptive authentication will send
+                            the authentication header in the first request, instead of waiting for a 401 response code to send it.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
