@@ -16,19 +16,19 @@
 
     <spring:beans xmlns="http://www.springframework.org/schema/beans">
         <bean id="authenticationManager1" class="org.springframework.security.authentication.ProviderManager">
-            <property name="providers">
+            <constructor-arg>
                 <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
                     <property name="userDetailsService" ref="userService1"/>
                 </bean>
-            </property>
+            </constructor-arg>
         </bean>
 
         <bean id="authenticationManager2" class="org.springframework.security.authentication.ProviderManager">
-            <property name="providers">
+            <constructor-arg>
                 <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
                     <property name="userDetailsService" ref="userService2"/>
                 </bean>
-            </property>
+            </constructor-arg>
         </bean>
 
         <ss:user-service id="userService1">

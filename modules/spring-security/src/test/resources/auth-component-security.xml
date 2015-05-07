@@ -23,12 +23,8 @@
         </ss:authentication-provider>
     </ss:authentication-manager>
 
-    <bean id="accessDecisionManager" class='org.springframework.security.access.vote.AffirmativeBased'>    
-        <property name="decisionVoters">
-            <list>
-                <ref bean="roleVoter" />
-            </list>
-        </property>
+    <bean id="accessDecisionManager" class='org.springframework.security.access.vote.AffirmativeBased'>
+        <constructor-arg ref="roleVoter" />
     </bean>
 
     <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter"/>
