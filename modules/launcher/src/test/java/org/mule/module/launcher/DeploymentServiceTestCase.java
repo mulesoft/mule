@@ -1881,7 +1881,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // Ensure resources are registered at domain's registry
         Domain domain = findADomain(domainDescriptor.id, 1);
-        assertThat(domain.getMuleContext().getRegistry().get("http-listener-config"), not(is(nullValue())));
+        assertThat(domain.getMuleContext().getRegistry().get("my-shared-http-connector"), not(is(nullValue())));
 
         ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
 
