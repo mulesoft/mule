@@ -25,7 +25,8 @@ import org.junit.Test;
 
 public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpRequestTestCase
 {
-
+    private static final int GRIZZLY_IDLE_CHECK_TIMEOUT_MILLIS = 6000;
+    private static final int POLL_DELAY_MILLIS = 200;
     private int remotePort;
 
     @Override
@@ -41,7 +42,7 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
         flow.process(getTestEvent(TEST_MESSAGE));
         ensureConnectionIsOpen();
 
-        new PollingProber().check(new JUnitProbe()
+        new PollingProber(GRIZZLY_IDLE_CHECK_TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitProbe()
         {
             @Override
             public boolean test() throws Exception

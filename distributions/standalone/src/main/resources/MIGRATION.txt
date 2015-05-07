@@ -120,6 +120,7 @@ MULE-8510: setting a message property/variable with the message's payload when i
 MULE-8483: MULE_ENCODING and Content-Type properties are not added on the outbound scope when message encoding or mimeType are updated. This was done in order to maintain consistency on MuleMessage data type and properties.
            In case any of these properties is needed, use <set-property> indicating the expected value.
 MULE-8584: Grizzly was upgraded to 2.3.20.
+MULE-8583: async-http-client was upgraded to 1.9.21.
 
 Migration changes from 3.5.x to 3.6.x
 
