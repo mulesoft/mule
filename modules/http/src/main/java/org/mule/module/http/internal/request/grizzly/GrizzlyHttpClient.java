@@ -9,17 +9,16 @@ package org.mule.module.http.internal.request.grizzly;
 import org.mule.api.CompletionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequest;
+import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.module.http.internal.multipart.HttpPart;
-import org.mule.module.http.internal.request.DefaultHttpAuthentication;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
@@ -189,10 +188,10 @@ public class GrizzlyHttpClient implements HttpClient
     }
 
     @Override
-    public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication) throws IOException, TimeoutException
+    public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication) throws IOException, TimeoutException
     {
 
-        Request grizzlyRequest= createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);;
+        Request grizzlyRequest= createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
         ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
         try
         {
@@ -209,7 +208,7 @@ public class GrizzlyHttpClient implements HttpClient
     }
 
     @Override
-    public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication
+    public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication
             authentication, final CompletionHandler<HttpResponse, Exception> completionHandler)
     {
         try
@@ -258,7 +257,7 @@ public class GrizzlyHttpClient implements HttpClient
     }
 
     private Request createGrizzlyRequest(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                         HttpAuthentication authentication) throws IOException
+                                         HttpRequestAuthentication authentication) throws IOException
     {
         RequestBuilder builder = new RequestBuilder();
 
@@ -284,31 +283,29 @@ public class GrizzlyHttpClient implements HttpClient
             }
         }
 
-        if (authentication != null && authentication instanceof DefaultHttpAuthentication)
+        if (authentication != null)
         {
-            DefaultHttpAuthentication defaultHttpAuthentication = (DefaultHttpAuthentication)authentication;
-
             Realm.RealmBuilder realmBuilder = new Realm.RealmBuilder()
-                        .setPrincipal(defaultHttpAuthentication.getUsername())
-                        .setPassword(defaultHttpAuthentication.getPassword())
-                        .setUsePreemptiveAuth(defaultHttpAuthentication.isPreemptive());
+                        .setPrincipal(authentication.getUsername())
+                        .setPassword(authentication.getPassword())
+                        .setUsePreemptiveAuth(authentication.isPreemptive());
 
-            if (defaultHttpAuthentication.getType() == HttpAuthenticationType.BASIC)
+            if (authentication.getType() == HttpAuthenticationType.BASIC)
             {
                 realmBuilder.setScheme(Realm.AuthScheme.BASIC);
             }
-            else if (defaultHttpAuthentication.getType() == HttpAuthenticationType.DIGEST)
+            else if (authentication.getType() == HttpAuthenticationType.DIGEST)
             {
                 realmBuilder.setScheme(Realm.AuthScheme.DIGEST);
             }
-            else if (defaultHttpAuthentication.getType() == HttpAuthenticationType.NTLM)
+            else if (authentication.getType() == HttpAuthenticationType.NTLM)
             {
-                String domain = defaultHttpAuthentication.getDomain();
+                String domain = authentication.getDomain();
                 if (domain != null)
                 {
                     realmBuilder.setNtlmDomain(domain);
                 }
-                String workstation = defaultHttpAuthentication.getWorkstation();
+                String workstation = authentication.getWorkstation();
                 String ntlmHost = workstation != null ? workstation : InetAddress.getLocalHost().getHostName();
                 realmBuilder.setNtlmHost(ntlmHost).setScheme(Realm.AuthScheme.NTLM);
             }
