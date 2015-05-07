@@ -9,6 +9,7 @@ package org.mule.transformer.simple;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
@@ -37,12 +38,12 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     {
         if (wildcardPropertyNameEvaluator.hasWildcards())
         {
-            wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(),new WildcardAttributeEvaluator.MatchCallback()
+            wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(), new WildcardAttributeEvaluator.MatchCallback()
             {
                 @Override
                 public void processMatch(String matchedValue)
                 {
-                    message.setOutboundProperty(matchedValue,message.getInboundProperty(matchedValue));
+                    message.setOutboundProperty(matchedValue, message.getInboundProperty(matchedValue), message.getPropertyDataType(matchedValue, PropertyScope.INBOUND));
                 }
             });
         }
@@ -55,7 +56,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
                 Object propertyValue = message.getInboundProperty(propertyName);
                 if (propertyValue != null)
                 {
-                    message.setOutboundProperty(propertyName, propertyValue);
+                    message.setOutboundProperty(propertyName, propertyValue, message.getPropertyDataType(propertyName, PropertyScope.INBOUND));
                 }
                 else
                 {
