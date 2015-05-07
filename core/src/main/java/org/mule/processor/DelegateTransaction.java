@@ -142,10 +142,22 @@ public class DelegateTransaction extends AbstractTransaction
         return this.delegate instanceof NullTransaction ||  this.delegate == transaction;
     }
 
+    @Override
+    public int getTimeout()
+    {
+        return delegate.getTimeout();
+    }
+
+    @Override
+    public void setTimeout(int timeout)
+    {
+        delegate.setTimeout(timeout);
+    }
+
     private class NullTransaction implements Transaction
     {
 
-        private Integer timeout = null;
+        private int timeout = muleContext.getConfiguration().getDefaultTransactionTimeout();
 
         @Override
         public void begin() throws TransactionException
