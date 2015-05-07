@@ -163,7 +163,7 @@
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.7.3</aspectjVersion>
-        <asyncHttpClientVersion>1.9.19</asyncHttpClientVersion>
+        <asyncHttpClientVersion>1.9.21</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
@@ -1438,6 +1438,11 @@
                 <artifactId>grizzly-websockets</artifactId>
                 <version>${grizzlyVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>connection-pool</artifactId>
+                <version>${grizzlyVersion}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.ning</groupId>
@@ -1757,10 +1762,7 @@
                             <exclude>**/build-number.txt</exclude>
 
                             <exclude>**/org/springframework/**</exclude>
-                            <exclude>**/GrizzlyAsyncHttpProvider.java</exclude>
-                            <exclude>**/GrizzlyAsyncHttpProviderConfig.java</exclude>
                             <exclude>**/HttpTransactionContext.java</exclude>
-                            <exclude>**/AsyncCompletionHandlerBase.java</exclude>
                             <exclude>**/BndMojo.java</exclude>
                             <exclude>**/BobberArchetype.java</exclude>
                             <exclude>**/BobberArchetypeMojo.java</exclude>
