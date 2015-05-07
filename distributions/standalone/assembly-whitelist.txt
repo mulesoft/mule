@@ -628,8 +628,6 @@
 /mule-standalone-${productVersion}/lib/opt/jetty-xml-8.1.13.v20130916.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-util-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-util5-6.1.26.jar
-/mule-standalone-${productVersion}/lib/opt/jffi-1.2.9.jar
-/mule-standalone-${productVersion}/lib/opt/jffi-1.2.9-native.jar
 /mule-standalone-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.5.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.50.jar

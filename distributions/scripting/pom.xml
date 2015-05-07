@@ -13,6 +13,7 @@
 
     <properties>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <jffiVersion>1.2.9</jffiVersion>
     </properties>
 
     <build>
@@ -49,6 +50,21 @@
         </plugins>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.jnr</groupId>
+                <artifactId>jffi</artifactId>
+                <version>${jffiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jnr</groupId>
+                <artifactId>jffi</artifactId>
+                <version>${jffiVersion}</version>
+                <classifier>native</classifier>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
