@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-extensions</artifactId>
-        <version>3.7.0-M2-SNAPSHOT</version>
+        <version>3.7.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
