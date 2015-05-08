@@ -2,3 +2,6 @@
 # Test cases listed in this file are not run.
 #
 
+# MULE-6771
+org.mule.transport.ssl.SslFunctionalTestCase
+org.mule.transport.ssl.TlsFunctionalTestCase
