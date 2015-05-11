@@ -712,14 +712,33 @@ public final class Base64
     } // end decode
 
     /**
-     * Decodes data from Base64 notation, automatically detecting gzip-compressed
-     * data and decompressing it.
-     * 
-     * @param s the string to decode
-     * @return the decoded data
-     * @since 1.4
+     * Similar to {@link #decode(String)} only that it will not check
+     * the decoded value for GZip compression and thus will not
+     * decompress anything
+     *
+     * @param encodedValue a Base64 encoded value
+     * @return a byte array
+     * @since 3.7.0
      */
-    public static byte[] decode(String s)
+    public static byte[] decodeWithoutUnzipping(String encodedValue)
+    {
+        return decode(encodedValue, false);
+    }
+
+    /**
+     * Decodes the given {@code s}. If the decoded value
+     * has a GZip Magic Number header ({@link GZIPInputStream#GZIP_MAGIC})
+     * then it automatically unzips the decoded value
+     *
+     * @param encodedValue a Base64 encoded value
+     * @return a byte array
+     */
+    public static byte[] decode(String encodedValue)
+    {
+        return decode(encodedValue, true);
+    }
+
+    private static byte[] decode(String s, boolean unzipIfNecessary)
     {
         byte[] bytes;
         try
@@ -741,7 +760,7 @@ public final class Base64
         {
 
             int head = (bytes[0] & 0xff) | ((bytes[1] << 8) & 0xff00);
-            if (GZIPInputStream.GZIP_MAGIC == head)
+            if (unzipIfNecessary && GZIPInputStream.GZIP_MAGIC == head)
             {
                 ByteArrayInputStream bais = null;
                 GZIPInputStream gzis = null;

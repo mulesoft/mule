@@ -33,7 +33,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
         
         if (serializedEncodedSession != null)
         {
-            byte[] serializedSession = Base64.decode(serializedEncodedSession);            
+            byte[] serializedSession = Base64.decodeWithoutUnzipping(serializedEncodedSession);
             if (serializedSession != null)
             {
                 session = deserialize(message, serializedSession);
