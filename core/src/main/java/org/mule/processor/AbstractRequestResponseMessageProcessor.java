@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.NonBlockingSupported;
-import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.api.transport.ReplyToHandler;
 
 /**
@@ -60,33 +59,26 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     protected MuleEvent processNonBlocking(MuleEvent event) throws MuleException
     {
         final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-        event = new DefaultMuleEvent(event, new CompletionHandlerReplyToHandlerAdaptor(new CompletionHandler<MuleEvent, MessagingException>()
+        event = new DefaultMuleEvent(event, new ReplyToHandler()
         {
             @Override
-            public void onCompletion(MuleEvent event)
+            public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
             {
-                try
+                MuleEvent response = processResponse(new DefaultMuleEvent(event, originalReplyToHandler));
+                if (!NonBlockingVoidMuleEvent.getInstance().equals(response))
                 {
-                    MuleEvent response = processResponse(new DefaultMuleEvent(event, originalReplyToHandler));
-                    if (!NonBlockingVoidMuleEvent.getInstance().equals(response))
-                    {
-                        originalReplyToHandler.processReplyTo(response, null, null);
-                    }
-                    processFinallly(event, null);
+                    originalReplyToHandler.processReplyTo(response, null, null);
                 }
-                catch (MuleException e)
-                {
-                    onFailure(new MessagingException(event, e));
-                }
+                processFinallly(event, null);
             }
 
             @Override
-            public void onFailure(MessagingException exception)
+            public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
             {
                 originalReplyToHandler.processExceptionReplyTo(exception.getEvent(), exception, null);
                 processFinallly(exception.getEvent(), exception);
             }
-        }));
+        });
 
         try
         {

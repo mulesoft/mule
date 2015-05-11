@@ -44,7 +44,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.service.Service;
-import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.construct.Flow;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
@@ -54,6 +53,7 @@ import org.mule.routing.ChoiceRouter;
 import org.mule.routing.ScatterGatherRouter;
 import org.mule.routing.filters.AcceptAllFilter;
 import org.mule.tck.SensingNullCompletionHandler;
+import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.simple.StringAppendTransformer;
@@ -957,19 +957,19 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         MuleEvent result;
         if (nonBlocking && exchangePattern.hasResponse())
         {
-            SensingNullCompletionHandler responseCallback = new SensingNullCompletionHandler();
-            event = new DefaultMuleEvent(event, new CompletionHandlerReplyToHandlerAdaptor(responseCallback));
+            SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+            event = new DefaultMuleEvent(event, nullReplyToHandler);
             result = messageProcessor.process(event);
             if (NonBlockingVoidMuleEvent.getInstance() == result)
             {
-                responseCallback.latch.await(1000, TimeUnit.MILLISECONDS);
-                if (responseCallback.exception != null)
+                nullReplyToHandler.latch.await(1000, TimeUnit.MILLISECONDS);
+                if (nullReplyToHandler.exception != null)
                 {
-                    throw responseCallback.exception;
+                    throw nullReplyToHandler.exception;
                 }
                 else
                 {
-                    result = responseCallback.event;
+                    result = nullReplyToHandler.event;
                 }
             }
         }
