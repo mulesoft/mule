@@ -147,18 +147,24 @@
         <log-component />
     </flow>
 
-    <flow name="serverClientProxy">
+    <flow name="serverClientProxy" processingStrategy="non-blocking">
         <http:listener path="/services/proxy" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:proxy-service>
-            <cxf:inInterceptors>
-                <spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-            </cxf:inInterceptors>
-            <cxf:outInterceptors>
-                <spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-            </cxf:outInterceptors>
-        </cxf:proxy-service>
-
-        <cxf:proxy-client />
+        <!--<cxf:proxy-service>-->
+            <!--<cxf:inInterceptors>-->
+                <!--<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />-->
+            <!--</cxf:inInterceptors>-->
+            <!--<cxf:outInterceptors>-->
+                <!--<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />-->
+            <!--</cxf:outInterceptors>-->
+        <!--</cxf:proxy-service>-->
+        <object-to-string-transformer/>
+        <all>
+            <logger/>
+            <logger/>
+            <logger/>
+        </all>
+        <object-to-string-transformer/>
+        <!--<cxf:proxy-client />-->
         <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
 
