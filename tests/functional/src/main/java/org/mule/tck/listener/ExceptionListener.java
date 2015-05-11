@@ -28,7 +28,7 @@ public class ExceptionListener
 
     private CountDownLatch exceptionThrownLatch = new Latch();
     private int timeout = 10000;
-    private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
+    private List<ExceptionNotification> exceptionNotifications = new ArrayList<ExceptionNotification>();
 
     /**
      * Constructor for creating a listener for any exception thrown within a flow or message source.
