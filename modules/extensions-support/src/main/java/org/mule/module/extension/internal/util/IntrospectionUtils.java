@@ -22,6 +22,7 @@ import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.declaration.ParameterDeclaration;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -112,6 +113,11 @@ public class IntrospectionUtils
     public static Field getField(Class<?> clazz, Parameter parameter)
     {
         return getField(clazz, getMemberName(parameter, parameter.getName()), parameter.getType().getRawType());
+    }
+
+    public static Field getField(Class<?> clazz, ParameterDeclaration parameterDeclaration)
+    {
+        return getField(clazz, getMemberName(parameterDeclaration, parameterDeclaration.getName()), parameterDeclaration.getType().getRawType());
     }
 
     public static Field getField(Class<?> clazz, String name, Class<?> type)

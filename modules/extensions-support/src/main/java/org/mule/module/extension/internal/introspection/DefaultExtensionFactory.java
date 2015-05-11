@@ -50,10 +50,15 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     @Override
     public Extension createFrom(Construct construct)
     {
-        applyPostProcessors(construct);
-        return toExtension(construct.getRootConstruct().getDeclaration());
+        return createFrom(construct, new ImmutableDescribingContext(construct.getRootConstruct()));
     }
 
+    @Override
+    public Extension createFrom(Construct construct, DescribingContext describingContext)
+    {
+        applyPostProcessors(describingContext);
+        return toExtension(construct.getRootConstruct().getDeclaration());
+    }
 
     private Extension toExtension(Declaration declaration)
     {
@@ -184,13 +189,11 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         }
     }
 
-    private void applyPostProcessors(Construct construct)
+    private void applyPostProcessors(DescribingContext describingContext)
     {
-        final DescribingContext context = new ImmutableDescribingContext(construct.getRootConstruct());
-
         for (DescriberPostProcessor postProcessor : postProcessors)
         {
-            postProcessor.postProcess(context);
+            postProcessor.postProcess(describingContext);
         }
     }
 
