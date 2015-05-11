@@ -9,24 +9,32 @@ package org.mule.module.extension.internal.capability.xml.schema;
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getFieldsAnnotatedWith;
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getJavaDocSummary;
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodDocumentation;
-import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodsAnnotatedWith;
+import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
+import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.extension.annotations.Operation;
+import org.mule.extension.annotations.Configuration;
 import org.mule.extension.annotations.Parameter;
+import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.declaration.ConfigurationDeclaration;
 import org.mule.extension.introspection.declaration.Declaration;
 import org.mule.extension.introspection.declaration.OperationDeclaration;
 import org.mule.extension.introspection.declaration.ParameterDeclaration;
+import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.util.CollectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+
+import org.apache.commons.collections.Predicate;
 
 /**
  * Utility class that picks a {@link Declaration}
@@ -48,16 +56,18 @@ final class SchemaDocumenter
         this.processingEnv = processingEnv;
     }
 
-    void document(Declaration declaration, TypeElement extensionElement)
+    void document(Declaration declaration, TypeElement extensionElement, RoundEnvironment roundEnvironment)
     {
         declaration.setDescription(getJavaDocSummary(processingEnv, extensionElement));
-        documentConfigurations(declaration, extensionElement);
-        documentOperations(declaration, extensionElement);
+        documentConfigurations(declaration, extensionElement, roundEnvironment);
+        documentOperations(declaration, roundEnvironment);
     }
 
-    private void documentOperations(Declaration declaration, TypeElement extensionElement)
+
+
+    private void documentOperations(Declaration declaration, RoundEnvironment roundEnvironment)
     {
-        final Map<String, ExecutableElement> methods = getMethodsAnnotatedWith(extensionElement, Operation.class);
+        final Map<String, ExecutableElement> methods = getOperationMethods(roundEnvironment);
 
         try
         {
@@ -93,29 +103,58 @@ final class SchemaDocumenter
         }
     }
 
-    private void documentConfigurations(Declaration declaration, TypeElement extensionElement)
+    private void documentConfigurations(Declaration declaration, TypeElement extensionElement, RoundEnvironment roundEnvironment)
     {
-        for (ConfigurationDeclaration configuration : declaration.getConfigurations())
+        if (declaration.getConfigurations().size() > 1)
         {
-            documentConfigurationParameters(configuration.getParameters(), extensionElement);
+            for (TypeElement configurationElement : getTypeElementsAnnotatedWith(Configuration.class, roundEnvironment))
+            {
+                ConfigurationDeclaration configurationDeclaration = findMatchingConfiguration(declaration, configurationElement);
+                documentConfigurationParameters(configurationDeclaration.getParameters(), configurationElement);
+            }
+        }
+        else
+        {
+            documentConfigurationParameters(declaration.getConfigurations().get(0).getParameters(), extensionElement);
         }
     }
 
-    private void documentConfigurationParameters(Collection<ParameterDeclaration> parameters, TypeElement element)
+    private void documentConfigurationParameters(Collection<ParameterDeclaration> parameters, final TypeElement element)
     {
-        final Map<String, VariableElement> fields = getFieldsAnnotatedWith(element, Parameter.class);
-        while (element != null && !Object.class.getName().equals(element.getQualifiedName().toString()))
+        final Map<String, VariableElement> variableElements = getFieldsAnnotatedWith(element, Parameter.class);
+        TypeElement traversingElement = element;
+        while (traversingElement != null && !Object.class.getName().equals(traversingElement.getQualifiedName().toString()))
         {
+            Class<?> declaringClass = AnnotationProcessorUtils.classFor(traversingElement, processingEnv);
             for (ParameterDeclaration parameter : parameters)
             {
-                VariableElement field = fields.get(parameter.getName());
-                if (field != null)
+                Field field = IntrospectionUtils.getField(declaringClass, parameter);
+                if (field != null && variableElements.containsKey(field.getName()))
                 {
-                    parameter.setDescription(getJavaDocSummary(processingEnv, field));
+                    parameter.setDescription(getJavaDocSummary(processingEnv, variableElements.get(field.getName())));
                 }
             }
 
-            element = (TypeElement) processingEnv.getTypeUtils().asElement(element.getSuperclass());
+            traversingElement = (TypeElement) processingEnv.getTypeUtils().asElement(traversingElement.getSuperclass());
         }
+
+        for (VariableElement variableElement : getFieldsAnnotatedWith(element, ParameterGroup.class).values())
+        {
+            TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(variableElement.asType());
+            documentConfigurationParameters(parameters, typeElement);
+        }
+    }
+
+    private ConfigurationDeclaration findMatchingConfiguration(Declaration declaration, final TypeElement configurationElement) {
+        return (ConfigurationDeclaration) CollectionUtils.find(declaration.getConfigurations(), new Predicate()
+        {
+            @Override
+            public boolean evaluate(Object object)
+            {
+                Configuration configuration = configurationElement.getAnnotation(Configuration.class);
+                ConfigurationDeclaration configurationDeclaration = (ConfigurationDeclaration) object;
+                return configurationDeclaration.getName().equals(configuration.name());
+            }
+        });
     }
 }
