@@ -14,10 +14,11 @@ import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.transport.ErrorHandlingCompletionHandlerReplyToHandlerAdaptor;
-import org.mule.api.CompletionHandler;
+import org.mule.api.transport.ExceptionHandlingReplyToHandlerDecorator;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.context.notification.NotificationHelper;
 import org.mule.context.notification.ServerNotificationManager;
@@ -67,7 +68,8 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                         fireNotification(muleEvent, MESSAGE_RECEIVED);
                         if (muleEvent.isAllowNonBlocking())
                         {
-                            muleEvent = new DefaultMuleEvent(muleEvent, new ErrorHandlingCompletionHandlerReplyToHandlerAdaptor(new FlowProcessingCompletionHandler(template, phaseResultNotifier, exceptionHandler), messageProcessContext.getFlowConstruct().getExceptionListener()));
+                            muleEvent = new DefaultMuleEvent(muleEvent, new ExceptionHandlingReplyToHandlerDecorator(new FlowProcessingNonBlockingReplyToHandler(template, phaseResultNotifier, exceptionHandler),
+                                                                                                                messageProcessContext.getFlowConstruct().getExceptionListener()));
                         }
                         return template.routeEvent(muleEvent);
                     }
@@ -190,14 +192,15 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
 
     }
 
-    class FlowProcessingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException>
+    class FlowProcessingNonBlockingReplyToHandler implements ReplyToHandler
     {
 
         private final AsyncResponseFlowProcessingPhaseTemplate template;
         private final PhaseResultNotifier phaseResultNotifier;
         private final MessagingExceptionHandler exceptionHandler;
 
-        public FlowProcessingCompletionHandler(AsyncResponseFlowProcessingPhaseTemplate template, PhaseResultNotifier
+        public FlowProcessingNonBlockingReplyToHandler(AsyncResponseFlowProcessingPhaseTemplate template,
+                                                       PhaseResultNotifier
                 phaseResultNotifier, MessagingExceptionHandler exceptionHandler)
         {
             this.template = template;
@@ -206,25 +209,20 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
         }
 
         @Override
-        public void onCompletion(MuleEvent event)
+        public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
         {
-            try
-            {
-                fireNotification(event, MESSAGE_RESPONSE);
-                template.sendResponseToClient(event, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
-            }
-            catch (MuleException e)
-            {
-                onFailure(new MessagingException(event, e));
-            }
+            fireNotification(event, MESSAGE_RESPONSE);
+            template.sendResponseToClient(event, createResponseCompletationCallback(phaseResultNotifier,
+                                                                                    exceptionHandler));
         }
 
         @Override
-        public void onFailure(MessagingException exception)
+        public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
         {
             try
             {
-                template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback(phaseResultNotifier));
+                template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback
+                        (phaseResultNotifier));
             }
             catch (MuleException e)
             {

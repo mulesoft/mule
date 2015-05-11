@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.tck.SensingNullCompletionHandler;
+import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -30,7 +30,7 @@ import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class ErrorHandlingCompletionHandlerReplyToHandlerAdaptorTestCase extends AbstractMuleTestCase
+public class ExceptionHandlingReplyToHandlerDecoratorTestCase extends AbstractMuleTestCase
 {
 
     @Mock
@@ -43,9 +43,9 @@ public class ErrorHandlingCompletionHandlerReplyToHandlerAdaptorTestCase extends
     @Test
     public void handleException()
     {
-        SensingNullCompletionHandler completionHandler = new SensingNullCompletionHandler();
-        ErrorHandlingCompletionHandlerReplyToHandlerAdaptor replyToHandler = new
-                ErrorHandlingCompletionHandlerReplyToHandlerAdaptor(completionHandler, messagingExceptionHandler);
+        SensingNullReplyToHandler sensingReplyToHandler = new SensingNullReplyToHandler();
+        ExceptionHandlingReplyToHandlerDecorator errorHandlingreplyToHandler = new
+                ExceptionHandlingReplyToHandlerDecorator(sensingReplyToHandler, messagingExceptionHandler);
         MessagingException messagingException = new MessagingException(sourceEvent, new RuntimeException());
 
         when(messagingExceptionHandler.handleException(messagingException, sourceEvent)).thenAnswer(new Answer<MuleEvent>()
@@ -57,20 +57,20 @@ public class ErrorHandlingCompletionHandlerReplyToHandlerAdaptorTestCase extends
             }
         });
 
-        replyToHandler.processExceptionReplyTo(sourceEvent, messagingException, null);
+        errorHandlingreplyToHandler.processExceptionReplyTo(sourceEvent, messagingException, null);
 
         verify(messagingExceptionHandler, Mockito.times(1)).handleException(messagingException, sourceEvent);
-        assertThat(completionHandler.exception, CoreMatchers.<Exception>equalTo(messagingException));
-        assertThat(((MessagingException) completionHandler.exception).getEvent(), equalTo(handledEvent));
-        assertThat(completionHandler.event, nullValue());
+        assertThat(sensingReplyToHandler.exception, CoreMatchers.<Exception>equalTo(messagingException));
+        assertThat(((MessagingException) sensingReplyToHandler.exception).getEvent(), equalTo(handledEvent));
+        assertThat(sensingReplyToHandler.event, nullValue());
     }
 
     @Test
     public void handleExceptionAndMarkHandled()
     {
-        SensingNullCompletionHandler completionHandler = new SensingNullCompletionHandler();
-        ErrorHandlingCompletionHandlerReplyToHandlerAdaptor replyToHandler = new
-                ErrorHandlingCompletionHandlerReplyToHandlerAdaptor(completionHandler, messagingExceptionHandler);
+        SensingNullReplyToHandler sensingReplyToHandler = new SensingNullReplyToHandler();
+        ExceptionHandlingReplyToHandlerDecorator errorHandlingReplyToHandler = new
+                ExceptionHandlingReplyToHandlerDecorator(sensingReplyToHandler, messagingExceptionHandler);
         MessagingException messagingException = new MessagingException(sourceEvent, new RuntimeException());
 
         when(messagingExceptionHandler.handleException(messagingException, sourceEvent)).thenAnswer(new Answer<MuleEvent>()
@@ -83,11 +83,11 @@ public class ErrorHandlingCompletionHandlerReplyToHandlerAdaptorTestCase extends
             }
         });
 
-        replyToHandler.processExceptionReplyTo(sourceEvent, messagingException, null);
+        errorHandlingReplyToHandler.processExceptionReplyTo(sourceEvent, messagingException, null);
 
         verify(messagingExceptionHandler, Mockito.times(1)).handleException(messagingException, sourceEvent);
-        assertThat(completionHandler.exception, nullValue());
-        assertThat(completionHandler.event, equalTo(handledEvent));
+        assertThat(sensingReplyToHandler.exception, nullValue());
+        assertThat(sensingReplyToHandler.event, equalTo(handledEvent));
     }
 
 }

@@ -8,6 +8,7 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -15,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageRouter;
-import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.api.CompletionHandler;
@@ -53,18 +53,15 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             if ((processor instanceof MessageRouter || processor instanceof InterceptingMessageProcessor) && !
                     (processor instanceof NonBlockingSupported))
             {
-                if (logger.isInfoEnabled())
-                {
-                    logger.info("The message processor {} does not currenlty support non-blocking execution and processing " +
-                                "will now fall back to blocking.  The 'non-blocking' processing strategy is not " +
-                                "recommended if unsupported message processors are being used.  ", processor);
-                }
+                logger.info("The message processor {} does not currenlty support non-blocking execution and " +
+                            "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
+                            "not recommended if unsupported message processors are being used.  ", processor.getClass());
                 event = new DefaultMuleEvent(event.getMessage(), event, true);
             }
 
             if (processor instanceof NonBlockingMessageProcessor)
             {
-                event = new DefaultMuleEvent(event, new CompletionHandlerReplyToHandlerAdaptor(new NonBlockingProcessingCompletionHandler()));
+                event = new DefaultMuleEvent(event, new NonBlockingProcessorExecutorReplyToHandler());
             }
         }
     }
@@ -85,11 +82,11 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
         }
     }
 
-    class NonBlockingProcessingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException>
+    class NonBlockingProcessorExecutorReplyToHandler implements ReplyToHandler
     {
 
         @Override
-        public void onCompletion(MuleEvent event)
+        public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
         {
             NonBlockingProcessorExecutor.this.event = new DefaultMuleEvent(event, replyToHandler);
             try
@@ -98,12 +95,12 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             }
             catch (MessagingException e)
             {
-                onFailure(e);
+                processExceptionReplyTo(event, e, null);
             }
         }
 
         @Override
-        public void onFailure(MessagingException exception)
+        public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
         {
             replyToHandler.processExceptionReplyTo(event, exception, null);
         }

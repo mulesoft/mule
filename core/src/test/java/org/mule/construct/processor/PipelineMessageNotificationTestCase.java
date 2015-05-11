@@ -25,7 +25,6 @@ import org.mule.api.MuleException;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.construct.AbstractPipeline;
@@ -45,6 +44,7 @@ import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.SensingNullCompletionHandler;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -127,13 +127,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         ));
         pipeline.initialise();
 
-        SensingNullCompletionHandler nullCompletionHandler = new SensingNullCompletionHandler();
+        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
         event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, new
-                CompletionHandlerReplyToHandlerAdaptor(nullCompletionHandler), pipeline);
+                                     MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         source.trigger(event);
-        nullCompletionHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        nullReplyToHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
 
         verify(notificationManager, times(1)).fireNotification(
                 argThat(new PipelineMessageNotificiationArgumentMatcher(
@@ -216,10 +215,9 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
         pipeline.initialise();
 
-        SensingNullCompletionHandler nullCompletionHandler = new SensingNullCompletionHandler();
+        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
         event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, new
-                CompletionHandlerReplyToHandlerAdaptor(nullCompletionHandler), pipeline);
+                                     MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         try
         {
@@ -229,7 +227,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         {
         }
 
-        nullCompletionHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        nullReplyToHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
 
         verify(notificationManager, times(1)).fireNotification(
                 argThat(new PipelineMessageNotificiationArgumentMatcher(
@@ -254,10 +252,9 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
         pipeline.initialise();
 
-        SensingNullCompletionHandler nullCompletionHandler = new SensingNullCompletionHandler();
+        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
         event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, new
-                CompletionHandlerReplyToHandlerAdaptor(nullCompletionHandler), pipeline);
+                                     MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         try
         {
@@ -267,7 +264,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         {
         }
 
-        nullCompletionHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        nullReplyToHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
 
         verify(notificationManager, times(1)).fireNotification(
                 argThat(new PipelineMessageNotificiationArgumentMatcher(

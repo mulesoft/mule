@@ -10,7 +10,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.ProcessorExecutor;
 import org.mule.api.service.Service;
-import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.processor.BlockingProcessorExecutor;
 import org.mule.processor.NonBlockingProcessorExecutor;
@@ -30,7 +29,7 @@ public class ProcessorExecutorFactory
                                                      MessageProcessorExecutionTemplate executionTemplate,
                                                      boolean copyOnVoidEvent)
     {
-        if (event.isAllowNonBlocking() && event.getReplyToHandler() instanceof CompletionHandlerReplyToHandlerAdaptor)
+        if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
         {
             return new NonBlockingProcessorExecutor(event, processors, executionTemplate, copyOnVoidEvent);
         }

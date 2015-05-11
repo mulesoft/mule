@@ -20,9 +20,9 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.ProcessorExecutor;
-import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.processor.NonBlockingProcessorExecutor;
 import org.mule.tck.SensingNullCompletionHandler;
+import org.mule.tck.SensingNullReplyToHandler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -37,13 +37,13 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
 
     private static final int LATCH_TIMEOUT = 50;
 
-    private SensingNullCompletionHandler completionHandler = new SensingNullCompletionHandler();
+    private SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
 
     @Override
     public void before() throws MessagingException
     {
         super.before();
-        when(event.getReplyToHandler()).thenReturn(new CompletionHandlerReplyToHandlerAdaptor(completionHandler));
+        when(event.getReplyToHandler()).thenReturn(nullReplyToHandler);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
             assertThat(executor.execute(), equalTo(event));
         }
 
-        completionHandler.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
+        nullReplyToHandler.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
 
         assertThat(processor1.event, is(notNullValue()));
         assertThat(processor1.thread, equalTo(Thread.currentThread()));
@@ -86,7 +86,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         assertThat(processor3.event, is(notNullValue()));
         assertThat(processor3.thread, not(equalTo(processor2.thread)));
 
-        assertThat(completionHandler.event.getMessageAsString(), equalTo(RESULT));
+        assertThat(nullReplyToHandler.event.getMessageAsString(), equalTo(RESULT));
     }
 
 }
