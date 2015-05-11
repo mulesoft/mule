@@ -29,7 +29,7 @@ public class SystemExceptionListener
 
     private CountDownLatch exceptionThrownLatch = new CountDownLatch(1);
     private int timeout = 10000;
-    private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
+    private List<ExceptionNotification> exceptionNotifications = new ArrayList<ExceptionNotification>();
 
     public SystemExceptionListener(MuleContext muleContext)
     {
