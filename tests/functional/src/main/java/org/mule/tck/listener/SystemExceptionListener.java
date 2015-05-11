@@ -6,11 +6,12 @@
  */
 package org.mule.tck.listener;
 
-import static java.lang.String.format;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.api.exception.RollbackSourceCallback;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.util.concurrent.Latch;
@@ -21,29 +22,43 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Listener for exception thrown by a message source or flow.
+ * Listener for exceptions managed by the {@link org.mule.api.exception.SystemExceptionHandler}.
  */
-public class ExceptionListener
+public class SystemExceptionListener
 {
 
-    private CountDownLatch exceptionThrownLatch = new Latch();
+    private CountDownLatch exceptionThrownLatch = new CountDownLatch(1);
     private int timeout = 10000;
     private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
 
-    /**
-     * Constructor for creating a listener for any exception thrown within a flow or message source.
-     */
-    public ExceptionListener(MuleContext muleContext)
+    public SystemExceptionListener(MuleContext muleContext)
     {
         try
         {
+            final SystemExceptionHandler exceptionListener = muleContext.getExceptionListener();
+            muleContext.setExceptionListener(new SystemExceptionHandler()
+            {
+                @Override
+                public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
+                {
+                    exceptionThrownLatch.countDown();
+                    exceptionListener.handleException(exception, rollbackMethod);
+                }
+
+                @Override
+                public void handleException(Exception exception)
+                {
+                    exceptionThrownLatch.countDown();
+                    exceptionListener.handleException(exception);
+                }
+            });
             muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
             {
                 @Override
                 public void onNotification(ExceptionNotification notification)
                 {
                     exceptionNotifications.add(notification);
-                    exceptionThrownLatch.countDown();
+
                 }
             });
         }
@@ -53,13 +68,13 @@ public class ExceptionListener
         }
     }
 
-    public ExceptionListener waitUntilAllNotificationsAreReceived()
+    public SystemExceptionListener waitUntilAllNotificationsAreReceived()
     {
         try
         {
             if (!exceptionThrownLatch.await(timeout, TimeUnit.MILLISECONDS))
             {
-                fail("There was no exception notification");
+                fail("An exception was never thrown");
             }
         }
         catch (InterruptedException e)
@@ -69,28 +84,19 @@ public class ExceptionListener
         return this;
     }
 
-    public ExceptionListener assertExpectedException(final Class<? extends Throwable> expectedExceptionType)
-    {
-        for (ExceptionNotification exceptionNotification : exceptionNotifications)
-        {
-            if (exceptionNotification.getException().getClass().isAssignableFrom(expectedExceptionType))
-            {
-                return this;
-            }
-        }
-        throw new AssertionError(format("Exception exception type %s was not thrown", expectedExceptionType.getName()));
-    }
-
     /**
      * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
      */
-    public ExceptionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired)
+    public SystemExceptionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired)
     {
         this.exceptionThrownLatch = new CountDownLatch(numberOfExecutionsRequired);
         return this;
     }
 
-    public ExceptionListener setTimeoutInMillis(int timeout)
+    /**
+     * @param timeout milliseconds to wait when calling {@link #waitUntilAllNotificationsAreReceived()} for an exception to be handled
+     */
+    public SystemExceptionListener setTimeoutInMillis(int timeout)
     {
         this.timeout = timeout;
         return this;
