@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms.integration;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -31,6 +32,7 @@ public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestC
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky test")
     public void testNoneTx() throws Exception
     {
         send(scenarioNoTx);
