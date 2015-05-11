@@ -6,6 +6,8 @@
  */
 package org.mule.transaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -14,9 +16,6 @@ import org.mule.context.notification.TransactionNotification;
 import org.mule.util.UUID;
 
 import java.text.MessageFormat;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This base class provides low level features for transactions.
@@ -27,6 +26,8 @@ public abstract class AbstractTransaction implements Transaction
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected String id = UUID.getUUID();
+
+    protected int timeout;
 
     protected MuleContext muleContext;
 
@@ -182,4 +183,14 @@ public abstract class AbstractTransaction implements Transaction
         return muleContext.getConfiguration().getId();
     }
 
+    @Override
+    public int getTimeout()
+    {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout)
+    {
+        this.timeout = timeout;
+    }
 }

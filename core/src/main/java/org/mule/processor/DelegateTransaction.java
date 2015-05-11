@@ -95,7 +95,9 @@ public class DelegateTransaction extends AbstractTransaction
         }
         TransactionFactory transactionFactory = muleContext.getTransactionFactoryManager().getTransactionFactoryFor(key.getClass());
         this.unbindTransaction();
+        int timeout = delegate.getTimeout();
         this.delegate = transactionFactory.beginTransaction(muleContext);
+        delegate.setTimeout(timeout);
         delegate.bindResource(key, resource);
     }
 
@@ -142,6 +144,9 @@ public class DelegateTransaction extends AbstractTransaction
 
     private class NullTransaction implements Transaction
     {
+
+        private Integer timeout = null;
+
         @Override
         public void begin() throws TransactionException
         {
@@ -179,6 +184,17 @@ public class DelegateTransaction extends AbstractTransaction
         public boolean isCommitted() throws TransactionException
         {
             return false;
+        }
+
+        @Override
+        public int getTimeout() {
+            return timeout;
+        }
+
+        @Override
+        public void setTimeout(int timeout)
+        {
+            this.timeout = timeout;
         }
 
         @Override
