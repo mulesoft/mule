@@ -11,11 +11,13 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.awt.Color;
 import java.io.Serializable;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Message is sent to and received from simple queue.
  */
+@Ignore("MULE-6926: Flaky test")
 public class JmsQueueMessageTypesTestCase extends AbstractJmsFunctionalTestCase
 {
     protected String getConfigResources()
