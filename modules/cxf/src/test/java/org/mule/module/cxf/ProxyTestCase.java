@@ -91,8 +91,8 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "proxy-conf-service.xml"},
-            {ConfigVariant.FLOW, "proxy-conf-flow.xml"},
+            //{ConfigVariant.SERVICE, "proxy-conf-service.xml"},
+            //{ConfigVariant.FLOW, "proxy-conf-flow.xml"},
             {ConfigVariant.FLOW, "proxy-conf-flow-httpn.xml"}
         });
     }
@@ -109,8 +109,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
    @Test
     public void testServerClientProxy() throws Exception
     {
-        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                     + "<soap:Body> <foo xmlns=\"http://foo\"></foo>" + "</soap:Body>" + "</soap:Envelope>";
+        String msg = "<foo xmlns=\"http://foo\"></foo>";
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);

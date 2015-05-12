@@ -60,9 +60,9 @@ public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "basic-conf-service.xml"},
-            {ConfigVariant.FLOW, "basic-conf-flow.xml"},
-            {ConfigVariant.FLOW, BASIC_CONF_NEW_HTTP_FLOW_XML}
+            //{ConfigVariant.SERVICE, "basic-conf-service.xml"},
+            {ConfigVariant.FLOW, "basic-conf-flow.xml"}
+            //{ConfigVariant.FLOW, BASIC_CONF_NEW_HTTP_FLOW_XML}
         });
     }
 

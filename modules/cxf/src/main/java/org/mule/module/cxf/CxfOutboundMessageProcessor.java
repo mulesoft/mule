@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf;
 
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -40,6 +41,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
@@ -205,14 +207,14 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         return buildResponseMessage(event, muleRes, objResponse);
     }
 
-    protected MuleEvent doSendWithClient(MuleEvent event) throws Exception
+    protected MuleEvent doSendWithClient(final MuleEvent event) throws Exception
     {
         BindingOperationInfo bop = getOperation(event);
 
         Map<String, Object> props = getInovcationProperties(event);
 
         // Holds the response from the transport
-        Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
+        final Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
 
         Map<String, Object> ctx = new HashMap<String, Object>();
@@ -235,9 +237,30 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         ExchangeImpl exchange = new ExchangeImpl();
         // mule will close the stream so don't let cxf, otherwise cxf will close it too early
         exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
-        Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
 
-        return buildResponseMessage(event, responseHolder.value, response);
+        if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
+        {
+            client.invoke(new ClientCallback()
+            {
+                @Override
+                public void handleResponse(Map<String, Object> ctx, Object[] res)
+                {
+                    try
+                    {
+                        event.getReplyToHandler().processReplyTo(buildResponseMessage(event, responseHolder.value, res), null, null);
+                    }
+                    catch (MuleException e)
+                    {
+                        event.getReplyToHandler().processExceptionReplyTo(event, new MessagingException(event, exception), null);
+                    }
+                }
+            }, bop, getArgs(event), ctx, exchange);
+            return NonBlockingVoidMuleEvent.getInstance();
+        }
+        else
+        {
+            return buildResponseMessage(event, responseHolder.value, client.invoke(bop, getArgs(event), ctx, exchange));
+        }
     }
 
     public Method getMethod(MuleEvent event) throws Exception

@@ -10,8 +10,10 @@ import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -19,7 +21,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.CompletionHandlerReplyToHandlerAdaptor;
 import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
@@ -239,41 +243,49 @@ public class MuleUniversalConduit extends AbstractConduit
         return result;
     }
     
-    protected void dispatchMuleMessage(Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException {
+    protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException {
         try
         {
             MuleMessage req = reqEvent.getMessage();
             req.setOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
 
-            MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
-
-            if (resEvent == null || VoidMuleEvent.getInstance().equals(resEvent))
+            if (reqEvent.isAllowNonBlocking())
             {
-                m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
-                return;
+                final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
+
+                reqEvent = new DefaultMuleEvent(reqEvent, new ReplyToHandler()
+                {
+                    @Override
+                    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
+                    {
+                        try
+                        {
+                            Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
+                            holder.value = event;
+                            tempMethod(m, event);
+                        }
+                        catch (IOException e)
+                        {
+                            processExceptionReplyTo(event, new MessagingException(event, e), null);
+                        }
+                    }
+
+                    @Override
+                    public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+                    {
+                        originalReplyToHandler.processExceptionReplyTo(event, exception, replyTo);
+                    }
+                });
             }
 
-            m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
-            
-            // If we have a result, send it back to CXF
-            MuleMessage result = resEvent.getMessage();
-            InputStream is = getResponseBody(m, result);
-            if (is != null)
-            {
-                Message inMessage = new MessageImpl();
+            MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
 
-                String encoding = result.getEncoding();
-                inMessage.put(Message.ENCODING, encoding);
-                
-                String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-                if (encoding != null && contentType.indexOf("charset") < 0)
+            if (!resEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
+            {
+                if (tempMethod(m, resEvent))
                 {
-                    contentType += "; charset=" + result.getEncoding();
+                    return;
                 }
-                inMessage.put(Message.CONTENT_TYPE, contentType);
-                inMessage.setContent(InputStream.class, is);
-                inMessage.setExchange(m.getExchange());
-                getMessageObserver().onMessage(inMessage);
             }
         }
         catch(MuleException me)
@@ -284,6 +296,39 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
         }
+    }
+
+    private boolean tempMethod(Message m, MuleEvent resEvent) throws TransformerException, IOException
+    {
+        if (resEvent == null || VoidMuleEvent.getInstance().equals(resEvent))
+        {
+            m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
+            return true;
+        }
+
+        m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
+
+        // If we have a result, send it back to CXF
+        MuleMessage result = resEvent.getMessage();
+        InputStream is = getResponseBody(m, result);
+        if (is != null)
+        {
+            Message inMessage = new MessageImpl();
+
+            String encoding = result.getEncoding();
+            inMessage.put(Message.ENCODING, encoding);
+
+            String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+            if (encoding != null && contentType.indexOf("charset") < 0)
+            {
+                contentType += "; charset=" + result.getEncoding();
+            }
+            inMessage.put(Message.CONTENT_TYPE, contentType);
+            inMessage.setContent(InputStream.class, is);
+            inMessage.setExchange(m.getExchange());
+            getMessageObserver().onMessage(inMessage);
+        }
+        return false;
     }
 
     protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
