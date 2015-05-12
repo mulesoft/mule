@@ -6,10 +6,8 @@
  */
 package org.mule.transport.jms.integration;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -19,8 +17,11 @@ import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.module.client.MuleClient;
 import org.mule.util.concurrent.Latch;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
 {
@@ -56,6 +57,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky test")
     public void testInExceptionDoRollbackJmsTx() throws Exception
     {
         muleClient = new MuleClient(muleContext);
