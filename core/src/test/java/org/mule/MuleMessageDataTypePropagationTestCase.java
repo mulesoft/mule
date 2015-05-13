@@ -237,15 +237,14 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void doesNotUpdatesDataTypeOnTransformationWhenPayloadDidNotChange() throws Exception
+    public void maintainsCurrentDataTypeClassWhenTransformerOutputTypeIsObject() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         DataType<?> originalDataType = muleMessage.getDataType();
 
         Transformer transformer = mock(Transformer.class);
         when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
-        DataType outputDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML);
-        outputDataType.setEncoding(CUSTOM_ENCODING);
+        DataType outputDataType = DataTypeFactory.create(Object.class, ANY);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
         when(transformer.transform(muleMessage)).thenReturn(TEST);
 
