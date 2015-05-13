@@ -6,20 +6,26 @@
  */
 package org.mule.transformers.simple;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
+import org.mule.transformer.types.MimeTypes;
+import org.mule.transformer.types.TypedValue;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +33,12 @@ import org.junit.Test;
 
 public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 {
+
+    public static final String BAR_PROPERTY = "bar";
+    public static final String FOO_PROPERTY = "foo";
+    public static final String TEXT_BAZ_MIME_TYPE = "text/baz";
+    public static final String FOO_VALUE = "fooValue";
+
     @Override
     protected String getConfigFile()
     {
@@ -37,9 +49,9 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     public void testOverwriteFlagEnabledByDefault() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        Map<String, Object> add = new HashMap<String, Object>();
-        add.put("addedProperty", "overwrittenValue");
-        t.setAddProperties(add);
+        Map<String, TypedValue> add = new HashMap<>();
+        add.put("addedProperty", new TypedValue("overwrittenValue", DataType.STRING_DATA_TYPE));
+        t.setAddTypedProperties(add);
         t.setMuleContext(muleContext);
 
         MuleMessage msg = new DefaultMuleMessage("message", muleContext);
@@ -60,9 +72,9 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     public void testOverwriteFalsePreservesOriginal() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        Map<String, Object> add = new HashMap<String, Object>();
-        add.put("addedProperty", "overwrittenValue");
-        t.setAddProperties(add);
+        Map<String, TypedValue> add = new HashMap<>();
+        add.put("addedProperty", new TypedValue("overwrittenValue", DataType.STRING_DATA_TYPE));
+        t.setAddTypedProperties(add);
         t.setOverwrite(false);
         t.setMuleContext(muleContext);
 
@@ -81,9 +93,9 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     public void testExpressionsInAddProperties() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        Map<String, Object> add = new HashMap<String, Object>();
-        add.put("Foo", "#[header:public-house]");
-        t.setAddProperties(add);
+        Map<String, TypedValue> add = new HashMap<>();
+        add.put("Foo", new TypedValue("#[header:public-house]", DataType.STRING_DATA_TYPE));
+        t.setAddTypedProperties(add);
         t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
@@ -152,12 +164,49 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(2, transformer.getDeleteProperties().size());
         assertEquals(1, transformer.getRenameProperties().size());
         assertTrue(transformer.isOverwrite());
-        assertEquals("text/baz;charset=UTF-16BE", transformer.getAddProperties().get("Content-Type"));
-        assertEquals("value", transformer.getAddProperties().get("key"));
+
+        TypedValue typedValue = transformer.getAddProperties().get("Content-Type");
+        assertThat((String) typedValue.getValue(), equalTo("text/baz;charset=UTF-16BE"));
+        assertThat(typedValue.getDataType(), like(Object.class, MimeTypes.ANY, null));
+
+        typedValue = transformer.getAddProperties().get("key");
+        assertThat((String) typedValue.getValue(), equalTo("value"));
+        assertThat(typedValue.getDataType(), like(String.class, MimeTypes.ANY, null));
+
         assertEquals("test-property1", transformer.getDeleteProperties().get(0));
         assertEquals("test-property2", transformer.getDeleteProperties().get(1));
         assertEquals("Faz", transformer.getRenameProperties().get("Foo"));
         assertEquals(PropertyScope.OUTBOUND, transformer.getScope());
+    }
+
+    @Test
+    public void setsDataTypeFromConfig() throws Exception
+    {
+        MessagePropertiesTransformer transformer = (MessagePropertiesTransformer) muleContext.getRegistry().lookupTransformer("addPropertyWithDataType");
+        transformer.setMuleContext(muleContext);
+        assertNotNull(transformer.getAddProperties());
+        assertEquals(1, transformer.getAddProperties().size());
+
+        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+
+        DefaultMuleMessage transformed = (DefaultMuleMessage) transformer.transform(msg);
+
+        assertThat(FOO_VALUE, equalTo(transformed.getOutboundProperty(FOO_PROPERTY)));
+        assertThat(transformed.getPropertyDataType(FOO_PROPERTY, PropertyScope.OUTBOUND), like(String.class, TEXT_BAZ_MIME_TYPE, StandardCharsets.UTF_16BE.name()));
+    }
+
+    @Test
+    public void copiesDataTypeOnRenameProperty() throws Exception
+    {
+        MessagePropertiesTransformer transformer = (MessagePropertiesTransformer) muleContext.getRegistry().lookupTransformer("renamePropertyWithDataType");
+        transformer.setMuleContext(muleContext);
+
+        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+
+        DefaultMuleMessage transformed = (DefaultMuleMessage) transformer.transform(msg);
+
+        assertThat(FOO_VALUE, equalTo(transformed.getOutboundProperty(BAR_PROPERTY)));
+        assertThat(transformed.getPropertyDataType(BAR_PROPERTY, PropertyScope.OUTBOUND), like(String.class, TEXT_BAZ_MIME_TYPE, StandardCharsets.UTF_16BE.name()));
     }
 
     @Test

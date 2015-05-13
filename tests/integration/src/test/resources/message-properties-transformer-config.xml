@@ -19,5 +19,12 @@
 
     </message-properties-transformer>
 
+    <message-properties-transformer name="addPropertyWithDataType" overwrite="true">
+        <add-message-property key="foo" value="fooValue" encoding="UTF-16BE" mimeType="text/baz"/>
+    </message-properties-transformer>
 
+    <message-properties-transformer name="renamePropertyWithDataType" overwrite="true">
+        <add-message-property key="foo" value="fooValue" encoding="UTF-16BE" mimeType="text/baz"/>
+        <rename-message-property key="foo" value="bar"/>
+    </message-properties-transformer>
 </mule>
