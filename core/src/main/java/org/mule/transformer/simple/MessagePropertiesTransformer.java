@@ -8,10 +8,12 @@ package org.mule.transformer.simple;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 
 import java.text.MessageFormat;
@@ -40,7 +42,7 @@ import java.util.Set;
 public class MessagePropertiesTransformer extends AbstractMessageTransformer
 {
     private List<String> deleteProperties = null;
-    private Map<String, Object> addProperties = null;
+    private Map<String, TypedValue> addProperties = new HashMap<>();
     /** the properties map containing rename mappings for message properties */
     private Map<String, String> renameProperties;
     private String getProperty;
@@ -66,7 +68,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
 
         if (addProperties != null)
         {
-            clone.setAddProperties(new HashMap<String, Object>(addProperties));
+            clone.setAddTypedProperties(new HashMap<>(addProperties));
         }
 
         if (renameProperties != null)
@@ -142,7 +144,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
 
     protected void addProperties(MuleMessage message)
     {
-        for (Map.Entry<String, Object> entry : addProperties.entrySet())
+        for (Map.Entry<String, TypedValue> entry : addProperties.entrySet())
         {
             if (entry.getKey() == null)
             {
@@ -152,36 +154,37 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
             {
                 final String key = entry.getKey();
 
-                Object value= entry.getValue();
-                Object realValue = value;
+                TypedValue typedValue = entry.getValue();
+                Object value = typedValue.getValue();
 
                 //Enable expression support for property values
                 if (muleContext.getExpressionManager().isExpression(value.toString()))
                 {
-                    realValue = muleContext.getExpressionManager().evaluate(value.toString(), message);
+                    value = muleContext.getExpressionManager().evaluate(value.toString(), message);
                 }
 
-                if (realValue != null)
+                if (value != null)
                 {
+                    DataType<?> propertyDataType = createPropertyDataType(value, typedValue.getDataType());
                     if (message.getProperty(key, scope) != null)
                     {
                         if (overwrite)
                         {
                             logger.debug("Overwriting message property " + key);
-                            message.setProperty(key, realValue, scope);
+                            message.setProperty(key, value, scope, propertyDataType);
                         }
                         else if(logger.isDebugEnabled())
                         {
                             logger.debug(MessageFormat.format(
                                 "Message already contains the property and overwrite is false, skipping: key={0}, value={1}, scope={2}",
-                                key, realValue, scope));
+                                key, value, scope));
                         }
                     }
                     //If value is null an exception will not be thrown if the key was marked as optional (with a '?'). If not
                     //optional the expression evaluator will throw an exception
                     else
                     {
-                        message.setProperty(key, realValue, scope);
+                        message.setProperty(key, value, scope, propertyDataType);
                     }
                 }
                 else if (logger.isInfoEnabled())
@@ -192,6 +195,14 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
                 }
             }
         }
+    }
+
+    private DataType<?> createPropertyDataType(Object value, DataType<?> propertyDataType)
+    {
+        DataType<?> dataType = DataTypeFactory.create(value.getClass(), propertyDataType.getMimeType());
+        dataType.setEncoding(propertyDataType.getEncoding());
+
+        return dataType;
     }
 
     protected void renameProperties(MuleMessage message)
@@ -238,8 +249,9 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
     protected void renameInScope(String oldKey, String newKey, PropertyScope propertyScope, MuleMessage message)
     {
         Object propValue = message.getProperty(oldKey, propertyScope);
+        DataType<?> propertyDataType = message.getPropertyDataType(oldKey, propertyScope);
         message.removeProperty(oldKey, propertyScope);
-        message.setProperty(newKey, propValue, propertyScope);
+        message.setProperty(newKey, propValue, propertyScope, propertyDataType);
     }
 
     public List<String> getDeleteProperties()
@@ -260,14 +272,24 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
         this.deleteProperties = Arrays.asList(deleteProperties);
     }
 
-    public Map<String, Object> getAddProperties()
+    public Map<String, TypedValue> getAddProperties()
     {
         return addProperties;
     }
 
+    public void setAddTypedProperties(Map<String, TypedValue> addProperties)
+    {
+        this.addProperties.putAll(addProperties);
+    }
+
     public void setAddProperties(Map<String, Object> addProperties)
     {
-        this.addProperties = addProperties;
+        for (String key : addProperties.keySet())
+        {
+            Object value = addProperties.get(key);
+            TypedValue typedValue = new TypedValue(value, value == null ? DataTypeFactory.OBJECT : DataTypeFactory.create(value.getClass()));
+            this.addProperties.put(key, typedValue);
+        }
     }
 
     /**
