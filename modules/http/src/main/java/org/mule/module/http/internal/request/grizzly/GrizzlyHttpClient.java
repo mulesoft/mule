@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
@@ -264,7 +263,9 @@ public class GrizzlyHttpClient implements HttpClient
 
         try
         {
-            response = future.get(responseTimeout, TimeUnit.MILLISECONDS);
+            // No timeout is used to get the value of the future object, as the responseTimeout configured in the request that
+            // is being sent will make the call throw a {@code TimeoutException} if this time is exceeded.
+            response = future.get();
         }
         catch (InterruptedException e)
         {
@@ -272,7 +273,14 @@ public class GrizzlyHttpClient implements HttpClient
         }
         catch (ExecutionException e)
         {
-            throw new IOException(e);
+            if (e.getCause() instanceof TimeoutException)
+            {
+                throw (TimeoutException) e.getCause();
+            }
+            else
+            {
+                throw new IOException(e);
+            }
         }
 
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();

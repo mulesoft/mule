@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -27,7 +28,6 @@ import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.hamcrest.core.Is;
@@ -42,6 +42,8 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
 
     public static final String PUT_HTTP_METHOD = "PUT";
     private static final long RESPONSE_TIMEOUT = 100;
+    private static final long SERVER_TIMEOUT = 2000;
+
     @Rule
     public DynamicPort port = new DynamicPort("port");
     @Rule
@@ -148,7 +150,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         {
             try
             {
-                latch.await(RESPONSE_TIMEOUT, TimeUnit.MILLISECONDS);
+                latch.await(SERVER_TIMEOUT, MILLISECONDS);
             }
             catch (InterruptedException e)
             {
