@@ -44,7 +44,6 @@ import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
@@ -195,7 +194,9 @@ public class GrizzlyHttpClient implements HttpClient
         ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
         try
         {
-            return createMuleResponse(future.get(responseTimeout, TimeUnit.MILLISECONDS));
+            // No timeout is used to get the value of the future object, as the responseTimeout configured in the request that
+            // is being sent will make the call throw a {@code TimeoutException} if this time is exceeded.
+            return createMuleResponse(future.get());
         }
         catch (InterruptedException e)
         {
@@ -203,7 +204,14 @@ public class GrizzlyHttpClient implements HttpClient
         }
         catch (ExecutionException e)
         {
-            throw new IOException(e);
+            if (e.getCause() instanceof TimeoutException)
+            {
+                throw (TimeoutException) e.getCause();
+            }
+            else
+            {
+                throw new IOException(e);
+            }
         }
     }
 
