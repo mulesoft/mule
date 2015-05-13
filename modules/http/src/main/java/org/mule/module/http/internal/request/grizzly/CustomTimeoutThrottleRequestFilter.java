@@ -17,6 +17,7 @@ import com.ning.http.client.filter.FilterException;
 import com.ning.http.client.filter.RequestFilter;
 
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,14 +65,27 @@ public class CustomTimeoutThrottleRequestFilter implements RequestFilter
         return new FilterContext.FilterContextBuilder(ctx).asyncHandler(new AsyncHandlerWrapper(ctx.getAsyncHandler())).build();
     }
 
-    private class AsyncHandlerWrapper<T> implements AsyncHandler
+    private class AsyncHandlerWrapper<T> implements AsyncHandler<T>
     {
 
         private final AsyncHandler<T> asyncHandler;
+        private final AtomicBoolean complete = new AtomicBoolean(false);
 
         public AsyncHandlerWrapper(AsyncHandler<T> asyncHandler)
         {
             this.asyncHandler = asyncHandler;
+        }
+
+        private void complete()
+        {
+            if (complete.compareAndSet(false, true))
+            {
+                available.release();
+            }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Current Throttling Status after onThrowable {}", available.availablePermits());
+            }
         }
 
         @Override
@@ -83,11 +97,7 @@ public class CustomTimeoutThrottleRequestFilter implements RequestFilter
             }
             finally
             {
-                available.release();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Current Throttling Status after onThrowable {}", available.availablePermits());
-                }
+                complete();
             }
         }
 
@@ -112,12 +122,14 @@ public class CustomTimeoutThrottleRequestFilter implements RequestFilter
         @Override
         public T onCompleted() throws Exception
         {
-            available.release();
-            if (logger.isDebugEnabled())
+            try
             {
-                logger.debug("Current Throttling Status {}", available.availablePermits());
+                return asyncHandler.onCompleted();
             }
-            return asyncHandler.onCompleted();
+            finally
+            {
+                complete();
+            }
         }
     }
 }
