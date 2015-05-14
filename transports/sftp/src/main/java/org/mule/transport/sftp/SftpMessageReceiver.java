@@ -15,16 +15,20 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.transport.ConnectException;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.lock.LockFactory;
 
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -38,6 +42,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     private SftpReceiverRequesterUtil sftpRRUtil = null;
     private LockFactory lockFactory;
     private boolean poolOnPrimaryInstanceOnly;
+    protected AtomicBoolean connected = new AtomicBoolean(false);
 
     public SftpMessageReceiver(SftpConnector connector,
                                FlowConstruct flow,
@@ -69,7 +74,23 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         }
         try
         {
-            String[] files = sftpRRUtil.getAvailableFiles(false);
+            if (!connected.get())
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Skipping poll since message receiver is not yet connected");
+                }
+                return;
+            }
+            String[] files;
+            try
+            {
+                files = sftpRRUtil.getAvailableFiles(false);
+            }
+            catch (Exception e)
+            {
+                throw new ConnectException(e, this);
+            }
 
             if (files.length == 0)
             {
@@ -202,7 +223,40 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
     public void doConnect() throws Exception
     {
-        // no op
+        retryTemplate.execute(new RetryCallback()
+        {
+            @Override
+            public void doWork(RetryContext context) throws Exception
+            {
+                try
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Trying to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
+                    }
+                    sftpRRUtil.getAvailableFiles(false);
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Successfully connected/reconnected to SFTP server " + endpoint.getEndpointURI());
+                    }
+                    connected.set(true);
+                }
+                catch (Exception e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Unable to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
+                    }
+                    throw new Exception("Fail to connect", e);
+                }
+            }
+
+            @Override
+            public String getWorkDescription()
+            {
+                return "Trying to reconnect to SFTP server " + endpoint.getEndpointURI();
+            }
+        }, getConnector().getMuleContext().getWorkManager());
     }
 
     public void doDisconnect() throws Exception
