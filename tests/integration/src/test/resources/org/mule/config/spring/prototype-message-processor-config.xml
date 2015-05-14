@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <spring:beans>
+        <spring:bean id="plainMessageProcessor" class="org.mule.config.spring.PrototypeMessageProcessorLifecycleTestCase$TestPlainMessageProcessorFactoryBean" scope="prototype" />
+        <spring:bean id="transformer" class="org.mule.config.spring.PrototypeMessageProcessorLifecycleTestCase$TestTransformerFactoryBean" scope="prototype" />
+        <spring:bean id="filter" class="org.mule.config.spring.PrototypeMessageProcessorLifecycleTestCase$TestMessageFilterFactoryBean" scope="prototype" />
+        <spring:bean id="filteringMessageProcessor" class="org.mule.config.spring.PrototypeMessageProcessorLifecycleTestCase$TestFilteringMessageProcessorFactoryBean" scope="prototype" />
+    </spring:beans>
+
+
+</mule>

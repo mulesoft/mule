@@ -14,14 +14,18 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transformer.Converter;
+import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.registry.AbstractRegistry;
+import org.mule.routing.MessageFilter;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
@@ -183,7 +187,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                 return null;
             }
 
-            if (!applicationContext.isSingleton(key))
+            if (shouldApplyPrototypeLifecycle(key, object))
             {
                 try
                 {
@@ -197,6 +201,24 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
             return object;
         }
+    }
+
+    private boolean shouldApplyPrototypeLifecycle(String key, Object object)
+    {
+        if (applicationContext.isSingleton(key))
+        {
+            return false;
+        }
+
+        if (object instanceof MessageProcessor)
+        {
+            return
+                    object instanceof Transformer ||
+                    object instanceof MessageFilter ||
+                    object instanceof AbstractFilteringMessageProcessor;
+        }
+
+        return true;
     }
 
     @Override
