@@ -1590,7 +1590,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private void transformMessage(MuleEvent event, Transformer transformer) throws TransformerMessagingException, TransformerException
     {
         Object result;
-        final Object payloadBeforeTransformation = payload;
 
         if (transformer instanceof MessageTransformer)
         {
@@ -1630,18 +1629,16 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             setPayload(result);
         }
 
-        if (!payloadBeforeTransformation.equals(payload))
-        {
-            setDataType(mergeDataType(dataType, transformer.getReturnDataType()));
-        }
+        setDataType(mergeDataType(dataType, transformer.getReturnDataType()));
     }
 
     private DataType<?> mergeDataType(DataType<?> original, DataType<?> transformed)
     {
         String mimeType = transformed.getMimeType() == null || MimeTypes.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
         String encoding = transformed.getEncoding() == null ? original.getEncoding() : transformed.getEncoding();
+        Class<?> type = transformed.getType() == Object.class ? original.getType() : transformed.getType();
 
-        DataType mergedDataType = DataTypeFactory.create(transformed.getType(), mimeType);
+        DataType mergedDataType = DataTypeFactory.create(type, mimeType);
         mergedDataType.setEncoding(encoding);
         return mergedDataType;
     }
