@@ -84,4 +84,13 @@ public class ConnectionListener
         return this;
     }
 
+    /**
+     * @return resets the listener state so it can be reused
+     */
+    public ConnectionListener reset()
+    {
+        this.notificationReceivedLatch = new Latch();
+        return this;
+    }
+
 }

@@ -6,6 +6,11 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
 
+    <sftp:connector name="sftpConnector">
+        <!-- the test case depends on the mule context creation but it does not executes any SFTP endpoint -->
+        <reconnect-forever blocking="false"/>
+    </sftp:connector>
+
     <model name="main">
         <service name="test1" initialState="stopped">
             <inbound>
