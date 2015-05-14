@@ -25,7 +25,6 @@ import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
@@ -34,14 +33,13 @@ import org.mule.transformer.types.MimeTypes;
 
 import java.util.Map;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 @SmallTest
 public class DefaultMuleEventTestCase extends AbstractMuleTestCase
 {
 
-    public static final String CUSTOM_ENCODING = "UFT-8";
+    public static final String CUSTOM_ENCODING = "UTF-8";
     public static final String PROPERTY_NAME = "test";
     public static final String PROPERTY_VALUE = "foo";
 

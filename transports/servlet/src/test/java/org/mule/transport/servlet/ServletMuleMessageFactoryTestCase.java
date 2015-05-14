@@ -6,6 +6,12 @@
  */
 package org.mule.transport.servlet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
@@ -22,13 +28,6 @@ import java.util.Vector;
 import javax.servlet.http.HttpSession;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -116,20 +115,20 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     @Test
     public void testContentEncodingWithCharsetLast() throws Exception
     {
-        String contentType = "text/plain;charset=UTF-21";
+        String contentType = "text/plain;charset=UTF-8";
         Object payload = buildGetRequestWithContentType(contentType);
         MuleMessage message = factory.create(payload, encoding, muleContext);
-        assertEquals("UTF-21", message.getEncoding());
+        assertEquals("UTF-8", message.getEncoding());
         assertInboundScopedProperty(contentType, message, CONTENT_TYPE_PROPERTY_KEY);
     }
 
     @Test
     public void testContentEncodingWithCharsetFirst() throws Exception
     {
-        String contentType = "charset=UTF-21;text/plain";
+        String contentType = "charset=UTF-8;text/plain";
         Object payload = buildGetRequestWithContentType(contentType);
         MuleMessage message = factory.create(payload, encoding, muleContext);
-        assertEquals("UTF-21", message.getEncoding());
+        assertEquals("UTF-8", message.getEncoding());
         assertInboundScopedProperty(contentType, message, CONTENT_TYPE_PROPERTY_KEY);
     }
 

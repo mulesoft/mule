@@ -6,13 +6,14 @@
  */
 package org.mule.transport.http.functional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import org.mule.api.config.MuleProperties;
+import org.mule.transport.http.HttpConstants;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.transport.http.HttpConnector;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Test;
 
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
@@ -21,18 +22,15 @@ public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTes
         super(variant, configResources);
     }
 
-    @Override
+    @Test
     public void testSend() throws Exception
     {
-        MuleClient client = muleContext.getClient();
+        GetMethod request = new GetMethod("http://localhost:" + dynamicPort.getValue());
+        request.addRequestHeader(MuleProperties.CONTENT_TYPE_PROPERTY,"text/bar; charset=UTFF-912");
+        HttpClient httpClient = new HttpClient();
 
-        // Send as bytes so that the StringRequestEntity isn't used. If it is used
-        // it will throw an exception and stop us from testing the server side.
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE.getBytes(), muleContext);
-        msg.setEncoding("UTFF-912");
-        MuleMessage reply = client.send("clientEndpoint", msg);
-        assertNotNull(reply);
-        assertEquals("500", reply.<Object>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-        assertNotNull(reply.getExceptionPayload());
+        int responseCode = httpClient.executeMethod(request);
+
+        assertThat(responseCode, equalTo(HttpConstants.SC_INTERNAL_SERVER_ERROR));
     }
 }

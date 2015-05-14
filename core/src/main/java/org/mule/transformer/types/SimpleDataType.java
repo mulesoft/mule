@@ -6,8 +6,10 @@
  */
 package org.mule.transformer.types;
 
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.transformer.DataType;
+import org.mule.util.StringUtils;
+
+import java.nio.charset.Charset;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -22,6 +24,9 @@ import org.apache.commons.beanutils.MethodUtils;
  */
 public class SimpleDataType<T> implements DataType<T>, Cloneable
 {
+
+    public static final String CHARSET_PARAM = "charset";
+
     protected final Class<?> type;
     protected String mimeType = ANY_MIME_TYPE;
     protected String encoding;
@@ -29,27 +34,7 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
     public SimpleDataType(Class<?> type, String mimeType)
     {
         this.type = type;
-        if (mimeType == null)
-        {
-            this.mimeType = ANY_MIME_TYPE;
-        }
-        else
-        {
-            try
-            {
-                MimeType mt = new MimeType(mimeType);
-                this.mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
-                if (mt.getParameter("charset") != null)
-                {
-                    encoding = mt.getParameter("charset");
-                }
-            }
-            catch (MimeTypeParseException e)
-            {
-                //TODO, this should really get thrown
-                throw new MuleRuntimeException(e);
-            }
-        }
+        setMimeType(mimeType);
     }
 
     public SimpleDataType(Class type)
@@ -69,7 +54,26 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
 
     public void setMimeType(String mimeType)
     {
-        this.mimeType = (mimeType == null ? ANY_MIME_TYPE : mimeType);
+        if (mimeType == null)
+        {
+            this.mimeType = ANY_MIME_TYPE;
+        }
+        else
+        {
+            try
+            {
+                MimeType mt = new MimeType(mimeType);
+                this.mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
+                if (mt.getParameter(CHARSET_PARAM) != null)
+                {
+                    setEncoding(mt.getParameter(CHARSET_PARAM));
+                }
+            }
+            catch (MimeTypeParseException e)
+            {
+                throw new IllegalArgumentException("MimeType cannot be parsed :" + mimeType);
+            }
+        }
     }
 
     public String getEncoding()
@@ -79,6 +83,12 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
 
     public void setEncoding(String encoding)
     {
+        if (!StringUtils.isEmpty(encoding))
+        {
+            // Checks that the encoding is valid and supported
+            Charset.forName(encoding);
+        }
+
         this.encoding = encoding;
     }
 

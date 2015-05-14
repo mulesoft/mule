@@ -8,7 +8,6 @@ package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -24,7 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -33,8 +32,8 @@ public class HttpFunctionalTestCase extends AbstractServiceAndFlowTestCase
     protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
     protected boolean checkPathProperties = true;
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port1");
 
     public HttpFunctionalTestCase(ConfigVariant variant, String configResources)
     {
@@ -44,10 +43,7 @@ public class HttpFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-      //      {ConfigVariant.SERVICE, "http-functional-test-service.xml"},
-      //      {ConfigVariant.FLOW, "http-functional-test-flow.xml"}
-        });
+        return Arrays.asList(new Object[][] {});
     }
 
     @Test
