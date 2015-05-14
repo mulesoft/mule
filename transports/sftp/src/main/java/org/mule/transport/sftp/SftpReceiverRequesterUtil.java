@@ -6,6 +6,8 @@
  */
 package org.mule.transport.sftp;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.FileUtils;
@@ -17,83 +19,83 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Contains reusable methods not directly related to usage of the jsch sftp library
  * (they can be found in the class SftpClient).
- * 
+ *
  * @author Magnus Larsson
  */
-public class SftpReceiverRequesterUtil
-{
+public class SftpReceiverRequesterUtil {
     private transient Log logger = LogFactory.getLog(getClass());
 
     private final SftpConnector connector;
     private final ImmutableEndpoint endpoint;
     private final FilenameFilter filenameFilter;
     private final SftpUtil sftpUtil;
+    private final long fileAge;
+    private final boolean checkFileAge;
+    private final long sizeCheckDelayMs;
 
-    public SftpReceiverRequesterUtil(ImmutableEndpoint endpoint)
-    {
+    public SftpReceiverRequesterUtil(ImmutableEndpoint endpoint) {
         this.endpoint = endpoint;
         this.connector = (SftpConnector) endpoint.getConnector();
 
         sftpUtil = new SftpUtil(endpoint);
+        // Get size check parameter
+        sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
 
-        if (endpoint.getFilter() instanceof FilenameFilter)
-        {
+        if (endpoint.getFilter() instanceof FilenameFilter) {
             this.filenameFilter = (FilenameFilter) endpoint.getFilter();
-        }
-        else
-        {
+        } else {
             this.filenameFilter = null;
         }
+
+        // Override the value from the Endpoint?
+        if (endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE) != null) {
+            checkFileAge = true;
+            fileAge = Long.valueOf((String) endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE));
+        } else {
+            fileAge = connector.getFileAge();
+            checkFileAge = connector.getCheckFileAge();
+        }
+        logger.debug("fileAge : " + fileAge);
 
     }
 
     // Get files in directory configured on the endpoint
-    public String[] getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception
-    {
+    public List<FileDescriptor> getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception {
         // This sftp client instance is only for checking available files. This
         // instance cannot be shared
         // with clients that retrieve files because of thread safety
 
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("Checking files at endpoint " + endpoint.getEndpointURI());
         }
 
         SftpClient client = null;
 
-        try
-        {
+        try {
             client = connector.createSftpClient(endpoint);
 
             long fileAge = connector.getFileAge();
             boolean checkFileAge = connector.getCheckFileAge();
 
             // Override the value from the Endpoint?
-            if (endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE) != null)
-            {
+            if (endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE) != null) {
                 checkFileAge = true;
                 fileAge = Long.valueOf((String) endpoint.getProperty(SftpConnector.PROPERTY_FILE_AGE));
             }
 
-            logger.debug("fileAge : " + fileAge);
+            logger.debug("fileAge: " + fileAge);
 
-            // Get size check parameter
-            long sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
-
-            String[] files = client.listFiles();
+            final FileDescriptor[] files = client.getFileDescriptors();
 
             // Only return files that have completely been written and match
             // fileExtension
-            List<String> completedFiles = new ArrayList<String>(files.length);
+            final List<FileDescriptor> completedFiles = new ArrayList<>(files.length);
 
-            for (String file : files)
-            {
+            for (final FileDescriptor fileDesc : files) {
+                final String file = fileDesc.getFilename();
                 // Skip if no match.
                 // Note, Mule also uses this filter. We use the filter here because
                 // we don't want to
@@ -101,57 +103,42 @@ public class SftpReceiverRequesterUtil
                 // that Mule
                 // later should have ignored. Thus this is an "early" filter so that
                 // improves performance.
-                if (filenameFilter != null && !filenameFilter.accept(null, file))
-                {
+                if (filenameFilter != null && !filenameFilter.accept(null, file)) {
                     continue;
                 }
 
-                if (checkFileAge || sizeCheckDelayMs >= 0)
-                {
-                    // See if the file is still growing (either by age or size),
-                    // leave it alone if it is
-                    if (canProcessFile(file, client, fileAge, sizeCheckDelayMs))
-                    {
-                        // logger.debug("marking file [" + files[i] +
-                        // "] as in transit.");
-                        // client.rename(files[i], files[i] + ".transtit");
-                        // completedFiles.add( files[i] + ".transtit" );
-                        completedFiles.add(file);
-                        if (onlyGetTheFirstOne)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    completedFiles.add(file);
-                    if (onlyGetTheFirstOne)
-                    {
+                if (isFileCompleted(file, client)) {
+                    completedFiles.add(fileDesc);
+                    if (onlyGetTheFirstOne) {
                         break;
                     }
                 }
             }
-            return completedFiles.toArray(new String[completedFiles.size()]);
-        }
-        finally
-        {
-            if (client != null)
-            {
+            return completedFiles;
+        } finally {
+            if (client != null) {
                 connector.releaseClient(endpoint, client);
             }
         }
+
     }
 
-    public InputStream retrieveFile(String fileName, SftpNotifier notifier) throws Exception
-    {
+    private boolean isFileCompleted(final String file, SftpClient client) throws Exception {
+        if (checkFileAge || sizeCheckDelayMs >= 0) {
+            // See if the file is still growing (either by age or size),
+            // leave it alone if it is
+            return canProcessFile(file, client, fileAge, sizeCheckDelayMs);
+        }
+        return true;
+    }
+
+    public InputStream retrieveFile(String fileName, SftpNotifier notifier) throws Exception {
         // Getting a new SFTP client dedicated to the SftpInputStream below
         SftpClient client = connector.createSftpClient(endpoint, notifier);
 
         // Check usage of tmpSendingDir
         String tmpSendingDir = sftpUtil.getTempDirInbound();
-        if (tmpSendingDir != null)
-        {
+        if (tmpSendingDir != null) {
             // Check usage of unique names of files during transfer
             boolean addUniqueSuffix = sftpUtil.isUseTempFileTimestampSuffix();
 
@@ -159,20 +146,17 @@ public class SftpReceiverRequesterUtil
             client.createSftpDirIfNotExists(endpoint, tmpSendingDir);
             String tmpSendingFileName = tmpSendingDir + "/" + fileName;
 
-            if (addUniqueSuffix)
-            {
+            if (addUniqueSuffix) {
                 tmpSendingFileName = sftpUtil.createUniqueSuffix(tmpSendingFileName);
             }
             String fullTmpSendingPath = endpoint.getEndpointURI().getPath() + "/" + tmpSendingFileName;
 
-            if (logger.isDebugEnabled())
-            {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Move " + fileName + " to " + fullTmpSendingPath);
             }
             client.rename(fileName, fullTmpSendingPath);
             fileName = tmpSendingFileName;
-            if (logger.isDebugEnabled())
-            {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Move done");
             }
         }
@@ -183,8 +167,7 @@ public class SftpReceiverRequesterUtil
         // Retrieve the file stream
         InputStream fileInputStream = client.retrieveFile(fileName);
 
-        if (!"".equals(archive))
-        {
+        if (!"".equals(archive)) {
             String archiveTmpReceivingDir = sftpUtil.getArchiveTempReceivingDir();
             String archiveTmpSendingDir = sftpUtil.getArchiveTempSendingDir();
 
@@ -199,14 +182,11 @@ public class SftpReceiverRequesterUtil
             File archiveFile = FileUtils.newFile(archive, fileNamePart);
 
             // Should temp dirs be used when handling the archive file?
-            if ("".equals(archiveTmpReceivingDir) || "".equals(archiveTmpSendingDir))
-            {
+            if ("".equals(archiveTmpReceivingDir) || "".equals(archiveTmpSendingDir)) {
                 return archiveFile(is, archiveFile);
-            }
-            else
-            {
+            } else {
                 return archiveFileUsingTempDirs(archive, archiveTmpReceivingDir, archiveTmpSendingDir, is,
-                    fileNamePart, archiveFile);
+                        fileNamePart, archiveFile);
             }
         }
 
@@ -236,80 +216,67 @@ public class SftpReceiverRequesterUtil
                                                  String archiveTmpSendingDir,
                                                  InputStream is,
                                                  String fileNamePart,
-                                                 File archiveFile) throws IOException
-    {
+                                                 File archiveFile) throws IOException {
 
         File archiveTmpReceivingFolder = FileUtils.newFile(archive + '/' + archiveTmpReceivingDir);
         File archiveTmpReceivingFile = FileUtils.newFile(archive + '/' + archiveTmpReceivingDir, fileNamePart);
-        if (!archiveTmpReceivingFolder.exists())
-        {
-            if (logger.isInfoEnabled())
-            {
+        if (!archiveTmpReceivingFolder.exists()) {
+            if (logger.isInfoEnabled()) {
                 logger.info("Creates " + archiveTmpReceivingFolder.getAbsolutePath());
             }
             if (!archiveTmpReceivingFolder.mkdirs())
                 throw new IOException("Failed to create archive-tmp-receiving-folder: "
-                                      + archiveTmpReceivingFolder);
+                        + archiveTmpReceivingFolder);
         }
 
         File archiveTmpSendingFolder = FileUtils.newFile(archive + '/' + archiveTmpSendingDir);
         File archiveTmpSendingFile = FileUtils.newFile(archive + '/' + archiveTmpSendingDir, fileNamePart);
-        if (!archiveTmpSendingFolder.exists())
-        {
-            if (logger.isInfoEnabled())
-            {
+        if (!archiveTmpSendingFolder.exists()) {
+            if (logger.isInfoEnabled()) {
                 logger.info("Creates " + archiveTmpSendingFolder.getAbsolutePath());
             }
             if (!archiveTmpSendingFolder.mkdirs())
                 throw new IOException("Failed to create archive-tmp-sending-folder: "
-                                      + archiveTmpSendingFolder);
+                        + archiveTmpSendingFolder);
         }
 
-        if (logger.isInfoEnabled())
-        {
+        if (logger.isInfoEnabled()) {
             logger.info("Copy SftpInputStream to archiveTmpReceivingFile... "
-                        + archiveTmpReceivingFile.getAbsolutePath());
+                    + archiveTmpReceivingFile.getAbsolutePath());
         }
         sftpUtil.copyStreamToFile(is, archiveTmpReceivingFile);
 
         // TODO. ML FIX. Should be performed before the sftp:delete - operation, i.e.
         // in the SftpInputStream in the operation above...
-        if (logger.isInfoEnabled())
-        {
+        if (logger.isInfoEnabled()) {
             logger.info("Move archiveTmpReceivingFile (" + archiveTmpReceivingFile
-                        + ") to archiveTmpSendingFile (" + archiveTmpSendingFile + ")...");
+                    + ") to archiveTmpSendingFile (" + archiveTmpSendingFile + ")...");
         }
         FileUtils.moveFile(archiveTmpReceivingFile, archiveTmpSendingFile);
 
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("Return SftpFileArchiveInputStream for archiveTmpSendingFile ("
-                         + archiveTmpSendingFile + ")...");
+                    + archiveTmpSendingFile + ")...");
         }
         return new SftpFileArchiveInputStream(archiveTmpSendingFile, archiveFile);
     }
 
-    private InputStream archiveFile(InputStream is, File archiveFile) throws IOException
-    {
+    private InputStream archiveFile(InputStream is, File archiveFile) throws IOException {
         File archiveFolder = FileUtils.newFile(archiveFile.getParentFile().getPath());
-        if (!archiveFolder.exists())
-        {
-            if (logger.isInfoEnabled())
-            {
+        if (!archiveFolder.exists()) {
+            if (logger.isInfoEnabled()) {
                 logger.info("Creates " + archiveFolder.getAbsolutePath());
             }
             if (!archiveFolder.mkdirs())
                 throw new IOException("Failed to create archive-folder: " + archiveFolder);
         }
 
-        if (logger.isInfoEnabled())
-        {
+        if (logger.isInfoEnabled()) {
             logger.info("Copy SftpInputStream to archiveFile... " + archiveFile.getAbsolutePath());
         }
         sftpUtil.copyStreamToFile(is, archiveFile);
 
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("*** Return SftpFileArchiveInputStream for archiveFile...");
         }
         return new SftpFileArchiveInputStream(archiveFile);
@@ -319,38 +286,28 @@ public class SftpReceiverRequesterUtil
      * Checks if the file has been changed.
      * <p/>
      * Note! This assumes that the time on both servers are synchronized!
-     * 
+     *
      * @param fileName The file to check
      * @param client instance of StftClient
      * @param fileAge How old the file should be to be considered "old" and not
      *            changed
      * @param sizeCheckDelayMs Wait time (in ms) between size-checks to determine if
-     *            a file is ready to be processed.
+     *                         a file is ready to be processed.
      * @return true if the file has changed
      * @throws Exception Error
      */
     protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, long sizeCheckDelayMs)
-        throws Exception
-    {
-        if (fileAge > 0 && !isOldFile(fileName, client, fileAge))
-        {
+            throws Exception {
+        if (fileAge > 0 && !isOldFile(fileName, client, fileAge)) {
             return false;
         }
 
-        if (sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs))
-        {
-            return false;
-        }
-
-        return true;
+        return !(sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs));
     }
 
-    private boolean isSizeModified(String fileName, SftpClient client, long sizeCheckDelayMs) throws IOException, InterruptedException
-    {
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
+    private boolean isSizeModified(String fileName, SftpClient client, long sizeCheckDelayMs) throws IOException, InterruptedException {
+        try {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Perform size check with a delay of: " + sizeCheckDelayMs + " ms.");
             }
 
@@ -358,27 +315,19 @@ public class SftpReceiverRequesterUtil
             Thread.sleep(sizeCheckDelayMs);
             long fileSize2 = client.getSize(fileName);
 
-            if (fileSize1 == fileSize2)
-            {
-                if (logger.isDebugEnabled())
-                {
+            if (fileSize1 == fileSize2) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("File is stable (not growing), ready for retrieval: " + fileName);
                 }
-            }
-            else
-            {
-                if (logger.isDebugEnabled())
-                {
+            } else {
+                if (logger.isDebugEnabled()) {
                     logger.debug("File is growing, deferring retrieval: " + fileName);
                 }
                 return true;
             }
             return false;
-        }
-        catch (IOException e)
-        {
-            if (logger.isDebugEnabled())
-            {
+        } catch (IOException e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Cannot check if size of file '%s' was modified or not", fileName));
             }
 
@@ -387,37 +336,29 @@ public class SftpReceiverRequesterUtil
         }
     }
 
-    private boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException
-    {
-        try
-        {
+    private boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException {
+        try {
             long lastModifiedTime = client.getLastModifiedTime(fileName);
             long now = System.currentTimeMillis();
             long diff = now - lastModifiedTime;
 
             // If the diff is negative it's a sign that the time on the test server
             // and the ftps-server is not synchronized
-            if (diff < fileAge)
-            {
-                if (logger.isDebugEnabled())
-                {
+            if (diff < fileAge) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("The file has not aged enough yet, will return nothing for: " + fileName
-                                 + ". The file must be " + (fileAge - diff) + "ms older, was " + diff);
+                            + ". The file must be " + (fileAge - diff) + "ms older, was " + diff);
                 }
 
                 return false;
             }
 
-            if (logger.isDebugEnabled())
-            {
+            if (logger.isDebugEnabled()) {
                 logger.debug("The file " + fileName + " has aged enough. Was " + diff);
             }
             return true;
-        }
-        catch (IOException e)
-        {
-            if (logger.isDebugEnabled())
-            {
+        } catch (IOException e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Cannot check if age of file '%s' is old enough", fileName));
             }
 
