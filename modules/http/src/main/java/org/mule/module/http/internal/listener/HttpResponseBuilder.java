@@ -14,9 +14,11 @@ import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.requester.HttpStreamingType;
@@ -32,10 +34,12 @@ import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.IOUtils;
 import org.mule.util.NumberUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
 import java.io.InputStream;
@@ -87,6 +91,16 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 {
                     final Object outboundPropertyValue = event.getMessage().getOutboundProperty(outboundPropertyName);
                     httpResponseHeaderBuilder.addHeader(outboundPropertyName, outboundPropertyValue);
+                }
+            }
+
+            if (!outboundProperties.contains(MuleProperties.CONTENT_TYPE_PROPERTY))
+            {
+                DataType<?> dataType = event.getMessage().getDataType();
+                if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+                {
+                    String contentType = dataType.getMimeType() + (StringUtils.isEmpty(dataType.getEncoding()) ? "" : "; charset=" + dataType.getEncoding());
+                    httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, contentType);
                 }
             }
         }

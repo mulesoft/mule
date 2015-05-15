@@ -17,6 +17,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.transformer.DataType;
 import org.mule.module.http.api.requester.HttpSendBodyMode;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpParser;
@@ -27,6 +29,7 @@ import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.StringUtils;
@@ -76,6 +79,16 @@ public class MuleEventToHttpRequest
         for (String outboundProperty : event.getMessage().getOutboundPropertyNames())
         {
             builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
+        }
+
+        if (!event.getMessage().getOutboundPropertyNames().contains(MuleProperties.CONTENT_TYPE_PROPERTY))
+        {
+            DataType<?> dataType = event.getMessage().getDataType();
+            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+            {
+                String contentType = dataType.getMimeType() + (StringUtils.isEmpty(dataType.getEncoding()) ? "" : "; charset=" + dataType.getEncoding());
+                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, contentType);
+            }
         }
 
         builder.setEntity(createRequestEntity(builder, event, resolvedMethod));

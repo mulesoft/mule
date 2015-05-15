@@ -9,10 +9,12 @@ package org.mule.transport.http.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.MuleManifest;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.CookieHelper;
 import org.mule.transport.http.HttpConnector;
@@ -207,21 +209,16 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         String contentType = msg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if (contentType == null)
         {
-            contentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
+            DataType<?> dataType = msg.getDataType();
+            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+            {
+                contentType = dataType.getMimeType() + (StringUtils.isEmpty(dataType.getEncoding()) ? "" : "; charset=" + dataType.getEncoding());
+            }
+            else
+            {
+                contentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
+            }
         }
-
-        // MULE-4047 Don't explicitly set the content-type to a default value here,
-        // otherwise any settings on the servlet/transport will be happily ignored.
-        //if (contentType == null)
-        //{
-        //    contentType = HttpConstants.DEFAULT_CONTENT_TYPE;
-        //
-        //    if (encoding != null)
-        //    {
-        //        contentType += "; charset=" + encoding;
-        //    }
-        //    logger.warn("Content-Type was not set, defaulting to: " + contentType);
-        //}
 
         response.setStatusLine(HttpVersion.parse(version), status);
         if (contentType != null)

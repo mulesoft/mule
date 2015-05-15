@@ -18,6 +18,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -246,6 +247,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
     private void checkForContentType(MuleMessage msg, EntityEnclosingMethod method)
     {
+        //TODO(pablo.kraan): HTTP  - check if a content-type must be added from the datatype
         // if a content type was specified on the endpoint, use it
         String outgoingContentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if (outgoingContentType != null)
@@ -340,8 +342,15 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             if (outboundMimeType == null)
             {
-                outboundMimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                logger.info("Content-Type not set on outgoing request, defaulting to: " + outboundMimeType);
+                if (!msg.getDataType().getMimeType().equals(MimeTypes.ANY))
+                {
+                    outboundMimeType = msg.getDataType().getMimeType();
+                }
+                else
+                {
+                    outboundMimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                    logger.info("Content-Type not set on outgoing request, defaulting to: " + outboundMimeType);
+                }
             }
 
             if (encoding != null && !"UTF-8".equals(encoding.toUpperCase())
