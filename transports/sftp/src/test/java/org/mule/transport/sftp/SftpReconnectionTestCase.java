@@ -25,8 +25,6 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
 
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static final String SFTP_RECEIVING_FLOW_NAME = "receiving";
-    private static final long TIMEOUT = 15000;
-    private static final int FILE_SIZE = 1024 * 1024 * 2;
 
     public SftpReconnectionTestCase(ConfigVariant variant, String configResources)
     {
@@ -66,7 +64,7 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
     private void verifySftpFlowIsRunning() throws Exception
     {
         FlowExecutionListener sftpInboundEndpointFlowExecutionListener = new FlowExecutionListener(SFTP_RECEIVING_FLOW_NAME, muleContext);
-        executeBaseTest(INBOUND_ENDPOINT_NAME, "vm://test.upload", FILENAME, FILE_SIZE, SFTP_RECEIVING_FLOW_NAME, TIMEOUT);
+        muleContext.getClient().dispatch("vm://test.upload", getTestMuleMessage());
         sftpInboundEndpointFlowExecutionListener.waitUntilFlowIsComplete();
     }
 
