@@ -151,9 +151,30 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         return new SpringRegistryLifecycleManager(getRegistryId(), this, muleContext);
     }
 
+    /**
+     * {@inheritDoc}
+     * @return the result of invoking {@link #lookupObject(String, boolean)} with {@code true} as the second argument
+     */
+    @Override
+    public <T> T lookupObject(String key)
+    {
+        return (T) lookupObject(key, true);
+    }
+
+    /**
+     * If looks for the bean registered under {@code key}.
+     * If the returned bean is a prototype and {@code applyLifecycle}
+     * is {@code true}, then the completed lifecycle phases
+     * are applied to the returning bean
+     *
+     * @param key            the key of the object you're looking for
+     * @param applyLifecycle if lifecycle should be applied to the returned object.
+     *                       Passing {@code true} doesn't guarantee that the lifecycle is applied
+     * @return object or {@code null} if not found
+     */
     @SuppressWarnings("unchecked")
     @Override
-    public Object lookupObject(String key)
+    public Object lookupObject(String key, boolean applyLifecycle)
     {
         if (StringUtils.isBlank(key))
         {
@@ -183,7 +204,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                 return null;
             }
 
-            if (!applicationContext.isSingleton(key))
+            if (applyLifecycle && !applicationContext.isSingleton(key))
             {
                 try
                 {

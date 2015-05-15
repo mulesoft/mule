@@ -13,6 +13,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
@@ -138,6 +139,38 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, Registry
         }
 
         return (T) obj;
+    }
+
+    /**
+     * Iterates through {@link #getRegistries()} trying to
+     * find the first one which is an instance of
+     * {@link LifecycleRegistry}. When found, it returns
+     * the result of {@link LifecycleRegistry#lookupObject(String, boolean)}.
+     * <p/>
+     * If none of the available registries is of that type, then it
+     * fallbacks to {@link #lookupObject(String)}
+     *
+     * @param key            the key of the object you're looking for
+     * @param applyLifecycle whether lifecycle should be applied to the object before returning
+     * @param <T>            the type of the expected object
+     * @return the object registered under {@code key}
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T lookupObject(String key, boolean applyLifecycle)
+    {
+        for (Registry registry : getRegistries())
+        {
+            if (registry instanceof LifecycleRegistry)
+            {
+                Object obj = ((LifecycleRegistry) registry).lookupObject(key, applyLifecycle);
+                if (obj != null)
+                {
+                    return (T) obj;
+                }
+            }
+        }
+
+        return lookupObject(key);
     }
 
     @Override

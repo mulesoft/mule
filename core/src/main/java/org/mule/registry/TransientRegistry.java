@@ -186,6 +186,12 @@ public class TransientRegistry extends AbstractRegistry
         return doGet(key);
     }
 
+    @Override
+    public <T> T lookupObject(Class<T> type) throws RegistrationException
+    {
+        return super.lookupObject(type);
+    }
+
     @SuppressWarnings("unchecked")
     public <T> Collection<T> lookupObjects(Class<T> returntype)
     {

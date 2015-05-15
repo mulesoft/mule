@@ -40,4 +40,22 @@ public interface LifecycleRegistry extends Registry
      */
     Object applyLifecycle(Object object, String phase) throws MuleException;
 
+    /**
+     * Look up a single object by name.
+     * <p/>
+     * Because {@link #lookupObject(String)} might
+     * or might not apply lifecycle before returning,
+     * this method exists to specify that you
+     * don't want the lifecycle to be applied
+     * to the object even if the registry implementation
+     * is capable of doing it
+     *
+     * @param key            the key of the object you're looking for
+     * @param applyLifecycle if lifecycle should be applied to the returned object.
+     *                       Passing {@code true} doesn't guarantee that the lifecycle is applied
+     * @return object or {@code null} if not found
+     */
+    <T> T lookupObject(String key, boolean applyLifecycle);
+
+
 }
