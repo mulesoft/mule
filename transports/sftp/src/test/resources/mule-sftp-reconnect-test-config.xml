@@ -29,7 +29,7 @@
 
     <flow name="receiving">
         <sftp:inbound-endpoint name="inboundEndpoint"
-                               address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data" sizeCheckWaitTime="1000"/>
+                               address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data" />
         <test:component/>
     </flow>
 
