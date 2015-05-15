@@ -122,6 +122,10 @@ MULE-8483: MULE_ENCODING and Content-Type properties are not added on the outbou
 MULE-8584: Grizzly was upgraded to 2.3.20.
 MULE-8583: async-http-client was upgraded to 1.9.21.
 MULE-8592: Default maximum permanent generation has been increased to 256 mb. This property is only used when using java 7. When using java 8 the property may lead to a warning. In such case it can be comment out in the wrapper.conf file.
+MULE-8569: For those with custom implementation of class org.mule.config.spring.SpringXmlConfigurationBuilder, some important changes have been made:
+    * The method createApplicationContext(MuleContext, ConfigResource[]) is now private. If you want to overwrite it, use doCreateApplicationContext(MuleContext, ConfigResource[], OptionalObjectsController) instead.
+    * If you want to intercept and change the list of resources to be loaded, override the new addResources(List<ConfigResource>) method
+
 
 Migration changes from 3.5.x to 3.6.x
 
