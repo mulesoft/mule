@@ -15,6 +15,10 @@ import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -62,32 +66,44 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     @Override
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-        ConfigResource[] allResources;
+        List<ConfigResource> allResources = new ArrayList<>();
         if (useMinimalConfigResource)
         {
-            allResources = new ConfigResource[configResources.length + 3];
-            allResources[0] = new ConfigResource(MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG);
-            allResources[1] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
-            allResources[2] = new ConfigResource(MULE_SPRING_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 3, configResources.length);
+            allResources.add(new ConfigResource(MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG));
+            allResources.add(new ConfigResource(MULE_MINIMAL_SPRING_CONFIG));
+            allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
+            allResources.addAll(Arrays.asList(configResources));
         }
         else if (useDefaultConfigResource)
         {
-            allResources = new ConfigResource[configResources.length + 4];
-            allResources[0] = new ConfigResource(MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG);
-            allResources[1] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
-            allResources[2] = new ConfigResource(MULE_SPRING_CONFIG);
-            allResources[3] = new ConfigResource(MULE_DEFAULTS_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 4, configResources.length);
+            allResources.add(new ConfigResource(MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG));
+            allResources.add(new ConfigResource(MULE_MINIMAL_SPRING_CONFIG));
+            allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
+            allResources.add( new ConfigResource(MULE_DEFAULTS_CONFIG));
+            allResources.addAll(Arrays.asList(configResources));
         }
         else
         {
-            allResources = new ConfigResource[configResources.length + 1];
-            allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 1, configResources.length);
+            allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
+            allResources.addAll(Arrays.asList(configResources));
         }
-        applicationContext = createApplicationContext(muleContext, allResources);
+
+        addResources(allResources);
+
+        ConfigResource[] configResourcesArray = new ConfigResource[allResources.size()];
+        applicationContext = createApplicationContext(muleContext, allResources.toArray(configResourcesArray));
         createSpringRegistry(muleContext, applicationContext);
+    }
+
+    /**
+     * Template method for modifying the list of resources to be loaded.
+     * This operation is a no-op by default.
+     *
+     * @param allResources the list of {@link ConfigResource} to be loaded
+     */
+    @SuppressWarnings("unused")
+    protected void addResources(List<ConfigResource> allResources)
+    {
     }
 
     public void unconfigure(MuleContext muleContext)
