@@ -18,7 +18,13 @@ import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.DataType;
+import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
+import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -58,7 +64,7 @@ public abstract class ExtensionsTestUtils
         return parameter;
     }
 
-    public static void stubRegistryKey(MuleContext muleContext, final String... keys)
+    public static void stubRegistryKeys(MuleContext muleContext, final String... keys)
     {
         when(muleContext.getRegistry().get(anyString())).thenAnswer(new Answer<Object>()
         {
@@ -87,5 +93,17 @@ public abstract class ExtensionsTestUtils
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(muleContext.getRegistry()).registerObject(captor.capture(), same(object));
         assertThat(captor.getValue(), containsString(key));
+    }
+
+    public static <C> C getConfigurationInstance(String key, MuleEvent muleEvent) throws Exception
+    {
+        ConfigurationInstanceProvider<C> configurationInstanceProvider = muleEvent.getMuleContext().getRegistry().lookupObject(key);
+        ExtensionManagerAdapter extensionManager = (ExtensionManagerAdapter) muleEvent.getMuleContext().getExtensionManager();
+        return extensionManager.getConfigurationInstance(configurationInstanceProvider, getOperationContext(muleEvent));
+    }
+
+    private static OperationContext getOperationContext(MuleEvent event) throws Exception
+    {
+        return new DefaultOperationContext(mock(Operation.class), mock(ResolverSetResult.class), event);
     }
 }

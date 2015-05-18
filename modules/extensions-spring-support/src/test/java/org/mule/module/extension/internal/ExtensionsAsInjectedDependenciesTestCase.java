@@ -9,10 +9,10 @@ package org.mule.module.extension.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
+import org.mule.extension.runtime.ConfigurationInstanceProvider;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import javax.inject.Inject;
@@ -22,6 +22,9 @@ import org.junit.Test;
 
 public class ExtensionsAsInjectedDependenciesTestCase extends ExtensionsFunctionalTestCase
 {
+
+    private static final String STATIC_HEISENBERG = "staticHeisenberg";
+    private static final String DYNAMIC_AGE_HEISENBERG = "dynamicAgeHeisenberg";
 
     private Dependent dependent;
 
@@ -48,41 +51,46 @@ public class ExtensionsAsInjectedDependenciesTestCase extends ExtensionsFunction
     @Test
     public void staticHeisenbergWasInjected() throws Exception
     {
-        ValueResolver<HeisenbergExtension> staticHeisenberg = dependent.getStaticHeisenberg();
-        assertThat(staticHeisenberg, is(sameInstance(muleContext.getRegistry().get("staticHeisenberg"))));
-        HeisenbergExtension heisenberg = staticHeisenberg.resolve(VoidMuleEvent.getInstance());
+        assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
+        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationInstance(STATIC_HEISENBERG, getTestEvent(""));
         assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
     }
 
     @Test
     public void dynamicHeisenbergWasInjected() throws Exception
     {
-        ValueResolver<HeisenbergExtension> dynamicHeisenberg = dependent.getDynamicAgeHeisenberg();
+        assertCorrectProviderInjected(DYNAMIC_AGE_HEISENBERG, dependent.getDynamicAgeHeisenberg());
+
         final int age = 52;
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("age", age);
 
-        HeisenbergExtension heisenberg = dynamicHeisenberg.resolve(event);
+        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationInstance(DYNAMIC_AGE_HEISENBERG, event);
         assertThat(heisenberg.getPersonalInfo().getAge(), is(age));
+    }
+
+    private void assertCorrectProviderInjected(String key, ConfigurationInstanceProvider<?> expected)
+    {
+        assertThat(expected, is(sameInstance(muleContext.getRegistry().get(key))));
     }
 
     public static class Dependent
     {
 
         @Inject
-        @Named("staticHeisenberg")
-        private ValueResolver<HeisenbergExtension> staticHeisenberg;
+        @Named(STATIC_HEISENBERG)
+        private ConfigurationInstanceProvider<HeisenbergExtension> staticHeisenberg;
 
         @Inject
-        @Named("dynamicAgeHeisenberg")
-        private ValueResolver<HeisenbergExtension> dynamicAgeHeisenberg;
+        @Named(DYNAMIC_AGE_HEISENBERG)
+        private ConfigurationInstanceProvider<HeisenbergExtension> dynamicAgeHeisenberg;
 
-        public ValueResolver<HeisenbergExtension> getStaticHeisenberg()
+        public ConfigurationInstanceProvider<HeisenbergExtension> getStaticHeisenberg()
         {
             return staticHeisenberg;
         }
 
-        public ValueResolver<HeisenbergExtension> getDynamicAgeHeisenberg()
+        public ConfigurationInstanceProvider<HeisenbergExtension> getDynamicAgeHeisenberg()
         {
             return dynamicAgeHeisenberg;
         }

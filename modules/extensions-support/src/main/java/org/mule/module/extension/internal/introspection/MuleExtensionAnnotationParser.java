@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -17,7 +18,6 @@ import org.mule.extension.annotations.RestrictedTo;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.Payload;
 import org.mule.extension.introspection.Capable;
-import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.declaration.CapableDeclaration;
 import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
@@ -158,7 +158,7 @@ public final class MuleExtensionAnnotationParser
         if (optional != null)
         {
             parameter.setRequired(false);
-            parameter.setDefaultValue(getDefaultValue(optional, dataType));
+            parameter.setDefaultValue(getDefaultValue(optional));
         }
         else
         {
@@ -179,33 +179,6 @@ public final class MuleExtensionAnnotationParser
             parameter.setTypeRestriction(typeRestriction.value());
         }
         return parameter;
-    }
-
-    protected static Object getDefaultValue(Optional optional, DataType dataType)
-    {
-        if (optional == null)
-        {
-            return null;
-        }
-
-        String defaultValue = optional.defaultValue();
-        if (DataQualifier.STRING.equals(dataType.getQualifier()))
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return StringUtils.isEmpty(defaultValue) ? null : defaultValue;
-        }
-    }
-
-    private static void checkParametrizable(DataType type)
-    {
-        if (IMPLICIT_ARGUMENT_TYPES.contains(type.getRawType()))
-        {
-            throw new IllegalArgumentException(
-                    String.format("Type %s is not allowed as an operation parameter. Use dependency injection instead", type.getRawType().getName()));
-        }
     }
 
     public static String[] getParamNames(Method method)

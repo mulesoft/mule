@@ -6,10 +6,24 @@
  */
 package org.mule.module.extension.internal.util;
 
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Described;
 import org.mule.extension.introspection.Operation;
+import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
+import org.mule.module.extension.internal.runtime.DynamicConfigurationInstanceProvider;
+import org.mule.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.module.extension.internal.runtime.StaticConfigurationInstanceProvider;
+import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.util.TemplateParser;
 
@@ -161,6 +175,47 @@ public final class MuleExtensionUtils
 
         Collections.sort(list, new DescribedComparator());
         return list;
+    }
+
+    public static <T> ConfigurationInstanceProvider<T> createConfigurationInstanceProvider(String name,
+                                                                                           Configuration configuration,
+                                                                                           ResolverSet resolverSet,
+                                                                                           MuleContext muleContext) throws Exception
+    {
+        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
+
+        if (resolverSet.isDynamic())
+        {
+            return new DynamicConfigurationInstanceProvider<>(name, configuration, configurationObjectBuilder, resolverSet);
+        }
+        else
+        {
+            MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
+            return new StaticConfigurationInstanceProvider<>(name, configuration, (T) configurationObjectBuilder.build(event));
+        }
+    }
+
+    public static OperationContextAdapter asOperationContextAdapter(OperationContext operationContext)
+    {
+        checkArgument(operationContext != null, "operationContext cannot be null");
+        if (!(operationContext instanceof OperationContextAdapter))
+        {
+            throw new IllegalArgumentException(String.format("operationContext was expected to be an instance of %s but got %s instead",
+                                                             OperationContextAdapter.class.getName(), operationContext.getClass().getName()));
+        }
+
+        return (OperationContextAdapter) operationContext;
+    }
+
+    public static String getDefaultValue(Optional optional)
+    {
+        if (optional == null)
+        {
+            return null;
+        }
+
+        String defaultValue = optional.defaultValue();
+        return Optional.NULL.equals(defaultValue) ? null : defaultValue;
     }
 
     private static class DescribedComparator implements Comparator<Described>

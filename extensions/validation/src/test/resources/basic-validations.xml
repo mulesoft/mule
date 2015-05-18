@@ -11,58 +11,55 @@
         <spring:bean id="customValidator" class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" />
     </spring:beans>
 
-    <validation:config name="validation"/>
-
     <flow name="email">
-        <validation:is-email email="#[payload]" config-ref="validation"/>
+        <validation:is-email email="#[payload]"/>
     </flow>
 
     <flow name="ip">
-        <validation:is-ip ip="#[payload]" config-ref="validation"/>
+        <validation:is-ip ip="#[payload]"/>
     </flow>
 
     <flow name="url">
-        <validation:is-url url="#[payload]" config-ref="validation" />
+        <validation:is-url url="#[payload]" />
     </flow>
 
     <flow name="time">
-        <validation:is-time time="#[payload]" pattern="#[pattern]" locale="#[java.util.Locale.getDefault().getLanguage()]" config-ref="validation"/>
+        <validation:is-time time="#[payload]" pattern="#[pattern]" locale="#[java.util.Locale.getDefault().getLanguage()]"/>
     </flow>
 
     <flow name="matchesRegex">
-        <validation:matches-regex value="#[payload]" regex="#[regexp]" caseSensitive="#[caseSensitive]"
-                                  config-ref="validation"/>
+        <validation:matches-regex value="#[payload]" regex="#[regexp]" caseSensitive="#[caseSensitive]"/>
     </flow>
 
     <flow name="size">
-        <validation:validate-size value="#[payload]" min="#[minLength]" max="#[maxLength]" config-ref="validation"/>
+        <validation:validate-size value="#[payload]" min="#[minLength]" max="#[maxLength]"/>
     </flow>
 
     <flow name="isTrue">
-        <validation:is-true expression="#[payload]" config-ref="validation"/>
+        <validation:is-true expression="#[payload]"/>
     </flow>
 
     <flow name="isFalse">
-        <validation:is-false expression="#[payload]" config-ref="validation"/>
+        <validation:is-false expression="#[payload]"/>
     </flow>
 
     <flow name="notEmpty">
-        <validation:is-not-empty value="#[payload]" config-ref="validation"/>
+        <validation:is-not-empty value="#[payload]"/>
     </flow>
 
     <flow name="empty">
-        <validation:is-empty value="#[payload]" config-ref="validation"/>
+        <validation:is-empty value="#[payload]"/>
     </flow>
 
     <flow name="isNull">
-        <validation:is-null value="#[payload]" config-ref="validation"/>
+        <validation:is-null value="#[payload]"/>
     </flow>
 
     <flow name="all">
-        <validation:all config-ref="validation">
+        <validation:all>
             <validation:validations>
-                <validation:is-url url="#[url]" config-ref="validation"/>
-                <validation:is-email email="#[email]" config-ref="validation"/>
+                <validation:is-url url="#[url]"/>
+                <validation:is-email email="#[email]"/>
             </validation:validations>
         </validation:all>
     </flow>
@@ -79,11 +76,11 @@
     </flow>
 
     <flow name="customValidationByClass">
-        <validation:custom-validator class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" message="#[customMessage]" config-ref="validation" />
+        <validation:custom-validator class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" message="#[customMessage]" />
     </flow>
 
     <flow name="customValidationByRef">
-        <validation:custom-validator ref="customValidator" config-ref="validation" />
+        <validation:custom-validator ref="customValidator" />
     </flow>
 
 </mule>

@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import java.math.BigDecimal;
@@ -53,11 +53,10 @@ public class StatefulOperationTestCase extends ExtensionsFunctionalTestCase
 
     private void assertRemainingMoney(String name, long expectedAmount) throws Exception
     {
-        ValueResolver<HeisenbergExtension> configResolver = muleContext.getRegistry().get("heisenberg");
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("myName", name);
 
-        HeisenbergExtension heisenbergExtension = configResolver.resolve(event);
+        HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationInstance("heisenberg", event);
         assertThat(heisenbergExtension.getMoney(), equalTo(BigDecimal.valueOf(expectedAmount)));
     }
 
