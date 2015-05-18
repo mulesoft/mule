@@ -6,12 +6,13 @@
  */
 package org.mule.tck;
 
-import org.mule.api.CompletionHandler;
-import org.mule.api.MessagingException;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
-import org.mule.util.concurrent.Latch;
 
 /**
  * Can be used to sense request and response threads used during processing.
@@ -33,6 +34,16 @@ public class SensingNullRequestResponseMessageProcessor extends AbstractRequestR
     {
         responseThread = Thread.currentThread();
         return super.processRequest(event);
+    }
+
+    public void assertRequestResponseThreadsDifferent()
+    {
+        assertThat(requestThread, not(sameInstance(responseThread)));
+    }
+
+    public void assertRequestResponseThreadsSame()
+    {
+        assertThat(requestThread, is(sameInstance(responseThread)));
     }
 
 }

@@ -73,7 +73,7 @@ public abstract class AbstractNonBlockingMessageProcessor implements NonBlocking
         @Override
         public void onFailure(final MessagingException exception)
         {
-            replyToHandler.processExceptionReplyTo(event, exception, null);
+            replyToHandler.processExceptionReplyTo(exception, null);
         }
 
         @Override

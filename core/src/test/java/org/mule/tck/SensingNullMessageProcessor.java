@@ -8,7 +8,6 @@ package org.mule.tck;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
@@ -66,7 +65,7 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
                 }
                 catch (MuleException e)
                 {
-                    event.getReplyToHandler().processExceptionReplyTo(event, new MessagingException(event, e), null);
+                    event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, e), null);
                 }
             }
         });
