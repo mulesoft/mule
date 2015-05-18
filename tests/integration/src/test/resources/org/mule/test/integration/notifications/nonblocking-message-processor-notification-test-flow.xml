@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <notifications>
+        <notification event="MESSAGE-PROCESSOR"/>
+    </notifications>
+
+    <spring:bean name="notificationLogger" class="org.mule.context.notification.processors.MessageProcessorNotificationLogger"/>
+
+    <notifications>
+        <notification-listener ref="notificationLogger"/>
+    </notifications>
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port}"/>
+
+    <flow name="httpIn">
+        <http:listener config-ref="listenerConfig" path="in"/>
+        <logger message="check1"/>
+        <response>
+            <http:request config-ref="requestConfig" path="echo"/>
+        </response>
+        <logger message="check2"/>
+        <http:request config-ref="requestConfig" path="echo"/>
+        <logger message="check3"/>
+        <http:request config-ref="requestConfig" path="echo"/>
+    </flow>
+
+    <flow name="httpEcho">
+        <http:listener config-ref="listenerConfig" path="echo"/>
+        <echo-component/>
+    </flow>
+
+</mule>
