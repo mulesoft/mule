@@ -190,21 +190,27 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                               Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
                               MuleContext muleContext)
     {
+        this(message, inboundProperties, outboundProperties, attachments, muleContext, createDefaultDataType(message, muleContext));
+    }
+
+    public DefaultMuleMessage(Object message, Map<String, Object> inboundProperties,
+                              Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
+                              MuleContext muleContext, DataType dataType)
+    {
         id =  UUID.getUUID();
         rootId = id;
-        
+
         setMuleContext(muleContext);
-        dataType = createDefaultDataType();
 
         if (message instanceof MuleMessage)
         {
             MuleMessage muleMessage = (MuleMessage) message;
-            setPayload(muleMessage.getPayload());
+            setPayload(muleMessage.getPayload(), dataType);
             copyMessageProperties(muleMessage);
         }
         else
         {
-            setPayload(message);
+            setPayload(message, dataType);
             originalPayload = message;
         }
         addProperties(inboundProperties, PropertyScope.INBOUND);
@@ -331,9 +337,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    private DataType<?> createDefaultDataType()
+    private static DataType<?> createDefaultDataType(Object payload, MuleContext muleContext)
     {
-        DataType<?> dataType = DataTypeFactory.create(Object.class);
+        DataType<?> dataType = DataTypeFactory.create(payload == null ? Object.class : payload.getClass());
         dataType.setEncoding(SystemUtils.getDefaultEncoding(muleContext));
 
         return dataType;

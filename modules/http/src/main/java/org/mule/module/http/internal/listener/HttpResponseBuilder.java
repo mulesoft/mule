@@ -14,9 +14,11 @@ import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.requester.HttpStreamingType;
@@ -32,8 +34,10 @@ import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.DataTypeUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.UUID;
@@ -78,9 +82,10 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     public HttpResponse build(org.mule.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder, MuleEvent event) throws MessagingException
     {
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
+        final Set<String> outboundProperties = event.getMessage().getOutboundPropertyNames();
+
         if (!disablePropertiesAsHeaders)
         {
-            final Set<String> outboundProperties = event.getMessage().getOutboundPropertyNames();
             for (String outboundPropertyName : outboundProperties)
             {
                 if (!outboundPropertyName.equals(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY))
@@ -88,6 +93,15 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     final Object outboundPropertyValue = event.getMessage().getOutboundProperty(outboundPropertyName);
                     httpResponseHeaderBuilder.addHeader(outboundPropertyName, outboundPropertyValue);
                 }
+            }
+        }
+
+        if (!outboundProperties.contains(MuleProperties.CONTENT_TYPE_PROPERTY))
+        {
+            DataType<?> dataType = event.getMessage().getDataType();
+            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+            {
+                httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
             }
         }
 
