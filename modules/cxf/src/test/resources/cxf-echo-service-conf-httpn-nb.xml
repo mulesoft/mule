@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+
+    <flow name="helloService" processingStrategy="non-blocking">
+        <http:listener path="/hello" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+    </flow>
+
+    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+
+    <spring:bean name="sensingRequestResponseProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <flow name="helloServiceClient" processingStrategy="non-blocking">
+        <http:listener path="/helloClient" config-ref="listenerConfig" allowedMethods="POST" />
+        <object-to-string-transformer />
+        <processor ref="sensingRequestResponseProcessor" />
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <http:request config-ref="requestConfig" path="/hello" method="POST" />
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="contentType" value="#[header:INBOUND:content-type]"/>
+        </message-properties-transformer>
+    </flow>
+
+    <spring:bean name="sensingRequestResponseProcessorProxy" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <flow name="helloServiceClientProxy" processingStrategy="non-blocking">
+        <http:listener path="/helloClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <object-to-string-transformer />
+        <processor ref="sensingRequestResponseProcessorProxy" />
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <http:request config-ref="requestConfig" path="/hello" method="POST" />
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="contentType" value="#[header:INBOUND:content-type]"/>
+        </message-properties-transformer>
+    </flow>
+
+</mule>

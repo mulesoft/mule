@@ -11,7 +11,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.CompletionHandler;
 
 /**
  * {@link org.mule.api.transport.ReplyToHandler} implementation that uses a {@link org.mule.api.exception
@@ -19,9 +18,9 @@ import org.mule.api.CompletionHandler;
  * <p/>
  * Invocations of {@link #processReplyTo(org.mule.api.MuleEvent, org.mule.api.MuleMessage, Object)} are passed straight
  * through to the delegate ReplyToHandler where as invocations of
- * {@link #processExceptionReplyTo(org.mule.api.MuleEvent, org.mule.api.MessagingException, Object)} may result in a
+ * {@link ReplyToHandler#processExceptionReplyTo(org.mule.api.MessagingException, Object)} may result in a
  * delegation to either {@link #processReplyTo(org.mule.api.MuleEvent, org.mule.api.MuleMessage, Object)} or
- * {@link #processExceptionReplyTo(org.mule.api.MuleEvent, org.mule.api.MessagingException, Object)} depending on the
+ * {@link ReplyToHandler#processExceptionReplyTo(org.mule.api.MessagingException, Object)} depending on the
  * result of {@link org.mule.api.MessagingException#handled()} after the MessagingExceptionHandler has been invoked.
  */
 public class ExceptionHandlingReplyToHandlerDecorator implements ReplyToHandler
@@ -44,7 +43,7 @@ public class ExceptionHandlingReplyToHandlerDecorator implements ReplyToHandler
     }
 
     @Override
-    public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
     {
         MuleEvent result;
         if (messagingExceptionHandler != null)
@@ -53,23 +52,22 @@ public class ExceptionHandlingReplyToHandlerDecorator implements ReplyToHandler
         }
         else
         {
-            result = exception.getEvent().getFlowConstruct().getExceptionListener().handleException(exception, event);
+            result = exception.getEvent().getFlowConstruct().getExceptionListener().handleException(exception, exception.getEvent());
         }
         exception.setProcessedEvent(result);
         if (!exception.handled())
         {
-            delegate.processExceptionReplyTo(event, exception, replyTo);
+            delegate.processExceptionReplyTo(exception, replyTo);
         }
         else
         {
             try
             {
-                delegate.processReplyTo(exception.getEvent(), exception.getEvent().getMessage(), null);
+                delegate.processReplyTo(exception.getEvent(), exception.getEvent().getMessage(), replyTo);
             }
             catch (MuleException e)
             {
-                delegate.processExceptionReplyTo(exception.getEvent(), new MessagingException(exception.getEvent(),
-                                                                                              e), null);
+                delegate.processExceptionReplyTo(new MessagingException(exception.getEvent(), e), replyTo);
             }
         }
     }
