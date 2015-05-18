@@ -16,12 +16,15 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.DataTypeUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -61,6 +64,12 @@ public class HttpResponseToMuleEvent
     public void convert(MuleEvent muleEvent, HttpResponse response) throws MessagingException
     {
         String responseContentType = response.getHeaderValue(CONTENT_TYPE.toLowerCase());
+        DataType<?> dataType = muleEvent.getMessage().getDataType();
+        if (StringUtils.isEmpty(responseContentType) && !MimeTypes.ANY.equals(dataType.getMimeType()))
+        {
+            responseContentType = DataTypeUtils.getContentType(dataType);
+        }
+
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
         String encoding = getEncoding(responseContentType);
 
@@ -90,7 +99,7 @@ public class HttpResponseToMuleEvent
 
 
         MuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
-                                                     null, inboundAttachments, muleContext);
+                                                     null, inboundAttachments, muleContext, muleEvent.getMessage().getDataType());
 
         if (encoding != null)
         {

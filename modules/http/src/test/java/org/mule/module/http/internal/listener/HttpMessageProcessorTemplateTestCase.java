@@ -16,6 +16,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
@@ -63,6 +64,8 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase
         MuleMessage testMessage = mock(MuleMessage.class);
         when(testMessage.getOutboundPropertyNames()).thenReturn(Collections.<String>emptySet());
         when(testMessage.getPayload()).thenReturn(NullPayload.getInstance());
+        DataType datatype = DataType.STRING_DATA_TYPE;
+        when(testMessage.getDataType()).thenReturn( datatype);
 
         MuleEvent testEvent = mock(MuleEvent.class);
         when(testEvent.getMessage()).thenReturn(testMessage);
