@@ -9,6 +9,8 @@ package org.mule.config.spring.processors;
 import org.mule.util.ClassUtils;
 
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.PropertyValues;
 
@@ -16,7 +18,8 @@ import org.springframework.beans.PropertyValues;
  * A {@link SelectiveInjectorProcessor} used to keep
  * mule from injecting dependencies into components
  * built with Devkit, by skipping injection of objects
- * which are instances of {@link org.mule.api.devkit.ProcessAdapter}
+ * which are instances of {@code org.mule.api.devkit.ProcessAdapter}
+ * or {@code org.mule.modules.process.ProcessAdapter}
  *
  * @since 3.7.0
  */
@@ -24,31 +27,52 @@ public class NoDevkitInjectorProcessor extends SelectiveInjectorProcessor
 {
 
     private static final String PROCESS_ADAPTER_CLASS_NAME = "org.mule.api.devkit.ProcessAdapter";
+    private static final String LEGACY_PROCESS_ADAPTER_CLASS_NAME = "org.mule.modules.process.ProcessAdapter";
 
-    private Class<?> exclusionClass;
+    private final Class<?>[] excludedClasses;
 
     public NoDevkitInjectorProcessor()
     {
-        try
-        {
-            // fetch class by name to avoid circular dependency between spring module
-            // and devkit-support
-            exclusionClass = ClassUtils.loadClass(PROCESS_ADAPTER_CLASS_NAME, getClass());
-        }
-        catch (ClassNotFoundException e)
-        {
-            exclusionClass = null;
-        }
+        List<Class<?>> presentClasses = new ArrayList<>();
+        fetchExcludedClassByName(PROCESS_ADAPTER_CLASS_NAME, presentClasses);
+        fetchExcludedClassByName(LEGACY_PROCESS_ADAPTER_CLASS_NAME, presentClasses);
+
+        excludedClasses = new Class<?>[presentClasses.size()];
+        presentClasses.toArray(excludedClasses);
     }
 
     @Override
     protected boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
     {
-        if (exclusionClass != null)
+        for (Class<?> excludedClass : excludedClasses)
         {
-            return !exclusionClass.isInstance(bean);
+            if (excludedClass.isInstance(bean))
+            {
+                return false;
+            }
         }
 
         return true;
+    }
+
+    /**
+     * fetch classes by name to avoid circular dependency between spring module
+     * and devkit support. If the class is in fact present, then it's
+     * added to {@code presentClasses}
+     */
+    private void fetchExcludedClassByName(String name, List<Class<?>> presentClasses)
+    {
+        try
+        {
+            Class<?> excludedClass = ClassUtils.loadClass(name, getClass());
+            if (excludedClass != null)
+            {
+                presentClasses.add(excludedClass);
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            // silently continue
+        }
     }
 }
