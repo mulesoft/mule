@@ -6,6 +6,12 @@
  */
 package org.mule.module.cxf.support;
 
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
+import static org.mule.module.cxf.MuleSoapHeaders.MULE_HEADER;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.MuleSoapHeaders;
@@ -21,14 +27,6 @@ import org.apache.cxf.phase.Phase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
-
-import static org.mule.module.cxf.MuleSoapHeaders.MULE_HEADER;
-
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
 /**
  * Writes the Mule Soap Header to the outgoing request.
@@ -51,7 +49,7 @@ public class MuleHeadersOutInterceptor extends AbstractMuleHeaderInterceptor
         SoapMessage message = (SoapMessage) m;
         MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
 
-        if (event == null)
+        if (event == null || event instanceof NonBlockingVoidMuleEvent)
         {
             return;
         }

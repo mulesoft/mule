@@ -8,12 +8,10 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.VoidMuleEvent;
-import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.transport.ReplyToHandler;
 
@@ -52,7 +50,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         }
         finally
         {
-            processFinallly(event, exception);
+            processFinally(event, exception);
         }
     }
 
@@ -69,14 +67,14 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
                 {
                     originalReplyToHandler.processReplyTo(response, null, null);
                 }
-                processFinallly(event, null);
+                processFinally(event, null);
             }
 
             @Override
             public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
             {
                 originalReplyToHandler.processExceptionReplyTo(exception.getEvent(), exception, null);
-                processFinallly(exception.getEvent(), exception);
+                processFinally(exception.getEvent(), exception);
             }
         });
 
@@ -85,7 +83,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
             MuleEvent result = processNext(processRequest(event));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
-                return processResponse(event);
+                return processResponse(result);
             }
             else
             {
@@ -94,7 +92,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         }
         catch (MessagingException exception)
         {
-            processFinallly(event, exception);
+            processFinally(event, exception);
             throw exception;
         }
     }
@@ -138,7 +136,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
      * @param exception the exception thrown during processing if any. If not exception was thrown then this parameter
      *                  is null
      */
-    protected void processFinallly(MuleEvent event, MessagingException exception)
+    protected void processFinally(MuleEvent event, MessagingException exception)
     {
 
     }
