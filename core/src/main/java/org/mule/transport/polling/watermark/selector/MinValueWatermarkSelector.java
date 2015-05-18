@@ -8,7 +8,7 @@
 package org.mule.transport.polling.watermark.selector;
 
 /**
- * Implementation of {@link WatermarkSelector} that selectes the minimum value of the
+ * Implementation of {@link WatermarkSelector} that selects the minimum value of the
  * set. For this to work, received values need to implement the {@link Comparable}
  * interface. Values that don't meet this condition will be discarded
  * 
@@ -18,8 +18,8 @@ public class MinValueWatermarkSelector extends ComparableWatermarkSelector
 {
 
     @Override
-    protected int comparableQualifier()
-    {
-        return -1;
-    }
+	public boolean compare(Comparable<Object> value, Comparable<Object> currentWatermark) {
+		return value.compareTo(currentWatermark) < 0;
+	}
+	
 }

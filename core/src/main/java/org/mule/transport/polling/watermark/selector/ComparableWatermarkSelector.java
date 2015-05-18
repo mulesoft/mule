@@ -20,13 +20,21 @@ public abstract class ComparableWatermarkSelector extends WatermarkSelector
 {
 
     private static final Logger logger = LoggerFactory.getLogger(ComparableWatermarkSelector.class);
-
+    
     /**
-     * Returns an int value according to the {@link Comparable} contract (-1, 0, 1).
-     * Then the result of the comparation matches this method's return value, then
-     * the selected value is updated
+     * Returns a boolean result depending on whether the current value should persist to the watermark.
+     * 
+     * If {@link MaxValueWatermarkSelector} is used, the method returns true if the first argument is larger
+     * than the second argument. If {@link MinValueWatermarkSelector} is used, the method returns true if 
+     * the first argument is smaller than the second argument.
+     * 
+     * If this method returns true, then the given value becomes the new watermark value
+     * @param valueToCompare The object that should be compared to the current watermark value
+     * @param watermarkValue The current watermark value.
+     * @return Returns a boolean that indicates whether the value given in the first argument 
+     * should be persisted to the watermark
      */
-    protected abstract int comparableQualifier();
+    protected abstract boolean compare(Comparable<Object> valueToCompare, Comparable<Object> watermarkValue);
 
     @Override
     public final void acceptValue(Object value)
@@ -40,12 +48,11 @@ public abstract class ComparableWatermarkSelector extends WatermarkSelector
         }
         else if (value instanceof Comparable)
         {
-            Comparable<Object> current = (Comparable<Object>) this.value;
-
-            if (current == null
-                || ((Comparable<Object>) value).compareTo(current) == this.comparableQualifier())
-            {
-                this.value = value;
+            Comparable<Object> currentWatermark = (Comparable<Object>) this.value;
+            Comparable<Object> possibleWatermark = (Comparable<Object>) value;
+            
+            if (currentWatermark == null || compare(possibleWatermark, currentWatermark)) {
+            	this.value = value;
             }
         }
         else

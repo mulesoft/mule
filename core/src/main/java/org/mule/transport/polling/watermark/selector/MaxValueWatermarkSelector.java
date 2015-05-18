@@ -8,7 +8,7 @@
 package org.mule.transport.polling.watermark.selector;
 
 /**
- * Implementation of {@link WatermarkSelector} that selectes the maximum value of the
+ * Implementation of {@link WatermarkSelector} that selects the maximum value of the
  * set. For this to work, received values need to implement the {@link Comparable}
  * interface. Values that don't meet this condition will be discarded
  * 
@@ -17,9 +17,9 @@ package org.mule.transport.polling.watermark.selector;
 public class MaxValueWatermarkSelector extends ComparableWatermarkSelector
 {
 
-    @Override
-    protected int comparableQualifier()
-    {
-        return 1;
-    }
+	@Override
+	public boolean compare(Comparable<Object> value, Comparable<Object> currentWatermark) {
+		return value.compareTo(currentWatermark) > 0;
+	}
+	
 }
