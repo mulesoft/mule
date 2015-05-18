@@ -266,7 +266,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
             MuleEvent responseEvent = sendThroughCxf(event, exchange);
 
-            if (!responseEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
+            if (responseEvent==null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
             {
                 return processResponse(event, exchange, responseEvent);
             }
