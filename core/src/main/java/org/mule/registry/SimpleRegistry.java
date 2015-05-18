@@ -51,6 +51,16 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
         super.doInitialise();
     }
 
+    /**
+     * This implementation doesn't support applying lifecycle upon lookup
+     * and thus this method simply delegates into {@link #lookupObject(String)}
+     */
+    @Override
+    public <T> T lookupObject(String key, boolean applyLifecycle)
+    {
+        return lookupObject(key);
+    }
+
     @Override
     protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException
     {

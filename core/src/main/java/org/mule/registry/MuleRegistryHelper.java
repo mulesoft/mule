@@ -757,10 +757,22 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
         return registry.lookupObject(type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     public <T> T lookupObject(String key)
     {
         return (T) registry.lookupObject(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T lookupObject(String key, boolean applyLifecycle)
+    {
+        return (T) registry.lookupObject(key, applyLifecycle);
     }
 
     /**
