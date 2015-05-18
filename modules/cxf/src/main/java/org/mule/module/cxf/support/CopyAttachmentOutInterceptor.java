@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf.support;
 
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.module.cxf.CxfConstants;
 
@@ -30,6 +31,12 @@ public class CopyAttachmentOutInterceptor extends AbstractPhaseInterceptor
     public void handleMessage(Message message) throws Fault
     {
         MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+
+        if (event == null || event instanceof NonBlockingVoidMuleEvent)
+        {
+            return;
+        }
+
         Collection<Attachment> a = event.getMessage().getInvocationProperty(CxfConstants.ATTACHMENTS);
         
         if (a != null) 
