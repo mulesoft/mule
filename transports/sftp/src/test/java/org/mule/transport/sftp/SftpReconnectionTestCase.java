@@ -13,6 +13,7 @@ import org.mule.tck.listener.FlowExecutionListener;
 
 import com.jcraft.jsch.SftpException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,8 +24,11 @@ import org.junit.runners.Parameterized;
 public class SftpReconnectionTestCase extends AbstractSftpTestCase
 {
 
+    private static final String INBOUND_ENDPOINT_DIRECTORY = "data";
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static final String SFTP_RECEIVING_FLOW_NAME = "receiving";
+    //SFTP seems to be very slow in CI. Long timeout provided to avoid flakyness.
+    private static final int TIMEOUT = 15000;
 
     public SftpReconnectionTestCase(ConfigVariant variant, String configResources)
     {
@@ -45,7 +49,7 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
     @Test
     public void reconnectStrategy() throws Exception
     {
-        ConnectionListener connectionSuccessfulListener = new ConnectionListener(muleContext);
+        ConnectionListener connectionSuccessfulListener = new ConnectionListener(muleContext).setTimeoutInMillis(TIMEOUT);
 
         verifyReconnectionKicksIn();
         startUpSftpEndpoint();
@@ -64,7 +68,8 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
     private void verifySftpFlowIsRunning() throws Exception
     {
         FlowExecutionListener sftpInboundEndpointFlowExecutionListener = new FlowExecutionListener(SFTP_RECEIVING_FLOW_NAME, muleContext);
-        muleContext.getClient().dispatch("vm://test.upload", getTestMuleMessage());
+        sftpClient.changeWorkingDirectory(INBOUND_ENDPOINT_DIRECTORY);
+        sftpClient.storeFile(FILENAME, new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
         sftpInboundEndpointFlowExecutionListener.waitUntilFlowIsComplete();
     }
 
