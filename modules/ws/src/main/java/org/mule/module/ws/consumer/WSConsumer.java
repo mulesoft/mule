@@ -13,6 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -29,7 +30,7 @@ import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.IOUtils;
@@ -66,7 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable
+public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingSupported
 {
 
     public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
@@ -139,28 +140,46 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     {
         MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
 
-        chainBuilder.chain(new AbstractInterceptingMessageProcessor()
+        chainBuilder.chain(createCopyAttachmentsMessageProcessor());
+
+        // Add a message processor that removes the invocation property CxfConstants.OPERATION if present
+        // (as it may change the behavior of CXF proxy client). It is added again after executing the proxy client.
+        chainBuilder.chain(createPropertyRemoverMessageProcessor(CxfConstants.OPERATION));
+
+        chainBuilder.chain(createCxfOutboundMessageProcessor(config.getSecurity()));
+
+        chainBuilder.chain(createSoapHeadersPropertiesRemoverMessageProcessor());
+
+        chainBuilder.chain(config.createOutboundMessageProcessor());
+
+        return chainBuilder.build();
+    }
+
+    private MessageProcessor createCopyAttachmentsMessageProcessor()
+    {
+        return new AbstractRequestResponseMessageProcessor()
         {
+            @Override
+            protected MuleEvent processRequest(MuleEvent event) throws MuleException
+            {
+                /* If the requestBody variable is set, it will be used as the payload to send instead
+                 * of the payload of the message. This will happen when an operation required no input parameters. */
+                if (requestBody != null)
+                {
+                    event.getMessage().setPayload(requestBody);
+                }
+
+                copyAttachmentsRequest(event);
+
+                return super.processRequest(event);
+            }
 
             @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
+            protected MuleEvent processNext(MuleEvent event) throws MuleException
             {
                 try
                 {
-                    /* If the requestBody variable is set, it will be used as the payload to send instead
-                     * of the payload of the message. This will happen when an operation required no input parameters. */
-
-                    if (requestBody != null)
-                    {
-                        event.getMessage().setPayload(requestBody);
-                    }
-
-                    copyAttachmentsRequest(event);
-
-                    MuleEvent result =  processNext(event);
-
-                    copyAttachmentsResponse(result);
-                    return result;
+                    return super.processNext(event);
                 }
                 catch (DispatchException e)
                 {
@@ -182,38 +201,53 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                     }
                 }
             }
-        });
 
-        // Add a message processor that removes the invocation property CxfConstants.OPERATION if present
-        // (as it may change the behavior of CXF proxy client). It is added again after executing the proxy client.
-        chainBuilder.chain(new AbstractInterceptingMessageProcessor()
-        {
             @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
+            protected MuleEvent processResponse(MuleEvent event) throws MuleException
             {
-                Object operation = event.getMessage().removeProperty(CxfConstants.OPERATION, PropertyScope.INVOCATION);
-
-                MuleEvent result = processNext(event);
-
-                if (operation != null)
-                {
-                    result.getMessage().setInvocationProperty(CxfConstants.OPERATION, operation);
-                }
-                return result;
+                copyAttachmentsResponse(event);
+                return super.processResponse(event);
             }
-        });
+        };
+    }
 
-        chainBuilder.chain(createCxfOutboundMessageProcessor(config.getSecurity()));
-
-        chainBuilder.chain(new AbstractInterceptingMessageProcessor()
+    private MessageProcessor createPropertyRemoverMessageProcessor(final String propertyName)
+    {
+        return new AbstractRequestResponseMessageProcessor()
         {
+            private Object propertyValue;
+
             @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
+            protected MuleEvent processRequest(MuleEvent event) throws MuleException
+            {
+                propertyValue = event.getMessage().removeProperty(propertyName, PropertyScope.INVOCATION);
+                return super.processRequest(event);
+            }
+
+            @Override
+            protected MuleEvent processResponse(MuleEvent event) throws MuleException
+            {
+                if (propertyValue != null)
+                {
+                    event.getMessage().setInvocationProperty(propertyName, propertyValue);
+                }
+                return super.processResponse(event);
+            }
+        };
+    }
+
+    private MessageProcessor createSoapHeadersPropertiesRemoverMessageProcessor()
+    {
+        return new AbstractRequestResponseMessageProcessor()
+        {
+
+            @Override
+            protected MuleEvent processRequest(MuleEvent event) throws MuleException
             {
                 // Remove outbound properties that are mapped to SOAP headers, so that the
                 // underlying transport does not include them as headers.
 
-                List<String> outboundProperties = new ArrayList<String>(event.getMessage().getOutboundPropertyNames());
+                List<String> outboundProperties = new ArrayList<>(event.getMessage().getOutboundPropertyNames());
 
                 for (String outboundProperty : outboundProperties)
                 {
@@ -222,24 +256,21 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                         event.getMessage().removeProperty(outboundProperty, PropertyScope.OUTBOUND);
                     }
                 }
+                return super.processRequest(event);
+            }
 
-                // Send the request through the transport/connector
-                MuleEvent result = processNext(event);
-
+            @Override
+            protected MuleEvent processResponse(MuleEvent event) throws MuleException
+            {
                 // Ensure that the http.status code inbound property (if present) is a String.
-                Object statusCode = result.getMessage().getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, null);
+                Object statusCode = event.getMessage().getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, null);
                 if (statusCode != null && !(statusCode instanceof String))
                 {
-                    result.getMessage().setProperty(HttpConnector.HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
+                    event.getMessage().setProperty(HttpConnector.HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
                 }
-
-                return result;
+                return super.processResponse(event);
             }
-        });
-
-        chainBuilder.chain(config.createOutboundMessageProcessor());
-
-        return chainBuilder.build();
+        };
     }
 
     /**

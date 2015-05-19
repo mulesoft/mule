@@ -8,6 +8,7 @@ package org.mule.module.cxf.config;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.Disposable;
@@ -26,7 +27,7 @@ import org.mule.api.processor.MessageProcessorPathElement;
  * Wraps a {@link MessageProcessorBuilder} and configures it lazily so it can
  * be injected with the {@link FlowConstruct}.
  */
-public class FlowConfiguringMessageProcessor implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor, MessageProcessorContainer
+public class FlowConfiguringMessageProcessor implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor, MessageProcessorContainer, NonBlockingSupported
 {
 
     private MessageProcessorBuilder builder;

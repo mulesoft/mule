@@ -137,7 +137,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             }
 
             @Override
-            protected void processFinallly(MuleEvent event, MessagingException exception)
+            protected void processFinally(MuleEvent event, MessagingException exception)
             {
                 muleContext.getNotificationManager().fireNotification(
                         new PipelineMessageNotification(AbstractPipeline.this, event,

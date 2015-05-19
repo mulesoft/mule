@@ -6,11 +6,13 @@
  */
 package org.mule.module.cxf;
 
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.CloneableMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
@@ -40,6 +42,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
@@ -52,7 +55,7 @@ import org.apache.cxf.ws.addressing.WSAContextUtils;
  * The CxfOutboundMessageProcessor performs outbound CXF processing, sending an event
  * through the CXF client, then on to the next MessageProcessor.
  */
-public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor implements CloneableMessageProcessor
+public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor implements CloneableMessageProcessor, NonBlockingSupported
 {
 
     private static final String URI_REGEX = "cxf:\\[(.+?)\\]:(.+?)/\\[(.+?)\\]:(.+?)";
@@ -130,27 +133,39 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             }
             return res;
         }
-        catch (MessagingException e) {
-            throw e;
-        }
-        // Because of CXF API, MuleExceptions can be wrapped in a Fault, in that case we should return the
-        // mule exception
-        catch(Fault f)
-        {
-            if(f.getCause() instanceof MuleException)
-            {
-                throw (MuleException) f.getCause();
-            }
-            throw new DispatchException(MessageFactory.createStaticMessage(f.getMessage()), event,this,f);
-        }
         catch (Exception e)
         {
-            throw new DispatchException(MessageFactory.createStaticMessage(ExceptionHelper.getRootException(e).getMessage()), event, this, e);
+            throw wrapException(event, e, false);
         }
         finally
         {
             cleanup();
         }
+    }
+
+    private MuleException wrapException(MuleEvent event, Throwable ex, boolean alwaysReturnMessagingException)
+    {
+        if (ex instanceof MessagingException)
+        {
+            return (MessagingException) ex;
+        }
+        if (ex instanceof Fault)
+        {
+            // Because of CXF API, MuleExceptions can be wrapped in a Fault, in that case we should return the mule exception
+            Fault fault = (Fault) ex;
+            if(fault.getCause() instanceof MuleException)
+            {
+                MuleException muleException = (MuleException) fault.getCause();
+                return alwaysReturnMessagingException ? new MessagingException(event, muleException) : muleException;
+            }
+            return new DispatchException(MessageFactory.createStaticMessage(fault.getMessage()), event, this, fault);
+        }
+        return new DispatchException(MessageFactory.createStaticMessage(ExceptionHelper.getRootException(ex).getMessage()), event, this, ex);
+    }
+
+    private MessagingException wrapException(MuleEvent event, Throwable ex)
+    {
+        return (MessagingException) wrapException(event, ex, true);
     }
 
     /**
@@ -205,14 +220,14 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         return buildResponseMessage(event, muleRes, objResponse);
     }
 
-    protected MuleEvent doSendWithClient(MuleEvent event) throws Exception
+    protected MuleEvent doSendWithClient(final MuleEvent event) throws Exception
     {
         BindingOperationInfo bop = getOperation(event);
 
         Map<String, Object> props = getInovcationProperties(event);
 
         // Holds the response from the transport
-        Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
+        final Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
 
         Map<String, Object> ctx = new HashMap<String, Object>();
@@ -235,9 +250,37 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         ExchangeImpl exchange = new ExchangeImpl();
         // mule will close the stream so don't let cxf, otherwise cxf will close it too early
         exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
-        Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
 
-        return buildResponseMessage(event, responseHolder.value, response);
+        if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
+        {
+            client.invoke(new ClientCallback()
+            {
+                @Override
+                public void handleResponse(Map<String, Object> ctx, Object[] res)
+                {
+                    try
+                    {
+                        event.getReplyToHandler().processReplyTo(buildResponseMessage(event, responseHolder.value, res), null, null);
+                    }
+                    catch (MuleException ex)
+                    {
+                        event.getReplyToHandler().processExceptionReplyTo(wrapException(responseHolder.value, ex), null);
+                    }
+                }
+
+                @Override
+                public void handleException(Map<String, Object> ctx, Throwable ex)
+                {
+                    event.getReplyToHandler().processExceptionReplyTo(wrapException(responseHolder.value, ex), null);
+                }
+            }, bop, getArgs(event), ctx, exchange);
+            return NonBlockingVoidMuleEvent.getInstance();
+        }
+        else
+        {
+            Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
+            return buildResponseMessage(event, responseHolder.value, response);
+        }
     }
 
     public Method getMethod(MuleEvent event) throws Exception

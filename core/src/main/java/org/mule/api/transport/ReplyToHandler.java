@@ -24,10 +24,9 @@ public interface ReplyToHandler
      * Processes replyTo in the case an exception occurred.  Not all implementations will implement this if for example
      * they should only send a reply message in the sucess case.
      *
-     * @param event the current event when the exception was caught.
      * @param exception the exception thrown by processing
      * @param replyTo name of the channel that exception message should be sent if relevant
      */
-    void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo);
+    void processExceptionReplyTo(MessagingException exception, Object replyTo);
 
 }

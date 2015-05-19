@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf;
 
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -14,8 +15,8 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transport.PropertyScope;
 import org.mule.component.ComponentException;
-import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.config.ExceptionHelper;
+import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
@@ -58,7 +59,7 @@ public class MuleInvoker implements Invoker
         {
             MuleMessage reqMsg = event.getMessage();
             reqMsg.setPayload(extractPayload(exchange.getInMessage()));
-            
+
             BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
             Service svc = exchange.get(Service.class);
             if (!cxfMmessageProcessor.isProxy())
@@ -69,7 +70,7 @@ public class MuleInvoker implements Invoker
                 {
                     m = matchMethod(m, targetClass);
                 }
-            
+
                 reqMsg.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m, PropertyScope.INVOCATION);
             }
 
@@ -125,11 +126,17 @@ public class MuleInvoker implements Invoker
             responseEvent = null;
         }
 
+        if( responseEvent instanceof NonBlockingVoidMuleEvent)
+        {
+            exchange.put(CxfConstants.MULE_EVENT, responseEvent);
+            return new Object();
+        }
+
         if (responseEvent != null && !VoidMuleEvent.getInstance().equals(responseEvent))
         {
             exchange.put(CxfConstants.MULE_EVENT, responseEvent);
             MuleMessage resMessage = responseEvent.getMessage();
-            
+
             if (resMessage.getExceptionPayload() != null)
             {
                 Throwable cause = resMessage.getExceptionPayload().getException();
@@ -171,7 +178,7 @@ public class MuleInvoker implements Invoker
             return null;
         }
     }
-    
+
     protected Object extractPayload(Message cxfMessage)
     {   
         List<Object> list = CastUtils.cast(cxfMessage.getContent(List.class));

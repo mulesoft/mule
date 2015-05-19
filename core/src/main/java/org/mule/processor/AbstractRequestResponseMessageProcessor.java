@@ -8,18 +8,27 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.VoidMuleEvent;
-import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.transport.ReplyToHandler;
 
 /**
- * Abstract implementation of a {@link org.mule.api.processor.MessageProcessor} that may performs processing during both
+ * Base implementation of a {@link org.mule.api.processor.MessageProcessor} that may performs processing during both
  * the request and response processing phases while supporting non-blocking execution.
+ * <p/>
+ *
+ * In order to define the process during the request phase you should override the {@link #processRequest(org.mule.api.MuleEvent)}
+ * method.
+ * Symmetrically, if you need to define a process to be executed during the response phase, then you should override
+ * the {@link #processResponse(org.mule.api.MuleEvent)} method.
+ * <p/>
+ *
+ * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you
+ * should override the {@link #processFinally(org.mule.api.MuleEvent, org.mule.api.MessagingException)} method.
+ *
  */
 public abstract class AbstractRequestResponseMessageProcessor extends AbstractInterceptingMessageProcessor implements
         NonBlockingSupported
@@ -52,7 +61,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         }
         finally
         {
-            processFinallly(event, exception);
+            processFinally(event, exception);
         }
     }
 
@@ -69,14 +78,14 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
                 {
                     originalReplyToHandler.processReplyTo(response, null, null);
                 }
-                processFinallly(event, null);
+                processFinally(event, null);
             }
 
             @Override
-            public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+            public void processExceptionReplyTo(MessagingException exception, Object replyTo)
             {
-                originalReplyToHandler.processExceptionReplyTo(exception.getEvent(), exception, null);
-                processFinallly(exception.getEvent(), exception);
+                originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
+                processFinally(exception.getEvent(), exception);
             }
         });
 
@@ -85,7 +94,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
             MuleEvent result = processNext(processRequest(event));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
-                return processResponse(event);
+                return processResponse(result);
             }
             else
             {
@@ -94,7 +103,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         }
         catch (MessagingException exception)
         {
-            processFinallly(event, exception);
+            processFinally(event, exception);
             throw exception;
         }
     }
@@ -138,7 +147,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
      * @param exception the exception thrown during processing if any. If not exception was thrown then this parameter
      *                  is null
      */
-    protected void processFinallly(MuleEvent event, MessagingException exception)
+    protected void processFinally(MuleEvent event, MessagingException exception)
     {
 
     }
