@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.request.grizzly;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
@@ -199,6 +201,21 @@ public class GrizzlyHttpClient implements HttpClient
             {
                 builder.addHeader(headerName, headerValue);
             }
+        }
+
+        // If persistent connections are disabled, the "Connection: close" header must be explicitly added. AHC will
+        // add "Connection: keep-alive" otherwise. (https://github.com/AsyncHttpClient/async-http-client/issues/885)
+
+        if (!usePersistentConnections)
+        {
+            String connectionHeaderValue = request.getHeaderValue(CONNECTION);
+            if (connectionHeaderValue != null && !CLOSE.equals(connectionHeaderValue) && logger.isDebugEnabled())
+            {
+                logger.debug("Persistent connections are disabled in the HTTP requester configuration, but the request already " +
+                             "contains a Connection header with value {}. This header will be ignored, and a Connection: close header " +
+                             "will be sent instead.", connectionHeaderValue);
+            }
+            builder.setHeader(CONNECTION, CLOSE);
         }
 
         DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
