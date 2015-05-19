@@ -76,7 +76,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             }
             catch (MuleException e)
             {
-                replyToHandler.processExceptionReplyTo(event, new MessagingException(event, e), null);
+                replyToHandler.processExceptionReplyTo(new MessagingException(event, e), null);
             }
         }
     }
@@ -94,14 +94,14 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             }
             catch (MessagingException e)
             {
-                processExceptionReplyTo(event, e, null);
+                processExceptionReplyTo(e, replyTo);
             }
         }
 
         @Override
-        public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+        public void processExceptionReplyTo(MessagingException exception, Object replyTo)
         {
-            replyToHandler.processExceptionReplyTo(event, exception, null);
+            replyToHandler.processExceptionReplyTo(exception, replyTo);
         }
     }
 }

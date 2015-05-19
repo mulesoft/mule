@@ -16,8 +16,19 @@ import org.mule.api.NonBlockingSupported;
 import org.mule.api.transport.ReplyToHandler;
 
 /**
- * Abstract implementation of a {@link org.mule.api.processor.MessageProcessor} that may performs processing during both
+ * Base implementation of a {@link org.mule.api.processor.MessageProcessor} that may performs processing during both
  * the request and response processing phases while supporting non-blocking execution.
+ * <p/>
+ *
+ * In order to define the process during the request phase you should override the {@link #processRequest(org.mule.api.MuleEvent)}
+ * method.
+ * Symmetrically, if you need to define a process to be executed during the response phase, then you should override
+ * the {@link #processResponse(org.mule.api.MuleEvent)} method.
+ * <p/>
+ *
+ * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you
+ * should override the {@link #processFinally(org.mule.api.MuleEvent, org.mule.api.MessagingException)} method.
+ *
  */
 public abstract class AbstractRequestResponseMessageProcessor extends AbstractInterceptingMessageProcessor implements
         NonBlockingSupported
@@ -71,9 +82,9 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
             }
 
             @Override
-            public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+            public void processExceptionReplyTo(MessagingException exception, Object replyTo)
             {
-                originalReplyToHandler.processExceptionReplyTo(exception.getEvent(), exception, null);
+                originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
                 processFinally(exception.getEvent(), exception);
             }
         });

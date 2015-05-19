@@ -264,14 +264,14 @@ public class MuleUniversalConduit extends AbstractConduit
                         }
                         catch (IOException e)
                         {
-                            processExceptionReplyTo(event, new MessagingException(event, e), null);
+                            processExceptionReplyTo(new MessagingException(event, e), replyTo);
                         }
                     }
 
                     @Override
-                    public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+                    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
                     {
-                        originalReplyToHandler.processExceptionReplyTo(event, exception, replyTo);
+                        originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
                     }
                 });
             }

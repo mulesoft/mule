@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -52,7 +51,6 @@ import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.routing.ChoiceRouter;
 import org.mule.routing.ScatterGatherRouter;
 import org.mule.routing.filters.AcceptAllFilter;
-import org.mule.tck.SensingNullCompletionHandler;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -72,7 +70,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 @RunWith(Parameterized.class)
@@ -1078,7 +1075,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
                         }
                         catch (MessagingException e)
                         {
-                            event.getReplyToHandler().processExceptionReplyTo(event, e, null);
+                            event.getReplyToHandler().processExceptionReplyTo(e, null);
                         }
                         catch (MuleException e)
                         {

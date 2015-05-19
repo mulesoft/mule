@@ -217,12 +217,11 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
         }
 
         @Override
-        public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+        public void processExceptionReplyTo(MessagingException exception, Object replyTo)
         {
             try
             {
-                template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback
-                        (phaseResultNotifier));
+                template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback(phaseResultNotifier));
             }
             catch (MuleException e)
             {

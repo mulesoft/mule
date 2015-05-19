@@ -6,6 +6,7 @@
  */
 package org.mule.module.ws.consumer;
 
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DataType;
@@ -44,7 +45,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor
     {
         MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
 
-        if (event == null)
+        if (event == null || event instanceof NonBlockingVoidMuleEvent)
         {
             return;
         }
