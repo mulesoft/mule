@@ -28,8 +28,8 @@ public abstract class AbstractSftpFunctionalTestCase extends FunctionalTestCase
     protected SftpServer sftpServer;
     protected SftpClient sftpClient;
 
-    @Before
-    public void setUp() throws IOException
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
         setUpServer();
         sftpClient = createDefaultSftpClient(sftpPort.getNumber());

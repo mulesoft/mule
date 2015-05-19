@@ -1273,11 +1273,36 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         }
     }
 
-    @Before
-    public void before() throws Exception {
+
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
+        super.doSetUpBeforeMuleContextCreation();
+        if (startServerOnStartUp())
+        {
+            startSftpServerAndClient();
+        }
+    }
+
+    /**
+      * @return true if the SFTP server and client must be created as setup of the test case
+     */
+    protected boolean startServerOnStartUp()
+    {
+        return true;
+    }
+
+    protected void startSftpServerAndClient() throws IOException
+    {
         sftpServer = new SftpServer(this.port.getNumber());
         sftpServer.start();
         sftpClient = getSftpClient(HOST, port.getNumber(), USER, PASSWORD);
+    }
+
+    protected void stopSftpServerAndClient() throws Exception
+    {
+        sftpServer.stop();
+        sftpClient.disconnect();
     }
 
 }
