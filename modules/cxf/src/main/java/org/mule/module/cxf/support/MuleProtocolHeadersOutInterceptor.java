@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf.support;
 
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.cxf.CxfConstants;
@@ -37,7 +38,7 @@ public class MuleProtocolHeadersOutInterceptor
     {
         MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
         
-        if (event == null) 
+        if (event == null || event instanceof NonBlockingVoidMuleEvent)
         {
             return;
         }
