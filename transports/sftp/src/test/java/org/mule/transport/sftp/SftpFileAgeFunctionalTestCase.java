@@ -14,12 +14,16 @@ import static org.junit.Assert.assertTrue;
  
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.construct.Flow;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -50,16 +54,18 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
         {ConfigVariant.FLOW, "mule-sftp-file-age-config-flow.xml"}});
     }
 
-    public void before() throws Exception
+    @Override
+    public void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        super.before();
+        super.doSetUpBeforeMuleContextCreation();
         sftpClient.mkdir(INBOUND_LOW_AGE);
         sftpClient.mkdir(INBOUND_HIGH_AGE);
     }
 
-    @After
-    public void after() throws Exception
+    @Override
+    protected void doTearDownAfterMuleContextDispose() throws Exception
     {
+        super.doTearDownAfterMuleContextDispose();
         sftpClient.changeWorkingDirectory("..");
         sftpClient.recursivelyDeleteDirectory(INBOUND_HIGH_AGE);
         sftpClient.recursivelyDeleteDirectory(INBOUND_LOW_AGE);
@@ -72,8 +78,6 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
         MuleClient muleClient = new MuleClient(muleContext);
         sftpClient.changeWorkingDirectory(INBOUND_HIGH_AGE);
         sftpClient.storeFile(FILENAME, new ByteArrayInputStream(FILE_CONTENT.getBytes()));
-        muleClient.dispatch("sftp://localhost:" + port.getNumber() + "/" + INBOUND_HIGH_AGE, TEST_MESSAGE,
-            MESSAGE_PROPERTIES);
         assertNull(muleClient.request("vm://out.higAge", READ_FILE_TIMEOUT));
         assertTrue(Arrays.asList(sftpClient.listFiles()).contains(FILENAME));
     }
@@ -84,8 +88,6 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
         MuleClient muleClient = new MuleClient(muleContext);
         sftpClient.changeWorkingDirectory(INBOUND_LOW_AGE);
         sftpClient.storeFile(FILENAME, new ByteArrayInputStream(FILE_CONTENT.getBytes()));
-        muleClient.dispatch("sftp://localhost:" + port.getNumber() + "/" + INBOUND_LOW_AGE, TEST_MESSAGE,
-            MESSAGE_PROPERTIES);
         MuleMessage message = muleClient.request("vm://out.lowAge", READ_FILE_TIMEOUT);
         assertNotNull(message);
         assertEquals(FILE_CONTENT, message.getPayloadAsString());

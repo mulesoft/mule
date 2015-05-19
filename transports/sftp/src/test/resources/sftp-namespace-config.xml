@@ -10,7 +10,10 @@
                     autoDelete="true"
                     fileAge="1234"
                     tempDirOutbound="uploading"
-                    maxConnectionPoolSize="42"/>
+                    maxConnectionPoolSize="42">
+        <!-- the test case depends on the mule context creation but it does not executes any SFTP endpoint -->
+        <reconnect-forever blocking="false"/>
+    </sftp:connector>
 
     <flow name="receiving">
         <sftp:inbound-endpoint name="inboundEndpoint" autoDelete="true"

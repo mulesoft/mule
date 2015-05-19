@@ -41,9 +41,10 @@ public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegri
             {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-flow.xml"}});
     }
 
-    public void before() throws Exception
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        super.before();
+        super.doSetUpBeforeMuleContextCreation();
         sftpClient.mkdir(INBOUND_ENDPOINT_DIR);
         sftpClient.mkdir(OUTBOUND_ENDPOINT_DIR);
     }
