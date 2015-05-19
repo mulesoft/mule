@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <spring:beans>
+        <spring:import resource="sftp-properties.xml"/>
+    </spring:beans>
+
+    <flow name="limitedFailures" processingStrategy="synchronous">
+        <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" archiveDir="${archiveDir}" />
+        <custom-processor class="org.mule.transport.sftp.reliability.SftpRedeliveryPolicyTestCase$CountDownAndFailMessageProcessor"/>
+        <vm:outbound-endpoint exchange-pattern="one-way" path="out"/>
+        <rollback-exception-strategy maxRedeliveryAttempts="${maxRedelivery}">
+            <on-redelivery-attempts-exceeded>
+                <vm:outbound-endpoint exchange-pattern="one-way" path="error-queue"/>
+            </on-redelivery-attempts-exceeded>
+        </rollback-exception-strategy>
+    </flow>
+
+</mule>
