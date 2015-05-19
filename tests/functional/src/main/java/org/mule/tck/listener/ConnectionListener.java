@@ -26,7 +26,8 @@ public class ConnectionListener
     private int timeout = 10000;
     private int expectedAction = ConnectionNotification.CONNECTION_CONNECTED;
 
-    public ConnectionListener(MuleContext muleContext)
+    public
+    ConnectionListener(MuleContext muleContext)
     {
         try
         {
@@ -81,6 +82,15 @@ public class ConnectionListener
     public ConnectionListener setExpectedAction(int expectedAction)
     {
         this.expectedAction = expectedAction;
+        return this;
+    }
+
+    /**
+     * @return resets the listener state so it can be reused
+     */
+    public ConnectionListener reset()
+    {
+        this.notificationReceivedLatch = new Latch();
         return this;
     }
 

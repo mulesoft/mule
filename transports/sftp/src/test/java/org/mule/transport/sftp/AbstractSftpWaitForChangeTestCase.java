@@ -29,7 +29,6 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
     public static final String FILE1_NAME = "file1.txt";
     public static final String FILE2_NAME = "file2.txt";
 
-    private static CountDownLatch pollingLatch;
     private static boolean pollingInvoked;
     private static String[] availableFiles;
 
@@ -41,20 +40,16 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
         sftpClient.storeFile(FILE2_NAME, new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
     }
 
-    @Override
-    public void setUp() throws IOException
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        pollingLatch = new CountDownLatch(1);
         pollingInvoked = false;
         availableFiles = null;
-
-        super.setUp();
+        super.doSetUpBeforeMuleContextCreation();
     }
 
     @Test
     public void detectsDeletedFilesWhileWaitingForFileChanges() throws Exception
     {
-        pollingLatch.countDown();
 
         Prober prober = new PollingProber(RECEIVE_TIMEOUT, 50);
         prober.check(new Probe()
@@ -127,8 +122,6 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
         @Override
         public String[] getAvailableFiles(boolean onlyGetTheFirstOne) throws Exception
         {
-            pollingLatch.await();
-
             try
             {
                 availableFiles = super.getAvailableFiles(onlyGetTheFirstOne);

@@ -42,9 +42,9 @@ public class SftpNoOutboundDirectoryTestCase extends AbstractSftpDataIntegrityTe
     }
 
     @Override
-    public void before() throws Exception
+    public void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        super.before();
+        super.doSetUpBeforeMuleContextCreation();
         initEndpointDirectory(ENDPOINT_NAME);
     }
 

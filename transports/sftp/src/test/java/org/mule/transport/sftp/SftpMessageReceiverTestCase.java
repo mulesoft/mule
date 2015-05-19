@@ -106,6 +106,7 @@ public class SftpMessageReceiverTestCase extends AbstractMuleTestCase
         public TestSftpMessageReceiver(SftpConnector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException
         {
             super(connector, flow, endpoint);
+            connected.set(true);
         }
 
         @Override

@@ -41,9 +41,9 @@ public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegri
     }
 
     @Override
-    public void before() throws Exception
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        super.before();
+        super.doSetUpBeforeMuleContextCreation();
         sftpClient.mkdir(INBOUND_ENDPOINT_DIR);
         sftpClient.mkdir(OUTBOUND_ENDPOINT_DIR);
     }
