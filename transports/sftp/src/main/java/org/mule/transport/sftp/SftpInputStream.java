@@ -6,25 +6,30 @@
  */
 package org.mule.transport.sftp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>SftpInputStream</code> wraps an sftp InputStream.
  */
 
-public class SftpInputStream extends BufferedInputStream implements ErrorOccurredDecorator
+public class SftpInputStream extends BufferedInputStream implements SftpStream
 {
     private final Log logger = LogFactory.getLog(getClass());
 
     private SftpClient client;
     private boolean autoDelete = true;
     private String fileName;
+    private boolean postProcessActionEnabled = false;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     public String getFileName()
     {
@@ -93,38 +98,80 @@ public class SftpInputStream extends BufferedInputStream implements ErrorOccurre
         return super.read(b);
     }
 
+    @Override
     public void close() throws IOException
     {
-        if (logger.isDebugEnabled())
+        if (closed.compareAndSet(false, true))
         {
-            logger.debug("Closing the stream for the file " + fileName);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Closing the stream for the file " + fileName);
+            }
+
+            try
+            {
+                super.close();
+            }
+            catch (IOException e)
+            {
+                logger.error("Error occurred while closing file " + fileName, e);
+                throw e;
+            }
+
+            if (postProcessActionEnabled)
+            {
+                try
+                {
+                    postProcess();
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(e);
+                }
+            }
         }
+    }
+
+    @Override
+    public boolean isClosed()
+    {
+        return closed.get();
+    }
+
+    @Override
+    public void postProcess() throws Exception
+    {
+        if (!client.isConnected())
+        {
+            return;
+        }
+
         try
         {
-            super.close();
-
+            close();
             if (autoDelete && !errorOccured)
             {
                 client.deleteFile(fileName);
             }
         }
-        catch (IOException e)
-        {
-            logger.error("Error occured while closing file " + fileName, e);
-            throw e;
-        }
         finally
         {
             // We should release the connection from the pool even if some error
             // occurs here
-            try
-            {
-                ((SftpConnector) endpoint.getConnector()).releaseClient(endpoint, client);
-            }
-            catch (Exception e)
-            {
-                logger.error(e.getMessage(), e);
-            }
+            releaseConnection();
+        }
+
+    }
+
+    void releaseConnection()
+    {
+        try
+        {
+            ((SftpConnector) endpoint.getConnector()).releaseClient(endpoint, client);
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -132,6 +179,12 @@ public class SftpInputStream extends BufferedInputStream implements ErrorOccurre
     {
         if (logger.isDebugEnabled()) logger.debug("setErrorOccurred() called");
         this.errorOccured = true;
+    }
+
+    @Override
+    public void setPostProcessActionEnabled(boolean postProcessActionEnabled)
+    {
+        this.postProcessActionEnabled = postProcessActionEnabled;
     }
 
     @Override

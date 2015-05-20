@@ -188,7 +188,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
                 {
                     if (deadLetterQueue != null)
                     {
-                        return deadLetterQueue.process(event);
+                        MuleEvent response = deadLetterQueue.process(event);
+                        enablePostProcessActionsIfNeeded(event);
+                        return response;
                     }
                     else
                     {
@@ -232,6 +234,15 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             lock.unlock();
         }
 
+    }
+
+    private void enablePostProcessActionsIfNeeded(MuleEvent event) throws Exception
+    {
+        Object payload = event.getMessage().getPayload();
+        if (payload instanceof PostProcessAction)
+        {
+            ((PostProcessAction) payload).setPostProcessActionEnabled(true);
+        }
     }
 
     private void resetCounter(String messageId) throws ObjectStoreException
