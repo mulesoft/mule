@@ -6,7 +6,6 @@
  */
 package org.mule.tck;
 
-import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -29,7 +28,7 @@ public class SensingNullReplyToHandler implements ReplyToHandler
     }
 
     @Override
-    public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
     {
         this.exception = exception;
         latch.countDown();

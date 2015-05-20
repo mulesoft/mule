@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+           ">
+
+
+    <custom-transformer name="holderTransformer" class="org.mule.module.cxf.HolderNonBlockingTestCase$HolderTransformer"/>
+    <custom-transformer name="holderTransformer2" class="org.mule.module.cxf.HolderNonBlockingTestCase$HolderTransformer2"/>
+    <custom-transformer name="holderTransformer3" class="org.mule.module.cxf.HolderNonBlockingTestCase$HolderTransformer3"/>
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
+
+    <flow name="echoService" processingStrategy="non-blocking">
+        <http:listener path="echo" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.HolderService"/>
+        <component class="org.mule.module.cxf.HolderServiceImplForNonBlocking" />
+    </flow>
+
+
+    <spring:bean name="sensingRequestResponseProcessorEcho" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <flow name="echoServiceClient" processingStrategy="non-blocking">
+        <http:listener path="/echoClient" config-ref="listenerConfig" allowedMethods="POST" />
+        <transformer ref="holderTransformer"/>
+        <processor ref="sensingRequestResponseProcessorEcho" />
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.HolderService" operation="echo"/>
+        <http:request path="echo" method="POST" config-ref="requestConfig"/>
+    </flow>
+
+    <spring:bean name="sensingRequestResponseProcessorEchoProxy" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <flow name="echoServiceClientProxy" processingStrategy="non-blocking">
+        <http:listener path="/echoClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <transformer ref="holderTransformer"/>
+        <processor ref="sensingRequestResponseProcessorEchoProxy" />
+        <cxf:jaxws-client clientClass="org.mule.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo" wsdlLocation="echoHolder.wsdl"/>
+        <http:request path="echo" method="POST" config-ref="requestConfig"/>
+    </flow>
+
+
+    <spring:bean name="sensingRequestResponseProcessorEcho2" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <flow name="echo2ServiceClient" processingStrategy="non-blocking">
+        <http:listener path="/echo2Client" config-ref="listenerConfig" allowedMethods="POST" />
+        <transformer ref="holderTransformer2"/>
+        <processor ref="sensingRequestResponseProcessorEcho2" />
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.HolderService" operation="echo2"/>
+        <http:request path="echo" method="POST" config-ref="requestConfig"/>
+    </flow>
+
+    <spring:bean name="sensingRequestResponseProcessorEchoProxy2" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <flow name="echo2ServiceClientProxy" processingStrategy="non-blocking">
+        <http:listener path="/echo2ClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <transformer ref="holderTransformer2"/>
+        <processor ref="sensingRequestResponseProcessorEchoProxy2" />
+        <cxf:jaxws-client clientClass="org.mule.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo2" wsdlLocation="echoHolder.wsdl"/>
+        <http:request path="echo" method="POST" config-ref="requestConfig"/>
+    </flow>
+
+
+    <spring:bean name="sensingRequestResponseProcessorEcho3" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <flow name="echo3ServiceClient" processingStrategy="non-blocking">
+        <http:listener path="/echo3Client" config-ref="listenerConfig" allowedMethods="POST" />
+        <transformer ref="holderTransformer3"/>
+        <processor ref="sensingRequestResponseProcessorEcho3" />
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.HolderService" operation="echo3"/>
+        <http:request path="echo" method="POST" config-ref="requestConfig"/>
+    </flow>
+
+    <spring:bean name="sensingRequestResponseProcessorEchoProxy3" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <flow name="echo3ServiceClientProxy" processingStrategy="non-blocking">
+        <http:listener path="/echo3ClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <transformer ref="holderTransformer3"/>
+        <processor ref="sensingRequestResponseProcessorEchoProxy3" />
+        <cxf:jaxws-client clientClass="org.mule.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo3" wsdlLocation="echoHolder.wsdl"/>
+        <http:request path="echo" method="POST" config-ref="requestConfig"/>
+    </flow>
+
+</mule>

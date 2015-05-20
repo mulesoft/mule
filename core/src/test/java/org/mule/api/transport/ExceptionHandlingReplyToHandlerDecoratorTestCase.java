@@ -9,7 +9,6 @@ package org.mule.api.transport;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MessagingException;
@@ -57,7 +56,7 @@ public class ExceptionHandlingReplyToHandlerDecoratorTestCase extends AbstractMu
             }
         });
 
-        errorHandlingreplyToHandler.processExceptionReplyTo(sourceEvent, messagingException, null);
+        errorHandlingreplyToHandler.processExceptionReplyTo(messagingException, null);
 
         verify(messagingExceptionHandler, Mockito.times(1)).handleException(messagingException, sourceEvent);
         assertThat(sensingReplyToHandler.exception, CoreMatchers.<Exception>equalTo(messagingException));
@@ -83,7 +82,7 @@ public class ExceptionHandlingReplyToHandlerDecoratorTestCase extends AbstractMu
             }
         });
 
-        errorHandlingReplyToHandler.processExceptionReplyTo(sourceEvent, messagingException, null);
+        errorHandlingReplyToHandler.processExceptionReplyTo(messagingException, null);
 
         verify(messagingExceptionHandler, Mockito.times(1)).handleException(messagingException, sourceEvent);
         assertThat(sensingReplyToHandler.exception, nullValue());

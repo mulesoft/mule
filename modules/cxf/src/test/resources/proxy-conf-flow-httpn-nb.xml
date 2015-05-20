@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf  http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/vm   http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               ">
+
+    <spring:bean name="sensingRequestResponseProcessorEcho" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <spring:bean name="sensingRequestResponseProcessorGreeter" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config  name="requestConfig"  host="localhost" port="${port1}" />
+
+
+    <flow name="echo-proxy" processingStrategy="non-blocking">
+        <http:listener path="/proxies/echo" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service />
+        <cxf:proxy-client />
+        <processor ref="sensingRequestResponseProcessorEcho" />
+        <http:request config-ref="requestConfig" path="/services/echo" method="POST" />
+    </flow>
+    <!-- Echo Service Start -->
+    <flow name="echo-service">
+        <http:listener path="/services/echo" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service />
+        <vm:outbound-endpoint path="echo-service-vm" exchange-pattern="request-response" />
+    </flow>
+    <flow name="echo-service-vm">
+        <inbound-endpoint address="vm://echo-service-vm" exchange-pattern="request-response" />
+        <logger level="WARN" message="********** -> ECHO IMPLEMENTATION"/>
+    </flow>
+    <!-- Echo Service End -->
+
+
+    <flow name="greeter-proxy" processingStrategy="non-blocking">
+        <http:listener path="/proxies/greeter" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service />
+        <cxf:proxy-client />
+        <processor ref="sensingRequestResponseProcessorGreeter" />
+        <http:request config-ref="requestConfig" path="/services/greeter" method="POST" />
+    </flow>
+    <flow name="greeter-service">
+        <http:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
+        <component>
+            <prototype-object class="org.apache.hello_world_soap_http.GreeterImpl" />
+        </component>
+    </flow>
+
+
+</mule>
