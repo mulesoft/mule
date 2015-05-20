@@ -33,7 +33,7 @@ public class DefaultDbConfigResolver implements DbConfigResolver
 
         Collection<DbConfigResolver> dbConfigResolvers = registry.lookupObjects(DbConfigResolver.class);
 
-        if (dbConfigResolvers.size() == 0)
+        if (dbConfigResolvers.isEmpty())
         {
             throw new UnresolvableDbConfigException("There is no database config defined");
         }

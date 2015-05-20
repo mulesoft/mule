@@ -19,13 +19,15 @@ import org.mule.util.StringUtils;
 public class DataSourceConfig implements MuleContextAware
 {
 
+    public static final int NO_TRANSACTION_ISOLATION_CONFIGURED = -1;
+
     private MuleContext muleContext;
     private String url;
     private String driverClassName;
     private int connectionTimeout;
     private String password;
     private String user;
-    private int transactionIsolation = -1;
+    private int transactionIsolation = NO_TRANSACTION_ISOLATION_CONFIGURED;
     private boolean useXaTransactions;
     private DbPoolingProfile poolingProfile;
 

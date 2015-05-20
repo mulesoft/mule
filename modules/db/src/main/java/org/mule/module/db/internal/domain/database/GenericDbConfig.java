@@ -7,6 +7,9 @@
 
 package org.mule.module.db.internal.domain.database;
 
+import static org.mule.common.Result.Status.FAILURE;
+import static org.mule.common.Result.Status.SUCCESS;
+import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
 import org.mule.common.DefaultResult;
 import org.mule.common.DefaultTestResult;
 import org.mule.common.Result;
@@ -14,7 +17,6 @@ import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataKey;
 import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
 
 import java.sql.Connection;
@@ -74,13 +76,13 @@ public class GenericDbConfig implements DbConfig
 
         try
         {
-            connection = dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED);
+            connection = dbConnectionFactory.createConnection(NOT_SUPPORTED);
 
-            return new DefaultTestResult(Result.Status.SUCCESS);
+            return new DefaultTestResult(SUCCESS);
         }
         catch (SQLException e)
         {
-            return new DefaultTestResult(Result.Status.FAILURE, e.getMessage());
+            return new DefaultTestResult(FAILURE, e.getMessage());
         }
         finally
         {
@@ -103,12 +105,12 @@ public class GenericDbConfig implements DbConfig
     {
         List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
 
-        return new DefaultResult<>(keys, Result.Status.SUCCESS, "Successfully obtained metadata");
+        return new DefaultResult<>(keys, SUCCESS, "Successfully obtained metadata");
     }
 
     @Override
     public Result<MetaData> getMetaData(MetaDataKey metaDataKey)
     {
-        return new DefaultResult<>(null, Result.Status.SUCCESS, "No metadata obtained");
+        return new DefaultResult<>(null, SUCCESS, "No metadata obtained");
     }
 }
