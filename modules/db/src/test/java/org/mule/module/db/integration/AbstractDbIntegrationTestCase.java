@@ -11,10 +11,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import org.mule.module.db.internal.domain.database.GenericDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
+import org.mule.module.db.internal.domain.database.DbConfig;
+import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.sql.SQLException;
@@ -49,9 +50,15 @@ public abstract class AbstractDbIntegrationTestCase extends FunctionalTestCase
 
     protected DataSource getDefaultDataSource()
     {
-        GenericDbConfig config = muleContext.getRegistry().get("dbConfig");
+        DbConfigResolver dbConfigResolver = muleContext.getRegistry().get("dbConfig");
+        DbConfig config = resolveConfig(dbConfigResolver);
 
         return config.getDataSource();
+    }
+
+    protected DbConfig resolveConfig(DbConfigResolver dbConfigResolver)
+    {
+        return dbConfigResolver.resolve(null);
     }
 
     @Override

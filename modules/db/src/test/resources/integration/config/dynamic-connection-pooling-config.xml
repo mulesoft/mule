@@ -9,18 +9,17 @@
 
     <flow name="defaultQueryRequestResponse">
         <vm:inbound-endpoint path="testIn" exchange-pattern="one-way"/>
-        <logger level="ERROR" message="Receiving message: #[payload]"/>
+
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+
         <transactional>
-            <logger level="ERROR" message="Deleting from message: #[payload]"/>
             <db:delete config-ref="pooledJdbcConfig">
                 <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
             </db:delete>
-            <logger level="ERROR" message="Deleted from message: #[payload]"/>
+
             <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$JoinRequests"/>
-            <logger level="ERROR" message="FINAL LOGGER: #[payload]"/>
         </transactional>
 
-        <logger level="ERROR" message="Sending message to testOut: #[payload]"/>
         <vm:outbound-endpoint path="testOut" exchange-pattern="one-way"/>
 
         <catch-exception-strategy>

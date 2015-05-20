@@ -33,16 +33,18 @@ public class DefaultDbConfigResolverTestCase extends AbstractMuleTestCase
     @Test
     public void resolvesDefaultDbConfig() throws Exception
     {
+        DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
         DbConfig dbConfig = mock(DbConfig.class);
+        when(dbConfigResolver.resolve(muleEvent)).thenReturn(dbConfig);
 
         MuleRegistry registry = mock(MuleRegistry.class);
-        Collection<DbConfig> foundDbConfigs = new ArrayList<DbConfig>();
-        foundDbConfigs.add(dbConfig);
+        Collection<DbConfigResolver> foundDbConfigResolvers = new ArrayList<>();
+        foundDbConfigResolvers.add(dbConfigResolver);
 
-        when(registry.lookupObjects(DbConfig.class)).thenReturn(foundDbConfigs);
-        DefaultDbConfigResolver dbConfigResolver = new DefaultDbConfigResolver(registry);
+        when(registry.lookupObjects(DbConfigResolver.class)).thenReturn(foundDbConfigResolvers);
+        DefaultDbConfigResolver defaultDbConfigResolver = new DefaultDbConfigResolver(registry);
 
-        DbConfig resolvedDbConfig = dbConfigResolver.resolve(muleEvent);
+        DbConfig resolvedDbConfig = defaultDbConfigResolver.resolve(muleEvent);
 
         assertThat(dbConfig, sameInstance(resolvedDbConfig));
     }
@@ -68,12 +70,18 @@ public class DefaultDbConfigResolverTestCase extends AbstractMuleTestCase
         DbConfig dbConfig2 = mock(DbConfig.class);
         when(dbConfig2.getName()).thenReturn("dbConfig2");
 
-        MuleRegistry registry = mock(MuleRegistry.class);
-        Collection<DbConfig> foundDbConfigs = new ArrayList<DbConfig>();
-        foundDbConfigs.add(dbConfig1);
-        foundDbConfigs.add(dbConfig2);
+        DbConfigResolver dbConfigResolver1 = mock(DbConfigResolver.class);
+        when(dbConfigResolver1.resolve(null)).thenReturn(dbConfig1);
 
-        when(registry.lookupObjects(DbConfig.class)).thenReturn(foundDbConfigs);
+        DbConfigResolver dbConfigResolver2 = mock(DbConfigResolver.class);
+        when(dbConfigResolver2.resolve(null)).thenReturn(dbConfig2);
+
+        MuleRegistry registry = mock(MuleRegistry.class);
+        Collection<DbConfigResolver> foundDbConfigResolvers = new ArrayList<>();
+        foundDbConfigResolvers.add(dbConfigResolver1);
+        foundDbConfigResolvers.add(dbConfigResolver2);
+
+        when(registry.lookupObjects(DbConfigResolver.class)).thenReturn(foundDbConfigResolvers);
 
         DefaultDbConfigResolver dbConfigResolver = new DefaultDbConfigResolver(registry);
 

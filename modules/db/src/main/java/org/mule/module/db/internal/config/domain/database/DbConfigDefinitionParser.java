@@ -60,9 +60,9 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
     public static final String USE_XA_TRANSACTIONS_ATTRIBUTE = "useXaTransactions";
     public static final String TYPE_NAME_ATTIRBUTE = "name";
 
-    public DbConfigDefinitionParser(Class<? extends DbConfigFactoryBean> poolFactoryClass, CheckExclusiveAttributes exclusiveAttributes)
+    public DbConfigDefinitionParser(Class<? extends DbConfigResolverFactoryBean> dbConfigFactoryClass, CheckExclusiveAttributes exclusiveAttributes)
     {
-        super(poolFactoryClass, true);
+        super(dbConfigFactoryClass, true);
 
         addMapping(TRANSACTION_ISOLATION_ATTRIBUTE, TRANSACTION_ISOLATION_MAPPING);
         addIgnored(CONNECTION_PROPERTIES_ELEMENT_NAME);

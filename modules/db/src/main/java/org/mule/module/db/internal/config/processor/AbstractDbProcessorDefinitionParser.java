@@ -11,7 +11,7 @@ import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.module.db.internal.config.resolver.database.DefaultDbConfigResolverFactoryBean;
 import org.mule.module.db.internal.domain.statement.QueryStatementFactory;
-import org.mule.module.db.internal.resolver.database.StaticDbConfigResolver;
+import org.mule.module.db.internal.resolver.database.ConfiguredDbConfigResolver;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -56,7 +56,7 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
         }
         else
         {
-            wrapper = BeanDefinitionBuilder.genericBeanDefinition(StaticDbConfigResolver.class);
+            wrapper = BeanDefinitionBuilder.genericBeanDefinition(ConfiguredDbConfigResolver.class);
             wrapper.addConstructorArgReference(config);
         }
 
@@ -96,7 +96,7 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
         return defaultStatementFactory;
     }
 
-    protected void processStreamingAttribute(BeanDefinitionBuilder builder, String streamingValue)
+    protected void processStreamingAttribute(String streamingValue)
     {
         if (!StringUtils.isEmpty(streamingValue))
         {
