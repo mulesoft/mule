@@ -18,7 +18,8 @@ import org.mule.api.retry.RetryNotifier;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.internal.domain.database.GenericDbConfig;
+import org.mule.module.db.internal.domain.database.DbConfig;
+import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 
 import java.util.List;
 
@@ -72,8 +73,9 @@ public class ReconnectStandardTestCase extends AbstractDbIntegrationTestCase
 
             if (errorCount == EXPECTED_CONNECTION_ERRORS)
             {
-                // Fixes dataource's URL to enable connection
-                GenericDbConfig config = muleContext.getRegistry().get("badDbConfig");
+                // Fixes datasource's URL to enable connection
+                DbConfigResolver dbConfigResolver = muleContext.getRegistry().get("badDbConfig");
+                DbConfig config = dbConfigResolver.resolve(null);
                 StandardDataSource dataSource = (StandardDataSource) config.getDataSource();
                 dataSource.setUrl("jdbc:derby:muleEmbeddedDB;create=true");
             }

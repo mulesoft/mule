@@ -595,7 +595,7 @@
                 <xsd:attribute name="url" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            URL used to connect to the database.
+                            URL used to connect to the database. Supports expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -610,7 +610,7 @@
                 <xsd:attribute name="driverClassName" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Fully qualified name of the database driver class.
+                            Fully qualified name of the database driver class. Supports expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -646,7 +646,7 @@
     <xsd:element name="connection-properties" type="connectionPropertiesType">
         <xsd:annotation>
             <xsd:documentation>
-                Allows to specify a list of custom key-value connectionProperties for the config
+                Allows to specify a list of custom key-value connectionProperties for the config. Supports expressions
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -760,14 +760,14 @@
                 <xsd:attribute name="user" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The user that is used for authentication against the database.
+                            The user that is used for authentication against the database. Supports expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="password" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The password that is used for authentication against the database.
+                            The password that is used for authentication against the database. Supports expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -786,7 +786,7 @@
                 <xsd:attribute name="host" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Allows to configure just the host part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                            Allows to configure just the host part of the JDBC URL (and leave the rest of the default JDBC URL untouched). Supports expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -800,7 +800,7 @@
                 <xsd:attribute name="instance" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Allows to configure just the instance part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                            Allows to configure just the instance part of the JDBC URL (and leave the rest of the default JDBC URL untouched). Supports expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -817,6 +817,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the database. Must be configured unless a full JDBC URL is configured.
+                            Supports expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -824,7 +825,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Allows to configure just the host part of the JDBC URL (and leave the rest of the default
-                            JDBC URL untouched).
+                            JDBC URL untouched). Supports expressions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

@@ -18,6 +18,7 @@ import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.DerbyTestDatabase;
+import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +54,8 @@ public class CustomDbTypeConfigTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void resolvesCustomDbTypes() throws Exception
     {
-        GenericDbConfig dbConfig = muleContext.getRegistry().lookupObject("dbConfig");
+        DbConfigResolver dbConfigResolver  = muleContext.getRegistry().lookupObject("dbConfig");
+        GenericDbConfig dbConfig = (GenericDbConfig) dbConfigResolver.resolve(null);
         DbTypeManager dbTypeManager = dbConfig.getDbTypeManager();
         DbConnectionFactory connectionFactory = dbConfig.getConnectionFactory();
         DbConnection connection = connectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED);

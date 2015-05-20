@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
+import org.mule.module.db.internal.domain.database.ConfigurableDbConfigFactory;
 import org.mule.util.StringUtils;
 
 import java.net.URI;
@@ -14,18 +15,19 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 /**
- *  Base class for creating vendor's {@link DbConfigFactoryBean}
+ *  Base class for creating vendor's {@link DbConfigResolverFactoryBean}
  */
-public abstract class AbstractVendorConfigFactoryBean extends DbConfigFactoryBean
+public abstract class AbstractVendorConfigResolverFactoryBean extends DbConfigResolverFactoryBean
 {
 
     private String host;
     private int port = -1;
-    private String urlPrefix;
+    private final String urlPrefix;
     private String database;
 
-    protected AbstractVendorConfigFactoryBean(String urlPrefix)
+    protected AbstractVendorConfigResolverFactoryBean(String urlPrefix, ConfigurableDbConfigFactory dbConfigFactory)
     {
+        super(dbConfigFactory);
         this.urlPrefix = urlPrefix;
     }
 
@@ -52,6 +54,16 @@ public abstract class AbstractVendorConfigFactoryBean extends DbConfigFactoryBea
     public String getUrlPrefix()
     {
         return urlPrefix;
+    }
+
+    public String getDatabase()
+    {
+        return database;
+    }
+
+    public void setDatabase(String database)
+    {
+        this.database = database;
     }
 
     @Override
@@ -134,15 +146,5 @@ public abstract class AbstractVendorConfigFactoryBean extends DbConfigFactoryBea
         {
             throw new IllegalArgumentException("Unable to parse database config URL", e);
         }
-    }
-
-    public String getDatabase()
-    {
-        return database;
-    }
-
-    public void setDatabase(String database)
-    {
-        this.database = database;
     }
 }
