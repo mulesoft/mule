@@ -31,7 +31,7 @@ public abstract class AbstractSingleQueryProcessorDefinitionParser extends Abstr
         parseConfig(element, builder);
 
         String streamingValue = element.getAttribute(STREAMING_ATTRIBUTE);
-        processStreamingAttribute(builder, streamingValue);
+        processStreamingAttribute(streamingValue);
         BeanDefinition sqlParamResolver = getParamResolverBeanDefinition();
 
         queryBean = queryDefinitionParser.parseQuery(element, nestedCtx);
