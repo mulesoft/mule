@@ -29,9 +29,9 @@ public abstract class AbstractResultSetHandlerProcessorDefinitionParser extends 
     }
 
     @Override
-    protected void processStreamingAttribute(BeanDefinitionBuilder builder, String streamingValue)
+    protected void processStreamingAttribute(String streamingValue)
     {
-        super.processStreamingAttribute(builder, streamingValue);
+        super.processStreamingAttribute(streamingValue);
 
         InsensitiveMapRowHandler recordHandler = new InsensitiveMapRowHandler();
 
