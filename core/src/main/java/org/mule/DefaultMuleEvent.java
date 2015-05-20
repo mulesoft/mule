@@ -327,6 +327,12 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
              rewriteEvent.isSynchronous(), replyToHandler, replyToDestination, true, rewriteEvent.getExchangePattern());
     }
 
+    public DefaultMuleEvent(MuleEvent rewriteEvent, FlowConstruct flowConstruct, ReplyToHandler replyToHandler, Object replyToDestination, boolean synchronous)
+    {
+        this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),
+             synchronous, replyToHandler, replyToDestination, true, rewriteEvent.getExchangePattern());
+    }
+
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus)
     {
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);

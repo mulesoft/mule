@@ -52,10 +52,10 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             if ((processor instanceof MessageRouter || processor instanceof InterceptingMessageProcessor) && !
                     (processor instanceof NonBlockingSupported))
             {
-                logger.info("The message processor {} does not currenlty support non-blocking execution and " +
-                                "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
-                                "not recommended if unsupported message processors are being used.  ", processor.getClass());
-                    event = new DefaultMuleEvent(event.getMessage(), event, true);
+                logger.info("The message processor {} does not currently support non-blocking execution and " +
+                            "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
+                            "not recommended if unsupported message processors are being used.  ", processor.getClass());
+                event = new DefaultMuleEvent(event.getMessage(), event, true);
             }
 
             if (processor instanceof NonBlockingMessageProcessor)
