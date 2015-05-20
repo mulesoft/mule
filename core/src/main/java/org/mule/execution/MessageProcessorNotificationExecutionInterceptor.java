@@ -79,15 +79,16 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
                 }
 
                 @Override
-                public void processExceptionReplyTo(MuleEvent result, MessagingException exception, Object replyTo)
+                public void processExceptionReplyTo(MessagingException exception, Object replyTo)
                 {
                     if (fireNotification)
                     {
+                        MuleEvent result = exception.getEvent();
                         fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event,
                                          messageProcessor,
                                          null, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
                     }
-                    originalReplyToHandler.processExceptionReplyTo(result, exception, replyTo);
+                    originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
                 }
             });
         }

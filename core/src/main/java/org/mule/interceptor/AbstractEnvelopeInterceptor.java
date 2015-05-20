@@ -117,7 +117,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
             try
             {
                 response = after(event);
-                originalReplyToHandler.processReplyTo(response, null, null);
+                originalReplyToHandler.processReplyTo(response, null, replyTo);
                 exceptionWasThrown = false;
             }
             finally
@@ -127,17 +127,17 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
         }
 
         @Override
-        public void processExceptionReplyTo(final MuleEvent event, MessagingException exception, Object replyTo)
+        public void processExceptionReplyTo(MessagingException exception, Object replyTo)
         {
             try
             {
-                originalReplyToHandler.processExceptionReplyTo(event, exception, null);
+                originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
             }
             finally
             {
                 try
                 {
-                    last(event, time, startTime, true);
+                    last(exception.getEvent(), time, startTime, true);
                 }
                 catch (MuleException muleException)
                 {

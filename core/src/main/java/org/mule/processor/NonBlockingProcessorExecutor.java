@@ -8,17 +8,16 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageRouter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
-import org.mule.api.CompletionHandler;
 
 import java.util.List;
 
@@ -54,9 +53,9 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
                     (processor instanceof NonBlockingSupported))
             {
                 logger.info("The message processor {} does not currenlty support non-blocking execution and " +
-                            "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
-                            "not recommended if unsupported message processors are being used.  ", processor.getClass());
-                event = new DefaultMuleEvent(event.getMessage(), event, true);
+                                "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
+                                "not recommended if unsupported message processors are being used.  ", processor.getClass());
+                    event = new DefaultMuleEvent(event.getMessage(), event, true);
             }
 
             if (processor instanceof NonBlockingMessageProcessor)
@@ -77,7 +76,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             }
             catch (MuleException e)
             {
-                replyToHandler.processExceptionReplyTo(event, new MessagingException(event, e), null);
+                replyToHandler.processExceptionReplyTo(new MessagingException(event, e), null);
             }
         }
     }
@@ -95,14 +94,14 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             }
             catch (MessagingException e)
             {
-                processExceptionReplyTo(event, e, null);
+                processExceptionReplyTo(e, replyTo);
             }
         }
 
         @Override
-        public void processExceptionReplyTo(MuleEvent event, MessagingException exception, Object replyTo)
+        public void processExceptionReplyTo(MessagingException exception, Object replyTo)
         {
-            replyToHandler.processExceptionReplyTo(event, exception, null);
+            replyToHandler.processExceptionReplyTo(exception, replyTo);
         }
     }
 }
