@@ -27,7 +27,6 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
     private static final String URL = "jdbc:mysql://localhost:3036/database";
     private static final String URL_WITHOUT_PORT = "jdbc:mysql://localhost/database";
     private static final String URL_PROPERTIES = "?user=root&password=pass";
-    private static final String METADATA_PROPERTY = "generateSimpleParameterMetadata=true";
     private static final String DATABASE = "database";
     private static final String HOST = "localhost";
     private static final int PORT = 3036;
@@ -36,13 +35,13 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
     private static final String PASSWORD_PROPERTY = "password";
     private static final String PASSWORD_VALUE = "pass";
 
-    private MySqlConfigFactoryBean factory;
+    private MySqlConfigResolverFactoryBean factory;
     private Map<String, String> properties;
 
     @Before
     public void setUp() throws Exception
     {
-        factory = new MySqlConfigFactoryBean();
+        factory = new MySqlConfigResolverFactoryBean();
 
         properties = new LinkedHashMap<String, String>();
         factory.setConnectionProperties(properties);

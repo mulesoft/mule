@@ -21,56 +21,56 @@ public class DefaultDbConfigResolver implements DbConfigResolver
 
     private final MuleRegistry registry;
 
-    private DbConfig defaultConfig;
+    private DbConfigResolver defaultConfigResolver;
 
     public DefaultDbConfigResolver(MuleRegistry registry)
     {
         this.registry = registry;
     }
 
-    private DbConfig getDefaultConfig()
+    private DbConfigResolver getDefaultConfigResolver()
     {
 
-        Collection<DbConfig> dbConfigs = registry.lookupObjects(DbConfig.class);
+        Collection<DbConfigResolver> dbConfigResolvers = registry.lookupObjects(DbConfigResolver.class);
 
-        if (dbConfigs.size() == 0)
+        if (dbConfigResolvers.isEmpty())
         {
             throw new UnresolvableDbConfigException("There is no database config defined");
         }
 
-        if (dbConfigs.size() > 1)
+        if (dbConfigResolvers.size() > 1)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            for (DbConfig dbConfig : dbConfigs)
+            for (DbConfigResolver dbConfigResolver : dbConfigResolvers)
             {
                 if (stringBuilder.length() != 0)
                 {
                     stringBuilder.append(", ");
                 }
 
-                stringBuilder.append(dbConfig.getName());
+                stringBuilder.append(dbConfigResolver.resolve(null).getName());
             }
 
             throw new UnresolvableDbConfigException("Database config must be explicitly defined using 'config-ref' attribute there are multiple database configs defined: " + stringBuilder);
         }
 
-        return dbConfigs.iterator().next();
+        return dbConfigResolvers.iterator().next();
     }
 
     @Override
     public DbConfig resolve(MuleEvent muleEvent)
     {
-        if (defaultConfig == null)
+        if (defaultConfigResolver == null)
         {
             synchronized (this)
             {
-                if (defaultConfig == null)
+                if (defaultConfigResolver == null)
                 {
-                    defaultConfig = getDefaultConfig();
+                    defaultConfigResolver = getDefaultConfigResolver();
                 }
             }
         }
 
-        return defaultConfig;
+        return defaultConfigResolver.resolve(muleEvent);
     }
 }

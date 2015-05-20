@@ -43,7 +43,7 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     }
 
     @Override
-    protected final String[] getFlowConfigurationResources()
+    protected String[] getFlowConfigurationResources()
     {
         return new String[] {getTransactionManagerResource(), "integration/xa/xa-transactional-config.xml"};
     }

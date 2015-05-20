@@ -9,15 +9,12 @@ package org.mule.module.db.internal.config.domain.database;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import org.mule.module.db.internal.domain.database.GenericDbConfig;
+import org.mule.module.db.internal.domain.database.DataSourceFactory;
 import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Collections;
-
-import javax.sql.DataSource;
 
 import org.junit.Test;
 
@@ -26,16 +23,16 @@ public class DbConfigFactoryBeanTestCase extends AbstractMuleTestCase
 {
 
     @Test
-    public void disposesDbConfig() throws Exception
+    public void disposesDataSourceFactory() throws Exception
     {
-        final GenericDbConfig dbConfig = mock(GenericDbConfig.class);
+        final DataSourceFactory dataSourceFactory = mock(DataSourceFactory.class);
 
-        DbConfigFactoryBean dbConfigFactoryBean = new DbConfigFactoryBean()
+        DbConfigResolverFactoryBean dbConfigFactoryBean = new DbConfigResolverFactoryBean()
         {
             @Override
-            protected GenericDbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager)
+            protected DataSourceFactory createDataSourceFactory()
             {
-                return dbConfig;
+                return dataSourceFactory;
             }
         };
         dbConfigFactoryBean.setCustomDataTypes(Collections.<DbType>emptyList());
@@ -43,6 +40,6 @@ public class DbConfigFactoryBeanTestCase extends AbstractMuleTestCase
 
         dbConfigFactoryBean.dispose();
 
-        verify(dbConfig).dispose();
+        verify(dataSourceFactory).dispose();
     }
 }

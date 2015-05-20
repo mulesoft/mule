@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.database;
+package org.mule.module.db.internal.domain.database;
 
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
@@ -14,20 +14,14 @@ import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OracleConfigFactoryBean extends AbstractVendorConfigFactoryBean
+/**
+ * Creates {@link DbConfig} instances for Oracle databases
+ */
+public class OracleDbConfigFactory extends GenericDbConfigFactory
 {
 
     private static final int CURSOR_TYPE_ID = -10;
     private static final String CURSOR_TYPE_NAME = "CURSOR";
-
-    private static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
-    private static final String ORACLE_URL_PREFIX = "jdbc:oracle:thin:@";
-
-    protected OracleConfigFactoryBean()
-    {
-        super(ORACLE_URL_PREFIX);
-        setDriverClassName(DRIVER_CLASS_NAME);
-    }
 
     @Override
     protected List<DbType> getVendorDataTypes()
@@ -38,5 +32,4 @@ public class OracleConfigFactoryBean extends AbstractVendorConfigFactoryBean
 
         return dbTypes;
     }
-
 }

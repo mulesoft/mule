@@ -8,19 +8,21 @@
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <flow name="defaultQueryRequestResponse">
-        <vm:inbound-endpoint path="testIn" exchange-pattern="one-way"/>
+        <vm:inbound-endpoint path="testIn" exchange-pattern="request-response">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
 
-        <transactional>
-            <db:delete config-ref="pooledJdbcConfig">
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+
+        <db:select config-ref="pooledJdbcConfig" maxRows="2">
+            <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
+        </db:select>
+
+        <collection-splitter/>
+
+        <!-- This needs to processStatement a new connection -->
+        <db:delete config-ref="pooledJdbcConfig" transactionalAction="NOT_SUPPORTED">
                 <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
-            </db:delete>
-            <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$JoinRequests"/>
-        </transactional>
-
-        <vm:outbound-endpoint path="testOut" exchange-pattern="one-way"/>
-
-        <catch-exception-strategy>
-            <vm:outbound-endpoint path="connectionError" exchange-pattern="one-way"/>
-        </catch-exception-strategy>
+        </db:delete>
     </flow>
 </mule>

@@ -7,73 +7,43 @@
 
 package org.mule.module.db.internal.domain.database;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.retry.RetryPolicyTemplate;
+import static org.mule.common.Result.Status.FAILURE;
+import static org.mule.common.Result.Status.SUCCESS;
+import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
 import org.mule.common.DefaultResult;
 import org.mule.common.DefaultTestResult;
 import org.mule.common.Result;
 import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataKey;
-import org.mule.module.db.internal.domain.connection.ConnectionFactory;
-import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
-import org.mule.module.db.internal.domain.connection.RetryConnectionFactory;
-import org.mule.module.db.internal.domain.connection.SimpleConnectionFactory;
-import org.mule.module.db.internal.domain.connection.TransactionalDbConnectionFactory;
-import org.mule.module.db.internal.domain.transaction.TransactionCoordinationDbTransactionManager;
+import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
-import org.mule.module.db.internal.domain.xa.CompositeDataSourceDecorator;
 
-import com.mchange.v2.c3p0.DataSources;
-
-import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
-
-import org.enhydra.jdbc.standard.StandardDataSource;
-import org.enhydra.jdbc.standard.StandardXADataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Defines a database configuration that is not customized for any particular
  * database vendor
  */
-public class GenericDbConfig implements DbConfig, Initialisable, Disposable
+public class GenericDbConfig implements DbConfig
 {
-    protected static final Logger logger = LoggerFactory.getLogger(GenericDbConfig.class);
 
-    private DataSource dataSource;
+    private final DataSource dataSource;
     private final String name;
-    private TransactionalDbConnectionFactory dbConnectionFactory;
+    private final DbConnectionFactory dbConnectionFactory;
     private final DbTypeManager dbTypeManager;
 
-    private final CompositeDataSourceDecorator databaseDecorator = new CompositeDataSourceDecorator();
-    private DbPoolingProfile poolingProfile;
-    private boolean useXaTransactions;
-    private String username;
-    private String password;
-    private int connectionTimeout;
-    private int transactionIsolation;
-    private String driverClassName;
-    private MuleContext muleContext;
-    private String url;
-    private RetryPolicyTemplate retryPolicyTemplate;
-
-    public GenericDbConfig(DataSource dataSource, String name, DbTypeManager dbTypeManager)
+    public GenericDbConfig(DataSource dataSource, String name, DbTypeManager dbTypeManager, DbConnectionFactory dbConnectionFactory)
     {
-        this.dataSource = dataSource;
         this.name = name;
+        this.dataSource = dataSource;
         this.dbTypeManager = dbTypeManager;
+        this.dbConnectionFactory = dbConnectionFactory;
     }
 
     @Override
@@ -89,7 +59,7 @@ public class GenericDbConfig implements DbConfig, Initialisable, Disposable
     }
 
     @Override
-    public TransactionalDbConnectionFactory getConnectionFactory()
+    public DbConnectionFactory getConnectionFactory()
     {
         return dbConnectionFactory;
     }
@@ -106,12 +76,13 @@ public class GenericDbConfig implements DbConfig, Initialisable, Disposable
 
         try
         {
-            connection = dataSource.getConnection();
-            return new DefaultTestResult(Result.Status.SUCCESS);
+            connection = dbConnectionFactory.createConnection(NOT_SUPPORTED);
+
+            return new DefaultTestResult(SUCCESS);
         }
         catch (SQLException e)
         {
-            return new DefaultTestResult(Result.Status.FAILURE, e.getMessage());
+            return new DefaultTestResult(FAILURE, e.getMessage());
         }
         finally
         {
@@ -134,177 +105,12 @@ public class GenericDbConfig implements DbConfig, Initialisable, Disposable
     {
         List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
 
-        return new DefaultResult<List<MetaDataKey>>(keys, Result.Status.SUCCESS, "Successfully obtained metadata");
+        return new DefaultResult<>(keys, SUCCESS, "Successfully obtained metadata");
     }
 
     @Override
     public Result<MetaData> getMetaData(MetaDataKey metaDataKey)
     {
-        return new DefaultResult<MetaData>(null, Result.Status.SUCCESS, "No metadata obtained");
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        databaseDecorator.init(muleContext);
-        DataSource instanceDataSource = dataSource;
-        if (instanceDataSource == null)
-        {
-            try
-            {
-                dataSource = createDataSource();
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(e, this);
-            }
-        }
-        dataSource = decorateDataSourceIfRequired(dataSource);
-
-        ConnectionFactory connectionFactory;
-        if (retryPolicyTemplate == null)
-        {
-            connectionFactory = new SimpleConnectionFactory();
-        }
-        else
-        {
-            connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, new SimpleConnectionFactory());
-        }
-
-        dbConnectionFactory = new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, this.getDataSource());
-    }
-
-    @Override
-    public void dispose()
-    {
-        if (poolingProfile == null || useXaTransactions)
-        {
-            return;
-        }
-
-        try
-        {
-            DataSources.destroy(dataSource);
-        }
-        catch (SQLException e)
-        {
-            logger.warn("Unable to properly release pooled data source", e);
-        }
-    }
-
-    protected DataSource createDataSource() throws Exception
-    {
-        if (poolingProfile == null)
-        {
-            DataSource singleDataSource = createSingleDataSource();
-            return singleDataSource;
-        }
-        else
-        {
-            return createPooledDataSource();
-        }
-    }
-
-    private DataSource createSingleDataSource() throws SQLException
-    {
-        StandardDataSource dataSource = useXaTransactions ? new StandardXADataSource() : new StandardDataSource();
-        dataSource.setDriverName(driverClassName);
-        if (connectionTimeout >= 0)
-        {
-            dataSource.setLoginTimeout(connectionTimeout);
-        }
-        dataSource.setPassword(password);
-        dataSource.setTransactionIsolation(transactionIsolation);
-        dataSource.setUrl(url);
-        dataSource.setUser(username);
-
-        return dataSource;
-    }
-
-    private DataSource createPooledDataSource() throws PropertyVetoException, SQLException
-    {
-        if (useXaTransactions)
-        {
-            return createPooledXaDataSource();
-        }
-        else
-        {
-            return createPooledStandardDataSource();
-        }
-    }
-
-    private DataSource createPooledStandardDataSource() throws PropertyVetoException, SQLException
-    {
-        Map<String, Object> config = new HashMap<String, Object>();
-        config.put("maxPoolSize", poolingProfile.getMaxPoolSize());
-        config.put("minPoolSize", poolingProfile.getMinPoolSize());
-        config.put("initialPoolSize", poolingProfile.getMinPoolSize());
-        config.put("checkoutTimeout", poolingProfile.getMaxWaitMillis());
-        config.put("acquireIncrement", poolingProfile.getAcquireIncrement());
-        config.put("maxStatements", 0);
-        config.put("maxStatementsPerConnection", poolingProfile.getPreparedStatementCacheSize());
-
-        return DataSources.pooledDataSource(createSingleDataSource(), config);
-    }
-
-    private DataSource createPooledXaDataSource() throws SQLException
-    {
-        DataSource dataSource = createSingleDataSource();
-        return decorateDataSourceIfRequired(dataSource);
-    }
-
-    private DataSource decorateDataSourceIfRequired(DataSource dataSource)
-    {
-        return databaseDecorator.decorate(dataSource, getName(), poolingProfile, muleContext);
-    }
-
-    public void setPoolingProfile(DbPoolingProfile poolingProfile)
-    {
-        this.poolingProfile = poolingProfile;
-    }
-
-    public void setUseXaTransactions(boolean useXaTransactions)
-    {
-        this.useXaTransactions = useXaTransactions;
-    }
-
-    public void setUrl(String url)
-    {
-        this.url = url;
-    }
-
-    public void setConnectionTimeout(int connectionTimeout)
-    {
-        this.connectionTimeout = connectionTimeout;
-    }
-
-    public void setUsername(String username)
-    {
-        this.username = username;
-    }
-
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
-
-    public void setTransactionIsolation(int transactionIsolation)
-    {
-        this.transactionIsolation = transactionIsolation;
-    }
-
-    public void setDriverClassName(String driverClassName)
-    {
-        this.driverClassName = driverClassName;
-    }
-
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
-
-    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
-    {
-        this.retryPolicyTemplate = retryPolicyTemplate;
+        return new DefaultResult<>(null, SUCCESS, "No metadata obtained");
     }
 }
