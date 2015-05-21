@@ -12,7 +12,7 @@ import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 
-public class AbstractDynamicDatabaseConfigTestCase extends AbstractDatabaseConfigTestCase
+public abstract class AbstractDynamicDatabaseConfigTestCase extends AbstractDatabaseConfigTestCase
 {
 
     public AbstractDynamicDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
