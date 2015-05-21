@@ -6,14 +6,17 @@
  */
 package org.mule.transport.sftp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.api.MuleRuntimeException;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Ensures that the file is moved to the archiveFile folder after a successful
@@ -21,7 +24,7 @@ import java.io.IOException;
  * 
  * @author Magnus Larsson
  */
-public class SftpFileArchiveInputStream extends FileInputStream implements ErrorOccurredDecorator
+public class SftpFileArchiveInputStream extends FileInputStream implements SftpStream
 {
     /**
      * logger used by this class
@@ -30,7 +33,10 @@ public class SftpFileArchiveInputStream extends FileInputStream implements Error
 
     private File file;
     private File archiveFile;
+    private final SftpInputStream remoteStream;
     private boolean errorOccured = false;
+    private boolean postProcessActionEnabled = false;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     // Log every 10 000 000 bytes read at debug-level
     // Good if really large files are transferred and you tend to get nervous by not
@@ -39,19 +45,18 @@ public class SftpFileArchiveInputStream extends FileInputStream implements Error
     private long bytesRead = 0;
     private long nextLevelToLogBytesRead = LOG_BYTE_INTERVAL;
 
-    public SftpFileArchiveInputStream(File file) throws FileNotFoundException
+    public SftpFileArchiveInputStream(File file, SftpInputStream remoteStream) throws FileNotFoundException
     {
         super(file);
 
         this.file = file;
         this.archiveFile = null;
+        this.remoteStream = remoteStream;
     }
 
-    public SftpFileArchiveInputStream(File file, File archiveFile) throws FileNotFoundException
+    public SftpFileArchiveInputStream(File file, File archiveFile, SftpInputStream sftpInputStream) throws FileNotFoundException
     {
-        super(file);
-
-        this.file = file;
+        this(file, sftpInputStream);
         this.archiveFile = archiveFile;
     }
 
@@ -76,13 +81,51 @@ public class SftpFileArchiveInputStream extends FileInputStream implements Error
         return super.read(b);
     }
 
+    @Override
     public void close() throws IOException
     {
+        if (!closed.compareAndSet(false, true))
+        {
+            return;
+        }
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Closing the stream for the file " + file);
         }
         super.close();
+        remoteStream.close();
+
+        if (postProcessActionEnabled)
+        {
+            try
+            {
+                postProcess();
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public boolean isClosed()
+    {
+        return closed.get();
+    }
+
+    @Override
+    public void postProcess() throws Exception
+    {
+        if (!errorOccured)
+        {
+            remoteStream.postProcess();
+        }
+        else
+        {
+            remoteStream.releaseConnection();
+        }
 
         if (!errorOccured && archiveFile != null)
         {
@@ -95,10 +138,17 @@ public class SftpFileArchiveInputStream extends FileInputStream implements Error
         }
     }
 
+    @Override
     public void setErrorOccurred()
     {
         if (logger.isDebugEnabled()) logger.debug("setErrorOccurred() called");
         this.errorOccured = true;
+    }
+
+    @Override
+    public void setPostProcessActionEnabled(boolean postProcessActionEnabled)
+    {
+        this.postProcessActionEnabled = postProcessActionEnabled;
     }
 
     private void logReadBytes(int newBytesRead)
