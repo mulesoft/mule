@@ -7,6 +7,7 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -15,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageRouter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
@@ -62,6 +64,8 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             {
                 event = new DefaultMuleEvent(event, new NonBlockingProcessorExecutorReplyToHandler());
             }
+            // Update RequestContext ThreadLocal for backwards compatibility
+            OptimizedRequestContext.unsafeSetEvent(event);
         }
     }
 
@@ -88,6 +92,8 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
         public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
         {
             NonBlockingProcessorExecutor.this.event = new DefaultMuleEvent(event, replyToHandler);
+            // Update RequestContext ThreadLocal for backwards compatibility
+            OptimizedRequestContext.unsafeSetEvent(event);
             try
             {
                 resume();

@@ -11,6 +11,7 @@ import static org.mule.context.notification.BaseConnectorMessageNotification.MES
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -70,6 +71,8 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                         {
                             muleEvent = new DefaultMuleEvent(muleEvent, new ExceptionHandlingReplyToHandlerDecorator(new FlowProcessingNonBlockingReplyToHandler(template, phaseResultNotifier, exceptionHandler),
                                                                                                                 messageProcessContext.getFlowConstruct().getExceptionListener()));
+                            // Update RequestContext ThreadLocal for backwards compatibility
+                            OptimizedRequestContext.unsafeSetEvent(muleEvent);
                         }
                         return template.routeEvent(muleEvent);
                     }

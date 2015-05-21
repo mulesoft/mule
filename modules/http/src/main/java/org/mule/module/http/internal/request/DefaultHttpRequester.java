@@ -9,6 +9,7 @@ package org.mule.module.http.internal.request;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -201,7 +202,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                  public void onFailure(Exception exception)
                                  {
                                      MessagingException msgException = new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"),
-                                                                                              DefaultMuleEvent.copy(muleEvent),
+                                                                                              resetMuleEventForNewThread(muleEvent),
                                                                                               exception,
                                                                                               DefaultHttpRequester.this);
                                      completionHandler.onFailure(msgException);
@@ -216,6 +217,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                          notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(),
                                                                              muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
                                          httpResponseToMuleEvent.convert(muleEvent, httpResponse);
+                                         resetMuleEventForNewThread(muleEvent);
+
 
                                          if (resendRequest(muleEvent, checkRetry, authentication))
                                          {
@@ -234,8 +237,17 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                      }
                                      catch (MuleException muleException)
                                      {
-                                         completionHandler.onFailure(new MessagingException(muleEvent, muleException, DefaultHttpRequester.this));
+                                         completionHandler.onFailure(new MessagingException(resetMuleEventForNewThread(muleEvent), muleException, DefaultHttpRequester.this));
                                      }
+                                 }
+
+                                 private MuleEvent resetMuleEventForNewThread(MuleEvent event)
+                                 {
+                                     // Reset access control for new thread
+                                     ((DefaultMuleEvent)event).resetAccessControl();
+                                     // Set RequestContext ThreadLocal in new thread for backwards compatibility
+                                     OptimizedRequestContext.unsafeSetEvent(event);
+                                     return event;
                                  }
                              });
     }

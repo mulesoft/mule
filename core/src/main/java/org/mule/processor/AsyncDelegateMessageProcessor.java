@@ -8,6 +8,7 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -130,6 +131,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             MuleEvent newEvent = new DefaultMuleEvent(
                     (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false, false,
                     MessageExchangePattern.ONE_WAY);
+            // Update RequestContext ThreadLocal for backwards compatibility
+            OptimizedRequestContext.unsafeSetEvent(newEvent);
             target.process(newEvent);
         }
         if (muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())

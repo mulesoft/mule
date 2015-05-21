@@ -8,6 +8,7 @@ package org.mule.interceptor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -73,6 +74,9 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
 
         final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
         responseEvent = new DefaultMuleEvent(event, new ResponseReplyToHandler(originalReplyToHandler, time, startTime));
+        // Update RequestContext ThreadLocal for backwards compatibility
+        OptimizedRequestContext.unsafeSetEvent(responseEvent);
+
         try
         {
             responseEvent = processNext(processRequest(responseEvent));

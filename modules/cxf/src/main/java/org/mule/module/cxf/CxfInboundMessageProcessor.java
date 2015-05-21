@@ -11,6 +11,7 @@ import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
@@ -266,6 +267,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                         originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
                     }
                 });
+                // Update RequestContext ThreadLocal for backwards compatibility
+                OptimizedRequestContext.unsafeSetEvent(event);
             }
 
             MuleEvent responseEvent = sendThroughCxf(event, exchange);
