@@ -10,6 +10,7 @@ import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.NonBlockingVoidMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
@@ -275,6 +276,8 @@ public class MuleUniversalConduit extends AbstractConduit
                     }
                 });
             }
+            // Update RequestContext ThreadLocal for backwards compatibility
+            OptimizedRequestContext.unsafeSetEvent(reqEvent);
 
             MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
 

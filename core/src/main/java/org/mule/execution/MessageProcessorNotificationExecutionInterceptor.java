@@ -8,6 +8,7 @@ package org.mule.execution;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -91,6 +92,9 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
                     originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
                 }
             });
+            // Update RequestContext ThreadLocal for backwards compatibility
+            OptimizedRequestContext.unsafeSetEvent(eventToProcess);
+
         }
         try
         {

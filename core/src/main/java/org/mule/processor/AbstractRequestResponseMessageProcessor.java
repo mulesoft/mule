@@ -8,6 +8,7 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -74,6 +75,8 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
             public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
             {
                 MuleEvent response = processResponse(new DefaultMuleEvent(event, originalReplyToHandler));
+                // Update RequestContext ThreadLocal for backwards compatibility
+                OptimizedRequestContext.unsafeSetEvent(response);
                 if (!NonBlockingVoidMuleEvent.getInstance().equals(response))
                 {
                     originalReplyToHandler.processReplyTo(response, null, null);
@@ -88,6 +91,8 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
                 processFinally(exception.getEvent(), exception);
             }
         });
+        // Update RequestContext ThreadLocal for backwards compatibility
+        OptimizedRequestContext.unsafeSetEvent(event);
 
         try
         {
