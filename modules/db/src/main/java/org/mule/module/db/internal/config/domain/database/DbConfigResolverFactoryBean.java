@@ -81,10 +81,14 @@ public class DbConfigResolverFactoryBean extends AbstractFactoryBean<DbConfigRes
         }
         else
         {
-            DataSource instanceDataSource = dataSource;
-            if (instanceDataSource == null)
+            DataSource instanceDataSource;
+            if (dataSource == null)
             {
                 instanceDataSource = dataSourceFactory.create(dataSourceConfig);
+            }
+            else
+            {
+                instanceDataSource = dataSourceFactory.decorateDataSource(dataSource, dataSourceConfig.getPoolingProfile(), muleContext);
             }
 
             DbConfig dbConfig = dbConfigFactory.create(name, instanceDataSource);

@@ -73,7 +73,7 @@ public class DataSourceFactory implements MuleContextAware, Disposable
 
         if (dataSourceConfig.isUseXaTransactions())
         {
-            dataSource = decorateDataSource(dataSource, dataSourceConfig.getPoolingProfile());
+            dataSource = decorateDataSource(dataSource, dataSourceConfig.getPoolingProfile(), getMuleContext());
         }
 
         if (!(dataSourceConfig.getPoolingProfile() == null || dataSourceConfig.isUseXaTransactions()))
@@ -85,12 +85,12 @@ public class DataSourceFactory implements MuleContextAware, Disposable
         return dataSource;
     }
 
-    protected DataSource decorateDataSource(DataSource dataSource, DbPoolingProfile poolingProfile)
+    public DataSource decorateDataSource(DataSource dataSource, DbPoolingProfile poolingProfile, MuleContext muleContext)
     {
         CompositeDataSourceDecorator dataSourceDecorator = new CompositeDataSourceDecorator();
-        dataSourceDecorator.init(getMuleContext());
+        dataSourceDecorator.init(muleContext);
 
-        return dataSourceDecorator.decorate(dataSource, name, poolingProfile, getMuleContext());
+        return dataSourceDecorator.decorate(dataSource, name, poolingProfile, muleContext);
     }
 
     protected DataSource createSingleDataSource(DataSourceConfig resolvedDataSourceConfig) throws SQLException

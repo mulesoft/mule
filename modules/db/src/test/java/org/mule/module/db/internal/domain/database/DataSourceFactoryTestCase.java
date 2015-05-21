@@ -10,6 +10,7 @@ package org.mule.module.db.internal.domain.database;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import org.mule.api.MuleContext;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -36,7 +37,7 @@ public class DataSourceFactoryTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        protected DataSource decorateDataSource(DataSource dataSource, DbPoolingProfile poolingProfile)
+        public DataSource decorateDataSource(DataSource dataSource, DbPoolingProfile poolingProfile, MuleContext muleContext)
         {
             return dataSource;
         }
