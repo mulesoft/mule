@@ -27,7 +27,7 @@ In this guide you will find:
 
  
 # Before you begin 
-Mule is a powerful and complex project. Before contributing to the Mule source code, it's important to understand the domain of the enterprose integration, Mule ESB from the user point of view and the different mechanisms to extend Mule.
+Mule is a powerful and complex project. Before contributing to the Mule source code, it's important to understand the domain of the enterprise integration, Mule ESB from the user point of view and the different mechanisms to extend Mule.
 
 ## Getting to know better Mule
 There are a number of sources you can use to understand better Mule and its forthcoming features:
@@ -35,12 +35,12 @@ There are a number of sources you can use to understand better Mule and its fort
 - MuleSoft's [blog](http://blogs.mulesoft.org/). The fastest way of knowing about new features in mule. 
 - [@MuleSoft](https://twitter.com/MuleSoft)'s twitter account. You might also want to check the [#MuleESB](https://twitter.com/hashtag/MuleESB) hashtag.
 - [Mule User Guide](http://www.mulesoft.org/documentation/display/current/Mule+User+Guide), the official documentation around usage of Mule ESB.
-- The books [Mule in Action 2ed](http://www.manning.com/dossot2/) and [Getting Started with Mule Cloud Connect](http://shop.oreilly.com/product/0636920025726.do). Both are excelent resources to understand how to use and extend Mule.
+- The books [Mule in Action 2ed](http://www.manning.com/dossot2/) and [Getting Started with Mule Cloud Connect](http://shop.oreilly.com/product/0636920025726.do). Both are excellent resources to understand how to use and extend Mule.
 
 
 ## Visiting the community meeting points
 
-If you are here reading this document, you probably have already in mind a new feature or a bug fix to work on. This is great, however there could be other members of the communiry with the same idea.  
+If you are here reading this document, you probably have already in mind a new feature or a bug fix to work on. This is great, however there could be other members of the community with the same idea.  
 
 Before you begin, please take a few minutes to review community meeting points to make sure someone else hasn't already taken on your challenge:
 
@@ -51,11 +51,11 @@ If, in the above-listed resources, no-one else has initiated your improvement or
 
 ## Understanding the extension mechanisms
 
-Mule ESB has two different extension mechanisms for writting modules and connectors. Avoiding to add functionality to this project and rather use one of those mechanisms to extend Mule is probably the more favorable option.
+Mule ESB has two different extension mechanisms for writing modules and connectors. Avoiding to add functionality to this project and rather use one of those mechanisms to extend Mule is probably the more favorable option.
 
-It is therefor important to understand those two extension mechanisms. The first and more intuitive mechanism for extensions is the [Anypoint Connector DevKit](http://www.mulesoft.org/documentation/display/current/Anypoint+Connector+DevKit), an annotation based framework for easy construction of extesions. The second choice is to extend mule through the [Extensions](http://www.mulesoft.org/documentation/display/current/Extending) mechanism.
+It is therefor important to understand those two extension mechanisms. The first and more intuitive mechanism for extensions is the [Anypoint Connector DevKit](http://www.mulesoft.org/documentation/display/current/Anypoint+Connector+DevKit), an annotation based framework for easy construction of extensions. The second choice is to extend mule through the [Extensions](http://www.mulesoft.org/documentation/display/current/Extending) mechanism.
 
-Now we should undestand Mule and the enterprise integration domain. At the same time we should  know the different extension mechanisms of Mule.
+Now we should understand Mule and the enterprise integration domain. At the same time we should  know the different extension mechanisms of Mule.
 
  
 # Setting up the development environment
@@ -76,7 +76,7 @@ Before you get started, you need to set yourself up with an environment in which
 4. If you are using a Mac OS X, examine the contents of the `$JAVA_HOME/jre/lib/` security directory to confirm that the following two files are present:  
     - local_policy.jar
     - US_export_policy.jar  
-These two files prevent any problems regarding cryptology. If not present, download the [Java Cryptology Extension (JCE) Unlimited Strength Jurisdiction Policy Files 6.0](http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html), then copy the files into the security directory identified above.
+These two files prevent any problems regarding cryptography. If not present, download the [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 6.0](http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html), then copy the files into the security directory identified above.
 
 ### Maven
 
@@ -110,7 +110,7 @@ If you're new to Git, consider reading [Pro Git](http://git-scm.com/book) to abs
     - For **SSH**: `git remote add upstream git@github.com:mulesoft/mule.git`
 
 ## Understanding the build
-This is an excelent moment to read the guide to [build Mule](BUILD.md). A correct understanding of how the Mule project is organized and build is key for a productive development.
+This is an excellent moment to read the guide to [build Mule](BUILD.md). A correct understanding of how the Mule project is organized and build is key for a productive development.
 
 We are ready to develop our improvements. However, instead of doing it manually we may want to configure an IDE for better productivity. We will do it in the next section.
 
@@ -137,7 +137,7 @@ An open-source integration development platform, use Eclipse to modify or add to
 
 #### Debugging
 
-You can debug following these steps. There is also a more in-depth guide avaiable in the [Mule documentation site](http://www.mulesoft.org/documentation/display/current/Step+Debugging).
+You can debug following these steps. There is also a more in-depth guide available in the [Mule documentation site](http://www.mulesoft.org/documentation/display/current/Step+Debugging).
 
 1. In Eclipse, select **Window >  Open Perspective > Other...**, then select **Java** to open the Java Perspective.
 2. Select **File > New > Java Project**. You are creating a new project just for launching Mule.
@@ -199,7 +199,7 @@ If you IDEA presents any compilation errors in test classes from the CXF module 
 
 #### Debugging Remotely
 
-You can debug following these steps. There is also a more in-depth guide avaiable in the [Mule documentation site](http://www.mulesoft.org/documentation/display/current/Step+Debugging).
+You can debug following these steps. There is also a more in-depth guide available in the [Mule documentation site](http://www.mulesoft.org/documentation/display/current/Step+Debugging).
 
 1. Start the Mule server with the `-debug` switch. The server waits until a debugger attaches.
 2. In IDEA, select **Run > Edit Configurations...** to open the **Run/Debug Configurations** window.
@@ -213,7 +213,7 @@ Use Maven to run unit tests on your project using the following command: `mvn te
 
 In addition to the unit tests for each sub-project, the Mule parent project has a separate sub-project containing integration tests. These tests verify "macroscopic" functionality that could not be tested by any single sub-project alone.
 
-We finally have everything ready to start writting code. Lets start with the code and also learn how to commit it in the next section.
+We finally have everything ready to start writing code. Lets start with the code and also learn how to commit it in the next section.
 
 
 #  Developing your contribution
@@ -226,7 +226,7 @@ In order to create our feature branch we should follow these steps:
 
 1. From your local drive, create a new branch in which you can work on your bug fix or improvement using the following command:
 `git branch yourJIRAissuenumber`.
-2. Switch to the new branch using the followcing ommand: 
+2. Switch to the new branch using the following command: 
 `git checkout yourJIRAissuenumber`.
 
 Now we should be able to make our very first compilation of the Mule ESB source code. We just need to instruct Maven to download all the dependent libraries and compile the project, you can do so execution the following command Within the directory into which you cloned the Mule source code: `mvn -DskipTests install`.
@@ -244,7 +244,7 @@ Now that you're all set with a local development environment and your own branch
 4. Debug and test your  local version, resolving any issues that arise. 
 5. Save your changes locally.
 6. Prepare your changes for a Pull Request by first squashing your changes into a single commit on your branch using the following command: 
-`git rebase -i mule3.x`.
+`git rebase -i mule-3.x`.
 7. Push your squashed commit to your branch on your github repository. Refer to [Git's documentation](http://git-scm.com/book/en/Git-Basics-Recording-Changes-to-the-Repository) for details on how to commit your changes.
 8. Regularly update your branch with any changes or fixes applied to the mule-3.x branch. Refer to details below.
 
