@@ -6,10 +6,6 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
-
     <flow name="helloMuleFlow">
         <inbound-endpoint address="${scheme}://localhost:${port1}/service/helloMule" connector-ref="sharedHttpConnector"/>
         <set-payload value="hello mule"/>
