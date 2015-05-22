@@ -164,19 +164,45 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="assert" substitutionGroup="mule:abstract-message-processor">
+    <xsd:element name="assert" substitutionGroup="mule:abstract-message-processor" type="assertType">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that has no effect.
+                Assertion processor used to assert an expression, invocation count and thread.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="assertType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:attribute name="expression" />
+                <xsd:attribute name="message"/>
+                <xsd:attribute name="count" type="xsd:string" default="1"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="assert-intercepting" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Assertion processor used to assert an expression, invocation count and thread of request and response.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="mule:abstractMessageProcessorType">
-                    <xsd:attribute name="expression" use="required" />
-                    <xsd:attribute name="message"/>
-                    <xsd:attribute name="count" type="xsd:string"/>
+                <xsd:extension base="assertType">
+                    <xsd:attribute name="responseExpression" />
+                    <xsd:attribute name="responseCount" type="xsd:string" default="1"/>
+                    <xsd:attribute name="responseSameThread" type="xsd:string" default="true"/>
                 </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="non-blocking-processor" substitutionGroup="mule:abstract-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType"/>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
