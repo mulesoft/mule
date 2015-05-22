@@ -11,6 +11,7 @@ import org.mule.api.serialization.SerializationException;
 import org.mule.util.SerializationUtils;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 /**
@@ -27,22 +28,19 @@ public class JavaObjectSerializer extends AbstractObjectSerializer
      * {@inheritDoc}
      */
     @Override
+    public void serialize(Object object, OutputStream out) throws SerializationException
+    {
+        validateForSerialization(object);
+        SerializationUtils.serialize((Serializable) object, out);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected byte[] doSerialize(Object object) throws Exception
     {
-        if (object != null && !(object instanceof Serializable))
-        {
-            throw new SerializationException(String.format(
-                    "Was expecting a Serializable type. %s was found instead", object.getClass()
-                            .getCanonicalName()));
-        }
-
-        if (object != null && !(object instanceof Serializable))
-        {
-            throw new SerializationException(String.format(
-                    "Was expecting a Serializable type. %s was found instead", object.getClass()
-                            .getName()));
-        }
-
+        validateForSerialization(object);
         return SerializationUtils.serialize((Serializable) object);
     }
 
@@ -63,5 +61,14 @@ public class JavaObjectSerializer extends AbstractObjectSerializer
     {
         //does nothing since SerializationUtils already does this on its own
         return object;
+    }
+
+    private void validateForSerialization(Object object)
+    {
+        if (object != null && !(object instanceof Serializable))
+        {
+            throw new SerializationException(String.format(
+                    "Was expecting a Serializable type. %s was found instead", object.getClass().getName()));
+        }
     }
 }
