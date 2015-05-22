@@ -188,7 +188,7 @@ public class SftpReceiverRequesterUtil
             String archiveTmpReceivingDir = sftpUtil.getArchiveTempReceivingDir();
             String archiveTmpSendingDir = sftpUtil.getArchiveTempSendingDir();
 
-            InputStream is = new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(),
+            SftpInputStream is = new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(),
                 endpoint);
 
             // TODO ML FIX. Refactor to util-class...
@@ -234,7 +234,7 @@ public class SftpReceiverRequesterUtil
     private InputStream archiveFileUsingTempDirs(String archive,
                                                  String archiveTmpReceivingDir,
                                                  String archiveTmpSendingDir,
-                                                 InputStream is,
+                                                 SftpInputStream is,
                                                  String fileNamePart,
                                                  File archiveFile) throws IOException
     {
@@ -286,10 +286,10 @@ public class SftpReceiverRequesterUtil
             logger.debug("Return SftpFileArchiveInputStream for archiveTmpSendingFile ("
                          + archiveTmpSendingFile + ")...");
         }
-        return new SftpFileArchiveInputStream(archiveTmpSendingFile, archiveFile);
+        return new SftpFileArchiveInputStream(archiveTmpSendingFile, archiveFile, is);
     }
 
-    private InputStream archiveFile(InputStream is, File archiveFile) throws IOException
+    private InputStream archiveFile(SftpInputStream is, File archiveFile) throws IOException
     {
         File archiveFolder = FileUtils.newFile(archiveFile.getParentFile().getPath());
         if (!archiveFolder.exists())
@@ -312,7 +312,7 @@ public class SftpReceiverRequesterUtil
         {
             logger.debug("*** Return SftpFileArchiveInputStream for archiveFile...");
         }
-        return new SftpFileArchiveInputStream(archiveFile);
+        return new SftpFileArchiveInputStream(archiveFile, is);
     }
 
     /**
