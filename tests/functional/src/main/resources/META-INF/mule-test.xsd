@@ -177,7 +177,7 @@
             <xsd:extension base="mule:abstractMessageProcessorType">
                 <xsd:attribute name="expression" />
                 <xsd:attribute name="message"/>
-                <xsd:attribute name="count" type="xsd:string" default="1"/>
+                <xsd:attribute name="count" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -192,7 +192,7 @@
             <xsd:complexContent>
                 <xsd:extension base="assertType">
                     <xsd:attribute name="responseExpression" />
-                    <xsd:attribute name="responseCount" type="xsd:string" default="1"/>
+                    <xsd:attribute name="responseCount" type="xsd:string"/>
                     <xsd:attribute name="responseSameThread" type="xsd:string" default="true"/>
                 </xsd:extension>
             </xsd:complexContent>
