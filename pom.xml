@@ -228,7 +228,7 @@
         <staxonVersion>0.7.0</staxonVersion>
         <sxcVersion>0.7.3</sxcVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
-        <tomcatVersion>6.0.41</tomcatVersion>
+        <tomcatVersion>6.0.44</tomcatVersion>
         <woodstoxVersion>4.1.4</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.2</xalanVersion>
