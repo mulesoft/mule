@@ -10,6 +10,8 @@ import static org.mule.module.launcher.log4j2.MuleLoggerContext.NO_CCL_CLASSLOAD
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
 
+import org.mule.module.reboot.MuleContainerSystemClassLoader;
+
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Iterator;
@@ -80,7 +82,7 @@ abstract class DispatchingLogger extends Logger
 
     private boolean isRootLogger(ClassLoader currentClassLoader)
     {
-        return currentClassLoader == null || ownerClassLoaderHash == NO_CCL_CLASSLOADER || currentClassLoader.hashCode() == ownerClassLoaderHash;
+        return currentClassLoader == null || ownerClassLoaderHash == NO_CCL_CLASSLOADER || currentClassLoader.hashCode() == ownerClassLoaderHash || currentClassLoader instanceof MuleContainerSystemClassLoader;
     }
 
 

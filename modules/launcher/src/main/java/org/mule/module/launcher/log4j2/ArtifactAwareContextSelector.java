@@ -282,7 +282,20 @@ final class ArtifactAwareContextSelector implements ContextSelector
 
         private int computeKey(ClassLoader classLoader)
         {
-            return classLoader == null ? NO_CCL_CLASSLOADER : classLoader.hashCode();
+            if (classLoader == null)
+            {
+                return NO_CCL_CLASSLOADER;
+            }
+            else if (classLoader instanceof ArtifactClassLoader)
+            {
+                return classLoader.hashCode();
+            }
+            else
+            {
+                //For any classloader that's not for an app or domain we just use the system classloader.
+                //This means that the system classloader hashcode is used to locate the container LoggerContext for mule.
+                return classLoader.getSystemClassLoader().hashCode();
+            }
         }
 
         private List<LoggerContext> getAllLoggerContexts()
