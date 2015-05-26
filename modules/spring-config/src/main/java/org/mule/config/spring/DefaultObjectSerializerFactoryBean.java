@@ -6,11 +6,9 @@
  */
 package org.mule.config.spring;
 
-import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.serialization.DefaultObjectSerializer;
 import org.mule.api.serialization.ObjectSerializer;
-import org.mule.serialization.internal.DefaultObjectSerializerWrapper;
 
 import org.springframework.beans.factory.SmartFactoryBean;
 
@@ -20,22 +18,10 @@ import org.springframework.beans.factory.SmartFactoryBean;
  * {@link MuleContext}'s default by invoking
  * {@link MuleContext#getObjectSerializer()}
  * <p/>
- * The default {@link ObjectSerializer} is wrapped in a
- * {@link DefaultObjectSerializerWrapper} so that the instance
- * returned by this factory is one annotated with {@link DefaultObjectSerializer}.
- * <p/>
- * Ideally, that shouldn't be necessary since this class also has
- * that annotation and that should be enough. However, due to
- * <a href="https://jira.spring.io/browse/SPR-12914">
- * Spring issue SPR-12914</a>we have to annotate both classes, since Spring
- * will only consider the annotation in this class when injecting in runtime,
- * while the annotation on {@link DefaultObjectSerializerWrapper} will only be
- * considered at startup time.
- * <p/>
- * When Spring fixes that issue we can get rid of
- * the {@link DefaultObjectSerializerWrapper}
- * and move the {@link DefaultObjectSerializer} annotation
- * to this one
+ * Because this class is annotated with the
+ * {@link DefaultObjectSerializer} qualified, this factory
+ * bean will be used to resolve injections requests for
+ * such qualifier
  *
  * @since 3.7.0
  */
@@ -53,13 +39,7 @@ public class DefaultObjectSerializerFactoryBean implements SmartFactoryBean<Obje
     @Override
     public ObjectSerializer getObject() throws Exception
     {
-        ObjectSerializer serializer = new DefaultObjectSerializerWrapper(muleContext.getObjectSerializer());
-        if (muleContext instanceof DefaultMuleContext)
-        {
-            ((DefaultMuleContext) muleContext).setObjectSerializer(serializer);
-        }
-
-        return serializer;
+        return muleContext.getObjectSerializer();
     }
 
     @Override

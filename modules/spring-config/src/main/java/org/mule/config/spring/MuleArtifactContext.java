@@ -39,6 +39,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
+import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -241,7 +242,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected DefaultListableBeanFactory createBeanFactory()
     {
         //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
-        DefaultListableBeanFactory beanFactory = new MuleBeanFactory(getInternalParentBeanFactory());
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(getInternalParentBeanFactory());
+        beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
         beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(), optionalObjectsController));
 
         if (getParent() != null)
