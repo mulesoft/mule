@@ -27,12 +27,16 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.filefilter.FalseFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -990,5 +994,30 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
 
         return timeStamp;
+    }
+
+    public static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive)
+    {
+        return listFiles(folder, filter, recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
+    }
+
+    public static File findFileByName(File folder, final String filename, boolean recursive)
+    {
+        Collection<File> files = FileUtils.findFiles(folder, new IOFileFilter()
+        {
+            @Override
+            public boolean accept(File file)
+            {
+                return filename.equals(file.getName());
+            }
+
+            @Override
+            public boolean accept(File dir, String name)
+            {
+                return true;
+            }
+        }, true);
+
+        return CollectionUtils.isEmpty(files) ? null : files.iterator().next();
     }
 }
