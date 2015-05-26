@@ -169,7 +169,7 @@
         <springSecurityVersion>3.0.3.RELEASE</springSecurityVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.3</sxcVersion>
-        <tomcatVersion>6.0.41</tomcatVersion>
+        <tomcatVersion>6.0.44</tomcatVersion>
         <woodstoxVersion>4.0.8</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.2</xalanVersion>
