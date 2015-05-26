@@ -192,7 +192,7 @@
 /mule-standalone-${productVersion}/lib/opt/abdera-parser-0.4.0-incubating.jar
 /mule-standalone-${productVersion}/lib/opt/abdera-server-0.4.0-incubating.jar
 /mule-standalone-${productVersion}/lib/opt/abdera-spring-0.4.0-incubating.jar
-/mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.41.jar
+/mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-3.1.1.jar
@@ -257,7 +257,7 @@
 /mule-standalone-${productVersion}/lib/opt/drools-compiler-5.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/drools-core-5.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/ecj-4.3.1.jar
-/mule-standalone-${productVersion}/lib/opt/el-api-6.0.41.jar
+/mule-standalone-${productVersion}/lib/opt/el-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.jar
@@ -290,8 +290,8 @@
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-xc-1.9.11.jar
-/mule-standalone-${productVersion}/lib/opt/jasper-6.0.41.jar
-/mule-standalone-${productVersion}/lib/opt/jasper-el-6.0.41.jar
+/mule-standalone-${productVersion}/lib/opt/jasper-6.0.44.jar
+/mule-standalone-${productVersion}/lib/opt/jasper-el-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-jdt-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
@@ -353,10 +353,10 @@
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.4.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
-/mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.41.jar
+/mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/juli-6.0.41.jar
+/mule-standalone-${productVersion}/lib/opt/juli-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7-b3.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-6.0.jar
@@ -411,7 +411,7 @@
 /mule-standalone-${productVersion}/lib/opt/sxc-runtime-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/uri-template-0.9.jar
-/mule-standalone-${productVersion}/lib/opt/coyote-6.0.41.jar
+/mule-standalone-${productVersion}/lib/opt/coyote-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/wsdl4j-1.6.3.jar
