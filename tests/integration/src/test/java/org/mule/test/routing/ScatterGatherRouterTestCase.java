@@ -167,6 +167,12 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void failedEventInAggregationStrategy() throws Exception
+    {
+        runFlow("failedEventInAggregationStrategy", getTestEvent(""));
+    }
+
+    @Test
     public void failingMergeStrategy() throws Exception
     {
         try
@@ -277,6 +283,19 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
                     latch.release();
                 }
             }
+
+            return event;
+        }
+    }
+
+    public static class FlatteningTestAggregationStrategy implements AggregationStrategy {
+
+        @Override
+        public MuleEvent aggregate(AggregationContext context) throws MuleException
+        {
+            MuleEvent event = context.getOriginalEvent();
+            event.getMessage().setPayload(context.getEvents());
+
 
             return event;
         }

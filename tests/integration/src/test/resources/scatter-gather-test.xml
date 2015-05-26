@@ -108,6 +108,24 @@
         </catch-exception-strategy>
     </flow>
 
+    <flow name="failedEventInAggregationStrategy">
+        <scatter-gather>
+            <custom-aggregation-strategy class="org.mule.test.routing.ScatterGatherRouterTestCase$FlatteningTestAggregationStrategy" />
+
+            <set-payload value="apple" />
+            <processor-chain>
+                <flow-ref name="setEventVariables" />
+                <set-payload value="banana" />
+                <test:component throwException="true"/>
+            </processor-chain>
+        </scatter-gather>
+
+        <test:assert expression="#[payload[0].getMessage().getPayload().equals('apple')]" />
+        <test:assert expression="#[payload[1].getMessage().getPayload().equals('banana')]" />
+        <test:assert expression="#[payload[1].getFlowVariable('flow').equals('var')]" />
+        <test:assert expression="#[payload[1].getSessionVariable('session').equals('sessionvar')]" />
+    </flow>
+
     <flow name="failingMergeStrategy">
         <scatter-gather>
             <custom-aggregation-strategy
@@ -120,8 +138,7 @@
     </flow>
 
     <flow name="messageProperties">
-        <set-variable variableName="flow" value="var"/>
-        <set-session-variable variableName="session" value="sessionvar"/>
+        <flow-ref name="setEventVariables" />
 
         <flow-ref name="minimalConfig"/>
 
@@ -277,6 +294,11 @@
         <test:assert expression="#[payload[0] == 'apple']"/>
         <test:assert expression="#[payload[1] == 'banana']"/>
         <test:assert expression="#[payload[2] == 'orange']"/>
+    </sub-flow>
+
+    <sub-flow name="setEventVariables">
+        <set-variable variableName="flow" value="var"/>
+        <set-session-variable variableName="session" value="sessionvar"/>
     </sub-flow>
 
 </mule>
