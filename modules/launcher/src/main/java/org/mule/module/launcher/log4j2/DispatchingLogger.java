@@ -6,11 +6,9 @@
  */
 package org.mule.module.launcher.log4j2;
 
-import static org.mule.module.launcher.log4j2.MuleLoggerContext.NO_CCL_CLASSLOADER;
+import static org.mule.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
-
-import org.mule.module.reboot.MuleContainerSystemClassLoader;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -68,8 +66,8 @@ abstract class DispatchingLogger extends Logger
 
     private Logger getLogger()
     {
-        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-        if (isRootLogger(currentClassLoader))
+        final ClassLoader currentClassLoader = resolveLoggerContextClassLoader(Thread.currentThread().getContextClassLoader());
+        if (useThisLoggerContextClassLoader(currentClassLoader))
         {
             return originalLogger;
         }
@@ -80,9 +78,14 @@ abstract class DispatchingLogger extends Logger
         return contextSelector.getContext(getName(), currentClassLoader, true).getLogger(getName(), getMessageFactory());
     }
 
-    private boolean isRootLogger(ClassLoader currentClassLoader)
+    /**
+     * @param currentClassLoader execution classloader of the logging operation
+     * @return true if the logger context associated with this instance must be used for logging,
+     *      false if we still need to continue searching for the right logger context
+     */
+    private boolean useThisLoggerContextClassLoader(ClassLoader currentClassLoader)
     {
-        return currentClassLoader == null || ownerClassLoaderHash == NO_CCL_CLASSLOADER || currentClassLoader.hashCode() == ownerClassLoaderHash || currentClassLoader instanceof MuleContainerSystemClassLoader;
+        return currentClassLoader.hashCode() == ownerClassLoaderHash;
     }
 
 
