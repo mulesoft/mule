@@ -66,7 +66,6 @@ import org.apache.logging.log4j.status.StatusLogger;
 final class ArtifactAwareContextSelector implements ContextSelector
 {
 
-    private static final int NO_CCL_CLASSLOADER = 0;
     private static final StatusLogger logger = StatusLogger.getLogger();
 
     private LoggerContextCache cache = new LoggerContextCache();
@@ -85,7 +84,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
     @Override
     public LoggerContext getContext(String fqcn, ClassLoader classLoader, boolean currentContext, URI configLocation)
     {
-        return cache.getLoggerContext(resolveClassLoader(classLoader));
+        return cache.getLoggerContext(resolveLoggerContextClassLoader(classLoader));
     }
 
     @Override
@@ -100,9 +99,28 @@ final class ArtifactAwareContextSelector implements ContextSelector
         cache.remove(context);
     }
 
-    private ClassLoader resolveClassLoader(ClassLoader classLoader)
+    /**
+     * Given a classloader this method will resolve which is the classloader
+     * associated with the logger context to use for this classloader.
+     *
+     * When the provided classloader is from an application or a domain it will return
+     * the classloader associated with the logger context of the application or domain.
+     * So far the artifact (domain or app) classloader will be resolved to it self.
+     *
+     * If the clasloader belongs to the container or any other classloader created from a
+     * library running outside the context of an artifact then the system classloader will be used.
+     *
+     * @param classLoader classloader running the code where the logging was done
+     * @return the classloader owner of the logger context
+     */
+    static ClassLoader resolveLoggerContextClassLoader(ClassLoader classLoader)
     {
-        return classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
+        ClassLoader loggerClassLoader = classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
+        if (!(loggerClassLoader instanceof ArtifactClassLoader))
+        {
+            loggerClassLoader = loggerClassLoader.getSystemClassLoader();
+        }
+        return loggerClassLoader;
     }
 
     private void destroyLoggersFor(ClassLoader classLoader)
@@ -154,7 +172,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
                 @Override
                 public void execute()
                 {
-                    destroyLoggersFor(classLoader);
+                    destroyLoggersFor(resolveLoggerContextClassLoader(classLoader));
                 }
             });
         }
@@ -282,20 +300,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
 
         private int computeKey(ClassLoader classLoader)
         {
-            if (classLoader == null)
-            {
-                return NO_CCL_CLASSLOADER;
-            }
-            else if (classLoader instanceof ArtifactClassLoader)
-            {
-                return classLoader.hashCode();
-            }
-            else
-            {
-                //For any classloader that's not for an app or domain we just use the system classloader.
-                //This means that the system classloader hashcode is used to locate the container LoggerContext for mule.
-                return classLoader.getSystemClassLoader().hashCode();
-            }
+            return classLoader.hashCode();
         }
 
         private List<LoggerContext> getAllLoggerContexts()
