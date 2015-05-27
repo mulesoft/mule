@@ -83,6 +83,10 @@ public class FtpMessageRequester extends AbstractMessageRequester
             if(connector.isFile(endpoint,client))
             {
                 fileToProcess = client.listFiles(endpoint.getEndpointURI().getPath())[0];
+                if(!isValid(fileToProcess, getFilenameFilter()))
+                {
+                    return null;
+                }
             } 
             else
             {
@@ -161,16 +165,10 @@ public class FtpMessageRequester extends AbstractMessageRequester
             for (int i = 0; i < files.length; i++)
             {
                 FTPFile file = files[i];
-                if (file.isFile())
+                if (file.isFile() && isValid(file, filenameFilter))
                 {
-                    if (filenameFilter.accept(null, file.getName()))
-                    {
-                        if (connector.validateFile(file))
-                        {
-                            // only read the first one
-                            return file;
-                        }
-                    }
+                    // only read the first one
+                    return file;
                 }
             }
         }
@@ -180,6 +178,11 @@ public class FtpMessageRequester extends AbstractMessageRequester
         }
         
         return null;
+    }
+
+    protected boolean isValid(FTPFile file, FilenameFilter filenameFilter)
+    {
+        return filenameFilter.accept(null, file.getName()) && connector.validateFile(file);
     }
 
     protected FTPFile[] listFiles(FTPClient client) throws IOException
