@@ -41,6 +41,7 @@ import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
+import org.mule.util.TestsLogConfigurationHelper;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 
@@ -63,7 +64,6 @@ import org.junit.rules.TemporaryFolder;
  */
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 {
-
     public static final String TEST_PAYLOAD = "test";
     public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
 
@@ -135,6 +135,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @Before
     public final void setUpMuleContext() throws Exception
     {
+        TestsLogConfigurationHelper.configureLoggingForTest(getClass());
         workingDirectory.create();
         String workingDirectoryOldValue = System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectory.getRoot().getAbsolutePath());
         try
@@ -323,6 +324,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         finally
         {
             muleContext = null;
+            TestsLogConfigurationHelper.clearLoggingConfig();
         }
     }
 
