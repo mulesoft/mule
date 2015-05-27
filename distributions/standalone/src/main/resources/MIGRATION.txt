@@ -72,3 +72,4 @@ MULE-8315: the following Apache Tomcat libraries were upgraded form version 6.0.
 MULE-8308: jruby was upgraded to version 1.7.4 because of a security issue with previous version. Artifact jruby-complete was removed and replaced with jruby-core and its dependencies.
 MULE-8430: in previous versions of Mule, domain home folders where created relative to current working directory instead of relative to <MULE_HOME> folder.
            Now that this is fixed, if your Mule instance was started from a folder other than <MULE_HOME> then folder <WORKING_DIRECTORY>/.mule/<DOMAIN_NAME> must be moved to <MULE_HOME>/.mule/<DOMAIN_NAME>
+MULE-8645: jasper-jdt-6.0.29 is not included anymore on Mule distributions because of some detected vulnerabilities. In case this artifact is needed, when using drools for example, then manually add it on <MULE_HOME>/lib/opt
