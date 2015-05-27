@@ -22,6 +22,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
@@ -518,6 +520,22 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     public boolean isExpression(String string)
     {
         return (string.contains(DEFAULT_EXPRESSION_PREFIX));
+    }
+
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        expression = preProcessExpression(expression);
+        if (isEvaluatorExpression(expression))
+        {
+            String[] parts = expression.split(":", 2);
+            final Object value = evaluate(parts[1], parts[0], message, false);
+            return new TypedValue(value, DataTypeFactory.create(value == null? Object.class : value.getClass(), null));
+        }
+        else
+        {
+            return expressionLanguage.evaluateTyped(expression, message);
+        }
     }
 
     /**

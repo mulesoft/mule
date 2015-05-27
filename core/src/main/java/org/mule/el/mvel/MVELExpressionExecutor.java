@@ -39,9 +39,9 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 
     protected static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
 
-    protected ParserConfiguration parserConfiguration;
+    public ParserConfiguration parserConfiguration;
 
-    protected LoadingCache<String, Serializable> compiledExpressionsCache;
+    public LoadingCache<String, Serializable> compiledExpressionsCache;
 
     public MVELExpressionExecutor(final ParserConfiguration parserConfiguration)
     {
@@ -85,7 +85,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
      * @param expression Expression to be compiled
      * @return A {@link Serializable} object representing the compiled expression
      */
-    protected Serializable getCompiledExpression(final String expression)
+    public Serializable getCompiledExpression(final String expression)
     {
         try
         {
