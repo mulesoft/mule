@@ -58,7 +58,7 @@ class MuleLoggerContext extends LoggerContext
         configFile = configLocn;
         this.contextSelector = contextSelector;
         this.standlone = standalone;
-        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : NO_CCL_CLASSLOADER;
+        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : getClass().getClassLoader().getSystemClassLoader().hashCode();
 
         if (ownerClassLoader instanceof ArtifactClassLoader)
         {
