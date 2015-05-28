@@ -64,7 +64,7 @@ public class TestsLogConfigurationHelper
     private static String findLogConfigurationPath(Class<?> testClass)
     {
         File folder = new File(testClass.getClassLoader().getResource("").getPath().toString());
-        while (folder != null && !"target".equals(folder.getName()))
+        if (folder != null && "target".equals(folder.getParentFile().getName()))
         {
             folder = folder.getParentFile();
         }
