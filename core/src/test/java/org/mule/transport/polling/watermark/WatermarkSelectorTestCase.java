@@ -10,6 +10,8 @@ package org.mule.transport.polling.watermark;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.transport.polling.watermark.selector.MaxValueWatermarkSelector;
 import org.mule.transport.polling.watermark.selector.MinValueWatermarkSelector;
 
@@ -18,7 +20,8 @@ import java.util.Calendar;
 
 import org.junit.Test;
 
-public class WatermarkSelectorTest
+@SmallTest
+public class WatermarkSelectorTestCase extends AbstractMuleTestCase
 {
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private Calendar calendar = Calendar.getInstance();
