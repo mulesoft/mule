@@ -210,7 +210,7 @@ public class StaxSource extends StAXSource
                 // determine location
                 int lineNumber = -1;
                 int columnNumber = -1;
-                if (e.getLocation()!=null) 
+                if (e.getLocation() != null)
                 {
                     lineNumber = e.getLocation().getLineNumber();
                     columnNumber = e.getLocation().getColumnNumber();
