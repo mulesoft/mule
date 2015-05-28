@@ -356,7 +356,7 @@
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.44.jar
-/mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7-b3.jar
+/mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-6.0.jar
 /mule-standalone-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
