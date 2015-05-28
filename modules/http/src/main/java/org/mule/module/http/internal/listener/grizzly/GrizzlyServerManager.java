@@ -6,12 +6,15 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static java.lang.Integer.valueOf;
+import static java.lang.System.getProperty;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.HttpMessageLogger;
 import org.mule.module.http.internal.listener.HttpServerManager;
@@ -22,25 +25,18 @@ import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.concurrent.NamedThreadFactory;
 
 import java.io.IOException;
-import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
-
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
-import org.glassfish.grizzly.filterchain.FilterChainContext;
-import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.filterchain.TransportFilter;
-import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.HttpServerFilter;
 import org.glassfish.grizzly.http.KeepAlive;
 import org.glassfish.grizzly.nio.RoundRobinConnectionDistributor;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
-import org.glassfish.grizzly.ssl.SSLConnectionContext;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
@@ -51,6 +47,8 @@ import org.slf4j.LoggerFactory;
 public class GrizzlyServerManager implements HttpServerManager
 {
 
+    //Defines the maximum size in bytes accepted for the http request header section (request line + headers)
+    public static final String MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY = SYSTEM_PROPERTY_PREFIX + "http.headerSectionSize";
     private static final int MAX_KEEP_ALIVE_REQUESTS = -1;
     private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
     private static final String LISTENER_WORKER_THREAD_NAME_SUFFIX = ".worker";
@@ -263,9 +261,21 @@ public class GrizzlyServerManager implements HttpServerManager
             ka.setMaxRequestsCount(MAX_KEEP_ALIVE_REQUESTS);
             ka.setIdleTimeoutInSeconds(convertToSeconds(connectionIdleTimeout));
         }
-        HttpServerFilter httpServerFilter = new HttpServerFilter(true, DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE, ka, idleTimeoutDelayedExecutor);
+        HttpServerFilter httpServerFilter = new HttpServerFilter(true, retrieveMaximumHeaderSectionSize(), ka, idleTimeoutDelayedExecutor);
         httpServerFilter.getMonitoringConfig().addProbes(new HttpMessageLogger(LISTENER));
         return httpServerFilter;
+    }
+
+    private int retrieveMaximumHeaderSectionSize()
+    {
+        try
+        {
+            return valueOf(getProperty(MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY, String.valueOf(DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE)));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("Invalid value %s for %s configuration", getProperty(MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY), MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY)), e);
+        }
     }
 
     private int convertToSeconds(int milliseconds)
