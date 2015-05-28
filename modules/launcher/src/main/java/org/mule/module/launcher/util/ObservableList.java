@@ -300,9 +300,11 @@ public class ObservableList<E> implements List<E>
 
     private class ObservableIterator implements Iterator<E>
     {
+        protected static final int LAST_RET_NONE = -1;
 
         private Iterator<E> iterDelegate;
         protected int cursor = 0;
+        protected int lastRet = LAST_RET_NONE;
 
         public ObservableIterator(Iterator<E> iterDelegate)
         {
@@ -323,14 +325,22 @@ public class ObservableList<E> implements List<E>
         @Override
         public E next()
         {
-            cursor++;
-            return iterDelegate.next();
+            E next = iterDelegate.next();
+            lastRet = cursor++;
+            return next;
         }
 
         @Override
         public void remove()
         {
-            ObservableList.this.remove(cursor--);
+            if (lastRet < 0)
+            {
+                throw new IllegalStateException("No element has been returned yet, or remove() or add() is called after the return.");
+            }
+            iterDelegate.remove();
+            //ObservableList.this.remove(lastRet);
+            cursor = lastRet;
+            lastRet = LAST_RET_NONE;
         }
     }
 
@@ -351,8 +361,9 @@ public class ObservableList<E> implements List<E>
         @Override
         public void add(E o)
         {
-            ObservableList.this.add(o);
+            getListIterator().add(o);
             cursor++;
+            lastRet = LAST_RET_NONE;
         }
 
         @Override
@@ -370,7 +381,9 @@ public class ObservableList<E> implements List<E>
         @Override
         public E previous()
         {
-            return getListIterator().previous();
+            E prev = getListIterator().previous();
+            lastRet = --cursor;
+            return prev;
         }
 
         @Override
@@ -382,7 +395,11 @@ public class ObservableList<E> implements List<E>
         @Override
         public void set(E e)
         {
-            ObservableList.this.set(cursor, e);
+            if (lastRet < 0)
+            {
+                throw new IllegalStateException("No element has been returned yet, or remove() or add() is called after the return.");
+            }
+            ObservableList.this.set(lastRet, e);
         }
 
     }
