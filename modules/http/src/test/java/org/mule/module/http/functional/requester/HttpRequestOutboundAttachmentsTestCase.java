@@ -10,6 +10,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.transformer.types.MimeTypes.HTML;
@@ -17,6 +19,7 @@ import static org.mule.transformer.types.MimeTypes.TEXT;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.message.ds.ByteArrayDataSource;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.io.File;
@@ -32,12 +35,16 @@ import javax.servlet.http.Part;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestTestCase
 {
     private static final String TEST_FILE_NAME = "realm.properties";
     private static final String TEST_PART_NAME = "partName";
+
+    @Rule
+    public SystemProperty sendBufferSize = new SystemProperty("sendBufferSize", "128");
 
     @Override
     protected String getConfigFile()
@@ -47,6 +54,12 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
 
     private Collection<Part> parts;
     private String requestContentType;
+
+    @Override
+    protected boolean enableHttps()
+    {
+        return true;
+    }
 
     @Test
     public void payloadIsIgnoredWhenSendingOutboundAttachments() throws Exception
@@ -124,6 +137,23 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
 
         Part part = getPart(TEST_PART_NAME);
         assertFormDataContentDisposition(part, TEST_PART_NAME, null);
+    }
+
+    @Test
+    public void sendingAttachmentBiggerThanAsyncWriteQueueSizeWorksOverHttps() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        
+        // Grizzly defines the maxAsyncWriteQueueSize as 4 times the sendBufferSize (org.glassfish.grizzly.nio.transport.TCPNIOConnection).
+        int maxAsyncWriteQueueSize = Integer.valueOf(sendBufferSize.getValue()) * 4;
+
+        // Set an attachment bigger than the queue size.
+        event.getMessage().addOutboundAttachment(TEST_PART_NAME, new byte[maxAsyncWriteQueueSize * 2], TEXT);
+
+        Flow flow = (Flow) getFlowConstruct("requestFlowTls");
+        MuleEvent response = flow.process(event);
+        
+        assertThat((Integer) response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(OK.getStatusCode()));
     }
 
     private void assertPart(String name, String expectedContentType, String expectedBody) throws Exception

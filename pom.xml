@@ -1695,6 +1695,7 @@
 
                             <exclude>**/AsyncCompletionHandler.java</exclude>
                             <exclude>**/AsyncCompletionHandlerBase.java</exclude>
+                            <exclude>**/FeedableBodyGenerator.java</exclude>
                             <exclude>**/BndMojo.java</exclude>
                             <exclude>**/BobberArchetype.java</exclude>
                             <exclude>**/BobberArchetypeMojo.java</exclude>
