@@ -43,7 +43,7 @@ public abstract class ComparableWatermarkSelector extends WatermarkSelector
             Comparable<Object> current = (Comparable<Object>) this.value;
 
             if (current == null
-                || ((Comparable<Object>) value).compareTo(current) == this.comparableQualifier())
+                || normalizeValue(((Comparable<Object>) value).compareTo(current)) == this.comparableQualifier())
             {
                 this.value = value;
             }
@@ -57,5 +57,27 @@ public abstract class ComparableWatermarkSelector extends WatermarkSelector
                     value.getClass().getCanonicalName()));
             }
         }
+    }
+
+    /**
+     * A method used to normalize the value given back by the compareTo method. The
+     * Min and Max selectors expect Java's compareTo method to return -1 or 1
+     * respectively. However, this is not always the case, so we use this method
+     * change and negative result to -1, and any positive result to 1.
+     * 
+     * @param value The result of a compareTo method.
+     * @return -1 if value is less than 0, 1 if value is larger than 0
+     */
+    private int normalizeValue(int value)
+    {
+        if (value > 0)
+        {
+            return 1;
+        }
+        if (value < 0)
+        {
+            return -1;
+        }
+        return 0;
     }
 }
