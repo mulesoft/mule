@@ -13,7 +13,7 @@
 
     <flow name="RedeliveryPolicy" processingStrategy="synchronous">
         <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}">
-            <idempotent-redelivery-policy maxRedeliveryCount="2">
+            <idempotent-redelivery-policy maxRedeliveryCount="${maxRedeliveryAttempts}">
                 <dead-letter-queue>
                     <vm:outbound-endpoint exchange-pattern="one-way" path="error-queue"/>
                 </dead-letter-queue>

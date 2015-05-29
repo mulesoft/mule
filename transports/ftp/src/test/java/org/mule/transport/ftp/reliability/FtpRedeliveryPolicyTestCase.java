@@ -10,12 +10,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.listener.ExceptionListener;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -23,6 +25,10 @@ public class FtpRedeliveryPolicyTestCase extends AbstractFtpServerTestCase
 {
 
     private static final String FILE_TXT = "file.txt";
+    private static final int MAX_REDELIVERY_ATTEMPTS = 2;
+
+    @Rule
+    public SystemProperty maxRedeliveryAttemptsSystemProperty = new SystemProperty("maxRedeliveryAttempts", Integer.toString(MAX_REDELIVERY_ATTEMPTS));
 
     public FtpRedeliveryPolicyTestCase(ConfigVariant variant, String configResources)
     {
@@ -39,7 +45,7 @@ public class FtpRedeliveryPolicyTestCase extends AbstractFtpServerTestCase
     @Test
     public void testRedeliveryPolicyDLQConsumesMessage() throws Exception
     {
-        ExceptionListener exceptionListener = new ExceptionListener(muleContext).setNumberOfExecutionsRequired(3);
+        ExceptionListener exceptionListener = new ExceptionListener(muleContext).setNumberOfExecutionsRequired(MAX_REDELIVERY_ATTEMPTS + 1);
         createFileOnFtpServer(FILE_TXT);
         exceptionListener.waitUntilAllNotificationsAreReceived();
         MuleMessage message = muleContext.getClient().request("vm://error-queue", RECEIVE_TIMEOUT);
