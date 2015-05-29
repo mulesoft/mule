@@ -13,7 +13,7 @@ import org.mule.module.db.internal.domain.database.DbConfig;
 /**
  * Resolves a {@link DbConfig} to a static value without using the current event
  */
-public class StaticDbConfigResolver implements DbConfigResolver
+public class StaticDbConfigResolver extends AbstractDbConfigResolver
 {
 
     private final DbConfig dbConfig;

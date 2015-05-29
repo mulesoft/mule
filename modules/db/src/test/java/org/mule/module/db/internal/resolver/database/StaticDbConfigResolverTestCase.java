@@ -18,27 +18,23 @@ import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataKey;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 
 import java.util.List;
 
 import org.junit.Test;
 
-@SmallTest
-public class ConfiguredDbConfigResolverTestCase extends AbstractMuleTestCase
+public class StaticDbConfigResolverTestCase extends AbstractMuleTestCase
 {
 
-    private DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
-    private ConfiguredDbConfigResolver configuredDbConfigResolver = new ConfiguredDbConfigResolver(dbConfigResolver);
-    private DbConfig dbConfig = mock(DbConfig.class);
+    private final DbConfig dbConfig = mock(DbConfig.class);
+    private final DbConfigResolver dbConfigResolver = new StaticDbConfigResolver(dbConfig);
 
     @Test
     public void resolvesDbConfig() throws Exception
     {
         MuleEvent muleEvent = mock(MuleEvent.class);
-        when(dbConfigResolver.resolve(muleEvent)).thenReturn(dbConfig);
 
-        DbConfig resolvedDbConfig = configuredDbConfigResolver.resolve(muleEvent);
+        DbConfig resolvedDbConfig = dbConfigResolver.resolve(muleEvent);
 
         assertThat(resolvedDbConfig, is(dbConfig));
     }
@@ -48,9 +44,8 @@ public class ConfiguredDbConfigResolverTestCase extends AbstractMuleTestCase
     {
         TestResult expectedTestResult = mock(TestResult.class);
         when(dbConfig.test()).thenReturn(expectedTestResult);
-        when(dbConfigResolver.resolve(null)).thenReturn(dbConfig);
 
-        TestResult testResult = configuredDbConfigResolver.test();
+        TestResult testResult = dbConfigResolver.test();
 
         assertThat(testResult, is(expectedTestResult));
     }
@@ -60,9 +55,8 @@ public class ConfiguredDbConfigResolverTestCase extends AbstractMuleTestCase
     {
         final Result<List<MetaDataKey>> expectedMetaDataResult = mock(Result.class);
         when(dbConfig.getMetaDataKeys()).thenReturn(expectedMetaDataResult);
-        when(dbConfigResolver.resolve(null)).thenReturn(dbConfig);
 
-        final Result<List<MetaDataKey>> metaDataResult = configuredDbConfigResolver.getMetaDataKeys();
+        final Result<List<MetaDataKey>> metaDataResult = dbConfigResolver.getMetaDataKeys();
 
         assertThat(metaDataResult, is(expectedMetaDataResult));
     }
@@ -73,9 +67,8 @@ public class ConfiguredDbConfigResolverTestCase extends AbstractMuleTestCase
         final Result<MetaData> expectedMetaData = mock(Result.class);
         final MetaDataKey metaDataKey = mock(MetaDataKey.class);
         when(dbConfig.getMetaData(metaDataKey)).thenReturn(expectedMetaData);
-        when(dbConfigResolver.resolve(null)).thenReturn(dbConfig);
 
-        final Result<MetaData> metaData = configuredDbConfigResolver.getMetaData(metaDataKey);
+        final Result<MetaData> metaData = dbConfigResolver.getMetaData(metaDataKey);
 
         assertThat(metaData, is(expectedMetaData));
     }
