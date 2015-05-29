@@ -6,6 +6,7 @@
  */
 package org.mule.el.mvel;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -37,6 +38,8 @@ import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
+import org.mule.transformer.types.TypedValue;
 
 import java.io.File;
 import java.io.FileReader;
@@ -46,6 +49,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -68,7 +72,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.mockito.Mockito;
 
 @RunWith(Parameterized.class)
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
@@ -374,7 +377,6 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         assertEquals(Pattern.class, evaluate(Pattern.class.getSimpleName()));
         assertEquals(DataType.class, evaluate(DataType.class.getSimpleName()));
         assertEquals(DataTypeFactory.class, evaluate(DataTypeFactory.class.getSimpleName()));
-
     }
 
     static class DummyExpressionLanguageExtension implements ExpressionLanguageExtension
@@ -495,6 +497,20 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         }
     }
 
+    @Test
+    public void returnsDataType() throws Exception
+    {
+        DataType<?> dataType = DataTypeFactory.create(String.class, MimeTypes.JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MuleMessage message = createMockMessage(TEST_MESSAGE, dataType);
+
+        TypedValue typedValue = evaluateTyped("payload", message);
+
+        assertThat((String) typedValue.getValue(), equalTo(TEST_MESSAGE));
+        assertThat(typedValue.getDataType(), like(String.class, MimeTypes.JSON, StandardCharsets.UTF_16.name()));
+    }
+
     protected Object evaluate(String expression)
     {
         if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER))
@@ -504,6 +520,18 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         else
         {
             return mvel.evaluate(expression);
+        }
+    }
+
+    protected TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER))
+        {
+            return mvel.evaluateTyped("#[" + expression + "]", message);
+        }
+        else
+        {
+            return mvel.evaluateTyped(expression, message);
         }
     }
 
@@ -561,15 +589,23 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         FlowConstruct flowConstruct = mock(FlowConstruct.class);
         when(flowConstruct.getName()).thenReturn("myFlow");
         MuleMessage message = createMockMessage();
-        Mockito.when(event.getFlowConstruct()).thenReturn(flowConstruct);
-        Mockito.when(event.getMessage()).thenReturn(message);
+        when(event.getFlowConstruct()).thenReturn(flowConstruct);
+        when(event.getMessage()).thenReturn(message);
         return event;
     }
 
     protected MuleMessage createMockMessage()
     {
         MuleMessage message = mock(MuleMessage.class);
-        Mockito.when(message.getPayload()).thenReturn("foo");
+        when(message.getPayload()).thenReturn("foo");
+        return message;
+    }
+
+    protected MuleMessage createMockMessage(Object payload, DataType dataType)
+    {
+        MuleMessage message = mock(MuleMessage.class);
+        when(message.getPayload()).thenReturn(payload);
+        when(message.getDataType()).thenReturn(dataType);
         return message;
     }
 
