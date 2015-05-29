@@ -25,8 +25,9 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
-import org.mule.transport.NullPayload;
+import org.mule.transformer.types.TypedValue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -96,6 +97,8 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
                 }
             });
         when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(EXPRESSION_VALUE);
+        TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, DataTypeFactory.STRING);
+        when(mockExpressionManager.evaluateTyped(EXPRESSION, mockMessage)).thenReturn(typedValue);
         addVariableTransformer.setMuleContext(mockMuleContext);
     }
 
@@ -190,6 +193,8 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
         throws InitialisationException, TransformerException
     {
         addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
+        TypedValue typedValue = new TypedValue(null, DataType.OBJECT_DATA_TYPE);
+        when(mockExpressionManager.evaluateTyped(NULL_EXPRESSION, mockMessage)).thenReturn(typedValue);
         addVariableTransformer.setValue(NULL_EXPRESSION);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
@@ -202,7 +207,8 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     {
         addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         addVariableTransformer.setValue(EXPRESSION);
-        when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(NullPayload.getInstance());
+        TypedValue typedValue = new TypedValue(null, DataType.OBJECT_DATA_TYPE);
+        when(mockExpressionManager.evaluateTyped(EXPRESSION, mockMessage)).thenReturn(typedValue);
         addVariableTransformer.initialise();
 
         addVariableTransformer.transform(mockMessage, ENCODING);

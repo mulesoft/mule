@@ -8,6 +8,7 @@ package org.mule.api.expression;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.transformer.types.TypedValue;
 
 /**
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as Xml, Java,
@@ -284,4 +285,5 @@ public interface ExpressionManager
      */
     public boolean isExpression(String string);
 
+    TypedValue evaluateTyped(String expression, MuleMessage message);
 }

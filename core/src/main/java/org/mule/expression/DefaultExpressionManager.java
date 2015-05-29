@@ -22,6 +22,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
@@ -205,7 +207,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     public Object evaluate(String expression, MuleEvent event, boolean failIfNull)
         throws ExpressionRuntimeException
     {
-        expression = preProcessExpression(expression);
+        expression = removeExpressionMarker(expression);
         if (isEvaluatorExpression(expression))
         {
             return evaluate(expression, event.getMessage(), failIfNull);
@@ -218,7 +220,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     public Object evaluate(String expression, MuleMessage message, boolean failIfNull)
     {
-        expression = preProcessExpression(expression);
+        expression = removeExpressionMarker(expression);
         if (isEvaluatorExpression(expression))
         {
             String[] parts = expression.split(":", 2);
@@ -233,7 +235,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     public void enrich(String expression, MuleMessage message, Object object)
         throws ExpressionRuntimeException
     {
-        expression = preProcessExpression(expression);
+        expression = removeExpressionMarker(expression);
         if (isEvaluatorExpression(expression))
         {
             String[] parts = expression.split(":", 2);
@@ -249,7 +251,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     @Override
     public void enrich(String expression, MuleEvent event, Object object)
     {
-        expression = preProcessExpression(expression);
+        expression = removeExpressionMarker(expression);
         if (isEvaluatorExpression(expression))
         {
             enrich(expression, event.getMessage(), object);
@@ -520,6 +522,22 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         return (string.contains(DEFAULT_EXPRESSION_PREFIX));
     }
 
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        expression = removeExpressionMarker(expression);
+        if (isEvaluatorExpression(expression))
+        {
+            String[] parts = expression.split(":", 2);
+            final Object value = evaluate(parts[1], parts[0], message, false);
+            return new TypedValue(value, DataTypeFactory.create(value == null? Object.class : value.getClass(), null));
+        }
+        else
+        {
+            return expressionLanguage.evaluateTyped(expression, message);
+        }
+    }
+
     /**
      * Determines if the expression is valid or not. This method will validate a single expression or
      * expressions embedded in a string. the expression must be well formed i.e. #[bean:user]
@@ -613,7 +631,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         return evaluateBoolean(expression, event, false, false);
     }
 
-    protected String preProcessExpression(String expression)
+    public static String removeExpressionMarker(String expression)
     {
         if (expression == null)
         {

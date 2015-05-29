@@ -13,8 +13,10 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.StringUtils;
 
 import java.text.MessageFormat;
 
@@ -48,8 +50,8 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
         }
         else
         {
-            Object value = valueEvaluator.resolveValue(message);
-            if (value == null || value instanceof NullPayload)
+            TypedValue typedValue = valueEvaluator.resolveTypedValue(message);
+            if (typedValue.getValue() == null || typedValue.getValue() instanceof NullPayload)
             {
                 message.removeProperty(key, getScope());
 
@@ -62,9 +64,16 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             }
             else
             {
-                DataType<?> dataType = DataTypeFactory.create(value.getClass(), getMimeType());
-                dataType.setEncoding(getEncoding());
-                message.setProperty(key, value, getScope(), dataType);
+                if (!StringUtils.isEmpty(mimeType) || !StringUtils.isEmpty(encoding))
+                {
+                    DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType());
+                    dataType.setEncoding(getEncoding());
+                    message.setProperty(key, typedValue.getValue(), getScope(), dataType);
+                }
+                else
+                {
+                    message.setProperty(key, typedValue.getValue(), getScope(), typedValue.getDataType());
+                }
             }
         }
         return message;
