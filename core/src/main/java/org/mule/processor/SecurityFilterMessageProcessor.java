@@ -8,6 +8,7 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -21,7 +22,7 @@ import org.mule.endpoint.EndpointAware;
  * message is not send or dispatched by the transport. When unauthorised the request
  * message is returned as the response.
  */
-public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements EndpointAware, Initialisable
+public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements EndpointAware, Initialisable, NonBlockingSupported
 {
     private SecurityFilter filter;
 

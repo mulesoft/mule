@@ -8,6 +8,7 @@ package org.mule.tck.junit4;
 
 import static org.junit.Assert.fail;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -27,6 +28,7 @@ import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
 import org.mule.construct.SimpleService;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
+import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
@@ -252,6 +254,19 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected MuleEvent runFlow(String flowName) throws Exception
     {
         return this.runFlow(flowName, (Object) null);
+    }
+
+    /**
+     * Runs the given non blocking flow with a default event
+     *
+     * @param flowName the name of the flow to be executed
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected MuleEvent runNonBlockingFlow(String flowName) throws Exception
+    {
+        Flow flow = lookupFlowConstruct(flowName);
+        return flow.process(new DefaultMuleEvent(getTestEvent(TEST_MESSAGE, flow), new SensingNullReplyToHandler()));
     }
 
     /**
