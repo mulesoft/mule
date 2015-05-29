@@ -207,4 +207,12 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="non-blocking-source" substitutionGroup="mule:abstract-message-source">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageSourceType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
 </xsd:schema>
