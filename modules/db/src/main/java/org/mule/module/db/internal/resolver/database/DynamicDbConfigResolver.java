@@ -7,14 +7,23 @@
 
 package org.mule.module.db.internal.resolver.database;
 
+import static org.mule.common.Result.Status.FAILURE;
 import org.mule.api.MuleEvent;
+import org.mule.common.DefaultResult;
+import org.mule.common.DefaultTestResult;
+import org.mule.common.Result;
+import org.mule.common.TestResult;
+import org.mule.common.metadata.MetaData;
+import org.mule.common.metadata.MetaDataKey;
 import org.mule.module.db.internal.domain.database.DataSourceConfig;
 import org.mule.module.db.internal.domain.database.DataSourceFactory;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.database.DbConfigFactory;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -28,6 +37,9 @@ import javax.sql.DataSource;
  */
 public class DynamicDbConfigResolver implements DbConfigResolver
 {
+
+    public static final String TEST_CONNECTION_ERROR = "Cannot test connection on a dynamic DB config";
+    public static final String NO_METADATA_OBTAINED = "No metadata obtained";
 
     private final String name;
     private final DbConfigFactory dbConfigFactory;
@@ -78,5 +90,25 @@ public class DynamicDbConfigResolver implements DbConfigResolver
     private String generateDbConfigName()
     {
         return name + "-dynamic-" + instanceCount++;
+    }
+
+    @Override
+    public TestResult test()
+    {
+        return new DefaultTestResult(FAILURE, TEST_CONNECTION_ERROR);
+    }
+
+    @Override
+    public Result<List<MetaDataKey>> getMetaDataKeys()
+    {
+        List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
+
+        return new DefaultResult<>(keys, FAILURE, NO_METADATA_OBTAINED);
+    }
+
+    @Override
+    public Result<MetaData> getMetaData(MetaDataKey metaDataKey)
+    {
+        return new DefaultResult<>(null, FAILURE, NO_METADATA_OBTAINED);
     }
 }

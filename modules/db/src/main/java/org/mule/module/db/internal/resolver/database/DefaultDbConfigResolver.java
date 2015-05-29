@@ -16,7 +16,7 @@ import java.util.Collection;
 /**
  * Resolves the default database configuration defined in an application
  */
-public class DefaultDbConfigResolver implements DbConfigResolver
+public class DefaultDbConfigResolver extends AbstractDbConfigResolver
 {
 
     private final MuleRegistry registry;

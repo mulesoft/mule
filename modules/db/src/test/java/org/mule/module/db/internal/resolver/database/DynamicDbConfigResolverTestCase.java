@@ -8,10 +8,15 @@
 package org.mule.module.db.internal.resolver.database;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
+import org.mule.common.Result;
+import org.mule.common.TestResult;
+import org.mule.common.metadata.MetaData;
+import org.mule.common.metadata.MetaDataKey;
 import org.mule.module.db.internal.domain.database.DataSourceConfig;
 import org.mule.module.db.internal.domain.database.DataSourceFactory;
 import org.mule.module.db.internal.domain.database.DbConfig;
@@ -19,6 +24,7 @@ import org.mule.module.db.internal.domain.database.DbConfigFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -53,6 +59,43 @@ public class DynamicDbConfigResolverTestCase extends AbstractMuleTestCase
 
         assertThat(dbConfig1, sameInstance(expectedDbConfig));
         assertThat(dbConfig1, sameInstance(dbConfig2));
+    }
+
+    @Test
+    public void doesNotTestConnection() throws Exception
+    {
+        DbConfig expectedDbConfig = mock(DbConfig.class);
+        DynamicDbConfigResolver dbConfigResolver = createDbConfigFactory(expectedDbConfig);
+
+        TestResult result = dbConfigResolver.test();
+
+        assertThat(result.getStatus(), equalTo(Result.Status.FAILURE));
+        assertThat(result.getMessage(), equalTo(DynamicDbConfigResolver.TEST_CONNECTION_ERROR));
+    }
+
+    @Test
+    public void returnsMetaDataKeys() throws Exception
+    {
+        DbConfig expectedDbConfig = mock(DbConfig.class);
+        DynamicDbConfigResolver dbConfigResolver = createDbConfigFactory(expectedDbConfig);
+
+        final Result<List<MetaDataKey>> result = dbConfigResolver.getMetaDataKeys();
+
+        assertThat(result.getStatus(), equalTo(Result.Status.FAILURE));
+        assertThat(result.getMessage(), equalTo(DynamicDbConfigResolver.NO_METADATA_OBTAINED));
+    }
+
+    @Test
+    public void returnsMetaData() throws Exception
+    {
+        DbConfig expectedDbConfig = mock(DbConfig.class);
+        DynamicDbConfigResolver dbConfigResolver = createDbConfigFactory(expectedDbConfig);
+
+        final MetaDataKey metaDataKey = mock(MetaDataKey.class);
+        final Result<MetaData> result = dbConfigResolver.getMetaData(metaDataKey);
+
+        assertThat(result.getStatus(), equalTo(Result.Status.FAILURE));
+        assertThat(result.getMessage(), equalTo(DynamicDbConfigResolver.NO_METADATA_OBTAINED));
     }
 
     private DynamicDbConfigResolver createDbConfigFactory(DbConfig expectedDbConfig) throws SQLException
