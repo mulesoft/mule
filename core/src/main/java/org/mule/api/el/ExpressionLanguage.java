@@ -10,6 +10,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
+import org.mule.transformer.types.TypedValue;
 
 import java.util.Map;
 
@@ -109,4 +110,5 @@ public interface ExpressionLanguage
     @Deprecated
     <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars);
 
+    TypedValue evaluateTyped(String expression, MuleMessage message);
 }

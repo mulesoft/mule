@@ -18,8 +18,10 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.transformer.types.SimpleDataType;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.StringUtils;
 
 /**
  * Modifies the payload of a {@link MuleMessage} according to the provided value.
@@ -36,10 +38,18 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        Object value = resolveValue(event);
-        DataType dataType = resolveDataType(event, value);
+        if (StringUtils.isEmpty(mimeType) && StringUtils.isEmpty(encoding))
+        {
+            final TypedValue typedValue = resolveTypedValue(event);
+            event.getMessage().setPayload(typedValue.getValue(), typedValue.getDataType());
+        }
+        else
+        {
+            Object value = resolveValue(event);
+            DataType dataType = resolveDataType(event, value);
 
-        event.getMessage().setPayload(value, dataType);
+            event.getMessage().setPayload(value, dataType);
+        }
 
         return event;
     }
@@ -56,6 +66,18 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
             value = valueEvaluator.resolveValue(event.getMessage());
         }
         return value;
+    }
+
+    private TypedValue resolveTypedValue(MuleEvent event)
+    {
+        if (valueEvaluator.getRawValue() == null)
+        {
+            return new TypedValue(NullPayload.getInstance(), DataType.OBJECT_DATA_TYPE);
+        }
+        else
+        {
+            return valueEvaluator.resolveTypedValue(event.getMessage());
+        }
     }
 
     private DataType resolveDataType(MuleEvent event, Object value)
