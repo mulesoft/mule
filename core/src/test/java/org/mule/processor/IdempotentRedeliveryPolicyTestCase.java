@@ -27,7 +27,6 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.lock.MuleLockFactory;
 import org.mule.util.lock.SingleServerLockProvider;
@@ -41,7 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.internal.verification.VerificationModeFactory;
@@ -53,6 +51,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
 
     public static final String STRING_MESSAGE = "message";
     public static final int MAX_REDELIVERY_COUNT = 0;
+    private static final String UTF_8 = "utf-8";
     private static ObjectSerializer serializer;
 
     private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
@@ -65,9 +64,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
     private Latch waitLatch = new Latch();
     private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
     private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
-
-    @Rule
-    public SystemProperty systemProperty = new SystemProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY,"utf-8");
 
     @Before
     @SuppressWarnings("rawtypes")
@@ -90,6 +86,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         muleLockFactory.initialise();
         when(mockMuleContext.getLockFactory()).thenReturn(muleLockFactory);
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+        when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8);
         final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
         when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenAnswer(new Answer<ObjectStore>()
         {
