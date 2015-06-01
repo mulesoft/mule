@@ -11,12 +11,11 @@ import static java.lang.System.getProperty;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.HttpMessageLogger;
+import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.HttpServerManager;
 import org.mule.module.http.internal.listener.Server;
 import org.mule.module.http.internal.listener.ServerAddress;
@@ -263,6 +262,7 @@ public class GrizzlyServerManager implements HttpServerManager
         }
         HttpServerFilter httpServerFilter = new HttpServerFilter(true, retrieveMaximumHeaderSectionSize(), ka, idleTimeoutDelayedExecutor);
         httpServerFilter.getMonitoringConfig().addProbes(new HttpMessageLogger(LISTENER));
+        httpServerFilter.setAllowPayloadForUndefinedHttpMethods(true);
         return httpServerFilter;
     }
 
