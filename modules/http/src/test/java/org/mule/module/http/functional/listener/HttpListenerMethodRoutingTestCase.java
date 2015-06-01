@@ -6,20 +6,20 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import org.mule.api.MuleEvent;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.IOUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,8 +31,10 @@ public class HttpListenerMethodRoutingTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
+
     @Rule
     public SystemProperty path = new SystemProperty("path", "path");
+
     private final String method;
     private final String expectedContent;
 
@@ -57,30 +59,25 @@ public class HttpListenerMethodRoutingTestCase extends FunctionalTestCase
     @Test
     public void callWithMethod() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), path.getValue());
-        Request request = null;
-        switch (method)
-        {
-            case "GET":
-                request = Request.Get(url);
-                break;
-            case "POST":
-                request = Request.Post(url);
-                break;
-            case "OPTIONS":
-                request = Request.Options(url);
-                break;
-            case "DELETE":
-                request = Request.Delete(url);
-                break;
-            case "PUT":
-                request = Request.Put(url);
-                break;
-        }
-        final Response response = request.connectTimeout(1000).execute();
-        final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(expectedContent));
+        sendRequestAndAssertMethod(TEST_MESSAGE);
+        assertThat(muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT).getPayloadAsString(), equalTo(TEST_MESSAGE));
+    }
+
+    @Test
+    public void callWithMethodEmptyBody() throws Exception
+    {
+        sendRequestAndAssertMethod(null);
+    }
+
+    private void sendRequestAndAssertMethod(String payload) throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("requestFlow");
+        MuleEvent event = getTestEvent(payload);
+        event.setFlowVariable("method", method);
+        event = flow.process(event);
+
+        assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));
+        assertThat(event.getMessageAsString(), is(expectedContent));
     }
 
 }
