@@ -8,7 +8,6 @@ package org.mule;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.Application;
@@ -85,7 +84,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
         muleServer.start();
         muleServer.deployDomainFromClasspathFolder("log/empty-domain-with-log4j", DOMAIN_NAME);
         muleServer.deploy("/log/appInDomain.zip", APP_NAME);
-        ensureArtifactAppender("Console", ConsoleAppender.class);
+        ensureArtifactAppender("ConsoleForDomain", ConsoleAppender.class);
     }
 
     private void ensureOnlyDefaultAppender() throws Exception
@@ -106,7 +105,9 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
             public Void call() throws Exception
             {
                 Logger logger = getRootLoggerForApp(APP_NAME);
-                assertEquals(Level.DEBUG, logger.getLevel());
+                assertThat(Level.WARN, equalTo(logger.getLevel()));
+                assertThat(true, equalTo(loggerHasAppender(APP_NAME, logger, appenderName)));
+
 
                 assertThat(1, equalTo(appendersCount(APP_NAME)));
                 assertThat(1, equalTo(selectByClass(APP_NAME, appenderClass).size()));
@@ -115,6 +116,11 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
                 return null;
             }
         });
+    }
+
+    private boolean loggerHasAppender(String appName, Logger logger, String appenderName) throws Exception
+    {
+        return getContext(appName).getConfiguration().getLoggerConfig(logger.getName()).getAppenders().containsKey(appenderName);
     }
 
     private Logger getRootLoggerForApp(String appName) throws Exception
