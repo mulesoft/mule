@@ -12,6 +12,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.util.ObjectUtils;
@@ -54,6 +55,9 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
         try
         {
             MuleEvent tapEvent = DefaultMuleEvent.copy(event);
+            // Tap should not respond to reply to handler
+            // TODO: Combine this with copy once we have MuleEventBuilder to avoid second copy
+            tapEvent = new DefaultMuleEvent(tapEvent, (ReplyToHandler) null);
             OptimizedRequestContext.unsafeSetEvent(tapEvent);
             filteredTap.process(tapEvent);
             OptimizedRequestContext.unsafeSetEvent(event);

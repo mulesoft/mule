@@ -12,12 +12,16 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.MessageProcessors;
+import org.mule.api.processor.MessageRouter;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.util.StringUtils;
@@ -63,9 +67,14 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
     {
         ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
 
-        MuleEvent enricherEvent;
         //TODO: change DefaultMuleEvent.copy to DefaultMuleEvent.copyPreservingSession
-        enricherEvent = DefaultMuleEvent.copy(event);
+        MuleEvent enricherEvent = DefaultMuleEvent.copy(event);
+        if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
+        {
+            // TODO: MULE-8662 Support non-blocking execution within message enricher
+            // TODO: Combine this with copy once we have MuleEventBuilder to avoid second copy
+            enricherEvent = new DefaultMuleEvent(event.getMessage(), event, true);
+        }
 
         OptimizedRequestContext.unsafeSetEvent(enricherEvent);
         MuleEvent enrichmentEvent = enrichmentProcessor.process(enricherEvent);

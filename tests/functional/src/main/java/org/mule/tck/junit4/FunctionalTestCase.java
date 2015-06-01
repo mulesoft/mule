@@ -6,10 +6,12 @@
  */
 package org.mule.tck.junit4;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -21,6 +23,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
 import org.mule.api.service.Service;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -36,6 +39,7 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -245,6 +249,28 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
+     * Runs the given flow before ensuring all assertions defined in the flow configuration were met.
+     * @param flowName the flow to test
+     * @throws Exception
+     */
+    protected void testFlowNonBlocking(String flowName) throws Exception
+    {
+        runFlowNonBlocking(flowName);
+        FlowAssert.verify(flowName);
+    }
+
+    /**
+     * Runs the given flow before ensuring all assertions defined in the flow configuration were met.
+     * @param flowName the flow to test
+     * @throws Exception
+     */
+    protected void testFlowNonBlocking(String flowName, MuleEvent event) throws Exception
+    {
+        runFlowNonBlocking(flowName, event);
+        FlowAssert.verify(flowName);
+    }
+
+    /**
      * Runs the given flow with a default event
      * 
      * @param flowName the name of the flow to be executed
@@ -263,10 +289,34 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
-    protected MuleEvent runNonBlockingFlow(String flowName) throws Exception
+    protected MuleEvent runFlowNonBlocking(String flowName) throws Exception
     {
-        Flow flow = lookupFlowConstruct(flowName);
-        return flow.process(new DefaultMuleEvent(getTestEvent(TEST_MESSAGE, flow), new SensingNullReplyToHandler()));
+        Flow flow = this.lookupFlowConstruct(flowName);
+        return runFlowNonBlocking(flowName, getTestEvent(TEST_MESSAGE, flow));
+    }
+
+    /**
+     * Runs the given non blocking flow with a default event
+     *
+     * @param flowName the name of the flow to be executed
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected MuleEvent runFlowNonBlocking(String flowName, MuleEvent event) throws Exception
+    {
+        Flow flow = this.lookupFlowConstruct(flowName);
+        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+        event = new DefaultMuleEvent(event, event.getFlowConstruct(), nullReplyToHandler, null, false);
+        MuleEvent result = flow.process(event);
+        if (NonBlockingVoidMuleEvent.getInstance() == result)
+        {
+            nullReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+            if (nullReplyToHandler.exception != null)
+            {
+                throw nullReplyToHandler.exception;
+            }
+        }
+        return nullReplyToHandler.event;
     }
 
     /**

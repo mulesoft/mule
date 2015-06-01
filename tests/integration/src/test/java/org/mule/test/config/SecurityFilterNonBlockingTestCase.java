@@ -26,7 +26,7 @@ public class SecurityFilterNonBlockingTestCase extends FunctionalTestCase
     @Test
     public void securityFilterShouldAllowNonBlocking() throws Exception
     {
-        runNonBlockingFlow("nonBlockingSecurity");
+        runFlowNonBlocking("nonBlockingSecurity");
         FlowAssert.verify();
     }
 

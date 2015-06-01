@@ -277,8 +277,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                     this);
         }
 
-        if (processingStrategy instanceof NonBlockingProcessingStrategy && !(messageSource instanceof
-                NonBlockingMessageSource))
+        if (processingStrategy instanceof NonBlockingProcessingStrategy && messageSource != null && !(messageSource
+                instanceof NonBlockingMessageSource))
         {
             throw new FlowConstructInvalidException(
                     CoreMessages.createStaticMessage("The non-blocking processing strategy currently only supports " +
