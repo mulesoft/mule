@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -96,6 +97,7 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void endpointAutoDeleteFalse() throws Exception
     {
         testDirectory(AUTO_DELETE_OFF);
