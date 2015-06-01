@@ -278,7 +278,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         {
             if (!((MessagingExceptionHandlerAcceptor)exceptionListener).acceptsAll())
             {
-                throw new FlowConstructInvalidException(CoreMessages.createStaticMessage("Flow exception listener contains and exception strategy that doesn't handle all request," +
+                throw new FlowConstructInvalidException(CoreMessages.createStaticMessage("Flow exception listener contains an exception strategy that doesn't handle all request," +
                         " Perhaps there's an exception strategy with a when attribute set but it's not part of a catch exception strategy"),this);
             }
         }
