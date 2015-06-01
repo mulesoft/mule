@@ -158,16 +158,11 @@
     </build>
 
     <dependencies>
+        <!--Jython-->
         <dependency>
-            <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
-            <groupId>javax.script</groupId>
-            <artifactId>jython-engine</artifactId>
-            <classifier>jdk14</classifier>
-        </dependency>
-        <dependency>
-            <!-- This is the actual language implementation -->
             <groupId>org.python</groupId>
-            <artifactId>jython</artifactId>
+            <artifactId>jython-standalone</artifactId>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>javax.script</groupId>
