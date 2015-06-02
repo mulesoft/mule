@@ -7,7 +7,12 @@
 package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 
@@ -118,6 +123,20 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
         flow.process(event);
 
         assertThat(getFirstReceivedHeader("User-Agent"), equalTo("TEST"));
+    }
+
+    @Test
+    public void ignoresHttpOutboundPropertiesButAcceptsHeaders() throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("httpHeaders");
+
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.getMessage().setOutboundProperty(HTTP_LISTENER_PATH, "listenerPath");
+
+        flow.process(event);
+
+        assertThat(getFirstReceivedHeader(HTTP_SCHEME), is("testValue1"));
+        assertThat(headers.asMap(), not(hasKey(HTTP_LISTENER_PATH)));
     }
 
 }

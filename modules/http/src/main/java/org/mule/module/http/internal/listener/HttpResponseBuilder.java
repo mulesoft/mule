@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
@@ -88,7 +89,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         {
             for (String outboundPropertyName : outboundProperties)
             {
-                if (!outboundPropertyName.equals(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY))
+                if (!outboundPropertyName.startsWith(HTTP_PREFIX))
                 {
                     final Object outboundPropertyValue = event.getMessage().getOutboundProperty(outboundPropertyName);
                     httpResponseHeaderBuilder.addHeader(outboundPropertyName, outboundPropertyValue);

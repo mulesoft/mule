@@ -34,5 +34,12 @@
         </http:request>
     </flow>
 
+    <flow name="httpHeaders">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:header headerName="http.scheme" value="testValue1" />
+            </http:request-builder>
+        </http:request>
+    </flow>
 
 </mule>

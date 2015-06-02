@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request;
 
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
@@ -79,7 +80,10 @@ public class MuleEventToHttpRequest
 
         for (String outboundProperty : event.getMessage().getOutboundPropertyNames())
         {
-            builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
+            if (!outboundProperty.startsWith(HTTP_PREFIX))
+            {
+                builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
+            }
         }
 
         if (!event.getMessage().getOutboundPropertyNames().contains(MuleProperties.CONTENT_TYPE_PROPERTY))

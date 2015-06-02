@@ -118,4 +118,15 @@
         </message-filter>
     </flow>
 
+    <flow name="httpHeadersResponseBuilderFlow">
+        <http:listener config-ref="listenerConfig" path="${httpHeadersResponseBuilderPath}">
+            <http:response-builder>
+                <http:header headerName="http.relative.path" value="relativePath"/>
+                <http:headers expression="['http.request.path': ['requestPath1', 'requestPath2']]"/>
+            </http:response-builder>
+        </http:listener>
+        <set-property propertyName="http.request.path" value="something"/>
+        <echo-component/>
+    </flow>
+
 </mule>
