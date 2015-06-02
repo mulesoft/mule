@@ -6,8 +6,12 @@
  */
 package org.mule.module.http.functional.listener;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_RELATIVE_PATH;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -26,7 +30,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.hamcrest.Matchers;
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -59,6 +62,8 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public SystemProperty errorHeaderDuplicatesResponseBuilderPath = new SystemProperty("headerDuplicatesResponseBuilderPath","headerDuplicatesResponseBuilderPath");
     @Rule
     public SystemProperty responseBuilderAndErrorResponseBuilderNotTheSamePath = new SystemProperty("responseBuilderAndErrorResponseBuilderNotTheSamePath","responseBuilderAndErrorResponseBuilderNotTheSamePath");
+    @Rule
+    public SystemProperty httpHeadersResponseBuilderPath = new SystemProperty("httpHeadersResponseBuilderPath","httpHeadersResponseBuilderPath");
 
     @Override
     protected String getConfigFile()
@@ -69,90 +74,107 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     @Test
     public void emptyResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), emptyResponseBuilderPath.getValue());
+        final String url = getUrl(emptyResponseBuilderPath);
         emptyResponseBuilderTest(url);
     }
 
     @Test
     public void statusLineResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), statusResponseBuilderPath.getValue());
+        final String url = getUrl(statusResponseBuilderPath);
         statusLineResponseBuilderTest(url, 201);
     }
 
     @Test
     public void statusLineWithCodeOverrideResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), statusResponseBuilderOverridePath.getValue());
+        final String url = getUrl(statusResponseBuilderOverridePath);
         statusLineResponseBuilderTest(url, 202);
     }
 
     @Test
     public void headerResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), headerResponseBuilderPath.getValue());
+        final String url = getUrl(headerResponseBuilderPath);
         simpleHeaderTest(url);
     }
 
     @Test
     public void headersResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), headersResponseBuilderPath.getValue());
+        final String url = getUrl(headersResponseBuilderPath);
         simpleHeaderTest(url);
     }
 
     @Test
     public void headerWithDuplicatesResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), headerDuplicatesResponseBuilderPath.getValue());
+        final String url = getUrl(headerDuplicatesResponseBuilderPath);
         headersWithDuplicatesResponseBuilderTest(url);
     }
 
     @Test
     public void errorEmptyResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), errorEmptyResponseBuilderPath.getValue());
+        final String url = getUrl(errorEmptyResponseBuilderPath);
         emptyResponseBuilderTest(url);
     }
 
     @Test
     public void errorStatusLineResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), errorStatusResponseBuilderPath.getValue());
+        final String url = getUrl(errorStatusResponseBuilderPath);
         statusLineResponseBuilderTest(url, 201);
     }
 
     @Test
     public void errorHeaderResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), errorHeaderResponseBuilderPath.getValue());
+        final String url = getUrl(errorHeaderResponseBuilderPath);
         simpleHeaderTest(url);
     }
 
     @Test
     public void errorHeadersResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), errorHeadersResponseBuilderPath.getValue());
+        final String url = getUrl(errorHeadersResponseBuilderPath);
         simpleHeaderTest(url);
     }
 
     @Test
     public void errorHeaderWithDuplicatesResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), errorHeaderDuplicatesResponseBuilderPath.getValue());
+        final String url = getUrl(errorHeaderDuplicatesResponseBuilderPath);
         headersWithDuplicatesResponseBuilderTest(url);
     }
 
     @Test
     public void responseBuilderIsDifferentFromErrorResponseBuilder() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), responseBuilderAndErrorResponseBuilderNotTheSamePath.getValue());
+        final String url = getUrl(responseBuilderAndErrorResponseBuilderNotTheSamePath);
         final Response successfulResponse = Request.Get(url).connectTimeout(100000).socketTimeout(10000000).execute();
         assertThat(successfulResponse.returnResponse().getStatusLine().getStatusCode(), is(202));
         final Response failureResponse = Request.Get(url).addHeader("FAIL", "true").connectTimeout(100000).socketTimeout(100000).execute();
         assertThat(failureResponse.returnResponse().getStatusLine().getStatusCode(), is(505));
     }
 
+    @Test
+    public void httpHeadersResponseBuilder() throws Exception
+    {
+        final String url = getUrl(httpHeadersResponseBuilderPath);
+        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        final HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getFirstHeader(HTTP_RELATIVE_PATH).getValue(), is("relativePath"));
+        Header[] requestPathHeaders = httpResponse.getHeaders(HTTP_REQUEST_PATH_PROPERTY);
+        assertThat(requestPathHeaders, is(arrayWithSize(2)));
+        assertThat(requestPathHeaders[0].getValue(), isOneOf("requestPath1", "requestPath2"));
+        assertThat(requestPathHeaders[1].getValue(), isOneOf("requestPath1", "requestPath2"));
+    }
+
+    private String getUrl(SystemProperty pathSystemProperty)
+    {
+        return String.format("http://localhost:%s/%s", listenPort.getNumber(), pathSystemProperty.getValue());
+    }
 
     private void statusLineResponseBuilderTest(String url, int expectedStatus) throws IOException
     {
@@ -192,8 +214,8 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     {
         final Response response = Request.Get(url).connectTimeout(1000).execute();
         final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), Is.is("Mule 3.6.0"));
-        assertThat(isDateValid(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue()), Is.is(true));
+        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), is("Mule 3.6.0"));
+        assertThat(isDateValid(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue()), is(true));
     }
 
     public boolean isDateValid(String dateToValidate){
