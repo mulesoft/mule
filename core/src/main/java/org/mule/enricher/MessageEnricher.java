@@ -9,12 +9,14 @@ package org.mule.enricher;
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.InterceptingMessageProcessor;
+import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
@@ -23,6 +25,7 @@ import org.mule.api.processor.MessageProcessors;
 import org.mule.api.processor.MessageRouter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractMessageProcessorOwner;
+import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.util.StringUtils;
 
@@ -65,38 +68,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
-
-        //TODO: change DefaultMuleEvent.copy to DefaultMuleEvent.copyPreservingSession
-        MuleEvent enricherEvent = DefaultMuleEvent.copy(event);
-        if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
-        {
-            // TODO: MULE-8662 Support non-blocking execution within message enricher
-            // TODO: Combine this with copy once we have MuleEventBuilder to avoid second copy
-            enricherEvent = new DefaultMuleEvent(event.getMessage(), event, true);
-        }
-
-        OptimizedRequestContext.unsafeSetEvent(enricherEvent);
-        MuleEvent enrichmentEvent = enrichmentProcessor.process(enricherEvent);
-        OptimizedRequestContext.unsafeSetEvent(event);
-
-        if (enrichmentEvent != null && !VoidMuleEvent.getInstance().equals(enrichmentEvent))
-        {
-            for (EnrichExpressionPair pair : enrichExpressionPairs)
-            {
-                enrich(event.getMessage(), enrichmentEvent.getMessage(), pair.getSource(), pair.getTarget(),
-                       expressionManager);
-            }
-        }
-
-        if (muleContext != null
-            && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
-        {
-            event = new DefaultMuleEvent(event.getMessage(), event, enrichmentEvent.getSession());
-        }
-        OptimizedRequestContext.unsafeSetEvent(event);
-
-        return event;
+        return new EnricherProcessor(enrichmentProcessor, muleContext).process(event);
     }
 
     protected void enrich(MuleMessage currentMessage,
@@ -216,5 +188,53 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
         {
             ((MessageProcessorContainer) enrichmentProcessor).addMessageProcessorPathElements(pathElement);
         }
+    }
+
+    /**
+     * Enriches the current event using the result of processing the next message processor (the enrichment processor)
+     * and the configured enrichment pairs.
+     */
+    private class EnricherProcessor extends AbstractRequestResponseMessageProcessor implements InternalMessageProcessor
+    {
+
+        private MuleEvent eventToEnrich;
+
+        protected EnricherProcessor(MessageProcessor enrichmentProcessor, MuleContext muleContext)
+        {
+            this.next = enrichmentProcessor;
+            this.muleContext = muleContext;
+        }
+
+        @Override
+        protected MuleEvent processRequest(MuleEvent event) throws MuleException
+        {
+            this.eventToEnrich = event;
+            //TODO: change DefaultMuleEvent.copy to DefaultMuleEvent.copyPreservingSession
+            return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(event));
+        }
+
+        @Override
+        protected MuleEvent processResponse(MuleEvent event) throws MuleException
+        {
+            final ExpressionManager expressionManager = eventToEnrich.getMuleContext().getExpressionManager();
+
+            if (event != null && !VoidMuleEvent.getInstance().equals(eventToEnrich))
+            {
+                for (EnrichExpressionPair pair : enrichExpressionPairs)
+                {
+                    enrich(eventToEnrich.getMessage(), event.getMessage(), pair.getSource(), pair.getTarget(),
+                           expressionManager);
+                }
+            }
+
+            if (muleContext != null
+                && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
+            {
+                eventToEnrich = new DefaultMuleEvent(eventToEnrich.getMessage(), eventToEnrich, event.getSession());
+            }
+
+            return OptimizedRequestContext.unsafeSetEvent(eventToEnrich);
+        }
+
     }
 }
