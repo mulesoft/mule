@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <configuration>
+        <expression-language>
+            <global-functions>
+                def assertPayload(){payload == org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE}
+            </global-functions>
+        </expression-language>
+    </configuration>
+
+    <flow name="catchExceptionStrategy">
+        <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+        <flow-ref name="catchExceptionStrategyChild"/>
+    </flow>
+    <flow name="catchExceptionStrategyChild">
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+            <test:non-blocking-processor/>
+            <test:assert count="1" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="splitter">
+        <test:assert-intercepting responseSameThread="true"/>
+        <splitter expression="#[payload]"/>
+        <test:assert-intercepting count="3" responseCount="3" responseSameThread="true"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+
+    <flow name="untilSuccessful">
+        <test:assert-intercepting responseSameThread="true"/>
+        <until-successful objectStore-ref="objectStore">
+            <processor-chain>
+                <test:assert-intercepting responseSameThread="true"/>
+                <test:non-blocking-processor/>
+            </processor-chain>
+        </until-successful>
+        <test:assert-intercepting responseSameThread="true"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="scatterGather">
+        <test:assert-intercepting responseSameThread="true"/>
+        <scatter-gather>
+            <test:non-blocking-processor/>
+            <test:non-blocking-processor/>
+        </scatter-gather>
+        <test:assert-intercepting responseSameThread="true"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="all">
+        <test:assert-intercepting responseSameThread="true"/>
+        <all>
+            <test:non-blocking-processor/>
+            <test:non-blocking-processor/>
+        </all>
+        <test:assert-intercepting responseSameThread="true"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="firstSuccessful">
+        <test:assert-intercepting responseSameThread="true"/>
+        <first-successful>
+            <test:non-blocking-processor/>
+            <test:non-blocking-processor/>
+        </first-successful>
+        <test:assert-intercepting responseSameThread="true"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="roundRobin">
+        <test:assert-intercepting responseSameThread="true"/>
+        <round-robin>
+            <test:non-blocking-processor/>
+            <test:non-blocking-processor/>
+        </round-robin>
+        <test:assert-intercepting responseSameThread="true"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="requestReply">
+        <test:assert-intercepting responseSameThread="true"/>
+        <request-reply>
+            <vm:outbound-endpoint address="vm://request" exchange-pattern="one-way"/>
+            <vm:inbound-endpoint address="vm://reply" exchange-pattern="one-way"/>
+        </request-reply>
+    </flow>
+    <flow name="requestReplyChild">
+        <vm:inbound-endpoint address="vm://request" exchange-pattern="one-way"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="aggregator">
+        <test:assert-intercepting message="before" count="3" responseCount="1" responseSameThread="true"/>
+        <collection-aggregator/>
+        <test:assert-intercepting message="after" count="1" responseCount="1" responseSameThread="true"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="poll">
+        <poll frequency="100">
+            <processor-chain>
+                <test:assert-intercepting responseSameThread="true"/>
+                <test:non-blocking-processor/>
+                <set-payload value="#[org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE]"/>
+            </processor-chain>
+        </poll>
+        <test:assert-intercepting responseSameThread="true"/>
+        <test:non-blocking-processor/>
+        <test:component/>
+    </flow>
+
+    <!-- Incompatible. Falls back to sync. -->
+
+    <flow name="syncFlow" processingStrategy="synchronous">
+        <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="transactional">
+        <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+        <transactional>
+            <test:assert-intercepting responseSameThread="true"/>
+            <test:non-blocking-processor/>
+        </transactional>
+        <test:assert-intercepting responseSameThread="true"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+</mule>

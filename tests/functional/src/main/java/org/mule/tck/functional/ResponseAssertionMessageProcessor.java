@@ -22,9 +22,13 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.transport.ReplyToHandler;
+import org.mule.execution.MessageProcessorExecutionTemplate;
+import org.mule.processor.chain.ProcessorExecutorFactory;
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -117,7 +121,17 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     {
         if (event != null || event instanceof VoidMuleEvent)
         {
-            return next.process(event);
+            try
+            {
+                return new ProcessorExecutorFactory().createProcessorExecutor(event, Collections.singletonList(next),
+                                                                              MessageProcessorExecutionTemplate
+                                                                                      .createExceptionTransformerExecutionTemplate(), false).execute();
+            }
+            catch (MessagingException e)
+            {
+                event.getSession().setValid(false);
+                throw e;
+            }
         }
         else
         {

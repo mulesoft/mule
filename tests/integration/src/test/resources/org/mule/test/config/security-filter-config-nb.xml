@@ -7,7 +7,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="nonBlockingSecurity" processingStrategy="non-blocking">
-        <test:non-blocking-source />
         <test:assert-intercepting responseSameThread="false" />
         <logger />  <!-- We need an intermediate message processor before the security message processor in order to check its asynchronicity -->
         <custom-security-filter class="org.mule.test.config.SecurityFilterTestCase$CustomSecurityFilter"/>

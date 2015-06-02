@@ -8,10 +8,15 @@ package org.mule.test.tck;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,13 +28,17 @@ import org.mule.expression.DefaultExpressionManager;
 import org.mule.tck.functional.AssertionMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
 {
-    private FlowConstruct flowConstruct;
-    private ExpressionManager expressionManager;
-    private MuleContext muleContext;
-    private final String TRUE_EXPRESSION = "trueExpression";
-    private final String FALSE_EXPRESSION = "falseExpression";
+    protected FlowConstruct flowConstruct;
+    protected ExpressionManager expressionManager;
+    protected MuleContext muleContext;
+    protected final String TRUE_EXPRESSION = "trueExpression";
+    protected final String FALSE_EXPRESSION = "falseExpression";
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    protected MuleEvent mockEvent;
 
     @Before
     public void initialise()
@@ -52,7 +61,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void startAssertionMessageProcessor() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.start();
     }
@@ -60,20 +69,20 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processDummyEvent() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.start();
-        asp.process(mock(MuleEvent.class));
+        asp.process(mockEvent);
     }
 
     @Test
     public void processValidEvent() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.start();
-        asp.process(mock(MuleEvent.class));
+        asp.process(mockEvent);
         assertFalse(asp.expressionFailed());
         assertFalse(asp.countFailOrNullEvent());
     }
@@ -81,11 +90,11 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processInvalidEvent() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(FALSE_EXPRESSION);
         asp.start();
-        asp.process(mock(MuleEvent.class));
+        asp.process(mockEvent);
         assertTrue(asp.expressionFailed());
         assertFalse(asp.countFailOrNullEvent());
     }
@@ -93,7 +102,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processZeroEvents() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.start();
@@ -104,13 +113,13 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processSomeValidEvents() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.start();
-        asp.process(mock(MuleEvent.class));
-        asp.process(mock(MuleEvent.class));
-        asp.process(mock(MuleEvent.class));
+        asp.process(mockEvent);
+        asp.process(mockEvent);
+        asp.process(mockEvent);
         assertFalse(asp.expressionFailed());
         assertFalse(asp.countFailOrNullEvent());
     }
@@ -118,16 +127,16 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processSomeInvalidEvent() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.start();
-        asp.process(mock(MuleEvent.class));
-        asp.process(mock(MuleEvent.class));
+        asp.process(mockEvent);
+        asp.process(mockEvent);
         asp.setExpression(FALSE_EXPRESSION);
-        asp.process(mock(MuleEvent.class));
+        asp.process(mockEvent);
         asp.setExpression(TRUE_EXPRESSION);
-        asp.process(mock(MuleEvent.class));
+        asp.process(mockEvent);
         assertTrue(asp.expressionFailed());
         assertFalse(asp.countFailOrNullEvent());
     }
@@ -135,14 +144,14 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processMoreThanCountEvents() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.setCount(5);
         asp.start();
         for(int i = 0; i < 6; i++)
         {
-            asp.process(mock(MuleEvent.class));
+            asp.process(mockEvent);
         }
         assertFalse(asp.expressionFailed());
         assertTrue(asp.countFailOrNullEvent());
@@ -151,14 +160,14 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processLessThanCountEvents() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.setCount(5);
         asp.start();
         for(int i = 0; i < 4; i++)
         {
-            asp.process(mock(MuleEvent.class));
+            asp.process(mockEvent);
         }
         assertFalse(asp.expressionFailed());
         assertTrue(asp.countFailOrNullEvent());
@@ -167,14 +176,14 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processExactCountEvents() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.setCount(5);
         asp.start();
         for(int i = 0; i < 5; i++)
         {
-            asp.process(mock(MuleEvent.class));
+            asp.process(mockEvent);
         }
         assertFalse(asp.expressionFailed());
         assertFalse(asp.countFailOrNullEvent());
@@ -183,7 +192,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void processNullEvent() throws Exception
     {
-        AssertionMessageProcessor asp = new AssertionMessageProcessor();
+        AssertionMessageProcessor asp = createAssertionMessageProcessor();
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.setCount(5);
@@ -192,4 +201,10 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
         assertFalse(asp.expressionFailed());
         assertTrue(asp.countFailOrNullEvent());
     }
+
+    protected AssertionMessageProcessor createAssertionMessageProcessor()
+    {
+        return new AssertionMessageProcessor();
+    }
+
 }
