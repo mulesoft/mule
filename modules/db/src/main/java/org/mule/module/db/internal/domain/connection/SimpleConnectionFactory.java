@@ -14,11 +14,11 @@ import javax.sql.DataSource;
 /**
  * Creates a {@link Connection} from a {@link DataSource}
  */
-public class SimpleConnectionFactory implements ConnectionFactory
+public class SimpleConnectionFactory extends AbstractConnectionFactory
 {
 
     @Override
-    public Connection create(DataSource dataSource)
+    protected Connection doCreateConnection(DataSource dataSource)
     {
         Connection connection;
         try
@@ -32,5 +32,4 @@ public class SimpleConnectionFactory implements ConnectionFactory
 
         return connection;
     }
-
 }
