@@ -157,7 +157,7 @@
         -->
         <jdk6Name>JavaSE-1.6</jdk6Name>
         <jdk7Name>JavaSE-1.7</jdk7Name>
-
+        <jython.version>2.5.3</jython.version>
         <activemqVersion>5.5.0</activemqVersion>
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
@@ -621,19 +621,11 @@
                 </exclusions>
             </dependency>
             <!-- Python for scripting -->
+            <!--Jython-->
             <dependency>
-                <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
-                <groupId>javax.script</groupId>
-                <artifactId>jython-engine</artifactId>
-                <version>1.1</version>
-                <!-- we use our own retrotranslated version -->
-                <classifier>jdk14</classifier>
-            </dependency>
-            <dependency>
-                <!-- This is the actual language implementation -->
                 <groupId>org.python</groupId>
-                <artifactId>jython</artifactId>
-                <version>2.2.1</version>
+                <artifactId>jython-standalone</artifactId>
+                <version>${jython.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
