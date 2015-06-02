@@ -34,10 +34,19 @@
             <version>${muleVersion}</version>
         </dependency>
 
-        <!--Jython-->
+        <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>jython-engine</artifactId>
+            <version>1.1</version>
+            <!-- we use our own retrotranslated version -->
+            <classifier>jdk14</classifier>
+        </dependency>
+        <!-- This is the actual language implementation -->
         <dependency>
             <groupId>org.python</groupId>
-            <artifactId>jython-standalone</artifactId>
+            <artifactId>jython</artifactId>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>

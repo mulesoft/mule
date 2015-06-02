@@ -309,13 +309,17 @@
         <!--
             Exclude the transitive dependencies of the scripting example
          -->
-        <!--Jython-->
         <dependency>
-            <groupId>org.python</groupId>
-            <artifactId>jython-standalone</artifactId>
+            <groupId>javax.script</groupId>
+            <artifactId>jython-engine</artifactId>
+            <classifier>jdk14</classifier>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <!--
             Exclude the transitive dependencies of the mule example launcher
          -->

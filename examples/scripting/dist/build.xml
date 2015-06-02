@@ -1,5 +1,7 @@
+
 <!--
  Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+
  The software in this package is published under the terms of the CPAL v1.0
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
@@ -14,11 +16,11 @@
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
-
+    
     <property name="app.name" value="mule-example-scripting"/>
     <property name="app.jar" value="${dir.build}/${app.name}.jar"/>
     <property name="app.file" value="${app.name}.zip"/>
-
+    
     <property environment="env"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
@@ -28,14 +30,27 @@
         <fileset dir="${dir.mule.lib}" includes="mule-tools-anttasks-*.jar"/>
     </path>
     <taskdef resource="org/mule/mulePackagingTasks.properties"
-             classpathref="anttasks.path"/>
+              classpathref="anttasks.path"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
         <delete dir="${dir.build}"/>
     </target>
 
-    <target name="init">
+    <!-- Download any additional libraries needed to run the application -->
+    <target name="get.libraries">
+        <mkdir dir="${dir.build}/lib"/>
+        <get src="${url.maven.repo2}/javax/script/jython-engine/1.1/jython-engine-1.1-jdk14.jar"
+             dest="${dir.build}/jython-engine-1.1-jdk14.jar"
+             verbose="true"
+             usetimestamp="true"/>
+        <get src="${url.maven.repo}/org/python/jython/2.2.1/jython-2.2.1.jar"
+             dest="${dir.build}/jython-2.2.1.jar"
+             verbose="true"
+             usetimestamp="true"/>
+    </target>
+
+    <target name="init" depends="get.libraries">
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
 
@@ -83,10 +98,11 @@
         <jar jarfile="${app.jar}"
              basedir="${dir.classes}"/>
     </target>
+        
 
     <target name="package"
-            depends="jar"
-            description="Package the application">
+           depends="jar"
+           description="Package the application">
 
         <mulePackage applicationFile="${app.file}">
             <config dir="src/main/app"/>
@@ -97,10 +113,13 @@
     </target>
 
     <target name="deploy"
-            depends="package"
-            description="Deploy the application to the Mule server">
+           depends="package"
+           description="Deploy the application to the Mule server">
 
         <muleDeploy applicationFile="${app.file}" />
+        <!-- workaround for MULE-4921 -->
+        <copy file="${dir.build}/jython-engine-1.1-jdk14.jar" todir="${dir.mule.home}/lib/user"/>
+        <copy file="${dir.build}/jython-2.2.1.jar" todir="${dir.mule.home}/lib/user"/>
     </target>
 
 </project>
