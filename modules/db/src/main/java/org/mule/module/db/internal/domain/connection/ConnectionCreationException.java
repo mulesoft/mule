@@ -13,6 +13,11 @@ package org.mule.module.db.internal.domain.connection;
 public class ConnectionCreationException extends RuntimeException
 {
 
+    public ConnectionCreationException(String message)
+    {
+        super(message);
+    }
+
     public ConnectionCreationException(Throwable throwable)
     {
         super(throwable);

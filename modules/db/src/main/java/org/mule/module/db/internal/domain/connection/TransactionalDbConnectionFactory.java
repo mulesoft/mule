@@ -46,9 +46,25 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
     @Override
     public DbConnection createConnection(TransactionalAction transactionalAction) throws SQLException
     {
-        Transaction tx = dbTransactionManager.getTransaction();
-
         Connection connection;
+
+        try
+        {
+            connection = createDataSourceConnection(transactionalAction);
+        }
+        catch (ConnectionCreationException e)
+        {
+            throw new SQLException(e);
+        }
+
+        return doCreateDbConnection(connection, transactionalAction);
+    }
+
+    private Connection createDataSourceConnection(TransactionalAction transactionalAction) throws SQLException
+    {
+        Transaction tx = dbTransactionManager.getTransaction();
+        Connection connection;
+
 
         if (transactionalAction == TransactionalAction.ALWAYS_JOIN)
         {
@@ -80,8 +96,7 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
         {
             throw new IllegalArgumentException("There is no defined way to manage transactional action " + transactionalAction);
         }
-
-        return doCreateDbConnection(connection, transactionalAction);
+        return connection;
     }
 
     protected DbConnection doCreateDbConnection(Connection connection, TransactionalAction transactionalAction)
