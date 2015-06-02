@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -55,81 +56,90 @@ public class MuleInvoker implements Invoker
         // this is the original request. Keep it to copy all the message properties from it
         final MuleEvent event = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
         MuleEvent responseEvent = null;
-        try
-        {
-            MuleMessage reqMsg = event.getMessage();
-            reqMsg.setPayload(extractPayload(exchange.getInMessage()));
 
-            BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
-            Service svc = exchange.get(Service.class);
-            if (!cxfMmessageProcessor.isProxy())
+        if (PropertyUtils.isTrue(exchange.remove(CxfConstants.NON_BLOCKING_RESPONSE)))
+        {
+            responseEvent = event;
+        }
+        else
+        {
+            try
             {
-                MethodDispatcher md = (MethodDispatcher) svc.get(MethodDispatcher.class.getName());
-                Method m = md.getMethod(bop);
-                if (targetClass != null)
+                MuleMessage reqMsg = event.getMessage();
+                reqMsg.setPayload(extractPayload(exchange.getInMessage()));
+
+                BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
+                Service svc = exchange.get(Service.class);
+                if (!cxfMmessageProcessor.isProxy())
                 {
-                    m = matchMethod(m, targetClass);
+                    MethodDispatcher md = (MethodDispatcher) svc.get(MethodDispatcher.class.getName());
+                    Method m = md.getMethod(bop);
+                    if (targetClass != null)
+                    {
+                        m = matchMethod(m, targetClass);
+                    }
+
+                    reqMsg.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m, PropertyScope.INVOCATION);
                 }
 
-                reqMsg.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m, PropertyScope.INVOCATION);
-            }
-
-            if (bop != null)
-            {
-                reqMsg.setProperty(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName(), PropertyScope.INVOCATION);
-                reqMsg.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
-            }
-
-            ErrorHandlingExecutionTemplate errorHandlingExecutionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
-            responseEvent = errorHandlingExecutionTemplate.execute(new ExecutionCallback<MuleEvent>()
-            {
-                @Override
-                public MuleEvent process() throws Exception
+                if (bop != null)
                 {
-                    return cxfMmessageProcessor.processNext(event);
+                    reqMsg.setProperty(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName(), PropertyScope.INVOCATION);
+                    reqMsg.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
                 }
-            });
-        }
-        catch (MuleException e)
-        {
-            exchange.put(CxfConstants.MULE_EVENT, event);
 
-            Throwable cause = e;
-
-            // See MULE-6329
-            if(Boolean.valueOf((String) event.getMessage().getInvocationProperty(CxfConstants.UNWRAP_MULE_EXCEPTIONS)))
-            {
-                cause = ExceptionHelper.getNonMuleException(e);
-                // Exceptions thrown from a ScriptComponent or a ScriptTransformer are going to be wrapped on a
-                // ScriptException
-                if(cause instanceof ScriptException && cause.getCause() != null)
+                ErrorHandlingExecutionTemplate errorHandlingExecutionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
+                responseEvent = errorHandlingExecutionTemplate.execute(new ExecutionCallback<MuleEvent>()
                 {
-                    cause = cause.getCause();
+                    @Override
+                    public MuleEvent process() throws Exception
+                    {
+                        return cxfMmessageProcessor.processNext(event);
+                    }
+                });
+            }
+            catch (MuleException e)
+            {
+                exchange.put(CxfConstants.MULE_EVENT, event);
+
+                Throwable cause = e;
+
+                // See MULE-6329
+                if(Boolean.valueOf((String) event.getMessage().getInvocationProperty(CxfConstants.UNWRAP_MULE_EXCEPTIONS)))
+                {
+                    cause = ExceptionHelper.getNonMuleException(e);
+                    // Exceptions thrown from a ScriptComponent or a ScriptTransformer are going to be wrapped on a
+                    // ScriptException
+                    if(cause instanceof ScriptException && cause.getCause() != null)
+                    {
+                        cause = cause.getCause();
+                    }
                 }
+                else if(e instanceof ComponentException) {
+                    cause = e.getCause();
+                }
+
+                throw new Fault(cause);
             }
-            else if(e instanceof ComponentException) {
-                cause = e.getCause();
+            catch (Exception e)
+            {
+                exchange.put(CxfConstants.MULE_EVENT, event);
+                throw new Fault(e);
             }
 
-            throw new Fault(cause);
-        }
-        catch (Exception e)
-        {
-            exchange.put(CxfConstants.MULE_EVENT, event);
-            throw new Fault(e);
-        }
+            if (!event.getExchangePattern().hasResponse())
+            {
+                // weird response from AbstractInterceptingMessageProcessor
+                responseEvent = null;
+            }
 
+            if (responseEvent instanceof NonBlockingVoidMuleEvent)
+            {
+                exchange.put(Message.SUSPENDED_INVOCATION, true);
+                exchange.put(CxfConstants.MULE_EVENT, responseEvent);
+                return null;
+            }
 
-        if (!event.getExchangePattern().hasResponse())
-        {
-            // weird response from AbstractInterceptingMessageProcessor
-            responseEvent = null;
-        }
-
-        if (responseEvent instanceof NonBlockingVoidMuleEvent)
-        {
-            exchange.put(CxfConstants.MULE_EVENT, responseEvent);
-            return null;
         }
 
         if (responseEvent != null && !VoidMuleEvent.getInstance().equals(responseEvent))

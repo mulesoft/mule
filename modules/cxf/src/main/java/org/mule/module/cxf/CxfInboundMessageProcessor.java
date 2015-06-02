@@ -56,6 +56,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.Exchange;
@@ -238,6 +239,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         {
             final Exchange exchange = new ExchangeImpl();
 
+            final MuleEvent originalEvent = event;
             if (event.isAllowNonBlocking())
             {
                 final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
@@ -245,19 +247,30 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 event = new DefaultMuleEvent(event, new ReplyToHandler()
                 {
                     @Override
-                    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
+                    public void processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo) throws MuleException
                     {
                         try
                         {
-                            originalReplyToHandler.processReplyTo(event, returnMessage, replyTo);
+                            // CXF execution chain was suspended, so we need to resume it.
+                            // The MuleInvoker component will be recalled, by using the CxfConstants.NON_BLOCKING_RESPONSE flag we force using the received response event instead of re-invoke the flow
+                            exchange.put(CxfConstants.MULE_EVENT, responseEvent);
+                            exchange.put(CxfConstants.NON_BLOCKING_RESPONSE, true);
+                            exchange.getInMessage().getInterceptorChain().resume();
+
+                            // Process the response
+                            responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+                            responseEvent = processResponse(originalEvent, exchange, responseEvent);
+
+                            // Continue the non blocking execution
+                            originalReplyToHandler.processReplyTo(responseEvent, responseEvent.getMessage(), replyTo);
                         }
                         catch (Exception e)
                         {
                             ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
-                            event.getMessage().setExceptionPayload(exceptionPayload);
+                            responseEvent.getMessage().setExceptionPayload(exceptionPayload);
                             returnMessage.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
-                            event.setMessage(returnMessage);
-                            processExceptionReplyTo(new MessagingException(event, e), replyTo);
+                            responseEvent.setMessage(returnMessage);
+                            processExceptionReplyTo(new MessagingException(responseEvent, e), replyTo);
                         }
                     }
 
@@ -285,33 +298,6 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             logger.warn("Could not dispatch message to CXF!", e);
             throw e;
         }
-    }
-
-    private MuleEvent processResponse(MuleEvent event, Exchange exchange, MuleEvent responseEvent)
-    {
-        // If there isn't one, there was probably a fault, so use the original event
-        if (responseEvent == null || VoidMuleEvent.getInstance().equals(responseEvent) || !event.getExchangePattern().hasResponse())
-        {
-            return null;
-        }
-
-        MuleMessage muleResMsg = responseEvent.getMessage();
-        muleResMsg.setPayload(getResponseOutputHandler(exchange));
-
-        // Handle a fault if there is one.
-        Message faultMsg = exchange.getOutFaultMessage();
-        if (faultMsg != null)
-        {
-            Exception ex = faultMsg.getContent(Exception.class);
-            if (ex != null)
-            {
-                ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-                event.getMessage().setExceptionPayload(exceptionPayload);
-                muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
-            }
-        }
-
-        return responseEvent;
     }
 
     private MuleEvent sendThroughCxf(MuleEvent event, Exchange exchange) throws TransformerException, IOException
@@ -422,10 +408,49 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
         // invoke the actual web service up until right before we serialize the
         // response
-        d.getMessageObserver().onMessage(m);
+        try
+        {
+            d.getMessageObserver().onMessage(m);
+        }
+        catch (SuspendedInvocationException e)
+        {
+            MuleEvent responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+
+            if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
+            {
+                throw e;
+            }
+        }
 
         // get the response event
         return (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+    }
+
+    private MuleEvent processResponse(MuleEvent event, Exchange exchange, MuleEvent responseEvent)
+    {
+        // If there isn't one, there was probably a fault, so use the original event
+        if (responseEvent == null || VoidMuleEvent.getInstance().equals(responseEvent) || !event.getExchangePattern().hasResponse())
+        {
+            return null;
+        }
+
+        MuleMessage muleResMsg = responseEvent.getMessage();
+        muleResMsg.setPayload(getResponseOutputHandler(exchange));
+
+        // Handle a fault if there is one.
+        Message faultMsg = exchange.getOutFaultMessage();
+        if (faultMsg != null)
+        {
+            Exception ex = faultMsg.getContent(Exception.class);
+            if (ex != null)
+            {
+                ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
+                event.getMessage().setExceptionPayload(exceptionPayload);
+                muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
+            }
+        }
+
+        return responseEvent;
     }
 
     protected boolean shouldSoapActionHeader()

@@ -25,11 +25,9 @@ public class ProxyNonBlockingTestCase extends FunctionalTestCase
 
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
-    private static final String ECHO_SOAP_TEST_ELEMENT = "<test xmlns=\"http://foo\"> foo </test>";
-
     private static final String ECHO_SOAP_REQUEST =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-            "<soap:Body>" + ECHO_SOAP_TEST_ELEMENT + "</soap:Body>" +
+            "<soap:Body><test xmlns=\"http://foo\"> foo </test></soap:Body>" +
         "</soap:Envelope>";
 
     private static final String GREETER_SOAP_TEST_ELEMENT_REQUEST = "<greetMe xmlns=\"http://apache.org/hello_world_soap_http/types\"><requestType>Dan</requestType></greetMe>";
@@ -52,13 +50,13 @@ public class ProxyNonBlockingTestCase extends FunctionalTestCase
     @Test
     public void testEchoService() throws Exception
     {
-        doTest("/services/echo", ECHO_SOAP_REQUEST, ECHO_SOAP_TEST_ELEMENT);
+        doTest("/services/echo", ECHO_SOAP_REQUEST, ECHO_SOAP_REQUEST);
     }
 
     @Test
     public void testEchoProxy() throws Exception
     {
-        doTest("/proxies/echo", ECHO_SOAP_REQUEST, ECHO_SOAP_TEST_ELEMENT);
+        doTest("/proxies/echo", ECHO_SOAP_REQUEST, ECHO_SOAP_REQUEST);
         getSensingInstance("sensingRequestResponseProcessorEcho").assertRequestResponseThreadsDifferent();
     }
 
