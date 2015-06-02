@@ -70,5 +70,11 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
         testFlowNonBlocking("choice");
     }
 
+    @Test
+    public void enricher() throws Exception
+    {
+        testFlowNonBlocking("enricher");
+    }
+
 }
 

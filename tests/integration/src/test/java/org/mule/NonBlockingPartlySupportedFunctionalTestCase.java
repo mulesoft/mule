@@ -35,12 +35,6 @@ public class NonBlockingPartlySupportedFunctionalTestCase extends FunctionalTest
     }
 
     @Test
-    public void enricher() throws Exception
-    {
-        testFlowNonBlocking("enricher");
-    }
-
-    @Test
     public void async() throws Exception
     {
         testFlowNonBlocking("async");
