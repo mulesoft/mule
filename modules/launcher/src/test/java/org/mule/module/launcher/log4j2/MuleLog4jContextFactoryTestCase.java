@@ -9,6 +9,8 @@ package org.mule.module.launcher.log4j2;
 import static java.lang.System.getProperty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -69,4 +71,12 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase
         assertThat(customHandler, equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
     }
 
+    @Test
+    public void dispose()
+    {
+        ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
+        MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector);
+        factory.dispose();
+        verify(contextSelector).dispose();
+    }
 }
