@@ -14,6 +14,8 @@ import org.mule.transport.AbstractMuleMessageFactory;
 import java.io.File;
 import java.io.InputStream;
 
+import javax.activation.MimetypesFileTypeMap;
+
 /**
  * <code>FileMuleMessageFactory</code> creates a new {@link MuleMessage} with a
  * {@link File} or {@link InputStream} payload. Users can obtain the filename and
@@ -22,6 +24,9 @@ import java.io.InputStream;
  */
 public class FileMuleMessageFactory extends AbstractMuleMessageFactory
 {
+
+    private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()
     {
@@ -46,7 +51,7 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory
     protected String getMimeType(Object transportMessage)
     {
         File file = convertToFile(transportMessage);
-        return FileMimeTypeResolver.resolveFileMimeType(file.getName());
+        return mimetypesFileTypeMap.getContentType(file.getName().toLowerCase());
     }
 
     protected File convertToFile(Object transportMessage)

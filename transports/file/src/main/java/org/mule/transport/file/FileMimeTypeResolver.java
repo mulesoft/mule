@@ -7,11 +7,7 @@
 
 package org.mule.transport.file;
 
-import org.mule.transformer.types.MimeTypes;
-import org.mule.util.FilenameUtils;
-
-import java.util.HashMap;
-import java.util.Map;
+import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Resolves default MIME type for well known file extensions
@@ -19,27 +15,10 @@ import java.util.Map;
 public class FileMimeTypeResolver
 {
 
-    public static Map<String, String> mimeTypes = createDefaultMimeTypeMapping();
-
-    private FileMimeTypeResolver()
-    {
-    }
-
-    private static HashMap<String, String> createDefaultMimeTypeMapping()
-    {
-        HashMap<String, String> mapping = new HashMap<>();
-        mapping.put("txt", MimeTypes.TEXT);
-        mapping.put("json", MimeTypes.JSON);
-        mapping.put("xml", MimeTypes.XML);
-        mapping.put("html", MimeTypes.HTML);
-
-        return mapping;
-    }
+    private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
 
     public static String resolveFileMimeType(String name)
     {
-        final String extension = FilenameUtils.getExtension(name);
-
-        return mimeTypes.get(extension.toLowerCase());
+        return mimetypesFileTypeMap.getContentType(name.toLowerCase());
     }
 }

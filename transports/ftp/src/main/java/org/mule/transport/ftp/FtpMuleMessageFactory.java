@@ -9,12 +9,13 @@ package org.mule.transport.ftp;
 import org.mule.DefaultMuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.transport.file.FileConnector;
-import org.mule.transport.file.FileMimeTypeResolver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+
+import javax.activation.MimetypesFileTypeMap;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -24,6 +25,7 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
 
     private FTPClient ftpClient;
     private boolean streaming;
+    private final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
 
     @Override
     protected Object extractPayload(Object transportMessage, String encoding) throws Exception
@@ -90,8 +92,7 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
     protected String getMimeType(Object transportMessage)
     {
         FTPFile file = (FTPFile) transportMessage;
-
-        return FileMimeTypeResolver.resolveFileMimeType(file.getName());
+        return mimetypesFileTypeMap.getContentType(file.getName().toLowerCase());
     }
 
     public void setFtpClient(FTPClient ftpClient)
