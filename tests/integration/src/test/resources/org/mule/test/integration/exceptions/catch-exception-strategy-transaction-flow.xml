@@ -23,7 +23,7 @@
         <jms:inbound-endpoint queue="in1" connector-ref="activeMq">
             <jms:transaction action="ALWAYS_BEGIN"/>
         </jms:inbound-endpoint>
-        <test:component throwException="true"/>
+        <test:component />
         <catch-exception-strategy/>
     </flow>
 
@@ -38,6 +38,17 @@
             <jms:transaction action="ALWAYS_BEGIN"/>
         </jms:outbound-endpoint>
         <test:component throwException="true"/>
+        <catch-exception-strategy/>
+    </flow>
+
+    <flow name="transactionCommitFails">
+        <vm:inbound-endpoint path="in3">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component />
+        <message-filter>
+            <expression-filter expression="#[message.inboundProperties['filterMessage']"/>
+        </message-filter>
         <catch-exception-strategy/>
     </flow>
 

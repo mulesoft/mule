@@ -26,7 +26,7 @@
                     <jms:transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
             </inbound>
-            <test:component throwException="true"/>
+            <test:component/>
             <catch-exception-strategy/>
         </service>
 
@@ -51,6 +51,15 @@
             <catch-exception-strategy/>
         </service>
 
+        <service name="transactionCommitFails">
+            <inbound>
+                <vm:inbound-endpoint path="in3">
+                    <vm:transaction action="ALWAYS_BEGIN"/>
+                </vm:inbound-endpoint>
+            </inbound>
+            <test:component />
+            <catch-exception-strategy/>
+        </service>
     </model>
 
 </mule>

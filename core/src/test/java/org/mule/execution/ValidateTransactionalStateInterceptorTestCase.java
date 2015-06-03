@@ -126,7 +126,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
                 {
                     return mockMuleEvent;
                 }
-            });
+            }, new ExecutionContext());
         }
         catch (IllegalTransactionStateException e)
         {
