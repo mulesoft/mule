@@ -10,6 +10,7 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -41,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpResponseBuilder extends AbstractMessageProcessorOwner
-    implements Initialisable, MessageProcessor
+    implements Initialisable, MessageProcessor, NonBlockingSupported
 {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponseBuilder.class);
 

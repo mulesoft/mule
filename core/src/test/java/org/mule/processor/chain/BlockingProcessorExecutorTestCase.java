@@ -93,7 +93,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     {
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         when(event.isSynchronous()).thenReturn(true);
-        assertBlockingExecution();
+        assertBlockingExecution(processors);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         when(event.isSynchronous()).thenReturn(false);
         when(event.isAllowNonBlocking()).thenReturn(true);
-        assertBlockingExecution();
+        assertBlockingExecution(processors);
     }
 
     @Test
@@ -110,12 +110,12 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     {
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
         when(event.isSynchronous()).thenReturn(false);
-        assertBlockingExecution();
+        assertBlockingExecution(processors);
     }
 
-    protected void assertBlockingExecution() throws MuleException
+    protected void assertBlockingExecution(List<MessageProcessor> processors) throws MuleException
     {
-        ProcessorExecutor executor = createProcessorExecutor();
+        ProcessorExecutor executor = createProcessorExecutor(processors);
 
         if (event.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE)
         {
@@ -136,7 +136,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
         assertThat(processor3.thread, equalTo(Thread.currentThread()));
     }
 
-    protected ProcessorExecutor createProcessorExecutor()
+    protected ProcessorExecutor createProcessorExecutor(List<MessageProcessor> processors)
     {
         return new BlockingProcessorExecutor(event, processors, executionTemplate, true);
     }

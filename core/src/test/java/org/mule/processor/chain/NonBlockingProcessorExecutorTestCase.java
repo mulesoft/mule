@@ -19,11 +19,15 @@ import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessorExecutor;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NonBlockingProcessorExecutor;
-import org.mule.tck.SensingNullCompletionHandler;
 import org.mule.tck.SensingNullReplyToHandler;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.CoreMatchers;
@@ -50,21 +54,72 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     @Override
     public void executeRequestResponseNonBlocking() throws MuleException, InterruptedException
     {
+        setupNonBlockingMockEvent();
+        assertNonBlockingExecution(processors);
+    }
+
+    @Test
+    public void executeRequestResponseWithInterceptingMPBlocking() throws MuleException, InterruptedException
+    {
+        setupNonBlockingMockEvent();
+        processors.clear();
+        processors.add(new AbstractInterceptingMessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return processNext(event);
+            }
+        });
+        processors.add(processor1);
+        processors.add(processor2);
+        processors.add(processor3);
+        assertBlockingExecution(processors);
+    }
+
+    @Test
+    public void executeRequestResponseWithMPContainerBlocking() throws MuleException, InterruptedException
+    {
+        setupNonBlockingMockEvent();
+        processors.clear();
+        processors.add(new TestContainerMessageProcessor());
+        processors.add(processor2);
+        processors.add(processor3);
+        assertBlockingExecution(processors);
+    }
+
+    private void setupNonBlockingMockEvent()
+    {
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         when(event.isSynchronous()).thenReturn(false);
         when(event.isAllowNonBlocking()).thenReturn(true);
-        assertNonBlockingExecution();
     }
 
+    private class TestContainerMessageProcessor implements  MessageProcessor, MessageProcessorContainer{
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            return processor1.process(event);
+        }
+
+        @Override
+        public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
+        {
+
+        }
+    }
+
+
     @Override
-    protected ProcessorExecutor createProcessorExecutor()
+    protected ProcessorExecutor createProcessorExecutor(List<MessageProcessor> processors)
     {
         return new NonBlockingProcessorExecutor(event, processors, executionTemplate, true);
     }
 
-    private void assertNonBlockingExecution() throws MuleException, InterruptedException
+    private void assertNonBlockingExecution(List<MessageProcessor> processors) throws MuleException, InterruptedException
     {
-        ProcessorExecutor executor = createProcessorExecutor();
+        ProcessorExecutor executor = createProcessorExecutor(processors);
 
         if (event.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE)
         {
