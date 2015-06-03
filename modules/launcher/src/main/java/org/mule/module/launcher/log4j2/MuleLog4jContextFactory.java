@@ -6,9 +6,12 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import org.mule.api.lifecycle.Disposable;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;
 import org.apache.logging.log4j.core.impl.Log4jContextFactory;
+import org.apache.logging.log4j.core.selector.ContextSelector;
 
 /**
  * Implementation of {@link org.apache.logging.log4j.spi.LoggerContextFactory} which
@@ -31,7 +34,7 @@ import org.apache.logging.log4j.core.impl.Log4jContextFactory;
  *
  * @since 3.6.0
  */
-public final class MuleLog4jContextFactory extends Log4jContextFactory
+public class MuleLog4jContextFactory extends Log4jContextFactory implements Disposable
 {
 
     private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
@@ -40,13 +43,23 @@ public final class MuleLog4jContextFactory extends Log4jContextFactory
     private static final String DEFAULT_ASYNC_LOGGER_EXCEPTION_HANLDER = AsyncLoggerExceptionHandler.class.getName();
 
     /**
-     * Initializes the ContextSelector.
+     * Initializes using a {@link ArtifactAwareContextSelector}
      */
     public MuleLog4jContextFactory()
     {
-        super(new ArtifactAwareContextSelector());
-        initialise();
+        this(new ArtifactAwareContextSelector());
 
+    }
+
+    /**
+     * Initializes using {@code contextSelector}
+     *
+     * @param contextSelector a {@link ContextSelector}
+     */
+    public MuleLog4jContextFactory(ContextSelector contextSelector)
+    {
+        super(contextSelector);
+        initialise();
     }
 
     protected void initialise()
@@ -69,4 +82,9 @@ public final class MuleLog4jContextFactory extends Log4jContextFactory
         }
     }
 
+    @Override
+    public void dispose()
+    {
+        ((ArtifactAwareContextSelector) getSelector()).dispose();
+    }
 }

@@ -8,17 +8,20 @@ package org.mule.module.launcher;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
+import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.Mockito;
 
 @SmallTest
 public class MuleContainerTestCase extends AbstractMuleTestCase
@@ -49,9 +52,9 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
     {
         container.start(false);
 
-        Mockito.verify(coreExtensionManager).setDeploymentService(deploymentService);
-        Mockito.verify(coreExtensionManager).initialise();
-        Mockito.verify(coreExtensionManager).start();
+        verify(coreExtensionManager).setDeploymentService(deploymentService);
+        verify(coreExtensionManager).initialise();
+        verify(coreExtensionManager).start();
     }
 
     @Test
@@ -95,5 +98,23 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
         InOrder inOrder = inOrder(coreExtensionManager, deploymentService);
         inOrder.verify(deploymentService).stop();
         inOrder.verify(coreExtensionManager).dispose();
+    }
+
+    @Test
+    public void disposesLogContextFactory() throws Exception
+    {
+        final LoggerContextFactory originalFactory = LogManager.getFactory();
+        try
+        {
+            MuleLog4jContextFactory contextFactory = mock(MuleLog4jContextFactory.class);
+            LogManager.setFactory(contextFactory);
+            container.stop();
+
+            verify(contextFactory).dispose();
+        }
+        finally
+        {
+            LogManager.setFactory(originalFactory);
+        }
     }
 }
