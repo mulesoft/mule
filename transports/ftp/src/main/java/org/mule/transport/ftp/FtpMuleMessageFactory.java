@@ -9,6 +9,7 @@ package org.mule.transport.ftp;
 import org.mule.DefaultMuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.transport.file.FileConnector;
+import org.mule.transport.file.FileMimeTypeResolver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -83,6 +84,14 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
         message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
         message.setInboundProperty(FileConnector.PROPERTY_FILE_SIZE, file.getSize());
         message.setInboundProperty(FileConnector.PROPERTY_FILE_TIMESTAMP, file.getTimestamp());
+    }
+
+    @Override
+    protected String getMimeType(Object transportMessage)
+    {
+        FTPFile file = (FTPFile) transportMessage;
+
+        return FileMimeTypeResolver.resolveFileMimeType(file.getName());
     }
 
     public void setFtpClient(FTPClient ftpClient)

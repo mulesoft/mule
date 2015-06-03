@@ -42,6 +42,13 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory
         setPropertiesFromFile(message, file);
     }
 
+    @Override
+    protected String getMimeType(Object transportMessage)
+    {
+        File file = convertToFile(transportMessage);
+        return FileMimeTypeResolver.resolveFileMimeType(file.getName());
+    }
+
     protected File convertToFile(Object transportMessage)
     {
         File file = null;

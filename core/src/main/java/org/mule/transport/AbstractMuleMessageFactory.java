@@ -88,9 +88,15 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         }
 
         message.setEncoding(encoding);
+        message.setMimeType(getMimeType(transportMessage));
         addProperties(message, transportMessage);
         addAttachments(message, transportMessage);
         return message;
+    }
+
+    protected String getMimeType(Object transportMessage)
+    {
+        return null;
     }
 
     protected abstract Class<?>[] getSupportedTransportMessageTypes();
