@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.expression.DefaultExpressionManager;
@@ -33,16 +34,23 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
 {
     protected FlowConstruct flowConstruct;
     protected ExpressionManager expressionManager;
-    protected MuleContext muleContext;
     protected final String TRUE_EXPRESSION = "trueExpression";
     protected final String FALSE_EXPRESSION = "falseExpression";
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    protected MuleContext muleContext;
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     protected MuleEvent mockEvent;
+
+    @Mock
+    protected MuleMessage muleMessage;
 
     @Before
     public void initialise()
     {
+        when(mockEvent.getMessage()).thenReturn(muleMessage);
+        when(muleMessage.getMuleContext()).thenReturn(muleContext);
         expressionManager = mock(DefaultExpressionManager.class);
         when(expressionManager.isValidExpression(anyString())).thenReturn(true);
         when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), anyBoolean(), anyBoolean()))
@@ -50,7 +58,6 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
         when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(MuleEvent.class), anyBoolean(), anyBoolean()))
             .thenReturn(false);
 
-        muleContext = mock(MuleContext.class);
         when(muleContext.getExpressionManager()).thenReturn(expressionManager);
 
         flowConstruct = mock(FlowConstruct.class);
