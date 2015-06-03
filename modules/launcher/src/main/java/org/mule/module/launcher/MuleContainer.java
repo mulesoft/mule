@@ -72,6 +72,7 @@ public class MuleContainer
 
         logger = LogFactory.getLog(MuleContainer.class);
     }
+
     /**
      * Application entry point.
      *
@@ -222,6 +223,10 @@ public class MuleContainer
         }
 
         coreExtensionManager.dispose();
+        if (LogManager.getFactory() instanceof MuleLog4jContextFactory)
+        {
+            ((MuleLog4jContextFactory) LogManager.getFactory()).dispose();
+        }
     }
 
     public Log getLogger()
