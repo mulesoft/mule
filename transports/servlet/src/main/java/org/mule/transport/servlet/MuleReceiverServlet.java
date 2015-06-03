@@ -252,7 +252,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         setupRequestMessage(request, requestMessage, receiver);
 
         MuleEvent event = routeMessage(receiver, requestMessage, request);
-        MuleMessage result = event == null ? null : event.getMessage();
+        MuleMessage result = !receiver.getEndpoint().getExchangePattern().hasResponse() || event == null ? null : event.getMessage();
         writeResponse(response, result);
     }
 

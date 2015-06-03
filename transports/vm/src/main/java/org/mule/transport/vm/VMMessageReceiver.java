@@ -113,7 +113,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                 public MuleEvent process() throws Exception
                 {
                     MuleEvent event = routeMessage(message);
-                    MuleMessage returnedMessage = event == null ? null : event.getMessage();
+                    MuleMessage returnedMessage = !getEndpoint().getExchangePattern().hasResponse() || event == null ? null : event.getMessage();
                     if (returnedMessage != null)
                     {
                         returnedMessage.release();
@@ -240,7 +240,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     }
 
     @Override
-    protected void processMessage(Object msg) throws Exception
+    protected MuleEvent processMessage(Object msg) throws Exception
     {
         MuleMessage message = (MuleMessage) msg;
 
@@ -248,7 +248,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         {
             message = (MuleMessage)((ThreadSafeAccess) message).newThreadCopy();
         }
-        routeMessage(message);
+        return routeMessage(message);
     }
 
     /*

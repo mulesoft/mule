@@ -30,7 +30,7 @@ public class SuspendXaTransactionInterceptor<T> implements ExecutionInterceptor<
     }
 
     @Override
-    public T execute(ExecutionCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception
     {
         Transaction suspendedXATx = null;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -47,7 +47,7 @@ public class SuspendXaTransactionInterceptor<T> implements ExecutionInterceptor<
         }
         try
         {
-            T result = next.execute(callback);
+            T result = next.execute(callback, executionContext);
             resumeXaTransactionIfRequired(suspendedXATx);
             return result;
         }

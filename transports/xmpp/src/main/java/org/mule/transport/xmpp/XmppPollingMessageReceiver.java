@@ -93,8 +93,7 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
                 public MuleEvent process() throws Exception
                 {
                     MuleMessage muleMessage = createMuleMessage(xmppMessage);
-                    routeMessage(muleMessage);
-                    return null;
+                    return routeMessage(muleMessage);
                 }
             });
         }

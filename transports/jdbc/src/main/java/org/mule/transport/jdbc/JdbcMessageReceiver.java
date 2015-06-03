@@ -7,6 +7,7 @@
 package org.mule.transport.jdbc;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -114,14 +115,14 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     }
 
     @Override
-    public void processMessage(Object message) throws Exception
+    public MuleEvent processMessage(Object message) throws Exception
     {
         Connection con = null;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         try
         {
             MuleMessage muleMessage = createMuleMessage(message, endpoint.getEncoding());
-            routeMessage(muleMessage);
+            MuleEvent result = routeMessage(muleMessage);
             if (hasAckStatement())
             {
                 con = this.connector.getConnection();
@@ -147,6 +148,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                     }
                 }
             }
+            return result;
         }
         catch (Exception ex)
         {

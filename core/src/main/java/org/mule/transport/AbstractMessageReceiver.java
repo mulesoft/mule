@@ -537,12 +537,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                 connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(),
                                                                            endpoint, resultEvent.getFlowConstruct(), EndpointMessageNotification.MESSAGE_RESPONSE));
             }
-            return resultEvent;
         }
-        else
-        {
-            return null;
-        }
+        return resultEvent;
     }
 
     protected void processMessage(final MessageProcessTemplate messageProcessTemplate, final MessageProcessContext messageProcessContext)

@@ -24,7 +24,7 @@ public class IsolateCurrentTransactionInterceptor<T> implements ExecutionInterce
 
 
     @Override
-    public T execute(ExecutionCallback<T> muleEventProcessingCallback) throws Exception
+    public T execute(ExecutionCallback<T> muleEventProcessingCallback, ExecutionContext executionContext) throws Exception
     {
         boolean transactionIsolated = false;
         try
@@ -38,7 +38,7 @@ public class IsolateCurrentTransactionInterceptor<T> implements ExecutionInterce
                     transactionIsolated = true;
                 }
             }
-            return next.execute(muleEventProcessingCallback);
+            return next.execute(muleEventProcessingCallback, executionContext);
         }
         finally 
         {
