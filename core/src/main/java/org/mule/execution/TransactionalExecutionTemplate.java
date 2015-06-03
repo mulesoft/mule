@@ -62,6 +62,6 @@ public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T>
     @Override
     public T execute(ExecutionCallback<T> executionCallback) throws Exception
     {
-        return executionInterceptor.execute(executionCallback);
+        return executionInterceptor.execute(executionCallback, new ExecutionContext());
     }
 }

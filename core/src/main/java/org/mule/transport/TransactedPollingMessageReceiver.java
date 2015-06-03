@@ -18,7 +18,9 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
+import org.mule.routing.DefaultRouterResultsHandler;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -45,6 +47,8 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
      * determines whether Multiple receivers are created to improve throughput
      */
     private boolean useMultipleReceivers = true;
+
+    private final DefaultRouterResultsHandler defaultRouterResultsHandler = new DefaultRouterResultsHandler(false);
 
     public TransactedPollingMessageReceiver(Connector connector,
                                             FlowConstruct flowConstruct,
@@ -137,14 +141,15 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                     {
                         // this is not ideal, but jdbc receiver returns a list of maps, not List<MuleMessage>
                         List messages = getMessages();
+                        LinkedList<MuleEvent> results = new LinkedList<MuleEvent>();
                         if (messages != null && messages.size() > 0)
                         {
                             for (Object message : messages)
                             {
-                                processMessage(message);
+                                results.add(processMessage(message));
                             }
                         }
-                        return null;  //To change body of implemented methods use File | Settings | File Templates.
+                        return defaultRouterResultsHandler.aggregateResults(results, results.getLast(), results.getLast().getMuleContext());
                     }
                 };
                 pt.execute(cb);
@@ -243,6 +248,6 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     protected abstract List<MuleMessage> getMessages() throws Exception;
 
-    protected abstract void processMessage(Object message) throws Exception;
+    protected abstract MuleEvent processMessage(Object message) throws Exception;
 
 }

@@ -265,7 +265,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
             {
                 message.setOutboundProperty("receiver-thread", Thread.currentThread().getName());
                 MuleEvent event = routeMessage(message);
-                MuleMessage returnedMessage = (event == null || VoidMuleEvent.getInstance().equals(event))
+                MuleMessage returnedMessage = (!endpoint.getExchangePattern().hasResponse() || event == null || VoidMuleEvent.getInstance().equals(event))
                                                                                                           ? null
                                                                                                           : event.getMessage();
                 /**
@@ -280,14 +280,14 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         }
 
         @Override
-        protected void processMessage(Object msg) throws Exception
+        protected MuleEvent processMessage(Object msg) throws Exception
         {
             MuleMessage message = (MuleMessage) msg;
 
             // Rewrite the message to treat it as a new message
             MuleMessage newMessage = message.createInboundMessage();
             newMessage.setOutboundProperty("receiver-thread", Thread.currentThread().getName());
-            routeMessage(newMessage);
+            return routeMessage(newMessage);
         }
 
     }

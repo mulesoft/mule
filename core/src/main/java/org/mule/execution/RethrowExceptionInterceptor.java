@@ -21,11 +21,11 @@ class RethrowExceptionInterceptor implements ExecutionInterceptor<MuleEvent>
     }
 
     @Override
-    public MuleEvent execute(ExecutionCallback<MuleEvent> processingCallback) throws Exception
+    public MuleEvent execute(ExecutionCallback<MuleEvent> processingCallback, ExecutionContext executionContext) throws Exception
     {
         try
         {
-            return this.next.execute(processingCallback);
+            return this.next.execute(processingCallback, executionContext);
         }
         catch (MessagingException e)
         {

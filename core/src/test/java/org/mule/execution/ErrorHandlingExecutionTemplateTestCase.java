@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +51,10 @@ import org.mockito.stubbing.Answer;
 @SmallTest
 public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
 {
+
+    private static final String NO_ROLLBACK_FILTER = null;
+    private static final String NO_COMMIT_FILTER = null;
+
     private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     @Mock
     private MuleEvent RETURN_VALUE;
@@ -213,7 +218,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         TransactionCoordination.getInstance().suspendCurrentTransaction();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
-        configureExceptionListener(null,null);
+        configureExceptionListener(NO_ROLLBACK_FILTER, NO_COMMIT_FILTER);
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         try
         {
@@ -235,7 +240,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         TransactionCoordination.getInstance().suspendCurrentTransaction();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
-        configureExceptionListener(null,null);
+        configureExceptionListener(NO_ROLLBACK_FILTER, NO_COMMIT_FILTER);
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         final Transaction mockNewTransaction = spy(new TestTransaction(mockMuleContext));
         try
@@ -257,7 +262,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     @Test
     public void testTransactionIsResolved() throws Exception
     {
-        configureExceptionListener(null,null);
+        configureExceptionListener(NO_ROLLBACK_FILTER, NO_COMMIT_FILTER);
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         try
         {
@@ -269,6 +274,17 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
         verify(mockTransaction, VerificationModeFactory.times(1)).rollback();
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+    }
+
+    @Test
+    public void transactionCommitFailsCallsExceptionHandler() throws Exception
+    {
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
+        TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+        configureExceptionListener(NO_ROLLBACK_FILTER, NO_COMMIT_FILTER);
+        executionTemplate.execute(TransactionTemplateTestUtils.getEmptyTransactionCallback(mockEvent));
+        verify(mockTransaction, never()).commit();
+        verify(mockTransaction, never()).rollback();
     }
 
     private void configureExceptionListener(final String rollbackFilter,final String commitFilter)

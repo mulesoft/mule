@@ -78,7 +78,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                 
                 MuleMessage message = receiver.createMuleMessage(httpServletRequest);
                 MuleEvent event = receiver.routeMessage(message);
-                MuleMessage returnMessage = event == null ? null : event.getMessage();
+                MuleMessage returnMessage = !receiver.getEndpoint().getExchangePattern().hasResponse() || event == null ? null : event.getMessage();
                 writeResponse(httpServletResponse, returnMessage);
             }
         }
@@ -102,7 +102,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                 receiver.getEndpoint().getEncoding());
             
             MuleEvent event = receiver.routeMessage(message);
-            MuleMessage returnMessage = event == null ? null : event.getMessage();
+            MuleMessage returnMessage = !receiver.getEndpoint().getExchangePattern().hasResponse() || event == null ? null : event.getMessage();
             writeResponse(httpServletResponse, returnMessage);
         }
         catch (Exception e)

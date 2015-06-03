@@ -127,6 +127,7 @@ MULE-8569: For those with custom implementation of class org.mule.config.spring.
 MULE-8639: Grizzly was upgraded to 2.3.21.
 MULE-8645: jasper-jdt-6.0.29 is not included anymore on Mule distributions because of some detected vulnerabilities. In case this artifact is needed, when using drools for example, then manually add it on <MULE_HOME>/lib/opt
 MULE-8641: The wrapper.conf file now contains default GC and memory settings configured to improve performance in an environment with 2GB+ memory. If you need to run Mule with less memory, you will need to edit this file.
+MULE-8660: AbstractMessageReceiver.routeMessage(..) no longer return nulls if the endpoint exchange pattern is one-way. It will always return the result of the flow so if a transaction commit fails the exception strategy is executed using the message result of the flow execution.
 
 Migration changes from 3.5.x to 3.6.x
 

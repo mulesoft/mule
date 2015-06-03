@@ -8,9 +8,11 @@ package org.mule.execution;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
+import org.mockito.Mock;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -23,6 +25,8 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transaction.TransactionException;
+import org.mule.api.transaction.TransactionFactory;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
@@ -36,6 +40,9 @@ import org.mule.transaction.TransactionTemplateTestUtils;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +51,26 @@ import static org.mockito.Mockito.when;
 @SmallTest
 public class TransactionalErrorHandlingExecutionTemplateTestCase extends TransactionalExecutionTemplateTestCase
 {
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private TransactionConfig mockTransactionConfig;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private TransactionFactory mockTransactionFactory;
+
+    @Before
+    public void setUp() throws TransactionException
+    {
+        when(mockTransactionConfig.getFactory()).thenReturn(mockTransactionFactory);
+        when(mockTransactionFactory.beginTransaction(mockMuleContext)).thenAnswer(new Answer<Transaction>()
+        {
+            @Override
+            public Transaction answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+                return mockTransaction;
+            }
+        });
+    }
 
     @Test
     public void testActionNoneAndXaTxAndFailureInCallback() throws Exception
@@ -74,8 +101,7 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
     public void testActionAlwaysBeginAndSuspendXaTxAndFailureCallback() throws Exception
     {
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-        mockTransaction.setXA(true);
-        MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+        MuleTransactionConfig config = createAlwaysBeginXaTransaction();
         ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
         MuleEvent exceptionListenerResult = configureExceptionListenerCall();
@@ -166,8 +192,36 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
         assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>notNullValue());
     }
 
+    @Test
+    public void transactionCommitFailsCallsExceptionHandler() throws Exception
+    {
+        when(mockTransactionConfig.getAction()).thenReturn(TransactionConfig.ACTION_ALWAYS_BEGIN);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(mockTransactionConfig);
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                TransactionCoordination.getInstance().unbindTransaction(mockTransaction);
+                throw new RuntimeException();
+            }
+        }).when(mockTransaction).commit();
+        configureCatchExceptionListenerCall();
+        try
+        {
+            executionTemplate.execute(TransactionTemplateTestUtils.getEmptyTransactionCallback(mockEvent));
+            fail("MessagingException must be thrown");
+        }
+        catch (MessagingException e)
+        {
+            assertThat(e.getEvent(), is(mockEvent));
+        }
+        verify(mockTransaction).commit();
+        verify(mockMessagingExceptionHandler).handleException(any(MessagingException.class), eq(mockEvent));
+    }
+
     @Override
-    protected ExecutionTemplate createExecutionTemplate(MuleTransactionConfig config)
+    protected ExecutionTemplate createExecutionTemplate(TransactionConfig config)
     {
         return TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
     }
@@ -215,6 +269,17 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
     protected ExecutionCallback<MuleEvent> getFailureTransactionCallback() throws Exception
     {
         return TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException);
+    }
+
+    private MuleTransactionConfig createAlwaysBeginXaTransaction() throws TransactionException
+    {
+        return createTransactionConfig(true);
+    }
+
+    private MuleTransactionConfig createTransactionConfig(boolean isXa) throws TransactionException
+    {
+        mockTransaction.setXA(isXa);
+        return new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
     }
 
 }

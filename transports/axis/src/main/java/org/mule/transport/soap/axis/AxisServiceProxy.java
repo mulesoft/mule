@@ -78,7 +78,7 @@ public class AxisServiceProxy
             messageToRoute.addProperties(AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext()));
 
             MuleEvent event = receiver.routeMessage(messageToRoute);
-            MuleMessage message = event == null ? null : event.getMessage();
+            MuleMessage message = !receiver.getEndpoint().getExchangePattern().hasResponse() || event == null ? null : event.getMessage();
 
             if (message != null)
             {

@@ -270,8 +270,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                     }
 
                     MuleMessage messageToRoute = createMuleMessage(message, encoding);
-                    routeMessage(messageToRoute);
-                    return null;
+                    return routeMessage(messageToRoute);
                 }
             };
             executionTemplate.execute(processingCallback);
