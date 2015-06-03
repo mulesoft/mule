@@ -19,16 +19,22 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import org.mule.module.launcher.application.CompositeApplicationClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 
+import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -40,7 +46,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
 {
+
     private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
+
+    @Rule
+    public SystemProperty disposeDelay = new SystemProperty(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, "10");
+
     private ArtifactAwareContextSelector selector;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -78,7 +89,16 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
         assertThat(context, is(selector.getContext(EMPTY, classLoader, true)));
         listener.execute();
 
-        assertThat(context, not(selector.getContext("", classLoader, true)));
+        assertStopped(context);
+    }
+
+    @Test
+    public void dispose() throws Exception
+    {
+        MuleLoggerContext context = (MuleLoggerContext) selector.getContext("", classLoader, true);
+
+        selector.dispose();
+        assertStopped(context);
     }
 
     @Test
@@ -102,5 +122,27 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
     private void assertConfigurationLocation(LoggerContext ctx)
     {
         assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
+    }
+
+    private void assertStopped(final MuleLoggerContext context)
+    {
+        PollingProber pollingProber = new PollingProber(1000, 100);
+        pollingProber.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertThat(context.getState(), is(LifeCycle.State.STOPPED));
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "context was not stopped";
+            }
+        });
+
+        assertThat(context, not(selector.getContext("", classLoader, true)));
     }
 }
