@@ -68,8 +68,33 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
     protected MuleEvent processNonBlocking(MuleEvent event) throws MuleException
     {
+        event = new DefaultMuleEvent(event, createReplyToHandler(event));
+        // Update RequestContext ThreadLocal for backwards compatibility
+        event = OptimizedRequestContext.unsafeSetEvent(event);
+
+        try
+        {
+            MuleEvent result = processNext(processRequest(event));
+            if (!(result instanceof NonBlockingVoidMuleEvent))
+            {
+                return processResponse(result);
+            }
+            else
+            {
+                return result;
+            }
+        }
+        catch (MessagingException exception)
+        {
+            processFinally(event, exception);
+            throw exception;
+        }
+    }
+
+    protected ReplyToHandler createReplyToHandler(final MuleEvent event)
+    {
         final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-        event = new DefaultMuleEvent(event, new ReplyToHandler()
+        return new ReplyToHandler()
         {
             @Override
             public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
@@ -90,27 +115,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
                 originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
                 processFinally(exception.getEvent(), exception);
             }
-        });
-        // Update RequestContext ThreadLocal for backwards compatibility
-        OptimizedRequestContext.unsafeSetEvent(event);
-
-        try
-        {
-            MuleEvent result = processNext(processRequest(event));
-            if (!(result instanceof NonBlockingVoidMuleEvent))
-            {
-                return processResponse(result);
-            }
-            else
-            {
-                return result;
-            }
-        }
-        catch (MessagingException exception)
-        {
-            processFinally(event, exception);
-            throw exception;
-        }
+        };
     }
 
     private boolean isNonBlocking(MuleEvent event)
