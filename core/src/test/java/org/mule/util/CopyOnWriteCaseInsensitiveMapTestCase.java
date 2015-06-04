@@ -7,8 +7,11 @@
 package org.mule.util;
 
 import static junit.framework.Assert.fail;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -517,5 +520,18 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         String key = iterator.next();
         assertEquals(keys.get(2), key);
         assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    public void asHashMap()
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> map = createTestMap();
+        Map<String, Object> regularMap = map.asHashMap();
+        assertThat(regularMap, is(instanceOf(HashMap.class)));
+        assertThat(regularMap.size(), is(map.size()));
+        for (Map.Entry<String, Object> entry : map.entrySet())
+        {
+            assertThat(map.get(entry.getKey()), is(regularMap.get(entry.getKey())));
+        }
     }
 }
