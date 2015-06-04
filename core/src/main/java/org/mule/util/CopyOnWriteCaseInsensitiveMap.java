@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -40,9 +41,16 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
         updateCore(new CaseInsensitiveHashMap());
     }
 
-    private CopyOnWriteCaseInsensitiveMap(CopyOnWriteCaseInsensitiveMap<K, V> that)
+    public CopyOnWriteCaseInsensitiveMap(Map<K, V> that)
     {
-        updateCore(that.core);
+        if (that instanceof CopyOnWriteCaseInsensitiveMap)
+        {
+            updateCore(((CopyOnWriteCaseInsensitiveMap) that).core);
+        }
+        else
+        {
+            updateCore(that);
+        }
         this.requiresCopy = true;
     }
 
@@ -131,6 +139,24 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
     public Set<K> keySet()
     {
         return keyset;
+    }
+
+    /**
+     * Returns a copy of {@code this} map
+     * which is case insensitive but doesn't
+     * have the copy-on-write functionality.
+     * <p/>
+     * This method is useful in which you need
+     * a copy of this map in which the assumption
+     * of reads vastly outnumbering writes is
+     * no longer true
+     *
+     * @return a case insensitive {@link Map} with a
+     * copy of {@code this} map's entries
+     */
+    public Map<K, V> asHashMap()
+    {
+        return new HashMap<>(view);
     }
 
     private final class KeySet extends AbstractSet<K>
