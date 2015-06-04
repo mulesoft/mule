@@ -118,7 +118,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                     {
                         returnedMessage.release();
                     }
-                    return event;
+                    return returnedMessage == null ? null : event;
                 }
             });
             if (resultEvent != null)
