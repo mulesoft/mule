@@ -68,18 +68,18 @@ public class TestsLogConfigurationHelper
         folderPath = URLDecoder.decode(folderPath);
         File folder = new File(folderPath);
 
-        if (folder != null && "target".equals(folder.getParentFile().getName()) && folder.isDirectory())
+        if (folder != null && "target".equals(folder.getParentFile().getName()))
         {
             folder = folder.getParentFile();
         }
 
         File logConfigFile = FileUtils.findFileByName(folder, "log4j2-test.xml", true);
-        if (logConfigFile == null && logConfigFile.isFile())
+        if (logConfigFile == null)
         {
             logConfigFile = FileUtils.findFileByName(folder, "log4j2.xml", true);
         }
 
-        String logConfigPath = logConfigFile != null ? logConfigFile.getAbsolutePath() : NULL_CONFIG_FILE;
+        String logConfigPath = logConfigFile != null && !logConfigFile.isDirectory()? logConfigFile.getAbsolutePath() : NULL_CONFIG_FILE;
         LOGGING_CONFIG_CACHE.set(logConfigPath);
         return logConfigPath;
     }
