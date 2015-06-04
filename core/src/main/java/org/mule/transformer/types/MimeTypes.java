@@ -15,7 +15,8 @@ public interface MimeTypes
 {
     public static final String ANY = "*/*";
 
-    public static final String JSON = "application/json";
+    public static final String JSON = "text/json";
+    public static final String APPLICATION_JSON = "application/json";
     public static final String ATOM = "application/atom+xml";
     public static final String RSS = "application/rss+xml";
     public static final String APPLICATION_XML = "application/xml";

@@ -6,11 +6,14 @@
  */
 package org.mule.transport.file;
 
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
+import org.mule.transformer.types.MimeTypes;
 
 import java.io.File;
 
@@ -67,6 +70,18 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         assertTrue(!tempFile.exists());
 
         mockStream.close(); // Ensure second close works ok
+    }
+
+    @Test
+    public void setsMimeType() throws Exception
+    {
+        MuleMessageFactory factory = createMuleMessageFactory();
+        File file = tempFolder.newFile("test.txt");
+        file.deleteOnExit();
+        ReceiverFileInputStream mockStream = new ReceiverFileInputStream(file, false, null);
+
+        MuleMessage message = factory.create(mockStream, encoding, muleContext);
+        assertThat(message.getDataType().getMimeType(), equalTo(MimeTypes.TEXT));
     }
 
     private void assertMessageProperties(MuleMessage message)

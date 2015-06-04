@@ -32,7 +32,7 @@ public class DataTypeFactory
 {
     public static final DataType<String> TEXT_STRING = new SimpleDataType<String>(String.class, MimeTypes.TEXT);
     public static final DataType<String> XML_STRING = new SimpleDataType<String>(String.class, MimeTypes.XML);
-    public static final DataType<String> JSON_STRING = new SimpleDataType<String>(String.class, MimeTypes.JSON);
+    public static final DataType<String> JSON_STRING = new SimpleDataType<String>(String.class, MimeTypes.APPLICATION_JSON);
     public static final DataType<String> HTML_STRING = new SimpleDataType<String>(String.class, MimeTypes.HTML);
     public static final DataType<String> ATOM_STRING = new SimpleDataType<String>(String.class, MimeTypes.ATOM);
     public static final DataType<String> RSS_STRING = new SimpleDataType<String>(String.class, MimeTypes.RSS);

@@ -1,4 +1,5 @@
 text/plain                   txt cgi java
+text/json                    json
 text/xml                     xml
 text/html                    htm html shtml
 application/octet-stream     bin class
