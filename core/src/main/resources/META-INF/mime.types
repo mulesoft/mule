@@ -1,5 +1,6 @@
 text/plain                   txt cgi java
-text/xml                     xml
+application/xml              xml
+application/json             json
 text/html                    htm html shtml
 application/octet-stream     bin class
 application/postscript       ps eps ai
