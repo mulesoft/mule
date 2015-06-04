@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 
+import javax.activation.MimetypesFileTypeMap;
+
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
@@ -23,6 +25,7 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
 
     private FTPClient ftpClient;
     private boolean streaming;
+    private final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
 
     @Override
     protected Object extractPayload(Object transportMessage, String encoding) throws Exception
@@ -83,6 +86,21 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
         message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
         message.setInboundProperty(FileConnector.PROPERTY_FILE_SIZE, file.getSize());
         message.setInboundProperty(FileConnector.PROPERTY_FILE_TIMESTAMP, file.getTimestamp());
+    }
+
+    @Override
+    protected String getMimeType(Object transportMessage)
+    {
+        if (transportMessage instanceof FTPFile)
+        {
+            FTPFile file = (FTPFile) transportMessage;
+
+            return mimetypesFileTypeMap.getContentType(file.getName().toLowerCase());
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public void setFtpClient(FTPClient ftpClient)
