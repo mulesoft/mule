@@ -7,6 +7,7 @@
 package org.mule.util;
 
 import java.io.File;
+import java.net.URLDecoder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -63,7 +64,10 @@ public class TestsLogConfigurationHelper
 
     private static String findLogConfigurationPath(Class<?> testClass)
     {
-        File folder = new File(testClass.getClassLoader().getResource("").getPath().toString());
+        String folderPath = testClass.getClassLoader().getResource("").getPath().toString();
+        folderPath = URLDecoder.decode(folderPath);
+        File folder = new File(folderPath);
+
         if (folder != null && "target".equals(folder.getParentFile().getName()))
         {
             folder = folder.getParentFile();
@@ -75,7 +79,7 @@ public class TestsLogConfigurationHelper
             logConfigFile = FileUtils.findFileByName(folder, "log4j2.xml", true);
         }
 
-        String logConfigPath = logConfigFile != null ? logConfigFile.getAbsolutePath() : NULL_CONFIG_FILE;
+        String logConfigPath = logConfigFile != null && !logConfigFile.isDirectory()? logConfigFile.getAbsolutePath() : NULL_CONFIG_FILE;
         LOGGING_CONFIG_CACHE.set(logConfigPath);
         return logConfigPath;
     }
