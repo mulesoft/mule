@@ -7,6 +7,9 @@
 package org.mule.util;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -63,7 +66,20 @@ public class TestsLogConfigurationHelper
 
     private static String findLogConfigurationPath(Class<?> testClass)
     {
-        File folder = new File(testClass.getClassLoader().getResource("").getPath().toString());
+        String encodedFolder = testClass.getClassLoader().getResource("").getPath().toString();
+
+        String folderPath;
+        try
+        {
+            folderPath = URLDecoder.decode(encodedFolder, Charset.defaultCharset().name());
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return NULL_CONFIG_FILE;
+        }
+
+        File folder = new File(folderPath);
+
         if (folder != null && "target".equals(folder.getParentFile().getName()))
         {
             folder = folder.getParentFile();
@@ -75,7 +91,7 @@ public class TestsLogConfigurationHelper
             logConfigFile = FileUtils.findFileByName(folder, "log4j2.xml", true);
         }
 
-        String logConfigPath = logConfigFile != null ? logConfigFile.getAbsolutePath() : NULL_CONFIG_FILE;
+        String logConfigPath = logConfigFile != null && logConfigFile.isFile() ? logConfigFile.getAbsolutePath() : NULL_CONFIG_FILE;
         LOGGING_CONFIG_CACHE.set(logConfigPath);
         return logConfigPath;
     }
