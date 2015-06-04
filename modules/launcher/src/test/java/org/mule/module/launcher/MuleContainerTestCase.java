@@ -6,9 +6,13 @@
  */
 package org.mule.module.launcher;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mule.module.launcher.MuleFoldersUtil.getExecutionFolder;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
 import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
@@ -16,6 +20,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.junit.Before;
@@ -45,6 +50,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
         deploymentService = mock(DeploymentService.class);
 
         container = new MuleContainer(deploymentService, coreExtensionManager);
+        FileUtils.deleteDirectory(getExecutionFolder());
     }
 
     @Test
@@ -116,5 +122,19 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
         {
             LogManager.setFactory(originalFactory);
         }
+    }
+
+    @Test
+    public void onStartCreateExecutionFolderIfDoesNotExists() throws Exception
+    {
+        container.start(false);
+        assertThat(getExecutionFolder().exists(), is(true));
+    }
+
+    @Test
+    public void onStartAndExecutionFolderExistsDoNotFail() throws Exception
+    {
+        assertThat(getExecutionFolder().mkdirs(), is(true));
+        container.start(false);
     }
 }
