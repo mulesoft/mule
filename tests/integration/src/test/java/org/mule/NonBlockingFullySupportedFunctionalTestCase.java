@@ -47,6 +47,12 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     }
 
     @Test
+    public void childFlow() throws Exception
+    {
+        testFlowNonBlocking("childFlow");
+    }
+
+    @Test
     public void processorChain() throws Exception
     {
         testFlowNonBlocking("processorChain");

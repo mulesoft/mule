@@ -59,7 +59,7 @@ import java.util.List;
  * <b>EIP Reference:</b> <a
  * href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
  */
-public class MessageEnricher extends AbstractMessageProcessorOwner implements MessageProcessor
+public class MessageEnricher extends AbstractMessageProcessorOwner implements MessageProcessor, NonBlockingSupported
 {
 
     private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<EnrichExpressionPair>();

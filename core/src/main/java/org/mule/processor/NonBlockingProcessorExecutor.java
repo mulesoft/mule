@@ -17,6 +17,7 @@ import org.mule.api.NonBlockingSupported;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageRouter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
@@ -51,8 +52,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
     {
         if (event.isAllowNonBlocking() && replyToHandler != null)
         {
-            if ((processor instanceof MessageRouter || processor instanceof InterceptingMessageProcessor) && !
-                    (processor instanceof NonBlockingSupported))
+            if (!processorSupportsNonBlocking(processor))
             {
                 logger.info("The message processor {} does not currently support non-blocking execution and " +
                             "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
@@ -66,6 +66,18 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             }
             // Update RequestContext ThreadLocal for backwards compatibility
             OptimizedRequestContext.unsafeSetEvent(event);
+        }
+    }
+
+    private boolean processorSupportsNonBlocking(MessageProcessor processor)
+    {
+        if (processor instanceof NonBlockingSupported)
+        {
+            return true;
+        }
+        else
+        {
+            return !(processor instanceof MessageProcessorContainer || processor instanceof InterceptingMessageProcessor);
         }
     }
 
