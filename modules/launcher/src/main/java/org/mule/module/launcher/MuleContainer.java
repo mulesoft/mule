@@ -8,6 +8,7 @@ package org.mule.module.launcher;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
@@ -20,6 +21,7 @@ import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -136,6 +138,19 @@ public class MuleContainer
         StartupContext.get().setStartupOptions(commandlineOptions);
     }
 
+    private void createExecutionMuleFolder()
+    {
+        File executionFolder = MuleFoldersUtil.getExecutionFolder();
+        if (!executionFolder.exists())
+        {
+            if (!executionFolder.mkdirs())
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage(
+                        String.format("Could not create folder %s, validate that the process has permissions over that directory", executionFolder.getAbsolutePath())));
+            }
+        }
+    }
+
     public void start(boolean registerShutdownHook) throws MuleException
     {
         if (registerShutdownHook)
@@ -145,6 +160,8 @@ public class MuleContainer
         showSplashScreen();
         try
         {
+            createExecutionMuleFolder();
+
             coreExtensionManager.setDeploymentService(deploymentService);
             coreExtensionManager.setPluginClassLoaderManager(pluginClassLoaderManager);
             coreExtensionManager.initialise();
