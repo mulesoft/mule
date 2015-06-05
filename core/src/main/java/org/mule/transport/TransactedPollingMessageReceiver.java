@@ -17,8 +17,10 @@ import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.routing.DefaultRouterResultsHandler;
+import org.mule.transaction.TransactionCoordination;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -148,6 +150,13 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                             {
                                 results.add(processMessage(message));
                             }
+                        }
+                        else
+                        {
+                            //If not message was processed mark exception for rollback to avoid tx timeout exceptions in XA
+                            Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
+                            currentTx.setRollbackOnly();
+                            return null;
                         }
                         return defaultRouterResultsHandler.aggregateResults(results, results.getLast(), results.getLast().getMuleContext());
                     }
