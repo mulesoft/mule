@@ -8,10 +8,10 @@ package org.mule.execution;
 
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -98,6 +98,18 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
     {
         try
         {
+            if (event == null)
+            {
+                //Null result only happens when there's a filter in the chain.
+                //Unfortunately a filter causes the whole chain to return null
+                //and there's no other way to retrieve the last event but using the RequestContext.
+                //see https://www.mulesoft.org/jira/browse/MULE-8670
+                event = RequestContext.getEvent();
+                if (event == null)
+                {
+                    return;
+                }
+            }
             getNotificationHelper(event.getMuleContext().getNotificationManager()).fireNotification(
                     event.getMessage(),
                     event.getMessageSourceURI().toString(),
