@@ -20,7 +20,7 @@ import javax.sql.DataSource;
  * Defines a {@link ConnectionFactory} that is configured to retry connection
  * creation in case of errors using a {@link RetryPolicyTemplate}
  */
-public class RetryConnectionFactory implements ConnectionFactory
+public class RetryConnectionFactory extends AbstractConnectionFactory
 {
 
     private final RetryPolicyTemplate retryPolicyTemplate;
@@ -33,7 +33,7 @@ public class RetryConnectionFactory implements ConnectionFactory
     }
 
     @Override
-    public Connection create(final DataSource dataSource)
+    protected Connection doCreateConnection(final DataSource dataSource)
     {
         final AtomicReference<Connection> connectionRef = new AtomicReference<Connection>();
 

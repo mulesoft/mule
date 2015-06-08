@@ -216,6 +216,15 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         verify(connection, times(0)).close();
     }
 
+    @Test(expected = SQLException.class)
+    public void managesConnectionCreationException() throws Exception
+    {
+        when(connectionFactory.create(datasource)).thenThrow(new ConnectionCreationException("Error"));
+
+        factory = new TransactionalDbConnectionFactory(dbTransactionManager, null, connectionFactory, datasource);
+        factory.createConnection(TransactionalAction.NOT_SUPPORTED);
+    }
+
     private void assertWrappedConnection(DbConnection connection, Connection wrappedConnection) throws SQLException
     {
         final String sqlText = "select * from test";

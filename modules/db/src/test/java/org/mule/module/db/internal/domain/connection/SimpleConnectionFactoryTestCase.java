@@ -44,4 +44,13 @@ public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase
 
         connectionFactory.create(dataSource);
     }
+
+    @Test(expected = ConnectionCreationException.class)
+    public void failsOnNullConnection() throws Exception
+    {
+        Connection expectedConnection = null;
+        when(dataSource.getConnection()).thenReturn(expectedConnection);
+
+        connectionFactory.create(dataSource);
+    }
 }
