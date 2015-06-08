@@ -42,4 +42,16 @@
         </http:request>
     </flow>
 
+    <flow name="connectionHeader">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:header headerName="Connection" value="close" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="outboundProperties">
+        <http:request config-ref="config" path="testPath" />
+    </flow>
+
 </mule>

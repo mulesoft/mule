@@ -44,12 +44,6 @@ public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase
     }
 
     @Test
-    public void persistentRequestWithClosePropertySendsCloseHeader() throws Exception
-    {
-        assertConnectionHeader("persistentRequestFlow", CLOSE, CLOSE);
-    }
-
-    @Test
     public void nonPersistentRequestWithKeepAlivePropertySendsCloseHeader() throws Exception
     {
         assertConnectionHeader("nonPersistentRequestFlow", KEEP_ALIVE, CLOSE);
