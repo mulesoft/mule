@@ -108,6 +108,12 @@ public class GenericDbConfig implements DbConfig, Initialisable, Disposable
         try
         {
             connection = dataSource.getConnection();
+
+            if (connection == null)
+            {
+                throw new SQLException("Unable to create connection to the provided dataSource: " + dataSource);
+            }
+
             return new DefaultTestResult(Result.Status.SUCCESS);
         }
         catch (SQLException e)
