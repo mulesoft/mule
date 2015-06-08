@@ -13,9 +13,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleEvent;
-import org.mule.MessageExchangePattern;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -288,6 +287,19 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
 
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
         verifyOnlyFailureWasCalled(mockException);
+    }
+
+    @Test
+    public void allowNullEventsOnNotifications() throws Exception
+    {
+        RequestContext.setEvent(null);
+        when(mockTemplate.getMuleEvent()).thenReturn(null);
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenReturn(null);
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
+        when(mockMuleEvent.newThreadCopy()).thenReturn(mockMuleEvent);
+        RequestContext.setEvent(mockMuleEvent);
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
     }
 
     private void verifyOnlySuccessfulWasCalled()
