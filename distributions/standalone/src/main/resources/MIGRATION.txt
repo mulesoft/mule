@@ -4,6 +4,10 @@ MIGRATION GUIDE
 The following is a list of changes you have to execute to migrate from Mule ESB Community edition version 3.4.x to version 3.7.x
 Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+Notes for more details.
 
+Migration changes from 3.7.x to 3.8.x
+MULE-8626: The HTTP Connector will now ignore a "Connection" outbound property when responding to a request (listener) or making one (request), instead of transforming it to a header. This means that:
+if such property is desired, it should be explicitly added as a header using a response/request builder.
+
 Migration changes from 3.6.x to 3.7.x
 
 MULE-8298: Spring dependency was upgraded to version 4.1.6.RELEASE.
