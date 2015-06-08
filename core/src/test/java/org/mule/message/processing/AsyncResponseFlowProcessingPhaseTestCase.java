@@ -11,15 +11,13 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.WorkManager;
 import org.mule.execution.AsyncResponseFlowProcessingPhase;
 import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.MessageProcessContext;
@@ -30,8 +28,6 @@ import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import javax.resource.spi.work.Work;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -180,6 +176,19 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
         verifyOnlyFailureWasCalled(mockException);
+    }
+
+    @Test
+    public void allowNullEventsOnNotifications() throws Exception
+    {
+        RequestContext.setEvent(null);
+        when(mockTemplate.getMuleEvent()).thenReturn(null);
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenReturn(null);
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
+        when(mockMuleEvent.newThreadCopy()).thenReturn(mockMuleEvent);
+        RequestContext.setEvent(mockMuleEvent);
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
     }
 
     private void verifyOnlySuccessfulWasCalled()
