@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request;
 
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
+import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
@@ -80,7 +81,7 @@ public class MuleEventToHttpRequest
 
         for (String outboundProperty : event.getMessage().getOutboundPropertyNames())
         {
-            if (!outboundProperty.startsWith(HTTP_PREFIX))
+            if (isNotIgnoredProperty(outboundProperty))
             {
                 builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
             }
@@ -98,6 +99,11 @@ public class MuleEventToHttpRequest
         builder.setEntity(createRequestEntity(builder, event, resolvedMethod));
 
         return builder;
+    }
+
+    private boolean isNotIgnoredProperty(String outboundProperty)
+    {
+        return !outboundProperty.startsWith(HTTP_PREFIX) && !outboundProperty.equalsIgnoreCase(CONNECTION);
     }
 
 
