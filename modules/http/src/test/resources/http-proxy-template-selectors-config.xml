@@ -15,7 +15,9 @@
         <http:direct-threading-profile />
     </http:listener-config>
 
-    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+    <http:request-config name="requestConfig" host="localhost" port="${httpPort}">
+        <http:direct-threading-profile />
+    </http:request-config>
 
     <flow name="proxyTemplate">
         <http:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO" parseRequest="false" >

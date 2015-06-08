@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request.grizzly;
 
+import org.mule.api.context.WorkManager;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
@@ -20,9 +21,10 @@ public class GrizzlyHttpClientConfiguration
     private final boolean usePersistentConnections;
     private final int connectionIdleTimeout;
     private final String threadNamePrefix;
+    private final WorkManager workManager;
 
     private GrizzlyHttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
-                                           int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix)
+                                           int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, WorkManager workManager)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
@@ -31,6 +33,7 @@ public class GrizzlyHttpClientConfiguration
         this.usePersistentConnections = usePersistentConnections;
         this.connectionIdleTimeout = connectionIdleTimeout;
         this.threadNamePrefix = threadNamePrefix;
+        this.workManager = workManager;
     }
 
     public TlsContextFactory getTlsContextFactory()
@@ -68,6 +71,11 @@ public class GrizzlyHttpClientConfiguration
         return threadNamePrefix;
     }
 
+    public WorkManager getWorkManager()
+    {
+        return workManager;
+    }
+
     public static class Builder
     {
         private TlsContextFactory tlsContextFactory;
@@ -77,6 +85,7 @@ public class GrizzlyHttpClientConfiguration
         private boolean usePersistentConnections;
         private int connectionIdleTimeout;
         private String threadNamePrefix;
+        private WorkManager workManager;
 
         public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory)
         {
@@ -120,10 +129,16 @@ public class GrizzlyHttpClientConfiguration
             return this;
         }
 
+        public Builder setWorkManager(WorkManager workManager)
+        {
+            this.workManager = workManager;
+            return this;
+        }
+
         public GrizzlyHttpClientConfiguration build()
         {
             return new GrizzlyHttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                                      usePersistentConnections, connectionIdleTimeout, threadNamePrefix);
+                                                      usePersistentConnections, connectionIdleTimeout, threadNamePrefix, workManager);
         }
     }
 }
