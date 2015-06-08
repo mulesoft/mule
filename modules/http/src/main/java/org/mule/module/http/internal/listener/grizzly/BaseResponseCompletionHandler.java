@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 
@@ -38,6 +40,10 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
         if (httpResponse.getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
         {
             httpResponsePacket.setChunked(true);
+        }
+        if (CLOSE.equalsIgnoreCase(httpResponsePacket.getHeader(CONNECTION)))
+        {
+            httpResponsePacket.getProcessingState().setKeepAlive(false);
         }
         return httpResponsePacket;
     }

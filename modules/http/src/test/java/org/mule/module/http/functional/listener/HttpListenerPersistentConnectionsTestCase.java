@@ -9,6 +9,8 @@ package org.mule.module.http.functional.listener;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.StringUtils;
@@ -31,14 +33,16 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
 
     private static final int HTTP_OK = 200;
     private static final int GET_TIMEOUT = 1000;
-    private static final String HEADER_CONNECTION_NAME = "Connection";
-    public static final String HEADER_CONNECTION_CLOSE_VALUE = "close";
 
     @Rule
     public DynamicPort nonPersistentPort = new DynamicPort("nonPersistentPort");
 
     @Rule
     public DynamicPort persistentPort = new DynamicPort("persistentPort");
+    @Rule
+    public DynamicPort persistentPortCloseHeader = new DynamicPort("persistentPortCloseHeader");
+    @Rule
+    public DynamicPort persistentPortCloseProperty = new DynamicPort("persistentPortCloseProperty");
 
     @Override
     protected String getConfigFile()
@@ -49,7 +53,7 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
     @Test
     public void nonPersistentCheckHeader() throws Exception
     {
-        assertThat(performRequest(nonPersistentPort.getNumber()), is(HEADER_CONNECTION_CLOSE_VALUE));
+        assertThat(performRequest(nonPersistentPort.getNumber()), is(CLOSE));
     }
 
     @Test
@@ -59,9 +63,44 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
     }
 
     @Test
+    public void persistentCloseHeaderCheckHeader() throws Exception
+    {
+        assertThat(performRequest(persistentPortCloseHeader.getNumber()), is(CLOSE));
+    }
+
+    @Test
+    public void persistentClosePropertyCheckHeader() throws Exception
+    {
+        assertThat(performRequest(persistentPortCloseProperty.getNumber()), is(nullValue()));
+    }
+
+    @Test
     public void nonPersistentConnectionClosing() throws Exception
     {
-        Socket socket = new Socket("localhost", nonPersistentPort.getNumber());
+        assertConnectionClosesAfterSend(nonPersistentPort);
+    }
+
+    @Test
+    public void persistentConnectionClosing() throws Exception
+    {
+        assertConnectionClosesAfterTimeout(persistentPort);
+    }
+
+    @Test
+    public void persistentConnectionCloseHeaderClosing() throws Exception
+    {
+        assertConnectionClosesAfterSend(persistentPortCloseHeader);
+    }
+
+    @Test
+    public void persistentConnectionClosePropertyClosing() throws Exception
+    {
+        assertConnectionClosesAfterTimeout(persistentPortCloseProperty);
+    }
+
+    private void assertConnectionClosesAfterSend(DynamicPort port) throws IOException
+    {
+        Socket socket = new Socket("localhost", port.getNumber());
         sendRequest(socket);
         assertResponse(getResponse(socket), true);
 
@@ -71,10 +110,9 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
         socket.close();
     }
 
-    @Test
-    public void persistentConnectionClosing() throws Exception
+    private void assertConnectionClosesAfterTimeout(DynamicPort port) throws IOException, InterruptedException
     {
-        Socket socket = new Socket("localhost", persistentPort.getNumber());
+        Socket socket = new Socket("localhost", port.getNumber());
         sendRequest(socket);
         assertResponse(getResponse(socket), true);
 
@@ -94,7 +132,7 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
         String url = String.format("http://localhost:%s/", port);
         HttpResponse response = Request.Get(url).connectTimeout(GET_TIMEOUT).execute().returnResponse();
         assertThat(response.getStatusLine().getStatusCode(), is(HTTP_OK));
-        Header connectionHeader = response.getFirstHeader(HEADER_CONNECTION_NAME);
+        Header connectionHeader = response.getFirstHeader(CONNECTION);
         return connectionHeader != null ? connectionHeader.getValue() : null;
     }
 
