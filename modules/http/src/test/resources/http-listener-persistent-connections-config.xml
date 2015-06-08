@@ -17,4 +17,21 @@
         <echo-component/>
     </flow>
 
+    <http:listener-config name="persistentConfigCloseHeader" host="localhost" port="${persistentPortCloseHeader}" usePersistentConnections="true" connectionIdleTimeout="1000" />
+    <flow name="persistentCloseHeader">
+        <http:listener path="/" config-ref="persistentConfigCloseHeader" >
+            <http:response-builder>
+                <http:header headerName="Connection" value="close"/>
+            </http:response-builder>
+                </http:listener>
+        <echo-component/>
+    </flow>
+
+    <http:listener-config name="persistentConfigCloseProperty" host="localhost" port="${persistentPortCloseProperty}" usePersistentConnections="true" connectionIdleTimeout="1000" />
+    <flow name="persistentCloseProperty">
+        <http:listener path="/" config-ref="persistentConfigCloseProperty"/>
+        <set-property propertyName="Connection" value="close"/>
+        <echo-component/>
+    </flow>
+
 </mule>

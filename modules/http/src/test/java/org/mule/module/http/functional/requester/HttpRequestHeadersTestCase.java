@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
+import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 
@@ -128,16 +130,38 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void ignoresHttpOutboundPropertiesButAcceptsHeaders() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("httpHeaders");
-
         MuleEvent event = getTestEvent(TEST_MESSAGE);
         event.getMessage().setOutboundProperty(HTTP_LISTENER_PATH, "listenerPath");
-
-        flow.process(event);
+        processEventInFlow(event, "httpHeaders");
 
         assertThat(getFirstReceivedHeader(HTTP_SCHEME), is("testValue1"));
         assertThat(headers.asMap(), not(hasKey(HTTP_LISTENER_PATH)));
     }
+
+    @Test
+    public void acceptsConnectionHeader() throws Exception
+    {
+        processEventInFlow(getTestEvent(TEST_MESSAGE), "connectionHeader");
+
+        assertThat(getFirstReceivedHeader(CONNECTION), is(CLOSE));
+    }
+
+    @Test
+    public void ignoresConnectionOutboundProperty() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.getMessage().setOutboundProperty(CONNECTION, CLOSE);
+        processEventInFlow(event, "outboundProperties");
+
+        assertThat(getFirstReceivedHeader(CONNECTION), is(not(CLOSE)));
+    }
+
+    private void processEventInFlow(MuleEvent event, String flowName) throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct(flowName);
+        flow.process(event);
+    }
+
 
 }
 
