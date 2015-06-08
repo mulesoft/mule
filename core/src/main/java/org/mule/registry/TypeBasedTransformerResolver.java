@@ -6,6 +6,7 @@
  */
 package org.mule.registry;
 
+import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -67,8 +68,11 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         {
             objectToString = new ObjectToString();
             objectToByteArray = new ObjectToByteArray();
-            muleContext.getRegistry().applyProcessorsAndLifecycle(objectToString);
-            muleContext.getRegistry().applyProcessorsAndLifecycle(objectToByteArray);
+
+            // these are just fallbacks that are not to go
+            // into the mule registry
+            initialiseIfNeeded(objectToString, muleContext);
+            initialiseIfNeeded(objectToByteArray, muleContext);
         }
         catch (MuleException e)
         {
