@@ -84,7 +84,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     {
         return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "worker", "worker", false},
                 {"http-proxy-template-selectors-config.xml", "SelectorRunner", "SelectorRunner", false},
-                {"http-proxy-template-config.xml", "worker", "SelectorRunner", true},
+                {"http-proxy-template-config.xml", "worker", "worker", true},
                 {"http-proxy-template-selectors-config.xml", "SelectorRunner", "SelectorRunner", true}});
     }
 

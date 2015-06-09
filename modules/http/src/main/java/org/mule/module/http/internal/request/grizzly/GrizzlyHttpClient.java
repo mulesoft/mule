@@ -9,6 +9,7 @@ package org.mule.module.http.internal.request.grizzly;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.CompletionHandler;
+import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
@@ -68,6 +69,7 @@ public class GrizzlyHttpClient implements HttpClient
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
     private String threadNamePrefix;
+    private WorkManager workManager;
 
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
@@ -81,6 +83,7 @@ public class GrizzlyHttpClient implements HttpClient
         this.usePersistentConnections = config.isUsePersistentConnections();
         this.connectionIdleTimeout = config.getConnectionIdleTimeout();
         this.threadNamePrefix = config.getThreadNamePrefix();
+        this.workManager = config.getWorkManager();
     }
 
     @Override
@@ -159,8 +162,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
         CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
-        compositeTransportCustomizer.addTransportCustomizer(new SameThreadIOStrategyTransportCustomizer
-                                                                    (threadNamePrefix));
+        compositeTransportCustomizer.addTransportCustomizer(new IOStrategyTransportCustomizer(threadNamePrefix, workManager));
         compositeTransportCustomizer.addTransportCustomizer(new LoggerTransportCustomizer());
 
         if (clientSocketProperties != null)

@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.request.grizzly;
 
+import org.mule.api.context.WorkManager;
+
 import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
@@ -17,21 +19,23 @@ import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
  * Transport customizer that sets the IO strategy to {@code SameThreadIOStrategy} and sets appropriate names
  * for the threads that are used.
  */
-public class SameThreadIOStrategyTransportCustomizer implements TransportCustomizer
+public class IOStrategyTransportCustomizer implements TransportCustomizer
 {
     private static final String REQUESTER_WORKER_THREAD_NAME_SUFFIX = ".worker";
 
     private final String threadNamePrefix;
+    private final WorkManager workManager;
 
-    public SameThreadIOStrategyTransportCustomizer(String threadNamePrefix)
+    public IOStrategyTransportCustomizer(String threadNamePrefix, WorkManager workManager)
     {
+        this.workManager = workManager;
         this.threadNamePrefix = threadNamePrefix;
     }
 
     @Override
     public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder)
     {
-        transport.setIOStrategy(SameThreadIOStrategy.getInstance());
+        transport.setIOStrategy(new WorkManagerIOStrategy(workManager));
         transport.setWorkerThreadPoolConfig(WorkerThreadIOStrategy.getInstance().createDefaultWorkerPoolConfig(transport));
 
         transport.getKernelThreadPoolConfig().setPoolName(threadNamePrefix);

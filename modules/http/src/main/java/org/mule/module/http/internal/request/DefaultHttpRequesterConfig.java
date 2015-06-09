@@ -12,12 +12,15 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.config.MutableThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.HttpConstants;
@@ -33,9 +36,16 @@ import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.concurrent.ThreadNameHelper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
 {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    public static final int DEFAULT_MAX_THREADS = 128;
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
@@ -56,6 +66,9 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     private TcpClientSocketProperties clientSocketProperties = new DefaultTcpClientSocketProperties();
     private RamlApiConfiguration apiConfiguration;
     private ProxyConfig proxyConfig;
+    private ThreadingProfile threadingProfile;
+    private String threadNamePrefix;
+    private WorkManager workManager;
 
     private HttpClient httpClient;
 
@@ -87,7 +100,15 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
             tlsContext = new TlsContextFactoryBuilder(muleContext).buildDefault();
         }
 
-        String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), name);
+        if (threadingProfile == null)
+        {
+            threadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
+            threadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
+        }
+
+        threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), name);
+
+        workManager = createWorkManager(threadNamePrefix);
 
         GrizzlyHttpClientConfiguration configuration = new GrizzlyHttpClientConfiguration.Builder()
                 .setTlsContextFactory(tlsContext)
@@ -97,11 +118,22 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
                 .setUsePersistentConnections(usePersistentConnections)
                 .setConnectionIdleTimeout(connectionIdleTimeout)
                 .setThreadNamePrefix(threadNamePrefix)
+                .setWorkManager(workManager)
                 .build();
 
         httpClient = new GrizzlyHttpClient(configuration);
 
         httpClient.initialise();
+    }
+
+    private WorkManager createWorkManager(String threadNamePrefix)
+    {
+        final WorkManager workManager = threadingProfile.createWorkManager(format("%s.%s", threadNamePrefix, "worker"), muleContext.getConfiguration().getShutdownTimeout());
+        if (workManager instanceof MuleContextAware)
+        {
+            ((MuleContextAware) workManager).setMuleContext(muleContext);
+        }
+        return workManager;
     }
 
     private void verifyConnectionsParameters() throws InitialisationException
@@ -124,6 +156,22 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         if (this.authentication instanceof Stoppable)
         {
             ((Stoppable) this.authentication).stop();
+        }
+        try
+        {
+            workManager.dispose();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failure shutting down work manager " + e.getMessage());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(e.getMessage(), e);
+            }
+        }
+        finally
+        {
+            workManager = null;
         }
     }
 
@@ -300,6 +348,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         {
             ((Startable) this.authentication).start();
         }
+        workManager.start();
     }
 
     public void setMaxConnections(int maxConnections)
@@ -326,6 +375,11 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     public void setProtocol(HttpConstants.Protocols protocol)
     {
         this.protocol = protocol;
+    }
+
+    public void setThreadingProfile(ThreadingProfile threadingProfile)
+    {
+        this.threadingProfile = threadingProfile;
     }
 
 }
