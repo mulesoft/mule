@@ -99,12 +99,14 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
         message2.setCorrelationId(correlationId);
         message2.setCorrelationGroupSize(correlationGroupSize);
         message2.setCorrelationSequence(2);
+        message2.setMessageRootId(message1.getMessageRootId());
         runFlowNonBlocking("aggregator", new DefaultMuleEvent(message2, MessageExchangePattern.REQUEST_RESPONSE, flow));
 
         MuleMessage message3 = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message3.setCorrelationId(correlationId);
         message3.setCorrelationGroupSize(correlationGroupSize);
         message3.setCorrelationSequence(3);
+        message3.setMessageRootId(message1.getMessageRootId());
         runFlowNonBlocking("aggregator", new DefaultMuleEvent(message3, MessageExchangePattern.REQUEST_RESPONSE, flow));
 
         FlowAssert.verify("aggregator");
