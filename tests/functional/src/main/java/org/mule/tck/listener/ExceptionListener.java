@@ -82,6 +82,25 @@ public class ExceptionListener
     }
 
     /**
+     * Asserts that there is at least one exception with the given cause
+     *
+     * @param expectedExceptionCauseType the excepted cause of a thrown exception
+     * @return the exception listener
+     */
+    public ExceptionListener assertExpectedExceptionCausedBy(final Class<? extends Throwable> expectedExceptionCauseType)
+    {
+        for (ExceptionNotification exceptionNotification : exceptionNotifications)
+        {
+            Throwable exceptionThrownCause = exceptionNotification.getException().getCause();
+            if (exceptionThrownCause != null && expectedExceptionCauseType.isAssignableFrom(exceptionThrownCause.getClass()))
+            {
+                return this;
+            }
+        }
+        throw new AssertionError(format("Exception exception caused by type %s was not thrown", expectedExceptionCauseType.getName()));
+    }
+
+    /**
      * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
      */
     public ExceptionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired)
