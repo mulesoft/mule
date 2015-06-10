@@ -11,6 +11,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
@@ -73,8 +74,9 @@ public class TransactedPollingMessageReceiverTestCase
         }
 
         @Override
-        protected void processMessage(Object message) throws Exception
+        protected MuleEvent processMessage(Object message) throws Exception
         {
+            return null;
         }
     }
 }

@@ -7,6 +7,7 @@
 package org.mule.transport.vm;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -113,12 +114,16 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                 public MuleEvent process() throws Exception
                 {
                     MuleEvent event = routeMessage(message);
-                    MuleMessage returnedMessage = event == null ? null : event.getMessage();
-                    if (returnedMessage != null)
+                    if (event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse())
                     {
-                        returnedMessage.release();
+                        MuleMessage returnedMessage = event.getMessage();
+                        if (returnedMessage != null)
+                        {
+                            returnedMessage.release();
+                        }
+                        return event;
                     }
-                    return event;
+                    return null;
                 }
             });
             if (resultEvent != null)
@@ -168,7 +173,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             {
                 return null;
             }
-            
+
             List<MuleMessage> messages = new ArrayList<MuleMessage>(1);
             ((DefaultMuleMessage)message.getMessage()).setMuleContext(endpoint.getMuleContext());
             messages.add(message.getMessage());
@@ -179,7 +184,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             return getFirstMessages();
         }
     }
-    
+
     protected List<MuleMessage> getFirstMessages() throws Exception
     {
         // The queue from which to pull events
@@ -214,7 +219,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         // let our workManager handle the batch of events
         return messages;
     }
-    
+
     protected MuleEvent getFirstMessage() throws Exception
     {
         // The queue from which to pull events
@@ -240,7 +245,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     }
 
     @Override
-    protected void processMessage(Object msg) throws Exception
+    protected MuleEvent processMessage(Object msg) throws Exception
     {
         MuleMessage message = (MuleMessage) msg;
 
@@ -248,7 +253,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         {
             message = (MuleMessage)((ThreadSafeAccess) message).newThreadCopy();
         }
-        routeMessage(message);
+        return routeMessage(message);
     }
 
     /*
@@ -258,5 +263,5 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     protected PollingReceiverWorker createWork()
     {
         return new ContinuousPollingReceiverWorker(this);
-    }    
+    }
 }

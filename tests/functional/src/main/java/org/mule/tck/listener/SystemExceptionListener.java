@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class SystemExceptionListener
 {
 
-    private CountDownLatch exceptionThrownLatch = new CountDownLatch(1);
+    private CountDownLatch exceptionThrownLatch = new Latch();
     private int timeout = 10000;
     private List<ExceptionNotification> exceptionNotifications = new ArrayList<ExceptionNotification>();
 
@@ -41,15 +41,27 @@ public class SystemExceptionListener
                 @Override
                 public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
                 {
-                    exceptionThrownLatch.countDown();
-                    exceptionListener.handleException(exception, rollbackMethod);
+                    try
+                    {
+                        exceptionListener.handleException(exception, rollbackMethod);
+                    }
+                    finally
+                    {
+                        exceptionThrownLatch.countDown();
+                    }
                 }
 
                 @Override
                 public void handleException(Exception exception)
                 {
-                    exceptionThrownLatch.countDown();
-                    exceptionListener.handleException(exception);
+                    try
+                    {
+                        exceptionListener.handleException(exception);
+                    }
+                    finally
+                    {
+                        exceptionThrownLatch.countDown();
+                    }
                 }
             });
             muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()

@@ -77,7 +77,12 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
 
     public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException
     {
-        return messageReceiver.routeEvent(muleEvent);
+        MuleEvent response = messageReceiver.routeEvent(muleEvent);
+        if (!messageReceiver.getEndpoint().getExchangePattern().hasResponse())
+        {
+            return null;
+        }
+        return response;
     }
 
     public void afterSuccessfulProcessingFlow(MuleEvent response) throws MuleException

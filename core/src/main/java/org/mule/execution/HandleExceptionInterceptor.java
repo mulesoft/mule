@@ -23,11 +23,11 @@ class HandleExceptionInterceptor implements ExecutionInterceptor<MuleEvent>
     }
 
     @Override
-    public MuleEvent execute(ExecutionCallback<MuleEvent> callback) throws Exception
+    public MuleEvent execute(ExecutionCallback<MuleEvent> callback, ExecutionContext executionContext) throws Exception
     {
         try
         {
-            return next.execute(callback);
+            return next.execute(callback, executionContext);
         }
         catch (MessagingException e)
         {
