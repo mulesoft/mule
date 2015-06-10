@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isNotNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -23,6 +24,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessorExecutor;
+import org.mule.construct.Flow;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NonBlockingProcessorExecutor;
 import org.mule.tck.SensingNullReplyToHandler;
@@ -93,6 +95,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         when(event.isSynchronous()).thenReturn(false);
         when(event.isAllowNonBlocking()).thenReturn(true);
+        when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
     }
 
     private class TestContainerMessageProcessor implements  MessageProcessor, MessageProcessorContainer{

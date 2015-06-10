@@ -15,6 +15,7 @@ import org.mule.api.CompletionHandler;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.transport.ReplyToHandler;
+import org.mule.construct.Flow;
 
 /**
  * Abstract implementation of {@link org.mule.processor.NonBlockingMessageProcessor} that determines if processing should
@@ -43,7 +44,7 @@ public abstract class AbstractNonBlockingMessageProcessor implements NonBlocking
 
     protected boolean isNonBlocking(MuleEvent event)
     {
-        return event.isAllowNonBlocking() && event.getReplyToHandler() != null;
+        return event.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null;
     }
 
     @Override
