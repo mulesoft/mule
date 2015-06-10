@@ -23,6 +23,7 @@ import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 
 /**
@@ -306,6 +307,7 @@ public class XaTransaction extends AbstractTransaction
             {
                 throw new TransactionException(MessageFactory.createStaticMessage("XATransaction is null"));
             }
+            resource.setTransactionTimeout(getTimeoutInSeconds());
             return jtaTransaction.enlistResource(resource);
         }
         catch (RollbackException e)
@@ -316,6 +318,16 @@ public class XaTransaction extends AbstractTransaction
         {
             throw new TransactionException(e);
         }
+        catch (XAException e)
+        {
+            throw new TransactionException(e);
+        }
+    }
+
+    private int getTimeoutInSeconds()
+    {
+        //we need to convert milliseconds timeout to seconds timeout for XA
+        return getTimeout() / 1000;
     }
 
     public boolean delistResource(XAResource resource, int tmflag) throws TransactionException
