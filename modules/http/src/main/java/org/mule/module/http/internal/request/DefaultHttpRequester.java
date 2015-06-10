@@ -16,11 +16,14 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.Flow;
 import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.context.notification.NotificationHelper;
 import org.mule.module.http.api.HttpAuthentication;
@@ -38,7 +41,7 @@ import java.io.InputStream;
 import java.util.List;
 
 
-public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware
+public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware
 {
 
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
@@ -67,6 +70,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     private String target;
 
     private MuleContext muleContext;
+    private FlowConstruct flowConstruct;
 
     private MuleEventToHttpRequest muleEventToHttpRequest;
     private HttpResponseToMuleEvent httpResponseToMuleEvent;
@@ -249,7 +253,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                      OptimizedRequestContext.unsafeSetEvent(event);
                                      return event;
                                  }
-                             });
+                             }, ((Flow) flowConstruct).getWorkManager());
     }
 
     private MuleEvent innerProcess(MuleEvent muleEvent, boolean checkRetry) throws MuleException
@@ -536,4 +540,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         this.muleContext = muleContext;
     }
 
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
+    }
 }

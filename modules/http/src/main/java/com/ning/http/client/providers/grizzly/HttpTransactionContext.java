@@ -151,7 +151,7 @@ public final class HttpTransactionContext {
         return connection;
     }
 
-    AsyncHandler getAsyncHandler() {
+    public AsyncHandler getAsyncHandler() {
         return future.getAsyncHandler();
     }
 
