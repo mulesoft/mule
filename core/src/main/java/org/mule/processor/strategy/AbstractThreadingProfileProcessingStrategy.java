@@ -32,19 +32,34 @@ public abstract class AbstractThreadingProfileProcessingStrategy implements Proc
     protected Long threadTTL;
     protected Long threadWaitTimeout;
     protected Integer poolExhaustedAction;
-    protected ProcessingStrategy synchronousProcessingStrategy = new SynchronousProcessingStrategy();
-
 
     protected ThreadingProfile createThreadingProfile(MuleContext muleContext)
     {
-        ThreadingProfile threadingProfile = new ChainedThreadingProfile(
-            muleContext.getDefaultThreadingProfile());
-        if (maxThreads != null) threadingProfile.setMaxThreadsActive(maxThreads);
-        if (minThreads != null) threadingProfile.setMaxThreadsIdle(minThreads);
-        if (maxBufferSize != null) threadingProfile.setMaxBufferSize(maxBufferSize);
-        if (threadTTL != null) threadingProfile.setThreadTTL(threadTTL);
-        if (threadWaitTimeout != null) threadingProfile.setThreadWaitTimeout(threadWaitTimeout);
-        if (poolExhaustedAction != null) threadingProfile.setPoolExhaustedAction(poolExhaustedAction);
+        ThreadingProfile threadingProfile = new ChainedThreadingProfile(muleContext.getDefaultThreadingProfile());
+        if (maxThreads != null)
+        {
+            threadingProfile.setMaxThreadsActive(maxThreads);
+        }
+        if (minThreads != null)
+        {
+            threadingProfile.setMaxThreadsIdle(minThreads);
+        }
+        if (maxBufferSize != null)
+        {
+            threadingProfile.setMaxBufferSize(maxBufferSize);
+        }
+        if (threadTTL != null)
+        {
+            threadingProfile.setThreadTTL(threadTTL);
+        }
+        if (threadWaitTimeout != null)
+        {
+            threadingProfile.setThreadWaitTimeout(threadWaitTimeout);
+        }
+        if (poolExhaustedAction != null)
+        {
+            threadingProfile.setPoolExhaustedAction(poolExhaustedAction);
+        }
         threadingProfile.setMuleContext(muleContext);
         return threadingProfile;
     }

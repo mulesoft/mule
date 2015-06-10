@@ -540,6 +540,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         this.muleContext = muleContext;
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;

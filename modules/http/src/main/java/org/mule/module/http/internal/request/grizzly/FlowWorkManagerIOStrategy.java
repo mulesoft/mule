@@ -36,6 +36,11 @@ public class FlowWorkManagerIOStrategy extends AbstractIOStrategy
 
     private static final Logger logger = Grizzly.logger(FlowWorkManagerIOStrategy.class);
 
+    private void FlowWorkManagerIOStrategy()
+    {
+        // Use getInstance() to obtain singleton instance.
+    }
+
     @Override
     public boolean executeIoEvent(final Connection connection,
                                   final IOEvent ioEvent, final boolean isIoEventEnabled)
@@ -78,8 +83,8 @@ public class FlowWorkManagerIOStrategy extends AbstractIOStrategy
     {
         if (WORKER_THREAD_EVENT_SET.contains(ioEvent))
         {
-            AsyncHandler handler = ((HttpTransactionContext) connection.getAttributes()
-                    .getAttribute("com.ning.http.client.providers.grizzly.HttpTransactionContext")).getAsyncHandler();
+            AsyncHandler handler = ((HttpTransactionContext) connection.getAttributes().getAttribute
+                    (HttpTransactionContext.class.getName())).getAsyncHandler();
             if (handler instanceof WorkManagerSource)
             {
                 try
