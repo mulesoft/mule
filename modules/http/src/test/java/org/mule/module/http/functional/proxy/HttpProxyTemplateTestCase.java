@@ -74,7 +74,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "worker", "worker", false},
-                {"http-proxy-template-config.xml", "worker", "SelectorRunner", true}});
+                {"http-proxy-template-config.xml", "worker", "proxyTemplate", true}});
     }
 
     public HttpProxyTemplateTestCase(String configFile, String requestThreadNameSubString, String responeThreadNameSubString, boolean nonBlocking)
