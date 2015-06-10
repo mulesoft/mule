@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.FLOW;
 import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -120,6 +121,11 @@ public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAn
     public void transactionCommitFailureTriggersExceptionStrategy() throws Exception
     {
         transactionCommitFailureExecutesExceptionStrategy(getTestMuleMessage());
+    }
+
+    private MuleMessage getTestMuleMessage()
+    {
+        return new DefaultMuleMessage("test-message", muleContext);
     }
 
     @Test
