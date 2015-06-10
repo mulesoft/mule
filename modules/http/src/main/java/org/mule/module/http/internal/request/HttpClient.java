@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request;
 
 import org.mule.api.CompletionHandler;
+import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.http.internal.domain.request.HttpRequest;
@@ -30,6 +31,6 @@ public interface HttpClient extends Initialisable, Stoppable
     /**
      * Sends a HttpRequest without blocking the current thread.  When a response is available or the request times out the provided CompletionHandler will be invoked.
      */
-    public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication, final CompletionHandler<HttpResponse, Exception> handler);
+    public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication, final CompletionHandler<HttpResponse, Exception> handler, WorkManager responseWorkManager);
 
 }

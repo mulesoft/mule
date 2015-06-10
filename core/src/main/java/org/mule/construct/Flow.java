@@ -16,6 +16,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
@@ -37,7 +38,9 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 
@@ -58,12 +61,43 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     private int stageCount = 0;
     private final StageNameSource sequentialStageNameSource;
     private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
+    private WorkManager workManager;
 
     public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
         this.sequentialStageNameSource = new SequentialStageNameSource(name);
         initialiseProcessingStrategy();
+    }
+
+    @Override
+    protected void doInitialise() throws MuleException
+    {
+        super.doInitialise();
+        if (processingStrategy instanceof NonBlockingProcessingStrategy)
+        {
+            workManager = ((NonBlockingProcessingStrategy) processingStrategy).createWorkManager(this);
+        }
+    }
+
+    @Override
+    protected void doStart() throws MuleException
+    {
+        if (workManager != null)
+        {
+            workManager.start();
+        }
+        super.doStart();
+    }
+
+    @Override
+    protected void doStop() throws MuleException
+    {
+        super.doStop();
+        if (workManager != null)
+        {
+            workManager.dispose();
+        }
     }
 
     @Override
@@ -243,5 +277,10 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     public DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException
     {
         return dynamicPipelineMessageProcessor.dynamicPipeline(id);
+    }
+
+    public WorkManager getWorkManager()
+    {
+        return workManager;
     }
 }
