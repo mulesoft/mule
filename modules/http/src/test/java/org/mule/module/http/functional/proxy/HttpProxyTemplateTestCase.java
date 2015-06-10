@@ -14,14 +14,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.util.ProcessingStrategyUtils;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.functional.TestInputStream;
-import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.MessageExchangePattern;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.functional.TestInputStream;
 import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
@@ -52,8 +45,6 @@ import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,9 +74,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "worker", "worker", false},
-                {"http-proxy-template-selectors-config.xml", "SelectorRunner", "SelectorRunner", false},
-                {"http-proxy-template-config.xml", "worker", "SelectorRunner", true},
-                {"http-proxy-template-selectors-config.xml", "SelectorRunner", "SelectorRunner", true}});
+                {"http-proxy-template-config.xml", "worker", "SelectorRunner", true}});
     }
 
     public HttpProxyTemplateTestCase(String configFile, String requestThreadNameSubString, String responeThreadNameSubString, boolean nonBlocking)
@@ -94,7 +83,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         this.requestThreadNameSubString = requestThreadNameSubString;
         this.responeThreadNameSubString = responeThreadNameSubString;
         this.nonBlocking = nonBlocking;
-        if(nonBlocking)
+        if (nonBlocking)
         {
             systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
                                                 ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);

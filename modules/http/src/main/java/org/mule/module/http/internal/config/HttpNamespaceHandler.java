@@ -11,8 +11,8 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.DirectThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.module.http.internal.HttpMapParam;
 import org.mule.module.http.internal.HttpMessageBuilderRef;
 import org.mule.module.http.internal.HttpParamType;
@@ -65,8 +65,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("failure-status-code-validator", new ChildDefinitionParser("responseValidator", FailureStatusCodeValidator.class));
 
         registerBeanDefinitionParser("raml-api-configuration", new ChildDefinitionParser("apiConfiguration", RamlApiConfiguration.class));
-        registerBeanDefinitionParser("worker-threading-profile", new HttpThreadingProfileDefinitionParser("threadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-        registerBeanDefinitionParser("direct-threading-profile", new DirectThreadingProfileDefinitionParser("threadingProfile"));
+        registerBeanDefinitionParser("worker-threading-profile", new HttpThreadingProfileDefinitionParser("workerThreadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
         registerBeanDefinitionParser("config", new ChildDefinitionParser("extension", HttpConfiguration.class));
     }
 }

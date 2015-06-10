@@ -117,16 +117,7 @@
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence>
                     <xsd:element ref="tls:context" minOccurs="0" maxOccurs="1" />
-                    <xsd:choice>
-                        <xsd:element name="worker-threading-profile" type="mule:asynchronousThreadingProfileType" minOccurs="0" maxOccurs="1"/>
-                        <xsd:element name="direct-threading-profile" minOccurs="0" maxOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Use this threading profile to disable the use of a worker thread pool for processing requests and instead process requests using the selector threads.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:choice>
+                    <xsd:element name="worker-threading-profile" type="mule:asynchronousThreadingProfileType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
                     <xsd:annotation>
