@@ -28,7 +28,7 @@ class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T>
     }
 
     @Override
-    public T execute(ExecutionCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception
     {
         Transaction joinedExternal = null;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -45,7 +45,7 @@ class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T>
                     joinedExternal = tx = externalTransactionFactory.joinExternalTransaction(muleContext);
                 }
             }
-            return next.execute(callback);
+            return next.execute(callback, executionContext);
         }
         finally
         {

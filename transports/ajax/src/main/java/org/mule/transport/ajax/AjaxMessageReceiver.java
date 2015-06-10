@@ -81,7 +81,7 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
                 // Mule does not invoke the replyTo handler if an error occurs, but in this case we
                 // want it to.
                 AjaxConnector ajaxConnector = (AjaxConnector) getConnector();
-                if (!ajaxConnector.isDisableReplyTo() && message != null && message.getExceptionPayload() == null && replyTo != null)
+                if (!ajaxConnector.isDisableReplyTo() && message != null && message.getExceptionPayload() == null && replyTo != null && endpoint.getExchangePattern().hasResponse())
                 {
                     ajaxConnector.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
                 }

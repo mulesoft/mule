@@ -7,6 +7,7 @@
 package org.mule.transport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.mule.MessageExchangePattern;
@@ -61,11 +62,11 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void routeMessageOneWayReturnsNull() throws MuleException
+    public void routeMessageOneWayReturnsNotNull() throws MuleException
     {
         MessageReceiver receiver = createMessageReciever(MessageExchangePattern.ONE_WAY);
 
-        assertNull(receiver.routeMessage(createRequestMessage()));
+        assertNotNull(receiver.routeMessage(createRequestMessage()));
     }
 
     @Test

@@ -11,7 +11,7 @@ import org.mule.api.execution.ExecutionCallback;
 class ExecuteCallbackInterceptor<T> implements ExecutionInterceptor<T>
 {
     @Override
-    public T execute(ExecutionCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception
     {
         return callback.process();
     }

@@ -36,7 +36,7 @@ class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterceptor<T
     }
 
     @Override
-    public T execute(ExecutionCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception
     {
         byte action = transactionConfig.getAction();
         int timeout = transactionConfig.getTimeout();
@@ -50,6 +50,7 @@ class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterceptor<T
             {
                 logger.debug("Beginning transaction");
             }
+            executionContext.markTransactionStart();
             tx = transactionConfig.getFactory().beginTransaction(muleContext);
             // Timeout is a traversal attribute of all Transaction implementations.
             // Setting it up here for all of them rather than in every implementation.
@@ -63,7 +64,7 @@ class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterceptor<T
         T result;
         try
         {
-            result = next.execute(callback);
+            result = next.execute(callback, executionContext);
             resolveTransactionIfRequired(resolveStartedTransaction);
             return result;
         }

@@ -8,8 +8,13 @@ package org.mule.execution;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -375,9 +380,9 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
         assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), Is.is(mockTransaction));
     }
 
-    protected ExecutionTemplate createExecutionTemplate(MuleTransactionConfig config)
+    protected ExecutionTemplate createExecutionTemplate(TransactionConfig config)
     {
-        return TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
+        return TransactionalExecutionTemplate.createTransactionalExecutionTemplate(mockMuleContext, config);
     }
 
     protected ExecutionCallback getEmptyTransactionCallback()

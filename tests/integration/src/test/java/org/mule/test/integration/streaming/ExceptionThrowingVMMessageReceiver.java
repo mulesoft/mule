@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.streaming;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -24,7 +25,7 @@ public class ExceptionThrowingVMMessageReceiver extends VMMessageReceiver
     }
 
     @Override
-    protected void processMessage(Object msg) throws Exception
+    protected MuleEvent processMessage(Object msg) throws Exception
     {
         throw new RuntimeException();
     }

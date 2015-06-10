@@ -300,10 +300,11 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     }
 
     @Override
-    protected void processMessage(Object msg) throws Exception
+    protected MuleEvent processMessage(Object msg) throws Exception
     {
         // This method is never called as the
         // message is processed when received
+        return null;
     }
 
     /**
