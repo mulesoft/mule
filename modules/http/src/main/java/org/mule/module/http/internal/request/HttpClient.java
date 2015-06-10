@@ -31,6 +31,6 @@ public interface HttpClient extends Initialisable, Stoppable
     /**
      * Sends a HttpRequest without blocking the current thread.  When a response is available or the request times out the provided CompletionHandler will be invoked.
      */
-    public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication, final CompletionHandler<HttpResponse, Exception> handler, WorkManager workManager);
+    public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication, final CompletionHandler<HttpResponse, Exception> handler, WorkManager responseWorkManager);
 
 }

@@ -23,6 +23,11 @@ import org.mule.work.MuleWorkManager;
 
 import java.util.List;
 
+/**
+ * A abstract {@link org.mule.api.processor.ProcessingStrategy} implementation that provides a
+ * {@link org.mule.api.config.ThreadingProfile} for you in extensions configured via setters for each of the threading
+ * profile attributes.
+ */
 public abstract class AbstractThreadingProfileProcessingStrategy implements ProcessingStrategy
 {
 

@@ -24,7 +24,7 @@ import java.util.List;
 public class NonBlockingProcessingStrategy extends AbstractThreadingProfileProcessingStrategy
 {
 
-    public static final int DEFAULT_MAX_THREADS = 128;
+    private static final int DEFAULT_MAX_THREADS = 128;
 
     public NonBlockingProcessingStrategy()
     {

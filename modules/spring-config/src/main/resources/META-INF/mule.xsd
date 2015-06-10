@@ -2472,8 +2472,8 @@
                     <xsd:enumeration value="non-blocking">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Processes message processors in the calling thread, but supported non-blocking components will release the calling thread once a request has been sent.  Once a response is available the Flow processing will continue in a Flow thread.  In order to configure the thread pool used, configure a custom 'non-blocking-processing-strategy' global element and reference it by name.
-                                NOTE: This processing strategy is currently supported with message sources other than a single 'HTTP Listener'.
+                                Processes message processors in the calling thread, but supported non components will release the calling thread once a request has been sent.  Once a response is available the Flow will continue processing a worker thread.  In order to configure the thread pool used you can configure a custom 'non-blocking-processing-strategy' global element and reference it by name.
+                                NOTE: This processing strategy is currently only supported with a  a single 'HTTP Listener’ or when there is no message source configured.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
@@ -2690,7 +2690,8 @@
     <xsd:element name="non-blocking-processing-strategy" type="nonBlockingProcessingStrategy" substitutionGroup="abstract-processing-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                Processing strategy that uses a thread pool to process the pipeline of message processors asynchronously in a worker thread.
+                Processes message processors in the calling thread, but supported non-blocking components will release the calling thread once a request has been sent.  Once a response is available the Flow will continue processing a worker thread.
+                NOTE: This processing strategy is currently only supported with a  a single 'HTTP Listener’ or when there is no message source configured.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

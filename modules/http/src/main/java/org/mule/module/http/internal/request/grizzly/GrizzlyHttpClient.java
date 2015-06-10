@@ -240,11 +240,11 @@ public class GrizzlyHttpClient implements HttpClient
         }
     }
 
-    class WorkManagerSourceAsyncCompletionHandler extends AsyncCompletionHandler<Response> implements WorkManagerSource
+    private class WorkManagerSourceAsyncCompletionHandler extends AsyncCompletionHandler<Response> implements WorkManagerSource
     {
 
-        CompletionHandler<HttpResponse, Exception> completionHandler;
-        WorkManager workManager;
+        private CompletionHandler<HttpResponse, Exception> completionHandler;
+        private WorkManager workManager;
 
         WorkManagerSourceAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception> completionHandler,
                                                 WorkManager workManager)
