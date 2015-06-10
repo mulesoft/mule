@@ -77,7 +77,9 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
             MuleEvent result = processNext(processRequest(event));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
-                return processResponse(result);
+                MuleEvent after = processResponse(result);
+                processFinally(after, null);
+                return after;
             }
             else
             {

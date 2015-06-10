@@ -8,16 +8,13 @@ package org.mule.construct.processor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
-import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -36,35 +33,30 @@ import org.mule.context.notification.ServerNotificationManager;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.AllStatistics;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
-import org.mule.tck.SensingNullCompletionHandler;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
+import org.mule.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -120,11 +112,21 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
     @Test
     public void requestResponseNonBlocking() throws Exception
     {
+        assertRequestResponseNonBlockingWithMessageProcessor(new SensingNullMessageProcessor());
+    }
+
+    @Test
+    public void requestResponseNonBlockingWithBlockingMessageProcessor() throws Exception
+    {
+        assertRequestResponseNonBlockingWithMessageProcessor(new StringAppendTransformer(""));
+    }
+
+    private void assertRequestResponseNonBlockingWithMessageProcessor(MessageProcessor messageProcessor) throws Exception
+    {
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        pipeline.setMessageProcessors(Collections.<MessageProcessor>singletonList(new SensingNullMessageProcessor()
-        ));
+        pipeline.setMessageProcessors(Collections.singletonList(messageProcessor));
         pipeline.initialise();
 
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
