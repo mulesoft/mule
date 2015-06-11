@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request.grizzly;
 
 import org.mule.api.MuleException;
+import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 
 import com.ning.http.client.AsyncHandler;
@@ -36,7 +37,7 @@ public class FlowWorkManagerIOStrategy extends AbstractIOStrategy
 
     private static final Logger logger = Grizzly.logger(FlowWorkManagerIOStrategy.class);
 
-    private void FlowWorkManagerIOStrategy()
+    protected FlowWorkManagerIOStrategy()
     {
         // Use getInstance() to obtain singleton instance.
     }
@@ -83,25 +84,40 @@ public class FlowWorkManagerIOStrategy extends AbstractIOStrategy
     {
         if (WORKER_THREAD_EVENT_SET.contains(ioEvent))
         {
-            AsyncHandler handler = ((HttpTransactionContext) connection.getAttributes().getAttribute
-                    (HttpTransactionContext.class.getName())).getAsyncHandler();
-            if (handler instanceof WorkManagerSource)
+            try
             {
-                try
+                WorkManager workManager = getWorkManager(connection);
+                if (workManager != null)
                 {
-                    return ((WorkManagerSource) handler).getWorkManager();
-                }
-                catch (MuleException e)
-                {
-                    logger.warning("Unable to obtain Mule WorkManager instance for worker thread IO.  " +
-                                   "WorkerIOStrategy  will be used instead.");
+                    return workManager;
                 }
             }
+            catch (MuleException e)
+            {
+                // ignore exception, log warning and fallback to using WorkerIOStrategy
+            }
+            logger.warning("Unable to obtain Mule WorkManager instance for worker thread IO.  " +
+                           "WorkerIOStrategy  will be used instead.");
             return connection.getTransport().getWorkerThreadPool();
         }
         else
         {
             // Run other types of IOEvent in selector thread.
+            return null;
+        }
+    }
+
+    protected WorkManager getWorkManager(Connection connection) throws MuleException
+    {
+        HttpTransactionContext httpTransactionContext = (HttpTransactionContext) connection.getAttributes().getAttribute
+                (HttpTransactionContext.class.getName());
+
+        if (httpTransactionContext != null && httpTransactionContext.getAsyncHandler() instanceof WorkManagerSource)
+        {
+            return ((WorkManagerSource) httpTransactionContext.getAsyncHandler()).getWorkManager();
+        }
+        else
+        {
             return null;
         }
     }
