@@ -87,6 +87,12 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
     }
 
     @Test
+    public void persistentConnectionClosingWithRequestConnectionCloseHeader() throws Exception
+    {
+        assertConnectionClosesWithRequestConnectionCloseHeader(persistentPort);
+    }
+
+    @Test
     public void persistentConnectionCloseHeaderClosing() throws Exception
     {
         assertConnectionClosesAfterSend(persistentPortCloseHeader);
@@ -120,6 +126,29 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
         assertResponse(getResponse(socket), true);
 
         Thread.sleep(3000);
+
+        sendRequest(socket);
+        assertResponse(getResponse(socket), false);
+
+        socket.close();
+    }
+
+    private void assertConnectionClosesWithRequestConnectionCloseHeader(DynamicPort port) throws IOException, InterruptedException
+    {
+        Socket socket = new Socket("localhost", port.getNumber());
+        sendRequest(socket);
+        assertResponse(getResponse(socket), true);
+
+        sendRequest(socket);
+        assertResponse(getResponse(socket), true);
+
+        PrintWriter writer = new PrintWriter(socket.getOutputStream());
+        writer.println("GET / HTTP/1.1");
+        writer.println("Host: www.example.com");
+        writer.println("Connection: close");
+        writer.println("");
+        writer.flush();
+        assertResponse(getResponse(socket), true);
 
         sendRequest(socket);
         assertResponse(getResponse(socket), false);
