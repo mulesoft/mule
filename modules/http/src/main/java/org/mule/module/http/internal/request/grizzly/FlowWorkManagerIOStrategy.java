@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request.grizzly;
 
 import org.mule.api.MuleException;
+import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 
 import com.ning.http.client.AsyncHandler;
@@ -15,6 +16,7 @@ import com.ning.http.client.providers.grizzly.HttpTransactionContext;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.concurrent.Executor;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.glassfish.grizzly.Connection;
@@ -36,7 +38,7 @@ public class FlowWorkManagerIOStrategy extends AbstractIOStrategy
 
     private static final Logger logger = Grizzly.logger(FlowWorkManagerIOStrategy.class);
 
-    private void FlowWorkManagerIOStrategy()
+    protected FlowWorkManagerIOStrategy()
     {
         // Use getInstance() to obtain singleton instance.
     }
@@ -83,25 +85,43 @@ public class FlowWorkManagerIOStrategy extends AbstractIOStrategy
     {
         if (WORKER_THREAD_EVENT_SET.contains(ioEvent))
         {
-            AsyncHandler handler = ((HttpTransactionContext) connection.getAttributes().getAttribute
-                    (HttpTransactionContext.class.getName())).getAsyncHandler();
-            if (handler instanceof WorkManagerSource)
+            try
             {
-                try
+                WorkManager workManager = getWorkManager(connection);
+                if (workManager != null)
                 {
-                    return ((WorkManagerSource) handler).getWorkManager();
+                    return workManager;
                 }
-                catch (MuleException e)
-                {
-                    logger.warning("Unable to obtain Mule WorkManager instance for worker thread IO.  " +
-                                   "WorkerIOStrategy  will be used instead.");
-                }
+            }
+            catch (MuleException e)
+            {
+                // ignore exception, log warning and fallback to using WorkerIOStrategy
+            }
+            if(logger.isLoggable(Level.FINE))
+            {
+                logger.fine("Unable to obtain Mule WorkManager instance for worker thread IO. Grizzly " +
+                            "WorkerIOStrategy will be used instead.");
             }
             return connection.getTransport().getWorkerThreadPool();
         }
         else
         {
             // Run other types of IOEvent in selector thread.
+            return null;
+        }
+    }
+
+    protected WorkManager getWorkManager(Connection connection) throws MuleException
+    {
+        HttpTransactionContext httpTransactionContext = (HttpTransactionContext) connection.getAttributes().getAttribute
+                (HttpTransactionContext.class.getName());
+
+        if (httpTransactionContext != null && httpTransactionContext.getAsyncHandler() instanceof WorkManagerSource)
+        {
+            return ((WorkManagerSource) httpTransactionContext.getAsyncHandler()).getWorkManager();
+        }
+        else
+        {
             return null;
         }
     }
