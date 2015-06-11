@@ -19,6 +19,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
@@ -253,7 +254,12 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                      OptimizedRequestContext.unsafeSetEvent(event);
                                      return event;
                                  }
-                             }, ((Flow) flowConstruct).getWorkManager());
+                             }, getWorkManager());
+    }
+
+    private WorkManager getWorkManager()
+    {
+        return flowConstruct != null ? ((Flow) flowConstruct).getWorkManager() : null;
     }
 
     private MuleEvent innerProcess(MuleEvent muleEvent, boolean checkRetry) throws MuleException
