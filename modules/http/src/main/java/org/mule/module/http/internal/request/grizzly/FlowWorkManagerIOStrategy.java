@@ -37,7 +37,7 @@ public class FlowWorkManagerIOStrategy extends AbstractIOStrategy
 
     private static final Logger logger = Grizzly.logger(FlowWorkManagerIOStrategy.class);
 
-    private void FlowWorkManagerIOStrategy()
+    protected FlowWorkManagerIOStrategy()
     {
         // Use getInstance() to obtain singleton instance.
     }
