@@ -14,9 +14,11 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,10 +26,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
 {
+
+    @Rule
+    public SystemProperty host = new SystemProperty("host" , "localhost");
 
     @Override
     protected String getConfigFile()
@@ -154,6 +160,24 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
         processEventInFlow(event, "outboundProperties");
 
         assertThat(getFirstReceivedHeader(CONNECTION), is(not(CLOSE)));
+    }
+
+    @Test
+    public void acceptsHostHeader() throws Exception
+    {
+        processEventInFlow(getTestEvent(TEST_MESSAGE), "hostHeader");
+
+        assertThat(getFirstReceivedHeader(HOST), is(host.getValue()));
+    }
+
+    @Test
+    public void ignoresHostOutboundProperty() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.getMessage().setOutboundProperty(HOST, host.getValue());
+        processEventInFlow(event, "outboundProperties");
+
+        assertThat(getFirstReceivedHeader(HOST), is(not(host.getValue())));
     }
 
     private void processEventInFlow(MuleEvent event, String flowName) throws Exception

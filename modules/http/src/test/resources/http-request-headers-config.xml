@@ -54,4 +54,12 @@
         <http:request config-ref="config" path="testPath" />
     </flow>
 
+    <flow name="hostHeader">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:header headerName="Host" value="${host}" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
 </mule>

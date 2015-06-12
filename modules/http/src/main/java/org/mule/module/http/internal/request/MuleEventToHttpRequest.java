@@ -10,6 +10,7 @@ import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREF
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
@@ -103,7 +104,7 @@ public class MuleEventToHttpRequest
 
     private boolean isNotIgnoredProperty(String outboundProperty)
     {
-        return !outboundProperty.startsWith(HTTP_PREFIX) && !outboundProperty.equalsIgnoreCase(CONNECTION);
+        return !outboundProperty.startsWith(HTTP_PREFIX) && !outboundProperty.equalsIgnoreCase(CONNECTION) && !outboundProperty.equalsIgnoreCase(HOST);
     }
 
 
