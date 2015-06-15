@@ -134,7 +134,14 @@
 			<artifactId>activemq-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!--Database Drivers -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-jaas</artifactId>
+            <version>${activemqVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--Database Drivers -->
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
