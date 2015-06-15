@@ -6,13 +6,21 @@
  */
 package org.mule.test.integration.transaction.xa;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
+import org.apache.activemq.broker.BrokerPlugin;
 import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.security.AuthenticationUser;
+import org.apache.activemq.security.SimpleAuthenticationPlugin;
 
 public class JmsBrokerSetUp implements TransactionalTestSetUp
 {
 
     private final int port;
     private BrokerService broker;
+    private final List<AuthenticationUser> users = Lists.newArrayList();
 
     public JmsBrokerSetUp(int port)
     {
@@ -26,6 +34,12 @@ public class JmsBrokerSetUp implements TransactionalTestSetUp
         broker.setUseJmx(false);
         broker.setPersistent(false);
         broker.addConnector("tcp://localhost:" + port);
+
+        if (!users.isEmpty())
+        {
+            SimpleAuthenticationPlugin authenticationPlugin = new SimpleAuthenticationPlugin(users);
+            broker.setPlugins(new BrokerPlugin[] {authenticationPlugin});
+        }
         broker.start();
     }
 
@@ -39,5 +53,10 @@ public class JmsBrokerSetUp implements TransactionalTestSetUp
         catch (Exception e)
         {
         }
+    }
+
+    public void addUser(String username, String password, String groups)
+    {
+        users.add(new AuthenticationUser(username, password, groups));
     }
 }
