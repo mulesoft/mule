@@ -64,9 +64,9 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void stringWithTransferEncoding() throws Exception
+    public void stringWithTransferEncodingHeader() throws Exception
     {
-        final String url = getUrl("stringWithTransferEncoding");
+        final String url = getUrl("stringWithTransferEncodingHeader");
         testResponseIsChunkedEncoding(url);
     }
 
@@ -74,7 +74,35 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
     public void stringWithTransferEncodingOutboundProperty() throws Exception
     {
         final String url = getUrl("stringWithTransferEncodingOutboundProperty");
-        testResponseIsChunkedEncoding(url);
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void stringWithTransferEncodingAndContentLengthHeader() throws Exception
+    {
+        final String url = getUrl("stringWithTransferEncodingAndContentLengthHeader");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void stringWithTransferEncodingAndContentLengthOutboundProperty() throws Exception
+    {
+        final String url = getUrl("stringWithTransferEncodingAndContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void stringWithTransferEncodingHeaderAndContentLengthOutboundProperty() throws Exception
+    {
+        final String url = getUrl("stringWithTransferEncodingHeaderAndContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void stringWithTransferEncodingOutboundPropertyAndContentLengthHeader() throws Exception
+    {
+        final String url = getUrl("stringWithTransferEncodingOutboundPropertyAndContentLengthHeader");
+        testResponseIsContentLengthEncoding(url);
     }
 
     // AUTO  - InputStream
@@ -101,9 +129,9 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void inputStreamWithTransferEncoding() throws Exception
+    public void inputStreamWithTransferEncodingHeader() throws Exception
     {
-        final String url = getUrl("inputStreamWithTransferEncoding");
+        final String url = getUrl("inputStreamWithTransferEncodingHeader");
         testResponseIsChunkedEncoding(url);
     }
 
@@ -115,9 +143,30 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void inputStreamWithTransferEncodingAndContentLength() throws Exception
+    public void inputStreamWithTransferEncodingAndContentLengthHeader() throws Exception
     {
-        final String url = getUrl("inputStreamWithTransferEncodingAndContentLength");
+        final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthHeader");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void inputStreamWithTransferEncodingAndContentLengthOutboundProperty() throws Exception
+    {
+        final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void inputStreamWithTransferEncodingHeaderAndContentLengthOutboundProperty() throws Exception
+    {
+        final String url = getUrl("inputStreamWithTransferEncodingHeaderAndContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeader() throws Exception
+    {
+        final String url = getUrl("inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeader");
         testResponseIsContentLengthEncoding(url);
     }
 
