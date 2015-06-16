@@ -32,9 +32,9 @@ Mule is a powerful and complex project. Before contributing to the Mule source c
 ## Getting to know better Mule
 There are a number of sources you can use to understand better Mule and its forthcoming features:
 
-- MuleSoft's [blog](http://blogs.mulesoft.org/). The fastest way of knowing about new features in mule. 
+- MuleSoft's [blog](http://blogs.mulesoft.com/). The fastest way of knowing about new features in mule. 
 - [@MuleSoft](https://twitter.com/MuleSoft)'s twitter account. You might also want to check the [#MuleESB](https://twitter.com/hashtag/MuleESB) hashtag.
-- [Mule User Guide](http://www.mulesoft.org/documentation/display/current/Mule+User+Guide), the official documentation around usage of Mule ESB.
+- [Mule User Guide](https://developer.mulesoft.com/docs/display/current/Mule+User+Guide), the official documentation around usage of Mule ESB.
 - The books [Mule in Action 2ed](http://www.manning.com/dossot2/) and [Getting Started with Mule Cloud Connect](http://shop.oreilly.com/product/0636920025726.do). Both are excellent resources to understand how to use and extend Mule.
 
 
@@ -53,7 +53,7 @@ If, in the above-listed resources, no-one else has initiated your improvement or
 
 Mule ESB has two different extension mechanisms for writing modules and connectors. Avoiding to add functionality to this project and rather use one of those mechanisms to extend Mule is probably the more favorable option.
 
-It is therefor important to understand those two extension mechanisms. The first and more intuitive mechanism for extensions is the [Anypoint Connector DevKit](http://www.mulesoft.org/documentation/display/current/Anypoint+Connector+DevKit), an annotation based framework for easy construction of extensions. The second choice is to extend mule through the [Extensions](http://www.mulesoft.org/documentation/display/current/Extending) mechanism.
+It is therefor important to understand those two extension mechanisms. The first and more intuitive mechanism for extensions is the [Anypoint Connector DevKit](https://developer.mulesoft.com/docs/display/current/Anypoint+Connector+DevKit), an annotation based framework for easy construction of extensions. The second choice is to extend mule through the [Extensions](https://developer.mulesoft.com/docs/display/current/Extending) mechanism.
 
 Now we should understand Mule and the enterprise integration domain. At the same time we should  know the different extension mechanisms of Mule.
 
@@ -68,7 +68,7 @@ Before you get started, you need to set yourself up with an environment in which
 
 ### JDK
 
-1. If you are working with **Windows** or **Linux**, install one of the following [Java Development Kits](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive. If you are working on a **Mac**, simply confirm that the JDK shipped with your Mac OS X the following is *Java SE Development Kit 7 (also known as Java SE 7u13)* or newer using the command `java -version`, then skip to step 4 below: 
+1. If you are working with **Windows** or **Linux**, install one of the following [Java Development Kits](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive. If you are working on a **Mac**, simply confirm that the JDK shipped with your Mac OS X is *Java SE Development Kit 7 (also known as Java SE 7u80)* or newer using the command `java -version`, then skip to step 4 below: 
 2. Create an environment variable called `JAVA_HOME`, setting it to the directory in which you installed the JDK. 
 3. Update the PATH environment variable so that it includes the path to JDK binaries. Add the following line to the PATH variable:
     - Windows: `%JAVA_HOME%/bin`
@@ -137,7 +137,7 @@ An open-source integration development platform, use Eclipse to modify or add to
 
 #### Debugging
 
-You can debug following these steps. There is also a more in-depth guide available in the [Mule documentation site](http://www.mulesoft.org/documentation/display/current/Step+Debugging).
+You can debug following these steps. There is also a more in-depth guide available in the [Mule documentation site](https://developer.mulesoft.com/docs/display/current/Debugging).
 
 1. In Eclipse, select **Window >  Open Perspective > Other...**, then select **Java** to open the Java Perspective.
 2. Select **File > New > Java Project**. You are creating a new project just for launching Mule.
@@ -187,7 +187,7 @@ Use IntelliJ's IDEA integration platform to modify or add to your cloned Mule so
 
 #### Importing
 
-1. [Download](http://www.jetbrains.com/idea/download/) and install IntelliJ IDEA.
+1. [Download](https://www.jetbrains.com/idea/download/) and install IntelliJ IDEA.
 2. Open IDEA, then select ***File > Open...***
 3. Browse to the directory into which you downloaded the Mule source code, then select the `pom.xml` file. 
 4. Click ***OK***. IDEA takes awhile to process all the pom.xml files.
@@ -245,7 +245,7 @@ Now that you're all set with a local development environment and your own branch
 5. Save your changes locally.
 6. Prepare your changes for a Pull Request by first squashing your changes into a single commit on your branch using the following command: 
 `git rebase -i mule-3.x`.
-7. Push your squashed commit to your branch on your github repository. Refer to [Git's documentation](http://git-scm.com/book/en/Git-Basics-Recording-Changes-to-the-Repository) for details on how to commit your changes.
+7. Push your squashed commit to your branch on your github repository. Refer to [Git's documentation](http://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository) for details on how to commit your changes.
 8. Regularly update your branch with any changes or fixes applied to the mule-3.x branch. Refer to details below.
 
 ## Updating Your feature Branch
