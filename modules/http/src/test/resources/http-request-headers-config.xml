@@ -51,13 +51,21 @@
     </flow>
 
     <flow name="outboundProperties">
-        <http:request config-ref="config" path="testPath" />
+        <http:request config-ref="config" path="testPath" method="POST"/>
     </flow>
 
     <flow name="hostHeader">
         <http:request config-ref="config" path="testPath" >
             <http:request-builder>
                 <http:header headerName="Host" value="${host}" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="transferEncodingHeader">
+        <http:request config-ref="config" path="testPath" method="POST">
+            <http:request-builder>
+                <http:header headerName="Transfer-Encoding" value="${encoding}" />
             </http:request-builder>
         </http:request>
     </flow>
