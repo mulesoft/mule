@@ -2,7 +2,7 @@ MIGRATION GUIDE
 ===============
 
 The following is a list of changes you have to execute to migrate from Mule ESB Community edition version 3.4.x to version 3.7.x
-Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+Notes for more details.
+Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
 Migration changes from 3.6.x to 3.7.x
 
