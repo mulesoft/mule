@@ -417,6 +417,8 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             guardedUndeploy(artifact);
 
             deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+
+            logArtifactUndeployed(artifact);
         }
         catch (RuntimeException e)
         {
@@ -430,6 +432,14 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         if (logger.isInfoEnabled())
         {
             logger.info("================== Request to Undeploy Artifact: " + artifact.getArtifactName());
+        }
+    }
+
+    private void logArtifactUndeployed(T artifact)
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info(miniSplash(String.format("Undeployed artifact '%s'", artifact.getArtifactName())));
         }
     }
 
