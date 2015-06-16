@@ -1,6 +1,6 @@
 Stop the point-to-point madness
 ===============================
-Mule is a lightweight, integration platform that allows you to connect anything anywhere. Rather than creating point-to-point integrations between systems, services, APIs and devices, you can use Mule to intelligently manage message-routing, data mapping, orchestration, reliability, security and scalability between nodes. Plug other systems and applications into Mule and let it handle all the communication betweens systems, enabling you track and monitor everything that happens. 
+Mule is a lightweight integration platform that allows you to connect anything anywhere. Rather than creating point-to-point integrations between systems, services, APIs and devices, you can use Mule to intelligently manage message-routing, data mapping, orchestration, reliability, security and scalability between nodes. Plug other systems and applications into Mule and let it handle all the communication betweens systems, enabling you track and monitor everything that happens. 
 
 At the simplest level, Mule applications accept and process messages through several Lego-block-like message processors plugged together in what we call a flow. Understanding the basic flow architecture is key to understanding Mule. Essentially every Mule flow contains a series of building blocks that accept, then transform and process messages. 
 
@@ -22,15 +22,15 @@ A flow, therefore, is the construct within which you link together several indiv
 Get Started
 ===========
 
-1. Download, then unzip Mule – either the Standalone version (just the ESB) or Mule Studio (the ESB + the Eclipse-based graphical IDE) – from [mulesoft.org](http://www.mulesoft.org).
+1. Download, then unzip Mule – either the Standalone version (Mule runtime engine) or Anypoint Studio (the runtime engine + the Eclipse-based graphical IDE) – from [mulesoft.com](https://www.mulesoft.com).
 
-1. Confirm that you have a [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive, Java SE 6 Update 26 or SE 7 (SE 8 is not currently supported).
+1. Confirm that you have a [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive, Java SE 7 Update 80 or SE 8 (Update 45).
 
-1. Launch Mule Studio by double-clicking MuleStudio.app (Mac) or MuleStudio.exe (Windows).  
+1. Launch Mule Studio by double-clicking AnypointStudio.app (Mac) or AnypointStudio.exe (Windows).  
      Launch Mule as a standalone from the command line by executing ./bin/mule (Mac) or mule.bat (Windows). 
-     Refer to the [Mule Installation Guide](http://www.mulesoft.org/documentation/display/current/Downloading+and+Launching+Mule+ESB) for more details. 
+     Refer to the [Mule Installation Guide](https://developer.mulesoft.com/docs/display/current/Installing) for more details. 
 
-Mule is up and kicking! Check out some [example applications](http://www.mulesoft.org/documentation/display/current/Mule+Examples) to explore the potential of Mule.
+Mule is up and kicking! Check out [Anypoint Exchange](https://www.mulesoft.com/exchange) to explore the potential of Mule.
 
 
 Contribute
