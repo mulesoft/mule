@@ -96,10 +96,7 @@ Where Do I Go Next?
 This document has provided a brief overview of getting started with Mule. What follows is information about where to go next.
 
 - For complete information on using Mule, go to the Mule User Guide at:
-https://developer.mulesoft.com/docs/display/current/Home. To access these pages, register a Mule Community user.  Registration is free and only takes a few moments.
-
-- To run the examples you can launch Mule ESB with the command:
-$MULE_HOME/bin/mule_examples
+https://developer.mulesoft.com/docs/display/current/Home
 
 - As a Mule Enterprise user, if you need assistance see the support page at
 https://www.mulesoft.com/support-and-services/mule-esb-support-license-subscription
