@@ -199,7 +199,7 @@ If you IDEA presents any compilation errors in test classes from the CXF module 
 
 #### Debugging Remotely
 
-You can debug following these steps. There is also a more in-depth guide available in the [Mule documentation site](http://www.mulesoft.org/documentation/display/current/Step+Debugging).
+You can debug following these steps. There is also a more in-depth guide available in the [Mule documentation site](https://developer.mulesoft.com/docs/display/current/Debugging).
 
 1. Start the Mule server with the `-debug` switch. The server waits until a debugger attaches.
 2. In IDEA, select **Run > Edit Configurations...** to open the **Run/Debug Configurations** window.
