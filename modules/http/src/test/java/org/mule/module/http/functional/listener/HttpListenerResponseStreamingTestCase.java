@@ -91,6 +91,20 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
         testResponseIsContentLengthEncoding(url);
     }
 
+    @Test
+    public void stringWithTransferEncodingHeaderAndContentLengthOutboundProperty() throws Exception
+    {
+        final String url = getUrl("stringWithTransferEncodingHeaderAndContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void stringWithTransferEncodingOutboundPropertyAndContentLengthHeader() throws Exception
+    {
+        final String url = getUrl("stringWithTransferEncodingOutboundPropertyAndContentLengthHeader");
+        testResponseIsContentLengthEncoding(url);
+    }
+
     // AUTO  - InputStream
 
     @Test
@@ -139,6 +153,20 @@ public class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
     public void inputStreamWithTransferEncodingAndContentLengthOutboundProperty() throws Exception
     {
         final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void inputStreamWithTransferEncodingHeaderAndContentLengthOutboundProperty() throws Exception
+    {
+        final String url = getUrl("inputStreamWithTransferEncodingHeaderAndContentLengthOutboundProperty");
+        testResponseIsContentLengthEncoding(url);
+    }
+
+    @Test
+    public void inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeader() throws Exception
+    {
+        final String url = getUrl("inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeader");
         testResponseIsContentLengthEncoding(url);
     }
 
