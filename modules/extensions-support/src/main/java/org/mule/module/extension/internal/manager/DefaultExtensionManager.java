@@ -258,7 +258,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         return configurationInstanceProvider;
     }
 
-    private Object attemptToCreateImplicitConfigurationInstance(Extension extension, OperationContext operationContext)
+    private void attemptToCreateImplicitConfigurationInstance(Extension extension, OperationContext operationContext)
     {
         Configuration implicitConfiguration = getImplicitConfiguration(extension);
 
@@ -267,23 +267,30 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
             throw new IllegalStateException(String.format("Could not find a config for extension %s and none can be created automatically. Please define one", extension.getName()));
         }
 
-        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(implicitConfiguration, buildImplicitConfigurationResolverSet(implicitConfiguration));
-
-        Object configurationInstance;
-        try
+        synchronized (implicitConfiguration)
         {
-            configurationInstance = configurationObjectBuilder.build(asOperationContextAdapter(operationContext).getEvent());
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+            //check that another thread didn't beat us to create the instance
+            if (!register.getConfigurationInstanceProviders(extension).isEmpty())
+            {
+                return;
+            }
 
-        final String instanceName = objectNameHelper.getUniqueName(String.format("%s-%s", extension.getName(), implicitConfiguration.getName()));
-        registerConfigurationInstanceProvider(instanceName,
-                                              new StaticConfigurationInstanceProvider<>(instanceName, implicitConfiguration, configurationInstance));
+            ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(implicitConfiguration, buildImplicitConfigurationResolverSet(implicitConfiguration));
 
-        return configurationInstance;
+            Object configurationInstance;
+            try
+            {
+                configurationInstance = configurationObjectBuilder.build(asOperationContextAdapter(operationContext).getEvent());
+            }
+            catch (MuleException e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+
+            final String instanceName = objectNameHelper.getUniqueName(String.format("%s-%s", extension.getName(), implicitConfiguration.getName()));
+            registerConfigurationInstanceProvider(instanceName,
+                                                  new StaticConfigurationInstanceProvider<>(instanceName, implicitConfiguration, configurationInstance));
+        }
     }
 
     private ResolverSet buildImplicitConfigurationResolverSet(Configuration configuration)

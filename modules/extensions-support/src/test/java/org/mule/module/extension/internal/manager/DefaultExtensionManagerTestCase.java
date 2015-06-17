@@ -33,11 +33,14 @@ import org.mule.extension.runtime.ConfigurationInstanceProvider;
 import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.runtime.OperationExecutor;
+import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.module.extension.internal.runtime.DelegatingOperationExecutor;
+import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.concurrent.Latch;
 
 import com.google.common.collect.ImmutableList;
 
@@ -48,6 +51,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -93,7 +98,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     private Operation extension1Operation;
 
     @Mock
-    private OperationContext extension1OperationContext;
+    private OperationContextAdapter extension1OperationContext;
 
     @Mock
     private ConfigurationInstanceProvider<Object> extension1ConfigurationInstanceProvider;
@@ -371,6 +376,56 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         extensionsManager.registerConfigurationInstanceProvider(EXTENSION1_CONFIG_INSTANCE_NAME, extension1ConfigurationInstanceProvider);
 
         OperationExecutor managedExecutor = extensionsManager.getOperationExecutor(extension1OperationContext);
+        assertThat(managedExecutor, is(sameInstance((OperationExecutor) executor)));
+        verify(extension1Operation).getExecutor(configInstance);
+    }
+
+    @Test
+    public void getOperationExecutorThroughImplicitConfiguration()
+    {
+        discover();
+        when(extension1Configuration.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
+
+        OperationExecutor managedExecutor = extensionsManager.getOperationExecutor(extension1OperationContext);
+        assertThat(managedExecutor, is(sameInstance((OperationExecutor) executor)));
+        verify(extension1Operation).getExecutor(configInstance);
+    }
+
+    @Test
+    public void getOperationExecutorThroughImplicitConfigurationConcurrently() throws Exception
+    {
+        final long timeout = 5;
+        final TimeUnit timeUnit = TimeUnit.SECONDS;
+        final int threadCount = 2;
+        final Latch testLatch = new Latch();
+        final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
+
+        discover();
+        when(extension1Configuration.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
+
+        when(extension1.getConfigurations()).thenAnswer(new Answer<List<Configuration>>()
+        {
+            @Override
+            public List<Configuration> answer(InvocationOnMock invocation) throws Throwable
+            {
+                new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        testLatch.release();
+                        extensionsManager.getOperationExecutor(extension1OperationContext);
+                    }
+                }.start();
+
+                testLatch.await(timeout, timeUnit);
+                joinerLatch.countDown();
+                return Arrays.asList(extension1Configuration);
+            }
+        });
+
+        OperationExecutor managedExecutor = extensionsManager.getOperationExecutor(extension1OperationContext);
+        assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
         assertThat(managedExecutor, is(sameInstance((OperationExecutor) executor)));
         verify(extension1Operation).getExecutor(configInstance);
     }
