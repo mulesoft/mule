@@ -74,7 +74,7 @@ public class DefaultResourceReleaser implements ResourceReleaser
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(String.format("No Oracle's '%s' MBean found.", DIAGNOSABILITY_BEAN_NAME);
+                logger.debug(String.format("No Oracle's '%s' MBean found.", DIAGNOSABILITY_BEAN_NAME));
             }
         }
         catch (Throwable e)
