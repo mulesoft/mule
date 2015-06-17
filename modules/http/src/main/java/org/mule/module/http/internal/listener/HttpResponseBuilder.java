@@ -174,7 +174,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 try
                 {
                     ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
-                    if (responseStreaming == ALWAYS || (responseStreaming == AUTO && CHUNKED.equals(existingTransferEncoding)))
+                    if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null && CHUNKED.equals(existingTransferEncoding)))
                     {
                         setupChunkedEncoding(httpResponseHeaderBuilder);
                     }
@@ -216,7 +216,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
 
     private boolean isNotIgnoredProperty(String outboundPropertyName)
     {
-        return !outboundPropertyName.startsWith(HTTP_PREFIX) && !outboundPropertyName.equalsIgnoreCase(CONNECTION);
+        return !outboundPropertyName.startsWith(HTTP_PREFIX) && !outboundPropertyName.equalsIgnoreCase(CONNECTION) && !outboundPropertyName.equalsIgnoreCase(TRANSFER_ENCODING);
     }
 
     private void setupContentLengthEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, int contentLength)
