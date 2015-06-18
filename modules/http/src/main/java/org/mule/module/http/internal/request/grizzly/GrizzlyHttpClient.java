@@ -283,6 +283,16 @@ public class GrizzlyHttpClient implements HttpClient
             // No timeout is used to get the value of the future object, as the responseTimeout configured in the request that
             // is being sent will make the call throw a {@code TimeoutException} if this time is exceeded.
             response = future.get();
+
+            // Under high load, sometimes the get() method returns null. Retrying once fixes the problem (see MULE-8712).
+            if (response == null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Null response returned by async client");
+                }
+                response = future.get();
+            }
         }
         catch (InterruptedException e)
         {
