@@ -101,8 +101,7 @@ public class SftpClient
         catch (SftpException e)
         {
             String message = "Error '" + e.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
-            logger.error(message);
-            throw new IOException(message);
+            throw new IOException(message, e);
         }
     }
 
@@ -236,7 +235,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e);
             // throw new IOException("Error occured when renaming " +
             // currentDirectory + "/" + filename + " to " + absolutePath +
             // ". Error Message=" + e.getMessage());
@@ -353,7 +352,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage() + ".  Filename is " + fileName);
+            throw new IOException(e.getMessage() + ".  Filename is " + fileName, e);
         }
     }
 
@@ -390,7 +389,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
@@ -418,7 +417,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
         finally
         {
@@ -442,7 +441,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
@@ -462,7 +461,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage() + " (" + currentDirectory + "/" + filename + ")");
+            throw new IOException(e.getMessage() + " (" + currentDirectory + "/" + filename + ")", e);
         }
     }
 
@@ -480,7 +479,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
@@ -504,7 +503,7 @@ public class SftpClient
         {
             // Don't throw e.getmessage since we only get "2: No such file"..
             throw new IOException("Could not create the directory '" + directoryName + "', caused by: "
-                                  + e.getMessage());
+                                  + e.getMessage(), e);
             // throw new IOException("Could not create the directory '" +
             // directoryName + "' in '" + currentDirectory + "', caused by: " +
             // e.getMessage());
@@ -524,7 +523,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
