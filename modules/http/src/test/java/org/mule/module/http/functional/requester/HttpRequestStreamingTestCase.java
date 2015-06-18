@@ -41,6 +41,8 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
         return "http-request-streaming-config.xml";
     }
 
+    //AUTO
+
     @Test
     public void streamsWhenPayloadIsInputStreamAndStreamingModeAuto() throws Exception
     {
@@ -64,21 +66,58 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
     }
 
     @Test
+    public void doesNotStreamStringWithContentLengthHeaderAndStreamingModeAuto() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
+        assertNoStreaming("streamingAuto", event);
+    }
+
+    @Test
     public void doesNotStreamWithContentLengthTransferEncodingHeadersAndStreamingModeAuto() throws Exception
     {
         MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
         event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
-        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, CHUNKED);
-        assertNoStreaming("streamingAuto", event);
+        assertNoStreaming("streamingAutoHeader", event);
+    }
+
+    @Test
+    public void doesNotStreamStringWithContentLengthTransferEncodingHeadersAndStreamingModeAuto() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
+        assertNoStreaming("streamingAutoHeader", event);
     }
 
     @Test
     public void streamsWhenPayloadIsStringTransferEncodingHeaderAndStreamingModeAuto() throws Exception
     {
+        assertStreaming("streamingAutoHeader", getTestEvent(TEST_MESSAGE));
+    }
+
+    @Test
+    public void doesNotStreamWhenPayloadIsStringTransferEncodingPropertyAndStreamingModeAuto() throws Exception
+    {
         MuleEvent event = getTestEvent(TEST_MESSAGE);
         event.getMessage().setOutboundProperty(TRANSFER_ENCODING, CHUNKED);
-        assertStreaming("streamingAuto", event);
+        assertNoStreaming("streamingAuto", event);
     }
+
+    @Test
+    public void streamsWhenPayloadIsInputStreamTransferEncodingHeaderAndStreamingModeAuto() throws Exception
+    {
+        assertStreaming("streamingAutoHeader", getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
+    }
+
+    @Test
+    public void streamsWhenPayloadIsInputStreamTransferEncodingPropertyAndStreamingModeAuto() throws Exception
+    {
+        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
+        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, CHUNKED);
+        assertStreaming("streamingAutoHeader", event);
+    }
+
+    //ALWAYS
 
     @Test
     public void streamsWhenStreamingModeAlways() throws Exception
@@ -110,6 +149,7 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
         assertStreaming("streamingAlways", event);
     }
 
+    //NEVER
 
     @Test
     public void doesNotStreamWhenStreamingModeNever() throws Exception

@@ -15,6 +15,8 @@ import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LIST
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.HOST;
+import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
@@ -34,6 +36,8 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
 
     @Rule
     public SystemProperty host = new SystemProperty("host" , "localhost");
+    @Rule
+    public SystemProperty encoding = new SystemProperty("encoding" , CHUNKED);
 
     @Override
     protected String getConfigFile()
@@ -178,6 +182,24 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
         processEventInFlow(event, "outboundProperties");
 
         assertThat(getFirstReceivedHeader(HOST), is(not(host.getValue())));
+    }
+
+    @Test
+    public void acceptsTransferEncodingHeader() throws Exception
+    {
+        processEventInFlow(getTestEvent(TEST_MESSAGE), "transferEncodingHeader");
+
+        assertThat(getFirstReceivedHeader(TRANSFER_ENCODING), is(encoding.getValue()));
+    }
+
+    @Test
+    public void ignoresTransferEncodingOutboundProperty() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, encoding.getValue());
+        processEventInFlow(event, "outboundProperties");
+
+        assertThat(headers.asMap(), not(hasKey(TRANSFER_ENCODING)));
     }
 
     private void processEventInFlow(MuleEvent event, String flowName) throws Exception

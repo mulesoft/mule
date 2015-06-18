@@ -43,10 +43,14 @@ import com.google.common.collect.Maps;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +58,7 @@ import org.slf4j.LoggerFactory;
 public class MuleEventToHttpRequest
 {
     private static final Logger logger = LoggerFactory.getLogger(MuleEventToHttpRequest.class);
+    private static final List<String> ignoredProperties = Arrays.asList(CONNECTION, HOST, TRANSFER_ENCODING);
 
     private DefaultHttpRequester requester;
     private MuleContext muleContext;
@@ -104,9 +109,20 @@ public class MuleEventToHttpRequest
 
     private boolean isNotIgnoredProperty(String outboundProperty)
     {
-        return !outboundProperty.startsWith(HTTP_PREFIX) && !outboundProperty.equalsIgnoreCase(CONNECTION) && !outboundProperty.equalsIgnoreCase(HOST);
+        return !outboundProperty.startsWith(HTTP_PREFIX) && !equalsIgnoredProperty(outboundProperty);
     }
 
+    private boolean equalsIgnoredProperty(final String outboundProperty)
+    {
+        return CollectionUtils.exists(ignoredProperties, new Predicate()
+        {
+            @Override
+            public boolean evaluate(Object propertyName)
+            {
+                return outboundProperty.equalsIgnoreCase((String) propertyName);
+            }
+        });
+    }
 
     private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod) throws MessagingException
     {
