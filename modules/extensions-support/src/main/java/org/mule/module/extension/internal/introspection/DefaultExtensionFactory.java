@@ -17,7 +17,7 @@ import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
 import org.mule.extension.introspection.declaration.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.Construct;
+import org.mule.extension.introspection.declaration.Descriptor;
 import org.mule.extension.introspection.declaration.Declaration;
 import org.mule.extension.introspection.declaration.OperationDeclaration;
 import org.mule.extension.introspection.declaration.ParameterDeclaration;
@@ -48,16 +48,16 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
-    public Extension createFrom(Construct construct)
+    public Extension createFrom(Descriptor descriptor)
     {
-        return createFrom(construct, new ImmutableDescribingContext(construct.getRootConstruct()));
+        return createFrom(descriptor, new ImmutableDescribingContext(descriptor.getRootDeclaration()));
     }
 
     @Override
-    public Extension createFrom(Construct construct, DescribingContext describingContext)
+    public Extension createFrom(Descriptor descriptor, DescribingContext describingContext)
     {
         applyPostProcessors(describingContext);
-        return toExtension(construct.getRootConstruct().getDeclaration());
+        return toExtension(descriptor.getRootDeclaration().getDeclaration());
     }
 
     private Extension toExtension(Declaration declaration)

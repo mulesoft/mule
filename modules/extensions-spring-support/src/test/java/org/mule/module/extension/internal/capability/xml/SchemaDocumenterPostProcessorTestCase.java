@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_ELEMENT;
 import static org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.PROCESSING_ENVIRONMENT;
 import org.mule.extension.introspection.DescribingContext;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.module.extension.internal.ImmutableDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaDocumenterPostProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -39,7 +39,7 @@ public class SchemaDocumenterPostProcessorTestCase extends AbstractMuleTestCase
     private DescribingContext context;
 
     @Mock
-    private DeclarationConstruct declaration;
+    private DeclarationDescriptor declaration;
 
     private Map<String, Object> parameters;
 

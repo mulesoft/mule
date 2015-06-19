@@ -11,7 +11,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.extension.annotations.ImplementationOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.introspection.declaration.Construct;
+import org.mule.extension.introspection.declaration.Descriptor;
 import org.mule.extension.validation.api.Validator;
 
 import com.google.common.cache.CacheBuilder;
@@ -26,7 +26,7 @@ import com.google.common.cache.LoadingCache;
  * named reference to it.
  * <p/>
  * If the user provided a classname, then the {@link Class} that it represents
- * is expected to have a default public {@link Construct} which can be used to
+ * is expected to have a default public {@link Descriptor} which can be used to
  * instantiate it.
  * <p/>
  * If the {@link Validator} is provided via a reference, then a lookup

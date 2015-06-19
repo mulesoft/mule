@@ -58,7 +58,7 @@ import org.mule.extension.exception.NoSuchConfigurationException;
 import org.mule.extension.exception.NoSuchOperationException;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.tck.WebServiceConsumerTestDeclarationReference;
 import org.mule.extension.introspection.spi.DescriberPostProcessor;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -85,7 +85,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 
     @Mock
     private ServiceRegistry serviceRegistry;
-    private DeclarationConstruct construct;
+    private DeclarationDescriptor descriptor;
     private Extension extension;
 
     private ExtensionFactory factory;
@@ -98,8 +98,8 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         when(serviceRegistry.lookupProviders(same(DescriberPostProcessor.class), any(ClassLoader.class))).thenReturn(emptyList);
 
         factory = new DefaultExtensionFactory(serviceRegistry);
-        construct = createDeclarationConstruct();
-        extension = factory.createFrom(construct);
+        descriptor = createDeclarationDescriptor();
+        extension = factory.createFrom(descriptor);
     }
 
     @Test
@@ -163,7 +163,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void nullCapability()
     {
-        factory.createFrom(createDeclarationConstruct().withCapability(null));
+        factory.createFrom(createDeclarationDescriptor().withCapability(null));
     }
 
     @Test
@@ -179,7 +179,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void badExtensionVersion()
     {
-        factory.createFrom(new DeclarationConstruct("bad", "i'm new"));
+        factory.createFrom(new DeclarationDescriptor("bad", "i'm new"));
     }
 
     @Test
@@ -189,7 +189,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         final String beta = "beta";
         final String alpha = "alpha";
 
-        Extension extension = factory.createFrom(new DeclarationConstruct("test", "1.0")
+        Extension extension = factory.createFrom(new DeclarationDescriptor("test", "1.0")
                                                          .withConfig(defaultConfiguration).describedAs(defaultConfiguration)
                                                          .withConfig(beta).describedAs(beta)
                                                          .withConfig(alpha).describedAs(alpha));
@@ -212,13 +212,13 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void nameClashes()
     {
-        factory.createFrom(construct.withConfig(CONFIG_NAME).describedAs(""));
+        factory.createFrom(descriptor.withConfig(CONFIG_NAME).describedAs(""));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void operationWithParameterNamedName()
     {
-        factory.createFrom(construct.withOperation("invalidOperation").describedAs("")
+        factory.createFrom(descriptor.withOperation("invalidOperation").describedAs("")
                                    .with().requiredParameter("name").ofType(String.class));
     }
 
@@ -227,15 +227,15 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     public void nameWithSpaces()
     {
 
-        construct = new DeclarationConstruct("i have spaces", "1.0").withConfig("default").getRootConstruct();
-        factory.createFrom(construct);
+        descriptor = new DeclarationDescriptor("i have spaces", "1.0").withConfig("default").getRootDeclaration();
+        factory.createFrom(descriptor);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void configlessConstruct()
+    public void configlessDescriptor()
     {
 
-        factory.createFrom(new DeclarationConstruct("noConfigs", "1.0"));
+        factory.createFrom(new DeclarationDescriptor("noConfigs", "1.0"));
     }
 
     @Test
@@ -248,7 +248,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
                 .thenReturn(Arrays.asList(postProcessor1, postProcessor2));
 
         factory = new DefaultExtensionFactory(serviceRegistry);
-        factory.createFrom(construct);
+        factory.createFrom(descriptor);
 
         assertDescribingContext(postProcessor1);
         assertDescribingContext(postProcessor2);
@@ -261,7 +261,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 
         DescribingContext ctx = captor.getValue();
         assertThat(ctx, is(notNullValue()));
-        assertThat(ctx.getDeclarationConstruct(), is(sameInstance(construct)));
+        assertThat(ctx.getDeclarationDescriptor(), is(sameInstance(descriptor)));
     }
 
     private void assertConsumeOperation(List<Operation> operations) throws NoSuchOperationException
@@ -332,8 +332,8 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         }
     }
 
-    private DeclarationConstruct createDeclarationConstruct()
+    private DeclarationDescriptor createDeclarationDescriptor()
     {
-        return new WebServiceConsumerTestDeclarationReference().getConstruct();
+        return new WebServiceConsumerTestDeclarationReference().getDescriptor();
     }
 }

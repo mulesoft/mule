@@ -17,9 +17,8 @@ import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.Describer;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.introspection.declaration.Construct;
+import org.mule.extension.introspection.declaration.Descriptor;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
-import org.mule.module.extension.internal.manager.DefaultExtensionDiscoverer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -47,7 +46,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     private ServiceRegistry serviceRegistry;
 
     @Mock
-    private Construct construct;
+    private Descriptor descriptor;
 
     @Mock
     private Describer describer;
@@ -67,8 +66,8 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     public void scan() throws Exception
     {
         when(serviceRegistry.lookupProviders(Describer.class, getClass().getClassLoader())).thenReturn(Arrays.asList(describer));
-        when(describer.describe()).thenReturn(construct);
-        when(extensionFactory.createFrom(construct)).thenReturn(extension);
+        when(describer.describe()).thenReturn(descriptor);
+        when(extensionFactory.createFrom(descriptor)).thenReturn(extension);
 
         List<Extension> extensions = discoverer.discover(getClass().getClassLoader());
         assertThat(extensions, hasSize(1));
@@ -77,7 +76,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
 
         verify(serviceRegistry).lookupProviders(Describer.class, getClass().getClassLoader());
         verify(describer).describe();
-        verify(extensionFactory).createFrom(construct);
+        verify(extensionFactory).createFrom(descriptor);
     }
 
     @Test(expected = IllegalArgumentException.class)

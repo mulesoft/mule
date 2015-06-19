@@ -10,8 +10,8 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import org.mule.api.registry.SPIServiceRegistry;
-import org.mule.extension.introspection.declaration.Construct;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.Descriptor;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.HasCapabilities;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -30,10 +30,10 @@ public abstract class AbstractCapabilitiesExtractorContractTestCase extends Abst
     protected CapabilitiesResolver resolver;
 
     @Mock
-    protected HasCapabilities<Construct> capabilitiesCallback;
+    protected HasCapabilities<Descriptor> capabilitiesCallback;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    protected DeclarationConstruct declarationConstruct;
+    protected DeclarationDescriptor declarationDescriptor;
 
     @Before
     public void before()
@@ -44,20 +44,20 @@ public abstract class AbstractCapabilitiesExtractorContractTestCase extends Abst
     @Test
     public void noCapability()
     {
-        resolver.resolveCapabilities(declarationConstruct, getClass(), capabilitiesCallback);
+        resolver.resolveCapabilities(declarationDescriptor, getClass(), capabilitiesCallback);
         verify(capabilitiesCallback, never()).withCapability(anyObject());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullClass()
     {
-        resolver.resolveCapabilities(declarationConstruct, null, capabilitiesCallback);
+        resolver.resolveCapabilities(declarationDescriptor, null, capabilitiesCallback);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullCallback()
     {
-        resolver.resolveCapabilities(declarationConstruct, getClass(), null);
+        resolver.resolveCapabilities(declarationDescriptor, getClass(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)

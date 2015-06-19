@@ -30,7 +30,7 @@ import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Describer;
 import org.mule.extension.introspection.declaration.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.Construct;
+import org.mule.extension.introspection.declaration.Descriptor;
 import org.mule.extension.introspection.declaration.Declaration;
 import org.mule.extension.introspection.declaration.OperationDeclaration;
 import org.mule.extension.introspection.declaration.ParameterDeclaration;
@@ -97,9 +97,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     @Test
     public void describeTestModule() throws Exception
     {
-        Construct construct = describer.describe();
+        Descriptor descriptor = describer.describe();
 
-        Declaration declaration = construct.getRootConstruct().getDeclaration();
+        Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
         assertExtensionProperties(declaration);
 
         assertTestModuleConfiguration(declaration);
@@ -119,7 +119,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     public void heisengergPointerPlusExternalConfig() throws Exception
     {
         describer = describerFor(HeisengergPointerPlusExternalConfig.class);
-        Declaration declaration = describer.describe().getRootConstruct().getDeclaration();
+        Declaration declaration = describer.describe().getRootDeclaration().getDeclaration();
 
         assertExtensionProperties(declaration);
         assertThat(declaration.getConfigurations().size(), equalTo(2));
@@ -140,7 +140,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     @Test
     public void operationIsImplementionOf() throws Exception
     {
-        Declaration declaration = describer.describe().getRootConstruct().getDeclaration();
+        Declaration declaration = describer.describe().getRootDeclaration().getDeclaration();
         OperationDeclaration operation = getOperation(declaration, LAUNDER_MONEY);
         assertThat(operation.getCapabilities(), is(not(emptyIterable())));
 

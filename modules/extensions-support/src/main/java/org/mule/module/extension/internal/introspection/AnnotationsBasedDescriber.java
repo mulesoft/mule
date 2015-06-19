@@ -26,11 +26,11 @@ import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Describer;
-import org.mule.extension.introspection.declaration.ConfigurationConstruct;
-import org.mule.extension.introspection.declaration.Construct;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
-import org.mule.extension.introspection.declaration.OperationConstruct;
-import org.mule.extension.introspection.declaration.ParameterConstruct;
+import org.mule.extension.introspection.declaration.ConfigurationDescriptor;
+import org.mule.extension.introspection.declaration.Descriptor;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.OperationDescriptor;
+import org.mule.extension.introspection.declaration.ParameterDescriptor;
 import org.mule.extension.introspection.declaration.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.WithParameters;
 import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Implementation of {@link Describer} which generates a {@link Construct} by
+ * Implementation of {@link Describer} which generates a {@link Descriptor} by
  * scanning annotations on a type provided in the constructor
  *
  * @since 3.7.0
@@ -73,12 +73,12 @@ public final class AnnotationsBasedDescriber implements Describer
      * {@inheritDoc}
      */
     @Override
-    public final Construct describe()
+    public final Descriptor describe()
     {
         checkArgument(extensionType != null, String.format("describer %s does not specify an extension type", getClass().getName()));
 
         Extension extension = getExtension(extensionType);
-        DeclarationConstruct declaration = newDeclarationConstruct(extension);
+        DeclarationDescriptor declaration = newDeclarationDescriptor(extension);
         declareConfigurations(declaration, extensionType);
         declareOperations(declaration, extensionType);
         describeCapabilities(declaration, extensionType);
@@ -86,12 +86,12 @@ public final class AnnotationsBasedDescriber implements Describer
         return declaration;
     }
 
-    private DeclarationConstruct newDeclarationConstruct(Extension extension)
+    private DeclarationDescriptor newDeclarationDescriptor(Extension extension)
     {
-        return new DeclarationConstruct(extension.name(), extension.version()).describedAs(extension.description());
+        return new DeclarationDescriptor(extension.name(), extension.version()).describedAs(extension.description());
     }
 
-    private void declareConfigurations(DeclarationConstruct declaration, Class<?> extensionType)
+    private void declareConfigurations(DeclarationDescriptor declaration, Class<?> extensionType)
     {
         Configurations configurations = extensionType.getAnnotation(Configurations.class);
         if (configurations != null)
@@ -107,11 +107,11 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void declareConfiguration(DeclarationConstruct declaration, Class<?> extensionType)
+    private void declareConfiguration(DeclarationDescriptor declaration, Class<?> extensionType)
     {
         checkArgument(CollectionUtils.isEmpty(getOperationMethods(extensionType)), String.format("Class %s can't declare a configuration and operations at the same time", extensionType.getName()));
 
-        ConfigurationConstruct configuration;
+        ConfigurationDescriptor configuration;
 
         Configuration configurationAnnotation = extensionType.getAnnotation(Configuration.class);
         if (configurationAnnotation != null)
@@ -128,7 +128,7 @@ public final class AnnotationsBasedDescriber implements Describer
         declareConfigurationParameters(extensionType, configuration);
     }
 
-    private void declareConfigurationParameters(Class<?> extensionType, ConfigurationConstruct configuration)
+    private void declareConfigurationParameters(Class<?> extensionType, ConfigurationDescriptor configuration)
     {
         declareSingleParameters(extensionType, configuration.with());
         List<ParameterGroup> groups = declareConfigurationParametersGroups(extensionType, configuration);
@@ -138,21 +138,21 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private List<ParameterGroup> declareConfigurationParametersGroups(Class<?> extensionType, ConfigurationConstruct configuration)
+    private List<ParameterGroup> declareConfigurationParametersGroups(Class<?> extensionType, ConfigurationDescriptor configuration)
     {
         List<ParameterGroup> groups = new LinkedList<>();
         for (Field field : getParameterGroupFields(extensionType))
         {
-            Set<ParameterConstruct> parameters = declareSingleParameters(field.getType(), configuration.with());
+            Set<ParameterDescriptor> parameters = declareSingleParameters(field.getType(), configuration.with());
 
             if (!parameters.isEmpty())
             {
                 ParameterGroup group = new ParameterGroup(field.getType(), field);
                 groups.add(group);
 
-                for (ParameterConstruct construct : parameters)
+                for (ParameterDescriptor descriptor : parameters)
                 {
-                    ParameterDeclaration parameter = construct.getDeclaration();
+                    ParameterDeclaration parameter = descriptor.getDeclaration();
                     group.addParameter(parameter.getName(), getField(field.getType(),
                                                                      getMemberName(parameter, parameter.getName()),
                                                                      parameter.getType().getRawType()));
@@ -169,9 +169,9 @@ public final class AnnotationsBasedDescriber implements Describer
         return groups;
     }
 
-    private Set<ParameterConstruct> declareSingleParameters(Class<?> extensionType, WithParameters with)
+    private Set<ParameterDescriptor> declareSingleParameters(Class<?> extensionType, WithParameters with)
     {
-        ImmutableSet.Builder<ParameterConstruct> parameters = ImmutableSet.builder();
+        ImmutableSet.Builder<ParameterDescriptor> parameters = ImmutableSet.builder();
 
         for (Field field : getParameterFields(extensionType))
         {
@@ -179,34 +179,34 @@ public final class AnnotationsBasedDescriber implements Describer
             Optional optional = field.getAnnotation(Optional.class);
 
             String parameterName = getParameterName(field, parameter);
-            ParameterConstruct parameterConstruct;
+            ParameterDescriptor parameterDescriptor;
             DataType dataType = IntrospectionUtils.getFieldDataType(field);
             if (optional == null)
             {
-                parameterConstruct = with.requiredParameter(parameterName);
+                parameterDescriptor = with.requiredParameter(parameterName);
             }
             else
             {
-                parameterConstruct = with.optionalParameter(parameterName).defaultingTo(getDefaultValue(optional));
+                parameterDescriptor = with.optionalParameter(parameterName).defaultingTo(getDefaultValue(optional));
             }
 
-            parameterConstruct.ofType(dataType);
+            parameterDescriptor.ofType(dataType);
 
             if (!parameter.isDynamic())
             {
-                parameterConstruct.whichIsNotDynamic();
+                parameterDescriptor.whichIsNotDynamic();
             }
 
-            parameterConstruct.withCapability(new MemberNameCapability(field.getName()));
+            parameterDescriptor.withCapability(new MemberNameCapability(field.getName()));
 
-            parameters.add(parameterConstruct);
+            parameters.add(parameterDescriptor);
         }
 
         return parameters.build();
     }
 
 
-    private void declareOperations(DeclarationConstruct declaration, Class<?> extensionType)
+    private void declareOperations(DeclarationDescriptor declaration, Class<?> extensionType)
     {
         Operations operations = extensionType.getAnnotation(Operations.class);
         if (operations != null)
@@ -222,11 +222,11 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private <T> void declareOperation(DeclarationConstruct declaration, Class<T> actingClass)
+    private <T> void declareOperation(DeclarationDescriptor declaration, Class<T> actingClass)
     {
         for (Method method : getOperationMethods(actingClass))
         {
-            OperationConstruct operation = declaration.withOperation(method.getName())
+            OperationDescriptor operation = declaration.withOperation(method.getName())
                     .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method, delegateFactory));
 
             declareOperationParameters(method, operation);
@@ -235,7 +235,7 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void calculateImplementedTypes(Class<?> actingClass, Method method, OperationConstruct operation)
+    private void calculateImplementedTypes(Class<?> actingClass, Method method, OperationDescriptor operation)
     {
         ImplementationOf implementation = method.getAnnotation(ImplementationOf.class);
         if (implementation == null)
@@ -249,13 +249,13 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void declareOperationParameters(Method method, OperationConstruct operation)
+    private void declareOperationParameters(Method method, OperationDescriptor operation)
     {
-        List<ParameterDescriptor> descriptors = MuleExtensionAnnotationParser.parseParameters(method);
+        List<org.mule.module.extension.internal.introspection.ParameterDescriptor> descriptors = MuleExtensionAnnotationParser.parseParameters(method);
 
-        for (ParameterDescriptor parameterDescriptor : descriptors)
+        for (org.mule.module.extension.internal.introspection.ParameterDescriptor parameterDescriptor : descriptors)
         {
-            ParameterConstruct parameter = parameterDescriptor.isRequired()
+            ParameterDescriptor parameter = parameterDescriptor.isRequired()
                                            ? operation.with().requiredParameter(parameterDescriptor.getName())
                                            : operation.with().optionalParameter(parameterDescriptor.getName()).defaultingTo(parameterDescriptor.getDefaultValue());
 
@@ -267,7 +267,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     }
 
-    private void hideIfNecessary(ParameterDescriptor parameterDescriptor, ParameterConstruct parameter)
+    private void hideIfNecessary(org.mule.module.extension.internal.introspection.ParameterDescriptor parameterDescriptor, ParameterDescriptor parameter)
     {
         if (parameterDescriptor.isHidden())
         {
@@ -275,7 +275,7 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void addTypeRestrictions(ParameterConstruct parameter, ParameterDescriptor descriptor)
+    private void addTypeRestrictions(ParameterDescriptor parameter, org.mule.module.extension.internal.introspection.ParameterDescriptor descriptor)
     {
         Class<?> restriction = descriptor.getTypeRestriction();
         if (restriction != null)
@@ -284,7 +284,7 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void describeCapabilities(DeclarationConstruct declaration, Class<?> extensionType)
+    private void describeCapabilities(DeclarationDescriptor declaration, Class<?> extensionType)
     {
         capabilitiesResolver.resolveCapabilities(declaration, extensionType, declaration);
     }

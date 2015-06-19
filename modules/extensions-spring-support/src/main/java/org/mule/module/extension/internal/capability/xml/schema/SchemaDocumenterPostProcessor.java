@@ -12,7 +12,6 @@ import static org.mule.module.extension.internal.resources.ExtensionResourcesGen
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.DescribingContext;
 import org.mule.extension.introspection.spi.DescriberPostProcessor;
-import org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -56,7 +55,7 @@ public final class SchemaDocumenterPostProcessor implements DescriberPostProcess
             return;
         }
 
-        new SchemaDocumenter(processingEnv).document(context.getDeclarationConstruct().getDeclaration(), extensionElement, roundEnvironment);
+        new SchemaDocumenter(processingEnv).document(context.getDeclarationDescriptor().getDeclaration(), extensionElement, roundEnvironment);
     }
 
     private <T> T getCheckedParameter(DescribingContext context, String key, Class<T> expectedType)

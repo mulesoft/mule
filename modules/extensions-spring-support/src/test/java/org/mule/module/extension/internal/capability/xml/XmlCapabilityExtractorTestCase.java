@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.module.extension.internal.introspection.AbstractCapabilitiesExtractorContractTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -47,7 +47,7 @@ public class XmlCapabilityExtractorTestCase extends AbstractCapabilitiesExtracto
     @Test
     public void capabilityAdded()
     {
-        resolver.resolveCapabilities(declarationConstruct, XmlSupport.class, capabilitiesCallback);
+        resolver.resolveCapabilities(declarationDescriptor, XmlSupport.class, capabilitiesCallback);
         verify(capabilitiesCallback).withCapability(captor.capture());
 
         XmlCapability capability = captor.getValue();
@@ -60,8 +60,8 @@ public class XmlCapabilityExtractorTestCase extends AbstractCapabilitiesExtracto
     @Test
     public void defaultCapabilityValues()
     {
-        declarationConstruct = new DeclarationConstruct(EXTENSION_NAME, EXTENSION_VERSION);
-        resolver.resolveCapabilities(declarationConstruct, DefaultXmlExtension.class, capabilitiesCallback);
+        declarationDescriptor = new DeclarationDescriptor(EXTENSION_NAME, EXTENSION_VERSION);
+        resolver.resolveCapabilities(declarationDescriptor, DefaultXmlExtension.class, capabilitiesCallback);
         verify(capabilitiesCallback).withCapability(captor.capture());
 
         XmlCapability capability = captor.getValue();
