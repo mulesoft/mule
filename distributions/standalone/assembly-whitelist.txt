@@ -122,8 +122,8 @@
 /mule-standalone-${productVersion}/lib/mule/mule-common-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-alpha.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-alpha.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-atom-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-bpm-${productVersion}.jar
