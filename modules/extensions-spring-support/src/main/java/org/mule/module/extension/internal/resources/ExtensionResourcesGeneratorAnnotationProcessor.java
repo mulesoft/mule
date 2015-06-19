@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.resources;
 
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import static org.mule.util.Preconditions.checkState;
-import org.mule.api.registry.SPIServiceRegistry;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.Extension;
@@ -58,13 +58,13 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
     public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
     public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
 
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SPIServiceRegistry());
+    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry());
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)
     {
         log("Starting Resources generator for Extensions");
-        ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(processingEnv, new SPIServiceRegistry());
+        ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(processingEnv, new SpiServiceRegistry());
         try
         {
             for (TypeElement extensionElement : findExtensions(roundEnv))

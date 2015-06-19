@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.mule.modules</groupId>
-		<artifactId>mule-modules</artifactId>
-		<version>3.7.1-SNAPSHOT</version>
-	</parent>
-	<groupId>org.mule.modules</groupId>
-	<artifactId>mule-module-extensions-spring-support</artifactId>
-	<name>Mule Extensions Spring Support</name>
-	<packaging>jar</packaging>
-	<description>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>3.7.1-SNAPSHOT</version>
+    </parent>
+    <groupId>org.mule.modules</groupId>
+    <artifactId>mule-module-extensions-spring-support</artifactId>
+    <name>Mule Extensions Spring Support</name>
+    <packaging>jar</packaging>
+    <description>
         Support for extensions to be configured through a mule config file
         backed by the spring framework
     </description>
 
     <dependencies>
-		<!-- Mule Dependencies -->
+        <!-- Mule Dependencies -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
@@ -35,11 +35,11 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.mule</groupId>
-			<artifactId>mule-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -49,12 +49,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-			<groupId>org.mule</groupId>
-			<artifactId>mule-core</artifactId>
-			<version>${project.version}</version>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -76,5 +76,5 @@
             <artifactId>Saxon-HE</artifactId>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>
