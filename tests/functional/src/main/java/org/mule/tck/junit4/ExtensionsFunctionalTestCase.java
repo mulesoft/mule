@@ -10,14 +10,14 @@ import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.SPIServiceRegistry;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.resources.GenerableResource;
+import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.extension.resources.spi.GenerableResourceContributor;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
@@ -73,7 +73,7 @@ import org.apache.commons.io.FileUtils;
 public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
 {
 
-    private final ServiceRegistry serviceRegistry = new SPIServiceRegistry();
+    private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
     private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry);
     private ExtensionManager extensionManager;
     private File generatedResourcesDirectory;
@@ -195,7 +195,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         Method method = org.springframework.util.ReflectionUtils.findMethod(cl.getClass(), "addURL", URL.class);
         method.setAccessible(true);
 
-        for (GenerableResource resource : generator.dumpAll())
+        for (GeneratedResource resource : generator.dumpAll())
         {
             URL generatedResourceURL = new File(generatedResourcesDirectory, resource.getFilePath()).toURI().toURL();
             method.invoke(cl, generatedResourceURL);
@@ -267,7 +267,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         }
 
         @Override
-        protected void write(GenerableResource resource)
+        protected void write(GeneratedResource resource)
         {
             File targetFile = new File(targetDirectory, resource.getFilePath());
             try

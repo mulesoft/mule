@@ -12,7 +12,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.extension.resources.GenerableResource;
+import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.tck.size.SmallTest;
 
@@ -47,7 +47,7 @@ public class AnnotationProcessorResourceGeneratorTestCase extends ResourcesGener
         final String filepath = "path";
         final String content = "hello world!";
 
-        GenerableResource resource = generator.getOrCreateResource(filepath);
+        GeneratedResource resource = generator.getOrCreateResource(filepath);
         resource.getContentBuilder().append(content);
 
         FileObject file = mock(FileObject.class);

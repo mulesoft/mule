@@ -12,6 +12,7 @@ import static org.mule.module.extension.internal.resources.ExtensionResourcesGen
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.spi.DescriberPostProcessor;
+import org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -30,7 +31,8 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * For this to be possible, the context should have as custom parameters a {@link ProcessingEnvironment}
  * and the corresponding {@link TypeElement}, which will be fetched in the
- * provided context under the keys {@link #PROCESSING_ENVIRONMENT} and {@link #EXTENSION_ELEMENT}
+ * provided context under the keys {@link ExtensionResourcesGeneratorAnnotationProcessor#PROCESSING_ENVIRONMENT} and
+ * {@link ExtensionResourcesGeneratorAnnotationProcessor#EXTENSION_ELEMENT}.
  * <p/>
  * If any of the above requirements is not met, then the post processor will skip the extension
  *

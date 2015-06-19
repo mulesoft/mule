@@ -25,8 +25,7 @@ public class DefaultOperationContext implements OperationContextAdapter
 {
 
     private final Operation operation;
-    private final Map<Parameter, Object> parameters;
-    private final Map<String, Object> parametersByName;
+    private final Map<String, Object> parameters;
     private final MuleEvent event;
 
     public DefaultOperationContext(Operation operation, ResolverSetResult parameters, MuleEvent event)
@@ -34,11 +33,11 @@ public class DefaultOperationContext implements OperationContextAdapter
         this.operation = operation;
         this.event = event;
 
-        this.parameters = parameters.asMap();
-        parametersByName = new HashMap<>(this.parameters.size());
-        for (Map.Entry<Parameter, Object> parameter : this.parameters.entrySet())
+        Map<Parameter, Object> parameterMap = parameters.asMap();
+        this.parameters = new HashMap<>(parameterMap.size());
+        for (Map.Entry<Parameter, Object> parameter : parameterMap.entrySet())
         {
-            parametersByName.put(parameter.getKey().getName(), parameter.getValue());
+            this.parameters.put(parameter.getKey().getName(), parameter.getValue());
         }
     }
 
@@ -49,21 +48,9 @@ public class DefaultOperationContext implements OperationContextAdapter
     }
 
     @Override
-    public Map<Parameter, Object> getParameters()
-    {
-        return parameters;
-    }
-
-    @Override
-    public Object getParameterValue(Parameter parameter)
-    {
-        return parameters.get(parameter);
-    }
-
-    @Override
     public Object getParameterValue(String parameterName)
     {
-        return parametersByName.get(parameterName);
+        return parameters.get(parameterName);
     }
 
     @Override

@@ -12,7 +12,6 @@
 
     <groupId>org.mule.extensions</groupId>
     <artifactId>mule-extensions</artifactId>
-    <version>3.7.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Mule Extensions</name>
