@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.introspection;
 
 import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.declaration.Construct;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.Descriptor;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.HasCapabilities;
 
 /**
@@ -24,10 +24,10 @@ public interface CapabilitiesResolver
      * Resolves the capabilities present in {@code extensionType} and registers them in
      * {@code builder}
      *
-     * @param declaration     a {@link DeclarationConstruct} describing the {@link Extension} to be built
+     * @param declaration     a {@link DeclarationDescriptor} describing the {@link Extension} to be built
      * @param capableType     the type of the {@link Capable} class
      * @param capableCallback a {@link HasCapabilities} on which the {@link Capable} is to be registered.
      * @throws java.lang.IllegalArgumentException if any argument is {@code null}
      */
-    void resolveCapabilities(DeclarationConstruct declaration, Class<?> capableType, HasCapabilities<? extends Construct> capableCallback);
+    void resolveCapabilities(DeclarationDescriptor declaration, Class<?> capableType, HasCapabilities<? extends Descriptor> capableCallback);
 }

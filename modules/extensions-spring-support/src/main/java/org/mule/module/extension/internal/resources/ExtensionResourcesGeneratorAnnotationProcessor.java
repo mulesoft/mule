@@ -90,20 +90,20 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
         Describer describer = new AnnotationsBasedDescriber(extensionClass);
 
-        DescribingContext context = new ImmutableDescribingContext(describer.describe().getRootConstruct());
+        DescribingContext context = new ImmutableDescribingContext(describer.describe().getRootDeclaration());
         context.getCustomParameters().put(EXTENSION_ELEMENT, extensionElement);
         context.getCustomParameters().put(PROCESSING_ENVIRONMENT, processingEnv);
         context.getCustomParameters().put(ROUND_ENVIRONMENT, roundEnvironment);
 
         extractXmlCapability(extensionClass, context);
 
-        return extensionFactory.createFrom(context.getDeclarationConstruct(), context);
+        return extensionFactory.createFrom(context.getDeclarationDescriptor(), context);
     }
 
     private XmlCapability extractXmlCapability(Class<?> extensionClass, DescribingContext context)
     {
         XmlCapabilityExtractor extractor = new XmlCapabilityExtractor();
-        XmlCapability capability = (XmlCapability) extractor.extractCapability(context.getDeclarationConstruct(), extensionClass, context.getDeclarationConstruct());
+        XmlCapability capability = (XmlCapability) extractor.extractCapability(context.getDeclarationDescriptor(), extensionClass, context.getDeclarationDescriptor());
         checkState(capability != null, "Could not find xml capability for extension " + extensionClass.getName());
 
         return capability;

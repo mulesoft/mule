@@ -9,9 +9,9 @@ package org.mule.module.extension.internal.capability.xml;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.introspection.declaration.Construct;
+import org.mule.extension.introspection.declaration.Descriptor;
 import org.mule.extension.introspection.declaration.Declaration;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.HasCapabilities;
 import org.mule.module.extension.CapabilityExtractor;
 
@@ -28,12 +28,12 @@ public class XmlCapabilityExtractor implements CapabilityExtractor
     public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/extension/%s";
 
     @Override
-    public Object extractCapability(DeclarationConstruct declaration, Class<?> capableType, HasCapabilities<? extends Construct> capableCallback)
+    public Object extractCapability(DeclarationDescriptor declarationDescriptor, Class<?> capableType, HasCapabilities<? extends Descriptor> capableCallback)
     {
         Xml xml = capableType.getAnnotation(Xml.class);
         if (xml != null)
         {
-            XmlCapability capability = processCapability(xml, declaration);
+            XmlCapability capability = processCapability(xml, declarationDescriptor);
             capableCallback.withCapability(capability);
 
             return capability;
@@ -42,10 +42,10 @@ public class XmlCapabilityExtractor implements CapabilityExtractor
         return null;
     }
 
-    private XmlCapability processCapability(Xml xml, DeclarationConstruct construct)
+    private XmlCapability processCapability(Xml xml, DeclarationDescriptor descriptor)
     {
 
-        Declaration declaration = construct.getDeclaration();
+        Declaration declaration = descriptor.getDeclaration();
         String schemaVersion = isBlank(xml.schemaVersion()) ? declaration.getVersion() : xml.schemaVersion();
         String schemaLocation = isBlank(xml.schemaLocation()) ? buildDefaultLocation(declaration) : xml.schemaLocation();
 

@@ -7,8 +7,8 @@
 package org.mule.module.extension;
 
 import org.mule.extension.introspection.Capable;
-import org.mule.extension.introspection.declaration.Construct;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.Descriptor;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.HasCapabilities;
 
 import java.util.ServiceLoader;
@@ -36,10 +36,10 @@ public interface CapabilityExtractor
      * and declares it into the given {@code capableCallback}. After doing such,
      * the found capability is returned (or {@code null} if not found)
      *
-     * @param declarationConstruct the construct that is being built
+     * @param declarationDescriptor the descriptor that is being built
      * @param capableType the type of the {@link Capable} class
      * @param capableCallback  a {@link HasCapabilities} on which the {@link Capable} is to be registered.
      * @return the extracted capability or {@code null} if none found
      */
-    public Object extractCapability(DeclarationConstruct declarationConstruct, Class<?> capableType, HasCapabilities<? extends Construct> capableCallback);
+    Object extractCapability(DeclarationDescriptor declarationDescriptor, Class<?> capableType, HasCapabilities<? extends Descriptor> capableCallback);
 }

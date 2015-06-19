@@ -13,7 +13,7 @@ import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.introspection.declaration.Construct;
+import org.mule.extension.introspection.declaration.Descriptor;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
@@ -46,8 +46,8 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
     {
         String expectedSchema = IOUtils.getResourceAsString("heisenberg.xsd", getClass());
 
-        Construct construct = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe().getRootConstruct();
-        Extension extension = extensionFactory.createFrom(construct);
+        Descriptor descriptor = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe().getRootDeclaration();
+        Extension extension = extensionFactory.createFrom(descriptor);
 
         XmlCapability capability = extension.getCapabilities(XmlCapability.class).iterator().next();
 

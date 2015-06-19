@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal;
 
 import org.mule.extension.introspection.DescribingContext;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,21 +22,21 @@ import java.util.Map;
 public final class ImmutableDescribingContext implements DescribingContext
 {
 
-    private final DeclarationConstruct declarationConstruct;
+    private final DeclarationDescriptor declarationDescriptor;
     private final Map<String, Object> customParameters = new HashMap<>();
 
-    public ImmutableDescribingContext(DeclarationConstruct declarationConstruct)
+    public ImmutableDescribingContext(DeclarationDescriptor declarationDescriptor)
     {
-        this.declarationConstruct = declarationConstruct;
+        this.declarationDescriptor = declarationDescriptor;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DeclarationConstruct getDeclarationConstruct()
+    public DeclarationDescriptor getDeclarationDescriptor()
     {
-        return declarationConstruct;
+        return declarationDescriptor;
     }
 
     /**

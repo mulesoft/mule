@@ -7,7 +7,7 @@
 package org.mule.module.extension;
 
 import org.mule.extension.introspection.Describer;
-import org.mule.extension.introspection.declaration.Construct;
+import org.mule.extension.introspection.declaration.Descriptor;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 
 /**
@@ -32,7 +32,7 @@ public abstract class DescriberSupport implements Describer
     }
 
     @Override
-    public final Construct describe()
+    public final Descriptor describe()
     {
         return delegate.describe();
     }

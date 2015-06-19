@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.introspection.DescribingContext;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -26,21 +26,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ImmutableDescribingContextTestCase extends AbstractMuleTestCase
 {
 
-    private DeclarationConstruct construct;
+    private DeclarationDescriptor descriptor;
 
     private DescribingContext context;
 
     @Before
     public void before()
     {
-        construct = new DeclarationConstruct("name", "version");
-        context = new ImmutableDescribingContext(construct);
+        descriptor = new DeclarationDescriptor("name", "version");
+        context = new ImmutableDescribingContext(descriptor);
     }
 
     @Test
     public void getExtensionType()
     {
-        assertThat(construct, is(sameInstance(context.getDeclarationConstruct())));
+        assertThat(descriptor, is(sameInstance(context.getDeclarationDescriptor())));
     }
 
     @Test

@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.declaration.Construct;
-import org.mule.extension.introspection.declaration.DeclarationConstruct;
+import org.mule.extension.introspection.declaration.Descriptor;
+import org.mule.extension.introspection.declaration.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.HasCapabilities;
 import org.mule.module.extension.CapabilityExtractor;
 
@@ -36,9 +36,9 @@ final class DefaultCapabilitiesResolver implements CapabilitiesResolver
      * {@inheritDoc}
      */
     @Override
-    public void resolveCapabilities(DeclarationConstruct declaration, Class<?> capableType, HasCapabilities<? extends Construct> capableCallback)
+    public void resolveCapabilities(DeclarationDescriptor declaration, Class<?> capableType, HasCapabilities<? extends Descriptor> capableCallback)
     {
-        checkArgument(declaration != null, "declaration construct cannot be null");
+        checkArgument(declaration != null, "declaration descriptor cannot be null");
         checkArgument(capableType != null, "capable type cannot be null");
         checkArgument(capableCallback != null, "capable callback cannot be null");
 
