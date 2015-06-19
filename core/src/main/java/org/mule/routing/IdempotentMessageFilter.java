@@ -27,6 +27,9 @@ import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.text.MessageFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * <code>IdempotentMessageFilter</code> ensures that only unique messages are passed
  * on. It does this by checking the unique ID of the incoming message. Note that the
@@ -39,6 +42,8 @@ import java.text.MessageFormat;
  */
 public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Initialisable, Disposable
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdempotentMessageFilter.class);
+
     protected volatile ObjectStore<String> store;
     protected FlowConstruct flowConstruct;
     protected String storePrefix;
@@ -73,7 +78,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     @Override
     public void dispose()
     {
-        LifecycleUtils.disposeIfNeeded(store);
+        LifecycleUtils.disposeIfNeeded(store, LOGGER);
     }
 
     protected ObjectStore<String> createMessageIdStore() throws InitialisationException

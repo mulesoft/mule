@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.resources;
 
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.resources.GenerableResource;
+import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.extension.resources.spi.GenerableResourceContributor;
 
@@ -23,7 +23,7 @@ import java.util.Map;
  * Base implementation of {@link ResourcesGenerator}
  * that takes care of the basic contract except for actually writing the resources to
  * a persistent store. Implementations are only required to provide that piece of logic
- * by using the {@link #write(GenerableResource)}
+ * by using the {@link #write(GeneratedResource)}
  * template method
  *
  * @since 3.7.0
@@ -31,7 +31,7 @@ import java.util.Map;
 public abstract class AbstractResourcesGenerator implements ResourcesGenerator
 {
 
-    private Map<String, GenerableResource> resources = new HashMap<>();
+    private Map<String, GeneratedResource> resources = new HashMap<>();
     private ServiceRegistry serviceRegistry;
 
     public AbstractResourcesGenerator(ServiceRegistry serviceRegistry)
@@ -43,13 +43,13 @@ public abstract class AbstractResourcesGenerator implements ResourcesGenerator
      * {@inheritDoc}
      */
     @Override
-    public GenerableResource getOrCreateResource(String filepath)
+    public GeneratedResource getOrCreateResource(String filepath)
     {
-        GenerableResource resource = resources.get(filepath);
+        GeneratedResource resource = resources.get(filepath);
 
         if (resource == null)
         {
-            resource = new ImmutableGenerableResource(filepath);
+            resource = new ImmutableGeneratedResource(filepath);
             resources.put(filepath, resource);
         }
 
@@ -72,10 +72,10 @@ public abstract class AbstractResourcesGenerator implements ResourcesGenerator
      * {@inheritDoc}
      */
     @Override
-    public List<GenerableResource> dumpAll()
+    public List<GeneratedResource> dumpAll()
     {
-        ImmutableList.Builder<GenerableResource> generatedResources = ImmutableList.builder();
-        for (GenerableResource resource : resources.values())
+        ImmutableList.Builder<GeneratedResource> generatedResources = ImmutableList.builder();
+        for (GeneratedResource resource : resources.values())
         {
             generatedResources.add(resource);
             write(resource);
@@ -88,7 +88,7 @@ public abstract class AbstractResourcesGenerator implements ResourcesGenerator
      * Template method to actually write the given
      * {@code resource} to a persistent store
      *
-     * @param resource a non null {@link GenerableResource}
+     * @param resource a non null {@link GeneratedResource}
      */
-    protected abstract void write(GenerableResource resource);
+    protected abstract void write(GeneratedResource resource);
 }

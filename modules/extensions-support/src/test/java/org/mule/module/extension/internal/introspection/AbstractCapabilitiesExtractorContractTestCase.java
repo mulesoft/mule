@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import org.mule.api.registry.SPIServiceRegistry;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
@@ -38,7 +38,7 @@ public abstract class AbstractCapabilitiesExtractorContractTestCase extends Abst
     @Before
     public void before()
     {
-        resolver = new DefaultCapabilitiesResolver(new SPIServiceRegistry());
+        resolver = new DefaultCapabilitiesResolver(new SpiServiceRegistry());
     }
 
     @Test

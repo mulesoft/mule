@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal;
 
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 
@@ -46,5 +47,26 @@ public final class ImmutableDescribingContext implements DescribingContext
     public Map<String, Object> getCustomParameters()
     {
         return customParameters;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T getCheckedParameter(String key, Class<T> expectedType)
+    {
+        Object parameter = getCustomParameters().get(key);
+        if (parameter == null)
+        {
+            return null;
+        }
+
+        checkArgument(expectedType.isInstance(parameter),
+                      String.format("Custom parameter '%s' was expected to be of class '%s' but got '%s' instead",
+                                    key,
+                                    expectedType.getName(),
+                                    parameter.getClass().getName()));
+
+        return (T) parameter;
     }
 }

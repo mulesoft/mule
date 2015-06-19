@@ -14,6 +14,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
@@ -28,6 +30,8 @@ import org.springframework.beans.factory.FactoryBean;
  */
 public class ConstantFactoryBean<T> implements FactoryBean<T>, MuleContextAware, Lifecycle
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConstantFactoryBean.class);
 
     private final T value;
 
@@ -85,6 +89,6 @@ public class ConstantFactoryBean<T> implements FactoryBean<T>, MuleContextAware,
     @Override
     public void dispose()
     {
-        LifecycleUtils.disposeIfNeeded(value);
+        LifecycleUtils.disposeIfNeeded(value, LOGGER);
     }
 }

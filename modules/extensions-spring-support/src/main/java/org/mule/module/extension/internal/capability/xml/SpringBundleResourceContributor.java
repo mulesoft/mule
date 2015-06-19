@@ -13,14 +13,11 @@ import org.mule.extension.resources.spi.GenerableResourceContributor;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
 import org.mule.module.extension.internal.config.ExtensionsNamespaceHandler;
-
-import java.util.Collection;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.mule.module.extension.internal.util.CapabilityUtils;
 
 /**
  * Implementation of {@link org.mule.extension.resources.spi.GenerableResourceContributor}
- * spring bundles
+ * Spring bundles
  *
  * @since 3.7.0
  */
@@ -30,13 +27,7 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
     @Override
     public void contribute(Extension extension, ResourcesGenerator resourcesGenerator)
     {
-        Collection<XmlCapability> capabilities = extension.getCapabilities(XmlCapability.class);
-        if (CollectionUtils.isEmpty(capabilities))
-        {
-            return;
-        }
-
-        XmlCapability capability = capabilities.iterator().next();
+        XmlCapability capability = CapabilityUtils.getSingleCapability(extension, XmlCapability.class);
 
         generateSchema(extension, capability, resourcesGenerator);
         generateSpringBundle(extension, capability, resourcesGenerator);
