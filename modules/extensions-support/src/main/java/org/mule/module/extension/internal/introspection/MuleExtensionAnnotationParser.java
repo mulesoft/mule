@@ -19,7 +19,7 @@ import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.Payload;
 import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.declaration.CapableDeclaration;
+import org.mule.extension.introspection.declaration.fluent.CapableDeclaration;
 import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;

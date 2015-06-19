@@ -10,8 +10,8 @@ import static org.mule.module.extension.internal.resources.ExtensionResourcesGen
 import static org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.PROCESSING_ENVIRONMENT;
 import static org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.ROUND_ENVIRONMENT;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.DescribingContext;
-import org.mule.extension.introspection.spi.DescriberPostProcessor;
+import org.mule.extension.introspection.declaration.DescribingContext;
+import org.mule.extension.introspection.declaration.spi.DescriberPostProcessor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;

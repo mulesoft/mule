@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.manager;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.Describer;
+import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;

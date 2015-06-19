@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.introspection.declaration.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.module.extension.internal.introspection.AbstractCapabilitiesExtractorContractTestCase;
 import org.mule.tck.size.SmallTest;
 

@@ -7,9 +7,9 @@
 package org.mule.module.extension;
 
 import org.mule.extension.introspection.Capable;
-import org.mule.extension.introspection.declaration.Descriptor;
-import org.mule.extension.introspection.declaration.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.HasCapabilities;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
 
 import java.util.ServiceLoader;
 

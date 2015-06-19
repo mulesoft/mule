@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.introspection.Describer;
-import org.mule.extension.introspection.declaration.Descriptor;
+import org.mule.extension.introspection.declaration.Describer;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 
 /**

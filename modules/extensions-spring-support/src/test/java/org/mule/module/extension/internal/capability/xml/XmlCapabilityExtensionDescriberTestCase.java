@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.introspection.declaration.Declaration;
+import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.AnnotationsBasedDescriberTestCase;
 import org.mule.tck.size.SmallTest;

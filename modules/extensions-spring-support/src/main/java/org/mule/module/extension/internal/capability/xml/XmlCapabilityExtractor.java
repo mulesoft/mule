@@ -9,10 +9,10 @@ package org.mule.module.extension.internal.capability.xml;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.introspection.declaration.Descriptor;
-import org.mule.extension.introspection.declaration.Declaration;
-import org.mule.extension.introspection.declaration.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.HasCapabilities;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.introspection.declaration.fluent.Declaration;
+import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
 import org.mule.module.extension.CapabilityExtractor;
 
 /**

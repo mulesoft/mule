@@ -13,7 +13,7 @@ import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.introspection.declaration.Descriptor;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;

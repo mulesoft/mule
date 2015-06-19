@@ -22,7 +22,7 @@ import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
-import org.mule.extension.introspection.declaration.ParameterDeclaration;
+import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;

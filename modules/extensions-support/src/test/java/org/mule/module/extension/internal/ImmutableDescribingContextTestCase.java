@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.mule.extension.introspection.DescribingContext;
-import org.mule.extension.introspection.declaration.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.DescribingContext;
+import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
