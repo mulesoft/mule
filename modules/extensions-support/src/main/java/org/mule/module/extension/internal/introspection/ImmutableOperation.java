@@ -11,7 +11,7 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.runtime.OperationExecutor;
 import org.mule.extension.introspection.Parameter;
-import org.mule.extension.introspection.declaration.OperationExecutorFactory;
+import org.mule.extension.introspection.declaration.fluent.OperationExecutorFactory;
 
 import java.util.List;
 import java.util.Set;

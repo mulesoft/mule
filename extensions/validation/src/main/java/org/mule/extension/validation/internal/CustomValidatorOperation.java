@@ -11,7 +11,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.extension.annotations.ImplementationOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.introspection.declaration.Descriptor;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.validation.api.Validator;
 
 import com.google.common.cache.CacheBuilder;

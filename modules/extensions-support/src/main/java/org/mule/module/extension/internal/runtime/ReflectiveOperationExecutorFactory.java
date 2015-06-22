@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.declaration.OperationExecutorFactory;
+import org.mule.extension.introspection.declaration.fluent.OperationExecutorFactory;
 import org.mule.extension.runtime.OperationExecutor;
 
 import java.lang.reflect.Method;

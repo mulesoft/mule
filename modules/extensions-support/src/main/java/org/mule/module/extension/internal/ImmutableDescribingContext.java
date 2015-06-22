@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal;
 
-import org.mule.extension.introspection.DescribingContext;
-import org.mule.extension.introspection.declaration.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.DescribingContext;
+import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;

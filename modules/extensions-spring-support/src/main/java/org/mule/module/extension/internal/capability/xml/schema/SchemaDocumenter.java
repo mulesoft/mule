@@ -17,10 +17,10 @@ import org.mule.extension.annotations.Configuration;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.declaration.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.Declaration;
-import org.mule.extension.introspection.declaration.OperationDeclaration;
-import org.mule.extension.introspection.declaration.ParameterDeclaration;
+import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.extension.introspection.declaration.fluent.Declaration;
+import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.CollectionUtils;
 

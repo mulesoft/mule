@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.Parameter;
-import org.mule.extension.introspection.declaration.Declaration;
+import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.util.CapabilityUtils;
 

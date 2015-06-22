@@ -8,9 +8,9 @@ package org.mule.module.extension.internal.introspection;
 
 import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.declaration.Descriptor;
-import org.mule.extension.introspection.declaration.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.HasCapabilities;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
 
 /**
  * Extracts all the capabilities in a given extension and registers it on a builder

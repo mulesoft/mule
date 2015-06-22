@@ -14,7 +14,7 @@ import org.mule.api.registry.SPIServiceRegistry;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Describer;
+import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.resources.GenerableResource;

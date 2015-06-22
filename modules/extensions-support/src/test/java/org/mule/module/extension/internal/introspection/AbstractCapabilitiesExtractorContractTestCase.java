@@ -10,9 +10,9 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import org.mule.api.registry.SPIServiceRegistry;
-import org.mule.extension.introspection.declaration.Descriptor;
-import org.mule.extension.introspection.declaration.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.HasCapabilities;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
