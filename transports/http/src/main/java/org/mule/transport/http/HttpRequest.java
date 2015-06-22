@@ -82,6 +82,13 @@ public class HttpRequest
         {
             return true;
         }
+        else if (HttpConstants.METHOD_GET.equalsIgnoreCase(methodName) ||
+                 HttpConstants.METHOD_DELETE.equalsIgnoreCase(methodName))
+        {
+            Header contentLength = headers.getFirstHeader(HttpConstants.HEADER_CONTENT_LENGTH);
+            Header transferEncoding = headers.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
+            return transferEncoding != null || (contentLength != null && Integer.valueOf(contentLength.getValue()) > 0);
+        }
         return false;
     }
 
