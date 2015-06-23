@@ -1,7 +1,7 @@
 Mule ESB is distributed under the terms of the Common Public Attribution 
 License (CPAL), whose definition follows below.  For information on the license
 type for each third-party software product used by Mule, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Third-party+Software+in+Mule 
+https://developer.mulesoft.com/docs/display/current/Third-Party+Software+In+Mule
 
 
 Common Public Attribution License Version 1.0 (CPAL)
@@ -465,14 +465,14 @@ WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the
 specific language governing rights and limitations under the License.
 The Original Code is MuleSoft Mule
 The Initial Developer of the Original Code is MuleSoft Inc. All portions of
-the code are Copyright (c) 2003-2009 MuleSoft Inc. All Rights Reserved.
+the code are Copyright (c) 2003-2015 MuleSoft Inc. All Rights Reserved.
 
 EXHIBIT B. Attribution Information
 Subject to the limitations and other requirements in Section 14 of the License,
 the Original Developer requires You to display the following Attribution
 Information:
 
-Attribution Copyright Notice: Copyright (c) 2003-2009 MuleSoft Inc.
+Attribution Copyright Notice: Copyright (c) 2003-2015 MuleSoft Inc.
 Attribution Phrase (not exceeding 10 words): Powered by Mule. MuleSoft is Open
 for Integration.
 Attribution URL: http://www.MuleSoft.com
