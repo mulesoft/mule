@@ -2,6 +2,7 @@ text/plain                   txt cgi java
 text/json                    json
 text/xml                     xml
 text/html                    htm html shtml
+text/csv                     csv
 application/octet-stream     bin class
 application/postscript       ps eps ai
 application/pdf              pdf
