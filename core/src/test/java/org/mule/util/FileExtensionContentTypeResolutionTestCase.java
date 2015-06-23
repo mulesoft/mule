@@ -44,6 +44,7 @@ public class FileExtensionContentTypeResolutionTestCase extends AbstractMuleTest
         mimeTypes.put("json", JSON);
         mimeTypes.put("xml", XML);
         mimeTypes.put("html", HTML);
+        mimeTypes.put("csv", "text/csv");
 
         for (String extension : mimeTypes.keySet())
         {
