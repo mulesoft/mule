@@ -15,7 +15,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.SPIServiceRegistry;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
 import org.mule.config.i18n.MessageFactory;
@@ -58,7 +58,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
     private final ExtensionRegister register = new ExtensionRegister();
-    private final ServiceRegistry serviceRegistry = new SPIServiceRegistry();
+    private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
 
     private MuleContext muleContext;
     private ObjectNameHelper objectNameHelper;

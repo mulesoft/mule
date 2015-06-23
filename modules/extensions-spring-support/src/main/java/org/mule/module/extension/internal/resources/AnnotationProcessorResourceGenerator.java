@@ -10,7 +10,7 @@ package org.mule.module.extension.internal.resources;
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.resources.GenerableResource;
+import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ final class AnnotationProcessorResourceGenerator extends AbstractResourcesGenera
     }
 
     @Override
-    protected void write(GenerableResource resource)
+    protected void write(GeneratedResource resource)
     {
         FileObject file;
         try
@@ -61,7 +61,7 @@ final class AnnotationProcessorResourceGenerator extends AbstractResourcesGenera
         }
     }
 
-    private RuntimeException wrapException(Exception e, GenerableResource resource)
+    private RuntimeException wrapException(Exception e, GeneratedResource resource)
     {
         return new RuntimeException(String.format("Could not write generated resource '%s'", resource.getFilePath()), e);
     }

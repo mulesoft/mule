@@ -41,6 +41,10 @@ import org.apache.commons.lang.StringUtils;
 public final class AnnotationProcessorUtils
 {
 
+    private static final char NEW_LINE_CHAR = '\n';
+    private static final char AT_CHAR = '@';
+    public static final String PARAM = "@param";
+
     /**
      * Returns the {@link Class} object that is associated to the {@code typeElement}
      *
@@ -105,32 +109,27 @@ public final class AnnotationProcessorUtils
 
     static Map<String, VariableElement> getFieldsAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation)
     {
-        ImmutableMap.Builder<String, VariableElement> fields = ImmutableMap.builder();
-
-        for (VariableElement variableElement : ElementFilter.fieldsIn(typeElement.getEnclosedElements()))
-        {
-            if (variableElement.getAnnotation(annotation) != null)
-            {
-                fields.put(variableElement.getSimpleName().toString(), variableElement);
-            }
-        }
-
-        return fields.build();
+        return collectAnnotatedElements(ElementFilter.fieldsIn(typeElement.getEnclosedElements()), annotation);
     }
 
     static Map<String, ExecutableElement> getMethodsAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation)
     {
-        ImmutableMap.Builder<String, ExecutableElement> methods = ImmutableMap.builder();
+        return collectAnnotatedElements(ElementFilter.methodsIn(typeElement.getEnclosedElements()), annotation);
+    }
 
-        for (ExecutableElement executableElement : ElementFilter.methodsIn(typeElement.getEnclosedElements()))
+    private static <T extends Element> Map<String, T> collectAnnotatedElements(Iterable<T> elements, Class<? extends Annotation> annotation)
+    {
+        ImmutableMap.Builder<String, T> fields = ImmutableMap.builder();
+
+        for (T element : elements)
         {
-            if (executableElement.getAnnotation(annotation) != null)
+            if (element.getAnnotation(annotation) != null)
             {
-                methods.put(executableElement.getSimpleName().toString(), executableElement);
+                fields.put(element.getSimpleName().toString(), element);
             }
         }
 
-        return methods.build();
+        return fields.build();
     }
 
 
@@ -149,7 +148,7 @@ public final class AnnotationProcessorUtils
             @Override
             void onBodyLine(String bodyLine)
             {
-                parsedComment.append(bodyLine).append('\n');
+                parsedComment.append(bodyLine).append(NEW_LINE_CHAR);
             }
         });
 
@@ -246,7 +245,7 @@ public final class AnnotationProcessorUtils
             @Override
             void onBodyLine(String bodyLine)
             {
-                parsedComment.append(bodyLine).append('\n');
+                parsedComment.append(bodyLine).append(NEW_LINE_CHAR);
             }
         });
 
@@ -259,14 +258,18 @@ public final class AnnotationProcessorUtils
         boolean insideTag = false;
         comment = comment.trim();
 
-        for (int i = 0; i < comment.length(); i++)
+        final int length = comment.length();
+        for (int i = 0; i < length; i++)
         {
-            if (comment.charAt(i) == '{' &&
-                comment.charAt(i + 1) == '@')
+            if (comment.charAt(i) == '{')
             {
-                insideTag = true;
-                i++; //skip
-                continue;
+                int nextCharIndex = i + 1;
+                if (nextCharIndex < length && comment.charAt(nextCharIndex) == AT_CHAR)
+                {
+                    insideTag = true;
+                    i = nextCharIndex;
+                    continue;
+                }
             }
             else if (comment.charAt(i) == '}' && insideTag)
             {
@@ -279,7 +282,7 @@ public final class AnnotationProcessorUtils
 
         String strippedComments = builder.toString().trim();
         while (strippedComments.length() > 0 &&
-               strippedComments.charAt(strippedComments.length() - 1) == '\n')
+               strippedComments.charAt(strippedComments.length() - 1) == NEW_LINE_CHAR)
         {
             strippedComments = StringUtils.chomp(strippedComments);
         }
@@ -295,11 +298,11 @@ public final class AnnotationProcessorUtils
         while (st.hasMoreTokens())
         {
             String nextToken = st.nextToken().trim();
-            if (nextToken.startsWith("@param"))
+            if (nextToken.startsWith(PARAM))
             {
                 handler.onParam(nextToken);
             }
-            else if (!nextToken.startsWith("@"))
+            else if (!(nextToken.charAt(0) == AT_CHAR))
             {
                 handler.onBodyLine(nextToken);
             }
@@ -308,7 +311,7 @@ public final class AnnotationProcessorUtils
 
     private static void parseMethodParameter(Map<String, String> parameters, String param)
     {
-        param = param.replaceFirst("@param", StringUtils.EMPTY).trim();
+        param = param.replaceFirst(PARAM, StringUtils.EMPTY).trim();
         int descriptionIndex = param.indexOf(" ");
         String paramName = param.substring(0, descriptionIndex).trim();
         String description = param.substring(descriptionIndex).trim();

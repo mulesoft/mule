@@ -7,19 +7,16 @@
 package org.mule.module.extension.internal.resources;
 
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
-import static org.mule.util.Preconditions.checkState;
-import org.mule.api.registry.SPIServiceRegistry;
-import org.mule.extension.introspection.declaration.Describer;
-import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.introspection.capability.XmlCapability;
+import org.mule.extension.introspection.declaration.Describer;
+import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.module.extension.internal.ImmutableDescribingContext;
-import org.mule.module.extension.internal.capability.xml.XmlCapabilityExtractor;
 import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.ExceptionUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -58,13 +55,13 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
     public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
     public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
 
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SPIServiceRegistry());
+    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry());
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)
     {
         log("Starting Resources generator for Extensions");
-        ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(processingEnv, new SPIServiceRegistry());
+        ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(processingEnv, new SpiServiceRegistry());
         try
         {
             for (TypeElement extensionElement : findExtensions(roundEnv))
@@ -95,20 +92,8 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         context.getCustomParameters().put(PROCESSING_ENVIRONMENT, processingEnv);
         context.getCustomParameters().put(ROUND_ENVIRONMENT, roundEnvironment);
 
-        extractXmlCapability(extensionClass, context);
-
         return extensionFactory.createFrom(context.getDeclarationDescriptor(), context);
     }
-
-    private XmlCapability extractXmlCapability(Class<?> extensionClass, DescribingContext context)
-    {
-        XmlCapabilityExtractor extractor = new XmlCapabilityExtractor();
-        XmlCapability capability = (XmlCapability) extractor.extractCapability(context.getDeclarationDescriptor(), extensionClass, context.getDeclarationDescriptor());
-        checkState(capability != null, "Could not find xml capability for extension " + extensionClass.getName());
-
-        return capability;
-    }
-
 
     private List<TypeElement> findExtensions(RoundEnvironment env)
     {

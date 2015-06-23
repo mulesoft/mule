@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.registry;
+package org.mule.registry;
+
+import org.mule.api.registry.ServiceRegistry;
 
 import com.google.common.collect.ImmutableList;
 
@@ -18,15 +20,22 @@ import java.util.ServiceLoader;
  *
  * @since 3.7.0
  */
-public class SPIServiceRegistry implements ServiceRegistry
+public class SpiServiceRegistry implements ServiceRegistry
 {
 
     /**
+     * If {@code classLoader} is {@code null}, then the current {@link Thread#getContextClassLoader()}
+     * will be used
      * {@inheritDoc}
      */
     @Override
     public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader classLoader)
     {
+        if (classLoader == null)
+        {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
+
         return ImmutableList.copyOf(ServiceLoader.load(providerClass, classLoader).iterator());
     }
 

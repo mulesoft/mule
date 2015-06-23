@@ -16,7 +16,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.registry.SPIServiceRegistry;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.extension.annotations.Configuration;
 import org.mule.extension.annotations.Configurations;
 import org.mule.extension.annotations.Extension;
@@ -60,7 +60,7 @@ import java.util.Set;
 public final class AnnotationsBasedDescriber implements Describer
 {
 
-    private CapabilitiesResolver capabilitiesResolver = new DefaultCapabilitiesResolver(new SPIServiceRegistry());
+    private CapabilitiesResolver capabilitiesResolver = new DefaultCapabilitiesResolver(new SpiServiceRegistry());
     private final Class<?> extensionType;
     private final ReflectiveDelegateFactory delegateFactory = new ReflectiveDelegateFactory();
 
