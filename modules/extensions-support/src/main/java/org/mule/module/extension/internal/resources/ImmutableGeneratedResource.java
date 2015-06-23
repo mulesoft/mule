@@ -6,20 +6,20 @@
  */
 package org.mule.module.extension.internal.resources;
 
-import org.mule.extension.resources.GenerableResource;
+import org.mule.extension.resources.GeneratedResource;
 
 /**
- * Immutable implementation of a {@link GenerableResource
+ * Immutable implementation of a {@link GeneratedResource
  *
  * @since 3.7.0}
  */
-final class ImmutableGenerableResource implements GenerableResource
+final class ImmutableGeneratedResource implements GeneratedResource
 {
 
     private final String filepath;
     private final StringBuilder contentBuilder = new StringBuilder();
 
-    ImmutableGenerableResource(String filepath)
+    ImmutableGeneratedResource(String filepath)
     {
         this.filepath = filepath;
     }

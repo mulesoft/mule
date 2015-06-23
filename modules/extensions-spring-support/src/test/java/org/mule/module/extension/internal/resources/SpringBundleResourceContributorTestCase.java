@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.resources.GenerableResource;
+import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.module.extension.internal.capability.xml.ImmutableXmlCapability;
 import org.mule.module.extension.internal.capability.xml.SpringBundleResourceContributor;
@@ -80,7 +80,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     {
         contributor.contribute(extension, generator);
 
-        GenerableResource resource = generator.getOrCreateResource(SCHEMA_NAME);
+        GeneratedResource resource = generator.getOrCreateResource(SCHEMA_NAME);
         assertNotNull(resource);
         assertFalse(StringUtils.isBlank(resource.getContentBuilder().toString()));
     }
@@ -90,7 +90,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     {
         contributor.contribute(extension, generator);
 
-        GenerableResource resource = generator.getOrCreateResource("spring.handlers");
+        GeneratedResource resource = generator.getOrCreateResource("spring.handlers");
         assertNotNull(resource);
         assertEquals(String.format("%s=%s", ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, ExtensionsNamespaceHandler.class.getName()), resource.getContentBuilder().toString());
     }
@@ -100,7 +100,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     {
         contributor.contribute(extension, generator);
 
-        GenerableResource resource = generator.getOrCreateResource("spring.schemas");
+        GeneratedResource resource = generator.getOrCreateResource("spring.schemas");
         assertNotNull(resource);
 
         StringBuilder expected = new StringBuilder();

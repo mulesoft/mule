@@ -60,7 +60,7 @@ public class SchemaGenerator
 
         schemaBuilder.registerEnums();
 
-        return renderSchema(schemaBuilder.getSchema());
+        return renderSchema(schemaBuilder.build());
     }
 
     private String renderSchema(Schema schema)

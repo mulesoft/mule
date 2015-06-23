@@ -18,7 +18,6 @@ import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -28,8 +27,6 @@ import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.junit.Before;
@@ -52,8 +49,6 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     @Mock
     private Operation operation;
 
-    private Map<Parameter, Object> parameterValues = new HashMap<>();
-
     private ReflectiveMethodOperationExecutor executor;
     private HeisenbergExtension config;
     private OperationContext operationContext;
@@ -65,7 +60,6 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     {
         initHeisenberg();
         operationContext = new DefaultOperationContext(operation, parameters, muleEvent);
-        when(operationContext.getParameters()).thenReturn(parameterValues);
     }
 
     @Test
