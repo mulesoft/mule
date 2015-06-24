@@ -15,18 +15,32 @@ import java.util.Collection;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class LifecycleUtils
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleUtils.class);
-
+    /**
+     * Invokes {@link Initialisable#initialise()} on {@code object}
+     * if it implements the {@link Initialisable} interface.
+     *
+     * @param object the object you're trying to initialise
+     * @throws InitialisationException
+     */
     public static void initialiseIfNeeded(Object object) throws InitialisationException
     {
         initialiseIfNeeded(object, null);
     }
 
+    /**
+     * The same as {@link #initialiseIfNeeded(Object)}, only that before checking
+     * for {@code object} being {@link Initialisable}, it also checks if it implements
+     * {@link MuleContextAware}, in which case it will invoke {@link MuleContextAware#setMuleContext(MuleContext)}
+     * with the given {@code muleContext}
+     *
+     * @param object      the object you're trying to initialise
+     * @param muleContext a {@link MuleContext}
+     * @throws InitialisationException
+     */
     public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException
     {
         if (muleContext != null && object instanceof MuleContextAware)
@@ -40,6 +54,14 @@ public abstract class LifecycleUtils
         }
     }
 
+
+    /**
+     * For each item in the {@code objects} collection, it invokes {@link Initialisable#initialise()}
+     * if it implements the {@link Initialisable} interface.
+     *
+     * @param objects the list of objects to be initialised
+     * @throws InitialisationException
+     */
     public static void initialiseIfNeeded(Collection<? extends Object> objects) throws InitialisationException
     {
         try
@@ -52,6 +74,13 @@ public abstract class LifecycleUtils
         }
     }
 
+    /**
+     * Invokes {@link Startable#start()} on {@code object} if it implements the
+     * {@link Startable} interface
+     *
+     * @param object the object you're trying to start
+     * @throws MuleException
+     */
     public static void startIfNeeded(Object object) throws MuleException
     {
         if (object instanceof Startable)
@@ -60,31 +89,63 @@ public abstract class LifecycleUtils
         }
     }
 
+    /**
+     * For each item in the {@code objects} collection, it invokes the the {@link Startable#start()}
+     * if it implements the {@link Startable} interface.
+     *
+     * @param objects the list of objects to be started
+     * @throws MuleException
+     */
     public static void startIfNeeded(Collection<? extends Object> objects) throws MuleException
     {
         doApplyPhase(Startable.PHASE_NAME, objects, null);
     }
 
+    /**
+     * For each item in the {@code objects} collection, it invokes the {@link Stoppable#stop()}
+     * if it implements the {@link Stoppable} interface.
+     *
+     * @param objects the list of objects to be stopped
+     * @throws MuleException
+     */
     public static void stopIfNeeded(Collection<? extends Object> objects) throws MuleException
     {
         doApplyPhase(Stoppable.PHASE_NAME, objects, null);
     }
 
+    /**
+     * Invokes the {@link Stoppable#stop()} on {@code object} if it implements the {@link Stoppable} interface.
+     *
+     * @param object the object you're trying to stop
+     * @throws MuleException
+     */
     public static void stopIfNeeded(Object object) throws MuleException
     {
         doApplyPhase(Stoppable.PHASE_NAME, Arrays.asList(object), null);
     }
 
-    public static void disposeIfNeeded(Object object)
-    {
-        disposeIfNeeded(object, LOGGER);
-    }
-
+    /**
+     * Invokes {@link Disposable#dispose()} on {@code object} if it implements the
+     * {@link Disposable} interface. If the dispose operation fails, then the exception
+     * will be silently logged using the provided {@code logger}
+     *
+     * @param object the object you're trying to dispose
+     */
     public static void disposeIfNeeded(Object object, Logger logger)
     {
         disposeAllIfNeeded(Arrays.asList(object), logger);
     }
 
+    /**
+     * For each item in the {@code objects} collection, it invokes {@link Disposable#dispose()}
+     * if it implements the {@link Disposable} interface.
+     * <p/>
+     * Per each dispose operation that fails, the exception will be silently logged using the
+     * provided {@code logger}
+     *
+     * @param objects the list of objects to be stopped
+     * @throws MuleException
+     */
     public static void disposeAllIfNeeded(Collection<? extends Object> objects, Logger logger)
     {
         try

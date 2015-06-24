@@ -40,7 +40,7 @@ public class SchemaGenerator
     {
         checkArgument(extension != null, "extension cannot be null");
         checkArgument(xmlCapability != null, "capability cannot be null");
-        checkState(!StringUtils.isBlank(xmlCapability.getNamespace()), "capability can't provide a blank namespace");
+        checkState(!StringUtils.isBlank(xmlCapability.getNamespace()), "capability cannot provide a blank namespace");
     }
 
     public String generate(Extension extension, XmlCapability xmlCapability)
@@ -60,7 +60,7 @@ public class SchemaGenerator
 
         schemaBuilder.registerEnums();
 
-        return renderSchema(schemaBuilder.getSchema());
+        return renderSchema(schemaBuilder.build());
     }
 
     private String renderSchema(Schema schema)

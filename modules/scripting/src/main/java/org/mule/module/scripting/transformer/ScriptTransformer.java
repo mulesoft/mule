@@ -16,11 +16,16 @@ import org.mule.transformer.AbstractMessageTransformer;
 import javax.script.Bindings;
 import javax.script.ScriptException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Runs a script to perform transformation on an object.
  */
 public class ScriptTransformer extends AbstractMessageTransformer
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptTransformer.class);
+
     private Scriptable script;
 
     @Override
@@ -34,7 +39,7 @@ public class ScriptTransformer extends AbstractMessageTransformer
     public void dispose()
     {
         super.dispose();
-        LifecycleUtils.disposeIfNeeded(script);
+        LifecycleUtils.disposeIfNeeded(script, LOGGER);
     }
 
     @Override

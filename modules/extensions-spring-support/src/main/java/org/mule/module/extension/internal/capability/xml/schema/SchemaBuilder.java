@@ -92,19 +92,13 @@ import org.apache.commons.collections.CollectionUtils;
 public class SchemaBuilder
 {
 
-    private Set<DataType> registeredEnums;
-    private Map<DataType, ComplexTypeHolder> registeredComplexTypesHolders;
-    private Map<String, NamedGroup> substitutionGroups = new HashMap<>();
+    private final Set<DataType> registeredEnums = new HashSet<>();
+    private final Map<DataType, ComplexTypeHolder> registeredComplexTypesHolders = new HashMap<>();
+    private final Map<String, NamedGroup> substitutionGroups = new HashMap<>();
+    private final ObjectFactory objectFactory = new ObjectFactory();
+
     private Schema schema;
-    private ObjectFactory objectFactory;
 
-
-    private SchemaBuilder()
-    {
-        registeredEnums = new HashSet<>();
-        objectFactory = new ObjectFactory();
-        registeredComplexTypesHolders = new HashMap<>();
-    }
 
     public static SchemaBuilder newSchema(String targetNamespace)
     {
@@ -120,7 +114,7 @@ public class SchemaBuilder
         return builder;
     }
 
-    public Schema getSchema()
+    public Schema build()
     {
         return schema;
     }
@@ -160,7 +154,7 @@ public class SchemaBuilder
         final ExplicitGroup choice = new ExplicitGroup();
         choice.setMinOccurs(new BigInteger("0"));
         choice.setMaxOccurs("unbounded");
-        config.setChoice(choice);
+
 
 
         for (final Parameter parameter : configuration.getParameters())
@@ -200,9 +194,9 @@ public class SchemaBuilder
 
         config.setAnnotation(createDocAnnotation(configuration.getDescription()));
 
-        if (choice.getParticle().size() == 0)
+        if (!choice.getParticle().isEmpty())
         {
-            config.setChoice(null);
+            config.setChoice(choice);
         }
 
         return this;
@@ -505,7 +499,7 @@ public class SchemaBuilder
         collectionItemElement.setMinOccurs(BigInteger.ZERO);
         collectionItemElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
 
-        final DataType genericType = getGenericType(type);
+        final DataType genericType = getFirstGenericType(type);
         genericType.getQualifier().accept(new BaseDataQualifierVisitor()
         {
 
@@ -543,7 +537,7 @@ public class SchemaBuilder
         return complexType;
     }
 
-    private DataType getGenericType(DataType type)
+    private DataType getFirstGenericType(DataType type)
     {
         return ArrayUtils.isEmpty(type.getGenericTypes()) ? type : type.getGenericTypes()[0];
     }
@@ -776,19 +770,9 @@ public class SchemaBuilder
             return complexType;
         }
 
-        public void setComplexType(ComplexType complexType)
-        {
-            this.complexType = complexType;
-        }
-
         public DataType getType()
         {
             return type;
-        }
-
-        public void setType(DataType type)
-        {
-            this.type = type;
         }
 
         @Override

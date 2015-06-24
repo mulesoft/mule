@@ -20,10 +20,13 @@ import java.util.Calendar;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OptionalObjectsIgnoredTestCase.class);
     private static final String OPTIONAL_OBJECT_KEY = "problematic";
 
     private MuleContext muleContext;
@@ -41,7 +44,7 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase
     {
         if (muleContext != null)
         {
-            LifecycleUtils.disposeIfNeeded(muleContext);
+            LifecycleUtils.disposeIfNeeded(muleContext, LOGGER);
         }
     }
 

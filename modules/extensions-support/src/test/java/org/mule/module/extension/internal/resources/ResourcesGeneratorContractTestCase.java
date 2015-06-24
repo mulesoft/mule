@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.resources.GenerableResource;
+import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.extension.resources.spi.GenerableResourceContributor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -49,7 +49,7 @@ public abstract class ResourcesGeneratorContractTestCase extends AbstractMuleTes
     public void getOrCreateResource()
     {
         final String filepath = "path";
-        GenerableResource resource = generator.getOrCreateResource(filepath);
+        GeneratedResource resource = generator.getOrCreateResource(filepath);
 
         assertNotNull(resource);
         assertEquals(filepath, resource.getFilePath());

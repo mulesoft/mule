@@ -27,6 +27,9 @@ import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of {@link InterceptingMessageProcessor} that filters message flow
  * using a {@link Filter}. Is the filter accepts the message then message flow
@@ -40,6 +43,8 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
  */
 public class MessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Lifecycle
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageFilter.class);
+
     protected Filter filter;
 
     /**
@@ -165,6 +170,6 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
             ((Disposable) unacceptedMessageProcessor).dispose();
         }
 
-        LifecycleUtils.disposeIfNeeded(filter);
+        LifecycleUtils.disposeIfNeeded(filter, LOGGER);
     }
 }
