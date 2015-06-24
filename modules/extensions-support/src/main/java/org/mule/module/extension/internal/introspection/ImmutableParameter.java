@@ -10,8 +10,6 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Parameter;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,16 +19,26 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @since 3.7.0
  */
-final class ImmutableParameter extends AbstractImmutableCapableDescribed implements Parameter
+final class ImmutableParameter extends AbstractCapableDescribed implements Parameter
 {
-
-    private static final Set<String> reservedNames = ImmutableSet.<String>builder().add("name").build();
 
     private final DataType type;
     private final boolean required;
     private final boolean dynamic;
     private final Object defaultValue;
 
+    /**
+     * Creates a new instance with the given state
+     *
+     * @param name         the parameter's name. Cannot be blank and cannot be one of the values in {@link #RESERVED_NAMES}
+     * @param description  the parameter's description
+     * @param type         the parameter's {@link DataType}. Cannot be {@code null}
+     * @param required     whether this parameter is required or not
+     * @param dynamic      whether this parameter is dynamic or not
+     * @param defaultValue this parameter's default value
+     * @param capabilities this parameter's capabilities
+     * @throws IllegalArgumentException if {@code required} is {@code true} and {@code defaultValue} is not {@code null} at the same time
+     */
     protected ImmutableParameter(String name,
                                  String description,
                                  DataType type,
@@ -41,17 +49,17 @@ final class ImmutableParameter extends AbstractImmutableCapableDescribed impleme
     {
         super(name, description, capabilities);
 
-        if (reservedNames.contains(name))
+        if (RESERVED_NAMES.contains(name))
         {
             throw new IllegalArgumentException(
                     String.format("Extension parameter cannot have the name ['%s'] since it's a reserved one", name));
         }
 
-        checkArgument(type != null, "Parameters must have a type");
+        checkArgument(type != null, "Extension parameters must have a type");
 
         if (required && defaultValue != null)
         {
-            throw new IllegalStateException("If a parameter is required then it cannot have a default value");
+            throw new IllegalStateException("A required Extension parameter cannot have a default value");
         }
 
         this.type = type;

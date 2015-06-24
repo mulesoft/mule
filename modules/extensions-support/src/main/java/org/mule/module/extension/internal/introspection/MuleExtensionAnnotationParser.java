@@ -191,7 +191,7 @@ public final class MuleExtensionAnnotationParser
         catch (IOException e)
         {
             throw new IllegalStateException(
-                    String.format("Could not read parameter names from method %s of class %s", method.getName(), method.getDeclaringClass().getName())
+                    String.format("Could not read parameter names from method '%s' of class '%s'", method.getName(), method.getDeclaringClass().getName())
                     , e);
         }
 

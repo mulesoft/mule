@@ -17,7 +17,7 @@ import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.module.extension.internal.introspection.BaseDataQualifierVisitor;
+import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.util.ArrayUtils;
 
 import com.google.common.collect.HashMultimap;
@@ -61,7 +61,7 @@ public class ExtensionsNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         extensionManager = MuleArtifactContext.getCurrentMuleContext().get().getExtensionManager();
-        checkState(extensionManager != null, "Could not obtain handledExtensions manager");
+        checkState(extensionManager != null, "Could not obtain the ExtensionManager");
     }
 
     /**
@@ -134,7 +134,7 @@ public class ExtensionsNamespaceHandler extends NamespaceHandlerSupport
 
     private void registerTopLevelParameter(final Extension extension, final DataType parameterType)
     {
-        parameterType.getQualifier().accept(new BaseDataQualifierVisitor()
+        parameterType.getQualifier().accept(new AbstractDataQualifierVisitor()
         {
 
             @Override
@@ -160,23 +160,14 @@ public class ExtensionsNamespaceHandler extends NamespaceHandlerSupport
             public void onMap()
             {
                 DataType[] genericTypes = parameterType.getGenericTypes();
-                if (genericTypes == null)
+                if (ArrayUtils.isEmpty(genericTypes))
                 {
                     return;
                 }
 
-                if (genericTypes.length >= 1)
-                {
-                    DataType keyType = genericTypes[0];
-                    registerTopLevelParameter(extension, keyType);
-                }
-
-                if (genericTypes.length >= 2)
-                {
-                    DataType valueType = parameterType.getGenericTypes()[0];
-                    valueType.getQualifier().accept(this);
-                    registerTopLevelParameter(extension, valueType);
-                }
+                DataType keyType = genericTypes[0];
+                keyType.getQualifier().accept(this);
+                registerTopLevelParameter(extension, keyType);
             }
         });
 
@@ -197,7 +188,7 @@ public class ExtensionsNamespaceHandler extends NamespaceHandlerSupport
         if (CollectionUtils.isEmpty(capableExtensions))
         {
             throw new IllegalArgumentException(
-                    String.format("Could not find any handled extensions supporting XML capabilities. Can't process namespace %s", namespace));
+                    String.format("Could not find any extensions supporting XML capabilities. Can't process namespace %s", namespace));
         }
 
         for (Extension extension : capableExtensions)

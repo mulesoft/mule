@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.collections.Predicate;
 
 /**
- * A utility class to track state related to registered instances
+ * Tracks state related to registered instances
  * which are realisations of {@link Configuration} models owned
  * by registered {@link Extension}s
  *

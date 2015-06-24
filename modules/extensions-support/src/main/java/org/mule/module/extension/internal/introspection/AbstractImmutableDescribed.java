@@ -70,7 +70,7 @@ abstract class AbstractImmutableDescribed implements Described
     }
 
     /**
-     * calculates hashcode based on {@link #getName()}
+     * Calculates hashcode based on {@link #getName()}
      *
      * @return a hash code
      */

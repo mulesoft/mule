@@ -21,12 +21,11 @@ public interface ExtensionDiscoverer
 {
 
     /**
-     * Performs a search for extensions
-     * according to the algorithm described in {@link ExtensionManager#discoverExtensions(ClassLoader)}
+     * Performs a search for extensions according to the algorithm described in
+     * {@link ExtensionManager#discoverExtensions(ClassLoader)}
      *
-     * @param classLoader the {@link ClassLoader} in which path perform the search
-     * @return a {@link List} of {@link Extension}. Might be empty
-     * but it will never be {@code null}
+     * @param classLoader the {@link ClassLoader} on which the search will be performed
+     * @return a {@link List} of {@link Extension}. Might be empty but it will never be {@code null}
      */
     List<Extension> discover(ClassLoader classLoader);
 }

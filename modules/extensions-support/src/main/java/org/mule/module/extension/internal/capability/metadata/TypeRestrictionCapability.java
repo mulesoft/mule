@@ -7,7 +7,15 @@
 package org.mule.module.extension.internal.capability.metadata;
 
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.extension.introspection.Capable;
 
+/**
+ * A metadata capability to link a {@link Capable} object
+ * to a certain {@link #type} which restricts it somehow.
+ *
+ * @param <T> generic type of the restriction {@link #type}
+ * @since 3.7.0
+ */
 public final class TypeRestrictionCapability<T>
 {
     private final Class<T> type;

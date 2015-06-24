@@ -48,7 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of {@link ExtensionManagerAdapter}
+ * Default implementation of {@link ExtensionManagerAdapter}. This implementation uses standard Java SPI
+ * as a discovery mechanism
  *
  * @since 3.7.0
  */
@@ -57,7 +58,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
-    private final ExtensionRegister register = new ExtensionRegister();
+    private final ExtensionRegistry extensionRegistry = new ExtensionRegistry();
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
 
     private MuleContext muleContext;
@@ -79,6 +80,9 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Extension> discoverExtensions(ClassLoader classLoader)
     {
@@ -109,7 +113,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         LOGGER.info("Registering extension {} (version {})", extension.getName(), extension.getVersion());
         final String extensionName = extension.getName();
 
-        if (register.containsExtension(extensionName))
+        if (extensionRegistry.containsExtension(extensionName))
         {
             return maybeUpdateExtension(extension, extensionName);
         }
@@ -127,7 +131,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     public <C> void registerConfigurationInstanceProvider(String providerName, ConfigurationInstanceProvider<C> configurationInstanceProvider)
     {
         Configuration configuration = configurationInstanceProvider.getConfiguration();
-        ExtensionStateTracker extensionStateTracker = register.getExtensionState(configuration);
+        ExtensionStateTracker extensionStateTracker = extensionRegistry.getExtensionState(configuration);
         extensionStateTracker.registerConfigurationInstanceProvider(configuration, providerName, configurationInstanceProvider);
     }
 
@@ -155,8 +159,8 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     @Override
     public OperationExecutor getOperationExecutor(OperationContext operationContext)
     {
-        Extension extension = register.getExtension(operationContext.getOperation());
-        Map<String, ConfigurationInstanceProvider> providers = register.getConfigurationInstanceProviders(extension);
+        Extension extension = extensionRegistry.getExtension(operationContext.getOperation());
+        Map<String, ConfigurationInstanceProvider> providers = extensionRegistry.getConfigurationInstanceProviders(extension);
 
         int matches = providers.size();
 
@@ -193,7 +197,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     @Override
     public Set<Extension> getExtensions()
     {
-        return register.getExtensions();
+        return extensionRegistry.getExtensions();
     }
 
     /**
@@ -203,12 +207,12 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     public <C> Set<Extension> getExtensionsCapableOf(Class<C> capabilityType)
     {
         checkArgument(capabilityType != null, "capability type cannot be null");
-        return register.getExtensionsCapableOf(capabilityType);
+        return extensionRegistry.getExtensionsCapableOf(capabilityType);
     }
 
     private <C> void registerConfigurationInstance(Configuration configuration, String configurationInstanceName, C configurationInstance)
     {
-        ExtensionStateTracker extensionStateTracker = register.getExtensionState(configuration);
+        ExtensionStateTracker extensionStateTracker = extensionRegistry.getExtensionState(configuration);
         extensionStateTracker.registerConfigurationInstance(configuration, configurationInstanceName, configurationInstance);
 
         putInRegistryAndApplyLifecycle(configurationInstanceName, configurationInstance);
@@ -233,7 +237,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
         synchronized (configurationInstance)
         {
-            ExtensionStateTracker extensionStateTracker = register.getExtensionState(configurationInstanceProvider.getConfiguration());
+            ExtensionStateTracker extensionStateTracker = extensionRegistry.getExtensionState(configurationInstanceProvider.getConfiguration());
             executor = extensionStateTracker.getOperationExecutor(configurationInstanceProvider.getConfiguration(), configurationInstance, operationContext);
             if (executor == null)
             {
@@ -250,7 +254,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
     private ConfigurationInstanceProvider<Object> getConfigurationInstanceProvider(String configurationInstanceProviderName)
     {
-        ConfigurationInstanceProvider<Object> configurationInstanceProvider = register.getConfigurationInstanceProviders().get(configurationInstanceProviderName);
+        ConfigurationInstanceProvider<Object> configurationInstanceProvider = extensionRegistry.getConfigurationInstanceProviders().get(configurationInstanceProviderName);
         if (configurationInstanceProvider == null)
         {
             throw new IllegalArgumentException("There's no registered ConfigurationInstanceProvider under name" + configurationInstanceProviderName);
@@ -270,7 +274,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         synchronized (implicitConfiguration)
         {
             //check that another thread didn't beat us to create the instance
-            if (!register.getConfigurationInstanceProviders(extension).isEmpty())
+            if (!extensionRegistry.getConfigurationInstanceProviders(extension).isEmpty())
             {
                 return;
             }
@@ -346,7 +350,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
     private boolean maybeUpdateExtension(Extension extension, String extensionName)
     {
-        Extension actual = register.getExtension(extensionName);
+        Extension actual = extensionRegistry.getExtension(extensionName);
         MuleVersion newVersion;
         try
         {
@@ -380,7 +384,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
     private void doRegisterExtension(Extension extension, String extensionName)
     {
-        register.registerExtension(extensionName, extension);
+        extensionRegistry.registerExtension(extensionName, extension);
     }
 
     private void logExtensionHotUpdate(Extension extension, Extension actual)
@@ -410,7 +414,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         executor = operation.getExecutor(configurationInstance);
         if (executor instanceof DelegatingOperationExecutor)
         {
-            Extension extension = register.getExtension(operation);
+            Extension extension = extensionRegistry.getExtension(operation);
             String executorName = objectNameHelper.getUniqueName(String.format("%s_executor_%s", extension.getName(), operation.getName()));
             try
             {

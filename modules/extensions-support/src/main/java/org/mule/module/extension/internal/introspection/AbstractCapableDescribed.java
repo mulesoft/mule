@@ -21,12 +21,12 @@ import java.util.Set;
  *
  * @since 3.7.0
  */
-abstract class AbstractImmutableCapableDescribed extends AbstractImmutableDescribed implements Capable
+abstract class AbstractCapableDescribed extends AbstractImmutableDescribed implements Capable
 {
 
-    private Set<Object> capabilities;
+    private final Set<Object> capabilities;
 
-    AbstractImmutableCapableDescribed(String name, String description, Set<Object> capabilities)
+    AbstractCapableDescribed(String name, String description, Set<Object> capabilities)
     {
         super(name, description);
         this.capabilities = capabilities != null ? ImmutableSet.copyOf(capabilities) : ImmutableSet.of();

@@ -6,12 +6,9 @@
  */
 package org.mule.module.extension;
 
+import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.Capable;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
-
-import java.util.ServiceLoader;
 
 
 /**
@@ -19,8 +16,7 @@ import java.util.ServiceLoader;
  * out of a {@link Class} that composes a {@link Capable}
  * <p/>
  * Because actual capabilities might be defined across several modules (or even extensions!)
- * the actual extractors are fetched through SPI, using the standard {@link ServiceLoader}
- * contract.
+ * the actual extractors are fetched through SPI, using a {@link ServiceRegistry}.
  * <p/>
  * Each implementation of this class has to aim to one and only one specific capability type. It's
  * this extractor's responsibility to ignore the capabilities which are outside of its domain
@@ -32,14 +28,11 @@ public interface CapabilityExtractor
 {
 
     /**
-     * Looks for a specific capability in the given {@code extensionType}.
-     * and declares it into the given {@code capableCallback}. After doing such,
-     * the found capability is returned (or {@code null} if not found)
+     * Looks for a specific capability in the given {@code extensionType} and returns it.
      *
      * @param declarationDescriptor the descriptor that is being built
      * @param capableType the type of the {@link Capable} class
-     * @param capableCallback  a {@link HasCapabilities} on which the {@link Capable} is to be registered.
      * @return the extracted capability or {@code null} if none found
      */
-    Object extractCapability(DeclarationDescriptor declarationDescriptor, Class<?> capableType, HasCapabilities<? extends Descriptor> capableCallback);
+    Object extractCapability(DeclarationDescriptor declarationDescriptor, Class<?> capableType);
 }

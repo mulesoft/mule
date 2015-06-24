@@ -12,7 +12,7 @@ import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.module.extension.internal.ImmutableDescribingContext;
+import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -87,7 +87,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
         Describer describer = new AnnotationsBasedDescriber(extensionClass);
 
-        DescribingContext context = new ImmutableDescribingContext(describer.describe().getRootDeclaration());
+        DescribingContext context = new DefaultDescribingContext(describer.describe().getRootDeclaration());
         context.getCustomParameters().put(EXTENSION_ELEMENT, extensionElement);
         context.getCustomParameters().put(PROCESSING_ENVIRONMENT, processingEnv);
         context.getCustomParameters().put(ROUND_ENVIRONMENT, roundEnvironment);
