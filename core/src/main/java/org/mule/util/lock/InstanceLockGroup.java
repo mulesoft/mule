@@ -56,12 +56,12 @@ public class InstanceLockGroup implements LockGroup
             if (lockEntry != null)
             {
                 lockEntry.decrementLockCount();
+                lockEntry.getLock().unlock();
                 if (!lockEntry.hasPendingLocks())
                 {
                     locks.remove(key);
+                    lockProvider.destroyLock(lockEntry.getLock());
                 }
-                lockEntry.getLock().unlock();
-                lockProvider.destroyLock(lockEntry.getLock());
             }
             lockAccessMonitor.notifyAll();
         }
