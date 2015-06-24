@@ -79,6 +79,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
         }
         instanceLockGroup.unlock("lockId");
         Mockito.verify(mockLockProvider, VerificationModeFactory.times(1)).createLock("lockId");
+        Mockito.verify(mockLockProvider,VerificationModeFactory.times(1)).destroyLock(Mockito.any(Lock.class));
     }
 
 
