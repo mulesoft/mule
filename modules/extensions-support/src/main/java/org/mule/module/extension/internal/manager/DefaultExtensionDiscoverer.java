@@ -8,9 +8,9 @@ package org.mule.module.extension.internal.manager;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.introspection.declaration.Describer;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 
 import com.google.common.collect.ImmutableList;
@@ -44,7 +44,8 @@ final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
         checkArgument(classLoader != null, "classloader cannot be null");
 
         Collection<Describer> describers = serviceRegistry.lookupProviders(Describer.class, classLoader);
-        if (describers.isEmpty()) {
+        if (describers.isEmpty())
+        {
             return ImmutableList.of();
         }
 

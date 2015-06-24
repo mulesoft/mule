@@ -14,19 +14,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Immutable implementation of {@link DescribingContext}.
+ * Default implementation of {@link DescribingContext}.
  * The fact that this class's attributes are immutable, doesn't mean that their inner state
  * is in fact immutable also.
  *
  * @since 3.7.0
  */
-public final class ImmutableDescribingContext implements DescribingContext
+public final class DefaultDescribingContext implements DescribingContext
 {
 
     private final DeclarationDescriptor declarationDescriptor;
     private final Map<String, Object> customParameters = new HashMap<>();
 
-    public ImmutableDescribingContext(DeclarationDescriptor declarationDescriptor)
+    public DefaultDescribingContext(DeclarationDescriptor declarationDescriptor)
     {
         this.declarationDescriptor = declarationDescriptor;
     }

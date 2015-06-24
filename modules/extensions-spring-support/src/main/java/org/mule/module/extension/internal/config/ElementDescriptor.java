@@ -18,7 +18,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A descriptor class which allows decoupling the running code
+ * A descriptor which allows decoupling the running code
  * from the actual XML element being parsed. This is convenient not only
  * for testing purposes, but also to provide an intermediate stage
  * in which placeholders and other parsing pre-processors can be
@@ -33,6 +33,15 @@ public final class ElementDescriptor
     private final Map<String, String> attributes;
     private final Multimap<String, ElementDescriptor> childs;
 
+    /**
+     * Creates a new instance which describes an XML element
+     * which state is represented by the passed arguments
+     *
+     * @param name       the name of the element
+     * @param attributes a {@link Map} containing the element's attribute names and their values
+     * @param childs     a {@link List} of other {@link ElementDescriptor} instances which represents this
+     *                   element's childs. Can be empty but must not be {@code null}
+     */
     public ElementDescriptor(String name, Map<String, String> attributes, List<ElementDescriptor> childs)
     {
         this.name = name;
@@ -57,11 +66,6 @@ public final class ElementDescriptor
     public String getAttribute(String attributeName)
     {
         return attributes.get(attributeName);
-    }
-
-    public Collection<ElementDescriptor> getChilds()
-    {
-        return childs.values();
     }
 
     public ElementDescriptor getChildByName(String childName)

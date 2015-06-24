@@ -11,18 +11,18 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
 import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.spi.DescriberPostProcessor;
-import org.mule.module.extension.internal.ImmutableDescribingContext;
+import org.mule.module.extension.internal.DefaultDescribingContext;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,7 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Default implementation of {@link ExtensionFactory}
+ * Default implementation of {@link ExtensionFactory} which uses a
+ * {@link ServiceRegistry} to locate instances of {@link DescriberPostProcessor}.
+ * The discovery of {@link DescriberPostProcessor}s will happen when the
+ * {@link #DefaultExtensionFactory(ServiceRegistry)} constructor is invoked
+ * and the list of discovered instances will be used during the whole duration of this instance
  *
  * @since 3.7.0
  */
@@ -39,6 +43,12 @@ public final class DefaultExtensionFactory implements ExtensionFactory
 
     private final List<DescriberPostProcessor> postProcessors;
 
+    /**
+     * Creates a new instance and uses the given {@code serviceRegistry} to
+     * locate instances of {@link DescriberPostProcessor}
+     *
+     * @param serviceRegistry a [@link ServiceRegistry
+     */
     public DefaultExtensionFactory(ServiceRegistry serviceRegistry)
     {
         postProcessors = searchPostProcessors(serviceRegistry);
@@ -50,9 +60,12 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     @Override
     public Extension createFrom(Descriptor descriptor)
     {
-        return createFrom(descriptor, new ImmutableDescribingContext(descriptor.getRootDeclaration()));
+        return createFrom(descriptor, new DefaultDescribingContext(descriptor.getRootDeclaration()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Extension createFrom(Descriptor descriptor, DescribingContext describingContext)
     {
@@ -178,14 +191,13 @@ public final class DefaultExtensionFactory implements ExtensionFactory
 
     private void validateMuleVersion(Declaration declaration)
     {
-        // make sure version is valid
         try
         {
             new MuleVersion(declaration.getVersion());
         }
         catch (IllegalArgumentException e)
         {
-            throw new IllegalArgumentException(String.format("Invalid version %s for capability %s", declaration.getVersion(), declaration.getName()));
+            throw new IllegalArgumentException(String.format("Invalid version %s for capability '%s'", declaration.getVersion(), declaration.getName()));
         }
     }
 

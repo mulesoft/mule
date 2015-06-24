@@ -34,7 +34,7 @@ import org.apache.commons.collections.Predicate;
  *
  * @since 3.7.0
  */
-final class ExtensionRegister
+final class ExtensionRegistry
 {
 
     private final LoadingCache<Extension, ExtensionStateTracker> extensionStates = CacheBuilder.newBuilder().build(new CacheLoader<Extension, ExtensionStateTracker>()
@@ -51,7 +51,7 @@ final class ExtensionRegister
     private final Map<Operation, Extension> operation2ExtensionCache = new ConcurrentHashMap<>();
     private final Map<Class<?>, Set<Extension>> capability2ExtensionCache = new ConcurrentHashMap<>();
 
-    ExtensionRegister()
+    ExtensionRegistry()
     {
     }
 

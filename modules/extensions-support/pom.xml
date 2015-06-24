@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.mule.modules</groupId>
-		<artifactId>mule-modules</artifactId>
-		<version>3.7.1-SNAPSHOT</version>
-	</parent>
-	<groupId>org.mule.modules</groupId>
-	<artifactId>mule-module-extensions-support</artifactId>
-	<name>Mule Extensions Support</name>
-	<packaging>jar</packaging>
-	<description>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>3.7.1-SNAPSHOT</version>
+    </parent>
+    <groupId>org.mule.modules</groupId>
+    <artifactId>mule-module-extensions-support</artifactId>
+    <name>Mule Extensions Support</name>
+    <packaging>jar</packaging>
+    <description>
         Default implementation of the Mule Extension API.
     </description>
 
     <dependencies>
-		<!-- Mule Dependencies -->
+        <!-- Mule Dependencies -->
         <dependency>
             <groupId>org.mule.extensions</groupId>
             <artifactId>mule-extensions-api</artifactId>
@@ -25,11 +25,11 @@
             <groupId>org.mule.extensions</groupId>
             <artifactId>mule-extensions-annotations</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.mule</groupId>
-			<artifactId>mule-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!--Other Dependencies-->
         <dependency>
@@ -45,14 +45,14 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.mule</groupId>
-			<artifactId>mule-core</artifactId>
-			<version>${project.version}</version>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -67,7 +67,7 @@
             <artifactId>hamcrest-library</artifactId>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 
     <build>
         <plugins>

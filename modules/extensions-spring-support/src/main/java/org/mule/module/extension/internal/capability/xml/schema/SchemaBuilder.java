@@ -65,7 +65,7 @@ import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelCo
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
-import org.mule.module.extension.internal.introspection.BaseDataQualifierVisitor;
+import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.ArrayUtils;
@@ -159,7 +159,7 @@ public class SchemaBuilder
 
         for (final Parameter parameter : configuration.getParameters())
         {
-            parameter.getType().getQualifier().accept(new BaseDataQualifierVisitor()
+            parameter.getType().getQualifier().accept(new AbstractDataQualifierVisitor()
             {
 
                 private boolean forceOptional = false;
@@ -274,7 +274,7 @@ public class SchemaBuilder
             final boolean required = isRequired(field);
             final boolean dynamic = isDynamic(field);
 
-            fieldType.getQualifier().accept(new BaseDataQualifierVisitor()
+            fieldType.getQualifier().accept(new AbstractDataQualifierVisitor()
             {
 
                 @Override
@@ -442,7 +442,7 @@ public class SchemaBuilder
         attribute.setUse(required ? SchemaConstants.USE_REQUIRED : SchemaConstants.USE_OPTIONAL);
         attribute.setAnnotation(createDocAnnotation(description));
 
-        type.getQualifier().accept(new BaseDataQualifierVisitor()
+        type.getQualifier().accept(new AbstractDataQualifierVisitor()
         {
 
             @Override
@@ -500,7 +500,7 @@ public class SchemaBuilder
         collectionItemElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
 
         final DataType genericType = getFirstGenericType(type);
-        genericType.getQualifier().accept(new BaseDataQualifierVisitor()
+        genericType.getQualifier().accept(new AbstractDataQualifierVisitor()
         {
 
             @Override
@@ -649,7 +649,7 @@ public class SchemaBuilder
             }
             else
             {
-                parameterQualifier.accept(new BaseDataQualifierVisitor()
+                parameterQualifier.accept(new AbstractDataQualifierVisitor()
                 {
 
                     @Override

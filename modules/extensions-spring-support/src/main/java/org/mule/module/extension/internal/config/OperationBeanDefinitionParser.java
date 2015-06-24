@@ -19,7 +19,7 @@ import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
-import org.mule.module.extension.internal.introspection.BaseDataQualifierVisitor;
+import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.ArrayUtils;
 
@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
  * A {@link BeanDefinitionParser} to parse message processors
  * which execute operations implemented through the extensions API.
  * <p/>
- * It defines an {@link OperationFactoryBean} which in turn builds
+ * It defines an {@link OperationMessageProcessorFactoryBean} which in turn builds
  * the actual {@link MessageProcessor}
  *
  * @since 3.7.0
@@ -59,7 +59,7 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext)
     {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OperationFactoryBean.class);
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OperationMessageProcessorFactoryBean.class);
         builder.setScope(BeanDefinition.SCOPE_PROTOTYPE);
         parseConfigRef(element, builder);
         builder.addConstructorArgValue(operation);
@@ -81,7 +81,7 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         for (final Parameter parameter : operation.getParameters())
         {
             final DataType type = parameter.getType();
-            type.getQualifier().accept(new BaseDataQualifierVisitor()
+            type.getQualifier().accept(new AbstractDataQualifierVisitor()
             {
 
                 @Override
