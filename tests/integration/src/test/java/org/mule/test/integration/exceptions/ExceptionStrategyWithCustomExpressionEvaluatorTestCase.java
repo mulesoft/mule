@@ -15,6 +15,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.message.ExceptionMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transformer.types.TypedValue;
 
 import org.junit.Test;
 
@@ -42,6 +43,12 @@ public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends Func
         public Object evaluate(String expression, MuleMessage message)
         {
             throw new UnsupportedOperationException("evaluate");
+        }
+
+        @Override
+        public TypedValue evaluateTyped(String expression, MuleMessage message)
+        {
+            return null;
         }
 
         public String getName()

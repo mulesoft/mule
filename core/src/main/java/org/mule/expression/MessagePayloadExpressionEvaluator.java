@@ -15,6 +15,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -87,6 +88,14 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator, M
                 throw new MuleRuntimeException(CoreMessages.failedToProcessExtractorFunction(expression), e);
             }
         }
+    }
+
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        final Object value = evaluate(expression, message);
+
+        return new TypedValue(value, value == null ? DataTypeFactory.create(Object.class, null) : message.getDataType());
     }
 
     /**

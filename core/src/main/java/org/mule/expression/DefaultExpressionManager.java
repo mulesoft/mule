@@ -22,7 +22,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.el.mvel.MVELExpressionLanguage;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
@@ -51,7 +50,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
      */
     protected static transient final Log logger = LogFactory.getLog(DefaultExpressionManager.class);
 
-    private static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
+    public static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
 
     // default style parser
     private TemplateParser parser = TemplateParser.createMuleStyleParser();
@@ -243,8 +242,24 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
         else
         {
+
             expressionLanguage.evaluate(createEnrichmentExpression(expression), message,
-                Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
+                                        Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
+        }
+    }
+
+    @Override
+    public void enrichTyped(String expression, MuleMessage message, TypedValue object)
+    {
+        expression = removeExpressionMarker(expression);
+        if (isEvaluatorExpression(expression))
+        {
+            String[] parts = expression.split(":", 2);
+            enrich(parts[1], parts[0], message, object.getValue());
+        }
+        else
+        {
+            expressionLanguage.enrich(createEnrichmentExpression(expression), message, object);
         }
     }
 
@@ -260,7 +275,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         {
             expression = createEnrichmentExpression(expression);
             expressionLanguage.evaluate(expression, event,
-                Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
+                                        Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
         }
     }
 
@@ -299,25 +314,54 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         {
             return expressionLanguage.evaluate(expression, message);
         }
+        ExpressionEvaluator extractor = getExpressionEvaluator(evaluator);
+        Object result = extractor.evaluate(expression, message);
+        checkRequiredValue(expression, evaluator, failIfNull, result);
+        return result;
+    }
+
+    @Override
+    public TypedValue evaluateTyped(String expression, String evaluator, MuleMessage message, boolean failIfNull)
+            throws ExpressionRuntimeException
+    {
+        if (evaluator == null)
+        {
+            return expressionLanguage.evaluateTyped(expression, message);
+        }
+        ExpressionEvaluator extractor = getExpressionEvaluator(evaluator);
+
+        TypedValue result = extractor.evaluateTyped(expression, message);
+
+        checkRequiredValue(expression, evaluator, failIfNull, result.getValue());
+
+        return result;
+    }
+
+    private ExpressionEvaluator getExpressionEvaluator(String evaluator)
+    {
         ExpressionEvaluator extractor = (ExpressionEvaluator) evaluators.get(evaluator);
+
         if (extractor == null)
         {
             throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator)
-                .getMessage());
+                                                       .getMessage());
         }
-        Object result = extractor.evaluate(expression, message);
-        // TODO Handle empty collections || (result instanceof Collection && ((Collection)result).size()==0)
-        if (failIfNull && (result == null))
+
+        return extractor;
+    }
+
+    private void checkRequiredValue(String expression, String evaluator, boolean failIfNull, Object value)
+    {
+        if (failIfNull && (value == null))
         {
             throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(evaluator,
-                expression));
+                                                                                          expression));
         }
         if (logger.isDebugEnabled())
         {
             logger.debug(MessageFormat.format("Result of expression: {0}:{1} is: {2}", evaluator, expression,
-                result));
+                                              value));
         }
-        return result;
     }
 
     public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message)
@@ -529,8 +573,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         if (isEvaluatorExpression(expression))
         {
             String[] parts = expression.split(":", 2);
-            final Object value = evaluate(parts[1], parts[0], message, false);
-            return new TypedValue(value, DataTypeFactory.create(value == null? Object.class : value.getClass(), null));
+            return evaluateTyped(parts[1], parts[0], message, false);
         }
         else
         {

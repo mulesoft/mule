@@ -8,20 +8,26 @@ package org.mule.mule.enricher;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
+import static org.junit.Assert.assertThat;
+import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transformer.DataType;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.transformer.types.DataTypeFactory;
+
+import java.nio.charset.StandardCharsets;
 
 import junit.framework.Assert;
-
 import org.junit.Test;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
@@ -107,7 +113,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         MessageEnricher enricher = new MessageEnricher();
         enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[process:appender:#[header:header1]]",
-            "#[header:myHeader]"));
+                                                                  "#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
 
@@ -368,4 +374,222 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         assertEquals("bar", out.getSessionVariable("foo"));
     }
 
+    @Test
+    public void enrichesFlowVarWithDataType() throws Exception
+    {
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[payload]", "#[flowVars['foo']]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+
+                event.getMessage().setPayload("bar", dataType);
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getInvocationProperty("foo"));
+        assertThat(out.getMessage().getPropertyDataType("foo", PropertyScope.INVOCATION), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+    }
+
+    @Test
+    public void enrichesFlowVarWithDataTypeUsingExpressionEvaluator() throws Exception
+    {
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[flowVars['foo']]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+
+                event.getMessage().setPayload("bar", dataType);
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getInvocationProperty("foo"));
+        assertThat(out.getMessage().getPropertyDataType("foo", PropertyScope.INVOCATION), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+    }
+
+    @Test
+    public void enrichesSessionVarWithDataType() throws Exception
+    {
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[payload]", "#[sessionVars['foo']]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+
+                event.getMessage().setPayload("bar", dataType);
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getProperty("foo", PropertyScope.SESSION));
+        assertThat(out.getMessage().getPropertyDataType("foo", PropertyScope.SESSION), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+    }
+
+    @Test
+    public void enrichesFlowVarWithDataTypeUsingComplexTargetExpression() throws Exception
+    {
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[payload]", "#[flowVars['foo' + 1]]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+
+                event.getMessage().setPayload("bar", dataType);
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getInvocationProperty("foo1"));
+        assertThat(out.getMessage().getPropertyDataType("foo1", PropertyScope.INVOCATION), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+    }
+
+    @Test
+    public void enrichesFlowVarWithDataTypeUsingDotSyntax() throws Exception
+    {
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[payload]", "#[flowVars.foo]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+
+                event.getMessage().setPayload("bar", dataType);
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getInvocationProperty("foo"));
+        assertThat(out.getMessage().getPropertyDataType("foo", PropertyScope.INVOCATION), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+    }
+
+
+    @Test
+    public void enrichesPayloadWithDataType() throws Exception
+    {
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[payload]", "#[payload]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+
+                event.getMessage().setPayload("bar", dataType);
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getPayload());
+        assertThat(out.getMessage().getDataType(), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+    }
+
+    @Test
+    public void enrichesInlineFlowVarWithDataType() throws Exception
+    {
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[payload]", "#[foo]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+
+                event.getMessage().setPayload("bar", dataType);
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+        in.getMessage().setInvocationProperty("foo", TEST_MESSAGE);
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getInvocationProperty("foo"));
+        assertThat(out.getMessage().getPropertyDataType("foo", PropertyScope.INVOCATION), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+    }
+
+    @Test
+    public void enrichesInlineSessionVarWithDataType() throws Exception
+    {
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(StandardCharsets.UTF_16.name());
+
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[payload]", "#[foo]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+
+                event.getMessage().setPayload("bar", dataType);
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+        in.getMessage().setProperty("foo", TEST_MESSAGE, PropertyScope.SESSION);
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getProperty("foo", PropertyScope.SESSION));
+        assertThat(out.getMessage().getPropertyDataType("foo", PropertyScope.SESSION), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+    }
 }

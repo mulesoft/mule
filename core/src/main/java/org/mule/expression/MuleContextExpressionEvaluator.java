@@ -12,7 +12,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 
@@ -30,7 +29,7 @@ import org.mule.config.i18n.CoreMessages;
  * <li>homeDir - Mule's home directory</li>
  * </ul>
  */
-public class MuleContextExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
+public class MuleContextExpressionEvaluator extends AbstractExpressionEvaluator implements MuleContextAware
 {
     public static final String NAME = "context";
 

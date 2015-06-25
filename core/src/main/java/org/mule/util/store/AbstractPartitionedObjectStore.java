@@ -15,7 +15,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class AbstractPartitionedObjectStore<T extends Serializable>
+    public abstract class AbstractPartitionedObjectStore<T extends Serializable>
     implements PartitionableObjectStore<T>
 {
     protected final static String DEFAULT_PARTITION = "DEFAULT_PARTITION";
