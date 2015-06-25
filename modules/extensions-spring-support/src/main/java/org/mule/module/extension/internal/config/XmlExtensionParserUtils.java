@@ -22,7 +22,7 @@ import org.mule.extension.introspection.DataQualifierVisitor;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
-import org.mule.module.extension.internal.introspection.BaseDataQualifierVisitor;
+import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.introspection.SimpleTypeDataQualifierVisitor;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
@@ -77,11 +77,197 @@ final class XmlExtensionParserUtils
     private static final TemplateParser parser = TemplateParser.createMuleStyleParser();
     private static final ConversionService conversionService = new DefaultConversionService();
 
+    /**
+     * Parses the given {@code element} for an attribute named {@code name}. If not found,
+     * a name is auto generated for the element. In either case, the obtained name
+     * is set on the {@code builder} using the {@link BeanDefinitionBuilder#addConstructorArgValue(Object)}
+     * method
+     *
+     * @param element an {@link Element} being parsed
+     * @param builder a {@link BeanDefinitionBuilder}
+     */
     static void parseConfigName(Element element, BeanDefinitionBuilder builder)
     {
         String name = AutoIdUtils.getUniqueName(element, "mule-bean");
         element.setAttribute("name", name);
         builder.addConstructorArgValue(name);
+    }
+
+    /**
+     * Sets the {@link MuleHierarchicalBeanDefinitionParserDelegate#MULE_NO_RECURSE} attribute
+     * on the given {@code definition}
+     *
+     * @param definition a {@link BeanDefinition}
+     */
+    static void setNoRecurseOnDefinition(BeanDefinition definition)
+    {
+        definition.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE, Boolean.TRUE);
+    }
+
+    /**
+     * Parses an {@code element} which is assumed to be a representation of the given
+     * {@code parameter}. It then returns a {@link ValueResolver} which will provide
+     * the actual value extracted from the {@code element}
+     *
+     * @param element   a {@link ElementDescriptor}
+     * @param parameter a {@link Parameter}
+     * @return a {@link ValueResolver}
+     */
+    static ValueResolver parseParameter(ElementDescriptor element, Parameter parameter)
+    {
+        return parseElement(element, parameter.getName(), parameter.getType(), parameter.getDefaultValue());
+    }
+
+    /**
+     * Parses an {@code element} which is assumed to be a representation of the given
+     * {@code dataType}. It then returns a {@link ValueResolver} which will provide
+     * the actual value extracted from the {@code element}
+     *
+     * @param element      a {@link ElementDescriptor}
+     * @param fieldName    the name of the variable in which the value is to be stored
+     * @param dataType     the {@link DataType} that describes the type of the value to be extracted
+     * @param defaultValue a default value in case that the {@code element} does not contain an actual value
+     * @return a {@link ValueResolver}
+     */
+    static ValueResolver parseElement(final ElementDescriptor element,
+                                      final String fieldName,
+                                      final DataType dataType,
+                                      final Object defaultValue)
+    {
+        final String hyphenizedFieldName = hyphenize(fieldName);
+        final String singularName = singularize(hyphenizedFieldName);
+        final ValueHolder<ValueResolver> resolverReference = new ValueHolder<>();
+
+        DataQualifierVisitor visitor = new AbstractDataQualifierVisitor()
+        {
+
+            /**
+             * An attribute of a generic type
+             */
+            @Override
+            public void defaultOperation()
+            {
+                resolverReference.set(getResolverFromValue(getAttributeValue(element, fieldName, defaultValue), dataType));
+            }
+
+            /**
+             * A collection type. Might be defined in an inner element or referenced
+             * from an attribute
+             */
+            @Override
+            public void onList()
+            {
+                resolverReference.set(parseCollection(element, fieldName, hyphenizedFieldName, singularName, defaultValue, dataType));
+            }
+
+            @Override
+            public void onPojo()
+            {
+                resolverReference.set(parsePojo(element, fieldName, hyphenizedFieldName, dataType, defaultValue));
+            }
+
+            @Override
+            public void onDateTime()
+            {
+                if (Calendar.class.isAssignableFrom(dataType.getRawType()))
+                {
+                    resolverReference.set(parseCalendar(element, fieldName, dataType, defaultValue));
+                }
+                else
+                {
+                    resolverReference.set(parseDate(element, fieldName, dataType, defaultValue));
+                }
+            }
+        };
+
+        dataType.getQualifier().accept(visitor);
+        return resolverReference.get();
+    }
+
+    /**
+     * Creates a {@link BeanDefinition} which generates a {@link ElementDescriptor}
+     * that describes the given {@code element}
+     *
+     * @param element the {@link Element} you want to describe
+     * @return a {@link BeanDefinition}
+     */
+    static BeanDefinition toElementDescriptorBeanDefinition(Element element)
+    {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ElementDescriptor.class);
+        builder.addConstructorArgValue(element.getLocalName());
+        parseElementDescriptorAttributes(element, builder);
+        parseElementDescriptorChilds(element, builder);
+
+        return builder.getBeanDefinition();
+    }
+
+    /**
+     * Creates a new {@link ResolverSet} which provides a {@link ValueResolver valueResolvers}
+     * for each {@link Parameter} in the {@code parameters} list,
+     * taking the same {@code element} as source
+     *
+     * @param element    a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
+     * @param parameters a {@link List} of {@link Parameter}s
+     * @return a {@link ResolverSet}
+     */
+    static ResolverSet getResolverSet(ElementDescriptor element, List<Parameter> parameters)
+    {
+        return getResolverSet(element, parameters, ImmutableMap.<String, List<MessageProcessor>>of());
+    }
+
+    /**
+     * Creates a new {@link ResolverSet} which provides a {@link ValueResolver valueResolvers}
+     * for each {@link Parameter} in the {@code parameters} list, taking as source the given {@code element}
+     * an a {@code nestedOperations} {@link Map} which has {@link Parameter} names as keys, and {@link List}s
+     * of {@link MessageProcessor} as values.
+     * <p/>
+     * For each {@link Parameter} in the {@code parameters} list, if an entry exists in the {@code nestedOperations}
+     * {@link Map}, a {@link ValueResolver} that generates {@link NestedProcessor} instances will be added to the
+     * {@link ResolverSet}. Otherwise, a {@link ValueResolver} will be inferred from the given {@code element} just
+     * like the {@link #getResolverSet(ElementDescriptor, List)} method does
+     *
+     * @param element          a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
+     * @param parameters       a {@link List} of {@link Parameter}s
+     * @param nestedOperations a {@link Map} which has {@link Parameter} names as keys, and {@link List}s
+     *                         of {@link MessageProcessor} as values
+     * @return a {@link ResolverSet}
+     */
+    static ResolverSet getResolverSet(ElementDescriptor element, List<Parameter> parameters, Map<String, List<MessageProcessor>> nestedOperations)
+    {
+        ResolverSet resolverSet = new ResolverSet();
+
+        for (Parameter parameter : parameters)
+        {
+            List<MessageProcessor> nestedProcessors = nestedOperations.get(parameter.getName());
+            if (!CollectionUtils.isEmpty(nestedProcessors))
+            {
+                addNestedProcessorResolver(resolverSet, parameter, nestedProcessors);
+            }
+            else
+            {
+                ValueResolver<?> resolver = parseParameter(element, parameter);
+                resolverSet.add(parameter, resolver != null ? resolver : new StaticValueResolver(null));
+            }
+        }
+
+        return resolverSet;
+    }
+
+    /**
+     * Returns a value associated with the {@code element}. If the {@code element} has an attribute
+     * named {@code attributeName}, then it returns the value of such attribute. Otherwise, it returns
+     * {@code defaultValue}
+     *
+     * @param element       a {@link ElementDescriptor}
+     * @param attributeName the name of an attribute presumed to exist in the {@code element}
+     * @param defaultValue  a default value in case that the {@code element} does not have the presumed attribute
+     * @return the value of the {@code element}
+     */
+    static Object getAttributeValue(ElementDescriptor element, String attributeName, Object defaultValue)
+    {
+        return element.hasAttribute(attributeName)
+               ? element.getAttribute(attributeName)
+               : defaultValue;
     }
 
     private static ValueResolver parseCollectionAsInnerElement(ElementDescriptor collectionElement,
@@ -93,7 +279,7 @@ final class XmlExtensionParserUtils
 
         for (final ElementDescriptor item : collectionElement.getChildsByName(childElementName))
         {
-            DataQualifierVisitor visitor = new BaseDataQualifierVisitor()
+            DataQualifierVisitor visitor = new AbstractDataQualifierVisitor()
             {
                 @Override
                 public void onPojo()
@@ -144,13 +330,6 @@ final class XmlExtensionParserUtils
         return getResolverFromValue(getAttributeValue(element, attributeName, defaultValue), expectedDataType);
     }
 
-    static Object getAttributeValue(ElementDescriptor element, String attributeName, Object defaultValue)
-    {
-        return element.hasAttribute(attributeName)
-               ? element.getAttribute(attributeName)
-               : defaultValue;
-    }
-
     private static ValueResolver getResolverFromValue(final Object value, final DataType expectedDataType)
     {
         if (isExpression(value, parser))
@@ -192,7 +371,7 @@ final class XmlExtensionParserUtils
     }
 
     /**
-     * parses a pojo which type is described by {@code pojoType},
+     * Parses a pojo which type is described by {@code pojoType},
      * recursively moving through the pojo's properties.
      *
      * @param element          the XML element which has the bean as a child
@@ -298,7 +477,7 @@ final class XmlExtensionParserUtils
             }
             catch (ParseException e)
             {
-                throw new IllegalArgumentException(String.format("Could not transform value '%s' into a Date using pattern %s", value, parseFormat));
+                throw new IllegalArgumentException(String.format("Could not transform value '%s' into a Date using pattern '%s'", value, parseFormat));
             }
         }
 
@@ -337,113 +516,6 @@ final class XmlExtensionParserUtils
         {
             return new StaticValueResolver(doParseDate(element, attributeName, DATE_FORMAT, defaultValue));
         }
-    }
-
-    static void setNoRecurseOnDefinition(BeanDefinition definition)
-    {
-        definition.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE, Boolean.TRUE);
-    }
-
-    static ValueResolver parseParameter(ElementDescriptor element, Parameter parameter)
-    {
-        return parseElement(element, parameter.getName(), parameter.getType(), parameter.getDefaultValue());
-    }
-
-    static ValueResolver parseElement(final ElementDescriptor element,
-                                      final String fieldName,
-                                      final DataType dataType,
-                                      final Object defaultValue)
-    {
-        final String hyphenizedFieldName = hyphenize(fieldName);
-        final String singularName = singularize(hyphenizedFieldName);
-        final ValueHolder<ValueResolver> resolverReference = new ValueHolder<>();
-
-        DataQualifierVisitor visitor = new BaseDataQualifierVisitor()
-        {
-
-            /**
-             * An attribute of a supported or unknown type
-             */
-            @Override
-            public void defaultOperation()
-            {
-                resolverReference.set(getResolverFromValue(getAttributeValue(element, fieldName, defaultValue), dataType));
-            }
-
-            /**
-             * A collection type. Might be defined in an inner element or referenced
-             * from an attribute
-             */
-            @Override
-            public void onList()
-            {
-                resolverReference.set(parseCollection(element, fieldName, hyphenizedFieldName, singularName, defaultValue, dataType));
-            }
-
-            @Override
-            public void onOperation()
-            {
-                super.onOperation();
-            }
-
-            @Override
-            public void onPojo()
-            {
-                resolverReference.set(parsePojo(element, fieldName, hyphenizedFieldName, dataType, defaultValue));
-            }
-
-            @Override
-            public void onDateTime()
-            {
-                if (Calendar.class.isAssignableFrom(dataType.getRawType()))
-                {
-                    resolverReference.set(parseCalendar(element, fieldName, dataType, defaultValue));
-                }
-                else
-                {
-                    resolverReference.set(parseDate(element, fieldName, dataType, defaultValue));
-                }
-            }
-        };
-
-        dataType.getQualifier().accept(visitor);
-        return resolverReference.get();
-    }
-
-    static BeanDefinition toElementDescriptorBeanDefinition(Element element)
-    {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ElementDescriptor.class);
-        builder.addConstructorArgValue(element.getLocalName());
-        parseElementDescriptorAttributes(element, builder);
-        parseElementDescriptorChilds(element, builder);
-
-        return builder.getBeanDefinition();
-    }
-
-    static ResolverSet getResolverSet(ElementDescriptor element, List<Parameter> parameters)
-    {
-        return getResolverSet(element, parameters, ImmutableMap.<String, List<MessageProcessor>>of());
-    }
-
-    static ResolverSet getResolverSet(ElementDescriptor element, List<Parameter> parameters, Map<String, List<MessageProcessor>> nestedOperations)
-    {
-        ResolverSet resolverSet = new ResolverSet();
-
-        for (Parameter parameter : parameters)
-        {
-            List<MessageProcessor> nestedProcessors = nestedOperations.get(parameter.getName());
-            if (!CollectionUtils.isEmpty(nestedProcessors))
-            {
-                addNestedProcessorResolver(resolverSet, parameter, nestedProcessors);
-            }
-            else
-            {
-                ValueResolver<?> resolver = parseParameter(element, parameter);
-                resolverSet.add(parameter, resolver != null ? resolver : new StaticValueResolver(null));
-            }
-        }
-
-        return resolverSet;
     }
 
     private static void addNestedProcessorResolver(ResolverSet resolverSet, Parameter parameter, List<MessageProcessor> nestedProcessors)

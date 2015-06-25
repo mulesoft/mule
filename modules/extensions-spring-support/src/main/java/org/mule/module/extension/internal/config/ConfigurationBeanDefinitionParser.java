@@ -9,20 +9,22 @@ package org.mule.module.extension.internal.config;
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConfigName;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
+import org.mule.api.registry.Registry;
 import org.mule.extension.introspection.Configuration;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
 /**
- * Generic implementation of {@link org.springframework.beans.factory.xml.BeanDefinitionParser}
- * capable of parsing any {@link Configuration}
+ * Implementation of {@link BaseExtensionBeanDefinitionParser} capable of parsing instances
+ * which are compliant with the model defined in a {@link Configuration}. The outcome of
+ * this parser will be a {@link ConfigurationInstanceProviderFactoryBean}.
  * <p/>
  * It supports simple attributes, pojos, lists/sets of simple attributes, list/sets of beans,
  * and maps of simple attributes
  * <p/>
  * It the given config doesn't provide a name, then one will be automatically generated in order to register the config
- * in the {@link org.mule.api.registry.Registry}
+ * in the {@link Registry}
  *
  * @since 3.7.0
  */

@@ -29,7 +29,7 @@ import org.mule.extension.introspection.DataQualifierVisitor;
  *
  * @since 3.7.0
  */
-public abstract class SimpleTypeDataQualifierVisitor extends BaseDataQualifierVisitor
+public abstract class SimpleTypeDataQualifierVisitor extends AbstractDataQualifierVisitor
 {
 
     protected abstract void onSimpleType();

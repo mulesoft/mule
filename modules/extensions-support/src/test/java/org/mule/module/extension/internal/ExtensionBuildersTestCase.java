@@ -51,6 +51,7 @@ import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.exception.NoSuchConfigurationException;
 import org.mule.extension.exception.NoSuchOperationException;
 import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.ConfigurationInstantiator;
 import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Extension;
@@ -185,14 +186,16 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test
     public void configurationsOrder()
     {
+        ConfigurationInstantiator mockInstantiator = mock(ConfigurationInstantiator.class);
+
         final String defaultConfiguration = "default";
         final String beta = "beta";
         final String alpha = "alpha";
 
         Extension extension = factory.createFrom(new DeclarationDescriptor("test", "1.0")
-                                                         .withConfig(defaultConfiguration).describedAs(defaultConfiguration)
-                                                         .withConfig(beta).describedAs(beta)
-                                                         .withConfig(alpha).describedAs(alpha));
+                                                         .withConfig(defaultConfiguration).describedAs(defaultConfiguration).instantiatedWith(mockInstantiator)
+                                                         .withConfig(beta).describedAs(beta).instantiatedWith(mockInstantiator)
+                                                         .withConfig(alpha).describedAs(alpha).instantiatedWith(mockInstantiator));
 
         List<Configuration> configurations = extension.getConfigurations();
         assertThat(configurations, hasSize(3));

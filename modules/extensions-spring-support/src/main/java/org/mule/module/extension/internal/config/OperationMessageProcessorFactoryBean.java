@@ -27,7 +27,7 @@ import org.springframework.beans.factory.FactoryBean;
  *
  * @since 3.7.0
  */
-public class OperationFactoryBean implements FactoryBean<OperationMessageProcessor>
+public class OperationMessageProcessorFactoryBean implements FactoryBean<OperationMessageProcessor>
 {
 
     private final String configurationInstanceProviderName;
@@ -35,11 +35,11 @@ public class OperationFactoryBean implements FactoryBean<OperationMessageProcess
     private final ElementDescriptor element;
     private final Map<String, List<MessageProcessor>> nestedOperations;
 
-    public OperationFactoryBean(String configurationInstanceProviderName,
-                                Operation operation,
-                                ElementDescriptor element,
-                                Map<String, List<MessageProcessor>> nestedOperations,
-                                MuleContext muleContext)
+    public OperationMessageProcessorFactoryBean(String configurationInstanceProviderName,
+                                                Operation operation,
+                                                ElementDescriptor element,
+                                                Map<String, List<MessageProcessor>> nestedOperations,
+                                                MuleContext muleContext)
     {
         this.configurationInstanceProviderName = configurationInstanceProviderName;
         this.operation = operation;

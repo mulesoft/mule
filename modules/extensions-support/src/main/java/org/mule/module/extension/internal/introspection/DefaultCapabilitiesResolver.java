@@ -8,9 +8,7 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
 import org.mule.module.extension.CapabilityExtractor;
 
 import java.util.Collection;
@@ -36,15 +34,18 @@ final class DefaultCapabilitiesResolver implements CapabilitiesResolver
      * {@inheritDoc}
      */
     @Override
-    public void resolveCapabilities(DeclarationDescriptor declaration, Class<?> capableType, HasCapabilities<? extends Descriptor> capableCallback)
+    public void resolveCapabilities(DeclarationDescriptor declaration, Class<?> capableType)
     {
         checkArgument(declaration != null, "declaration descriptor cannot be null");
         checkArgument(capableType != null, "capable type cannot be null");
-        checkArgument(capableCallback != null, "capable callback cannot be null");
 
         for (CapabilityExtractor extractor : getExtractors())
         {
-            extractor.extractCapability(declaration, capableType, capableCallback);
+            Object capability = extractor.extractCapability(declaration, capableType);
+            if (capability != null)
+            {
+                declaration.withCapability(capability);
+            }
         }
     }
 

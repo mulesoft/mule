@@ -10,11 +10,12 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.checkNa
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.checkNullOrRepeatedNames;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
 import org.mule.extension.exception.NoSuchConfigurationException;
 import org.mule.extension.exception.NoSuchOperationException;
+import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
+import org.mule.extension.introspection.Parameter;
 
 import com.google.common.collect.ImmutableList;
 
@@ -29,13 +30,24 @@ import org.apache.commons.lang.StringUtils;
  *
  * @since 3.7.0
  */
-final class ImmutableExtension extends AbstractImmutableCapableDescribed implements Extension
+final class ImmutableExtension extends AbstractCapableDescribed implements Extension
 {
 
     private final String version;
     private final Map<String, Configuration> configurations;
     private final Map<String, Operation> operations;
 
+    /**
+     * Creates a new instance with the given state
+     *
+     * @param name           the extension's name. Cannot be blank
+     * @param description    the extension's description
+     * @param version        the extension's version
+     * @param configurations a {@link List} with the extension's {@link Configuration}s
+     * @param operations     a {@link List} with the extension's {@link Operation}s
+     * @param capabilities   a {@link Set} with the extension's capabilities
+     * @throws IllegalArgumentException if {@code configurations} or {@link Parameter} are null or contain instances with non unique names
+     */
     protected ImmutableExtension(String name,
                                  String description,
                                  String version,

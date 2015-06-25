@@ -8,11 +8,21 @@ package org.mule.module.extension.internal.config;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.VoidMuleEvent;
+import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.DataType;
+import org.mule.extension.introspection.Operation;
+import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
+/**
+ * A {@link FactoryBean} that creates instances of a type defined by a
+ * {@link DataType}. It will be defined as a top level element and will
+ * serve as a reusable {@link Parameter} of a {@link Configuration} or {@link Operation}
+ *
+ * @since 3.7.0
+ */
 final class TopLevelParameterTypeFactoryBean implements FactoryBean<Object>
 {
 

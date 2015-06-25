@@ -23,7 +23,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ImmutableDescribingContextTestCase extends AbstractMuleTestCase
+public class DefaultDescribingContextTestCase extends AbstractMuleTestCase
 {
 
     private DeclarationDescriptor descriptor;
@@ -34,7 +34,7 @@ public class ImmutableDescribingContextTestCase extends AbstractMuleTestCase
     public void before()
     {
         descriptor = new DeclarationDescriptor("name", "version");
-        context = new ImmutableDescribingContext(descriptor);
+        context = new DefaultDescribingContext(descriptor);
     }
 
     @Test
