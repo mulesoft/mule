@@ -10,6 +10,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 
 /**
  * This evaluator provide a powerful expression language for querying mule information
@@ -84,6 +86,19 @@ public class MuleExpressionEvaluator implements ExpressionEvaluator, MuleContext
         return muleContext.getExpressionManager().evaluate(fullExpression, message);
     }
 
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        if (expression == null)
+        {
+            return new TypedValue(message, DataTypeFactory.create(message.getClass(), null));
+        }
+        int i = expression.indexOf(".");
+
+        ExpressionConfig config = getExpressionConfig(expression.substring(0, i), expression.substring(i + 1));
+        String fullExpression = config.getFullExpression(muleContext.getExpressionManager());
+        return muleContext.getExpressionManager().evaluateTyped(fullExpression, message);
+    }
 
     protected ExpressionConfig getExpressionConfig(String eval, String expression)
     {

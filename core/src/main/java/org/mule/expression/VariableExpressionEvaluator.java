@@ -9,6 +9,7 @@ package org.mule.expression;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.PropertyScope;
+import org.mule.transformer.types.TypedValue;
 
 /**
  * Looks up the variable on the message using the name given.
@@ -24,6 +25,12 @@ public class VariableExpressionEvaluator implements ExpressionEvaluator
     {
         // Variable is a shortcut for invocation properties
         return ExpressionUtils.getProperty(expression, PropertyScope.INVOCATION, message);
+    }
+
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        return ExpressionUtils.getTypedProperty(expression, message, PropertyScope.INVOCATION);
     }
 
     /**

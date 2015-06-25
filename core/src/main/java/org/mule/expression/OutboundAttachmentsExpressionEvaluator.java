@@ -7,7 +7,6 @@
 package org.mule.expression;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionEvaluator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  * Creates a Map facade around a {@link org.mule.api.MuleMessage} instance to allow access to outbound
  * attachments from within components and transformers without the these objects needing access to the Mule Message
  */
-public class OutboundAttachmentsExpressionEvaluator implements ExpressionEvaluator
+public class OutboundAttachmentsExpressionEvaluator extends AbstractExpressionEvaluator
 {
     public static final String NAME = "outboundAttachments";
 

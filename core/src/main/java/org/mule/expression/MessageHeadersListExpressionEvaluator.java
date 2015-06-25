@@ -7,7 +7,6 @@
 package org.mule.expression;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionEvaluator;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ import java.util.List;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluator
+public class MessageHeadersListExpressionEvaluator extends AbstractExpressionEvaluator
 {
     public static final String NAME = "headers-list";
 

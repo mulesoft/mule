@@ -13,6 +13,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transformer.types.TypedValue;
 
 import java.util.Map;
 
@@ -41,6 +42,12 @@ public class CustomExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         public Object evaluate(String expression, MuleMessage message)
         {
             return message.getPayload() + expression;
+        }
+
+        @Override
+        public TypedValue evaluateTyped(String expression, MuleMessage message)
+        {
+            return null;
         }
 
         public String getName()

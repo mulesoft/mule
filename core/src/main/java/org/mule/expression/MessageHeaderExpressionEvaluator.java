@@ -8,6 +8,7 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.transformer.types.TypedValue;
 
 /**
  * Looks up the property on the message using the property name given.  If the call on the messgae returns null,
@@ -25,6 +26,12 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
     public Object evaluate(String expression, MuleMessage message)
     {
         return ExpressionUtils.getPropertyWithScope(expression, message);
+    }
+
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        return ExpressionUtils.getTypedProperty(expression, message);
     }
 
     /**

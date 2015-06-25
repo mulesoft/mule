@@ -6,8 +6,10 @@
  */
 package org.mule.expression;
 
+import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
+import static org.mule.expression.ExpressionConstants.DELIM;
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.WildcardFilter;
@@ -19,10 +21,6 @@ import java.util.StringTokenizer;
 
 import javax.activation.DataHandler;
 
-import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
-import static org.mule.expression.ExpressionConstants.DELIM;
-import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
-
 /**
  * Looks up the attachment(s) on the message using the expression given. The expression can contain a comma-separated list
  * of header names to lookup. A {@link java.util.List} of values is returned.
@@ -32,7 +30,7 @@ import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageAttachmentsListExpressionEvaluator implements ExpressionEvaluator
+public class MessageAttachmentsListExpressionEvaluator extends AbstractExpressionEvaluator
 {
     public static final String NAME = "attachments-list";
 

@@ -6,6 +6,7 @@
  */
 package org.mule.el.mvel;
 
+import static org.mule.expression.DefaultExpressionManager.OBJECT_FOR_ENRICHMENT;
 import static org.mule.expression.DefaultExpressionManager.removeExpressionMarker;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -18,6 +19,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
@@ -35,6 +37,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -63,6 +66,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     protected Map<String, Class<?>> imports = new HashMap<String, Class<?>>();
     protected boolean autoResolveVariables = true;
     protected MvelDataTypeResolver dataTypeResolver = new MvelDataTypeResolver();
+    protected MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator();
 
     public MVELExpressionLanguage(MuleContext muleContext)
     {
@@ -186,6 +190,18 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
                         createVariableVariableResolverFactory(message)))));
         }
         return evaluateInternal(expression, context);
+    }
+
+    @Override
+    public void enrich(String expression, MuleMessage message, TypedValue typedValue)
+    {
+        evaluate(expression, message, Collections.singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
+
+        expression = removeExpressionMarker(expression);
+
+        final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
+
+        dataTypePropagator.propagate(typedValue, message, compiledExpression);
     }
 
     @Override

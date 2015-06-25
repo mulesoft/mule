@@ -15,18 +15,16 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.expression.ExpressionManager;
-import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.MessageProcessors;
-import org.mule.api.processor.MessageRouter;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
+import org.mule.transformer.types.TypedValue;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -82,19 +80,21 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
             sourceExpressionArg = "#[payload:]";
         }
 
-        Object enrichmentObject = expressionManager.evaluate(sourceExpressionArg, enrichmentMessage);
-        if (enrichmentObject instanceof MuleMessage)
+        TypedValue typedValue = expressionManager.evaluateTyped(sourceExpressionArg, enrichmentMessage);
+
+        if (typedValue.getValue() instanceof MuleMessage)
         {
-            enrichmentObject = ((MuleMessage) enrichmentObject).getPayload();
+            MuleMessage muleMessage = (MuleMessage) typedValue.getValue();
+            typedValue = new TypedValue(muleMessage.getPayload(), muleMessage.getDataType());
         }
 
         if (!StringUtils.isEmpty(targetExpressionArg))
         {
-            expressionManager.enrich(targetExpressionArg, currentMessage, enrichmentObject);
+            expressionManager.enrichTyped(targetExpressionArg, currentMessage, typedValue);
         }
         else
         {
-            currentMessage.setPayload(enrichmentObject);
+            currentMessage.setPayload(typedValue.getValue(), typedValue.getDataType());
         }
     }
 
