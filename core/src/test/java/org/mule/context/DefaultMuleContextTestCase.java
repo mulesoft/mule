@@ -6,15 +6,21 @@
  */
 package org.mule.context;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
+import org.mule.DataTypeConversionResolver;
 import org.mule.DefaultMuleContext;
+import org.mule.DynamicDataTypeConversionResolver;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
@@ -44,7 +50,6 @@ import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 
 public class DefaultMuleContextTestCase extends AbstractMuleTestCase
@@ -54,8 +59,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
     public static final String VALUE_AFTER_REDEPLOY = "222";
     public static final String TEST_PROTOCOL = "test2";
 
-    private SystemExceptionHandler mockSystemExceptionHandler = Mockito.mock(SystemExceptionHandler.class);
-    private MessagingException mockMessagingException = Mockito.mock(MessagingException.class);
+    private SystemExceptionHandler mockSystemExceptionHandler = mock(SystemExceptionHandler.class);
+    private MessagingException mockMessagingException = mock(MessagingException.class);
     private MuleContextFactory muleContextFactory;
 
     @Before
@@ -208,4 +213,18 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         assertThat((TransactionManager)context.getRegistry().lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER), is(CoreMatchers.sameInstance(transactionManager)));
     }
 
+    @Test
+    public void cachesDataTypeConversionResolver() throws Exception
+    {
+        DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+        final MuleRegistryHelper muleRegistry = mock(MuleRegistryHelper.class);
+        context.setMuleRegistry(muleRegistry);
+
+        DataTypeConversionResolver dataTypeConverterResolver1 = context.getDataTypeConverterResolver();
+        DataTypeConversionResolver dataTypeConverterResolver2 = context.getDataTypeConverterResolver();
+
+        assertThat(dataTypeConverterResolver1, instanceOf(DynamicDataTypeConversionResolver.class));
+        assertThat(dataTypeConverterResolver2, sameInstance(dataTypeConverterResolver1));
+        verify(muleRegistry).lookupObject(OBJECT_CONVERTER_RESOLVER);
+    }
 }
