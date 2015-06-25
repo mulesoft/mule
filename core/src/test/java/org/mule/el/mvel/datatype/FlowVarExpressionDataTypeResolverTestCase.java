@@ -7,22 +7,13 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.transport.PropertyScope;
-
-import org.junit.Test;
+import static org.mule.api.transport.PropertyScope.INVOCATION;
 
 public class FlowVarExpressionDataTypeResolverTestCase extends AbstractVarExpressionDataTypeResolverTestCase
 {
 
-    @Test
-    public void returnsFlowVarDataType() throws Exception
+    public FlowVarExpressionDataTypeResolverTestCase()
     {
-        doVarDataTypeTest(PropertyScope.INVOCATION, "flowVars['foo']");
-    }
-
-    @Override
-    protected ExpressionDataTypeResolver createExpressionDataTypeResolver()
-    {
-        return new FlowVarExpressionDataTypeResolver();
+        super(new FlowVarExpressionDataTypeResolver(), INVOCATION,  "flowVars");
     }
 }

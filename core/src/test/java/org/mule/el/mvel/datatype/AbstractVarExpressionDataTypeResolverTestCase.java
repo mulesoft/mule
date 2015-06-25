@@ -32,23 +32,51 @@ import org.mule.transformer.types.DataTypeFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
+import org.junit.Test;
+
 public abstract class AbstractVarExpressionDataTypeResolverTestCase extends AbstractMuleContextTestCase
 {
 
     public static final String EXPRESSION_VALUE = "bar";
     public static final String CUSTOM_ENCODING = StandardCharsets.UTF_16.name();
+    public static final String PROPERTY_NAME = "foo";
 
-    private final ExpressionDataTypeResolver expressionDataTypeResolver = createExpressionDataTypeResolver();
+    private final ExpressionDataTypeResolver expressionDataTypeResolver;
+    private final PropertyScope scope;
+    private final String variableName;
 
-    protected abstract ExpressionDataTypeResolver createExpressionDataTypeResolver();
+    protected AbstractVarExpressionDataTypeResolverTestCase(ExpressionDataTypeResolver expressionDataTypeResolver, PropertyScope scope, String variableName)
+    {
+        this.expressionDataTypeResolver = expressionDataTypeResolver;
+        this.scope = scope;
+        this.variableName = variableName;
+    }
 
-    protected void doVarDataTypeTest(PropertyScope scope, String expression) throws Exception
+    @Test
+    public void returnsFlowVarDataTypeUsingMapSyntax() throws Exception
+    {
+        doVarDataTypeTest(variableName + "['" + PROPERTY_NAME + "']");
+    }
+
+    @Test
+    public void returnsFlowVarDataTypeUsingDotSyntax() throws Exception
+    {
+        doVarDataTypeTest(variableName + "." + PROPERTY_NAME );
+    }
+
+    @Test
+    public void returnsFlowVarDataTypeUsingEscapedDotSyntax() throws Exception
+    {
+        doVarDataTypeTest(variableName + ".'" + PROPERTY_NAME + "'");
+    }
+
+    protected void doVarDataTypeTest(String expression) throws Exception
     {
         final DataType expectedDataType = DataTypeFactory.create(String.class, JSON);
         expectedDataType.setEncoding(CUSTOM_ENCODING);
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-        testEvent.getMessage().setProperty("foo", EXPRESSION_VALUE, scope, expectedDataType);
+        testEvent.getMessage().setProperty(PROPERTY_NAME, EXPRESSION_VALUE, scope, expectedDataType);
 
         final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
         final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(testEvent, parserConfiguration);

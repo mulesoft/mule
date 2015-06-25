@@ -9,20 +9,11 @@ package org.mule.el.mvel.datatype;
 
 import static org.mule.api.transport.PropertyScope.SESSION;
 
-import org.junit.Test;
-
 public class SessionVarExpressionDataTypeResolverTestCase extends AbstractVarExpressionDataTypeResolverTestCase
 {
 
-    @Test
-    public void returnsFlowVarDataType() throws Exception
+    public SessionVarExpressionDataTypeResolverTestCase()
     {
-        doVarDataTypeTest(SESSION, "sessionVars['foo']");
-    }
-
-    @Override
-    protected ExpressionDataTypeResolver createExpressionDataTypeResolver()
-    {
-        return new SessionVarExpressionDataTypeResolver();
+        super(new SessionVarExpressionDataTypeResolver(), SESSION, "sessionVars");
     }
 }
