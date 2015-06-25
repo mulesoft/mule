@@ -182,6 +182,7 @@ public class DefaultMuleContext implements MuleContext
     private ExtensionManager extensionManager;
 
     private ObjectSerializer objectSerializer;
+    private DataTypeConversionResolver dataTypeConversionResolver;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -931,19 +932,29 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public DataTypeConversionResolver getDataTypeConverterResolver()
     {
-        DataTypeConversionResolver dataTypeConversionResolver = getRegistry().lookupObject(MuleProperties.OBJECT_CONVERTER_RESOLVER);
         if (dataTypeConversionResolver == null)
         {
-            dataTypeConversionResolver = new DynamicDataTypeConversionResolver(this);
+            synchronized (this)
+            {
+                if (dataTypeConversionResolver == null)
+                {
+                    dataTypeConversionResolver = getRegistry().lookupObject(MuleProperties.OBJECT_CONVERTER_RESOLVER);
 
-            try
-            {
-                getRegistry().registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER, dataTypeConversionResolver);
-            }
-            catch (RegistrationException e)
-            {
-                // Should not occur
-                throw new IllegalStateException(e);
+                    if (dataTypeConversionResolver == null)
+                    {
+                        dataTypeConversionResolver = new DynamicDataTypeConversionResolver(this);
+
+                        try
+                        {
+                            getRegistry().registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER, dataTypeConversionResolver);
+                        }
+                        catch (RegistrationException e)
+                        {
+                            // Should not occur
+                            throw new IllegalStateException(e);
+                        }
+                    }
+                }
             }
         }
 
