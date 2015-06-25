@@ -14,6 +14,7 @@ import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.compiler.Accessor;
 import org.mule.mvel2.compiler.AccessorNode;
 import org.mule.mvel2.compiler.ExecutableLiteral;
+import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessor;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessorNest;
 import org.mule.mvel2.optimizers.impl.refl.nodes.VariableAccessor;
 
@@ -43,14 +44,23 @@ public abstract class AbstractVariableExpressionDataTypeResolver extends Abstrac
             if (variableAccessor.getProperty().equals(propertyName))
             {
                 final AccessorNode nextNode = variableAccessor.getNextNode();
+                String propertyName = null;
                 if (nextNode instanceof MapAccessorNest)
                 {
                     final MapAccessorNest mapAccesorNest = (MapAccessorNest) nextNode;
                     if (mapAccesorNest.getProperty().isLiteralOnly())
                     {
-                        final String propertyName = (String) ((ExecutableLiteral) mapAccesorNest.getProperty()).getLiteral();
-                        return message.getPropertyDataType(propertyName, scope);
+                        propertyName = (String) ((ExecutableLiteral) mapAccesorNest.getProperty()).getLiteral();
                     }
+                }
+                else if (nextNode instanceof MapAccessor)
+                {
+                    propertyName = (String) ((MapAccessor) nextNode).getProperty();
+                }
+
+                if (propertyName != null)
+                {
+                    return message.getPropertyDataType(propertyName, scope);
                 }
             }
         }
