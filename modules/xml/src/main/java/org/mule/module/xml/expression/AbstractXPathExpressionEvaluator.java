@@ -11,7 +11,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -20,6 +19,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.expression.AbstractExpressionEvaluator;
 import org.mule.module.xml.el.XPath3Function;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
  * @deprecated this base class is deprecated. Use {@link XPath3Function} instead
  */
 @Deprecated
-public abstract class AbstractXPathExpressionEvaluator implements ExpressionEvaluator, Initialisable, Disposable, MuleContextAware
+public abstract class AbstractXPathExpressionEvaluator extends AbstractExpressionEvaluator implements Initialisable, Disposable, MuleContextAware
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXPathExpressionEvaluator.class);
 

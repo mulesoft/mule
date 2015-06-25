@@ -12,6 +12,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transformer.types.TypedValue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +59,12 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase
         expressionManager.registerEvaluator(new ExpressionEvaluator()
         {
             public Object evaluate(String expression, MuleMessage message)
+            {
+                return null;
+            }
+
+            @Override
+            public TypedValue evaluateTyped(String expression, MuleMessage message)
             {
                 return null;
             }

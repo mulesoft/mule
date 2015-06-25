@@ -9,7 +9,6 @@ package org.mule.expression;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.AbstractEndpointBuilder;
 
@@ -22,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
+public class EndpointInfoExpressionEvaluator extends AbstractExpressionEvaluator implements MuleContextAware
 {
     public static final String NAME = "endpoint";
 

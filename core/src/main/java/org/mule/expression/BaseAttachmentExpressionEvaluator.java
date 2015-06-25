@@ -7,15 +7,13 @@
 package org.mule.expression;
 
 import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
-
-import javax.activation.DataHandler;
-
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 
-public abstract class BaseAttachmentExpressionEvaluator implements ExpressionEvaluator
+import javax.activation.DataHandler;
+
+public abstract class BaseAttachmentExpressionEvaluator extends AbstractExpressionEvaluator
 {
     
     public Object evaluate(String expression, MuleMessage message)
@@ -43,7 +41,7 @@ public abstract class BaseAttachmentExpressionEvaluator implements ExpressionEva
         }
         return dh;
     }
-    
+
     protected abstract DataHandler getAttachment(MuleMessage message, String attachmentName);
 
 }

@@ -8,7 +8,6 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
@@ -36,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * <li>shortPayloadClass - Returns just the class name of the payload as a string</li>
  * </ul>
  */
-public class FunctionExpressionEvaluator implements ExpressionEvaluator
+public class FunctionExpressionEvaluator extends AbstractExpressionEvaluator
 {
     public static final String NAME = "function";
 
@@ -128,7 +127,7 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         {
             throw new IllegalArgumentException(name);
         }
-    }    
+    }
 
     /**
      * Gts the name of the object
