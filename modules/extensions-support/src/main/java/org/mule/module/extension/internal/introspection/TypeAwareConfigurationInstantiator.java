@@ -25,11 +25,10 @@ final class TypeAwareConfigurationInstantiator implements ConfigurationInstantia
     private final Class<?> configurationType;
 
     /**
-     * Constructor which receives the type to be instantiated on each invocation to
-     * {@link #newInstance()}. This type must be not {@code null}, and have a public default
-     * constructor. Otherwise an {@link IllegalArgumentException} is thrown
+     * Creates an instance of a given {@code configurationType} on each invocation to
+     * {@link #newInstance()}.
      *
-     * @param configurationType the type to be instantiated
+     * @param configurationType the type to be instantiated. Must be not {@code null}, and have a public default constructor
      * @throws IllegalArgumentException if the type is {@code null} or doesn't have a default public constructor
      */
     TypeAwareConfigurationInstantiator(Class<?> configurationType)

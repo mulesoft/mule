@@ -9,10 +9,8 @@ package org.mule.module.extension.internal.introspection;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import org.mule.registry.SpiServiceRegistry;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -29,9 +27,6 @@ public abstract class AbstractCapabilitiesExtractorContractTestCase extends Abst
 {
     protected CapabilitiesResolver resolver;
 
-    @Mock
-    protected HasCapabilities<Descriptor> capabilitiesCallback;
-
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     protected DeclarationDescriptor declarationDescriptor;
 
@@ -44,26 +39,20 @@ public abstract class AbstractCapabilitiesExtractorContractTestCase extends Abst
     @Test
     public void noCapability()
     {
-        resolver.resolveCapabilities(declarationDescriptor, getClass(), capabilitiesCallback);
-        verify(capabilitiesCallback, never()).withCapability(anyObject());
+        resolver.resolveCapabilities(declarationDescriptor, getClass());
+        verify(declarationDescriptor, never()).withCapability(anyObject());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullClass()
     {
-        resolver.resolveCapabilities(declarationDescriptor, null, capabilitiesCallback);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullCallback()
-    {
-        resolver.resolveCapabilities(declarationDescriptor, getClass(), null);
+        resolver.resolveCapabilities(declarationDescriptor, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullDeclaration()
     {
-        resolver.resolveCapabilities(null, getClass(), capabilitiesCallback);
+        resolver.resolveCapabilities(null, getClass());
     }
 
 }

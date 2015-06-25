@@ -9,10 +9,8 @@ package org.mule.module.extension.internal.capability.xml;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
 import org.mule.module.extension.CapabilityExtractor;
 
 /**
@@ -28,23 +26,14 @@ public class XmlCapabilityExtractor implements CapabilityExtractor
     public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/extension/%s";
 
     @Override
-    public Object extractCapability(DeclarationDescriptor declarationDescriptor, Class<?> capableType, HasCapabilities<? extends Descriptor> capableCallback)
+    public Object extractCapability(DeclarationDescriptor declarationDescriptor, Class<?> capableType)
     {
         Xml xml = capableType.getAnnotation(Xml.class);
-        if (xml != null)
-        {
-            XmlCapability capability = processCapability(xml, declarationDescriptor);
-            capableCallback.withCapability(capability);
-
-            return capability;
-        }
-
-        return null;
+        return xml != null ? processCapability(xml, declarationDescriptor) : null;
     }
 
     private XmlCapability processCapability(Xml xml, DeclarationDescriptor descriptor)
     {
-
         Declaration declaration = descriptor.getDeclaration();
         String schemaVersion = isBlank(xml.schemaVersion()) ? declaration.getVersion() : xml.schemaVersion();
         String schemaLocation = isBlank(xml.schemaLocation()) ? buildDefaultLocation(declaration) : xml.schemaLocation();

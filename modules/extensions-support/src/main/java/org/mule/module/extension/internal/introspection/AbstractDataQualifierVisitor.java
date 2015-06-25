@@ -18,7 +18,7 @@ import org.mule.extension.introspection.DataQualifierVisitor;
  *
  * @since 3.7.0
  */
-public class BaseDataQualifierVisitor implements DataQualifierVisitor
+public abstract class AbstractDataQualifierVisitor implements DataQualifierVisitor
 {
 
     @Override

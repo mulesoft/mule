@@ -66,6 +66,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     public AnnotationsBasedDescriber(Class<?> extensionType)
     {
+        checkArgument(extensionType != null, String.format("describer %s does not specify an extension type", getClass().getName()));
         this.extensionType = extensionType;
     }
 
@@ -286,6 +287,6 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void describeCapabilities(DeclarationDescriptor declaration, Class<?> extensionType)
     {
-        capabilitiesResolver.resolveCapabilities(declaration, extensionType, declaration);
+        capabilitiesResolver.resolveCapabilities(declaration, extensionType);
     }
 }

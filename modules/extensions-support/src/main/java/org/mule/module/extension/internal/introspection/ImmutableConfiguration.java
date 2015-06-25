@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.checkNullOrRepeatedNames;
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.ConfigurationInstantiator;
 import org.mule.extension.introspection.Parameter;
@@ -20,12 +21,21 @@ import java.util.Set;
  *
  * @since 3.7.0
  */
-final class ImmutableConfiguration extends AbstractImmutableCapableDescribed implements Configuration
+final class ImmutableConfiguration extends AbstractCapableDescribed implements Configuration
 {
 
     private final List<Parameter> parameters;
     private final ConfigurationInstantiator instantiator;
 
+    /**
+     * Creates a new instance with the given state
+     *
+     * @param name         the configuration's name
+     * @param description  the configuration's description
+     * @param instantiator the {@link ConfigurationInstantiator}. Cannot be {@code null}
+     * @param parameters   a {@link List} with the configuration's {@link Parameter}s
+     * @param capabilities a {@link Set} with the configuration's capabilities
+     */
     protected ImmutableConfiguration(String name,
                                      String description,
                                      ConfigurationInstantiator instantiator,
@@ -34,6 +44,7 @@ final class ImmutableConfiguration extends AbstractImmutableCapableDescribed imp
     {
         super(name, description, capabilities);
         checkNullOrRepeatedNames(parameters, "parameters");
+        checkArgument(instantiator != null, "instantiator cannot be null");
 
         this.parameters = MuleExtensionUtils.immutableList(parameters);
         this.instantiator = instantiator;

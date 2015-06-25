@@ -14,16 +14,39 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+/**
+ * Base class for {@link BeanDefinitionParser}s that process elements
+ * of components developed using the Extensions API
+ *
+ * @since 3.7.0
+ */
 abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
 {
 
+    /**
+     * The type of the instance to be generated
+     */
     private final Class<?> type;
 
+    /**
+     * Constructs a new instance which will generate instances of {@code type}
+     *
+     * @param type a {@link Class}
+     */
     BaseExtensionBeanDefinitionParser(Class<?> type)
     {
         this.type = type;
     }
 
+    /**
+     * Creates and returns a singleton {@link BeanDefinition}. Actual parsing
+     * is delegated to the {@link #doParse(BeanDefinitionBuilder, Element)}
+     * method
+     *
+     * @param element       a {@link Element}
+     * @param parserContext the current {@link ParserContext}
+     * @return a {@link BeanDefinition}
+     */
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext)
     {
@@ -38,5 +61,11 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
         return definition;
     }
 
+    /**
+     * Template method to add the component specific parsing logic.
+     *
+     * @param builder a {@link BeanDefinitionBuilder}
+     * @param element the {@link Element} being parsed
+     */
     protected abstract void doParse(BeanDefinitionBuilder builder, Element element);
 }

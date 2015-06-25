@@ -13,6 +13,12 @@ import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
+/**
+ * A {@link FactoryBean} that creates instances of a type defined by a
+ * {@link DataType}
+ *
+ * @since 3.7.0
+ */
 final class TopLevelParameterTypeFactoryBean implements FactoryBean<Object>
 {
 

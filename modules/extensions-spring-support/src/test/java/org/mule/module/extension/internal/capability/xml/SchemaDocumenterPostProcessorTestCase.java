@@ -14,7 +14,7 @@ import static org.mule.module.extension.internal.resources.ExtensionResourcesGen
 import static org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.PROCESSING_ENVIRONMENT;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.module.extension.internal.ImmutableDescribingContext;
+import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaDocumenterPostProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -48,7 +48,7 @@ public class SchemaDocumenterPostProcessorTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
-        context = new ImmutableDescribingContext(declaration);
+        context = new DefaultDescribingContext(declaration);
         parameters = spy(new HashMap<String, Object>());
         parameters.put(EXTENSION_ELEMENT, mock(TypeElement.class));
         parameters.put(PROCESSING_ENVIRONMENT, mock(ProcessingEnvironment.class));

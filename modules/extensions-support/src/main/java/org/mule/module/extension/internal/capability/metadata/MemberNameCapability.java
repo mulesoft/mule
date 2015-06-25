@@ -15,13 +15,13 @@ import org.mule.extension.introspection.Described;
 /**
  * A capability to link a {@link Capable} object which
  * is also an instance of {@link Described} or {@link NamedObject}
- * to the actual member in which it was defined. The most common
- * use case for this metadata capability is to support the
- * {@link Parameter#alias()} attribute. For example, consider
- * a {@link Configuration} parameter which is obtained through inspecting
- * fields in a class. This capability allows for the introspection model
- * to list the parameter by a given alias, while this parameter still
- * provides the real name of the field which is going to be needed
+ * to the actual member in which it was defined.
+ *
+ * The most common use case for this metadata capability is to support the
+ * {@link Parameter#alias()} attribute. For example, consider a {@link Configuration}
+ * parameter which is obtained through inspecting fields in a class. This capability
+ * allows for the introspection model to list the parameter by a given alias, while
+ * this parameter still provides the real name of the field which is going to be needed
  * for further operations
  *
  * @since 3.7.0
