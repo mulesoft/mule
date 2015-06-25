@@ -257,7 +257,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         ConfigurationInstanceProvider<Object> configurationInstanceProvider = extensionRegistry.getConfigurationInstanceProviders().get(configurationInstanceProviderName);
         if (configurationInstanceProvider == null)
         {
-            throw new IllegalArgumentException("There's no registered ConfigurationInstanceProvider under name" + configurationInstanceProviderName);
+            throw new IllegalArgumentException("There is no registered ConfigurationInstanceProvider under name" + configurationInstanceProviderName);
         }
         return configurationInstanceProvider;
     }

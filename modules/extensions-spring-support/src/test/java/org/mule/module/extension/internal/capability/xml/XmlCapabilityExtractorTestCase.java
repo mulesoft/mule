@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.capability.XmlCapability;
@@ -47,8 +48,8 @@ public class XmlCapabilityExtractorTestCase extends AbstractCapabilitiesExtracto
     @Test
     public void capabilityAdded()
     {
-        resolver.resolveCapabilities(declarationDescriptor, XmlSupport.class, capabilitiesCallback);
-        verify(capabilitiesCallback).withCapability(captor.capture());
+        resolver.resolveCapabilities(declarationDescriptor, XmlSupport.class);
+        verify(declarationDescriptor).withCapability(captor.capture());
 
         XmlCapability capability = captor.getValue();
         assertThat(capability, is(notNullValue()));
@@ -60,9 +61,9 @@ public class XmlCapabilityExtractorTestCase extends AbstractCapabilitiesExtracto
     @Test
     public void defaultCapabilityValues()
     {
-        declarationDescriptor = new DeclarationDescriptor(EXTENSION_NAME, EXTENSION_VERSION);
-        resolver.resolveCapabilities(declarationDescriptor, DefaultXmlExtension.class, capabilitiesCallback);
-        verify(capabilitiesCallback).withCapability(captor.capture());
+        declarationDescriptor = spy(new DeclarationDescriptor(EXTENSION_NAME, EXTENSION_VERSION));
+        resolver.resolveCapabilities(declarationDescriptor, DefaultXmlExtension.class);
+        verify(declarationDescriptor).withCapability(captor.capture());
 
         XmlCapability capability = captor.getValue();
         assertThat(capability, is(notNullValue()));

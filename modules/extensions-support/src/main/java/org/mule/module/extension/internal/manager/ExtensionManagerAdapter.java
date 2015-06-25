@@ -11,7 +11,7 @@ import org.mule.extension.runtime.ConfigurationInstanceProvider;
 import org.mule.extension.runtime.OperationContext;
 
 /**
- * An adapter interface which expands the contact
+ * An adapter interface which expands the contract
  * of {@link ExtensionManager} with functionality
  * that is internal to this implementation
  * of the extensions API and that extensions
