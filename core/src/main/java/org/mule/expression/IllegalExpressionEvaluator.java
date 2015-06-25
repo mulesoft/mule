@@ -8,6 +8,7 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.transformer.types.TypedValue;
 
 /**
  * Defines an {@link ExpressionEvaluator} that can never be evaluated.
@@ -23,4 +24,9 @@ public abstract class IllegalExpressionEvaluator implements ExpressionEvaluator
         throw new UnsupportedOperationException(String.format(ILLEGAL_EVALUATOR_MESSAGE, getName()));
     }
 
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        throw new UnsupportedOperationException(String.format(ILLEGAL_EVALUATOR_MESSAGE, getName()));
+    }
 }

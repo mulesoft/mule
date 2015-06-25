@@ -8,8 +8,8 @@ package org.mule.module.json;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.expression.AbstractExpressionEvaluator;
 import org.mule.util.NumberUtils;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ import org.codehaus.jackson.node.ValueNode;
  *
  * @see org.mule.module.json.JsonData
  */
-public class JsonExpressionEvaluator implements ExpressionEvaluator
+public class JsonExpressionEvaluator extends AbstractExpressionEvaluator
 {
     /**
      * logger used by this class

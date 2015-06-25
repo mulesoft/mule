@@ -9,7 +9,6 @@ package org.mule.expression;
 import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
 import static org.mule.expression.ExpressionConstants.DELIM;
 import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
@@ -34,7 +33,7 @@ import javax.activation.DataHandler;
  * @see ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluator
+public class MessageAttachmentsExpressionEvaluator extends AbstractExpressionEvaluator
 {
     public static final String NAME = "attachments";
 

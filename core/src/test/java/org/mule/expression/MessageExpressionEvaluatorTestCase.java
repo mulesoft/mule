@@ -6,20 +6,35 @@
  */
 package org.mule.expression;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.transformer.types.MimeTypes.JSON;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
+import org.mule.message.DefaultExceptionPayload;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
+
+import java.nio.charset.StandardCharsets;
+
+import org.junit.Test;
 
 public class MessageExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
+
+    private static final String CUSTOM_ENCODING = StandardCharsets.UTF_16.name();
+    private static final String PAYLOAD = "test";
+    private static final String PAYLOAD_EXPRESSION = "payload";
+
     @Test
     public void testUsingEvaluatorDirectly() throws Exception
     {
@@ -49,7 +64,7 @@ public class MessageExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         assertEquals("foo", eval.evaluate("replyTo", message));
         assertEquals(e, eval.evaluate("exception", message));
         assertEquals("UTF-8", eval.evaluate("encoding", message));
-        assertEquals("test", eval.evaluate("payload", message));
+        assertEquals("test", eval.evaluate(PAYLOAD_EXPRESSION, message));
 
         try
         {
@@ -98,5 +113,23 @@ public class MessageExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         {
             //Expected
         }
+    }
+
+    @Test
+    public void evaluatesPayloadWithType() throws Exception
+    {
+        MessageExpressionEvaluator evaluator = new MessageExpressionEvaluator();
+
+        final DataType dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(CUSTOM_ENCODING);
+
+        final MuleMessage message = mock(MuleMessage.class);
+        when(message.getPayload()).thenReturn(PAYLOAD);
+        when(message.getDataType()).thenReturn(dataType);
+
+        final TypedValue typedValue = evaluator.evaluateTyped(PAYLOAD_EXPRESSION, message);
+
+        assertThat((String) typedValue.getValue(), equalTo("test"));
+        assertThat(typedValue.getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
     }
 }

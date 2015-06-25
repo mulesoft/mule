@@ -7,7 +7,6 @@
 package org.mule.expression;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.PropertyScope;
 
 import java.util.Collection;
@@ -22,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  * Creates a Map facade around a {@link org.mule.api.MuleMessage} instance to allow access to outbound
  * headers from within components and transformers without the these objects needing access to the Mule Message
  */
-public class OutboundHeadersExpressionEvaluator implements ExpressionEvaluator
+public class OutboundHeadersExpressionEvaluator extends AbstractExpressionEvaluator
 {
     public static final String NAME = "outboundHeaders";
 

@@ -10,10 +10,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.expression.AbstractExpressionEvaluator;
 import org.mule.module.scripting.component.Scriptable;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ import javax.script.ScriptException;
  * If a POJO is passed in it is accessible from the 'payload' namespace.  If a {@link MuleMessage} instance is used then
  * it is accessible from the message' namespace and the 'payload' namespace is also available.
  */
-public abstract class AbstractScriptExpressionEvaluator implements ExpressionEvaluator, Disposable, MuleContextAware
+public abstract class AbstractScriptExpressionEvaluator extends AbstractExpressionEvaluator implements Disposable, MuleContextAware
 {
     protected Map<String, Scriptable> cache = new WeakHashMap<String, Scriptable>(8);
 

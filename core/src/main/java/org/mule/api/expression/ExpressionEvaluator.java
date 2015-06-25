@@ -8,6 +8,7 @@ package org.mule.api.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
+import org.mule.transformer.types.TypedValue;
 
 /**
  * <code>ExpressionEvaluator</code> extracts a property from the message in a generic
@@ -15,7 +16,7 @@ import org.mule.api.NamedObject;
  * strategy. This can be used to extract Correlation Ids, Message Ids etc.
  *
  * These objects are used to execute property expressions (usually on the
- * current message) at runtime to extracta dynamic value.
+ * current message) at runtime to extracts dynamic value.
  * 
  * ExpressionEvaluator names most contain only letters, dashes or underscores.
  */
@@ -30,4 +31,12 @@ public interface ExpressionEvaluator extends NamedObject
      */
     Object evaluate(String expression, MuleMessage message);
 
+    /**
+     * Extracts a single typed property from the message
+     *
+     * @param expression the property expression or expression
+     * @param message the message to extract from
+     * @return a no null data type for the extracted value
+     */
+    TypedValue evaluateTyped(String expression, MuleMessage message);
 }

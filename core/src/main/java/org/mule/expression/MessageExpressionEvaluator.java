@@ -9,6 +9,9 @@ package org.mule.expression;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.api.transformer.DataType;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -37,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 public class MessageExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "message";
+    public static final String PAYLOAD = "payload";
 
     /**
      * logger used by this class
@@ -71,7 +75,7 @@ public class MessageExpressionEvaluator implements ExpressionEvaluator
             {
                 return message.getReplyTo();
             }
-            else if (expression.equals("payload"))
+            else if (expression.equals(PAYLOAD))
             {
                 return message.getPayload();
             }
@@ -96,6 +100,14 @@ public class MessageExpressionEvaluator implements ExpressionEvaluator
         }
     }
 
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        Object value = evaluate(expression, message);
+        DataType dataType = expression.equals(PAYLOAD)? message.getDataType() : DataTypeFactory.create(value == null ? Object.class : value.getClass(), null);
+
+        return new TypedValue(value, dataType);
+    }
 
     /**
      * {@inheritDoc}

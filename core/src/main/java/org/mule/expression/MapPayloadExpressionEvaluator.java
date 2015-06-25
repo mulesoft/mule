@@ -8,9 +8,7 @@ package org.mule.expression;
 
 import static org.mule.expression.ExpressionConstants.DELIM;
 import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
-
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
@@ -22,7 +20,7 @@ import java.util.Map;
  * If the message payload is a map this extractor will look up the property value in
  * the map
  */
-public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
+public class MapPayloadExpressionEvaluator extends AbstractExpressionEvaluator
 {
     public static final String NAME = "map-payload";
 

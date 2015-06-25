@@ -7,10 +7,10 @@
 package org.mule.module.ognl.expression;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.expression.AbstractExpressionEvaluator;
 import org.mule.module.ognl.config.OGNLNamespaceHandler;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * An expression evaluator that uses OGNL as the expression language
  */
-public class OgnlExpressionEvaluator implements ExpressionEvaluator, Disposable
+public class OgnlExpressionEvaluator extends AbstractExpressionEvaluator implements Disposable
 {
 
     static
