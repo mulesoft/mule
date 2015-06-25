@@ -26,11 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.collections.Predicate;
 
 /**
- * A utility class to hold the state related to registered
- * {@link Extension}s and their realising instances.
+ * Hold the state related to registered {@link Extension}s and their instances.
  * <p/>
- * It also provides utility methods and caches to easily
- * locate pieces of such state.
+ * It also provides utility methods and caches to easily locate pieces of such state.
  *
  * @since 3.7.0
  */
@@ -47,9 +45,9 @@ final class ExtensionRegistry
     });
 
     private final Map<String, Extension> extensions = new ConcurrentHashMap<>();
-    private final Map<Configuration, Extension> configuration2ExtensionCache = new ConcurrentHashMap<>();
-    private final Map<Operation, Extension> operation2ExtensionCache = new ConcurrentHashMap<>();
-    private final Map<Class<?>, Set<Extension>> capability2ExtensionCache = new ConcurrentHashMap<>();
+    private final Map<Configuration, Extension> configurationToExtensions = new ConcurrentHashMap<>();
+    private final Map<Operation, Extension> operationToExtension = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Set<Extension>> capabilityToExtension = new ConcurrentHashMap<>();
 
     ExtensionRegistry()
     {
@@ -64,7 +62,6 @@ final class ExtensionRegistry
     void registerExtension(String name, Extension extension)
     {
         extensions.put(name, extension);
-        clearCaches();
     }
 
     /**
@@ -99,7 +96,7 @@ final class ExtensionRegistry
      */
     Extension getExtension(final Configuration configuration)
     {
-        Extension extension = lookupInCache(configuration2ExtensionCache, configuration, new Predicate()
+        Extension extension = lookupInCache(configurationToExtensions, configuration, new Predicate()
         {
             @Override
             public boolean evaluate(Object object)
@@ -123,7 +120,7 @@ final class ExtensionRegistry
      */
     Extension getExtension(final Operation operation)
     {
-        Extension extension = lookupInCache(operation2ExtensionCache, operation, new Predicate()
+        Extension extension = lookupInCache(operationToExtension, operation, new Predicate()
         {
             @Override
             public boolean evaluate(Object object)
@@ -197,7 +194,7 @@ final class ExtensionRegistry
      */
     <C> Set<Extension> getExtensionsCapableOf(Class<C> capabilityType)
     {
-        Set<Extension> cachedCapables = capability2ExtensionCache.get(capabilityType);
+        Set<Extension> cachedCapables = capabilityToExtension.get(capabilityType);
         if (CollectionUtils.isEmpty(cachedCapables))
         {
             ImmutableSet.Builder<Extension> capables = ImmutableSet.builder();
@@ -210,17 +207,10 @@ final class ExtensionRegistry
             }
 
             cachedCapables = capables.build();
-            capability2ExtensionCache.put(capabilityType, cachedCapables);
+            capabilityToExtension.put(capabilityType, cachedCapables);
         }
 
         return cachedCapables;
-    }
-
-    private void clearCaches()
-    {
-        configuration2ExtensionCache.clear();
-        operation2ExtensionCache.clear();
-        capability2ExtensionCache.clear();
     }
 
     private <K, V> V lookupInCache(Map<K, V> cache, final K key, Predicate predicate)
