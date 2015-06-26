@@ -22,7 +22,7 @@ public interface ValueResolver<T>
      *
      * @param event a {@link MuleEvent}
      * @return a resolved value
-     * @throws MuleException
+     * @throws MuleException if the resolution of the value fails
      */
     T resolve(MuleEvent event) throws MuleException;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.module.extension.internal.util.NameUtils.getGlobalPojoTypeName;
+import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.config.spring.MuleArtifactContext;
@@ -140,7 +140,7 @@ public class ExtensionsNamespaceHandler extends NamespaceHandlerSupport
             @Override
             public void onPojo()
             {
-                String name = hyphenize(getGlobalPojoTypeName(parameterType));
+                String name = hyphenize(getTopLevelTypeName(parameterType));
                 if (topLevelParameters.put(extension, name))
                 {
                     registerBeanDefinitionParser(name, new TopLevelParameterTypeBeanDefinitionParser(parameterType));

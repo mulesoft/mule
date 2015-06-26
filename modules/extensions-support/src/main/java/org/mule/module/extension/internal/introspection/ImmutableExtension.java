@@ -6,9 +6,8 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.checkNamesClashes;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.checkNullOrRepeatedNames;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.toMap;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.validateRepeatedNames;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.exception.NoSuchConfigurationException;
 import org.mule.extension.exception.NoSuchOperationException;
@@ -58,9 +57,7 @@ final class ImmutableExtension extends AbstractCapableDescribed implements Exten
         super(name, description, capabilities);
 
         checkArgument(!name.contains(" "), "Extension name cannot contain spaces");
-        checkNullOrRepeatedNames(configurations, "configurations");
-        checkNullOrRepeatedNames(operations, "operations");
-        checkNamesClashes(configurations, operations);
+        validateRepeatedNames(configurations, operations);
 
         this.configurations = toMap(configurations);
         this.operations = toMap(operations);

@@ -30,8 +30,8 @@ public final class ReflectiveOperationExecutorFactory<T> implements OperationExe
 
     public ReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod, ReflectiveDelegateFactory delegateFactory)
     {
-        checkArgument(implementationClass != null, "operation implementation class cannot be null");
-        checkArgument(operationMethod != null, "operation method cannot be null");
+        checkArgument(implementationClass != null, "implementationClass cannot be null");
+        checkArgument(operationMethod != null, "operationMethod cannot be null");
         checkArgument(delegateFactory != null, "delegateFactory cannot be null");
 
         this.implementationClass = implementationClass;

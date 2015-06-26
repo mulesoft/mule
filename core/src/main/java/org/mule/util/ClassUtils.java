@@ -8,6 +8,8 @@ package org.mule.util;
 
 import org.mule.routing.filters.WildcardFilter;
 
+import com.google.common.primitives.Primitives;
+
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
@@ -1065,4 +1067,75 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             return annotation.getClass();
         }
     }
+
+    /**
+     * Checks that {@code value} is an instance of {@code type}.
+     * <p/>
+     * The value that this method adds over something like {@link Class#isInstance(Object)}
+     * is that it also considers the case in which {@code type} and {@code value}
+     * are evaluate by {@link #isWrapperAndPrimitivePair(Class, Class)} as {@code true}
+     *
+     * @param type  the {@link Class} you want to check the {@code value against}
+     * @param value an instance you want to verify is instance of {@code type}
+     * @param <T>   the generic type of {@code type}
+     * @return {@code true} if {@code value} is an instance of {@code type} or if they are a wrapper-primitive pair.
+     * {@code false} otherwise
+     */
+    public static <T> boolean isInstance(Class<T> type, Object value)
+    {
+        if (value == null)
+        {
+            return false;
+        }
+
+        if (type.isInstance(value))
+        {
+            return true;
+        }
+
+        Class<?> valueType = value.getClass();
+        return isWrapperAndPrimitivePair(type, valueType) || isWrapperAndPrimitivePair(valueType, type);
+    }
+
+    /**
+     * Checks that a wrapper-primitive relationship exists between the two types, no matter which one
+     * is the wrapper or which is the primitive.
+     * <p/>
+     * For example, this method will return {@code true} for both the {@link Double}/{@code double}
+     * and the {@code double}/{@link Double} pairs. Notice that {@code false} will be returned for the pair
+     * {@link Long}/{code int} since they don't represent the same data type.
+     * <p/>
+     * If any of the two types is neither wrappers or primitives, it will return {@code false}
+     *
+     * @param type1 a {@link Class} presumed to be a wrapper or primitive type related to {@code type2}
+     * @param type2 a {@link Class} presumed to be a wrapper or primitive type related to {@code type1}
+     * @return {@code true} if the types are a wrapper/primitive pair referring to the same data type. {@code false} otherwise.
+     */
+    private static boolean isWrapperAndPrimitivePair(Class<?> type1, Class<?> type2)
+    {
+        if (isPrimitiveWrapper(type1))
+        {
+            return type2.equals(Primitives.unwrap(type1));
+        }
+        else if (isPrimitiveWrapper(type2))
+        {
+            return type1.equals(Primitives.unwrap(type2));
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks that the given {@code type} is a primitive wrapper such as
+     * {@link Double}, {@link Boolean}, {@link Integer}, etc
+     *
+     * @param type the {@link Class} that is presumed to be a primitive wrapper
+     * @param <T>  the generic type of the argument
+     * @return {@code true} if {@code type} is a primitive wrapper. {@code false} otherwise
+     */
+    private static <T> boolean isPrimitiveWrapper(Class<T> type)
+    {
+        return Primitives.isWrapperType(type);
+    }
+
 }

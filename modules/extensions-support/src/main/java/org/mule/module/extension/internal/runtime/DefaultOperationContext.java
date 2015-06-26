@@ -28,6 +28,13 @@ public class DefaultOperationContext implements OperationContextAdapter
     private final Map<String, Object> parameters;
     private final MuleEvent event;
 
+    /**
+     * Creates a new instance with the given state
+     *
+     * @param operation  the {@link Operation} that will be executed
+     * @param parameters the parameters that the operation will use
+     * @param event      the current {@link MuleEvent}
+     */
     public DefaultOperationContext(Operation operation, ResolverSetResult parameters, MuleEvent event)
     {
         this.operation = operation;

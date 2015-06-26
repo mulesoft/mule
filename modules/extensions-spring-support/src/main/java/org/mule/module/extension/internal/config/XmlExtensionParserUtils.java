@@ -9,8 +9,7 @@ package org.mule.module.extension.internal.config;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.isExpression;
-import static org.mule.module.extension.internal.util.NameUtils.getGlobalPojoTypeName;
+import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
 import org.mule.api.NestedProcessor;
@@ -405,7 +404,7 @@ final class XmlExtensionParserUtils
         }
 
         // last chance, check if this is a top level element
-        if (getGlobalPojoTypeName(pojoType).equals(element.getName()))
+        if (getTopLevelTypeName(pojoType).equals(element.getName()))
         {
             return getPojoValueResolver(pojoType, element);
         }
@@ -559,5 +558,15 @@ final class XmlExtensionParserUtils
         }
 
         builder.addConstructorArgValue(managedAttributes);
+    }
+
+    private static boolean isExpression(Object value, TemplateParser parser)
+    {
+        if (value instanceof String)
+        {
+            return parser.isContainsTemplate((String) value);
+        }
+
+        return false;
     }
 }

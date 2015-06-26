@@ -13,7 +13,7 @@ import org.mule.extension.runtime.OperationContext;
  * Adapter interface which expands the contract of
  * {@link OperationContext} which functionality that is
  * internal to this implementation of the extensions
- * api and shouldn't be accessible for the extensions
+ * API and shouldn't be accessible for the extensions
  * themselves
  *
  * @since 3.7.0
