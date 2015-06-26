@@ -7,6 +7,7 @@
 package org.mule.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,6 +23,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
@@ -252,10 +254,10 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     {
         Object a = new HashBlob(1);
         Object b = new HashBlob(2);
-        assertTrue(ClassUtils.hash(new Object[]{a, b, a, b}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertTrue(ClassUtils.hash(new Object[] {a, b, a, b}) == ClassUtils.hash(new Object[] {a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{a, b, a, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
-        assertFalse(ClassUtils.hash(new Object[]{b, a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertFalse(ClassUtils.hash(new Object[] {b, a, b, a}) == ClassUtils.hash(new Object[] {a, b, a, b}));
     }
 
     @Test
@@ -350,6 +352,27 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     public void setInheritedFieldValueWithoutRecurse() throws Exception
     {
         ClassUtils.setFieldValue(new ExtendedHashBlob(1), "hash", 0, false);
+    }
+
+    @Test
+    public void isInstance()
+    {
+        assertThat(ClassUtils.isInstance(String.class, null), is(false));
+        assertThat(ClassUtils.isInstance(String.class, ""), is(true));
+        assertThat(ClassUtils.isInstance(Fruit.class, new Apple()), is(true));
+        assertThat(ClassUtils.isInstance(Apple.class, new Kiwi()), is(false));
+        assertThat(ClassUtils.isInstance(int.class, 0), is(true));
+
+        assertThat(ClassUtils.isInstance(Integer.class, 0), is(true));
+        assertThat(ClassUtils.isInstance(Long.class, 0L), is(true));
+        assertThat(ClassUtils.isInstance(Double.class, double.class), is(true));
+        assertThat(ClassUtils.isInstance(Long.class, long.class), is(true));
+        assertThat(ClassUtils.isInstance(double.class, Double.class), is(true));
+        assertThat(ClassUtils.isInstance(long.class, Long.class), is(true));
+        assertThat(ClassUtils.isInstance(int.class, Integer.class), is(true));
+        assertThat(ClassUtils.isInstance(boolean.class, Boolean.class), is(true));
+        assertThat(ClassUtils.isInstance(String.class, boolean.class), is(false));
+        assertThat(ClassUtils.isInstance(long.class, boolean.class), is(false));
     }
 
     private void simpleNameHelper(String target, Class clazz)

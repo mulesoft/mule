@@ -6,7 +6,6 @@
  */
 package org.mule.module.extension.internal.util;
 
-import org.mule.api.MuleException;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
@@ -47,12 +46,11 @@ public final class SingleValueSetter implements ValueSetter
      * from {@code result}
      *
      * @param target the object on which the value is being set
-     * @param result a {@link ResolverSetResult} containing the value that corresponds to {@code parameter}
-     * @throws MuleException
+     * @param resolverSetResult a {@link ResolverSetResult} containing the value that corresponds to {@code parameter}
      */
     @Override
-    public void set(Object target, ResolverSetResult result) throws MuleException
+    public void set(Object target, ResolverSetResult resolverSetResult)
     {
-        ReflectionUtils.setField(field, target, result.get(parameter));
+        ReflectionUtils.setField(field, target, resolverSetResult.get(parameter));
     }
 }

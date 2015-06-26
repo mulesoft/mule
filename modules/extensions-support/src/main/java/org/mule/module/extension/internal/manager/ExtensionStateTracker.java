@@ -39,6 +39,15 @@ final class ExtensionStateTracker
                 }
             });
 
+    /**
+     * Registers than when a configuration instance with the given {@code providerName} is requested,
+     * {@code configurationInstanceProvider} should be used to fulfil that request
+     *
+     * @param configuration                 the {@link Configuration} model of the instances that {@code configurationInstanceProvider} will return
+     * @param providerName                  the name under which the {@code configurationInstanceProvider} will be registered
+     * @param configurationInstanceProvider the {@link ConfigurationInstanceProvider} to use
+     * @param <C>                           the generic type of the configuration instances that will be provisioned by {@code configurationInstanceProvider}
+     */
     <C> void registerConfigurationInstanceProvider(Configuration configuration,
                                                    String providerName,
                                                    ConfigurationInstanceProvider<C> configurationInstanceProvider)

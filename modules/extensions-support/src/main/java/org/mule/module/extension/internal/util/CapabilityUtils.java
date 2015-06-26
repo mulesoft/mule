@@ -20,8 +20,12 @@ import org.apache.commons.collections.CollectionUtils;
  *
  * @since 3.7.0
  */
-public final class CapabilityUtils
+public class CapabilityUtils
 {
+
+    private CapabilityUtils()
+    {
+    }
 
     /**
      * Returns the items in {@code capabilities} which
@@ -65,9 +69,10 @@ public final class CapabilityUtils
      * If {@code capable} doesn't have a matching capability, then it returns {@code null}.
      * If {@code capable} has more than one instance of that capability, then it throws
      * {@link IllegalArgumentException}
-     * @param capable a {@link Capable}
+     *
+     * @param capable        a {@link Capable}
      * @param capabilityType a capability t ype
-     * @param <T>
+     * @param <T>            the generic type of the capability you're looking for
      * @return A capability or {@code null}
      * @throws IllegalArgumentException if more than one capability of type {@code capabilityType} is found
      */
@@ -85,7 +90,17 @@ public final class CapabilityUtils
 
     }
 
-    public static <T> T getSingleCapability(Set<?> capabilities, Class<T> capabilityType) {
+    /**
+     * Expects the {@code capabilities} {@link Set} to have at most one capability of type {@code capabilityType}
+     * and returns such capability.
+     *
+     * @param capabilities   a {@link Set} with capability objects
+     * @param capabilityType the {@link Class} of a certain capability type
+     * @param <T>            the generic type of the capability you're looking for
+     * @return an instance of {@code T} or {@code null} is {@code capabilities} is empty or contains no matching item
+     */
+    public static <T> T getSingleCapability(Set<?> capabilities, Class<T> capabilityType)
+    {
         if (CollectionUtils.isEmpty(capabilities))
         {
             return null;

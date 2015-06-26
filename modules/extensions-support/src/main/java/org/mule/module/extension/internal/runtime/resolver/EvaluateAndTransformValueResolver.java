@@ -6,7 +6,9 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -16,6 +18,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.extension.introspection.DataType;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -62,7 +65,7 @@ public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>
 
     private T transform(T object, MuleEvent event) throws MuleException
     {
-        if (expectedType.getRawType().isInstance(object))
+        if (ClassUtils.isInstance(expectedType.getRawType(), object))
         {
             return object;
         }
@@ -83,23 +86,24 @@ public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>
         }
         catch (TransformerException e)
         {
-            // no transformer found. Return the object we have and let's hope for the best
-            return object;
+
+            throw new MessagingException(createStaticMessage(String.format(
+                    "Expression '%s' was expected to return a value of type '%s' but a '%s' was found instead " +
+                    "and no suitable transformer could be located",
+                    evaluator.getRawValue(),
+                    expectedType.getRawType().getName(),
+                    object.getClass().getName())),
+                 event, e);
         }
 
-        if (transformer != null)
+        if (transformer instanceof MessageTransformer)
         {
-            if (transformer instanceof MessageTransformer)
-            {
-                return (T) ((MessageTransformer) transformer).transform(object, event);
-            }
-            else
-            {
-                return (T) transformer.transform(object);
-            }
+            return (T) ((MessageTransformer) transformer).transform(object, event);
         }
-
-        return object;
+        else
+        {
+            return (T) transformer.transform(object);
+        }
     }
 
     /**
@@ -138,7 +142,7 @@ public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>
     {
 
         @Override
-        public synchronized Object resolveValue(MuleEvent event)
+        public Object resolveValue(MuleEvent event)
         {
             return evaluator.resolveValue(event);
         }
