@@ -16,7 +16,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Described;
-import org.mule.extension.introspection.Operation;
+import org.mule.extension.introspection.Extension;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
@@ -25,10 +25,9 @@ import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.StaticConfigurationInstanceProvider;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.util.TemplateParser;
+import org.mule.util.ArrayUtils;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedHashMultiset;
@@ -46,81 +45,49 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 
-public final class MuleExtensionUtils
+/**
+ * Utilities for handling {@link Extension extensions}
+ *
+ * @since 3.7.0
+ */
+public abstract class MuleExtensionUtils
 {
 
-    public static void checkNullOrRepeatedNames(Collection<? extends Described> describedCollection, String describedEntityName)
+    /**
+     * Verifies that none of the {@link Described} items in {@code describedCollection} have an
+     * equivalent value for {@link Described#getName()}
+     *
+     * @param describedCollections an array of {@link Collection}s with instances of {@link Described}
+     * @throws IllegalArgumentException if the validation fails
+     */
+    public static void validateRepeatedNames(Collection<? extends Described>... describedCollections)
     {
-        Set<String> repeatedNames = collectRepeatedNames(describedCollection, describedEntityName);
-
-        if (!repeatedNames.isEmpty())
+        if (ArrayUtils.isEmpty(describedCollections))
         {
-            throw new IllegalArgumentException(
-                    String.format("The following %s were declared multiple times: [%s]",
-                                  describedEntityName,
-                                  Joiner.on(", ").join(repeatedNames))
-            );
+            return;
+        }
+
+        List<Described> all = new ArrayList<>();
+        for (Collection<? extends Described> describedCollection : describedCollections)
+        {
+            all.addAll(describedCollection);
+        }
+
+        Set<String> clashes = collectRepeatedNames(all);
+        if (!clashes.isEmpty())
+        {
+            throw new IllegalArgumentException("The following names have been assigned to multiple components: " + Joiner.on(", ").join(clashes));
         }
     }
 
     /**
-     * Verifies that no operation has the same name as a configuration. This
-     * method assumes that the configurations and operations provided have
-     * already been verified through {@link #checkNullOrRepeatedNames(java.util.Collection, String)}
-     * which means that name clashes can only occur against each other and not within the
-     * inner elements of each collection
+     * Returns a {@link Map} in which the keys are the {@link Described#getName() names} of the items
+     * in the {@code objects} {@link List}, and the values are the items themselves.
+     *
+     * @param objects a {@link List} with items that implement the {@link Described} interface
+     * @param <T>     the generic type of the items in {@code objects}
+     * @return a {@link Map} in which the keys are the item's names and the values are the items
      */
-    public static void checkNamesClashes(Collection<Configuration> configurations, Collection<Operation> operations)
-    {
-        List<Described> all = new ArrayList<>(configurations.size() + operations.size());
-        all.addAll(configurations);
-        all.addAll(operations);
-
-        Set<String> clashes = collectRepeatedNames(all, "operations");
-        if (!clashes.isEmpty())
-        {
-            throw new IllegalArgumentException(
-                    String.format("The following operations have the same name as a declared configuration: [%s]",
-                                  Joiner.on(", ").join(clashes))
-            );
-        }
-    }
-
-    private static Set<String> collectRepeatedNames(Collection<? extends Described> describedCollection, String describedEntityName)
-    {
-        if (CollectionUtils.isEmpty(describedCollection))
-        {
-            return ImmutableSet.of();
-        }
-
-        Multiset<String> names = LinkedHashMultiset.create();
-
-        for (Described described : describedCollection)
-        {
-            checkArgument(described != null, String.format("A null %s was provided", describedEntityName));
-            names.add(described.getName());
-        }
-
-        names = Multisets.copyHighestCountFirst(names);
-        Set<String> repeatedNames = new HashSet<>();
-        for (String name : names)
-        {
-            if (names.count(name) == 1)
-            {
-                break;
-            }
-
-            repeatedNames.add(name);
-        }
-
-        return repeatedNames;
-    }
-
-    public static <T> List<T> immutableList(Collection<T> collection)
-    {
-        return collection != null ? ImmutableList.copyOf(collection) : ImmutableList.<T>of();
-    }
-
     public static <T extends Described> Map<String, T> toMap(List<T> objects)
     {
         ImmutableMap.Builder<String, T> map = ImmutableMap.builder();
@@ -132,6 +99,14 @@ public final class MuleExtensionUtils
         return map.build();
     }
 
+    /**
+     * Returns {@code true} if any of the items in {@code resolvers} return true for the
+     * {@link ValueResolver#isDynamic()} method
+     *
+     * @param resolvers a {@link Iterable} with instances of {@link ValueResolver}
+     * @param <T>       the generic type of the {@link ValueResolver} items
+     * @return {@code true} if at least one {@link ValueResolver} is dynamic, {@code false} otherwise
+     */
     public static <T extends Object> boolean hasAnyDynamic(Iterable<ValueResolver<T>> resolvers)
     {
         for (ValueResolver resolver : resolvers)
@@ -144,28 +119,14 @@ public final class MuleExtensionUtils
         return false;
     }
 
-    public static boolean isSimpleExpression(String expression, TemplateParser parser)
-    {
-        TemplateParser.PatternInfo style = parser.getStyle();
-        return expression.startsWith(style.getPrefix()) && expression.endsWith(style.getSuffix());
-    }
-
-    public static boolean containsExpression(String expression, TemplateParser parser)
-    {
-        return parser.isContainsTemplate(expression);
-    }
-
-    public static boolean isExpression(Object value, TemplateParser parser)
-    {
-        if (value instanceof String)
-        {
-            String maybeExpression = (String) value;
-            return isSimpleExpression(maybeExpression, parser) || containsExpression(maybeExpression, parser);
-        }
-
-        return false;
-    }
-
+    /**
+     * Sorts the given {@code list} in ascending alphabetic order, using {@link Described#getName()}
+     * as the sorting criteria
+     *
+     * @param list a {@link List} with instances of {@link Described}
+     * @param <T>  the generic type of the items in the {@code list}
+     * @return the sorted {@code list}
+     */
     public static <T extends Described> List<T> alphaSortDescribedList(List<T> list)
     {
         if (CollectionUtils.isEmpty(list))
@@ -216,6 +177,38 @@ public final class MuleExtensionUtils
 
         String defaultValue = optional.defaultValue();
         return Optional.NULL.equals(defaultValue) ? null : defaultValue;
+    }
+
+    private static Set<String> collectRepeatedNames(Collection<? extends Described> describedCollection)
+    {
+        if (CollectionUtils.isEmpty(describedCollection))
+        {
+            return ImmutableSet.of();
+        }
+
+        Multiset<String> names = LinkedHashMultiset.create();
+
+        for (Described described : describedCollection)
+        {
+            if (described == null) {
+                throw new IllegalArgumentException("A null described was provided");
+            }
+            names.add(described.getName());
+        }
+
+        names = Multisets.copyHighestCountFirst(names);
+        Set<String> repeatedNames = new HashSet<>();
+        for (String name : names)
+        {
+            if (names.count(name) == 1)
+            {
+                break;
+            }
+
+            repeatedNames.add(name);
+        }
+
+        return repeatedNames;
     }
 
     private static class DescribedComparator implements Comparator<Described>

@@ -6,12 +6,12 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.checkNullOrRepeatedNames;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.validateRepeatedNames;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.ConfigurationInstantiator;
 import org.mule.extension.introspection.Parameter;
-import org.mule.module.extension.internal.util.MuleExtensionUtils;
+import org.mule.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -43,10 +43,10 @@ final class ImmutableConfiguration extends AbstractCapableDescribed implements C
                                      Set<Object> capabilities)
     {
         super(name, description, capabilities);
-        checkNullOrRepeatedNames(parameters, "parameters");
+        validateRepeatedNames(parameters);
         checkArgument(instantiator != null, "instantiator cannot be null");
 
-        this.parameters = MuleExtensionUtils.immutableList(parameters);
+        this.parameters = CollectionUtils.immutableList(parameters);
         this.instantiator = instantiator;
     }
 

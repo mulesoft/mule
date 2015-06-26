@@ -7,6 +7,7 @@
 package org.mule.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,6 +23,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
@@ -252,7 +254,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     {
         Object a = new HashBlob(1);
         Object b = new HashBlob(2);
-        assertTrue(ClassUtils.hash(new Object[]{a, b, a, b}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertTrue(ClassUtils.hash(new Object[] {a, b, a, b}) == ClassUtils.hash(new Object[] {a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{a, b, a, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{b, a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
@@ -350,6 +352,55 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     public void setInheritedFieldValueWithoutRecurse() throws Exception
     {
         ClassUtils.setFieldValue(new ExtendedHashBlob(1), "hash", 0, false);
+    }
+
+    @Test
+    public void isInstance()
+    {
+        assertThat(ClassUtils.isInstance(String.class, null), is(false));
+        assertThat(ClassUtils.isInstance(String.class, ""), is(true));
+        assertThat(ClassUtils.isInstance(Fruit.class, new Apple()), is(true));
+        assertThat(ClassUtils.isInstance(Apple.class, new Kiwi()), is(false));
+        assertThat(ClassUtils.isInstance(int.class, 0), is(true));
+        assertThat(ClassUtils.isInstance(Integer.class, 0), is(true));
+        assertThat(ClassUtils.isInstance(Long.class, 0L), is(true));
+    }
+
+    @Test
+    public void isWrapperAndPrimitiveType()
+    {
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(Double.class, double.class), is(true));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(Long.class, long.class), is(true));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(Integer.class, int.class), is(true));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(Boolean.class, boolean.class), is(true));
+
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(double.class, Double.class), is(true));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(long.class, Long.class), is(true));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(int.class, Integer.class), is(true));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(boolean.class, Boolean.class), is(true));
+
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(String.class, String.class), is(false));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(String.class, Apple.class), is(false));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(String.class, boolean.class), is(false));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(long.class, boolean.class), is(false));
+        assertThat(ClassUtils.isWrapperAndPrimitivePair(Long.class, Long.class), is(false));
+    }
+
+    @Test
+    public void isPrimitiveWrapper()
+    {
+        assertThat(ClassUtils.isPrimitiveWrapper(Double.class), is(true));
+        assertThat(ClassUtils.isPrimitiveWrapper(Long.class), is(true));
+        assertThat(ClassUtils.isPrimitiveWrapper(Integer.class), is(true));
+        assertThat(ClassUtils.isPrimitiveWrapper(Short.class), is(true));
+        assertThat(ClassUtils.isPrimitiveWrapper(Boolean.class), is(true));
+
+        assertThat(ClassUtils.isPrimitiveWrapper(double.class), is(false));
+        assertThat(ClassUtils.isPrimitiveWrapper(long.class), is(false));
+        assertThat(ClassUtils.isPrimitiveWrapper(int.class), is(false));
+        assertThat(ClassUtils.isPrimitiveWrapper(short.class), is(false));
+        assertThat(ClassUtils.isPrimitiveWrapper(boolean.class), is(false));
+        assertThat(ClassUtils.isPrimitiveWrapper(String.class), is(false));
     }
 
     private void simpleNameHelper(String target, Class clazz)

@@ -9,14 +9,14 @@ package org.mule.module.extension.internal.config;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.isExpression;
-import static org.mule.module.extension.internal.util.NameUtils.getGlobalPojoTypeName;
+import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
 import org.mule.api.NestedProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.expression.ExpressionUtils;
 import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataQualifierVisitor;
 import org.mule.extension.introspection.DataType;
@@ -405,7 +405,7 @@ final class XmlExtensionParserUtils
         }
 
         // last chance, check if this is a top level element
-        if (getGlobalPojoTypeName(pojoType).equals(element.getName()))
+        if (getTopLevelTypeName(pojoType).equals(element.getName()))
         {
             return getPojoValueResolver(pojoType, element);
         }
@@ -559,5 +559,15 @@ final class XmlExtensionParserUtils
         }
 
         builder.addConstructorArgValue(managedAttributes);
+    }
+
+    private static boolean isExpression(Object value, TemplateParser parser)
+    {
+        if (value instanceof String)
+        {
+            return ExpressionUtils.isExpression((String) value, parser);
+        }
+
+        return false;
     }
 }

@@ -10,6 +10,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.ConfigurationInstantiator;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -28,7 +29,7 @@ import java.util.List;
  * <p/>
  * The object instances are created through the {@link Configuration#getInstantiator()#instantiateObject()}
  * method. A {@link ResolverSet} is also used to automatically set this builders
- * properties. The name of the properties in the {@link ResolverSet must match} the
+ * properties. The name of the properties in the {@link ResolverSet} must match the
  * name of an actual property in the prototype class
  *
  * @since 3.7.0
@@ -36,14 +37,14 @@ import java.util.List;
 public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
 {
 
-    private final Configuration configuration;
+    private final ConfigurationInstantiator configurationInstantiator;
     private final ResolverSet resolverSet;
     private final List<ValueSetter> groupValueSetters;
     private final List<ValueSetter> singleValueSetters;
 
     public ConfigurationObjectBuilder(Configuration configuration, ResolverSet resolverSet)
     {
-        this.configuration = configuration;
+        this.configurationInstantiator = configuration.getInstantiator();
         this.resolverSet = resolverSet;
 
         singleValueSetters = createSingleValueSetters(configuration, resolverSet);
@@ -101,6 +102,6 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
     @Override
     protected Object instantiateObject()
     {
-        return configuration.getInstantiator().newInstance();
+        return configurationInstantiator.newInstance();
     }
 }

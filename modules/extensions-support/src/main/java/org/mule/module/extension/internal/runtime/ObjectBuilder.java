@@ -11,7 +11,6 @@ import org.mule.api.MuleException;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * A builder capable of creating instances of a
@@ -48,15 +47,6 @@ public interface ObjectBuilder<T>
      * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
      */
     ObjectBuilder<T> addPropertyResolver(Field field, ValueResolver<? extends Object> resolver);
-
-    /**
-     * Adds a property which value is given as a constant
-     *
-     * @param field   the {@link Field} in which the value is to be assigned
-     * @param value  the value to be set
-     * @return this builder
-     */
-    ObjectBuilder<T> addPropertyValue(Field field, Object value);
 
     /**
      * Whether any of the registered {@link ValueResolver}s are dynamic

@@ -42,7 +42,7 @@ import org.springframework.core.ResolvableType;
  *
  * @since 3.7.0
  */
-public class IntrospectionUtils
+public abstract class IntrospectionUtils
 {
 
     /**
@@ -188,7 +188,7 @@ public class IntrospectionUtils
 
     public static boolean isIgnored(AccessibleObject object)
     {
-        return object == null || object.getAnnotation(Ignore.class) != null;
+        return object.getAnnotation(Ignore.class) != null;
     }
 
     public static boolean isRequired(AccessibleObject object)

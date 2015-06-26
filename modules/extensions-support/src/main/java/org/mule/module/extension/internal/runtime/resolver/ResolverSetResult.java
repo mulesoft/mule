@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
  * to be consistent with the result objects. This is so that given two instances of this class
  * you can determine if the evaluations they represent have an equivalent outcome
  * <p/>
- * Instances of this class are immutable and can only be created through a {@link Builder}
+ * Instances of this class can only be created through a {@link Builder}
  * obtained via {@link #newBuilder()}
  *
  * @since 3.7.0
@@ -88,16 +88,16 @@ public class ResolverSetResult
     }
 
     private final Map<Parameter, Object> evaluationResult;
-    private final Map<String, Object> parameterName2Result;
+    private final Map<String, Object> parameterToResult;
     private final int hashCode;
 
     private ResolverSetResult(Map<Parameter, Object> evaluationResult, int hashCode)
     {
         this.evaluationResult = evaluationResult;
-        parameterName2Result = new HashMap<>(evaluationResult.size());
+        parameterToResult = new HashMap<>(evaluationResult.size());
         for (Map.Entry<Parameter, Object> entry : evaluationResult.entrySet())
         {
-            parameterName2Result.put(entry.getKey().getName(), entry.getValue());
+            parameterToResult.put(entry.getKey().getName(), entry.getValue());
         }
 
         this.hashCode = hashCode;
@@ -129,12 +129,12 @@ public class ResolverSetResult
      */
     public Object get(String parameterName)
     {
-        if (!parameterName2Result.containsKey(parameterName))
+        if (!parameterToResult.containsKey(parameterName))
         {
             throw new NoSuchElementException("This result contains no information for the parameter: " + parameterName);
         }
 
-        return parameterName2Result.get(parameterName);
+        return parameterToResult.get(parameterName);
     }
 
     public Map<Parameter, Object> asMap()

@@ -14,15 +14,19 @@ import org.mule.util.ClassUtils;
 /**
  * Default implementation of {@link ObjectBuilder} which
  * creates instances through a provided {@link Class}.
- * That class needs to have a public default constructor
  *
  * @since 3.7.0
  */
 public class DefaultObjectBuilder<T> extends BaseObjectBuilder<T>
 {
 
-    private Class<T> prototypeClass;
+    private final Class<T> prototypeClass;
 
+    /**
+     * Creates a new instance that will build instances of {@code prototypeClass}.
+     *
+     * @param prototypeClass a {@link Class} which needs to have a public defualt constructor
+     */
     public DefaultObjectBuilder(Class<T> prototypeClass)
     {
         checkInstantiable(prototypeClass);

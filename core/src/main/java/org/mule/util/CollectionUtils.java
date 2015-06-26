@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import com.google.common.collect.ImmutableList;
+
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
@@ -223,4 +225,16 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         });
     }
 
+    /**
+     * Returns an immutalbe copy of {@code collection}. If {@code collection}
+     * is {@code null}, then it returns an empty {@link List}
+     *
+     * @param collection a {@link Collection}.
+     * @param <T>        the generic type of {@code collection}
+     * @return a {@link ImmutableList}. Might be empty but will never be {@code null}
+     */
+    public static <T> List<T> immutableList(Collection<T> collection)
+    {
+        return collection != null ? ImmutableList.copyOf(collection) : ImmutableList.<T>of();
+    }
 }

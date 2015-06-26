@@ -17,6 +17,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
+import org.mule.util.TemplateParser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -279,6 +280,48 @@ public final class ExpressionUtils
         }
 
         return new TypedValue(result, propertyDataType);
+    }
+
+    /**
+     * Returns {@code true} if the {@code expression} string starts with
+     * the {@code parser}' style prefix and ends with the style's suffix.
+     * Notice that this doesn't account for the case in which you have an embedded
+     * expression like {@code hello #[world]}
+     *
+     * @param value  a {@link String} which is presumed to be a simple expression
+     * @param parser the {@link TemplateParser} which provides the {@link TemplateParser.PatternInfo} style
+     * @return {@code true} if {@code expression} is a simple expression. {@code false otherwise}
+     */
+    public static boolean isSimpleExpression(String value, TemplateParser parser)
+    {
+        TemplateParser.PatternInfo style = parser.getStyle();
+        return value.startsWith(style.getPrefix()) && value.endsWith(style.getSuffix());
+    }
+
+    /**
+     * Returns {@code true} if the {@code expression} string contains a substring which
+     * matches the template defined in the {@code parser}
+     *
+     * @param value  a string presumed to be a expression
+     * @param parser the {@link TemplateParser} containing the template used for the validation
+     * @return {@code true} if {@code expression} contains a expression. {@code false} otherwise
+     */
+    public static boolean containsExpression(String value, TemplateParser parser)
+    {
+        return parser.isContainsTemplate(value);
+    }
+
+    /**
+     * Returns {@code true} if the {@code value} and {@code parser} evaluates {@code true}
+     * in either {@link #isSimpleExpression(String, TemplateParser)} or {@link #containsExpression(String, TemplateParser)}
+     *
+     * @param value  a String presumed to be an expression
+     * @param parser the {@link TemplateParser} used in the validation
+     * @return {@code true} if {@code value} is an expression. {@code false} othewise
+     */
+    public static boolean isExpression(String value, TemplateParser parser)
+    {
+        return isSimpleExpression(value, parser) || containsExpression(value, parser);
     }
 
     private static Map<String, Object> returnMap(Map<String, Object> props, PropertyScope scope)

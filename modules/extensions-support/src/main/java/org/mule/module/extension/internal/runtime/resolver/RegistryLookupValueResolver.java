@@ -15,7 +15,7 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Implementation of {@link ValueResolver} which accesses the mule registry
- * and returns the value associated with {@link #key}.public static final
+ * and returns the value associated with {@link #key}.
  * <p/>
  * Because the registry is mutable, {@link #isDynamic()} will always return
  * {@code true} even though the odds are that the same value will always be returned.

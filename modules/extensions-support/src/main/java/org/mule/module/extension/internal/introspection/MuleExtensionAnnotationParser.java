@@ -21,6 +21,7 @@ import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.declaration.fluent.CapableDeclaration;
 import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
+import org.mule.module.extension.internal.util.CapabilityUtils;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.ParamReader;
@@ -68,7 +69,7 @@ public final class MuleExtensionAnnotationParser
 
     static String getMemberName(CapableDeclaration<?> capable, String defaultName)
     {
-        MemberNameCapability memberNameCapability = getSingleCapability(capable.getCapabilities(), MemberNameCapability.class);
+        MemberNameCapability memberNameCapability = CapabilityUtils.getSingleCapability(capable.getCapabilities(), MemberNameCapability.class);
         return memberNameCapability != null ? memberNameCapability.getName() : defaultName;
     }
 
