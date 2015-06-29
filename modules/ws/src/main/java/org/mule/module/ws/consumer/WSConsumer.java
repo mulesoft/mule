@@ -31,6 +31,7 @@ import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.IOUtils;
@@ -67,7 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingSupported
+public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
 {
 
     public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
