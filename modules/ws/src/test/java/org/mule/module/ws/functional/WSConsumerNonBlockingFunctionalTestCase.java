@@ -8,6 +8,7 @@
 package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
@@ -65,6 +66,17 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
         String message = "<tns:echo xmlns:tns=\"http://invalid/\"><text>Hello</text></tns:echo>";
         assertSoapFault("http://localhost:" + dynamicPort.getNumber() + "/in", message, "Unexpected wrapper element {http://invalid/}echo found");
         muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsDifferent();
+    }
+
+    @Test
+    public void webServiceConsumerMidFlow() throws Exception
+    {
+        MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, muleContext);
+        MuleClient client = muleContext.getClient();
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/inMidFlow",
+                                           request, newOptions().method(POST.name()).disableStatusCodeValidation()
+                                                   .build());
+        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
     }
 
     protected void assertValidResponse(String address, Map<String, Object> properties) throws Exception
