@@ -45,13 +45,8 @@ import org.springframework.core.ResolvableType;
 public class IntrospectionUtils
 {
 
-    /**
-     * Returns a {@link DataType} representing the
-     * given clazz
-     */
-    public static DataType getClassDataType(Class<?> clazz)
+    private IntrospectionUtils()
     {
-        return toDataType(ResolvableType.forClass(clazz));
     }
 
     /**
@@ -188,7 +183,7 @@ public class IntrospectionUtils
 
     public static boolean isIgnored(AccessibleObject object)
     {
-        return object == null || object.getAnnotation(Ignore.class) != null;
+        return object.getAnnotation(Ignore.class) != null;
     }
 
     public static boolean isRequired(AccessibleObject object)

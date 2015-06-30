@@ -49,7 +49,7 @@ public final class DynamicConfigurationInstanceProvider<T> implements Configurat
      *
      * @param name                       the name of the config definition
      * @param configuration              the {@link Configuration} model
-     * @param configurationObjectBuilder the introspection model of the objects this resolver produces
+     * @param configurationObjectBuilder the {@link ConfigurationObjectBuilder} that will build the configuration instances
      * @param resolverSet                the {@link ResolverSet} that's going to be evaluated
      */
     public DynamicConfigurationInstanceProvider(String name,

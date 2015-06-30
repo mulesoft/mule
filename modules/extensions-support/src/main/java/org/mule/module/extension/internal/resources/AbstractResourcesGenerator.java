@@ -49,7 +49,7 @@ public abstract class AbstractResourcesGenerator implements ResourcesGenerator
 
         if (resource == null)
         {
-            resource = new ImmutableGeneratedResource(filepath);
+            resource = new DefaultGeneratedResource(filepath);
             resources.put(filepath, resource);
         }
 

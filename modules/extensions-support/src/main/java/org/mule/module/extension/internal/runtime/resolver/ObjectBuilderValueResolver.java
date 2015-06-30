@@ -20,7 +20,7 @@ import org.mule.module.extension.internal.runtime.ObjectBuilder;
  * It implements {@link Lifecycle} and propagates all lifecycle events to
  * the underlying {@code builder}
  *
- * @param <T>
+ * @param <T> the generic type for the instances built.
  * @since 3.7.0
  */
 public class ObjectBuilderValueResolver<T> implements ValueResolver<T>
