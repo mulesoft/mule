@@ -15,7 +15,9 @@ import org.mule.api.processor.ProcessingStrategy;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.processor.AsyncDelegateMessageProcessor;
+import org.mule.processor.strategy.AbstractThreadingProfileProcessingStrategy;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -61,6 +63,13 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testNonBlocking() throws Exception
+    {
+        assertEquals(NonBlockingProcessingStrategy.class,
+                     getFlowProcessingStrategy("nonBlockingFlow").getClass());
+    }
+
+    @Test
     public void testCustomAsynchronous() throws Exception
     {
         ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customAsynchronousFlow");
@@ -68,6 +77,16 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
         assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
 
         assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
+    }
+
+    @Test
+    public void testCustomNonBlocking() throws Exception
+    {
+        ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customNonBlockingFlow");
+
+        assertEquals(NonBlockingProcessingStrategy.class, processingStrategy.getClass());
+
+        assertAsynchronousStrategyConfig((AbstractThreadingProfileProcessingStrategy) processingStrategy);
     }
 
     @Test
@@ -150,7 +169,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
         assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
     }
 
-    private void assertAsynchronousStrategyConfig(AsynchronousProcessingStrategy processingStrategy)
+    private void assertAsynchronousStrategyConfig(AbstractThreadingProfileProcessingStrategy processingStrategy)
     {
         assertEquals(10, processingStrategy.getMaxThreads().intValue());
         assertEquals(5, processingStrategy.getMinThreads().intValue());

@@ -88,6 +88,7 @@ import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
 import org.mule.processor.strategy.ThreadPerProcessorProcessingStrategy;
@@ -425,6 +426,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
         registerMuleBeanDefinitionParser("queued-thread-per-processor-processing-strategy",
             new OrphanDefinitionParser(QueuedThreadPerProcessorProcessingStrategy.class, false)).addMapping(
+            "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
+        registerMuleBeanDefinitionParser("non-blocking-processing-strategy",
+            new OrphanDefinitionParser(NonBlockingProcessingStrategy.class, false)).addMapping(
             "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
         registerMuleBeanDefinitionParser("custom-processing-strategy", new OrphanDefinitionParser(false)).addIgnored(
             "name");
