@@ -9,8 +9,6 @@ package org.mule.module.extension.internal.runtime.resolver;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 
@@ -35,7 +33,7 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-public class ResolverSet implements ValueResolver<Object>
+public class ResolverSet implements ValueResolver<ResolverSetResult>
 {
 
     private Map<Parameter, ValueResolver> resolvers = new LinkedHashMap<>();
@@ -45,13 +43,6 @@ public class ResolverSet implements ValueResolver<Object>
      * Links the given {@link ValueResolver} to the given {@link Parameter}.
      * If such {@code parameter} was already added, then the associated {@code resolver}
      * is replaced.
-     * <p/>
-     * Since this class implements {@link Lifecycle} and {@link MuleContextAware},
-     * this method works in tandem with the ones defined in that interface.
-     * All the lifecycle invocations received by this instances are propagates to the
-     * registered resolvers. You should make a best effort then to add all the resolvers
-     * <b>before</b> lifecycle is applied. Otherwise, adding more resolvers will be allowed
-     * but you'll be in charge of whatever lifecycle phases it has missed
      *
      * @param parameter a not {@code null} {@link Parameter}
      * @param resolver  a not {@code null} {@link ValueResolver}

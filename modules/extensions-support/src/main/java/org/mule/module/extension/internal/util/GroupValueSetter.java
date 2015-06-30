@@ -16,6 +16,7 @@ import org.mule.module.extension.internal.introspection.ParameterGroup;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 
 import com.google.common.collect.ImmutableList;
 
@@ -38,6 +39,15 @@ import java.util.Map;
 public final class GroupValueSetter implements ValueSetter
 {
 
+    /**
+     * Returns a {@link List} containing one {@link ValueSetter} instance per each
+     * {@link ParameterGroup} defined in the {@link ParameterGroupCapability} extracted
+     * from the given {@code capable}. If {@code capable} does not contain such capability
+     * then an empty {@link List} is returned
+     *
+     * @param capable a {@link Capable} instance presumed to have the {@link ParameterGroupCapability}
+     * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
+     */
     public static List<ValueSetter> settersFor(Capable capable)
     {
         ImmutableList.Builder<ValueSetter> groupValueSetters = ImmutableList.builder();
@@ -55,8 +65,13 @@ public final class GroupValueSetter implements ValueSetter
     }
 
     private final org.mule.module.extension.internal.introspection.ParameterGroup group;
-    private List<ValueSetter> childSetters;
+    private final List<ValueSetter> childSetters;
 
+    /**
+     * Creates a new instance that can set values defined in the given {@code group}
+     *
+     * @param group a {@link ParameterGroup}
+     */
     public GroupValueSetter(org.mule.module.extension.internal.introspection.ParameterGroup group)
     {
         this.group = group;
@@ -70,15 +85,15 @@ public final class GroupValueSetter implements ValueSetter
 
         for (Map.Entry<String, Field> parameter : group.getParameters().entrySet())
         {
-            groupBuilder.addPropertyValue(parameter.getValue(), result.get(parameter.getKey()));
+            groupBuilder.addPropertyResolver(parameter.getValue(), new StaticValueResolver<>(result.get(parameter.getKey())));
         }
 
-        Object object = groupBuilder.build(VoidMuleEvent.getInstance());
-        setField(group.getField(), target, object);
+        Object groupValue = groupBuilder.build(VoidMuleEvent.getInstance());
+        setField(group.getField(), target, groupValue);
 
         for (ValueSetter childSetter : childSetters)
         {
-            childSetter.set(object, result);
+            childSetter.set(groupValue, result);
         }
     }
 }

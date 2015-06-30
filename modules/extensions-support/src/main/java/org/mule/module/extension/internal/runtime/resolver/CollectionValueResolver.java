@@ -29,7 +29,7 @@ import java.util.Set;
  * This class implements {@link Lifecycle} and propagates those events to each
  * of the {@code resolvers}
  *
- * @param <T>
+ * @param <T> the generic type for the items of the returned {@link Collection}
  * @since 3.7.0
  */
 public final class CollectionValueResolver<T> implements ValueResolver<Collection<T>>

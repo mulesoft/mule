@@ -9,10 +9,17 @@ package org.mule.module.extension.internal.runtime;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.Operation;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
 import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
 
+/**
+ * {@link ConfigurationInstanceProvider} which provides always the same {@link #configurationInstance}.
+ *
+ * @param <T> the generic type of the instances provided
+ * @since 3.7.0
+ */
 public final class StaticConfigurationInstanceProvider<T> implements ConfigurationInstanceProvider<T>
 {
 
@@ -29,6 +36,14 @@ public final class StaticConfigurationInstanceProvider<T> implements Configurati
         providerDelegate = new FirstTimeProviderDelegate<>();
     }
 
+    /**
+     * Returns {@link #configurationInstance}. The first time this method is invoked, the instance
+     * is registered on the {@code registrationCallback}
+     *
+     * @param operationContext     the {@link OperationContext context} of the {@link Operation} being executed
+     * @param registrationCallback a {@link ConfigurationInstanceRegistrationCallback}
+     * @return {@link #configurationInstance}
+     */
     @Override
     public T get(OperationContext operationContext, ConfigurationInstanceRegistrationCallback registrationCallback)
     {

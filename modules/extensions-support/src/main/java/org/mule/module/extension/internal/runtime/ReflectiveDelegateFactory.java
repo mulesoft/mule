@@ -13,15 +13,15 @@ import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withParametersAssignableTo;
 import static org.reflections.ReflectionUtils.withParametersCount;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Operation;
 import org.mule.module.extension.internal.manager.ConfigurationInstanceWrapper;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Callable;
 
 /**
  * A factory to create delegate objects to be used by {@link DelegatingOperationExecutor} instances.
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentMap;
  * that it will be related to.
  * <p/>
  * The provided {@link Class} is expected to have a public {@link Constructor} which takes a configuration instance
- * as its only argument, since per the rules of {@link ExtensionManager#getOperationExecutor(Operation, Object)}
+ * as its only argument.
  * <p/>
  * This factory will ensure that for a given {@code delegateType}|{@code configurationInstance} pair, the same
  * delegate will always be returned. This will allow for the delegate objects to safely store state
@@ -40,21 +40,29 @@ import java.util.concurrent.ConcurrentMap;
 public final class ReflectiveDelegateFactory
 {
 
-    private ConcurrentMap<DelegateKey, Object> delegates = new ConcurrentHashMap<>();
+    private final Cache<DelegateKey, Object> delegates = CacheBuilder.newBuilder().build();
 
-    public <C, D> D getDelegate(Class<D> delegateType, C configurationInstance)
+    public <C, D> D getDelegate(final Class<D> delegateType, final C configurationInstance)
     {
         DelegateKey key = new DelegateKey(delegateType, configurationInstance);
-        synchronized (configurationInstance)
+        try
         {
-            D delegate = (D) delegates.get(key);
-            if (delegate == null)
+            return (D) delegates.get(key, new Callable<D>()
             {
-                delegate = createDelegate(delegateType, configurationInstance);
-                delegates.put(key, delegate);
+                @Override
+                public D call() throws Exception
+                {
+                    return createDelegate(delegateType, configurationInstance);
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            if (e.getCause() instanceof RuntimeException)
+            {
+                throw (RuntimeException) e.getCause();
             }
-
-            return delegate;
+            throw new RuntimeException(e);
         }
     }
 

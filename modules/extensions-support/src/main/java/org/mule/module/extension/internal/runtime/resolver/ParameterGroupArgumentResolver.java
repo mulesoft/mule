@@ -7,14 +7,15 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import org.mule.api.MuleRuntimeException;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.runtime.ReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -22,17 +23,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class is the one that makes it possible to resolve arguments annotated with
- * {@link ParameterGroup} in a {@link org.mule.module.extension.internal.runtime.ReflectiveMethodOperationExecutor}.
+ * Resolves arguments annotated with {@link ParameterGroup} in a {@link ReflectiveMethodOperationExecutor}.
  * <p/>
- * An implementation of {@link ArgumentResolver} which creates instances
- * of a given {@link #type} and maps the fields annotated with
- * {@link Parameter} to parameter values of a {@link OperationContext}.
+ * An implementation of {@link ArgumentResolver} which creates instances of a given {@link #type} and maps
+ * the fields annotated with {@link Parameter} to parameter values of a {@link OperationContext}.
  * <p/>
- * It also looks for fields annotated with {@link ParameterGroup}
- * and recursively populates them too.
+ * It also looks for fields annotated with {@link ParameterGroup} and recursively populates them too.
  *
- * @param <T>
+ * @param <T> the generic type of the argument instances that will be resolved
  * @since 3.7.0
  */
 public class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T>
@@ -42,6 +40,11 @@ public class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T>
     private final Collection<Field> parameterFields;
     private final Map<Field, ParameterGroupArgumentResolver<?>> childGroups;
 
+    /**
+     * Creates an instance that will resolve instances of {@code type}
+     *
+     * @param type the {@link Class} of the instances that will be resolved
+     */
     public ParameterGroupArgumentResolver(Class<T> type)
     {
         checkInstantiable(type);

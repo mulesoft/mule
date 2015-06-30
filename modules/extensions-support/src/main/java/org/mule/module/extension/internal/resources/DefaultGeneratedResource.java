@@ -13,13 +13,13 @@ import org.mule.extension.resources.GeneratedResource;
  *
  * @since 3.7.0}
  */
-final class ImmutableGeneratedResource implements GeneratedResource
+final class DefaultGeneratedResource implements GeneratedResource
 {
 
     private final String filepath;
     private final StringBuilder contentBuilder = new StringBuilder();
 
-    ImmutableGeneratedResource(String filepath)
+    DefaultGeneratedResource(String filepath)
     {
         this.filepath = filepath;
     }
