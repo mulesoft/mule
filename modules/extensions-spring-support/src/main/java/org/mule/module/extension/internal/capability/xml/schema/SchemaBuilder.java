@@ -26,7 +26,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isDynamic;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
-import static org.mule.module.extension.internal.util.NameUtils.getGlobalPojoTypeName;
+import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.annotations.Extensible;
@@ -379,7 +379,7 @@ public class SchemaBuilder
     private void registerPojoGlobalElement(DataType type, String description)
     {
         TopLevelElement objectElement = new TopLevelElement();
-        objectElement.setName(getGlobalPojoTypeName(type));
+        objectElement.setName(getTopLevelTypeName(type));
 
         LocalComplexType complexContent = newLocalComplexTypeWithBase(type, description);
         complexContent.getComplexContent().getExtension().getAttributeOrAttributeGroup().add(createNameAttribute());

@@ -8,20 +8,30 @@ package org.mule.module.extension.internal.util;
 
 import org.mule.extension.annotations.Alias;
 import org.mule.extension.introspection.DataType;
+import org.mule.extension.introspection.Extension;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Utilities for manipulating names of {@link Extension extensions} and
+ * their components
+ *
+ * @since 3.7.0
+ */
 public class NameUtils
 {
+
+    private NameUtils()
+    {
+    }
 
     private static final List<Inflection> plural = new ArrayList<>();
     private static final List<Inflection> singular = new ArrayList<>();
     private static final List<String> uncountable = new ArrayList<>();
 
-    //TODO: Refactor this. This was fine on devkit but we can't keep all these static info in runtime
     static
     {
         // plural is "singular to plural form"
@@ -38,7 +48,6 @@ public class NameUtils
         plural("(?:([^f])fe|([lr])f)$", "$1$2ves");
         plural("(hive)$", "$1s");
         plural("([^aeiouy]|qu)y$", "$1ies");
-        //plural("([^aeiouy]|qu)ies$", "$1y");
         plural("(x|ch|ss|sh)$", "$1es");
         plural("(matr|vert|ind)ix|ex$", "$1ices");
         plural("([m|l])ouse$", "$1ice");
@@ -87,11 +96,23 @@ public class NameUtils
         uncountable("sheep");
     }
 
+    /**
+     * Registers a plural {@code replacement} for the given {@code pattern}
+     *
+     * @param pattern     the pattern for which you want to register a plural form
+     * @param replacement the replacement pattern
+     */
     private static void plural(String pattern, String replacement)
     {
         plural.add(0, new Inflection(pattern, replacement));
     }
 
+    /**
+     * Registers a singular {@code replacement} for the given {@code pattern}
+     *
+     * @param pattern     the pattern for which you want to register a plural form
+     * @param replacement the replacement pattern
+     */
     private static void singular(String pattern, String replacement)
     {
         singular.add(0, new Inflection(pattern, replacement));
@@ -108,10 +129,19 @@ public class NameUtils
         uncountable.add(word);
     }
 
-    public static String camel(String uncamelCaseName)
+    /**
+     * Transforms a hyphenized value into a camel case one.
+     * <p/>
+     * For example:
+     * {@code message-processor} would be transformed to {@code messageProcessor}
+     *
+     * @param hyphenizedValue a String in hypenized form
+     * @return the {@code hyphenizedValue} in camel case format
+     */
+    public static String camel(String hyphenizedValue)
     {
         String result = "";
-        String[] parts = uncamelCaseName.split("-");
+        String[] parts = hyphenizedValue.split("-");
 
         for (int i = 0; i < parts.length; i++)
         {
@@ -121,11 +151,15 @@ public class NameUtils
         return result;
     }
 
-    public static String getSetterName(String name)
-    {
-        return "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
-    }
-
+    /**
+     * Transforms a camel case value into a hyphenizedone.
+     * <p/>
+     * For example:
+     * {@code messageProcessor} would be transformed to {@code message-processor}
+     *
+     * @param camelCaseName a {@link String} in camel case form
+     * @return the {@code camelCaseName} in hypenized form
+     */
     public static String hyphenize(String camelCaseName)
     {
         if (StringUtils.isBlank(camelCaseName))
@@ -216,7 +250,17 @@ public class NameUtils
         return false;
     }
 
-    public static String getGlobalPojoTypeName(DataType type)
+    /**
+     * Returns the name of the give top level {@code type}.
+     * <p/>
+     * If the {@code type}'s {@link DataType#getRawType()} contains the {@link Alias}
+     * annotation, then the {@link Alias#value()} is returned. Otherwise, the raw
+     * type's {@link Class#getName()} is returned
+     *
+     * @param type the {@link DataType} which name you want
+     * @return the name for the given {@code type}
+     */
+    public static String getTopLevelTypeName(DataType type)
     {
         Alias alias = type.getRawType().getAnnotation(Alias.class);
         String name = alias != null ? alias.value() : type.getRawType().getSimpleName();
@@ -229,11 +273,6 @@ public class NameUtils
         private String pattern;
         private String replacement;
         private boolean ignoreCase;
-
-        public Inflection(String pattern)
-        {
-            this(pattern, null, true);
-        }
 
         public Inflection(String pattern, String replacement)
         {

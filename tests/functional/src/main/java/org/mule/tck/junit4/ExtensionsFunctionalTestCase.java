@@ -6,17 +6,18 @@
  */
 package org.mule.tck.junit4;
 
+import static org.mule.util.IOUtils.getResourceAsUrl;
+import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextAware;
-import org.mule.registry.SpiServiceRegistry;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.extension.resources.spi.GenerableResourceContributor;
@@ -24,8 +25,8 @@ import org.mule.module.extension.internal.introspection.AnnotationsBasedDescribe
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.module.extension.internal.resources.AbstractResourcesGenerator;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.ArrayUtils;
-import org.mule.util.IOUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -79,6 +80,12 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
     private File generatedResourcesDirectory;
 
 
+    /**
+     * Performs all the logic inherited from the super class, plus invokes
+     * {@link #createExtensionsManager()}
+     *
+     * @throws Exception in case of any failure
+     */
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
@@ -114,6 +121,13 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         return null;
     }
 
+    /**
+     * Adds a {@link ConfigurationBuilder} that sets the {@link #extensionManager}
+     * into the {@link #muleContext}. This {@link ConfigurationBuilder} is set
+     * as the first element of the {@code builders} {@link List}
+     *
+     * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
+     */
     @Override
     protected final void addBuilders(List<ConfigurationBuilder> builders)
     {
@@ -192,7 +206,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
     private void generateResourcesAndAddToClasspath(ResourcesGenerator generator) throws Exception
     {
         ClassLoader cl = getClass().getClassLoader();
-        Method method = org.springframework.util.ReflectionUtils.findMethod(cl.getClass(), "addURL", URL.class);
+        Method method = findMethod(cl.getClass(), "addURL", URL.class);
         method.setAccessible(true);
 
         for (GeneratedResource resource : generator.dumpAll())
@@ -204,7 +218,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
 
     private File getGenerationTargetDirectory()
     {
-        URL url = IOUtils.getResourceAsUrl(getEffectiveConfigFile(), getClass(), true, true);
+        URL url = getResourceAsUrl(getEffectiveConfigFile(), getClass(), true, true);
         File targetDirectory = new File(FileUtils.toFile(url).getParentFile(), "META-INF");
 
         if (!targetDirectory.exists() && !targetDirectory.mkdir())

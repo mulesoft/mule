@@ -14,7 +14,7 @@ import org.mule.module.extension.internal.runtime.OperationContextAdapter;
  * An implementation of {@link ArgumentResolver} which
  * returns the {@link MuleMessage} associated with a given
  * {@link OperationContext}.
- *
+ * <p/>
  * Notice that for this to work, the {@link OperationContext}
  * has to be an instance of {@link OperationContextAdapter}
  *

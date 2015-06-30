@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.immutableList;
+import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;

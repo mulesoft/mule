@@ -82,7 +82,9 @@ final class ExtensionRegistry
     }
 
     /**
-     * @param name the registration of the extension you want
+     * Returns a registered {@link Extension} of the given {@code name}
+     *
+     * @param name the name of the extension that is being retrieved
      * @return the registered {@link Extension} or {@code null} if nothing was registered with that {@code name}
      */
     Extension getExtension(String name)

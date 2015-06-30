@@ -29,7 +29,6 @@ abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
 {
 
     private final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
-    private final Map<Field, Object> values = new HashMap<>();
 
     /**
      * Returns the instance to be returned before the properties have
@@ -48,16 +47,6 @@ abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
 
         field.setAccessible(true);
         resolvers.put(field, (ValueResolver<Object>) resolver);
-        return this;
-    }
-
-    @Override
-    public ObjectBuilder<T> addPropertyValue(Field field, Object value)
-    {
-        checkArgument(field != null, "field cannot be null");
-
-        field.setAccessible(true);
-        values.put(field, value);
         return this;
     }
 
@@ -81,11 +70,6 @@ abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
         for (Map.Entry<Field, ValueResolver<Object>> resolver : resolvers.entrySet())
         {
             setField(resolver.getKey(), object, resolver.getValue().resolve(event));
-        }
-
-        for (Map.Entry<Field, Object> value : values.entrySet())
-        {
-            setField(value.getKey(), object, value.getValue());
         }
 
         return object;
