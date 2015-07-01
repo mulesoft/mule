@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.annotations.ImplementationOf;
+import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ public class MoneyLaunderingOperation
     }
 
     @Operation
-    @ImplementationOf(HeisenbergExtension.class)
+    @ExtensionOf(HeisenbergExtension.class)
     public synchronized Long launder(long amount)
     {
         config.setMoney(config.getMoney().subtract(BigDecimal.valueOf(amount)));

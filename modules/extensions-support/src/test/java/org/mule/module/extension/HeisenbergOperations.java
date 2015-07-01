@@ -11,7 +11,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.transport.PropertyScope;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.annotations.ImplementationOf;
+import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.RestrictedTo;
@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-@ImplementationOf(HeisenbergExtension.class)
+@ExtensionOf(HeisenbergExtension.class)
 public class HeisenbergOperations
 {
 

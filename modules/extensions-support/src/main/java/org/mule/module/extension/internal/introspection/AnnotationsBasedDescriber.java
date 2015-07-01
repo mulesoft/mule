@@ -20,7 +20,7 @@ import org.mule.registry.SpiServiceRegistry;
 import org.mule.extension.annotations.Configuration;
 import org.mule.extension.annotations.Configurations;
 import org.mule.extension.annotations.Extension;
-import org.mule.extension.annotations.ImplementationOf;
+import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.param.Optional;
@@ -34,7 +34,7 @@ import org.mule.extension.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.fluent.WithParameters;
 import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
-import org.mule.module.extension.internal.capability.metadata.ImplementedTypeCapability;
+import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
 import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
@@ -232,21 +232,21 @@ public final class AnnotationsBasedDescriber implements Describer
 
             declareOperationParameters(method, operation);
 
-            calculateImplementedTypes(actingClass, method, operation);
+            calculateExtendedTypes(actingClass, method, operation);
         }
     }
 
-    private void calculateImplementedTypes(Class<?> actingClass, Method method, OperationDescriptor operation)
+    private void calculateExtendedTypes(Class<?> actingClass, Method method, OperationDescriptor operation)
     {
-        ImplementationOf implementation = method.getAnnotation(ImplementationOf.class);
-        if (implementation == null)
+        ExtensionOf extensionOf = method.getAnnotation(ExtensionOf.class);
+        if (extensionOf == null)
         {
-            implementation = actingClass.getAnnotation(ImplementationOf.class);
+            extensionOf = actingClass.getAnnotation(ExtensionOf.class);
         }
 
-        if (implementation != null)
+        if (extensionOf != null)
         {
-            operation.withCapability(new ImplementedTypeCapability(implementation.value()));
+            operation.withCapability(new ExtendingOperationCapability(extensionOf.value()));
         }
     }
 

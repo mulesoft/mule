@@ -9,7 +9,7 @@ package org.mule.extension.validation.internal;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import org.mule.api.MuleEvent;
 import org.mule.api.NestedProcessor;
-import org.mule.extension.annotations.ImplementationOf;
+import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.RestrictedTo;
 import org.mule.extension.validation.api.MultipleValidationException;
@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @since 3.7.0
  */
-@ImplementationOf(ValidationExtension.class)
+@ExtensionOf(ValidationExtension.class)
 public final class ValidationStrategies
 {
 

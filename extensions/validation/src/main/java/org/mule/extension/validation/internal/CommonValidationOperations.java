@@ -7,7 +7,7 @@
 package org.mule.extension.validation.internal;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.annotations.ImplementationOf;
+import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.param.Optional;
@@ -37,7 +37,7 @@ import java.util.Map;
  * @see ValidationExtension
  * @since 3.7.0
  */
-@ImplementationOf(ValidationExtension.class)
+@ExtensionOf(ValidationExtension.class)
 public final class CommonValidationOperations extends ValidationSupport
 {
 

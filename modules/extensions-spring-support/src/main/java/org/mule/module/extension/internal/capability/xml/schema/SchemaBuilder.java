@@ -37,7 +37,7 @@ import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
-import org.mule.module.extension.internal.capability.metadata.ImplementedTypeCapability;
+import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
 import org.mule.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
@@ -555,21 +555,21 @@ public class SchemaBuilder
     private QName getOperationSubstitutionGroup(Operation operation)
     {
         QName substitutionGroup = MULE_ABSTRACT_MESSAGE_PROCESSOR;
-        ImplementedTypeCapability implementation = getSingleCapability(operation, ImplementedTypeCapability.class);
-        if (implementation != null)
+        ExtendingOperationCapability extendingOperationCapability = getSingleCapability(operation, ExtendingOperationCapability.class);
+        if (extendingOperationCapability != null)
         {
-            substitutionGroup = getSubstitutionGroup(operation, implementation.getType());
+            substitutionGroup = getSubstitutionGroup(extendingOperationCapability.getType());
         }
 
         return substitutionGroup;
     }
 
-    private QName getSubstitutionGroup(Operation operation, Class<?> type)
+    private QName getSubstitutionGroup(Class<?> type)
     {
-        return new QName(schema.getTargetNamespace(), registerExtensibleElement(operation, type));
+        return new QName(schema.getTargetNamespace(), registerExtensibleElement(type));
     }
 
-    private String registerExtensibleElement(Operation operation, Class<?> type)
+    private String registerExtensibleElement(Class<?> type)
     {
         Extensible extensible = type.getAnnotation(Extensible.class);
         checkArgument(extensible != null, String.format("Type %s is not extensible", type.getName()));
@@ -645,7 +645,7 @@ public class SchemaBuilder
             if (isOperation(parameterType))
             {
                 String maxOccurs = parameterQualifier == DataQualifier.LIST ? "unbounded" : "1";
-                generateNestedProcessorElement(all, operation, parameter, maxOccurs);
+                generateNestedProcessorElement(all, parameter, maxOccurs);
             }
             else
             {
@@ -691,10 +691,10 @@ public class SchemaBuilder
                 OPERATION.equals(genericTypes[0].getQualifier()));
     }
 
-    private void generateNestedProcessorElement(ExplicitGroup all, Operation operation, Parameter parameter, String maxOccurs)
+    private void generateNestedProcessorElement(ExplicitGroup all, Parameter parameter, String maxOccurs)
     {
         LocalComplexType collectionComplexType = new LocalComplexType();
-        GroupRef group = generateNestedProcessorGroup(operation, parameter, maxOccurs);
+        GroupRef group = generateNestedProcessorGroup(parameter, maxOccurs);
         collectionComplexType.setGroup(group);
         collectionComplexType.setAnnotation(createDocAnnotation(parameter.getDescription()));
 
@@ -706,13 +706,13 @@ public class SchemaBuilder
         all.getParticle().add(objectFactory.createElement(collectionElement));
     }
 
-    private GroupRef generateNestedProcessorGroup(Operation operation, Parameter parameter, String maxOccurs)
+    private GroupRef generateNestedProcessorGroup(Parameter parameter, String maxOccurs)
     {
         QName ref = MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
         TypeRestrictionCapability restrictionCapability = getSingleCapability(parameter, TypeRestrictionCapability.class);
         if (restrictionCapability != null)
         {
-            ref = getSubstitutionGroup(operation, restrictionCapability.getType());
+            ref = getSubstitutionGroup(restrictionCapability.getType());
             ref = new QName(ref.getNamespaceURI(), getGroupName(ref.getLocalPart()), ref.getPrefix());
         }
 
