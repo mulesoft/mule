@@ -49,13 +49,13 @@ public abstract class ResourcesGeneratorContractTestCase extends AbstractMuleTes
     public void getOrCreateResource()
     {
         final String filepath = "path";
-        GeneratedResource resource = generator.getOrCreateResource(filepath);
+        GeneratedResource resource = generator.get(filepath);
 
         assertNotNull(resource);
         assertEquals(filepath, resource.getFilePath());
         assertNotNull(resource.getContentBuilder());
 
-        assertSame(resource, generator.getOrCreateResource(filepath));
+        assertSame(resource, generator.get(filepath));
     }
 
     @Test

@@ -11,10 +11,7 @@ import static org.springframework.util.ReflectionUtils.invokeMethod;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.runtime.OperationExecutor;
 
-import com.google.common.util.concurrent.Futures;
-
 import java.lang.reflect.Method;
-import java.util.concurrent.Future;
 
 /**
  * Implementation of {@link OperationExecutor} which relies on a
@@ -45,10 +42,10 @@ public final class ReflectiveMethodOperationExecutor<D> implements DelegatingOpe
      * {@inheritDoc}
      */
     @Override
-    public Future<Object> execute(OperationContext operationContext) throws Exception
+    public Object execute(OperationContext operationContext) throws Exception
     {
         Object result = invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext));
-        return Futures.immediateFuture(returnDelegate.asReturnValue(result, operationContext));
+        return returnDelegate.asReturnValue(result, operationContext);
     }
 
     /**

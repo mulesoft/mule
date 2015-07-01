@@ -43,7 +43,7 @@ public abstract class AbstractResourcesGenerator implements ResourcesGenerator
      * {@inheritDoc}
      */
     @Override
-    public GeneratedResource getOrCreateResource(String filepath)
+    public GeneratedResource get(String filepath)
     {
         GeneratedResource resource = resources.get(filepath);
 

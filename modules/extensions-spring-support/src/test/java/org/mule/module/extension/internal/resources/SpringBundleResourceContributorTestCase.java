@@ -80,7 +80,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     {
         contributor.contribute(extension, generator);
 
-        GeneratedResource resource = generator.getOrCreateResource(SCHEMA_NAME);
+        GeneratedResource resource = generator.get(SCHEMA_NAME);
         assertNotNull(resource);
         assertFalse(StringUtils.isBlank(resource.getContentBuilder().toString()));
     }
@@ -90,7 +90,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     {
         contributor.contribute(extension, generator);
 
-        GeneratedResource resource = generator.getOrCreateResource("spring.handlers");
+        GeneratedResource resource = generator.get("spring.handlers");
         assertNotNull(resource);
         assertEquals(String.format("%s=%s", ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, ExtensionsNamespaceHandler.class.getName()), resource.getContentBuilder().toString());
     }
@@ -100,7 +100,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     {
         contributor.contribute(extension, generator);
 
-        GeneratedResource resource = generator.getOrCreateResource("spring.schemas");
+        GeneratedResource resource = generator.get("spring.schemas");
         assertNotNull(resource);
 
         StringBuilder expected = new StringBuilder();

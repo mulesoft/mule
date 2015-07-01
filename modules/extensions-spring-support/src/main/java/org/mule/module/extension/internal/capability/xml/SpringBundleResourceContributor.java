@@ -36,7 +36,7 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
     private void generateSchema(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
     {
         String schema = new SchemaGenerator().generate(extension, capability);
-        resourcesGenerator.getOrCreateResource(getXsdFileName(extension)).getContentBuilder().append(schema);
+        resourcesGenerator.get(getXsdFileName(extension)).getContentBuilder().append(schema);
     }
 
     private void generateSpringBundle(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
@@ -48,12 +48,12 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
     private void writeSpringHandlerBundle(XmlCapability capability, ResourcesGenerator resourcesGenerator)
     {
         String content = String.format("%s=%s", capability.getSchemaLocation(), ExtensionsNamespaceHandler.class.getName());
-        resourcesGenerator.getOrCreateResource("spring.handlers").getContentBuilder().append(springBundleScape(content));
+        resourcesGenerator.get("spring.handlers").getContentBuilder().append(springBundleScape(content));
     }
 
     private void writeSpringSchemaBundle(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
     {
-        StringBuilder builder = resourcesGenerator.getOrCreateResource("spring.schemas").getContentBuilder();
+        StringBuilder builder = resourcesGenerator.get("spring.schemas").getContentBuilder();
         builder.append(getSpringSchemaBundle(extension, capability, capability.getSchemaVersion()));
         builder.append(getSpringSchemaBundle(extension, capability, "current"));
     }

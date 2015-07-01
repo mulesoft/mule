@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -159,6 +160,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1Operation.getExecutor(configInstance)).thenReturn(executor);
 
         classLoader = getClass().getClassLoader();
+        setDiscoverableExtensions(extension1, extension2);
 
         when(discoverer.discover(same(classLoader))).thenAnswer(new Answer<List<Extension>>()
         {
@@ -170,6 +172,11 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         });
 
         ExtensionsTestUtils.stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
+    }
+
+    private void setDiscoverableExtensions(Extension... extensions)
+    {
+        when(discoverer.discover(same(classLoader))).thenReturn(Arrays.asList(extensions));
     }
 
     @Test
@@ -222,13 +229,14 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     {
         discover();
 
-        extension1 = mock(Extension.class);
-        when(extension1.getName()).thenReturn(EXTENSION1_NAME);
-        when(extension1.getVersion()).thenReturn(NEWER_VERSION);
+        Extension newerExtension = mock(Extension.class);
+        when(newerExtension.getName()).thenReturn(EXTENSION1_NAME);
+        when(newerExtension.getVersion()).thenReturn(NEWER_VERSION);
+
+        setDiscoverableExtensions(newerExtension, extension2);
 
         List<Extension> extensions = extensionsManager.discoverExtensions(classLoader);
-        assertThat(extensions, hasSize(1));
-        testEquals(extension1, extensions.get(0));
+        matchExtensions(extensions, Arrays.asList(newerExtension, extension2));
     }
 
     @Test
@@ -236,12 +244,14 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     {
         discover();
 
-        extension1 = mock(Extension.class);
-        when(extension1.getName()).thenReturn(EXTENSION1_NAME);
-        when(extension1.getVersion()).thenReturn(OLDER_VERSION);
+        Extension olderExtension = mock(Extension.class);
+        when(olderExtension.getName()).thenReturn(EXTENSION1_NAME);
+        when(olderExtension.getVersion()).thenReturn(OLDER_VERSION);
+
+        setDiscoverableExtensions(olderExtension, extension2);
 
         List<Extension> extensions = extensionsManager.discoverExtensions(classLoader);
-        assertThat(extensions.isEmpty(), is(true));
+        matchToTestExtensions(extensions);
     }
 
     @Test
@@ -249,7 +259,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     {
         discover();
         List<Extension> extensions = extensionsManager.discoverExtensions(classLoader);
-        assertThat(extensions.isEmpty(), is(true));
+        matchToTestExtensions(extensions);
     }
 
     @Test
@@ -257,30 +267,12 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     {
         discover();
 
-        extension1 = mock(Extension.class);
-        when(extension1.getName()).thenReturn(EXTENSION1_NAME);
-        when(extension1.getVersion()).thenReturn("brandnew");
+        Extension invalidVersionExtension = mock(Extension.class);
+        when(invalidVersionExtension.getName()).thenReturn(EXTENSION1_NAME);
+        when(invalidVersionExtension.getVersion()).thenReturn("brandnew");
 
         List<Extension> extensions = extensionsManager.discoverExtensions(classLoader);
-        assertThat(extensions.isEmpty(), is(true));
-    }
-
-    @Test
-    public void hotUpdateWithOneInvalidVersion()
-    {
-        discover();
-
-        extension1 = mock(Extension.class);
-        when(extension1.getName()).thenReturn(EXTENSION1_NAME);
-        when(extension1.getVersion()).thenReturn("brandnew");
-
-        extension2 = mock(Extension.class);
-        when(extension2.getName()).thenReturn(EXTENSION2_NAME);
-        when(extension2.getVersion()).thenReturn(NEWER_VERSION);
-
-        List<Extension> extensions = extensionsManager.discoverExtensions(classLoader);
-        assertThat(extensions, hasSize(1));
-        testEquals(extension2, extensions.get(0));
+        matchToTestExtensions(extensions);
     }
 
     @Test
@@ -475,4 +467,14 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         assertThat(obtained.getVersion(), equalTo(expected.getVersion()));
     }
 
+    private void matchToTestExtensions(List<Extension> extensions)
+    {
+        matchExtensions(extensions, getTestExtensions());
+    }
+
+    private void matchExtensions(List<Extension> actual, List<Extension> expected)
+    {
+        assertThat(actual, hasSize(expected.size()));
+        assertThat(actual, containsInAnyOrder(expected.toArray()));
+    }
 }

@@ -27,7 +27,6 @@ import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.concurrent.Future;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +74,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     {
         Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {});
         executor = new ReflectiveMethodOperationExecutor(method, operations, VoidReturnDelegate.INSTANCE);
+
         assertSameInstance(executor.execute(operationContext), muleEvent);
         assertThat(config.getEndingHealth(), is(DEAD));
     }
@@ -108,15 +108,13 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         operations = new HeisenbergOperations(config);
     }
 
-    private void assertResult(Future<Object> result, Object expected) throws Exception
+    private void assertResult(Object value, Object expected) throws Exception
     {
-        Object value = result.get();
         assertThat(value, is(expected));
     }
 
-    private void assertSameInstance(Future<Object> result, Object expected) throws Exception
+    private void assertSameInstance(Object value, Object expected) throws Exception
     {
-        Object value = result.get();
         assertThat(value, is(sameInstance(expected)));
     }
 }

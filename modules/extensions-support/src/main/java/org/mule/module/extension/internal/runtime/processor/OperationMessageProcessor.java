@@ -22,8 +22,6 @@ import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
-import java.util.concurrent.Future;
-
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -61,9 +59,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         OperationContext operationContext = createOperationContext(event);
-
-        Future<Object> future = executeOperation(operationContext);
-        Object result = extractResult(event, future);
+        Object result = executeOperation(operationContext);
 
         if (result instanceof MuleEvent)
         {
@@ -81,21 +77,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         return event;
     }
 
-    private Object extractResult(MuleEvent event, Future<Object> future) throws MuleException
-    {
-        try
-        {
-            // for now this is fine because the execution engine is blocking. When we move
-            // to a non-blocking engine, this future needs to be handled differently
-            return future.get();
-        }
-        catch (Exception e)
-        {
-            throw handledException("Could not execute operation " + operation.getName(), event, e);
-        }
-    }
-
-    private Future<Object> executeOperation(OperationContext operationContext) throws MuleException
+    private Object executeOperation(OperationContext operationContext) throws MuleException
     {
         OperationExecutor executor = StringUtils.isBlank(configurationInstanceProviderName)
                                      ? muleContext.getExtensionManager().getOperationExecutor(operationContext)

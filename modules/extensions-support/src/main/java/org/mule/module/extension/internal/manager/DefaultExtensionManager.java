@@ -91,17 +91,12 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         List<Extension> discovered = extensionDiscoverer.discover(classLoader);
         LOGGER.info("Discovered {} extensions", discovered.size());
 
-        ImmutableList.Builder<Extension> accepted = ImmutableList.builder();
-
         for (Extension extension : discovered)
         {
-            if (registerExtension(extension))
-            {
-                accepted.add(extension);
-            }
+            registerExtension(extension);
         }
 
-        return accepted.build();
+        return ImmutableList.copyOf(extensionRegistry.getExtensions());
     }
 
     /**

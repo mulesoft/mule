@@ -47,7 +47,7 @@ public class AnnotationProcessorResourceGeneratorTestCase extends ResourcesGener
         final String filepath = "path";
         final String content = "hello world!";
 
-        GeneratedResource resource = generator.getOrCreateResource(filepath);
+        GeneratedResource resource = generator.get(filepath);
         resource.getContentBuilder().append(content);
 
         FileObject file = mock(FileObject.class);
