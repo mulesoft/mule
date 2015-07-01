@@ -195,7 +195,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
             if (!parameter.isDynamic())
             {
-                parameterDescriptor.whichIsNotDynamic();
+                parameterDescriptor.whichIsStatic();
             }
 
             parameterDescriptor.withCapability(new MemberNameCapability(field.getName()));
