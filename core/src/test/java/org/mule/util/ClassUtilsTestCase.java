@@ -361,18 +361,17 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertThat(ClassUtils.isInstance(String.class, ""), is(true));
         assertThat(ClassUtils.isInstance(Fruit.class, new Apple()), is(true));
         assertThat(ClassUtils.isInstance(Apple.class, new Kiwi()), is(false));
-        assertThat(ClassUtils.isInstance(int.class, 0), is(true));
 
         assertThat(ClassUtils.isInstance(Integer.class, 0), is(true));
-        assertThat(ClassUtils.isInstance(Long.class, 0L), is(true));
-        assertThat(ClassUtils.isInstance(Double.class, double.class), is(true));
-        assertThat(ClassUtils.isInstance(Long.class, long.class), is(true));
-        assertThat(ClassUtils.isInstance(double.class, Double.class), is(true));
-        assertThat(ClassUtils.isInstance(long.class, Long.class), is(true));
-        assertThat(ClassUtils.isInstance(int.class, Integer.class), is(true));
-        assertThat(ClassUtils.isInstance(boolean.class, Boolean.class), is(true));
-        assertThat(ClassUtils.isInstance(String.class, boolean.class), is(false));
-        assertThat(ClassUtils.isInstance(long.class, boolean.class), is(false));
+        assertThat(ClassUtils.isInstance(int.class, 0), is(true));
+        assertThat(ClassUtils.isInstance(long.class, new Long(0)), is(true));
+        assertThat(ClassUtils.isInstance(Double.class, new Double(0).doubleValue()), is(true));
+        assertThat(ClassUtils.isInstance(double.class, new Double(0).doubleValue()), is(true));
+        assertThat(ClassUtils.isInstance(boolean.class, true), is(true));
+        assertThat(ClassUtils.isInstance(boolean.class, Boolean.TRUE), is(true));
+        assertThat(ClassUtils.isInstance(Boolean.class, true), is(true));
+        assertThat(ClassUtils.isInstance(String.class, true), is(false));
+        assertThat(ClassUtils.isInstance(long.class, Boolean.FALSE), is(false));
     }
 
     private void simpleNameHelper(String target, Class clazz)
