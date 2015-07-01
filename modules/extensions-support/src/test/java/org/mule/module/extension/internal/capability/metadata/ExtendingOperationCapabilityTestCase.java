@@ -16,26 +16,26 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class ImplementedTypeCapabilityTestCase extends AbstractMuleTestCase
+public class ExtendingOperationCapabilityTestCase extends AbstractMuleTestCase
 {
 
     @Test
     public void extensible()
     {
-        ImplementedTypeCapability<TestExtensibleType> capability = new ImplementedTypeCapability(TestExtensibleType.class);
+        ExtendingOperationCapability<TestExtensibleType> capability = new ExtendingOperationCapability(TestExtensibleType.class);
         assertThat(capability.getType(), is(sameInstance(TestExtensibleType.class)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void notExtensible()
     {
-        new ImplementedTypeCapability(Object.class);
+        new ExtendingOperationCapability(Object.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullImplementation()
     {
-        new ImplementedTypeCapability(null);
+        new ExtendingOperationCapability(null);
     }
 
     @Extensible

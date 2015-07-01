@@ -8,7 +8,7 @@ package org.mule.extension.validation.internal;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.extension.annotations.ImplementationOf;
+import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
@@ -39,7 +39,7 @@ import com.google.common.cache.LoadingCache;
  *
  * @since 3.7.0
  */
-@ImplementationOf(ValidationExtension.class)
+@ExtensionOf(ValidationExtension.class)
 public final class CustomValidatorOperation extends ValidationSupport
 {
 

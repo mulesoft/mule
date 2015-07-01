@@ -40,7 +40,7 @@ import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.Ricin;
-import org.mule.module.extension.internal.capability.metadata.ImplementedTypeCapability;
+import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -144,18 +144,18 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
         OperationDeclaration operation = getOperation(declaration, LAUNDER_MONEY);
         assertThat(operation.getCapabilities(), is(not(emptyIterable())));
 
-        List<ImplementedTypeCapability> capabilities = new ArrayList<>();
+        List<ExtendingOperationCapability> capabilities = new ArrayList<>();
 
         for (Object object : operation.getCapabilities())
         {
-            if (object instanceof ImplementedTypeCapability)
+            if (object instanceof ExtendingOperationCapability)
             {
-                capabilities.add((ImplementedTypeCapability) object);
+                capabilities.add((ExtendingOperationCapability) object);
             }
         }
 
         assertThat(capabilities, hasSize(1));
-        ImplementedTypeCapability<HeisenbergExtension> capability = capabilities.get(0);
+        ExtendingOperationCapability<HeisenbergExtension> capability = capabilities.get(0);
         assertThat(capability.getType(), is(sameInstance(HeisenbergExtension.class)));
     }
 

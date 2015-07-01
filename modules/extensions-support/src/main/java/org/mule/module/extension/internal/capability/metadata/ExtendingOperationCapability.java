@@ -8,10 +8,12 @@ package org.mule.module.extension.internal.capability.metadata;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.annotations.Extensible;
+import org.mule.extension.annotations.Extension;
 
 /**
- * A metadata capability which marks that an operation is an
- * implementation of a type annotated with {@link Extensible}.
+ * A metadata capability which marks that an operation is augmenting
+ * the functionality of an {@link Extension} which is defined in a type
+ * annotated with {@link Extensible}.
  * <p/>
  * The runtime consequences of this capabilities depend on the runtime.
  * This class constructor throws {@link IllegalArgumentException} if
@@ -19,7 +21,7 @@ import org.mule.extension.annotations.Extensible;
  *
  * @since 3.7.0
  */
-public final class ImplementedTypeCapability<T>
+public final class ExtendingOperationCapability<T>
 {
 
     private final Class<T> type;
@@ -31,7 +33,7 @@ public final class ImplementedTypeCapability<T>
      * @param type the type that is being implemented
      * @throws IllegalArgumentException if {@code type} is not annotated with {@link Extensible}
      */
-    public ImplementedTypeCapability(Class<T> type)
+    public ExtendingOperationCapability(Class<T> type)
     {
         checkArgument(type != null, "cannot implement a null type");
         checkArgument(type.getAnnotation(Extensible.class) != null, type.getName() + " is not annotated with @Extensible");
