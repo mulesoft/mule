@@ -18,6 +18,7 @@ import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Described;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.DynamicConfigurationInstanceProvider;
@@ -142,21 +143,24 @@ public class MuleExtensionUtils
         return list;
     }
 
-    public static <T> ConfigurationInstanceProvider<T> createConfigurationInstanceProvider(String name,
-                                                                                           Configuration configuration,
-                                                                                           ResolverSet resolverSet,
-                                                                                           MuleContext muleContext) throws Exception
+    public static <T> ConfigurationInstanceProvider<T> createConfigurationInstanceProvider(
+            String name,
+            Extension extension,
+            Configuration configuration,
+            ResolverSet resolverSet,
+            MuleContext muleContext,
+            ConfigurationInstanceRegistrationCallback registrationCallback) throws Exception
     {
-        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
+        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(name, extension, configuration, resolverSet, registrationCallback);
 
         if (resolverSet.isDynamic())
         {
-            return new DynamicConfigurationInstanceProvider<>(name, configuration, configurationObjectBuilder, resolverSet);
+            return new DynamicConfigurationInstanceProvider<>(configurationObjectBuilder, resolverSet);
         }
         else
         {
             MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
-            return new StaticConfigurationInstanceProvider<>(name, configuration, (T) configurationObjectBuilder.build(event));
+            return new StaticConfigurationInstanceProvider<>((T) configurationObjectBuilder.build(event));
         }
     }
 
@@ -181,6 +185,11 @@ public class MuleExtensionUtils
 
         String defaultValue = optional.defaultValue();
         return Optional.NULL.equals(defaultValue) ? null : defaultValue;
+    }
+
+    public static MuleEvent getInitialiserEvent(MuleContext muleContext)
+    {
+        return new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
     }
 
     private static Set<String> collectRepeatedNames(Collection<? extends Described> describedCollection)

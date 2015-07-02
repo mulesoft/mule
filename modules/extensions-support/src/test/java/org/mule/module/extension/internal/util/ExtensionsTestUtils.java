@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.util;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.DataType;
+import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
@@ -37,6 +39,11 @@ public abstract class ExtensionsTestUtils
 
     public static final String HELLO_WORLD = "Hello World!";
 
+    public static ValueResolver getResolver(Object value) throws Exception
+    {
+        return getResolver(value, null, true);
+    }
+
     public static ValueResolver getResolver(Object value, MuleEvent event, boolean dynamic, Class<?>... extraInterfaces) throws Exception
     {
         ValueResolver resolver;
@@ -49,7 +56,7 @@ public abstract class ExtensionsTestUtils
             resolver = mock(ValueResolver.class, withSettings().extraInterfaces(extraInterfaces));
         }
 
-        when(resolver.resolve(event)).thenReturn(value);
+        when(resolver.resolve(event != null ? same(event) : any(MuleEvent.class))).thenReturn(value);
         when(resolver.isDynamic()).thenReturn(dynamic);
 
         return resolver;
@@ -95,15 +102,29 @@ public abstract class ExtensionsTestUtils
         assertThat(captor.getValue(), containsString(key));
     }
 
-    public static <C> C getConfigurationInstance(String key, MuleEvent muleEvent) throws Exception
+    public static <C> C getConfigurationInstanceFromExtensionManager(String key, Extension extension, MuleEvent muleEvent) throws Exception
     {
-        ConfigurationInstanceProvider<C> configurationInstanceProvider = muleEvent.getMuleContext().getRegistry().lookupObject(key);
-        ExtensionManagerAdapter extensionManager = (ExtensionManagerAdapter) muleEvent.getMuleContext().getExtensionManager();
-        return extensionManager.getConfigurationInstance(configurationInstanceProvider, getOperationContext(muleEvent));
+        return extractExtensionManager(muleEvent).getConfigurationInstance(extension, key, getOperationContext(muleEvent));
+    }
+
+    public static <C> C getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent) throws Exception
+    {
+        ConfigurationInstanceProvider<C> configurationInstanceProvider = muleEvent.getMuleContext().getRegistry().get(key);
+        return configurationInstanceProvider.get(getOperationContext(muleEvent));
+    }
+
+    private static ExtensionManagerAdapter extractExtensionManager(MuleEvent muleEvent)
+    {
+        return (ExtensionManagerAdapter) muleEvent.getMuleContext().getExtensionManager();
     }
 
     private static OperationContext getOperationContext(MuleEvent event) throws Exception
     {
-        return new DefaultOperationContext(mock(Operation.class), mock(ResolverSetResult.class), event);
+        return new DefaultOperationContext(mock(Extension.class),
+                                           mock(Operation.class),
+                                           "",
+                                           mock(ResolverSetResult.class),
+                                           event,
+                                           extractExtensionManager(event));
     }
 }

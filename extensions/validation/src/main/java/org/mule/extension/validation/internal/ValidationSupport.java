@@ -29,15 +29,6 @@ abstract class ValidationSupport
 {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected final ValidationExtension config;
-    private final ValidationMessages messages;
-
-    public ValidationSupport(ValidationExtension config)
-    {
-        this.config = config;
-        messages = config.getMessageFactory();
-    }
-
     protected void validateWith(Validator validator, ValidationContext validationContext, MuleEvent event) throws Exception
     {
         ValidationResult result = validator.validate(event);
@@ -47,11 +38,11 @@ abstract class ValidationSupport
             String customExceptionClass = validationContext.getOptions().getExceptionClass();
             if (StringUtils.isEmpty(customExceptionClass))
             {
-                throw config.getExceptionFactory().createException(result, ValidationException.class, event);
+                throw validationContext.getConfig().getExceptionFactory().createException(result, ValidationException.class, event);
             }
             else
             {
-                throw config.getExceptionFactory().createException(result, customExceptionClass, event);
+                throw validationContext.getConfig().getExceptionFactory().createException(result, customExceptionClass, event);
             }
         }
         else
@@ -71,9 +62,9 @@ abstract class ValidationSupport
         return result;
     }
 
-    protected ValidationContext createContext(ValidationOptions options, MuleEvent muleEvent)
+    protected ValidationContext createContext(ValidationOptions options, MuleEvent muleEvent, ValidationExtension config)
     {
-        return new ValidationContext(messages, options, muleEvent);
+        return new ValidationContext(options, muleEvent, config);
     }
 
     protected Locale parseLocale(String locale)

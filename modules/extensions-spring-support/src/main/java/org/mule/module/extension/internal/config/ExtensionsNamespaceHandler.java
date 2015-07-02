@@ -107,7 +107,7 @@ public class ExtensionsNamespaceHandler extends NamespaceHandlerSupport
     {
         for (Operation operation : extension.getOperations())
         {
-            registerBeanDefinitionParser(hyphenize(operation.getName()), new OperationBeanDefinitionParser(operation));
+            registerBeanDefinitionParser(hyphenize(operation.getName()), new OperationBeanDefinitionParser(extension, operation));
         }
     }
 
@@ -115,7 +115,7 @@ public class ExtensionsNamespaceHandler extends NamespaceHandlerSupport
     {
         for (Configuration configuration : extension.getConfigurations())
         {
-            registerBeanDefinitionParser(configuration.getName(), new ConfigurationBeanDefinitionParser(configuration));
+            registerBeanDefinitionParser(configuration.getName(), new ConfigurationBeanDefinitionParser(extension, configuration));
         }
     }
 

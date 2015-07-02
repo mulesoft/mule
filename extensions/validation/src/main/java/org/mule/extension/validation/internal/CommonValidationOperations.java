@@ -10,6 +10,7 @@ import org.mule.api.MuleEvent;
 import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
+import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.validator.BooleanValidator;
@@ -41,23 +42,19 @@ import java.util.Map;
 public final class CommonValidationOperations extends ValidationSupport
 {
 
-    public CommonValidationOperations(ValidationExtension config)
-    {
-        super(config);
-    }
-
     /**
      * Validates that the given {@code value} is {@code true}
      *
      * @param expression the boolean to test
      * @param options    the {@link ValidationOptions}
      * @param event      the current {@link MuleEvent
+     * @param config     the current {@link ValidationExtension} that serves as config
      * @throws Exception if the value is not {@code true}
      */
     @Operation
-    public void isTrue(boolean expression, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isTrue(boolean expression, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new BooleanValidator(expression, true, context), context, event);
     }
 
@@ -67,12 +64,13 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param expression the boolean to test
      * @param options    the {@link ValidationOptions}
      * @param event      the current {@link MuleEvent
+     * @param config     the current {@link ValidationExtension} that serves as config
      * @throws Exception if the value is not {@code true}
      */
     @Operation
-    public void isFalse(boolean expression, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isFalse(boolean expression, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new BooleanValidator(expression, false, context), context, event);
     }
 
@@ -82,11 +80,12 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param email   an email address
      * @param options the {@link ValidationOptions}
      * @param event   the current {@link MuleEvent
+     * @param config  the current {@link ValidationExtension} that serves as config
      */
     @Operation
-    public void isEmail(String email, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isEmail(String email, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new EmailValidator(email, context), context, event);
     }
 
@@ -96,11 +95,12 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param ip      the ip address to validate
      * @param options the {@link ValidationOptions}
      * @param event   the current {@link MuleEvent
+     * @param config  the current {@link ValidationExtension} that serves as config
      */
     @Operation
-    public void isIp(String ip, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isIp(String ip, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new IpValidator(ip, context), context, event);
     }
 
@@ -114,15 +114,17 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param max     the maximum expected length (inclusive). Leave unspecified or {@code null} to allow any max length
      * @param options the {@link ValidationOptions}
      * @param event   the current {@link MuleEvent
+     * @param config  the current {@link ValidationExtension} that serves as config
      */
     @Operation
     public void validateSize(Object value,
                              @Optional(defaultValue = "0") int min,
                              @Optional Integer max,
                              @ParameterGroup ValidationOptions options,
-                             MuleEvent event) throws Exception
+                             MuleEvent event,
+                             @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new SizeValidator(value, min, max, context), context, event);
     }
 
@@ -135,12 +137,13 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param value   the value to check
      * @param options the {@link ValidationOptions}
      * @param event   the current {@link MuleEvent
+     * @param config  the current {@link ValidationExtension} that serves as config
      * @throws IllegalArgumentException if {@code value} is something other than a {@link String},{@link Collection} or {@link Map}
      */
     @Operation
-    public void isNotEmpty(Object value, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isNotEmpty(Object value, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new NotEmptyValidator(value, context), context, event);
     }
 
@@ -153,12 +156,13 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param value   the value to check
      * @param options the {@link ValidationOptions}
      * @param event   the current {@link MuleEvent}
+     * @param config  the current {@link ValidationExtension} that serves as config
      * @throws IllegalArgumentException if {@code value} is something other than a {@link String},{@link Collection} or {@link Map}
      */
     @Operation
-    public void isEmpty(Object value, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isEmpty(Object value, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new EmptyValidator(value, context), context, event);
     }
 
@@ -168,12 +172,13 @@ public final class CommonValidationOperations extends ValidationSupport
      *
      * @param value   the value to test
      * @param options the {@link ValidationOptions}
-     * @param event   the current {@link MuleEvent
+     * @param event   the current {@link MuleEvent}
+     * @param config  the current {@link ValidationExtension} that serves as config
      */
     @Operation
-    public void isNotNull(Object value, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isNotNull(Object value, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new NotNullValidator(value, context), context, event);
     }
 
@@ -183,12 +188,13 @@ public final class CommonValidationOperations extends ValidationSupport
      *
      * @param value   the value to test
      * @param options the {@link ValidationOptions}
-     * @param event   the current {@link MuleEvent
+     * @param event   the current {@link MuleEvent}
+     * @param config  the current {@link ValidationExtension} that serves as config
      */
     @Operation
-    public void isNull(Object value, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isNull(Object value, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new NullValidator(value, context), context, event);
     }
 
@@ -200,29 +206,33 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param locale  the locale of the String
      * @param pattern the pattern for the {@code date}
      * @param options the {@link ValidationOptions}
-     * @param event   the current {@link MuleEvent
+     * @param event   the current {@link MuleEvent}
+     * @param config  the current {@link ValidationExtension} that serves as config
      */
     @Operation
     public void isTime(String time,
                        @Optional String locale,
                        @Optional String pattern,
-                       @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+                       @ParameterGroup ValidationOptions options,
+                       MuleEvent event,
+                       @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new TimeValidator(time, nullSafeLocale(locale), pattern, context), context, event);
     }
 
     /**
      * Validates that {@code url} is a valid one
      *
-     * @param url             the URL to validate as a {@link String}
-     * @param options         the {@link ValidationOptions}
-     * @param event           the current {@link MuleEvent
+     * @param url     the URL to validate as a {@link String}
+     * @param options the {@link ValidationOptions}
+     * @param event   the current {@link MuleEvent}
+     * @param config  the current {@link ValidationExtension} that serves as config
      */
     @Operation
-    public void isUrl(String url, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void isUrl(String url, @ParameterGroup ValidationOptions options, MuleEvent event, @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new UrlValidator(url, context), context, event);
     }
 
@@ -233,15 +243,18 @@ public final class CommonValidationOperations extends ValidationSupport
      * @param regex         the regular expression to check against
      * @param caseSensitive when {@code true} matching is case sensitive, otherwise matching is case in-sensitive
      * @param options       the {@link ValidationOptions}
-     * @param event         the current {@link MuleEvent
+     * @param event         the current {@link MuleEvent}
+     * @param config        the current {@link ValidationExtension} that serves as config
      */
     @Operation
     public void matchesRegex(String value,
                              String regex,
                              @Optional(defaultValue = "true") boolean caseSensitive,
-                             @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+                             @ParameterGroup ValidationOptions options,
+                             MuleEvent event,
+                             @UseConfig ValidationExtension config) throws Exception
     {
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         validateWith(new MatchesRegexValidator(value, regex, caseSensitive, context), context, event);
     }
 

@@ -6,8 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.api.MuleRuntimeException;
 import org.mule.extension.introspection.declaration.fluent.OperationExecutorFactory;
 import org.mule.extension.runtime.OperationExecutor;
 
@@ -26,24 +28,30 @@ public final class ReflectiveOperationExecutorFactory<T> implements OperationExe
     private final Class<T> implementationClass;
     private final Method operationMethod;
     private final ReturnDelegate returnDelegate;
-    private final ReflectiveDelegateFactory delegateFactory;
 
-    public ReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod, ReflectiveDelegateFactory delegateFactory)
+    public ReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod)
     {
         checkArgument(implementationClass != null, "implementationClass cannot be null");
         checkArgument(operationMethod != null, "operationMethod cannot be null");
-        checkArgument(delegateFactory != null, "delegateFactory cannot be null");
 
         this.implementationClass = implementationClass;
         this.operationMethod = operationMethod;
-        this.delegateFactory = delegateFactory;
         returnDelegate = isVoid(operationMethod) ? VoidReturnDelegate.INSTANCE : ValueReturnDelegate.INSTANCE;
     }
 
     @Override
-    public <C> OperationExecutor getExecutor(C configurationInstance)
+    public OperationExecutor newExecutor()
     {
-        Object executorDelegate = delegateFactory.getDelegate(implementationClass, configurationInstance);
-        return new ReflectiveMethodOperationExecutor<>(operationMethod, executorDelegate, returnDelegate);
+        Object delegate;
+        try
+        {
+            delegate = implementationClass.newInstance();
+        }
+        catch (Exception e)
+        {
+            throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class " + implementationClass.getName()), e);
+        }
+
+        return new ReflectiveMethodOperationExecutor(operationMethod, delegate, returnDelegate);
     }
 }

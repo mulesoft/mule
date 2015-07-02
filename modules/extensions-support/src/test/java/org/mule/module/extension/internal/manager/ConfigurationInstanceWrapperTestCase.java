@@ -9,12 +9,8 @@ package org.mule.module.extension.internal.manager;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.runtime.OperationExecutor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -73,21 +69,5 @@ public class ConfigurationInstanceWrapperTestCase extends AbstractMuleTestCase
     public void getConfigurationInstance()
     {
         assertThat(instanceWrapper.getConfigurationInstance(), is(sameInstance(configurationInstance)));
-    }
-
-    @Test
-    public void registerOperationExecutor()
-    {
-        Operation operation = mock(Operation.class);
-        OperationExecutor executor = mock(OperationExecutor.class);
-
-        instanceWrapper.registerOperationExecutor(operation, executor);
-        assertThat(instanceWrapper.getOperationExecutor(operation), is(sameInstance(executor)));
-    }
-
-    @Test
-    public void noRegisteredExecutor()
-    {
-        assertThat(instanceWrapper.getOperationExecutor(mock(Operation.class)), is(nullValue()));
     }
 }

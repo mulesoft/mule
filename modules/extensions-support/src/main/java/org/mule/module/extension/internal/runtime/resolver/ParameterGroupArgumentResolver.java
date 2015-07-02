@@ -33,7 +33,7 @@ import java.util.Map;
  * @param <T> the generic type of the argument instances that will be resolved
  * @since 3.7.0
  */
-public class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T>
+public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T>
 {
 
     private final Class<T> type;

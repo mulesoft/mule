@@ -7,7 +7,8 @@
 package org.mule.module.extension.internal.config;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import org.mule.VoidMuleEvent;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import org.mule.api.MuleContext;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Operation;
@@ -27,16 +28,18 @@ final class TopLevelParameterTypeFactoryBean implements FactoryBean<Object>
 {
 
     private final ValueResolver valueResolver;
+    private final MuleContext muleContext;
 
-    TopLevelParameterTypeFactoryBean(ElementDescriptor element, DataType dataType)
+    TopLevelParameterTypeFactoryBean(ElementDescriptor element, DataType dataType, MuleContext muleContext)
     {
         this.valueResolver = XmlExtensionParserUtils.parseElement(element, EMPTY, dataType, null);
+        this.muleContext = muleContext;
     }
 
     @Override
     public Object getObject() throws Exception
     {
-        return valueResolver.resolve(VoidMuleEvent.getInstance());
+        return valueResolver.resolve(getInitialiserEvent(muleContext));
     }
 
     @Override

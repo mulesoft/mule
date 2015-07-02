@@ -21,6 +21,9 @@ import org.junit.Test;
 public class StatefulOperationTestCase extends ExtensionsFunctionalTestCase
 {
 
+    private static final String DYNAMIC_CONFIG_1 = "heisenberg";
+    private static final String DYNAMIC_CONFIG_2 = "walter";
+
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
     {
@@ -34,21 +37,24 @@ public class StatefulOperationTestCase extends ExtensionsFunctionalTestCase
     }
 
     @Test
-    public void statefulOperation() throws Exception
+    public void stateOnOperationInstance() throws Exception
     {
-        final String dynamicConfig1 = "heisenberg";
-        doLaunder(dynamicConfig1, 10000);
-        final long totalLaunderedAmountForConfig1 = doLaunder(dynamicConfig1, 20000);
+        assertThat(launder(), is(40000L));
+    }
 
-        final String dynamicConfig2 = "walter";
-        doLaunder(dynamicConfig2, 30000);
-        final long totalLaunderedAmountForConfig2 = doLaunder(dynamicConfig2, 30000);
+    @Test
+    public void stateOnDynamicConfigs() throws Exception
+    {
+        launder();
 
-        assertThat(totalLaunderedAmountForConfig1, is(30000L));
-        assertThat(totalLaunderedAmountForConfig2, is(60000L));
+        assertRemainingMoney(DYNAMIC_CONFIG_1, 70000);
+        assertRemainingMoney(DYNAMIC_CONFIG_2, 90000);
+    }
 
-        assertRemainingMoney(dynamicConfig1, 70000);
-        assertRemainingMoney(dynamicConfig2, 40000);
+    private long launder() throws Exception
+    {
+        doLaunder(DYNAMIC_CONFIG_1, 30000);
+        return doLaunder(DYNAMIC_CONFIG_2, 10000);
     }
 
     private void assertRemainingMoney(String name, long expectedAmount) throws Exception
@@ -56,7 +62,7 @@ public class StatefulOperationTestCase extends ExtensionsFunctionalTestCase
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("myName", name);
 
-        HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationInstance("heisenberg", event);
+        HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationInstanceFromRegistry("heisenberg", event);
         assertThat(heisenbergExtension.getMoney(), equalTo(BigDecimal.valueOf(expectedAmount)));
     }
 

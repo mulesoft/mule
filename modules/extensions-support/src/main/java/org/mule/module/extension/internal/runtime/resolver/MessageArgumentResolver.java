@@ -17,11 +17,25 @@ import org.mule.module.extension.internal.runtime.OperationContextAdapter;
  * <p/>
  * Notice that for this to work, the {@link OperationContext}
  * has to be an instance of {@link OperationContextAdapter}
+ * <p/>
+ * Because this {@link ArgumentResolver} is stateless and thread-safe,
+ * it is exposed as a singleton
  *
  * @since 3.7.0
  */
-public class MessageArgumentResolver implements ArgumentResolver<MuleMessage>
+public final class MessageArgumentResolver implements ArgumentResolver<MuleMessage>
 {
+
+    private static final MessageArgumentResolver INSTANCE = new MessageArgumentResolver();
+
+    public static MessageArgumentResolver getInstance()
+    {
+        return INSTANCE;
+    }
+
+    private MessageArgumentResolver()
+    {
+    }
 
     @Override
     public MuleMessage resolve(OperationContext operationContext)

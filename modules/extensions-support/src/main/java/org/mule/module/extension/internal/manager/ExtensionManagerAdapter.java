@@ -7,33 +7,39 @@
 package org.mule.module.extension.internal.manager;
 
 import org.mule.extension.ExtensionManager;
+import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.Extension;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
 
 /**
- * An adapter interface which expands the contract
- * of {@link ExtensionManager} with functionality
- * that is internal to this implementation
- * of the extensions API and that extensions
+ * An adapter interface which expands the contract of {@link ExtensionManager} with functionality
+ * that is internal to this implementation of the extensions API and that extensions
  * themselves shouldn't be able to access
  *
  * @since 3.7.0
  */
-public interface ExtensionManagerAdapter extends ExtensionManager
+public interface ExtensionManagerAdapter extends ExtensionManager, ConfigurationInstanceRegistrationCallback
 {
 
     /**
-     * Returns a configuration instance obtained through the given
-     * {@code configurationInstanceProvider} and for the
-     * provided {@code operationContext}. This method will fail
-     * if {@code configurationInstanceProvider} hasn't previously been
-     * registered through the {@link #registerConfigurationInstanceProvider(String, ConfigurationInstanceProvider)}
-     * method
+     * Returns a configuration instance obtained through a {@link ConfigurationInstanceProvider}
+     * previously registered using the {@link #registerConfigurationInstanceProvider(Extension, String, ConfigurationInstanceProvider)}
+     * under the given {@code configurationInstanceProviderName}.
+     * <p/>
+     * After the {@link ConfigurationInstanceProvider} has been located, an instance is returned by
+     * invoking its {@link ConfigurationInstanceProvider#get(OperationContext)} with {@code operationContext}
+     * as the argument.
      *
-     * @param configurationInstanceProvider a registered {@link ConfigurationInstanceProvider}
-     * @param operationContext              a {@link OperationContext}
-     * @param <C>                           the type of the configuration instance to be returned
+     * @param extension                         the {@link Extension} that owns the {@link Configuration}
+     * @param configurationInstanceProviderName the name of a previously registered {@link ConfigurationInstanceProvider}
+     * @param operationContext                  a {@link OperationContext}
+     * @param <C>                               the type of the configuration instance to be returned
      * @return a configuration instance
      */
-    <C> C getConfigurationInstance(ConfigurationInstanceProvider<C> configurationInstanceProvider, OperationContext operationContext);
+    <C> C getConfigurationInstance(Extension extension, String configurationInstanceProviderName, OperationContext operationContext);
+
+    <C> C getConfigurationInstance(Extension extension, OperationContext operationContext);
+
 }
