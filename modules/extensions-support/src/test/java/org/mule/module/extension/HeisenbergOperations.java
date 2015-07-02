@@ -15,6 +15,7 @@ import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.RestrictedTo;
+import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.Payload;
 
@@ -29,30 +30,23 @@ public class HeisenbergOperations
     private static final String SECRET_PACKAGE = "secretPackage";
     private static final String METH = "meth";
 
-    private final HeisenbergExtension config;
-
-    public HeisenbergOperations(HeisenbergExtension config)
-    {
-        this.config = config;
-    }
-
     @Inject
     private ExtensionManager extensionManager;
 
     @Operation
-    public String sayMyName()
+    public String sayMyName(@UseConfig HeisenbergExtension config)
     {
         return config.getPersonalInfo().getName();
     }
 
     @Operation
-    public void die()
+    public void die(@UseConfig HeisenbergExtension config)
     {
         config.setEndingHealth(HealthStatus.DEAD);
     }
 
     @Operation
-    public String getEnemy(int index)
+    public String getEnemy(@UseConfig HeisenbergExtension config, int index)
     {
         return config.getEnemies().get(index);
     }

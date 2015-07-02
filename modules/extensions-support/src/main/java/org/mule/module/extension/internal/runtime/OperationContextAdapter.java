@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.runtime;
 
 import org.mule.api.MuleEvent;
+import org.mule.extension.introspection.Configuration;
 import org.mule.extension.runtime.OperationContext;
 
 /**
@@ -26,4 +27,14 @@ public interface OperationContextAdapter extends OperationContext
      * an operation is to be executed
      */
     MuleEvent getEvent();
+
+    /**
+     * Returns an object which is configuring the operation being executed. The actual type
+     * of the instance is unknown, but it's guaranteed to be a realisation of the {@link Configuration}
+     * model that was set for the operation
+     *
+     * @param <C> the generic type of the configuration instance
+     * @return an {@link Object} consistent with a corresponding {@link Configuration} model
+     */
+    <C> C getConfigurationInstance();
 }

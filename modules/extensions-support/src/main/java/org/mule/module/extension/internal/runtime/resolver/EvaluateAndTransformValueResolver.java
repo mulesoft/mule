@@ -39,7 +39,7 @@ import org.apache.commons.lang.StringUtils;
  * @param <T>
  * @since 3.7.0
  */
-public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>
+public final class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>
 {
 
     private final DataType expectedType;

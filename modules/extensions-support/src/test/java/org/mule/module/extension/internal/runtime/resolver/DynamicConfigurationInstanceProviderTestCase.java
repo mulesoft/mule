@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Configuration;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.DynamicConfigurationInstanceProvider;
@@ -42,10 +41,6 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
 {
 
     private static final Class MODULE_CLASS = HeisenbergExtension.class;
-    private static final String CONFIGURATION_NAME = "heisenberg";
-
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private Configuration configuration;
 
     @Mock
     private ResolverSet resolverSet;
@@ -67,7 +62,7 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
     @Before
     public void before() throws Exception
     {
-        ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIGURATION_NAME);
+        ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIG_NAME);
         when(configuration.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
         when(configuration.getInstantiator().newInstance()).thenAnswer(new Answer<Object>()
         {
@@ -84,18 +79,18 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
 
         when(operationContext.getEvent()).thenReturn(event);
 
-        configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
-        instanceProvider = new DynamicConfigurationInstanceProvider(CONFIGURATION_NAME, configuration, configurationObjectBuilder, resolverSet);
+        configurationObjectBuilder = new ConfigurationObjectBuilder(CONFIG_NAME, extension, configuration, resolverSet, configurationInstanceRegistrationCallback);
+        instanceProvider = new DynamicConfigurationInstanceProvider(configurationObjectBuilder, resolverSet);
     }
 
     @Test
     public void resolveCached() throws Exception
     {
         final int count = 10;
-        HeisenbergExtension config = (HeisenbergExtension) instanceProvider.get(operationContext, configurationInstanceRegistrationCallback);
+        HeisenbergExtension config = (HeisenbergExtension) instanceProvider.get(operationContext);
         for (int i = 1; i < count; i++)
         {
-            assertThat((HeisenbergExtension) instanceProvider.get(operationContext, configurationInstanceRegistrationCallback), is(sameInstance(config)));
+            assertThat((HeisenbergExtension) instanceProvider.get(operationContext), is(sameInstance(config)));
         }
 
         verify(resolverSet, times(count)).resolve(event);
@@ -104,12 +99,12 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
     @Test
     public void resolveDifferentInstances() throws Exception
     {
-        HeisenbergExtension instance1 = (HeisenbergExtension) instanceProvider.get(operationContext, configurationInstanceRegistrationCallback);
+        HeisenbergExtension instance1 = (HeisenbergExtension) instanceProvider.get(operationContext);
 
         ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
         when(resolverSet.resolve(event)).thenReturn(alternateResult);
 
-        HeisenbergExtension instance2 = (HeisenbergExtension) instanceProvider.get(operationContext, configurationInstanceRegistrationCallback);
+        HeisenbergExtension instance2 = (HeisenbergExtension) instanceProvider.get(operationContext);
         assertThat(instance2, is(not(sameInstance(instance1))));
     }
 
@@ -117,18 +112,19 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
     public void resolveDynamicConfigWithEquivalentEvent() throws Exception
     {
         assertSameInstancesResolved();
+        assertConfigInstanceRegistered(instanceProvider.get(operationContext));
     }
 
     @Test
     public void resolveDynamicConfigWithDifferentEvent() throws Exception
     {
-        Object config1 = instanceProvider.get(operationContext, configurationInstanceRegistrationCallback);
+        Object config1 = instanceProvider.get(operationContext);
 
         when(resolverSet.resolve(event)).thenReturn(mock(ResolverSetResult.class));
-        Object config2 = instanceProvider.get(operationContext, configurationInstanceRegistrationCallback);
+        Object config2 = instanceProvider.get(operationContext);
 
         assertThat(config1, is(not(Matchers.sameInstance(config2))));
-        assertConfigInstanceRegistered(instanceProvider, config1);
-        assertConfigInstanceRegistered(instanceProvider, config2);
+        assertConfigInstanceRegistered(config1);
+        assertConfigInstanceRegistered(config2);
     }
 }

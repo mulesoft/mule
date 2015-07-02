@@ -17,6 +17,7 @@ import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.enricher.MessageEnricher;
 import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataType;
+import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
@@ -49,10 +50,12 @@ import org.w3c.dom.Element;
 final class OperationBeanDefinitionParser implements BeanDefinitionParser
 {
 
+    private final Extension extension;
     private final Operation operation;
 
-    OperationBeanDefinitionParser(Operation operation)
+    OperationBeanDefinitionParser(Extension extension, Operation operation)
     {
+        this.extension = extension;
         this.operation = operation;
     }
 
@@ -62,6 +65,7 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OperationMessageProcessorFactoryBean.class);
         builder.setScope(BeanDefinition.SCOPE_PROTOTYPE);
         parseConfigRef(element, builder);
+        builder.addConstructorArgValue(extension);
         builder.addConstructorArgValue(operation);
         builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
         builder.addConstructorArgValue(parseNestedOperations(element, parserContext));

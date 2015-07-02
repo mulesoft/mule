@@ -12,10 +12,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Parameter;
 import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.tck.size.SmallTest;
@@ -33,16 +32,11 @@ import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigurationValueResolverTestCase extends AbstractConfigurationInstanceProviderTestCase
+public class ConfigurationInstanceProviderTestCase extends AbstractConfigurationInstanceProviderTestCase
 {
-
-    private static final String CONFIG_NAME = "myConfig";
     private static final Class MODULE_CLASS = HeisenbergExtension.class;
     private static final String MY_NAME = "heisenberg";
     private static final int AGE = 50;
-
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private Configuration configuration;
 
     @Mock
     private ResolverSet resolverSet;
@@ -57,7 +51,7 @@ public class ConfigurationValueResolverTestCase extends AbstractConfigurationIns
     private ResolverSetResult resolverSetResult;
 
     @Mock
-    private ExtensionManager extensionManager;
+    private ExtensionManagerAdapter extensionManager;
 
     @Before
     public void before() throws Exception
@@ -84,7 +78,7 @@ public class ConfigurationValueResolverTestCase extends AbstractConfigurationIns
         when(resolverSet.getResolvers()).thenReturn(parameters);
         when(resolverSet.isDynamic()).thenReturn(false);
 
-        instanceProvider = MuleExtensionUtils.createConfigurationInstanceProvider(CONFIG_NAME, configuration, resolverSet, muleContext);
+        instanceProvider = MuleExtensionUtils.createConfigurationInstanceProvider(CONFIG_NAME, extension, configuration, resolverSet, muleContext, extensionManager);
     }
 
     @Test

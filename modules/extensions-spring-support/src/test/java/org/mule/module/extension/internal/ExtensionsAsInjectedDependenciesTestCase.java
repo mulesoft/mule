@@ -52,7 +52,7 @@ public class ExtensionsAsInjectedDependenciesTestCase extends ExtensionsFunction
     public void staticHeisenbergWasInjected() throws Exception
     {
         assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
-        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationInstance(STATIC_HEISENBERG, getTestEvent(""));
+        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationInstanceFromRegistry(STATIC_HEISENBERG, getTestEvent(""));
         assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
     }
 
@@ -65,7 +65,7 @@ public class ExtensionsAsInjectedDependenciesTestCase extends ExtensionsFunction
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("age", age);
 
-        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationInstance(DYNAMIC_AGE_HEISENBERG, event);
+        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationInstanceFromRegistry(DYNAMIC_AGE_HEISENBERG, event);
         assertThat(heisenberg.getPersonalInfo().getAge(), is(age));
     }
 

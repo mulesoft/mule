@@ -23,6 +23,7 @@ import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.capability.Xml;
+import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
@@ -124,15 +125,8 @@ public class ImplicitConfigTestCase extends ExtensionsFunctionalTestCase
     public static class ImplicitOperations
     {
 
-        private final ImplicitConfigExtension config;
-
-        public ImplicitOperations(ImplicitConfigExtension config)
-        {
-            this.config = config;
-        }
-
         @Operation
-        public ImplicitConfigExtension getConfig()
+        public ImplicitConfigExtension getConfig(@UseConfig ImplicitConfigExtension config)
         {
             return config;
         }

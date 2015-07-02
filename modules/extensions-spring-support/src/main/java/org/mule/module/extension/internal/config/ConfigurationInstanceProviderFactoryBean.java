@@ -6,16 +6,14 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.Extension;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.DynamicConfigurationInstanceProvider;
 import org.mule.module.extension.internal.runtime.StaticConfigurationInstanceProvider;
@@ -36,22 +34,27 @@ final class ConfigurationInstanceProviderFactoryBean implements FactoryBean<Conf
     private final ConfigurationInstanceProvider<Object> configurationInstanceProvider;
 
     ConfigurationInstanceProviderFactoryBean(String name,
+                                             Extension extension,
                                              Configuration configuration,
                                              ElementDescriptor element,
                                              MuleContext muleContext)
     {
+        final ExtensionManagerAdapter extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
+
         ResolverSet resolverSet = getResolverSet(element, configuration.getParameters());
-        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
+        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(name, extension, configuration, resolverSet, extensionManager);
 
         if (resolverSet.isDynamic())
         {
-            configurationInstanceProvider = new DynamicConfigurationInstanceProvider(name, configuration, configurationObjectBuilder, resolverSet);
+            configurationInstanceProvider = new DynamicConfigurationInstanceProvider<>(configurationObjectBuilder, resolverSet);
         }
         else
         {
             Object configurationInstance = instantiateStaticConfiguration(muleContext, configurationObjectBuilder);
-            configurationInstanceProvider = new StaticConfigurationInstanceProvider<>(name, configuration, configurationInstance);
+            configurationInstanceProvider = new StaticConfigurationInstanceProvider<>(configurationInstance);
         }
+
+        extensionManager.registerConfigurationInstanceProvider(extension, name, configurationInstanceProvider);
     }
 
     private Object instantiateStaticConfiguration(MuleContext muleContext, ConfigurationObjectBuilder configurationObjectBuilder)
@@ -64,11 +67,6 @@ final class ConfigurationInstanceProviderFactoryBean implements FactoryBean<Conf
         {
             throw new MuleRuntimeException(e);
         }
-    }
-
-    private MuleEvent getInitialiserEvent(MuleContext muleContext)
-    {
-        return new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
     }
 
     @Override

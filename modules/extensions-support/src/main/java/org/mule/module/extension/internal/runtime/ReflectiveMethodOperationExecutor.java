@@ -7,35 +7,67 @@
 package org.mule.module.extension.internal.runtime;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.runtime.OperationExecutor;
 
 import java.lang.reflect.Method;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of {@link OperationExecutor} which relies on a
- * {@link #executorDelegate} and a reference to one of its methods.
+ * {@link #executorDelegate} and a reference to one of its {@link Method}s.
+ * When {@link #execute(OperationContext)} is invoked, the {@link #operationMethod}
+ * is invoked over the {@link #executorDelegate}.
+ * <p/>
+ * All the {@link Lifecycle} events that {@code this} instance receives are propagated
+ * to the {@link #executorDelegate}
  *
- * @param <D> the generic type of the {@link #executorDelegate} instance
  * @since 3.7.0
  */
-public final class ReflectiveMethodOperationExecutor<D> implements DelegatingOperationExecutor<D>
+public final class ReflectiveMethodOperationExecutor implements OperationExecutor, MuleContextAware, Lifecycle
 {
 
+    private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate
+    {
+
+        private static final Object[] EMPTY = new Object[] {};
+
+        @Override
+        public Object[] resolve(OperationContext operationContext)
+        {
+            return EMPTY;
+        }
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectiveMethodOperationExecutor.class);
     private static final ArgumentResolverDelegate NO_ARGS_DELEGATE = new NoArgumentsResolverDelegate();
 
     private final Method operationMethod;
-    private final D executorDelegate;
+    private final Object executorDelegate;
     private final ReturnDelegate returnDelegate;
     private final ArgumentResolverDelegate argumentResolverDelegate;
 
-    ReflectiveMethodOperationExecutor(Method operationMethod, D executorDelegate, ReturnDelegate returnDelegate)
+    private MuleContext muleContext;
+
+    ReflectiveMethodOperationExecutor(Method operationMethod, Object executorDelegate, ReturnDelegate returnDelegate)
     {
         this.operationMethod = operationMethod;
         this.executorDelegate = executorDelegate;
         this.returnDelegate = returnDelegate;
-        argumentResolverDelegate = isEmpty(operationMethod.getParameterTypes()) ? NO_ARGS_DELEGATE : new MethodArgumentResolverDelegate(this, operationMethod);
+        argumentResolverDelegate = isEmpty(operationMethod.getParameterTypes()) ? NO_ARGS_DELEGATE : new MethodArgumentResolverDelegate(operationMethod);
     }
 
     /**
@@ -48,34 +80,53 @@ public final class ReflectiveMethodOperationExecutor<D> implements DelegatingOpe
         return returnDelegate.asReturnValue(result, operationContext);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public D getExecutorDelegate()
-    {
-        return executorDelegate;
-    }
-
     private Object[] getParameterValues(OperationContext operationContext)
     {
         return argumentResolverDelegate.resolve(operationContext);
     }
 
-    private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate
+
+    @Override
+    public void initialise() throws InitialisationException
     {
-
-        private static Object[] EMPTY = new Object[] {};
-
-        @Override
-        public Object[] resolve(OperationContext operationContext)
+        try
         {
-            return EMPTY;
+            muleContext.getInjector().inject(executorDelegate);
         }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(
+                    createStaticMessage("Could not perform dependency injection on operation class " + executorDelegate.getClass().getName()), e, this);
+        }
+
+        initialiseIfNeeded(executorDelegate);
     }
 
-    Method getOperationMethod()
+    @Override
+    public void start() throws MuleException
     {
-        return operationMethod;
+        startIfNeeded(executorDelegate);
+    }
+
+    @Override
+    public void stop() throws MuleException
+    {
+        stopIfNeeded(executorDelegate);
+    }
+
+    @Override
+    public void dispose()
+    {
+        disposeIfNeeded(executorDelegate, LOGGER);
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+        if (executorDelegate instanceof MuleContextAware)
+        {
+            ((MuleContextAware) executorDelegate).setMuleContext(context);
+        }
     }
 }
