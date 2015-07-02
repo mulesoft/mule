@@ -12,7 +12,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
+import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
+import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.ObjectNameHelper;
@@ -31,19 +33,24 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
 {
 
     private final String configurationInstanceProviderName;
+    private final Extension extension;
     private final Operation operation;
     private final ElementDescriptor element;
+    private final ExtensionManagerAdapter extensionManager;
     private final Map<String, List<MessageProcessor>> nestedOperations;
 
     public OperationMessageProcessorFactoryBean(String configurationInstanceProviderName,
+                                                Extension extension,
                                                 Operation operation,
                                                 ElementDescriptor element,
                                                 Map<String, List<MessageProcessor>> nestedOperations,
                                                 MuleContext muleContext)
     {
         this.configurationInstanceProviderName = configurationInstanceProviderName;
+        this.extension = extension;
         this.operation = operation;
         this.element = element;
+        this.extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
         this.nestedOperations = nestedOperations;
 
         registerNestedProcessors(nestedOperations, muleContext);
@@ -54,7 +61,7 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
     public OperationMessageProcessor getObject() throws Exception
     {
         ResolverSet resolverSet = getResolverSet(element, operation.getParameters(), nestedOperations);
-        return new OperationMessageProcessor(operation, configurationInstanceProviderName, resolverSet);
+        return new OperationMessageProcessor(extension, operation, configurationInstanceProviderName, resolverSet, extensionManager);
     }
 
     /**

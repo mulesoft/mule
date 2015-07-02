@@ -21,6 +21,11 @@ import org.junit.Test;
 public class StatefulOperationTestCase extends ExtensionsFunctionalTestCase
 {
 
+    private static final String TENANT_1 = "heisenberg";
+    private static final String TENANT_2 = "walter";
+    private static final String STATIC_CONFIG = "staticHeisenberg";
+    private static final String DYNAMIC_CONFIG = "heisenberg";
+
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
     {
@@ -34,37 +39,54 @@ public class StatefulOperationTestCase extends ExtensionsFunctionalTestCase
     }
 
     @Test
-    public void statefulOperation() throws Exception
+    public void stateOnOperationInstance() throws Exception
     {
-        final String dynamicConfig1 = "heisenberg";
-        doLaunder(dynamicConfig1, 10000);
-        final long totalLaunderedAmountForConfig1 = doLaunder(dynamicConfig1, 20000);
-
-        final String dynamicConfig2 = "walter";
-        doLaunder(dynamicConfig2, 30000);
-        final long totalLaunderedAmountForConfig2 = doLaunder(dynamicConfig2, 30000);
-
-        assertThat(totalLaunderedAmountForConfig1, is(30000L));
-        assertThat(totalLaunderedAmountForConfig2, is(60000L));
-
-        assertRemainingMoney(dynamicConfig1, 70000);
-        assertRemainingMoney(dynamicConfig2, 40000);
+        assertThat(dynamicLaunder(), is(40000L));
     }
 
-    private void assertRemainingMoney(String name, long expectedAmount) throws Exception
+    @Test
+    public void stateOnDynamicConfigs() throws Exception
+    {
+        dynamicLaunder();
+
+        assertRemainingMoney(DYNAMIC_CONFIG, TENANT_1, 70000);
+        assertRemainingMoney(DYNAMIC_CONFIG, TENANT_2, 90000);
+    }
+
+    @Test
+    public void stateOnStaticConfig() throws Exception
+    {
+        staticLounder(10000);
+        staticLounder(5000);
+
+        assertRemainingMoney(STATIC_CONFIG, "", 85000);
+    }
+
+    private long dynamicLaunder() throws Exception
+    {
+        doDynamicLaunder(TENANT_1, 30000);
+        return doDynamicLaunder(TENANT_2, 10000);
+    }
+
+    private void assertRemainingMoney(String configName, String name, long expectedAmount) throws Exception
     {
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("myName", name);
 
-        HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationInstance("heisenberg", event);
+        HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationInstanceFromRegistry(configName, event);
         assertThat(heisenbergExtension.getMoney(), equalTo(BigDecimal.valueOf(expectedAmount)));
     }
 
-    private long doLaunder(String name, long amount) throws Exception
+    private long doDynamicLaunder(String name, long amount) throws Exception
     {
         MuleEvent event = getTestEvent(amount);
         event.setFlowVariable("myName", name);
 
         return (Long) runFlow("laundry", event).getMessage().getPayload();
+    }
+
+    private long staticLounder(long amount) throws Exception
+    {
+        return (Long) runFlow("staticLaundry", getTestEvent(amount)).getMessage().getPayload();
     }
 }

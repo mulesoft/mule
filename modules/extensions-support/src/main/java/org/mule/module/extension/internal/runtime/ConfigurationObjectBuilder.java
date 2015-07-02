@@ -10,8 +10,9 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.ConfigurationInstantiator;
+import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Parameter;
+import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.GroupValueSetter;
@@ -37,15 +38,25 @@ import java.util.List;
 public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
 {
 
-    private final ConfigurationInstantiator configurationInstantiator;
+    private final String name;
+    private final Extension extension;
+    private final Configuration configuration;
+    private final ConfigurationInstanceRegistrationCallback registrationCallback;
     private final ResolverSet resolverSet;
     private final List<ValueSetter> groupValueSetters;
     private final List<ValueSetter> singleValueSetters;
 
-    public ConfigurationObjectBuilder(Configuration configuration, ResolverSet resolverSet)
+    public ConfigurationObjectBuilder(String name,
+                                      Extension extension,
+                                      Configuration configuration,
+                                      ResolverSet resolverSet,
+                                      ConfigurationInstanceRegistrationCallback registrationCallback)
     {
-        this.configurationInstantiator = configuration.getInstantiator();
+        this.name = name;
+        this.extension = extension;
+        this.configuration = configuration;
         this.resolverSet = resolverSet;
+        this.registrationCallback = registrationCallback;
 
         singleValueSetters = createSingleValueSetters(configuration, resolverSet);
         groupValueSetters = GroupValueSetter.settersFor(configuration);
@@ -70,7 +81,6 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
         return singleValueSetters.build();
     }
 
-
     @Override
     public Object build(MuleEvent event) throws MuleException
     {
@@ -79,20 +89,14 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
 
     public Object build(ResolverSetResult result) throws MuleException
     {
-        Object target = instantiateObject();
+        Object configurationInstance = instantiateObject();
 
-        setValues(target, result, groupValueSetters);
-        setValues(target, result, singleValueSetters);
+        setValues(configurationInstance, result, groupValueSetters);
+        setValues(configurationInstance, result, singleValueSetters);
 
-        return target;
-    }
+        registerInstance(configurationInstance);
 
-    private void setValues(Object target, ResolverSetResult result, List<ValueSetter> setters) throws MuleException
-    {
-        for (ValueSetter setter : setters)
-        {
-            setter.set(target, result);
-        }
+        return configurationInstance;
     }
 
     /**
@@ -102,6 +106,18 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
     @Override
     protected Object instantiateObject()
     {
-        return configurationInstantiator.newInstance();
+        return configuration.getInstantiator().newInstance();
+    }
+
+    private void setValues(Object target, ResolverSetResult result, List<ValueSetter> setters) throws MuleException
+    {
+        for (ValueSetter setter : setters)
+        {
+            setter.set(target, result);
+        }
+    }
+    private void registerInstance(Object configurationInstance)
+    {
+        registrationCallback.registerConfigurationInstance(extension, name, configurationInstance);
     }
 }

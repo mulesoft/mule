@@ -31,13 +31,6 @@ import java.util.List;
 public final class ValidationStrategies
 {
 
-    private final ValidationExtension config;
-
-    public ValidationStrategies(ValidationExtension config)
-    {
-        this.config = config;
-    }
-
     /**
      * Perform a list of nested validation operations and informs only one {@link MultipleValidationResult}
      * which summarizes all of the found errors (if any).

@@ -84,7 +84,7 @@ public class CapabilityUtils
             return null;
         }
 
-        checkArgument(capabilities.size() == 1, String.format("Only once instance of capability %s was expected but %d found instead", capabilityType.getName(), capabilities.size()));
+        checkArgument(capabilities.size() == 1, String.format("One instance of capability %s was expected but %d found instead", capabilityType.getName(), capabilities.size()));
 
         return capabilities.iterator().next();
 

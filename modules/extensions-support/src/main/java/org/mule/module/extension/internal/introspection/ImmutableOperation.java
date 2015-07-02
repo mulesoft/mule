@@ -62,8 +62,8 @@ final class ImmutableOperation extends AbstractCapableDescribed implements Opera
      * {@inheritDoc}
      */
     @Override
-    public <T> OperationExecutor getExecutor(T configurationInstance)
+    public OperationExecutor getExecutor()
     {
-        return executorFactory.getExecutor(configurationInstance);
+        return executorFactory.createExecutor();
     }
 }

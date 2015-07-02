@@ -6,14 +6,12 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import org.mule.api.MuleMessage;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
  * An implementation of {@link ArgumentResolver} which
- * returns the {@link MuleMessage} associated with a given
- * {@link OperationContext}.
+ * returns the value obtained through {@link OperationContextAdapter#getConfigurationInstance()}
  * <p/>
  * Notice that for this to work, the {@link OperationContext}
  * has to be an instance of {@link OperationContextAdapter}
@@ -21,25 +19,25 @@ import org.mule.module.extension.internal.runtime.OperationContextAdapter;
  * Because this {@link ArgumentResolver} is stateless and thread-safe,
  * it is exposed as a singleton
  *
- * @since 3.7.0
+ * @since 3.7.1
  */
-public final class MessageArgumentResolver implements ArgumentResolver<MuleMessage>
+public final class ConfigurationInstanceArgumentResolver implements ArgumentResolver<Object>
 {
 
-    private static final MessageArgumentResolver INSTANCE = new MessageArgumentResolver();
+    private static final ConfigurationInstanceArgumentResolver INSTANCE = new ConfigurationInstanceArgumentResolver();
 
-    public static MessageArgumentResolver getInstance()
+    public static ConfigurationInstanceArgumentResolver getInstance()
     {
         return INSTANCE;
     }
 
-    private MessageArgumentResolver()
+    private ConfigurationInstanceArgumentResolver()
     {
     }
 
     @Override
-    public MuleMessage resolve(OperationContext operationContext)
+    public Object resolve(OperationContext operationContext)
     {
-        return ((OperationContextAdapter) operationContext).getEvent().getMessage();
+        return ((OperationContextAdapter) operationContext).getConfigurationInstance();
     }
 }

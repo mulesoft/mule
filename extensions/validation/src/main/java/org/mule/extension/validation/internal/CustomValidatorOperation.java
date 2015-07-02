@@ -11,6 +11,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
+import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.validation.api.Validator;
 
@@ -52,18 +53,16 @@ public final class CustomValidatorOperation extends ValidationSupport
         }
     });
 
-    public CustomValidatorOperation(ValidationExtension config)
-    {
-        super(config);
-    }
-
     @Operation
-    public void customValidator(@ParameterGroup ObjectSource<Validator> source, @ParameterGroup ValidationOptions options, MuleEvent event) throws Exception
+    public void customValidator(@ParameterGroup ObjectSource<Validator> source,
+                                @ParameterGroup ValidationOptions options,
+                                MuleEvent event,
+                                @UseConfig ValidationExtension config) throws Exception
     {
         ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
         Validator validator = validatorSource.getObject(event.getMuleContext());
 
-        validateWith(validator, createContext(options, event), event);
+        validateWith(validator, createContext(options, event, config), event);
     }
 
     @Override

@@ -11,12 +11,14 @@ import static org.mule.module.extension.internal.introspection.MuleExtensionAnno
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.extension.annotations.ParameterGroup;
+import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser;
 import org.mule.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
+import org.mule.module.extension.internal.runtime.resolver.ConfigurationInstanceArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.EventArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
@@ -34,19 +36,16 @@ import java.util.Map;
 final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 {
 
-    private final ReflectiveMethodOperationExecutor reflectiveMethodOperationExecutor;
     private final Method method;
     private ArgumentResolver<? extends Object>[] argumentResolvers;
 
     /**
-     * Creates a new instance with the given state
+     * Creates a new instance for the given {@code method}
      *
-     * @param reflectiveMethodOperationExecutor the {@link ReflectiveMethodOperationExecutor} to use
-     * @param method                            the {@link Method} to be called
+     * @param method the {@link Method} to be called
      */
-    public MethodArgumentResolverDelegate(ReflectiveMethodOperationExecutor reflectiveMethodOperationExecutor, Method method)
+    public MethodArgumentResolverDelegate(Method method)
     {
-        this.reflectiveMethodOperationExecutor = reflectiveMethodOperationExecutor;
         this.method = method;
         initArgumentResolvers();
     }
@@ -57,33 +56,42 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
         if (isEmpty(parameterTypes))
         {
             argumentResolvers = new ArgumentResolver[] {};
+            return;
         }
 
-        Method operationMethod = reflectiveMethodOperationExecutor.getOperationMethod();
         argumentResolvers = new ArgumentResolver[parameterTypes.length];
-        Annotation[][] parameterAnnotations = operationMethod.getParameterAnnotations();
-        final String[] paramNames = MuleExtensionAnnotationParser.getParamNames(operationMethod);
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        final String[] paramNames = MuleExtensionAnnotationParser.getParamNames(method);
 
         for (int i = 0; i < parameterTypes.length; i++)
         {
             final Class<?> parameterType = parameterTypes[i];
             Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
-            if (MuleEvent.class.isAssignableFrom(parameterType))
+
+            ArgumentResolver<?> argumentResolver;
+
+            if (annotations.containsKey(UseConfig.class))
             {
-                argumentResolvers[i] = new EventArgumentResolver();
+                argumentResolver = ConfigurationInstanceArgumentResolver.getInstance();
+            }
+            else if (MuleEvent.class.isAssignableFrom(parameterType))
+            {
+                argumentResolver = EventArgumentResolver.getInstance();
             }
             else if (MuleMessage.class.isAssignableFrom(parameterType))
             {
-                argumentResolvers[i] = new MessageArgumentResolver();
+                argumentResolver = MessageArgumentResolver.getInstance();
             }
-            else if (annotations.get(ParameterGroup.class) != null)
+            else if (annotations.containsKey(ParameterGroup.class))
             {
-                argumentResolvers[i] = new ParameterGroupArgumentResolver(parameterType);
+                argumentResolver = new ParameterGroupArgumentResolver(parameterType);
             }
             else
             {
-                argumentResolvers[i] = new ByParameterNameArgumentResolver<>(paramNames[i]);
+                argumentResolver = new ByParameterNameArgumentResolver<>(paramNames[i]);
             }
+
+            argumentResolvers[i] = argumentResolver;
         }
     }
 

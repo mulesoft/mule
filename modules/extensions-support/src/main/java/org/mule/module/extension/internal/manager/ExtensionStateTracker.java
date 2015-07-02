@@ -6,19 +6,17 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import org.mule.extension.introspection.Configuration;
+import static org.mule.util.Preconditions.checkArgument;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.runtime.OperationExecutor;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Holds state regarding the use that the platform is doing of a
@@ -29,83 +27,76 @@ import java.util.Map;
 final class ExtensionStateTracker
 {
 
-    private final LoadingCache<Configuration, ConfigurationStateTracker> configurationsStates = CacheBuilder.newBuilder()
-            .build(new CacheLoader<Configuration, ConfigurationStateTracker>()
-            {
-                @Override
-                public ConfigurationStateTracker load(Configuration configuration) throws Exception
-                {
-                    return new ConfigurationStateTracker();
-                }
-            });
+    /**
+     * Correlates instances of {@link ConfigurationInstanceProvider} by the key in which they were defined
+     * through the {@link ExtensionManager#registerConfigurationInstanceProvider(Extension, String, ConfigurationInstanceProvider)}
+     * method.
+     */
+    private final Map<String, ConfigurationInstanceProvider<?>> configurationInstanceProviders = new ConcurrentHashMap<>();
 
     /**
-     * Registers than when a configuration instance with the given {@code providerName} is requested,
-     * {@code configurationInstanceProvider} should be used to fulfil that request
+     * Correlates a configuration instance to the key on which it was registered on the
+     * {@link MuleRegistry}
+     */
+    private final Map<String, Object> configurationInstances = new ConcurrentHashMap<>();
+
+    /**
+     * Registers the {@code configurationInstanceProvider} than shoudl be used when a configuration instance
+     * for the given {@code key} is requested
      *
-     * @param configuration                 the {@link Configuration} model of the instances that {@code configurationInstanceProvider} will return
-     * @param providerName                  the name under which the {@code configurationInstanceProvider} will be registered
+     * @param key                           the name under which the {@code configurationInstanceProvider} will be registered
      * @param configurationInstanceProvider the {@link ConfigurationInstanceProvider} to use
      * @param <C>                           the generic type of the configuration instances that will be provisioned by {@code configurationInstanceProvider}
      */
-    <C> void registerConfigurationInstanceProvider(Configuration configuration,
-                                                   String providerName,
-                                                   ConfigurationInstanceProvider<C> configurationInstanceProvider)
+    <C> void registerConfigurationInstanceProvider(String key, ConfigurationInstanceProvider<C> configurationInstanceProvider)
     {
-        getStateTracker(configuration).registerInstanceProvider(providerName, configurationInstanceProvider);
-    }
-
-    Map<String, ConfigurationInstanceProvider> getConfigurationInstanceProviders(Configuration configuration)
-    {
-        return ImmutableMap.copyOf(getStateTracker(configuration).getConfigurationInstanceProviders());
+        idempotentPut(configurationInstanceProviders, key, configurationInstanceProvider);
     }
 
     /**
-     * Registers a {@code configurationInstance} which is a realization of a {@link Configuration}
-     * model defined by {@code configuration}
+     * Returns the {@link ConfigurationInstanceProvider} that was registered under {@code configurationInstanceProviderName}
+     * through the {@link #registerConfigurationInstanceProvider(String, ConfigurationInstanceProvider)} method
      *
-     * @param configuration         a {@link Configuration}
-     * @param instanceName          the name of the instance
-     * @param configurationInstance an instance which is compliant with the {@code configuration} model
-     * @param <C>                   the type of the configuration instance
+     * @param configurationInstanceProviderName the registration name of the {@link ConfigurationInstanceProvider} you're looking for
+     * @param <C>                               the generic type of the {@link ConfigurationInstanceProvider}
+     * @return a registered {@link ConfigurationInstanceProvider} or {@code null} if no such provider was registered
      */
-    <C> void registerConfigurationInstance(Configuration configuration, String instanceName, C configurationInstance)
+    <C> ConfigurationInstanceProvider<C> getConfigurationInstanceProvider(String configurationInstanceProviderName)
     {
-        getStateTracker(configuration).registerInstance(instanceName, configurationInstance);
+        return (ConfigurationInstanceProvider<C>) configurationInstanceProviders.get(configurationInstanceProviderName);
     }
 
     /**
-     * Returns an {@link OperationExecutor} that was previously registered
-     * through {@link #registerOperationExecutor(Configuration, Operation, Object, OperationExecutor)}
+     * Returns an immutable {@link List} with all the {@link ConfigurationInstanceProvider} instances
+     * that were registered through {@link #registerConfigurationInstanceProvider(String, ConfigurationInstanceProvider)}
      *
-     * @param configuration         a {@link Configuration}
-     * @param configurationInstance a previously registered configuration instance
-     * @param operationContext      a {@link OperationContext}
-     * @param <C>                   the type of the configuration instance
-     * @return a {@link OperationExecutor}
+     * @return a immutable {@link List} with the registered {@link ConfigurationInstanceProvider}. May be empty but will never be {@code null}
      */
-    <C> OperationExecutor getOperationExecutor(Configuration configuration, C configurationInstance, OperationContext operationContext)
+    List<ConfigurationInstanceProvider<?>> getConfigurationInstanceProviders()
     {
-        return getStateTracker(configuration).getOperationExecutor(configurationInstance, operationContext);
+        return ImmutableList.copyOf(configurationInstanceProviders.values());
     }
 
     /**
-     * Registers a {@link OperationExecutor} for the {@code operation}|{@code configurationInstance}
-     * pair.
+     * Registers the creation of a new configuration instance
      *
-     * @param configuration         a {@link Configuration}
-     * @param operation             a {@link Operation} model
-     * @param configurationInstance a previously registered configuration instance
-     * @param executor              a {@link OperationExecutor}
-     * @param <C>                   the type of the configuration instance
+     * @param instanceKey           the key under which the instance was registered in the {@link MuleRegistry}
+     * @param configurationInstance the configuration instance. Cannot be {@code null}
+     * @param <C>                   the generic type for the {@code configurationInstance}
      */
-    <C> void registerOperationExecutor(Configuration configuration, Operation operation, C configurationInstance, OperationExecutor executor)
+    <C> void registerConfigurationInstance(String instanceKey, C configurationInstance)
     {
-        getStateTracker(configuration).registerOperationExecutor(operation, configurationInstance, executor);
+        idempotentPut(configurationInstances, instanceKey, configurationInstance);
     }
 
-    private ConfigurationStateTracker getStateTracker(Configuration configuration)
+    private <K, V> void idempotentPut(Map<K, V> map, K key, V value)
     {
-        return configurationsStates.getUnchecked(configuration);
+        checkArgument(value != null, "value cannot be null");
+        if (map.containsKey(key))
+        {
+            throw new IllegalStateException(String.format("A %s is already registered for the name '%s'", value.getClass().getSimpleName(), key));
+        }
+
+        map.put(key, value);
     }
 }

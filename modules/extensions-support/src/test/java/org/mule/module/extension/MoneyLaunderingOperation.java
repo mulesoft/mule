@@ -8,24 +8,18 @@ package org.mule.module.extension;
 
 import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
+import org.mule.extension.annotations.param.UseConfig;
 
 import java.math.BigDecimal;
 
 public class MoneyLaunderingOperation
 {
 
-    private final HeisenbergExtension config;
-
     private long totalLaunderedAmount = 0;
-
-    public MoneyLaunderingOperation(HeisenbergExtension config)
-    {
-        this.config = config;
-    }
 
     @Operation
     @ExtensionOf(HeisenbergExtension.class)
-    public synchronized Long launder(long amount)
+    public synchronized Long launder(@UseConfig HeisenbergExtension config, long amount)
     {
         config.setMoney(config.getMoney().subtract(BigDecimal.valueOf(amount)));
         totalLaunderedAmount += amount;
