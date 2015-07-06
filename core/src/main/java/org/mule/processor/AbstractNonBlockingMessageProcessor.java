@@ -8,6 +8,7 @@ package org.mule.processor;
 
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -32,8 +33,9 @@ public abstract class AbstractNonBlockingMessageProcessor implements NonBlocking
         if (isNonBlocking(event))
         {
             processNonBlocking(event, createNonBlockingCompletionHandler(event));
-            // Update RequestContext ThreadLocal for backwards compatibility
-            OptimizedRequestContext.unsafeSetEvent(NonBlockingVoidMuleEvent.getInstance());
+            // Update RequestContext ThreadLocal for backwards compatibility.  Clear event as we are done with this
+            // thread.
+            RequestContext.clear();
             return NonBlockingVoidMuleEvent.getInstance();
         }
         else
