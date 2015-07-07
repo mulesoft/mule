@@ -47,10 +47,15 @@ import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GrizzlyHttpClient implements HttpClient
 {
 
     private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
+
+    private Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
 
     private final TlsContextFactory tlsContextFactory;
     private final ProxyConfig proxyConfig;
