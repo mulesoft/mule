@@ -23,6 +23,7 @@ import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.MessageProcessors;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.transformer.types.TypedValue;
 import org.mule.util.StringUtils;
@@ -57,7 +58,7 @@ import java.util.List;
  * <b>EIP Reference:</b> <a
  * href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
  */
-public class MessageEnricher extends AbstractMessageProcessorOwner implements MessageProcessor, NonBlockingSupported
+public class MessageEnricher extends AbstractMessageProcessorOwner implements NonBlockingMessageProcessor
 {
 
     private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<EnrichExpressionPair>();

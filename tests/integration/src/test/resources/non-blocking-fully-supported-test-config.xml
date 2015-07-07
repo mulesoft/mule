@@ -94,6 +94,7 @@
                 <test:non-blocking-processor/>
             </processor-chain>
         </enricher>
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
     </flow>
 
