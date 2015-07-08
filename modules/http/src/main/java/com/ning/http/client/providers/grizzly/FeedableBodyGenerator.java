@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2012-2015 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -19,7 +19,6 @@ import static org.glassfish.grizzly.utils.Exceptions.makeIOException;
 
 import com.ning.http.client.Body;
 import com.ning.http.client.BodyGenerator;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider.HttpTransactionContext;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -44,8 +43,9 @@ import org.glassfish.grizzly.utils.Futures;
 /**
  * This is a custom version of the {@link FeedableBodyGenerator}
  * class patched with the fix for https://github.com/AsyncHttpClient/async-http-client/issues/893.
+ * Remove this file when upgrading to version 1.9.26 or higher.
  *
- * A Grizzly-specific {@link BodyGenerator} that allows data to be fed to the
+ * A Grizzly-specific {@link com.ning.http.client.BodyGenerator} that allows data to be fed to the
  * connection in blocking or non-blocking fashion via the use of a {@link Feeder}.
  *
  * This class provides two {@link Feeder} implementations for rapid prototyping.
@@ -86,9 +86,6 @@ public class FeedableBodyGenerator implements BodyGenerator {
     // ---------------------------------------------- Methods from BodyGenerator
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Body createBody() throws IOException {
         return EMPTY_BODY;
@@ -109,8 +106,8 @@ public class FeedableBodyGenerator implements BodyGenerator {
      * @param maxPendingBytes maximum number of bytes that may be queued to
      *                        be written to the wire.
      *
-     * @throws IllegalStateException if called after {@link #initializeAsynchronousTransfer(FilterChainContext, HttpRequestPacket)}
-     *  has been called by the {@link GrizzlyAsyncHttpProvider}.
+     * @throws IllegalStateException if called after {@link #initializeAsynchronousTransfer(org.glassfish.grizzly.filterchain.FilterChainContext, org.glassfish.grizzly.http.HttpRequestPacket)}
+     *  has been called by the {@link com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider}.
      * @throws IllegalArgumentException if maxPendingBytes is less than zero and is
      *  not {@link #UNBOUND} or {@link #DEFAULT}.
      */
@@ -133,8 +130,8 @@ public class FeedableBodyGenerator implements BodyGenerator {
      *
      * @param feeder the {@link Feeder} responsible for providing data.
      *
-     * @throws IllegalStateException if called after {@link #initializeAsynchronousTransfer(FilterChainContext, HttpRequestPacket)}
-     *  has been called by the {@link GrizzlyAsyncHttpProvider}.
+     * @throws IllegalStateException if called after {@link #initializeAsynchronousTransfer(org.glassfish.grizzly.filterchain.FilterChainContext, org.glassfish.grizzly.http.HttpRequestPacket)}
+     *  has been called by the {@link com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider}.
      * @throws IllegalArgumentException if <code>feeder</code> is <code>null</code>
      */
     @SuppressWarnings("UnusedDeclaration")
@@ -207,9 +204,9 @@ public class FeedableBodyGenerator implements BodyGenerator {
 
     private void feederFlush0(final Connection c) {
         try {
-            feeder.flush();
+             feeder.flush();
         } catch (IOException ioe) {
-            c.closeWithReason(ioe);
+             c.closeWithReason(ioe);
         }
     }
 
@@ -260,7 +257,7 @@ public class FeedableBodyGenerator implements BodyGenerator {
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             context.completeAndRecycle();
             context = null;
             requestPacket = null;
@@ -283,28 +280,28 @@ public class FeedableBodyGenerator implements BodyGenerator {
 
         /**
          * This method will be invoked when it's possible to begin feeding
-         * data downstream.  Implementations of this method must use {@link #feed(Buffer, boolean)}
+         * data downstream.  Implementations of this method must use {@link #feed(org.glassfish.grizzly.Buffer, boolean)}
          * to perform the actual write.
          *
-         * @throws IOException if an I/O error occurs.
+         * @throws java.io.IOException if an I/O error occurs.
          */
         void flush() throws IOException;
 
         /**
-         * This method will write the specified {@link Buffer} to the connection.
+         * This method will write the specified {@link org.glassfish.grizzly.Buffer} to the connection.
          * Be aware that this method may block depending if data is being fed
          * faster than it can write.  How much data may be queued is dictated
          * by {@link #setMaxPendingBytes(int)}.  Once this threshold is exceeded,
          * the method will block until the write queue length drops below the
          * aforementioned threshold.
          *
-         * @param buffer the {@link Buffer} to write.
+         * @param buffer the {@link org.glassfish.grizzly.Buffer} to write.
          * @param last flag indicating if this is the last buffer to send.
          *
-         * @throws IOException if an I/O error occurs.
-         * @throws java.lang.IllegalArgumentException if <code>buffer</code>
+         * @throws java.io.IOException if an I/O error occurs.
+         * @throws IllegalArgumentException if <code>buffer</code>
          *  is <code>null</code>.
-         * @throws java.lang.IllegalStateException if this method is invoked
+         * @throws IllegalStateException if this method is invoked
          *  before asynchronous transferring has been initiated.
          *
          * @see #setMaxPendingBytes(int)
@@ -334,10 +331,8 @@ public class FeedableBodyGenerator implements BodyGenerator {
         // --------------------------------------------- Package Private Methods
 
 
-        /**
-         * {@inheritDoc}
-         */
         @SuppressWarnings("UnusedDeclaration")
+        @Override
         public final synchronized void feed(final Buffer buffer, final boolean last)
                 throws IOException {
             if (buffer == null) {
@@ -394,9 +389,9 @@ public class FeedableBodyGenerator implements BodyGenerator {
                     future.get();
                 }
             } catch (ExecutionException e) {
-                HttpTransactionContext.get(c).abort(e.getCause());
+                c.closeWithReason(Exceptions.makeIOException(e.getCause()));
             } catch (Exception e) {
-                HttpTransactionContext.get(c).abort(e);
+                c.closeWithReason(Exceptions.makeIOException(e));
             }
         }
 
@@ -479,7 +474,7 @@ public class FeedableBodyGenerator implements BodyGenerator {
 
         /**
          * Constructs the <code>NonBlockingFeeder</code> with the associated
-         * {@link com.ning.http.client.providers.grizzly.FeedableBodyGenerator}.
+         * {@link FeedableBodyGenerator}.
          */
         public NonBlockingFeeder(final FeedableBodyGenerator feedableBodyGenerator) {
             super(feedableBodyGenerator);
@@ -493,7 +488,7 @@ public class FeedableBodyGenerator implements BodyGenerator {
          * Notification that it's possible to send another block of data via
          * {@link #feed(org.glassfish.grizzly.Buffer, boolean)}.
          *
-         * It's important to only invoke {@link #feed(Buffer, boolean)}
+         * It's important to only invoke {@link #feed(org.glassfish.grizzly.Buffer, boolean)}
          * once per invocation of {@link #canFeed()}.
          */
         public abstract void canFeed() throws IOException;
@@ -525,9 +520,6 @@ public class FeedableBodyGenerator implements BodyGenerator {
         // ------------------------------------------------- Methods from Feeder
 
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public synchronized void flush() throws IOException {
             final Connection c = feedableBodyGenerator.context.getConnection();
@@ -605,7 +597,7 @@ public class FeedableBodyGenerator implements BodyGenerator {
             @Override
             public void onError(Throwable t) {
                 c.setMaxAsyncWriteQueueSize(feedableBodyGenerator.origMaxPendingBytes);
-                HttpTransactionContext.get(c).abort(t);
+                c.closeWithReason(Exceptions.makeIOException(t));
             }
 
         } // END WriteHandlerImpl
@@ -625,7 +617,7 @@ public class FeedableBodyGenerator implements BodyGenerator {
                 } catch (IOException e) {
                     final Connection c = feedableBodyGenerator.context.getConnection();
                     c.setMaxAsyncWriteQueueSize(feedableBodyGenerator.origMaxPendingBytes);
-                    HttpTransactionContext.get(c).abort(e);
+                    c.closeWithReason(Exceptions.makeIOException(e));
                 }
             }
 
@@ -647,7 +639,7 @@ public class FeedableBodyGenerator implements BodyGenerator {
 
         /**
          * Constructs the <code>SimpleFeeder</code> with the associated
-         * {@link com.ning.http.client.providers.grizzly.FeedableBodyGenerator}.
+         * {@link FeedableBodyGenerator}.
          */
         public SimpleFeeder(FeedableBodyGenerator feedableBodyGenerator) {
             super(feedableBodyGenerator);

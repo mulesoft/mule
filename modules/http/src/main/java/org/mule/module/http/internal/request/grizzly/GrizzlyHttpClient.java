@@ -18,6 +18,7 @@ import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
+import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.module.http.internal.request.DefaultHttpAuthentication;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
@@ -25,28 +26,26 @@ import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.module.http.internal.request.ProxyConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.PerRequestConfig;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
-import javax.servlet.http.Part;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +55,7 @@ public class GrizzlyHttpClient implements HttpClient
 
     private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
 
-    private static final Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
+    private Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
 
     private final TlsContextFactory tlsContextFactory;
     private final ProxyConfig proxyConfig;
@@ -85,8 +84,7 @@ public class GrizzlyHttpClient implements HttpClient
     public void initialise() throws InitialisationException
     {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnection(true);
-        builder.setRemoveQueryParamsOnRedirect(false);
+        builder.setAllowPoolingConnections(true);
 
         configureTransport(builder);
 
@@ -115,8 +113,17 @@ public class GrizzlyHttpClient implements HttpClient
             }
 
             // This sets all the TLS configuration needed, except for the enabled protocols and cipher suites.
-            // These parameters are set through the TlsTransportCustomizer class.
             builder.setSSLContext(sslContext);
+            //These complete the set up
+            if (tlsContextFactory.getEnabledCipherSuites() != null)
+            {
+                builder.setEnabledCipherSuites(tlsContextFactory.getEnabledCipherSuites());
+            }
+            if (tlsContextFactory.getEnabledProtocols() != null)
+            {
+                builder.setEnabledProtocols(tlsContextFactory.getEnabledProtocols());
+            }
+
         }
     }
 
@@ -159,12 +166,9 @@ public class GrizzlyHttpClient implements HttpClient
             compositeTransportCustomizer.addTransportCustomizer(new SocketConfigTransportCustomizer(clientSocketProperties));
         }
 
-        if (tlsContextFactory != null)
-        {
-            compositeTransportCustomizer.addTransportCustomizer(new TlsTransportCustomizer(tlsContextFactory));
-        }
-
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, compositeTransportCustomizer);
+        //Grizzly now decompresses encoded responses, this flag maintains the previous behaviour
+        providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.DECOMPRESS_RESPONSE, Boolean.FALSE);
         builder.setAsyncHttpClientProviderConfig(providerConfig);
     }
 
@@ -175,14 +179,14 @@ public class GrizzlyHttpClient implements HttpClient
             builder.addRequestFilter(new CustomTimeoutThrottleRequestFilter(maxConnections));
         }
 
-        builder.setMaximumConnectionsTotal(maxConnections);
-        builder.setMaximumConnectionsPerHost(maxConnections);
+        builder.setMaxConnections(maxConnections);
+        builder.setMaxConnectionsPerHost(maxConnections);
 
-        builder.setAllowPoolingConnection(usePersistentConnections);
-        builder.setAllowSslConnectionPool(usePersistentConnections);
+        builder.setAllowPoolingConnections(usePersistentConnections);
+        builder.setAllowPoolingSslConnections(usePersistentConnections);
 
-        builder.setMaxConnectionLifeTimeInMs(MAX_CONNECTION_LIFETIME);
-        builder.setIdleConnectionInPoolTimeoutInMs(connectionIdleTimeout);
+        builder.setConnectionTTL(MAX_CONNECTION_LIFETIME);
+        builder.setPooledConnectionIdleTimeout(connectionIdleTimeout);
     }
 
     @Override
@@ -192,7 +196,7 @@ public class GrizzlyHttpClient implements HttpClient
         RequestBuilder builder = new RequestBuilder();
 
         builder.setMethod(request.getMethod());
-        builder.setUrl(encodePath(request.getUri()));
+        builder.setUrl(request.getUri());
         builder.setFollowRedirects(followRedirects);
 
         for (String headerName : request.getHeaderNames())
@@ -224,7 +228,7 @@ public class GrizzlyHttpClient implements HttpClient
         {
             for (String queryParamValue : defaultHttpRequest.getQueryParams().getAll(queryParamName))
             {
-                builder.addQueryParameter(queryParamName, queryParamValue);
+                builder.addQueryParam(queryParamName, queryParamValue);
             }
         }
 
@@ -264,16 +268,24 @@ public class GrizzlyHttpClient implements HttpClient
             {
                 MultipartHttpEntity multipartHttpEntity = (MultipartHttpEntity) request.getEntity();
 
-                for (Part part : multipartHttpEntity.getParts())
+                for (HttpPart part : multipartHttpEntity.getParts())
                 {
-                    builder.addBodyPart(new PartWrapper(part));
+                    if (part.getFileName() != null)
+                    {
+                        builder.addBodyPart(new ByteArrayPart(part.getName(), IOUtils.toByteArray(part.getInputStream()), part.getContentType(), null, part.getFileName()));
+                    }
+                    else
+                    {
+                        byte[] content = IOUtils.toByteArray(part.getInputStream());
+                        builder.addBodyPart(new ByteArrayPart(part.getName(), content, part.getContentType(), null));
+                    }
                 }
             }
         }
 
         // Set the response timeout in the request, this value is read by {@code CustomTimeoutThrottleRequestFilter}
         // if the maxConnections attribute is configured in the requester.
-        builder.setPerRequestConfig(new PerRequestConfig(null, responseTimeout));
+        builder.setRequestTimeout(responseTimeout);
 
         ListenableFuture<Response> future = asyncHttpClient.executeRequest(builder.build());
         Response response = null;
@@ -328,30 +340,6 @@ public class GrizzlyHttpClient implements HttpClient
 
         return responseBuilder.build();
 
-    }
-
-    /**
-     * Encodes the path of a URI, keeping the query parameters unmodified. This is required because Grizzly decodes
-     * the path of the request URI when creating the HTTP request.
-     */
-    private String encodePath(String uri)
-    {
-        URI originalUri = URI.create(uri);
-
-        try
-        {
-            URI encodedUri = new URI(originalUri.getScheme(), originalUri.getUserInfo(), originalUri.getHost(),
-                                 originalUri.getPort(), originalUri.getRawPath(), originalUri.getQuery(), originalUri.getFragment());
-
-            return encodedUri.toString();
-        }
-        catch (URISyntaxException e)
-        {
-            // Log that the URI could not be encoded. Keep the previous value (un-encoded) and let Grizzly fail
-            // accordingly, as the URI is not valid.
-            logger.warn("Could not encode request URI", e);
-            return uri;
-        }
     }
 
     @Override

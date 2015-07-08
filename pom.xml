@@ -162,7 +162,7 @@
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.7.3</aspectjVersion>
-        <asyncHttpClientVersion>1.8.14</asyncHttpClientVersion>
+        <asyncHttpClientVersion>1.9.21</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
@@ -192,7 +192,7 @@
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <grizzlyVersion>2.3.19</grizzlyVersion>
+        <grizzlyVersion>2.3.21</grizzlyVersion>
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
@@ -1412,6 +1412,11 @@
                 <artifactId>grizzly-websockets</artifactId>
                 <version>${grizzlyVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>connection-pool</artifactId>
+                <version>${grizzlyVersion}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.ning</groupId>
@@ -1693,8 +1698,7 @@
                             <exclude>**/*.css</exclude>
                             <exclude>**/build-number.txt</exclude>
 
-                            <exclude>**/AsyncCompletionHandler.java</exclude>
-                            <exclude>**/AsyncCompletionHandlerBase.java</exclude>
+                            <exclude>**/HttpTransactionContext.java</exclude>
                             <exclude>**/FeedableBodyGenerator.java</exclude>
                             <exclude>**/BndMojo.java</exclude>
                             <exclude>**/BobberArchetype.java</exclude>
