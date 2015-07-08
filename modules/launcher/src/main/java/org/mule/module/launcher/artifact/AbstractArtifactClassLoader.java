@@ -56,6 +56,15 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
     @Override
     public void dispose()
     {
+        try
+        {
+            createResourceReleaserInstance().release();
+        }
+        catch (Exception e)
+        {
+            logger.error(e);
+        }
+
         for (ShutdownListener listener : shutdownListeners)
         {
             try
@@ -66,15 +75,6 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
             {
                 logger.error(e);
             }
-        }
-
-        try
-        {
-            createResourceReleaserInstance().release();
-        }
-        catch (Exception e)
-        {
-            logger.error(e);
         }
 
         super.dispose();

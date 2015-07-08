@@ -7,6 +7,7 @@
 package org.mule.module.launcher.application;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -17,7 +18,10 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.domain.Domain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -123,6 +127,28 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
             verify(mockContext).unregisterListener(any(MuleContextNotificationListener.class));
             assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
         }
+    }
+
+    @Test
+    public void disposesDeploymentClassLoader() throws NotificationException
+    {
+        ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
+        when(descriptor.getAbsoluteResourcePaths()).thenReturn(new String[] {});
+
+        ApplicationClassLoaderFactory classLoaderFactory = mock(ApplicationClassLoaderFactory.class);
+        final ArtifactClassLoader applicationClassLoader1 = mock(ApplicationClassLoader.class);
+        final ArtifactClassLoader applicationClassLoader2 = mock(ApplicationClassLoader.class);
+        when(classLoaderFactory.create(descriptor)).thenReturn(applicationClassLoader1).thenReturn(applicationClassLoader2);
+
+        DefaultMuleApplication application = new DefaultMuleApplication(descriptor, classLoaderFactory, mock(Domain.class));
+        application.install();
+
+        assertThat(application.deploymentClassLoader, is(applicationClassLoader1));
+
+        application.dispose();
+
+        assertThat(application.deploymentClassLoader, is(nullValue()));
+        assertThat(application.getArtifactClassLoader(), is(applicationClassLoader2));
     }
 
     private void assertStatus(final ApplicationStatus status)
