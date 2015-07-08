@@ -100,7 +100,8 @@ public class DefaultMuleApplication implements Application
                 throw new InstallException(MessageFactory.createStaticMessage(message));
             }
         }
-        deploymentClassLoader = applicationClassLoaderFactory.create(descriptor);
+
+        initDeploymentClassLoader();
     }
 
     @Override
@@ -299,6 +300,7 @@ public class DefaultMuleApplication implements Application
         {
             // kill any refs to the old classloader to avoid leaks
             Thread.currentThread().setContextClassLoader(null);
+            deploymentClassLoader = null;
         }
     }
 
@@ -317,7 +319,20 @@ public class DefaultMuleApplication implements Application
     @Override
     public ArtifactClassLoader getArtifactClassLoader()
     {
+        if (deploymentClassLoader == null)
+        {
+            initDeploymentClassLoader();
+        }
+
         return deploymentClassLoader;
+    }
+
+    private synchronized void initDeploymentClassLoader()
+    {
+        if (deploymentClassLoader == null)
+        {
+            deploymentClassLoader = applicationClassLoaderFactory.create(descriptor);
+        }
     }
 
     @Override
