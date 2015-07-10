@@ -16,8 +16,12 @@ import java.util.Collection;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
-public abstract class LifecycleUtils
+public class LifecycleUtils
 {
+
+    private LifecycleUtils()
+    {
+    }
 
     /**
      * Invokes {@link Initialisable#initialise()} on {@code object}

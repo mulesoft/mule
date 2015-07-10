@@ -54,7 +54,10 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>
         checkArgument(parameter != null, "parameter cannot be null");
         checkArgument(resolver != null, "resolver cannot be null");
 
-        resolvers.put(parameter, resolver);
+        if (resolvers.put(parameter, resolver) != null)
+        {
+            throw new IllegalStateException("A value was already given for parameter " + parameter.getName());
+        }
 
         if (resolver.isDynamic())
         {

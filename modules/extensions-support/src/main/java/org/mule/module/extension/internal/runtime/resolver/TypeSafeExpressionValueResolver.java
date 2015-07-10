@@ -39,7 +39,7 @@ import org.apache.commons.lang.StringUtils;
  * @param <T>
  * @since 3.7.0
  */
-public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>
+public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>
 {
 
     private final DataType expectedType;
@@ -47,7 +47,7 @@ public class EvaluateAndTransformValueResolver<T> implements ValueResolver<T>
     private MuleContext muleContext;
     private EvaluatorDelegate delegate = new CaptureContextEvaluatorDelegate();
 
-    public EvaluateAndTransformValueResolver(String expression, DataType expectedType)
+    public TypeSafeExpressionValueResolver(String expression, DataType expectedType)
     {
         checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
         checkArgument(expectedType != null, "expected type cannot be null");
