@@ -11,7 +11,7 @@ import org.mule.api.MuleException;
 
 /**
  * A wrapper for an instance of {@link ValueResolver} in which
- * the delegate is only invoked once and the obtained value is cached.
+ * the {@link #delegate} is only invoked once and the obtained value is cached.
  * This is useful in cases in which its expensive for the {@link #delegate}
  * to resolve the value.
  * <p/>
@@ -30,15 +30,16 @@ import org.mule.api.MuleException;
  *
  * @since 3.7.0
  */
-public class CachingValueResolverWrapper<T> extends BaseValueResolverWrapper<T>
+public class CachingValueResolverWrapper<T> implements ValueResolver<T>
 {
 
+    private final ValueResolver<T> delegate;
     private T value;
     private CachingDelegate cacheDelegate = new FirstTimeCachingDelegate();
 
     public CachingValueResolverWrapper(ValueResolver<T> delegate)
     {
-        super(delegate);
+        this.delegate = delegate;
     }
 
     /**

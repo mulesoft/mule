@@ -84,6 +84,10 @@ final class SchemaDocumenter
             {
                 ExecutableElement method = methods.get(operation.getName());
 
+                 // there are two cases in which method can be null:
+                 //   * A synthetic operation which was not defined in any class but added by a capability
+                 //   * An extension which operations are defined across multiple classes and the one being processed is not
+                 //     the one which defined the operation being processed
                 if (method == null)
                 {
                     continue;
