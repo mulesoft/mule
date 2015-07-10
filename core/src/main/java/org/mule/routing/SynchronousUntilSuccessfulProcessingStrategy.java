@@ -6,12 +6,16 @@
  */
 package org.mule.routing;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
+
+import java.io.NotSerializableException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,11 +30,12 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
     protected transient Log logger = LogFactory.getLog(getClass());
 
     @Override
-    public MuleEvent route(MuleEvent event) throws MessagingException
+    protected MuleEvent doRoute(MuleEvent event) throws MessagingException
     {
         Exception lastExecutionException = null;
         try
         {
+            MuleEvent retryEvent = DefaultMuleEvent.copy(event);
             for (int i = 0; i <= getUntilSuccessfulConfiguration().getMaxRetries(); i++)
             {
                 try
@@ -48,6 +53,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                     if (i < getUntilSuccessfulConfiguration().getMaxRetries())
                     {
                         Thread.sleep(getUntilSuccessfulConfiguration().getMillisBetweenRetries());
+                        event = DefaultMuleEvent.copy(retryEvent);
                     }
                 }
             }
@@ -79,4 +85,11 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
             throw new InitialisationException(CoreMessages.createStaticMessage("Until successful cannot be configured to be synchronous and use a dead letter queue. Failure must be processed with exception strategy"), this);
         }
     }
+
+    @Override
+    protected void ensureSerializable(MuleMessage message) throws NotSerializableException
+    {
+        // Message is not required to be Serializable because it is kept in memory
+    }
+
 }

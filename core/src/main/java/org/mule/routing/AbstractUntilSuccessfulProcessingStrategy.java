@@ -6,12 +6,17 @@
  */
 package org.mule.routing;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
+
+import java.io.NotSerializableException;
+import java.io.Serializable;
 
 /**
  * Abstract class with common logic for until successful processing strategies.
@@ -32,7 +37,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
      *
      * @param event the event to process through the until successful inner route.
      * @return the response from the route if there's no ack expression. If there's ack expression
-     *         then a message with the response event but with a payload defined by the ack expression.
+     * then a message with the response event but with a payload defined by the ack expression.
      */
     protected MuleEvent processEvent(final MuleEvent event)
     {
@@ -94,6 +99,50 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     protected UntilSuccessfulConfiguration getUntilSuccessfulConfiguration()
     {
         return untilSuccessfulConfiguration;
+    }
+
+    @Override
+    public MuleEvent route(MuleEvent event) throws MessagingException
+    {
+        prepareAndValidateEvent(event);
+        return doRoute(event);
+    }
+
+    protected abstract MuleEvent doRoute(final MuleEvent event) throws MessagingException;
+
+    private void prepareAndValidateEvent(final MuleEvent event) throws MessagingException
+    {
+        try
+        {
+            final MuleMessage message = event.getMessage();
+            if (message instanceof DefaultMuleMessage)
+            {
+                if (((DefaultMuleMessage) message).isConsumable())
+                {
+                    message.getPayloadAsBytes();
+                }
+                else
+                {
+                    ensureSerializable(message);
+                }
+            }
+            else
+            {
+                message.getPayloadAsBytes();
+            }
+        }
+        catch (final Exception e)
+        {
+            throw new MessagingException(MessageFactory.createStaticMessage("Failed to prepare message for processing"), event, e, getUntilSuccessfulConfiguration().getRouter());
+        }
+    }
+
+    protected void ensureSerializable(MuleMessage message) throws NotSerializableException
+    {
+        if (!(message.getPayload() instanceof Serializable))
+        {
+            throw new NotSerializableException(message.getPayload().getClass().getCanonicalName());
+        }
     }
 
 }
