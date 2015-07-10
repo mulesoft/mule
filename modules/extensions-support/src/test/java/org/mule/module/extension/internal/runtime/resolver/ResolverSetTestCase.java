@@ -75,6 +75,16 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
         set.add(getParameter("blah", String.class), null);
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void addRepeatedParameter() throws Exception
+    {
+        Parameter parameter = getParameter("name", String.class);
+        ValueResolver<String> resolver = getResolver(NAME);
+
+        set.add(parameter, resolver);
+        set.add(parameter, resolver);
+    }
+
     @Test
     public void isNotDynamic()
     {
