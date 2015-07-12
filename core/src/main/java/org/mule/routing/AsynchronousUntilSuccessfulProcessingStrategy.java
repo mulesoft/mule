@@ -8,7 +8,6 @@ package org.mule.routing;
 
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -29,7 +28,6 @@ import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.queue.objectstore.QueueKey;
 import org.mule.util.store.QueuePersistenceObjectStore;
 
-import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -87,17 +85,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     }
 
     @Override
-    public MuleEvent route(MuleEvent event) throws MessagingException
+    protected MuleEvent doRoute(MuleEvent event) throws MessagingException
     {
-        try
-        {
-            ensurePayloadSerializable(event);
-        }
-        catch (final Exception e)
-        {
-            throw new MessagingException(
-                    MessageFactory.createStaticMessage("Failed to prepare message for processing"), event, e, getUntilSuccessfulConfiguration().getRouter());
-        }
         try
         {
             final Serializable eventStoreKey = storeEvent(event);
@@ -277,29 +266,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                                                                   event.getMessage(), getUntilSuccessfulConfiguration().getMuleContext());
 
         return new DefaultMuleEvent(message, event);
-    }
-
-    private void ensurePayloadSerializable(final MuleEvent event) throws Exception
-    {
-        final MuleMessage message = event.getMessage();
-        if (message instanceof DefaultMuleMessage)
-        {
-            if (((DefaultMuleMessage) message).isConsumable())
-            {
-                message.getPayloadAsBytes();
-            }
-            else
-            {
-                if (!(message.getPayload() instanceof Serializable))
-                {
-                    throw new NotSerializableException(message.getPayload().getClass().getCanonicalName());
-                }
-            }
-        }
-        else
-        {
-            message.getPayloadAsBytes();
-        }
     }
 
     @Override
