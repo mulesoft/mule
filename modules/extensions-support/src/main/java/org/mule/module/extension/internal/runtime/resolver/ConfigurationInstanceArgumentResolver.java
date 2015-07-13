@@ -7,14 +7,10 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
  * An implementation of {@link ArgumentResolver} which
- * returns the value obtained through {@link OperationContextAdapter#getConfigurationInstance()}
- * <p/>
- * Notice that for this to work, the {@link OperationContext}
- * has to be an instance of {@link OperationContextAdapter}
+ * returns the value obtained through {@link OperationContext#getConfigurationInstance()}
  * <p/>
  * Because this {@link ArgumentResolver} is stateless and thread-safe,
  * it is exposed as a singleton
@@ -38,6 +34,6 @@ public final class ConfigurationInstanceArgumentResolver implements ArgumentReso
     @Override
     public Object resolve(OperationContext operationContext)
     {
-        return ((OperationContextAdapter) operationContext).getConfigurationInstance();
+        return operationContext.getConfigurationInstance();
     }
 }
