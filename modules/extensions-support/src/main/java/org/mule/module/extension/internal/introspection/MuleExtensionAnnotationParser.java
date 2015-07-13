@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.extension.annotations.Extension;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.RestrictedTo;
+import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.Payload;
 import org.mule.extension.introspection.Capable;
@@ -144,7 +145,7 @@ public final class MuleExtensionAnnotationParser
 
     private static ParameterDescriptor doParseParameter(String paramName, DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
     {
-        if (IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()))
+        if (IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) || annotations.containsKey(UseConfig.class))
         {
             return null;
         }

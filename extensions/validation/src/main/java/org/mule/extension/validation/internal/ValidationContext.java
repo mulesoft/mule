@@ -20,12 +20,24 @@ public final class ValidationContext
     private final ValidationMessages messages;
     private final ValidationOptions options;
     private final MuleEvent muleEvent;
+    private final ValidationExtension config;
 
     public ValidationContext(ValidationMessages messages, ValidationOptions options, MuleEvent muleEvent)
+    {
+        this(messages, options, muleEvent, null);
+    }
+
+    public ValidationContext(ValidationOptions options, MuleEvent muleEvent, ValidationExtension config)
+    {
+        this(config.getMessageFactory(), options, muleEvent, config);
+    }
+
+    public ValidationContext(ValidationMessages messages, ValidationOptions options, MuleEvent muleEvent, ValidationExtension config)
     {
         this.messages = messages;
         this.options = options;
         this.muleEvent = muleEvent;
+        this.config = config;
     }
 
     /**
@@ -59,5 +71,10 @@ public final class ValidationContext
     public MuleEvent getMuleEvent()
     {
         return muleEvent;
+    }
+
+    public ValidationExtension getConfig()
+    {
+        return config;
     }
 }
