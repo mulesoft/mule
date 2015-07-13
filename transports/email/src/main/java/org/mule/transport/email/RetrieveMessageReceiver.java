@@ -6,6 +6,8 @@
  */
 package org.mule.transport.email;
 
+import static javax.mail.Flags.Flag.DELETED;
+import static javax.mail.Flags.Flag.SEEN;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -147,8 +149,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                     }
                     try
                     {
-                        if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
-                            && !messages[i].getFlags().contains(Flags.Flag.SEEN))
+                        if (shouldProcessMessage(messages[i]))
                         {
                             try
                             {
@@ -163,7 +164,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                                         folder.copyMessages(new Message[]{messages[i]}, moveToFolder);
                                     }
                                     // Mark as deleted
-                                    messages[i].setFlag(Flags.Flag.DELETED, true);
+                                    messages[i].setFlag(DELETED, true);
                                 }
                                 else
                                 {
@@ -172,7 +173,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                                         Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
                                         if (flag != null)
                                         {
-                                            if(flag == Flags.Flag.DELETED && moveToFolder != null)
+                                            if(flag == DELETED && moveToFolder != null)
                                             {
                                                 folder.copyMessages(new Message[]{messages[i]}, moveToFolder);
                                             }
@@ -181,7 +182,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                                     }
                                     else
                                     {
-                                        messages[i].setFlag(Flags.Flag.SEEN, true);
+                                        messages[i].setFlag(SEEN, true);
                                         processedMessages.add(messages[i]);
                                     }
                                 }
@@ -358,12 +359,15 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         //retrieve batchSize messages at most, considering the offset that might be present
                         int limit = Math.min(count, offset + batchSize - 1);
                         Message[] messages = folder.getMessages(offset, limit);
+                        boolean newMessagesReceived = containsNewMessages(messages);
                         MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
                             messages);
                         messagesAdded(event);
-                        if (!castConnector().isDeleteReadMessages())
+
+                        // If the processed messages are not deleted, or if current batch doesn't have new mails (already
+                        // marked as read in the server), move the offset forward to not consider them next.
+                        if (!castConnector().isDeleteReadMessages() || !newMessagesReceived)
                         {
-                            //if the processed messages are not deleted, move the offset forward to not consider them next
                             offset += batchSize;
                         }
                     }
@@ -437,6 +441,23 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         }
     }
 
+    private boolean containsNewMessages(Message[] messages) throws MessagingException
+    {
+        for (Message message : messages)
+        {
+            if (shouldProcessMessage(message))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean shouldProcessMessage(Message message) throws MessagingException
+    {
+        return !message.getFlags().contains(DELETED) && !message.getFlags().contains(SEEN);
+    }
+
     @Override
     protected MuleMessage handleUnacceptedFilter(MuleMessage message)
     {
@@ -446,7 +467,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             Message msg = (Message) message.getPayload();
             try
             {
-                msg.setFlag(Flags.Flag.DELETED, endpoint.isDeleteUnacceptedMessages());
+                msg.setFlag(DELETED, endpoint.isDeleteUnacceptedMessages());
             }
             catch (MessagingException e)
             {
