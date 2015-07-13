@@ -6,7 +6,8 @@
  */
 package org.mule.transport.email.functional;
 
-import java.util.Arrays;
+import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.FLOW;
+
 import java.util.Collection;
 
 import org.junit.runners.Parameterized;
@@ -14,16 +15,14 @@ import org.junit.runners.Parameterized;
 public class ImapRetrieveMessagesNoDeleteTestCase extends AbstractImapRetrieveMessagesTestCase
 {
 
-    public ImapRetrieveMessagesNoDeleteTestCase(ConfigVariant variant, String configResources)
+    public ImapRetrieveMessagesNoDeleteTestCase(int initialReadMessages)
     {
-        super(variant, configResources);
+        super(FLOW, "imap-no-delete-messages-test.xml", initialReadMessages);
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "imap-no-delete-messages-test.xml"}
-        });
+        return READ_MESSAGES_PARAMETERS;
     }
 }
