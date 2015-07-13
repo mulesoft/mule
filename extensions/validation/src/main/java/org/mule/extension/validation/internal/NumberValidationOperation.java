@@ -9,6 +9,7 @@ package org.mule.extension.validation.internal;
 import org.mule.api.MuleEvent;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
+import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.validator.NumberType;
@@ -25,11 +26,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public class NumberValidationOperation extends ValidationSupport
 {
-
-    public NumberValidationOperation(ValidationExtension config)
-    {
-        super(config);
-    }
 
     /**
      * Receives a numeric {@code value} as a {@link String} and validates that it can be parsed
@@ -52,10 +48,11 @@ public class NumberValidationOperation extends ValidationSupport
                          @Optional String maxValue,
                          NumberType numberType,
                          @ParameterGroup ValidationOptions options,
-                         MuleEvent event) throws Exception
+                         MuleEvent event,
+                         @UseConfig ValidationExtension config) throws Exception
     {
 
-        ValidationContext context = createContext(options, event);
+        ValidationContext context = createContext(options, event, config);
         Validator validator = new NumberValidator(value,
                                                   parseLocale(locale),
                                                   pattern,

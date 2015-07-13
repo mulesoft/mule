@@ -10,10 +10,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -27,7 +25,8 @@ public class VoidReturnDelegateTestCase extends AbstractMuleTestCase
     public void returnsMuleEvent()
     {
         MuleEvent event = mock(MuleEvent.class);
-        OperationContext operationContext = new DefaultOperationContext(mock(Operation.class), mock(ResolverSetResult.class), event);
+        OperationContextAdapter operationContext = mock(OperationContextAdapter.class);
+        when(operationContext.getEvent()).thenReturn(event);
 
         Object returnValue = VoidReturnDelegate.INSTANCE.asReturnValue(new Object(), operationContext);
         assertThat(event, is(sameInstance(returnValue)));
