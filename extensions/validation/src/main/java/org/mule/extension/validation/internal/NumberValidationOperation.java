@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @since 3.7.0
  */
+
 public class NumberValidationOperation extends ValidationSupport
 {
 

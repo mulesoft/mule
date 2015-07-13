@@ -24,20 +24,23 @@ import static org.mule.module.extension.HeisenbergExtension.NAMESPACE;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_LOCATION;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
 import org.mule.extension.annotations.Configurations;
+import org.mule.extension.annotations.Extensible;
+import org.mule.extension.annotations.ExtensionOf;
+import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
+import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.Ricin;
 import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
@@ -47,7 +50,6 @@ import org.mule.tck.size.SmallTest;
 import org.mule.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -80,6 +82,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     private static final String LAUNDER_MONEY = "launder";
     private static final String INJECTED_EXTENSION_MANAGER = "getInjectedExtensionManager";
     private static final String ALIAS = "alias";
+    public static final String SAY_HELLO_OPERATION = "sayHello";
+    public static final String SAY_BYE_OPERATION = "sayBye";
 
     private Describer describer;
 
@@ -109,14 +113,14 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void heisengergPointer() throws Exception
+    public void heisenbergPointer() throws Exception
     {
         describer = describerFor(HeisenbergPointer.class);
         describeTestModule();
     }
 
     @Test
-    public void heisengergPointerPlusExternalConfig() throws Exception
+    public void heisenbergPointerPlusExternalConfig() throws Exception
     {
         describer = describerFor(HeisengergPointerPlusExternalConfig.class);
         Declaration declaration = describer.describe().getRootDeclaration().getDeclaration();
@@ -138,25 +142,37 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void operationIsImplementionOf() throws Exception
+    public void operationIsExtensionOfSameExtension() throws Exception
+    {
+        assertOperationExtensionOf(LAUNDER_MONEY, HeisenbergExtension.class);
+    }
+
+    @Test
+    public void operationIsExtensionOfDifferentExtension()
+    {
+        describer = describerFor(ExtendingExtension.class);
+        assertOperationExtensionOf(SAY_HELLO_OPERATION, ExtensibleExtension.class);
+        assertOperationExtensionOf(SAY_BYE_OPERATION, ExtensibleExtension.class);
+    }
+
+    @Test
+    public void operationIsExtensionOfSameAndDifferentExtension()
+    {
+        describer = describerFor(ExtensibleExtendingExtension.class);
+        assertOperationExtensionOf(SAY_HELLO_OPERATION, ExtensibleExtendingExtension.class);
+        assertOperationExtensionOf(SAY_BYE_OPERATION, ExtensibleExtension.class);
+    }
+
+    private void assertOperationExtensionOf(String operationName, Class capabilityType)
     {
         Declaration declaration = describer.describe().getRootDeclaration().getDeclaration();
-        OperationDeclaration operation = getOperation(declaration, LAUNDER_MONEY);
+        OperationDeclaration operation = getOperation(declaration, operationName);
         assertThat(operation.getCapabilities(), is(not(emptyIterable())));
 
-        List<ExtendingOperationCapability> capabilities = new ArrayList<>();
-
-        for (Object object : operation.getCapabilities())
-        {
-            if (object instanceof ExtendingOperationCapability)
-            {
-                capabilities.add((ExtendingOperationCapability) object);
-            }
-        }
-
-        assertThat(capabilities, hasSize(1));
-        ExtendingOperationCapability<HeisenbergExtension> capability = capabilities.get(0);
-        assertThat(capability.getType(), is(sameInstance(HeisenbergExtension.class)));
+        Set<ExtendingOperationCapability> extendingOperationCapabilities = operation.getCapabilities(ExtendingOperationCapability.class);
+        assertThat(extendingOperationCapabilities, hasSize(1));
+        ExtendingOperationCapability<ExtensibleExtension> capability = extendingOperationCapabilities.iterator().next();
+        assertThat(capability.getType(), is(sameInstance(capabilityType)));
     }
 
     private void assertTestModuleConfiguration(Declaration declaration) throws Exception
@@ -361,4 +377,57 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
             this.extendedProperty = extendedProperty;
         }
     }
+
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @Extensible
+    public static class ExtensibleExtension
+    {
+
+    }
+
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @Operations({ClassLevelExtensionOfOperation.class, MethodLevelExtensionOfOperation.class})
+    public static class ExtendingExtension
+    {
+
+    }
+
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @Operations({MethodLevelExtensionOfOperation.class, ExtensibleExtensionOperation.class})
+    @Extensible
+    public static class ExtensibleExtendingExtension
+    {
+
+    }
+
+    @ExtensionOf(ExtensibleExtension.class)
+    private static class ClassLevelExtensionOfOperation
+    {
+        @Operation
+        public String sayHello()
+        {
+            return "Hello!";
+        }
+    }
+
+
+    private static class MethodLevelExtensionOfOperation
+    {
+        @ExtensionOf(ExtensibleExtension.class)
+        @Operation
+        public String sayBye()
+        {
+            return "Bye!";
+        }
+    }
+
+    private static class ExtensibleExtensionOperation
+    {
+        @Operation
+        public String sayHello()
+        {
+            return "Hello!";
+        }
+    }
+
 }

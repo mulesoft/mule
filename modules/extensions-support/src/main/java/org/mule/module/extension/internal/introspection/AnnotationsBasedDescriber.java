@@ -16,9 +16,9 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.registry.SpiServiceRegistry;
 import org.mule.extension.annotations.Configuration;
 import org.mule.extension.annotations.Configurations;
+import org.mule.extension.annotations.Extensible;
 import org.mule.extension.annotations.Extension;
 import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operations;
@@ -27,20 +27,21 @@ import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.declaration.fluent.ConfigurationDescriptor;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.OperationDescriptor;
-import org.mule.extension.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.introspection.declaration.fluent.WithParameters;
-import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
+import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
 import org.mule.module.extension.internal.runtime.ReflectiveDelegateFactory;
 import org.mule.module.extension.internal.runtime.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -244,9 +245,9 @@ public final class AnnotationsBasedDescriber implements Describer
             extensionOf = actingClass.getAnnotation(ExtensionOf.class);
         }
 
-        if (extensionOf != null)
+        if (extensionOf != null || extensionType.getAnnotation(Extensible.class) != null)
         {
-            operation.withCapability(new ExtendingOperationCapability(extensionOf.value()));
+            operation.withCapability(new ExtendingOperationCapability(extensionOf != null ? extensionOf.value() : extensionType));
         }
     }
 
