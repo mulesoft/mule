@@ -18,6 +18,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefa
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.annotations.Configuration;
 import org.mule.extension.annotations.Configurations;
+import org.mule.extension.annotations.Extensible;
 import org.mule.extension.annotations.Extension;
 import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operations;
@@ -246,6 +247,15 @@ public final class AnnotationsBasedDescriber implements Describer
         {
             operation.withCapability(new ExtendingOperationCapability(extensionOf.value()));
         }
+        else if (isExtensible())
+        {
+            operation.withCapability(new ExtendingOperationCapability(extensionType));
+        }
+    }
+
+    private boolean isExtensible()
+    {
+        return extensionType.getAnnotation(Extensible.class) != null;
     }
 
     private void declareOperationParameters(Method method, OperationDescriptor operation)
