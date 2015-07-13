@@ -160,7 +160,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
         OperationContext operationContext = operationContextCaptor.getValue();
 
         assertThat(operationContext, is(instanceOf(OperationContextAdapter.class)));
-        assertThat(((OperationContextAdapter) operationContext).getConfigurationInstance(), is(sameInstance(defaultConfigInstance)));
+        assertThat(operationContext.getConfigurationInstance(), is(sameInstance(defaultConfigInstance)));
     }
 
     @Test
