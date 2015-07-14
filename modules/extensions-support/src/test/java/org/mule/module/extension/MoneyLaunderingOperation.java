@@ -6,7 +6,6 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.param.UseConfig;
 
@@ -18,7 +17,6 @@ public class MoneyLaunderingOperation
     private long totalLaunderedAmount = 0;
 
     @Operation
-    @ExtensionOf(HeisenbergExtension.class)
     public synchronized Long launder(@UseConfig HeisenbergExtension config, long amount)
     {
         config.setMoney(config.getMoney().subtract(BigDecimal.valueOf(amount)));
