@@ -19,12 +19,12 @@ public abstract class AbstractAnnotationsBasedDescriberTestCase extends Abstract
 {
     private Describer describer;
 
-    public Describer getDescriber()
+    protected Describer getDescriber()
     {
         return describer;
     }
 
-    public void setDescriber(Describer describer)
+    protected void setDescriber(Describer describer)
     {
         this.describer = describer;
     }

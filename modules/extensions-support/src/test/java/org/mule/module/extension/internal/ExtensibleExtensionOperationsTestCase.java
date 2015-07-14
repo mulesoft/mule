@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class ExtensionOfTestCase extends AbstractAnnotationsBasedDescriberTestCase
+public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBasedDescriberTestCase
 {
     private static final String SAY_HELLO_OPERATION = "sayHello";
     private static final String SAY_BYE_OPERATION = "sayBye";
