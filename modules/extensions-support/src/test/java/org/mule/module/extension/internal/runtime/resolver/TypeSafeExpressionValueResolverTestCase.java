@@ -25,7 +25,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.junit.Test;
 import org.mockito.verification.VerificationMode;
 
-public class EvaluateAndTransformValueResolverTestCase extends AbstractMuleContextTestCase
+public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContextTestCase
 {
 
     private static final String HELLO_WORLD = "Hello World!";
@@ -104,6 +104,6 @@ public class EvaluateAndTransformValueResolverTestCase extends AbstractMuleConte
 
     private ValueResolver getResolver(String expression, Class<?> expectedType) throws Exception
     {
-        return new EvaluateAndTransformValueResolver(expression, DataType.of(expectedType));
+        return new TypeSafeExpressionValueResolver(expression, DataType.of(expectedType));
     }
 }

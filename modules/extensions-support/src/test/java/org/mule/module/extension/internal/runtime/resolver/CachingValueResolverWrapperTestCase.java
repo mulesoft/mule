@@ -32,7 +32,7 @@ public class CachingValueResolverWrapperTestCase extends AbstractMuleTestCase
     @Mock
     private MuleEvent event;
 
-    private BaseValueResolverWrapper resolver;
+    private CachingValueResolverWrapper resolver;
 
     @Before
     public void before() throws Exception

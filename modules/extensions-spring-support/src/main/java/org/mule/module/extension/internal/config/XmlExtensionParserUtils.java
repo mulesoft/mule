@@ -27,7 +27,7 @@ import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.CachingValueResolverWrapper;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
-import org.mule.module.extension.internal.runtime.resolver.EvaluateAndTransformValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
@@ -333,7 +333,7 @@ final class XmlExtensionParserUtils
     {
         if (isExpression(value, parser))
         {
-            return new EvaluateAndTransformValueResolver((String) value, expectedDataType);
+            return new TypeSafeExpressionValueResolver((String) value, expectedDataType);
         }
 
         if (value != null)
@@ -494,7 +494,7 @@ final class XmlExtensionParserUtils
         Object value = getAttributeValue(element, attributeName, defaultValue);
         if (isExpression(value, parser))
         {
-            return new EvaluateAndTransformValueResolver((String) value, dataType);
+            return new TypeSafeExpressionValueResolver((String) value, dataType);
         }
 
         Date date = doParseDate(element, attributeName, CALENDAR_FORMAT, defaultValue);
@@ -509,7 +509,7 @@ final class XmlExtensionParserUtils
         Object value = getAttributeValue(element, attributeName, defaultValue);
         if (isExpression(value, parser))
         {
-            return new EvaluateAndTransformValueResolver((String) value, dataType);
+            return new TypeSafeExpressionValueResolver((String) value, dataType);
         }
         else
         {

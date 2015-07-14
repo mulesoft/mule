@@ -23,7 +23,7 @@ import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.StaticConfigurationInstanceProvider;
-import org.mule.module.extension.internal.runtime.resolver.EvaluateAndTransformValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
@@ -248,7 +248,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
                 ValueResolver<Object> valueResolver;
                 if (defaultValue instanceof String && muleContext.getExpressionManager().isExpression((String) defaultValue))
                 {
-                    valueResolver = new EvaluateAndTransformValueResolver<>((String) defaultValue, parameter.getType());
+                    valueResolver = new TypeSafeExpressionValueResolver<>((String) defaultValue, parameter.getType());
                 }
                 else
                 {
