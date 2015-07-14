@@ -8,10 +8,7 @@ package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.annotations.Extension.DEFAULT_CONFIG_NAME;
@@ -28,26 +25,21 @@ import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
+import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
+import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.Ricin;
-import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
-import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -62,7 +54,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
+public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedDescriberTestCase
 {
 
     private static final String EXTENDED_CONFIG_NAME = "extendedConfig";
@@ -81,23 +73,16 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     private static final String INJECTED_EXTENSION_MANAGER = "getInjectedExtensionManager";
     private static final String ALIAS = "alias";
 
-    private Describer describer;
-
     @Before
     public void setUp()
     {
-        describer = describerFor(HeisenbergExtension.class);
-    }
-
-    protected Describer describerFor(final Class<?> type)
-    {
-        return new AnnotationsBasedDescriber(type);
+        setDescriber(describerFor(HeisenbergExtension.class));
     }
 
     @Test
     public void describeTestModule() throws Exception
     {
-        Descriptor descriptor = describer.describe();
+        Descriptor descriptor = getDescriber().describe();
 
         Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
         assertExtensionProperties(declaration);
@@ -109,17 +94,17 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void heisengergPointer() throws Exception
+    public void heisenbergPointer() throws Exception
     {
-        describer = describerFor(HeisenbergPointer.class);
+        setDescriber(describerFor(HeisenbergPointer.class));
         describeTestModule();
     }
 
     @Test
-    public void heisengergPointerPlusExternalConfig() throws Exception
+    public void heisenbergPointerPlusExternalConfig() throws Exception
     {
-        describer = describerFor(HeisengergPointerPlusExternalConfig.class);
-        Declaration declaration = describer.describe().getRootDeclaration().getDeclaration();
+        setDescriber(describerFor(HeisengergPointerPlusExternalConfig.class));
+        Declaration declaration = getDescriber().describe().getRootDeclaration().getDeclaration();
 
         assertExtensionProperties(declaration);
         assertThat(declaration.getConfigurations().size(), equalTo(2));
@@ -135,28 +120,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
     public void heisenbergWithOperationsConfig() throws Exception
     {
         describerFor(HeisenbergWithOperations.class).describe();
-    }
-
-    @Test
-    public void operationIsImplementionOf() throws Exception
-    {
-        Declaration declaration = describer.describe().getRootDeclaration().getDeclaration();
-        OperationDeclaration operation = getOperation(declaration, LAUNDER_MONEY);
-        assertThat(operation.getCapabilities(), is(not(emptyIterable())));
-
-        List<ExtendingOperationCapability> capabilities = new ArrayList<>();
-
-        for (Object object : operation.getCapabilities())
-        {
-            if (object instanceof ExtendingOperationCapability)
-            {
-                capabilities.add((ExtendingOperationCapability) object);
-            }
-        }
-
-        assertThat(capabilities, hasSize(1));
-        ExtendingOperationCapability<HeisenbergExtension> capability = capabilities.get(0);
-        assertThat(capability.getType(), is(sameInstance(HeisenbergExtension.class)));
     }
 
     private void assertTestModuleConfiguration(Declaration declaration) throws Exception
@@ -262,18 +225,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
         assertThat(operation.getDescription(), equalTo(operationDescription));
     }
 
-    private OperationDeclaration getOperation(Declaration declaration, final String operationName)
-    {
-        return (OperationDeclaration) CollectionUtils.find(declaration.getOperations(), new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object object)
-            {
-                return ((OperationDeclaration) object).getName().equals(operationName);
-            }
-        });
-    }
-
     private void assertParameter(List<ParameterDeclaration> parameters,
                                  String name,
                                  String description,
@@ -361,4 +312,5 @@ public class AnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
             this.extendedProperty = extendedProperty;
         }
     }
+
 }
