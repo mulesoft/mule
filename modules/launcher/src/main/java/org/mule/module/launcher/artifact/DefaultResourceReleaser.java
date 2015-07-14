@@ -60,7 +60,7 @@ public class DefaultResourceReleaser implements ResourceReleaser
 
     private void deregisterOracleDiagnosabilityMBean()
     {
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader cl = this.getClass().getClassLoader();
         final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
         final Hashtable<String, String> keys = new Hashtable<String, String>();
         keys.put("type", DIAGNOSABILITY_BEAN_NAME);
