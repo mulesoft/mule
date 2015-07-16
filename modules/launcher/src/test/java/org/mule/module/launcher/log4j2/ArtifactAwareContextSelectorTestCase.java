@@ -20,6 +20,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
+import static org.mule.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
+import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
 import org.mule.module.launcher.application.CompositeApplicationClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
@@ -27,6 +29,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.ValueHolder;
 
@@ -49,6 +52,8 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
 {
 
     private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
+    private static final int PROBER_TIMEOUT = 5000;
+    private static final int PROBER_FREQ = 500;
 
     @Rule
     public SystemProperty disposeDelay = new SystemProperty(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, "200");
@@ -102,11 +107,6 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
         assertStopped(context);
     }
 
-    private MuleLoggerContext getContext()
-    {
-        return (MuleLoggerContext) selector.getContext("", classLoader, true);
-    }
-
     @Test
     public void returnsMuleLoggerContext()
     {
@@ -123,6 +123,47 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
         expected = new File(expected, "log4j2.xml");
         LoggerContext ctx = selector.getContext("", classLoader, true);
         assertThat(ctx.getConfigLocation(), equalTo(expected.toURI()));
+    }
+
+    @Test
+    public void usesLoggerContextReaperThread()
+    {
+        assertReaperThreadNotRunning();
+
+        MuleLoggerContext context = getContext();
+        selector.removeContext(context);
+
+        Thread thread = getReaperThread();
+        assertThat(thread, is(notNullValue()));
+    }
+
+    private void assertReaperThreadNotRunning()
+    {
+        PollingProber prober = new PollingProber(PROBER_TIMEOUT, PROBER_FREQ);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return getReaperThread() == null;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Reaper thread exists from previous test and did not died";
+            }
+        });
+    }
+
+    private Thread getReaperThread()
+    {
+        return getRunningThreadByName(THREAD_NAME);
+    }
+
+    private MuleLoggerContext getContext()
+    {
+        return (MuleLoggerContext) selector.getContext("", classLoader, true);
     }
 
     private void assertConfigurationLocation(LoggerContext ctx)
