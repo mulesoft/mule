@@ -686,4 +686,23 @@ public final class MuleTestUtils
         void run() throws Exception;
     }
 
+    /**
+     * Returns a currently running {@link Thread} of the given {@code name}
+     *
+     * @param name the name of the {@link Thread} you're looking for
+     * @return a {@link Thread} or {@code null} if none found
+     */
+    public static Thread getRunningThreadByName(String name)
+    {
+        for (Thread thread : Thread.getAllStackTraces().keySet())
+        {
+            if (thread.getName().equals(name))
+            {
+                return thread;
+            }
+        }
+
+        return null;
+    }
+
 }
