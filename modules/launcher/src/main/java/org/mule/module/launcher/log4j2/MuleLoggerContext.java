@@ -37,8 +37,6 @@ import org.apache.logging.log4j.message.MessageFactory;
 class MuleLoggerContext extends LoggerContext
 {
 
-    protected static final int NO_CCL_CLASSLOADER = 0;
-
     private final URI configFile;
     private final boolean standlone;
     private final ContextSelector contextSelector;
