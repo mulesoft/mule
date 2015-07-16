@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
@@ -21,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -66,13 +66,12 @@ final class LoggerContextCache implements Disposable
     private final ArtifactAwareContextSelector artifactAwareContextSelector;
     private final Cache<Integer, LoggerContext> activeContexts;
     private final Cache<Integer, LoggerContext> disposedContexts;
-    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService executorService;
     private Long disposeDelayInMillis;
 
-    LoggerContextCache(ArtifactAwareContextSelector artifactAwareContextSelector)
+    LoggerContextCache(ArtifactAwareContextSelector artifactAwareContextSelector, ClassLoader reaperContextClassLoader)
     {
         acquireContextDisposeDelay();
-
         this.artifactAwareContextSelector = artifactAwareContextSelector;
         activeContexts = CacheBuilder.newBuilder().build();
 
@@ -88,6 +87,8 @@ final class LoggerContextCache implements Disposable
                     }
                 })
                 .build();
+
+        executorService = newScheduledThreadPool(1, new LoggerContextReaperThreadFactory(reaperContextClassLoader));
     }
 
     private void stop(LoggerContext loggerContext)
@@ -117,7 +118,7 @@ final class LoggerContextCache implements Disposable
 
     LoggerContext getLoggerContext(final ClassLoader classLoader)
     {
-        LoggerContext ctx;
+        final LoggerContext ctx;
         try
         {
             final int key = computeKey(classLoader);
@@ -132,8 +133,7 @@ final class LoggerContextCache implements Disposable
         }
         catch (ExecutionException e)
         {
-            throw new MuleRuntimeException(
-                    createStaticMessage("Could not init logger context "), e);
+            throw new MuleRuntimeException(createStaticMessage("Could not init logger context "), e);
         }
 
         if (ctx.getState() == LifeCycle.State.INITIALIZED)
@@ -173,6 +173,11 @@ final class LoggerContextCache implements Disposable
 
     private void disposeContext(Integer key, LoggerContext loggerContext)
     {
+        if (isDisposedClassLoader(key))
+        {
+            return;
+        }
+
         disposedContexts.put(key, loggerContext);
         executorService.schedule(new Runnable()
         {
@@ -187,6 +192,11 @@ final class LoggerContextCache implements Disposable
     private int computeKey(ClassLoader classLoader)
     {
         return classLoader.hashCode();
+    }
+
+    private boolean isDisposedClassLoader(int classLoaderHashCode)
+    {
+        return disposedContexts.asMap().containsKey(classLoaderHashCode);
     }
 
     @Override

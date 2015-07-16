@@ -59,7 +59,7 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable
 
     private static final StatusLogger logger = StatusLogger.getLogger();
 
-    private LoggerContextCache cache = new LoggerContextCache(this);
+    private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
 
 
     ArtifactAwareContextSelector()
@@ -91,18 +91,18 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable
     }
 
     /**
-     * Given a classloader this method will resolve which is the classloader
-     * associated with the logger context to use for this classloader.
+     * Given a {@code classLoader}  this method will resolve which is the {@code classLoader}
+     * associated with the logger context to use for this {@code classLoader} .
+     * <p/>
+     * When the provided {@code classLoader}  is from an application or a domain it will return
+     * the {@code classLoader}  associated with the logger context of the application or domain.
+     * So far the artifact (domain or app) {@code classLoader}  will be resolved to it self.
+     * <p/>
+     * If the {@code classLoader} belongs to the container or any other {@code classLoader}  created from a
+     * library running outside the context of an artifact then the system {@code classLoader}  will be used.
      *
-     * When the provided classloader is from an application or a domain it will return
-     * the classloader associated with the logger context of the application or domain.
-     * So far the artifact (domain or app) classloader will be resolved to it self.
-     *
-     * If the clasloader belongs to the container or any other classloader created from a
-     * library running outside the context of an artifact then the system classloader will be used.
-     *
-     * @param classLoader classloader running the code where the logging was done
-     * @return the classloader owner of the logger context
+     * @param classLoader {@link ClassLoader} running the code where the logging was done
+     * @return the {@link ClassLoader} owner of the logger context
      */
     static ClassLoader resolveLoggerContextClassLoader(ClassLoader classLoader)
     {
