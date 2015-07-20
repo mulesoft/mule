@@ -6,12 +6,12 @@
  */
 package org.mule.tck.junit4;
 
+import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.ExtensionManager;
@@ -138,10 +138,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
             protected void doConfigure(MuleContext muleContext) throws Exception
             {
                 ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
-                if (extensionManager instanceof MuleContextAware)
-                {
-                    ((MuleContextAware) extensionManager).setMuleContext(muleContext);
-                }
+                initialiseIfNeeded(extensionManager, muleContext);
             }
         });
     }

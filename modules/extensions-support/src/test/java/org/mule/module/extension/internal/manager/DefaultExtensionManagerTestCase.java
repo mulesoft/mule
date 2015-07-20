@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
@@ -101,11 +102,12 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     private final Object configInstance = new Object();
 
     @Before
-    public void before()
+    public void before() throws InitialisationException
     {
         DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
         extensionsManager.setExtensionsDiscoverer(discoverer);
         extensionsManager.setMuleContext(muleContext);
+        extensionsManager.initialise();
         this.extensionsManager = extensionsManager;
 
         when(extension1.getName()).thenReturn(EXTENSION1_NAME);
