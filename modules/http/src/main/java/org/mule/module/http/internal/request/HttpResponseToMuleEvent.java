@@ -6,8 +6,8 @@
  */
 package org.mule.module.http.internal.request;
 
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
@@ -30,6 +30,7 @@ import com.google.common.net.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -125,13 +126,23 @@ public class HttpResponseToMuleEvent
 
         for (String headerName : response.getHeaderNames())
         {
-            properties.put(headerName, response.getHeaderValue(headerName));
+            properties.put(headerName, getHeaderValueToProperty(response, headerName));
         }
 
         properties.put(HTTP_STATUS_PROPERTY, response.getStatusCode());
         properties.put(HTTP_REASON_PROPERTY, response.getReasonPhrase());
 
         return properties;
+    }
+
+    private Object getHeaderValueToProperty(HttpResponse response, String headerName)
+    {
+        Collection<String> headerValues = response.getHeaderValues(headerName);
+        if (headerValues.size() > 1)
+        {
+            return new ArrayList<String>(headerValues);
+        }
+        return response.getHeaderValue(headerName);
     }
 
     private Map<String, DataHandler> getInboundAttachments(InputStream responseInputStream, String responseContentType) throws IOException
