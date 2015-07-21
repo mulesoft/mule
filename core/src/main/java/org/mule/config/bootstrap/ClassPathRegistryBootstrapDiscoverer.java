@@ -11,6 +11,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.OrderedProperties;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -56,14 +57,19 @@ public class ClassPathRegistryBootstrapDiscoverer implements RegistryBootstrapDi
                 logger.debug("Reading bootstrap properties from: " + propertiesResource.toString());
             }
             Properties properties = new OrderedProperties();
+
             try
             {
-                properties.load(propertiesResource.openStream());
+                try (InputStream resourceStream = propertiesResource.openStream())
+                {
+                    properties.load(resourceStream);
+                }
             }
             catch (IOException e)
             {
                 throw new BootstrapException(MessageFactory.createStaticMessage("Could not load properties from: %s", propertiesResource.toString()), e);
             }
+
             bootstrapsProperties.add(properties);
         }
         return bootstrapsProperties;
