@@ -10,8 +10,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.transport.PropertyScope.INBOUND;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -23,6 +23,8 @@ import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +33,9 @@ import org.junit.Test;
 public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
 {
 
+    private static final String TEST_HEADER = "TestHeader";
+    private static final String TEST_MULTIPLE_HEADER = "TestMultipleHeader";
+    private static final String TEST_VALUE = "TestValue";
     private DefaultHttpRequester httpRequester;
     private HttpResponseToMuleEvent httpResponseToMuleEvent;
     private HttpResponse httpResponse;
@@ -44,7 +49,9 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
 
         HttpResponseBuilder builder = new HttpResponseBuilder();
         builder.setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
-        builder.addHeader("TestHeader", "TestValue");
+        builder.addHeader(TEST_HEADER, TEST_VALUE);
+        builder.addHeader(TEST_MULTIPLE_HEADER, TEST_VALUE);
+        builder.addHeader(TEST_MULTIPLE_HEADER, TEST_VALUE);
         builder.setStatusCode(200);
         builder.setReasonPhrase("OK");
         httpResponse = builder.build();
@@ -55,13 +62,14 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     public void responseHeadersAreMappedAsInboundProperties() throws MessagingException
     {
         httpResponseToMuleEvent.convert(event, httpResponse);
-        assertThat((String) event.getMessage().getInboundProperty("TestHeader"), equalTo("TestValue"));
+        assertThat((String) event.getMessage().getInboundProperty(TEST_HEADER), equalTo(TEST_VALUE));
+        assertThat((List<String>) event.getMessage().getInboundProperty(TEST_MULTIPLE_HEADER), equalTo(Arrays.asList(TEST_VALUE, TEST_VALUE)));
     }
 
     @Test
     public void previousInboundPropertiesAreRemoved() throws MessagingException
     {
-        event.getMessage().setProperty("TestInboundProperty", "TestValue", INBOUND);
+        event.getMessage().setProperty("TestInboundProperty", TEST_VALUE, INBOUND);
         httpResponseToMuleEvent.convert(event, httpResponse);
         assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
     }
