@@ -7,7 +7,6 @@
 package org.mule.transport.polling;
 
 import static org.mule.config.i18n.CoreMessages.pollSourceReturnedNull;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
@@ -31,6 +30,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.SchedulerFactory;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
@@ -89,6 +89,10 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
      */
     private static final String POLLING_SCHEDULER_NAME_FORMAT = POLLING_TRANSPORT + "://%s/%s";
 
+    /**
+     * The {@link org.mule.api.schedule.Scheduler} instance used to execute the scheduled jobs
+     */
+    private Scheduler scheduler;
 
     /**
      * <p>
@@ -99,9 +103,6 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     {
         return String.format(POLLING_SCHEDULER_NAME_FORMAT, source.flowConstruct.getName(), source.hashCode());
     }
-
-
-
 
     /**
      * <p>
@@ -218,7 +219,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             ((Initialisable) override).initialise();
         }
 
-        getSchedulerFactory().create(schedulerNameOf(this), createWork());
+        createScheduler();
     }
 
     @Override
@@ -240,31 +241,62 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     @Override
     protected void doStop() throws MuleException
     {
-        // The stop phase if handled by the scheduler
         if (override instanceof Stoppable)
         {
             ((Stoppable) override).stop();
+        }
+
+        // Stop the scheduler to address the case when the flow is stop but not the application
+        if (scheduler != null)
+        {
+            scheduler.stop();
         }
     }
 
     @Override
     protected void doDispose()
     {
-        if (override instanceof Disposable)
+        try
+        {
+            if (override instanceof Disposable)
+            {
+                try
+                {
+                    ((Disposable) override).dispose();
+                }
+                catch (Exception e)
+                {
+                    logger.warn(String.format("Could not dispose polling override of class %s. Message receiver will continue to dispose", override.getClass().getCanonicalName()), e);
+                }
+            }
+
+            disposeScheduler();
+        }
+        finally
+        {
+            super.doDispose();
+
+        }
+    }
+
+    private void createScheduler()
+    {
+        scheduler = getSchedulerFactory().create(schedulerNameOf(this), createWork());
+    }
+
+    private void disposeScheduler()
+    {
+        if (scheduler != null)
         {
             try
             {
-                ((Disposable) override).dispose();
+                flowConstruct.getMuleContext().getRegistry().unregisterScheduler(scheduler);
             }
-            catch (Exception e)
+            catch (MuleException e)
             {
-                logger.warn(String.format("Could not dispose polling override of class %s. Message receiver will continue to dispose", override.getClass().getCanonicalName()), e);
+                logger.warn(String.format("Could not unregister scheduler %s from registry.", scheduler.getName()), e);
             }
-            finally
-            {
-                super.doDispose();
-
-            }
+            scheduler = null;
         }
     }
 
