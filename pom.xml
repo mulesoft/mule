@@ -1699,6 +1699,7 @@
                             <exclude>**/build-number.txt</exclude>
 
                             <exclude>**/HttpTransactionContext.java</exclude>
+                            <exclude>**/HttpConnection.java</exclude>
                             <exclude>**/FeedableBodyGenerator.java</exclude>
                             <exclude>**/BndMojo.java</exclude>
                             <exclude>**/BobberArchetype.java</exclude>
