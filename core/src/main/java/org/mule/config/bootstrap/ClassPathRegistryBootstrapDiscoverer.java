@@ -57,19 +57,26 @@ public class ClassPathRegistryBootstrapDiscoverer implements RegistryBootstrapDi
                 logger.debug("Reading bootstrap properties from: " + propertiesResource.toString());
             }
             Properties properties = new OrderedProperties();
-
             try
             {
-                try (InputStream resourceStream = propertiesResource.openStream())
+                InputStream resourceStream = null;
+                try
                 {
+                    resourceStream = propertiesResource.openStream();
                     properties.load(resourceStream);
+                }
+                finally
+                {
+                    if (resourceStream != null)
+                    {
+                        resourceStream.close();
+                    }
                 }
             }
             catch (IOException e)
             {
                 throw new BootstrapException(MessageFactory.createStaticMessage("Could not load properties from: %s", propertiesResource.toString()), e);
             }
-
             bootstrapsProperties.add(properties);
         }
         return bootstrapsProperties;
