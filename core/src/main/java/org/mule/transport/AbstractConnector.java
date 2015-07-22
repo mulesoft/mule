@@ -20,7 +20,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -57,7 +56,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.context.notification.OptimisedNotificationHandler;
+import org.mule.context.notification.NotificationHelper;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AbstractRedeliveryPolicy;
@@ -222,7 +221,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * notifications.
      */
     private boolean dynamicNotification = false;
-    private ServerNotificationHandler cachedNotificationHandler;
+    private NotificationHelper notificationHelper;
 
     private final List<String> supportedProtocols;
 
@@ -1474,7 +1473,19 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public void fireNotification(ServerNotification notification)
     {
-        cachedNotificationHandler.fireNotification(notification);
+        notificationHelper.fireNotification(notification);
+    }
+
+    /**
+     * Fires a server notification to all registered listeners
+     * on the {@link MuleContext} of the given {@code event}
+     *
+     * @param notification the notification to fire.
+     * @param event        a {@link MuleEvent}
+     */
+    public void fireNotification(ServerNotification notification, MuleEvent event)
+    {
+        notificationHelper.fireNotification(notification, event);
     }
 
     @Override
@@ -1700,7 +1711,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 logger.info("Disconnected: " + this.getConnectionDescription());
             }
             this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                    ConnectionNotification.CONNECTION_DISCONNECTED));
+                                                             ConnectionNotification.CONNECTION_DISCONNECTED));
         }
         catch (Exception e)
         {
@@ -1818,21 +1829,25 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         if (null != muleContext)
         {
-            if (dynamicNotification)
-            {
-                cachedNotificationHandler = muleContext.getNotificationManager();
-            }
-            else
-            {
-                cachedNotificationHandler = new OptimisedNotificationHandler(
-                        muleContext.getNotificationManager(), EndpointMessageNotification.class);
-            }
+            notificationHelper = new NotificationHelper(muleContext.getNotificationManager(), EndpointMessageNotification.class, dynamicNotification);
         }
     }
 
     public boolean isEnableMessageEvents()
     {
-        return cachedNotificationHandler.isNotificationEnabled(EndpointMessageNotification.class);
+        return notificationHelper.isNotificationEnabled();
+    }
+
+    /**
+     * Indicates if notifications are enabled for the given
+     * {@code event}
+     *
+     * @param event a {@link MuleEvent}
+     * @return {@code true} if notifications are to be fired for the given {@code event}, {@code false} otherwise
+     */
+    public boolean isEnableMessageEvents(MuleEvent event)
+    {
+        return notificationHelper.isNotificationEnabled(event);
     }
 
     /**
@@ -2661,7 +2676,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 {
                     // We need to invoke notification message processor with request
                     // message only after successful send/dispatch
-                    notificationMessageProcessor.dispatchNotification(beginNotification);
+                    notificationMessageProcessor.dispatchNotification(beginNotification, event);
                     notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
                             result)) ? result : event);
                 }

@@ -532,10 +532,13 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                 applyResponseTransformers(resultEvent);
             }
 
-            if (connector.isEnableMessageEvents())
+            if (connector.isEnableMessageEvents(muleEvent))
             {
                 connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(),
-                                                                           endpoint, resultEvent.getFlowConstruct(), EndpointMessageNotification.MESSAGE_RESPONSE));
+                                                                           endpoint,
+                                                                           resultEvent.getFlowConstruct(),
+                                                                           EndpointMessageNotification.MESSAGE_RESPONSE),
+                                           muleEvent);
             }
         }
         return resultEvent;
