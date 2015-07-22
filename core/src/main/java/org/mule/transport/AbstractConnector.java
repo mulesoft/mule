@@ -1490,6 +1490,18 @@ public abstract class AbstractConnector implements Connector, WorkListener
         notificationHelper.fireNotification(notification);
     }
 
+    /**
+     * Fires a server notification to all registered listeners
+     * on the {@link MuleContext} of the given {@code event}
+     *
+     * @param notification the notification to fire.
+     * @param event        a {@link MuleEvent}
+     */
+    public void fireNotification(ServerNotification notification, MuleEvent event)
+    {
+        notificationHelper.fireNotification(notification, event);
+    }
+
     @Override
     public boolean isResponseEnabled()
     {
@@ -1713,7 +1725,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 logger.info("Disconnected: " + this.getConnectionDescription());
             }
             this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                    ConnectionNotification.CONNECTION_DISCONNECTED));
+                                                             ConnectionNotification.CONNECTION_DISCONNECTED));
         }
         catch (Exception e)
         {
@@ -1838,6 +1850,18 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public boolean isEnableMessageEvents()
     {
         return notificationHelper.isNotificationEnabled();
+    }
+
+    /**
+     * Indicates if notifications are enabled for the given
+     * {@code event}
+     *
+     * @param event a {@link MuleEvent}
+     * @return {@code true} if notifications are to be fired for the given {@code event}, {@code false} otherwise
+     */
+    public boolean isEnableMessageEvents(MuleEvent event)
+    {
+        return notificationHelper.isNotificationEnabled(event);
     }
 
     /**
@@ -2665,7 +2689,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 {
                     // We need to invoke notification message processor with request
                     // message only after successful send/dispatch
-                    notificationMessageProcessor.dispatchNotification(beginNotification);
+                    notificationMessageProcessor.dispatchNotification(beginNotification, event);
                     notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
                             result)) ? result : event);
                 }

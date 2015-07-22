@@ -199,7 +199,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         final HttpAuthentication authentication = requestConfig.getAuthentication();
         final HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
 
-        notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
+        notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
         getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent),
                              new CompletionHandler<HttpResponse, Exception>()
                              {
@@ -219,7 +219,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                      try
                                      {
 
-                                         notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(),
+                                         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(),
                                                                              muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
                                          httpResponseToMuleEvent.convert(muleEvent, httpResponse);
                                          resetMuleEventForNewThread(muleEvent);
@@ -278,9 +278,9 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         HttpResponse response;
         try
         {
-            notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
+            notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
             response = getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent));
-            notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
+            notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
         }
         catch (Exception e)
         {
