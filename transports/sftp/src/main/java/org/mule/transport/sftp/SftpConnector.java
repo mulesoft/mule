@@ -478,13 +478,6 @@ public class SftpConnector extends AbstractConnector
         tempDirOutbound = pTempDirOutbound;
     }
 
-    // Need this method to be public for SftpNotifier
-    @Override
-    public boolean isEnableMessageEvents()
-    {
-        return super.isEnableMessageEvents();
-    }
-
     public void setDuplicateHandling(String duplicateHandling)
     {
         this.duplicateHandling = duplicateHandling;
