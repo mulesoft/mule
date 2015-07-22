@@ -1589,6 +1589,7 @@
                             <exclude>**/BobberArchetype.java</exclude>
                             <exclude>**/BobberArchetypeMojo.java</exclude>
                             <exclude>**/DummySSLServerSocketFactory.java</exclude>
+                            <exclude>**/HttpConnection.java</exclude>
                             <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
                             <exclude>**/ModuleArchetypeMojo.java</exclude>
                             <exclude>**/MultipartConfiguration.java</exclude>
