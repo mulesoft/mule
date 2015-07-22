@@ -47,14 +47,16 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     public static String getResourceAsString(final String resourceName, final Class callingClass)
         throws IOException
     {
-        InputStream is = getResourceAsStream(resourceName, callingClass);
-        if (is != null)
+        try (InputStream is = getResourceAsStream(resourceName, callingClass))
         {
-            return toString(is);
-        }
-        else
-        {
-            throw new IOException("Unable to load resource " + resourceName);
+            if (is != null)
+            {
+                return toString(is);
+            }
+            else
+            {
+                throw new IOException("Unable to load resource " + resourceName);
+            }
         }
     }
 
