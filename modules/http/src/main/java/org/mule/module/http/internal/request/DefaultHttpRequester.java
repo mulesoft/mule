@@ -192,9 +192,9 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
         try
         {
             HttpRequest httpRequest = builder.build();
-            notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
+            notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
             response = httpClient.send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), authentication);
-            notificationHelper.fireNotification(muleEvent.getMessage(), httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
+            notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
         }
         catch (Exception e)
         {

@@ -95,7 +95,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                 }
             }
             getNotificationHelper(event.getMuleContext().getNotificationManager()).fireNotification(
-                    event.getMessage(),
+                    event,
                     event.getMessageSourceURI().toString(),
                     event.getFlowConstruct(),
                     action);
