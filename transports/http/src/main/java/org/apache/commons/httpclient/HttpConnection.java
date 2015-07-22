@@ -51,6 +51,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * This is a modified version of the HttpConnection class from commons-httpclient that doesn't limit the size
+ * of the input/output buffers to 2KB. They are always set to the sizes of the send/receive buffers of the socket if
+ * they are defined. See the {@code open()} and {@code tunnelCreated()}  methods.
+ *
  * An abstraction of an HTTP {@link InputStream} and {@link OutputStream}
  * pair, together with the relevant attributes.
  * <p>
@@ -735,11 +739,11 @@ public class HttpConnection {
                 socket.setReceiveBufferSize(rcvBufSize);
             }
             int outbuffersize = socket.getSendBufferSize();
-            if ((outbuffersize > 2048) || (outbuffersize <= 0)) {
+            if (outbuffersize <= 0) {
                 outbuffersize = 2048;
             }
             int inbuffersize = socket.getReceiveBufferSize();
-            if ((inbuffersize > 2048) || (inbuffersize <= 0)) {
+            if (inbuffersize <= 0) {
                 inbuffersize = 2048;
             }
             inputStream = new BufferedInputStream(socket.getInputStream(), inbuffersize);
@@ -793,13 +797,7 @@ public class HttpConnection {
             socket.setReceiveBufferSize(rcvBufSize);
         }
         int outbuffersize = socket.getSendBufferSize();
-        if (outbuffersize > 2048) {
-            outbuffersize = 2048;
-        }
         int inbuffersize = socket.getReceiveBufferSize();
-        if (inbuffersize > 2048) {
-            inbuffersize = 2048;
-        }
         inputStream = new BufferedInputStream(socket.getInputStream(), inbuffersize);
         outputStream = new BufferedOutputStream(socket.getOutputStream(), outbuffersize);
         usingSecureSocket = true;
