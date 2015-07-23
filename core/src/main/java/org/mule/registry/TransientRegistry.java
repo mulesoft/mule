@@ -99,19 +99,16 @@ public class TransientRegistry extends AbstractRegistry
     {
         for (Object obj : registryMap.getLostObjects())
         {
-            if (obj != null && obj instanceof Disposable)
+            try
             {
-                try
+                ((Disposable) obj).dispose();
+            }
+            catch (Exception e)
+            {
+                logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
+                if (logger.isDebugEnabled())
                 {
-                    ((Disposable) obj).dispose();
-                }
-                catch (Exception e)
-                {
-                    logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
-                    }
+                    logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
                 }
             }
         }
@@ -432,7 +429,10 @@ public class TransientRegistry extends AbstractRegistry
                 final Object previousObject = registry.put(key, object);
                 if (previousObject != null && previousObject != object)
                 {
-                    lostObjects.add(previousObject);
+                    if (previousObject instanceof Disposable)
+                    {
+                        lostObjects.add(previousObject);
+                    }
                     // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
                     // Not sure whether to throw an exception or log a warning here.
                     //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
