@@ -6,8 +6,11 @@
  */
 package org.mule.registry;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -21,10 +24,13 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.logging.Log;
 import org.junit.Test;
 
 public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 {
+
+    public static final String TEST_KEY = "test";
 
     @Test
     public void testObjectLifecycle() throws Exception
@@ -32,7 +38,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         muleContext.start();
 
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
 
         muleContext.dispose();
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
@@ -44,13 +50,13 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         muleContext.start();
 
         InterfaceBasedTracker tracker1 = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker1);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker1);
 
         InterfaceBasedTracker tracker2 = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker2);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker2);
 
         InterfaceBasedTracker tracker3 = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker3);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker3);
 
         muleContext.dispose();
         assertEquals("[setMuleContext, initialise, start, dispose]", tracker1.getTracker().toString());
@@ -59,12 +65,26 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void doesNotTracksNonDisposableOverriddenObjects() throws Exception
+    {
+        final Log log = mock(Log.class);
+        final TransientRegistry.RegistryMap registryMap = new TransientRegistry.RegistryMap(log);
+        Object value1 = new Object();
+        Object value2 = new Object();
+        registryMap.putAndLogWarningIfDuplicate(TEST_KEY, value1);
+        registryMap.putAndLogWarningIfDuplicate(TEST_KEY, value2);
+
+        assertThat(registryMap.getLostObjects().size(), is(0));
+    }
+
+
+    @Test
     public void testJSR250ObjectLifecycle() throws Exception
     {
         muleContext.start();
 
         JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
-        muleContext.getRegistry().registerObject("test", tracker);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
 
         muleContext.dispose();
         assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
@@ -106,7 +126,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
     public void testObjectLifecycleStates() throws Exception
     {
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
         assertEquals("[setMuleContext, initialise]", tracker.getTracker().toString());
 
         try
@@ -163,7 +183,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
     public void testObjectLifecycleRestart() throws Exception
     {
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
 
         muleContext.start();
         assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
@@ -188,7 +208,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
         try
         {
-            reg.registerObject("test", tracker);
+            reg.registerObject(TEST_KEY, tracker);
             fail("Cannot register objects on a disposed registry");
         }
         catch (RegistrationException e)
@@ -202,7 +222,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
     {
         muleContext.start();
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
         //Initialise called implicitly because you cannot start a component without initialising it first
         assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
 
@@ -227,7 +247,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         muleContext.start();
         muleContext.stop();
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject("test", tracker);
+        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
         //Start is bypassed because the component was added when the registry was stopped, hence no need to start the component
         //Stop isn't called either because start was not called
         //Initialised is called because that pahse has completed in the registry
@@ -245,7 +265,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
         try
         {
-            muleContext.getRegistry().registerObject("test", tracker);
+            muleContext.getRegistry().registerObject(TEST_KEY, tracker);
             fail("cannot register objects on a disposed registry");
         }
         catch (RegistrationException e)

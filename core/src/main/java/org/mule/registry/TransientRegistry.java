@@ -366,7 +366,7 @@ public class TransientRegistry extends AbstractRegistry
      * transient registry and also shields client code from having to deal with locking the
      * {@link ReadWriteLock} for the exposed Map operations.
      */
-    private static class RegistryMap
+    protected static class RegistryMap
     {
 
         private final Map<String, Object> registry = new HashMap<String, Object>();
