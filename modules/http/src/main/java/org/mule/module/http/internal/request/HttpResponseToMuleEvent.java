@@ -165,7 +165,7 @@ public class HttpResponseToMuleEvent
     {
         if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget()) )
         {
-            muleEvent.getMessage().setPayload(payload);
+            muleEvent.getMessage().setPayload(payload, muleEvent.getMessage().getDataType());
         }
         else
         {

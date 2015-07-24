@@ -214,6 +214,21 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         }
     }
 
+    @Override
+    public synchronized void setPayload(Object payload, DataType dataType)
+    {
+        if (this.getPayload() == payload)
+        {
+            setDataType(dataType);
+            return;
+        }
+        else
+        {
+            super.setPayload(payload, dataType);
+            invalidatedPayload = true;
+        }
+    }
+
     /**
      * Applies the {@link org.mule.api.MuleMessage#getPayload(Class)} call to every message in the collection and returns a
      * {@link java.util.List} of results.

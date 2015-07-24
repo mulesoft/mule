@@ -2232,7 +2232,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     }
                 }
             };
-            result.setPayload(is);
+            result.setPayload(is, result.getDataType());
         }
         else
         {

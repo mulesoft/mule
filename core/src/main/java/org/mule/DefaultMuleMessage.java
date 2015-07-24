@@ -1423,13 +1423,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         DataType  newDataType;
         if (payload == null || payload instanceof NullPayload)
         {
-            newDataType = DataTypeFactory.create(Object.class, dataType.getMimeType());
-            newDataType.setEncoding(dataType.getEncoding());
+            newDataType = DataTypeFactory.create(Object.class, null);
         }
         else
         {
-            newDataType = DataTypeFactory.create(payload.getClass(), dataType.getMimeType());
-            newDataType.setEncoding(dataType.getEncoding());
+            newDataType = DataTypeFactory.create(payload.getClass(), null);
         }
 
         setPayload(payload, newDataType);
@@ -1623,7 +1621,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 synchronized (this)
                 {
                     MuleMessage resultMessage = (MuleMessage) result;
-                    setPayload(resultMessage.getPayload());
+                    setPayload(resultMessage.getPayload(), resultMessage.getDataType());
                     originalPayload = resultMessage.getOriginalPayload();
                     copyMessageProperties(resultMessage);
                     copyAttachments(resultMessage);
@@ -1632,16 +1630,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
-            setPayload(result);
+            final DataType<?> mergedDataType = mergeDataType(dataType, transformer.getReturnDataType());
+            setPayload(result, mergedDataType);
         }
-
-        setDataType(mergeDataType(dataType, transformer.getReturnDataType()));
     }
 
     private DataType<?> mergeDataType(DataType<?> original, DataType<?> transformed)
     {
         String mimeType = transformed.getMimeType() == null || MimeTypes.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
-        String encoding = transformed.getEncoding() == null ? original.getEncoding() : transformed.getEncoding();
+        String encoding = transformed.getEncoding() == null ? this.getEncoding() : transformed.getEncoding();
         Class<?> type = transformed.getType() == Object.class ? original.getType() : transformed.getType();
 
         DataType mergedDataType = DataTypeFactory.create(type, mimeType);
