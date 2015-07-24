@@ -136,7 +136,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         muleMessage.setMimeType(APPLICATION_XML);
         muleMessage.setPayload(null);
 
-        assertDataType(muleMessage, Object.class, APPLICATION_XML, CUSTOM_ENCODING);
+        assertDataType(muleMessage, Object.class, ANY, null);
     }
 
     @Test
@@ -175,7 +175,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         muleMessage.setMimeType(APPLICATION_XML);
         muleMessage.setPayload(1);
 
-        assertDataType(muleMessage, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
+        assertDataType(muleMessage, Integer.class, ANY, null);
     }
 
     @Test
