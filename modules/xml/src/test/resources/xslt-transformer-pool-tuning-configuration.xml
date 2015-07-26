@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/xml
+        http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+        http://www.mulesoft.org/schema/mule/core
+        http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
+
+  <mulexml:xslt-transformer name="defaultTransformer" xsl-file="cdcatalog.xsl"/>
+
+  <mulexml:xslt-transformer name="transformerSpecifyingTenMaxIdleTransformers"
+        xsl-file="cdcatalog.xsl" maxIdleTransformers="10"/>
+
+  <mulexml:xslt-transformer name="transformerSpecifyingTenMaxActiveTransformers"
+        xsl-file="cdcatalog.xsl" maxActiveTransformers="10"/>
+
+  <mulexml:xslt-transformer name="transformerSpecifyingHourlyTimeBetweenTransformerEvictions"
+        xsl-file="cdcatalog.xsl" timeBetweenTransformerEvictions="3600000"/>
+
+</mule>
