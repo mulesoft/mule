@@ -434,7 +434,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         // message. This is the only time this method will alter the payload on the message
         if (isPayloadConsumed(source.getType()))
         {
-            setPayload(result);
+            setPayload(result, dataType);
         }
 
         return (T) result;
