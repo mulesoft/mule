@@ -8,9 +8,13 @@
 package org.mule;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.IsNot.not;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -21,6 +25,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.PropertyScope;
@@ -30,6 +35,7 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -264,6 +270,26 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         muleMessage.setDataType(dataType);
 
         assertThat(muleMessage.getDataType(), like(dataType));
+    }
+
+    @Test
+    public void maintainsDataTypeOnGetPayloadTransformation() throws Exception
+    {
+        InputStream payload = mock(InputStream.class);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, muleContext);
+        muleMessage.setMimeType(APPLICATION_XML);
+        muleMessage.setEncoding(CUSTOM_ENCODING);
+
+        MuleRegistry muleRegistry = mock(MuleRegistry.class);
+        when(muleContext.getRegistry()).thenReturn(muleRegistry);
+        Transformer transformer = mock(Transformer.class);
+        when(transformer.transform(anyObject(), anyString())).thenReturn(TEST);
+        when(muleRegistry.lookupTransformer(argThat(any(DataType.class)), argThat(any(DataType.class)))).thenReturn(transformer);
+
+        muleMessage.getPayloadAsString();
+
+        assertThat(muleMessage.getDataType().getMimeType(), equalTo(APPLICATION_XML));
+        assertThat(muleMessage.getDataType().getEncoding(), equalTo(CUSTOM_ENCODING));
     }
 
     @Test
