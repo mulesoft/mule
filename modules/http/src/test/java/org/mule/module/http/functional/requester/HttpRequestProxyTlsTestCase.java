@@ -17,6 +17,7 @@ import org.mule.construct.Flow;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.io.BufferedReader;
@@ -25,11 +26,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 
+@RunWith(Parameterized.class)
 public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
 {
 
@@ -43,16 +49,41 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-proxy-tls-config.xml";
-    }
+    @Rule
+    public SystemProperty keyStorePathProperty;
+
+    @Rule
+    public SystemProperty trustStorePathProperty;
 
     private MockProxyServer proxyServer = new MockProxyServer(proxyPort.getNumber(), httpPort.getNumber());
 
     private String requestURI;
     private String requestPayload;
+    private String requestHost;
+
+    public HttpRequestProxyTlsTestCase(String keyStorePath, String trustStorePath, String requestHost)
+    {
+        this.keyStorePathProperty = new SystemProperty("keyStorePath", keyStorePath);
+        this.trustStorePathProperty = new SystemProperty("trustStorePath", trustStorePath);
+        this.requestHost = requestHost;
+    }
+
+    /**
+     * The test will run with two key store / trust store pairs. One has the subject alternative name set to localhost (the
+     * default for all TLS tests), and the other one has the name set to "test". We need this to validate that the hostname
+     * verification is performed using the host of the request, and not the one of the proxy.
+     */
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters() {
+        return Arrays.asList(new Object[][] {{"ssltest-keystore-with-test-hostname.jks", "ssltest-truststore-with-test-hostname.jks", "test"},
+                {"ssltest-keystore.jks", "ssltest-cacerts.jks", "localhost"}});
+    }
+
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-request-proxy-tls-config.xml";
+    }
 
     @Test
     public void requestIsSentCorrectlyThroughHttpsProxy() throws Exception
@@ -72,6 +103,7 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
         Flow flow = (Flow) getFlowConstruct("clientFlow");
         MuleEvent event = getTestEvent(TEST_MESSAGE);
 
+        event.setFlowVariable("host", requestHost);
         event.setFlowVariable("path", PATH);
         event = flow.process(event);
 
