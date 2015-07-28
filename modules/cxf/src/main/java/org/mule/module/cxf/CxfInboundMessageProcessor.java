@@ -100,6 +100,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private QueryHandler wsdlQueryHandler;
 
+    private String mimeType;
+
     @Override
     public void initialise() throws InitialisationException
     {
@@ -219,7 +221,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             msg = out.toString();
         }
 
-        event.getMessage().setPayload(msg);
+        event.getMessage().setPayload(msg, DataTypeFactory.XML_STRING);
         event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
         return event;
     }
@@ -435,7 +437,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
 
         MuleMessage muleResMsg = responseEvent.getMessage();
-        muleResMsg.setPayload(getResponseOutputHandler(exchange));
+        muleResMsg.setPayload(getResponseOutputHandler(exchange), DataTypeFactory.XML_STRING);
 
         // Handle a fault if there is one.
         Message faultMsg = exchange.getOutFaultMessage();
@@ -630,4 +632,13 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         this.wsdlQueryHandler = wsdlQueryHandler;
     }
 
+    public String getMimeType()
+    {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType)
+    {
+        this.mimeType = mimeType;
+    }
 }

@@ -25,6 +25,7 @@ import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.module.cxf.support.WSDLQueryHandler;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -206,8 +207,14 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
         processor.setServer(server);
         processor.setProxy(isProxy());
         processor.setWSDLQueryHandler(getWSDLQueryHandler());
+        processor.setMimeType(getMimeType());
 
         return processor;
+    }
+
+    protected String getMimeType()
+    {
+        return MimeTypes.ANY;
     }
 
     protected QueryHandler getWSDLQueryHandler()

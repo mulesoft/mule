@@ -17,6 +17,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.component.ComponentException;
 import org.mule.config.ExceptionHelper;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
@@ -66,7 +67,9 @@ public class MuleInvoker implements Invoker
             try
             {
                 MuleMessage reqMsg = event.getMessage();
-                reqMsg.setPayload(extractPayload(exchange.getInMessage()));
+                Object payload = extractPayload(exchange.getInMessage());
+                Class payloadClass = payload != null ? payload.getClass() : Object.class;
+                reqMsg.setPayload(payload, DataTypeFactory.create(payloadClass, cxfMmessageProcessor.getMimeType()));
 
                 BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
                 Service svc = exchange.get(Service.class);
