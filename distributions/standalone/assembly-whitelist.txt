@@ -203,7 +203,7 @@
 /mule-standalone-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.21.jar
+/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.27.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-api-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-impl-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/bcmail-jdk16-1.46.jar

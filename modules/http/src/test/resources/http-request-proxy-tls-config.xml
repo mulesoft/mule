@@ -10,16 +10,16 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" protocol="HTTPS">
+    <http:request-config name="requestConfig" host="#[host]" port="${httpPort}" protocol="HTTPS">
         <tls:context>
-            <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+            <tls:trust-store path="${trustStorePath}" password="changeit"/>
         </tls:context>
         <http:proxy host="localhost" port="${proxyPort}" />
     </http:request-config>
 
     <http:listener-config name="listenerConfig" host="0.0.0.0" port="${httpPort}" protocol="HTTPS" usePersistentConnections="false">
         <tls:context>
-            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            <tls:key-store path="${keyStorePath}" keyPassword="changeit" password="changeit"/>
         </tls:context>
     </http:listener-config>
 
