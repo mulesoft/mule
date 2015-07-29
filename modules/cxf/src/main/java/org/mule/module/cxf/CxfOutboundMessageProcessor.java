@@ -23,6 +23,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.module.cxf.security.WebServiceSecurityException;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.TemplateParser;
 
@@ -68,6 +69,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     private String operation;
     private BindingProvider clientProxy;
     private String decoupledEndpoint;
+    private String mimeType;
 
     public CxfOutboundMessageProcessor(Client client)
     {
@@ -461,12 +463,13 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         MuleMessage message = transportResponse.getMessage();
 
         Object httpStatusCode = message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
-        if(isProxy() && httpStatusCode != null)
+        if (isProxy() && httpStatusCode != null)
         {
             message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, httpStatusCode);
         }
 
-        message.setPayload(payload);
+        Class payloadClass = payload != null ? payload.getClass() : Object.class;
+        message.setPayload(payload, DataTypeFactory.create(payloadClass, getMimeType()));
 
         return transportResponse;
     }
@@ -551,5 +554,15 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         clone.decoupledEndpoint = decoupledEndpoint;
 
         return clone;
+    }
+
+    public String getMimeType()
+    {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType)
+    {
+        this.mimeType = mimeType;
     }
 }
