@@ -22,6 +22,7 @@ import org.mule.module.cxf.CxfPayloadToArguments;
 import org.mule.module.cxf.config.WsSecurity;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
+import org.mule.transformer.types.MimeTypes;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -64,7 +65,6 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected String decoupledEndpoint;
 
     private WsSecurity wsSecurity;
-
 
     @Override
     public CxfOutboundMessageProcessor build() throws MuleException
@@ -144,6 +144,8 @@ public abstract class AbstractOutboundMessageProcessorBuilder
             flow.setMessageSource(ep.buildInboundEndpoint());
             muleContext.getRegistry().registerObject(flow.getName(), flow);
         }
+
+        processor.setMimeType(getMimeType());
         
         return processor;
     }
@@ -379,6 +381,11 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     public void setWsSecurity(WsSecurity wsSecurity)
     {
         this.wsSecurity = wsSecurity;
+    }
+
+    protected String getMimeType()
+    {
+        return MimeTypes.ANY;
     }
 
 }

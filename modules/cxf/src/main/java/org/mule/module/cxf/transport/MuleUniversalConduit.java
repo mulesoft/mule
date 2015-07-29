@@ -173,7 +173,7 @@ public class MuleUniversalConduit extends AbstractConduit
         }
         else 
         {
-            event.getMessage().setPayload(handler);
+            event.getMessage().setPayload(handler, DataTypeFactory.XML_STRING);
         }
 
         if (!decoupled)
@@ -340,7 +340,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // we want to act appropriately. E.g. one way invocations over a proxy
             InputStream is = result.getPayload(DataTypeFactory.create(InputStream.class));
             PushbackInputStream pb = new PushbackInputStream(is);
-            result.setPayload(pb);
+            result.setPayload(pb, DataTypeFactory.XML_STRING);
             
             int b = pb.read();
             if (b != -1)
