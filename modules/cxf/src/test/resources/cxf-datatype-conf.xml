@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+           http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <flow name="helloService">
+        <http:listener path="/hello" config-ref="listenerConfig" allowedMethods="POST" />
+        <response>
+            <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        </response>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+        <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureAnyDataType" />
+    </flow>
+
+    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+    <flow name="helloServiceClient" processingStrategy="synchronous">
+        <inbound-endpoint address="vm://helloClient" exchange-pattern="request-response"/>
+        <response>
+            <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureAnyDataType" />
+        </response>
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        <http:request config-ref="requestConfig" path="/hello" method="POST" />
+    </flow>
+
+    <flow name="helloProxy">
+        <http:listener path="/hello-proxy" config-ref="listenerConfig"/>
+        <response>
+            <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        </response>
+        <cxf:proxy-service />
+        <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        <response>
+            <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        </response>
+        <cxf:proxy-client />
+        <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        <http:request path="/hello" method="POST" config-ref="requestConfig"/>
+    </flow>
+
+    <flow name="echoService">
+        <http:listener path="/echo" config-ref="listenerConfig"/>
+        <response>
+            <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        </response>
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
+        <component class="org.mule.component.simple.EchoComponent"/>
+        <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureAnyDataType" />
+    </flow>
+
+    <flow name="greeterService">
+        <http:listener path="greeter" config-ref="listenerConfig" allowedMethods="POST" />
+        <response>
+            <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        </response>
+        <cxf:simple-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
+        <component>
+            <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+        </component>
+        <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureAnyDataType" />
+    </flow>
+
+    <flow name="PopulateData">
+        <inbound-endpoint address="vm://echoClient" exchange-pattern="request-response"/>
+        <response>
+            <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureAnyDataType" />
+        </response>
+        <cxf:simple-client serviceClass="org.apache.hello_world_soap_http.Greeter" operation="greetMe">
+            <!-- Aegis will use file resources/org/apache/hello_world_soap_http/Greeter.aegis.xml to configure the call
+                to the webservice. -->
+            <cxf:aegis-databinding>
+                <spring:property name="configuration">
+                    <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions" />
+                </spring:property>
+            </cxf:aegis-databinding>
+        </cxf:simple-client>
+        <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
+        <http:request config-ref="requestConfig" path="/services/greeter" method="POST" />
+    </flow>
+
+</mule>

@@ -19,6 +19,7 @@ import org.mule.module.cxf.support.ProxyWSDLQueryHandler;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
+import org.mule.transformer.types.MimeTypes;
 
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCInInterceptor;
@@ -148,6 +149,12 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     public void setPayload(String payload)
     {
         this.payload = payload;
+    }
+
+    @Override
+    protected String getMimeType()
+    {
+        return MimeTypes.XML;
     }
 
 }

@@ -18,6 +18,7 @@ import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.StreamClosingInterceptor;
 import org.mule.module.cxf.transport.MuleUniversalConduit;
+import org.mule.transformer.types.MimeTypes;
 
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
@@ -118,5 +119,11 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
     {
         this.payload = payload;
     }
-    
+
+    @Override
+    protected String getMimeType()
+    {
+        return MimeTypes.XML;
+    }
+
 }
