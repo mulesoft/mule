@@ -7,7 +7,6 @@
 package org.mule.module.http.internal;
 
 import static org.mule.util.StringUtils.WHITE_SPACE;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.util.StringUtils;
@@ -34,7 +33,6 @@ import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.ParseException;
 import javax.mail.util.ByteArrayDataSource;
-import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
 
@@ -91,13 +89,16 @@ public class HttpParser
                 BodyPart part = mimeMultipart.getBodyPart(i);
 
                 String partName = part.getFileName();
-                String contentDisposition = part.getHeader(CONTENT_DISPOSITION_PART_HEADER)[0];
-                if (contentDisposition.contains(NAME_ATTRIBUTE))
+                String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION_PART_HEADER);
+                if (contentDispositions != null)
                 {
-                    partName = contentDisposition.substring(contentDisposition.indexOf(NAME_ATTRIBUTE) + NAME_ATTRIBUTE.length() + 2);
-                    partName = partName.substring(0, partName.indexOf("\""));
+                    String contentDisposition = contentDispositions[0];
+                    if (contentDisposition.contains(NAME_ATTRIBUTE))
+                    {
+                        partName = contentDisposition.substring(contentDisposition.indexOf(NAME_ATTRIBUTE) + NAME_ATTRIBUTE.length() + 2);
+                        partName = partName.substring(0, partName.indexOf("\""));
+                    }
                 }
-
                 HttpPart httpPart = new HttpPart(partName, IOUtils.toByteArray(part.getInputStream()), part.getContentType(), part.getSize());
 
                 Enumeration<Header> headers = part.getAllHeaders();
