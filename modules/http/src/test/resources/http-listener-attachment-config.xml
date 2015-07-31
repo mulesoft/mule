@@ -23,4 +23,14 @@
         <vm:outbound-endpoint path="out"/>
     </flow>
 
+    <flow name="testFlow3">
+        <http:listener config-ref="listenerConfig" path="${contentLength}"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerAttachmentsTestCase$AddAttachmentMessageProcessor"/>
+    </flow>
+
+    <flow name="testFlow4">
+        <http:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerAttachmentsTestCase$AddAttachmentMessageProcessor"/>
+    </flow>
+
 </mule>

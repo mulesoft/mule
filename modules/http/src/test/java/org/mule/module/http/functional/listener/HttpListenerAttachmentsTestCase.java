@@ -8,17 +8,18 @@ package org.mule.module.http.functional.listener;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.http.api.HttpConstants;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
@@ -34,6 +35,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.activation.DataHandler;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
@@ -70,6 +72,12 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty mixedPath = new SystemProperty("mixedPath", "mixedPath");
     @Rule
+    public SystemProperty contentLength = new SystemProperty("contentLength", "contentLength");
+    @Rule
+    public SystemProperty chunked = new SystemProperty("chunked", "chunked");
+    @Rule
+    public SystemProperty responsePath = new SystemProperty("responsePath", "responsePath");
+    @Rule
     public SystemProperty formDataChunkedPath = new SystemProperty("multipartChunked", "multipartChunked");
     @Rule
     public SystemProperty multipartResponse = new SystemProperty("multipartResponse", "multipartResponse");
@@ -99,9 +107,26 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
         processAttachmentRequestAndResponse(formDataPath.getValue(), MULTIPART_FORM_DATA, USE_CHUNKED_MODE);
     }
 
-    private HttpRequestOptions transferEncodingChunkWithPostOptions()
+    @Test
+    public void respondWithAttachmentsContentLength() throws Exception
     {
-        return newOptions().requestStreamingMode(HttpStreamingType.ALWAYS).method(HttpConstants.Methods.POST.name()).build();
+        MuleMessage response = getResponseWithExpectedAttachmentFrom(contentLength.getValue());
+        assertThat(response.getInboundProperty(CONTENT_LENGTH), is(notNullValue()));
+    }
+
+    @Test
+    public void respondWithAttachmentsChunked() throws Exception
+    {
+        MuleMessage response = getResponseWithExpectedAttachmentFrom(chunked.getValue());
+        assertThat((String) response.getInboundProperty(TRANSFER_ENCODING), is(CHUNKED));
+    }
+
+    private MuleMessage getResponseWithExpectedAttachmentFrom(String path) throws MuleException, IOException
+    {
+        MuleMessage response = muleContext.getClient().send(getUrl(path), getTestMuleMessage());
+        assertThat(response.getInboundAttachmentNames().size(), is(1));
+        assertThat((String) response.getInboundAttachment(null).getContent(), is(TEXT_BODY_FIELD_VALUE));
+        return response;
     }
 
     private void processAttachmentRequestAndResponse(String pathToCall, String expectedResponseContentType, boolean useChunkedMode) throws IOException, MuleException, ServletException
@@ -187,5 +212,22 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
         return partsAsMap;
     }
 
+    public static class AddAttachmentMessageProcessor implements MessageProcessor
+    {
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            try
+            {
+                event.getMessage().addOutboundAttachment(TEXT_BODY_FIELD_NAME, new DataHandler(TEXT_BODY_FIELD_VALUE, "text/plain"));
+            }
+            catch (Exception e)
+            {
+                //do nothing
+            }
+            return event;
+        }
+    }
 
 }
