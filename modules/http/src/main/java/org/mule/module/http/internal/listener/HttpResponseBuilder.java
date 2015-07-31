@@ -117,6 +117,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
             }
             httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType());
+            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, (ByteArrayHttpEntity) httpEntity);
         }
         else
         {
@@ -165,6 +166,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     {
                         setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
                     }
+
                     httpEntity = byteArrayHttpEntity;
                 }
                 catch (Exception e)
@@ -195,6 +197,18 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         }
         httpResponseBuilder.setEntity(httpEntity);
         return httpResponseBuilder.build();
+    }
+
+    private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding, String existingContentLength, ByteArrayHttpEntity byteArrayHttpEntity)
+    {
+        if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null && CHUNKED.equals(existingTransferEncoding)))
+        {
+            setupChunkedEncoding(httpResponseHeaderBuilder);
+        }
+        else
+        {
+            setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+        }
     }
 
     private void setupContentLengthEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, int contentLength)
