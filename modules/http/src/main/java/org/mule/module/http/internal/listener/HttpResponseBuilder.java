@@ -134,6 +134,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
             }
             httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType());
+            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, (ByteArrayHttpEntity) httpEntity);
         }
         else
         {
@@ -174,14 +175,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 try
                 {
                     ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
-                    if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null && CHUNKED.equals(existingTransferEncoding)))
-                    {
-                        setupChunkedEncoding(httpResponseHeaderBuilder);
-                    }
-                    else
-                    {
-                        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
-                    }
+                    resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, byteArrayHttpEntity);
                     httpEntity = byteArrayHttpEntity;
                 }
                 catch (Exception e)
@@ -212,6 +206,18 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         }
         httpResponseBuilder.setEntity(httpEntity);
         return httpResponseBuilder.build();
+    }
+
+    private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding, String existingContentLength, ByteArrayHttpEntity byteArrayHttpEntity)
+    {
+        if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null && CHUNKED.equals(existingTransferEncoding)))
+        {
+            setupChunkedEncoding(httpResponseHeaderBuilder);
+        }
+        else
+        {
+            setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+        }
     }
 
     private boolean isNotIgnoredProperty(String outboundPropertyName)
