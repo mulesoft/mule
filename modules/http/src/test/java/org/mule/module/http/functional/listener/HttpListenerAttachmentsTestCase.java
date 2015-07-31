@@ -120,7 +120,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     {
         MuleMessage response = muleContext.getClient().send(getUrl(path), getTestMuleMessage());
         assertThat(response.getInboundAttachmentNames().size(), is(1));
-        assertThat((String) response.getInboundAttachment(null).getContent(), is(TEXT_BODY_FIELD_VALUE));
+        assertThat((String) response.getInboundAttachment(TEXT_BODY_FIELD_NAME).getContent(), is(TEXT_BODY_FIELD_VALUE));
         return response;
     }
 

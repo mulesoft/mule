@@ -6,7 +6,8 @@
  */
 package org.mule.module.http.internal.multipart;
 
-import org.mule.module.http.api.HttpHeaders;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.util.IOUtils;
@@ -19,7 +20,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-import javax.servlet.http.Part;
 
 /**
  * Creates multipart
@@ -32,7 +32,7 @@ public class HttpMultipartEncoder
         MimeMultipart mimeMultipartContent = new HttpMimeMultipart(contentType, HttpParser.getContentTypeSubType(contentType));
         final Collection<HttpPart> parts = body.getParts();
 
-        for (Part part : parts)
+        for (HttpPart part : parts)
         {
             final InternetHeaders internetHeaders = new InternetHeaders();
             for (String headerName : part.getHeaderNames())
@@ -43,9 +43,13 @@ public class HttpMultipartEncoder
                     internetHeaders.addHeader(headerName, headerValue);
                 }
             }
-            if (part.getContentType() != null)
+            if (internetHeaders.getHeader(CONTENT_DISPOSITION) == null)
             {
-                internetHeaders.addHeader(HttpHeaders.Names.CONTENT_TYPE, part.getContentType());
+                internetHeaders.addHeader(CONTENT_DISPOSITION, getContentDispositionHeader(part));
+            }
+            if (internetHeaders.getHeader(CONTENT_TYPE) == null && part.getContentType() != null)
+            {
+                internetHeaders.addHeader(CONTENT_TYPE, part.getContentType());
             }
             try
             {
@@ -58,6 +62,21 @@ public class HttpMultipartEncoder
             }
         }
         return mimeMultipartContent;
+    }
+
+    private static String getContentDispositionHeader(HttpPart part)
+    {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("form-data; name=\"");
+        buffer.append(part.getName());
+        buffer.append("\"");
+        if (part.getFileName() != null)
+        {
+            buffer.append("; filename=\"");
+            buffer.append(part.getFileName());
+            buffer.append("\"");
+        }
+        return buffer.toString();
     }
 
     public static byte[] createMultipartContent(MultipartHttpEntity multipartEntity, String contentType) throws IOException, MessagingException
