@@ -8,10 +8,12 @@ package org.mule.module.http.functional.listener;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
@@ -33,6 +35,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.activation.DataHandler;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
@@ -62,6 +65,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     private static final String VM_MESSAGE_ENDPOINT = "vm://out";
     private static final boolean DO_NOT_USE_CHUNKED_MODE = false;
     private static final boolean USE_CHUNKED_MODE = true;
+    private static final String TEXT_PLAIN = "text/plain";
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
     @Rule
@@ -116,11 +120,27 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
         assertThat((String) response.getInboundProperty(TRANSFER_ENCODING), is(CHUNKED));
     }
 
+    @Test
+    public void returnOnlyOneContentTypeHeaderPerPart() throws Exception
+    {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault())
+        {
+            HttpPost httpPost = new HttpPost(getUrl(formDataPath.getValue()));
+            httpPost.setEntity(getMultipartEntity(false));
+            try (CloseableHttpResponse response = httpClient.execute(httpPost))
+            {
+                assertThat(countMatches(IOUtils.toString(response.getEntity().getContent()),CONTENT_TYPE), is(1));
+            }
+        }
+    }
+
     private MuleMessage getResponseWithExpectedAttachmentFrom(String path) throws MuleException, IOException
     {
         MuleMessage response = muleContext.getClient().send(getUrl(path), getTestMuleMessage());
         assertThat(response.getInboundAttachmentNames().size(), is(1));
-        assertThat((String) response.getInboundAttachment(null).getContent(), is(TEXT_BODY_FIELD_VALUE));
+        DataHandler attachment = response.getInboundAttachment(null);
+        assertThat((String) attachment.getContent(), is(TEXT_BODY_FIELD_VALUE));
+        assertThat(attachment.getContentType(), is(TEXT_PLAIN));
         return response;
     }
 
@@ -129,7 +149,6 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
         CloseableHttpClient httpClient = HttpClients.createDefault();
         try
         {
-
             HttpPost httpPost = new HttpPost(getUrl(pathToCall));
             HttpEntity multipart = createHttpEntity(useChunkedMode);
             httpPost.setEntity(multipart);
@@ -168,10 +187,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
 
     private HttpEntity createHttpEntity(boolean useChunkedMode) throws IOException
     {
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addTextBody(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, ContentType.TEXT_PLAIN);
-        builder.addBinaryBody(FILE_BODY_FIELD_NAME, FILE_BODY_FIELD_VALUE.getBytes(), ContentType.APPLICATION_OCTET_STREAM, FIELD_BDOY_FILE_NAME);
-        HttpEntity multipartEntity = builder.build();
+        HttpEntity multipartEntity = getMultipartEntity(true);
         if (useChunkedMode)
         {
             //The only way to send multipart + chunked is putting the multipart content in an output stream entity.
@@ -190,6 +206,17 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
         {
             return multipartEntity;
         }
+    }
+
+    private HttpEntity getMultipartEntity(boolean withFile)
+    {
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addTextBody(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, ContentType.TEXT_PLAIN);
+        if (withFile)
+        {
+            builder.addBinaryBody(FILE_BODY_FIELD_NAME, FILE_BODY_FIELD_VALUE.getBytes(), ContentType.APPLICATION_OCTET_STREAM, FIELD_BDOY_FILE_NAME);
+        }
+        return builder.build();
     }
 
     private String getUrl(String pathToCall)
