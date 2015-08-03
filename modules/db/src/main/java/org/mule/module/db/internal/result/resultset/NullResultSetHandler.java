@@ -23,4 +23,10 @@ public class NullResultSetHandler implements ResultSetHandler
     {
         return resultSet;
     }
+
+    @Override
+    public boolean requiresMultipleOpenedResults()
+    {
+        return false;
+    }
 }
