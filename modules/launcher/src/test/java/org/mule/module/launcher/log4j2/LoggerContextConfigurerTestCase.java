@@ -19,6 +19,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
+import static org.mule.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -33,6 +35,7 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.ConfigurationMonitor;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
@@ -136,13 +139,31 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
                 Appender forcedConsoleAppender = appenderCaptor.getValue();
 
                 assertThat(forcedConsoleAppender, notNullValue());
-                assertThat(forcedConsoleAppender.getName(), equalTo("Forced-Console"));
+                assertThat(forcedConsoleAppender.getName(), equalTo(FORCED_CONSOLE_APPENDER_NAME));
                 assertThat(forcedConsoleAppender.isStarted(), is(true));
 
                 LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
-                verify(rootLogger).addAppender(forcedConsoleAppender, Level.INFO, null);
+                verify(rootLogger).addAppender(forcedConsoleAppender, Level.ALL, null);
             }
         });
+    }
+
+    @Test
+    public void perAppDefaultAppender()
+    {
+        when(context.isArtifactClassloader()).thenReturn(true);
+        contextConfigurer.configure(context);
+        ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
+        verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
+
+        Appender perAppAppender = appenderCaptor.getValue();
+
+        assertThat(perAppAppender, notNullValue());
+        assertThat(perAppAppender.getName(), equalTo(PER_APP_FILE_APPENDER_NAME));
+        assertThat(perAppAppender.isStarted(), is(true));
+
+        LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+        verify(rootLogger).addAppender(perAppAppender, Level.ALL, null);
     }
 
     @Test
