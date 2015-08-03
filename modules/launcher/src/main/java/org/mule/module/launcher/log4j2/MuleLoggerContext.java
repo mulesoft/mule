@@ -76,6 +76,11 @@ class MuleLoggerContext extends LoggerContext
     public synchronized void reconfigure()
     {
         super.reconfigure();
+        applyContainerConfiguration();
+    }
+
+    private void applyContainerConfiguration()
+    {
         new LoggerContextConfigurer().configure(this);
     }
 
@@ -91,6 +96,7 @@ class MuleLoggerContext extends LoggerContext
     @Override
     public void updateLoggers(Configuration config)
     {
+        applyContainerConfiguration();
         super.updateLoggers(config);
         for (Logger logger : getLoggers())
         {

@@ -62,10 +62,13 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
  */
 final class LoggerContextConfigurer
 {
+
     private static final String MULE_APP_LOG_FILE_TEMPLATE = "mule-app-%s.log";
     private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
     private static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
     private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
+    static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
+    static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
 
     LoggerContextConfigurer()
     {
@@ -125,7 +128,7 @@ final class LoggerContextConfigurer
                 configFile = new File(configuration.getName());
             }
 
-            if (configFile != null)
+            if (configFile != null && configuration instanceof Reconfigurable)
             {
                 configuration.setConfigurationMonitor(new FileConfigurationMonitor(
                         (Reconfigurable) configuration,
@@ -150,13 +153,13 @@ final class LoggerContextConfigurer
 
     private void addDefaultAppender(MuleLoggerContext context, String logFilePath)
     {
-        RollingFileAppender appender = createRollingFileAppender(logFilePath, "'.'%d{yyyy-MM-dd}", "defaultFileAppender", context.getConfiguration());
+        RollingFileAppender appender = createRollingFileAppender(logFilePath, "'.'%d{yyyy-MM-dd}", PER_APP_FILE_APPENDER_NAME, context.getConfiguration());
         doAddAppender(context, appender);
     }
 
     private void forceConsoleAppender(MuleLoggerContext context)
     {
-        Appender appender = ConsoleAppender.createAppender(createLayout(context.getConfiguration()), null, null, "Forced-Console", null, null);
+        Appender appender = ConsoleAppender.createAppender(createLayout(context.getConfiguration()), null, null, FORCED_CONSOLE_APPENDER_NAME, null, null);
         doAddAppender(context, appender);
     }
 
@@ -164,7 +167,7 @@ final class LoggerContextConfigurer
     {
         appender.start();
         context.getConfiguration().addAppender(appender);
-        getRootLogger(context).addAppender(appender, Level.INFO, null);
+        getRootLogger(context).addAppender(appender, Level.ALL, null);
     }
 
     private RollingFileAppender createRollingFileAppender(String logFilePath, String filePattern, String appenderName, Configuration configuration)
