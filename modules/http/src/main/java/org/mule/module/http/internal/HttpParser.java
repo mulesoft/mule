@@ -88,7 +88,8 @@ public class HttpParser
             {
                 BodyPart part = mimeMultipart.getBodyPart(i);
 
-                String partName = part.getFileName();
+                String filename = part.getFileName();
+                String partName = filename;
                 String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION_PART_HEADER);
                 if (contentDispositions != null)
                 {
@@ -99,7 +100,7 @@ public class HttpParser
                         partName = partName.substring(0, partName.indexOf("\""));
                     }
                 }
-                HttpPart httpPart = new HttpPart(partName, IOUtils.toByteArray(part.getInputStream()), part.getContentType(), part.getSize());
+                HttpPart httpPart = new HttpPart(partName, filename, IOUtils.toByteArray(part.getInputStream()), part.getContentType(), part.getSize());
 
                 Enumeration<Header> headers = part.getAllHeaders();
 
