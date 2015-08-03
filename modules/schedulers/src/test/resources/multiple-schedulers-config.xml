@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:schedulers="http://www.mulesoft.org/schema/mule/schedulers"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/schedulers http://www.mulesoft.org/schema/mule/schedulers/current/mule-schedulers.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <flow name="poll1" processingStrategy="synchronous">
+        <poll>
+            <schedulers:cron-scheduler expression="0/1 0/1 * 1/1 * ? *"/>
+            <set-payload value="poll1"/>
+        </poll>
+
+        <component class="org.mule.modules.schedulers.cron.MultipleSchedulersTestCase$SynchronizedPollExecutionCounter"/>
+    </flow>
+
+    <flow name="poll2" processingStrategy="synchronous">
+        <poll>
+            <schedulers:cron-scheduler expression="0/1 0/1 * 1/1 * ? *"/>
+            <set-payload value="poll2"/>
+        </poll>
+
+        <component class="org.mule.modules.schedulers.cron.MultipleSchedulersTestCase$SynchronizedPollExecutionCounter"/>
+    </flow>
+</mule>

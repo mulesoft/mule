@@ -48,6 +48,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
     public static final String THREAD_POLL_CLASS = "org.quartz.simpl.SimpleThreadPool";
     public static final String THREAD_POOL_COUNT_PROPERTY = "org.quartz.threadPool.threadCount";
     public static final String POLL_CRON_SCHEDULER_JOB = "poll.scheduler.job";
+    public static final String QUARTZ_INSTANCE_NAME_PROPERTY = "org.quartz.scheduler.instanceName";
 
     /**
      * <p>
@@ -207,6 +208,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
     {
         Properties factoryProperties = new Properties();
 
+        factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, context.getConfiguration().getId() + "-" + name);
         factoryProperties.setProperty(THREAD_POLL_CLASS_PROPERTY, THREAD_POLL_CLASS);
         factoryProperties.setProperty(THREAD_POOL_COUNT_PROPERTY, String.valueOf(context.getDefaultMessageReceiverThreadingProfile().getMaxThreadsActive()));
         return factoryProperties;
