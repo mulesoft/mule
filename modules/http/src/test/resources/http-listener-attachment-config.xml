@@ -33,4 +33,10 @@
         <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
     </flow>
 
+    <flow name="testFlow5">
+        <http:listener config-ref="listenerConfig" path="${filePath}" />
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerAttachmentsTestCase$CustomAttachmentMessageProcessor"/>
+        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+    </flow>
+
 </mule>

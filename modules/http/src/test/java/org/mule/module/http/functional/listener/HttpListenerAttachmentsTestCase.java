@@ -17,8 +17,11 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.multipart.HttpPart;
@@ -77,6 +80,8 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty chunked = new SystemProperty("chunked", "chunked");
     @Rule
+    public SystemProperty filePath = new SystemProperty("filePath", "filePath");
+    @Rule
     public SystemProperty formDataChunkedPath = new SystemProperty("multipartChunked", "multipartChunked");
     @Rule
     public SystemProperty multipartResponse = new SystemProperty("multipartResponse", "multipartResponse");
@@ -121,6 +126,24 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void respondWithSeveralAttachments() throws Exception
+    {
+        MuleMessage response = muleContext.getClient().send(getUrl(filePath.getValue()), getTestMuleMessage());
+        assertThat(response.getInboundAttachmentNames().size(), is(2));
+
+        DataHandler attachment1 = response.getInboundAttachment(FILE_BODY_FIELD_NAME);
+        HttpPart part = ((HttpPartDataSource) attachment1.getDataSource()).getPart();
+        assertThat(part.getName(), is(FILE_BODY_FIELD_NAME));
+        assertThat(part.getFileName(), is(FIELD_BDOY_FILE_NAME));
+        assertThat(part.getContentType(), is("application/octet-stream"));
+        assertThat(IOUtils.toString(part.getInputStream()), is(FILE_BODY_FIELD_VALUE));
+
+        DataHandler attachment2 = response.getInboundAttachment(TEXT_BODY_FIELD_NAME);
+        assertThat((String) attachment2.getContent(), is(TEXT_BODY_FIELD_VALUE));
+        assertThat(attachment2.getContentType(), is(TEXT_PLAIN));
+    }
+
+    @Test
     public void returnOnlyOneContentTypeHeaderPerPart() throws Exception
     {
         try (CloseableHttpClient httpClient = HttpClients.createDefault())
@@ -138,7 +161,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     {
         MuleMessage response = muleContext.getClient().send(getUrl(path), getTestMuleMessage());
         assertThat(response.getInboundAttachmentNames().size(), is(1));
-        DataHandler attachment = response.getInboundAttachment(null);
+        DataHandler attachment = response.getInboundAttachment(TEXT_BODY_FIELD_NAME);
         assertThat((String) attachment.getContent(), is(TEXT_BODY_FIELD_VALUE));
         assertThat(attachment.getContentType(), is(TEXT_PLAIN));
         return response;
@@ -234,4 +257,21 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
         return partsAsMap;
     }
 
+    public static class CustomAttachmentMessageProcessor implements MessageProcessor
+    {
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            try
+            {
+                event.getMessage().addOutboundAttachment(FILE_BODY_FIELD_NAME, new DataHandler(new ByteArrayDataSource(FILE_BODY_FIELD_VALUE.getBytes(), ContentType.APPLICATION_OCTET_STREAM.toString(), FIELD_BDOY_FILE_NAME)));
+            }
+            catch (Exception e)
+            {
+                //do nothing
+            }
+            return event;
+        }
+    }
 }
