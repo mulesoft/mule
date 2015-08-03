@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.multipart;
 
-import org.mule.module.http.api.HttpHeaders;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.util.IOUtils;
@@ -43,9 +43,9 @@ public class HttpMultipartEncoder
                     internetHeaders.addHeader(headerName, headerValue);
                 }
             }
-            if (part.getContentType() != null)
+            if (internetHeaders.getHeader(CONTENT_TYPE) == null && part.getContentType() != null)
             {
-                internetHeaders.addHeader(HttpHeaders.Names.CONTENT_TYPE, part.getContentType());
+                internetHeaders.addHeader(CONTENT_TYPE, part.getContentType());
             }
             try
             {
