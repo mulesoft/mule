@@ -35,4 +35,10 @@ public class IteratorResultSetHandler implements ResultSetHandler
 
         return new ResultSetIterator(connection, resultSet, rowHandler, streamingResultSetCloser);
     }
+
+    @Override
+    public boolean requiresMultipleOpenedResults()
+    {
+        return true;
+    }
 }
