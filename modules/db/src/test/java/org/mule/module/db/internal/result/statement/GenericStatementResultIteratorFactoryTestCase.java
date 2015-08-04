@@ -34,19 +34,11 @@ public class GenericStatementResultIteratorFactoryTestCase extends AbstractMuleT
     private final Statement statement = mock(CallableStatement.class);
 
     @Test(expected = IllegalArgumentException.class)
-    public void failsToCreateIteratorForStoredProcedureWhenDbDoesNotSupportsIt() throws Exception
-    {
-        DbConnection connection = createMockConnection(false);
-
-        resultIteratorFactory.create(connection, statement, null, null);
-    }
-
-    @Test
     public void createsIterator() throws Exception
     {
         DbConnection connection = createMockConnection(true);
 
-        StatementResultIterator statementResultIterator = resultIteratorFactory.create(connection, statement, new QueryTemplate("unused", STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList()), null);
+        StatementResultIterator statementResultIterator = resultIteratorFactory.create(connection, statement, new QueryTemplate(null, STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList()), null);
 
         assertThat(statementResultIterator, instanceOf(StatementResultIterator.class));
     }

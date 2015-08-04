@@ -19,4 +19,13 @@ public interface ResultSetHandler
 {
 
     Object processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException;
+
+    /**
+     * Indicates whether or not the resultSet handler requires that the
+     * connection supports multiple opened results in order to process
+     * the resultSet.
+     *
+     * @return {@code true} is multiple opened results is required, {@code false} otherwise
+     */
+    boolean requiresMultipleOpenedResults();
 }
