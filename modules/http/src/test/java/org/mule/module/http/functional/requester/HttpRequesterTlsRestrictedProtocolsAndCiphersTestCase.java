@@ -40,10 +40,10 @@ import org.junit.Test;
 public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends FunctionalTestCase
 {
 
-    private static final String CLIENT_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
-    private static final String CLIENT_CIPHER_SUITE_DISABLED = "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA";
+    private static final String CLIENT_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256";
+    private static final String CLIENT_CIPHER_SUITE_DISABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
 
-    private static final String CLIENT_PROTOCOL_ENABLED = "SSLv3";
+    private static final String CLIENT_PROTOCOL_ENABLED = "TLSv1.2";
     private static final String CLIENT_PROTOCOL_DISABLED = "TLSv1";
 
     @Rule
