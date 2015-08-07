@@ -298,42 +298,43 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException
     {
-        if (resEvent == null || VoidMuleEvent.getInstance().equals(resEvent))
+        if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent))
         {
-            m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
-            return;
-        }
+            m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
 
-        m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
-
-        // If we have a result, send it back to CXF
-        MuleMessage result = resEvent.getMessage();
-        InputStream is = getResponseBody(m, result);
-        if (is != null)
-        {
-            Message inMessage = new MessageImpl();
-
-            String encoding = result.getEncoding();
-            inMessage.put(Message.ENCODING, encoding);
-
-            String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-            if (encoding != null && contentType.indexOf("charset") < 0)
+            // If we have a result, send it back to CXF
+            MuleMessage result = resEvent.getMessage();
+            InputStream is = getResponseBody(m, result);
+            if (is != null)
             {
-                contentType += "; charset=" + result.getEncoding();
+                Message inMessage = new MessageImpl();
+
+                String encoding = result.getEncoding();
+                inMessage.put(Message.ENCODING, encoding);
+
+                String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+                if (encoding != null && contentType.indexOf("charset") < 0)
+                {
+                    contentType += "; charset=" + result.getEncoding();
+                }
+                inMessage.put(Message.CONTENT_TYPE, contentType);
+                inMessage.setContent(InputStream.class, is);
+                inMessage.setExchange(m.getExchange());
+                getMessageObserver().onMessage(inMessage);
+                return;
             }
-            inMessage.put(Message.CONTENT_TYPE, contentType);
-            inMessage.setContent(InputStream.class, is);
-            inMessage.setExchange(m.getExchange());
-            getMessageObserver().onMessage(inMessage);
         }
+
+        // No body in the response, mark the exchange as finished.
+        m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
     }
 
     protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
     {
         boolean response = result != null
-            && !NullPayload.getInstance().equals(result.getPayload())
-            && !isOneway(m.getExchange());
-        
+                           && !NullPayload.getInstance().equals(result.getPayload())
+                           && !isOneway(m.getExchange());
+
         if (response)
         {
             // Sometimes there may not actually be a body, in which case
@@ -341,7 +342,7 @@ public class MuleUniversalConduit extends AbstractConduit
             InputStream is = result.getPayload(DataTypeFactory.create(InputStream.class));
             PushbackInputStream pb = new PushbackInputStream(is);
             result.setPayload(pb, DataTypeFactory.XML_STRING);
-            
+
             int b = pb.read();
             if (b != -1)
             {
@@ -349,7 +350,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 return pb;
             }
         }
-        
+
         return null;
     }
 

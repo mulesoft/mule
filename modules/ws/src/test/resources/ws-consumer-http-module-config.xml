@@ -5,22 +5,14 @@
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:ss="http://www.springframework.org/schema/security"
-      xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
-               http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
-    <http:request-config host="localhost" port="${port}" name="customConfig">
-        <http:basic-authentication username="user" password="pass" />
-    </http:request-config>
+    <http:request-config host="localhost" port="${port}" name="customConfig" />
 
     <ws:consumer-config wsdlLocation="Test.wsdl" service="TestService" port="TestPort"
                         serviceAddress="http://localhost:${port}/services/Test" connectorConfig="customConfig" name="globalConfig"/>
@@ -30,29 +22,8 @@
         <ws:consumer operation="echo" />
     </flow>
 
-
-    <mule-ss:security-manager>
-        <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
-        <mule-ss:delegate-security-provider name="memory-dao-with-provider" delegate-ref="authenticationManager"
-                                            authenticationProvider-ref="authenticationProvider"  />
-    </mule-ss:security-manager>
-
-    <spring:beans>
-        <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
-
-        <ss:authentication-manager alias="authenticationManager">
-            <ss:authentication-provider>
-                <ss:user-service id="userService">
-                    <ss:user name="user" password="pass" authorities="ROLE_ADMIN" />
-                </ss:user-service>
-            </ss:authentication-provider>
-        </ss:authentication-manager>
-
-    </spring:beans>
-
     <flow name="server">
         <inbound-endpoint address="http://localhost:${port}/services/Test" exchange-pattern="request-response">
-            <mule-ss:http-security-filter realm="mule-realm"/>
             <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
         </inbound-endpoint>
         <component class="org.mule.module.ws.consumer.TestService"/>
