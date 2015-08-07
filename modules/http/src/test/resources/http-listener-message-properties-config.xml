@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerBaseConfig" host="localhost" port="${port2}" basePath="api"/>
+
+    <flow name="generalFlow">
+        <http:listener  path="/*" config-ref="listenerConfig"/>
+        <copy-properties propertyName="*" />
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="severalUriParameters">
+        <http:listener config-ref="listenerConfig" path="/{uri-param1}/{uri-param2}/{uri-param3}" />
+        <copy-properties propertyName="*" />
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="oneUriParameterInTheMiddle">
+        <http:listener config-ref="listenerConfig" path="/some-path/{uri-param1}/some-other-path" />
+        <copy-properties propertyName="*" />
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="basePathConfig">
+        <http:listener config-ref="listenerBaseConfig" path="*" />
+        <copy-properties propertyName="*" />
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+</mule>

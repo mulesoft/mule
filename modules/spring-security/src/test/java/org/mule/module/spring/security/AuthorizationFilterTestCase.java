@@ -11,22 +11,48 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.hamcrest.core.Is;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class AuthorizationFilterTestCase extends FunctionalTestCase
 {
+
+    private final String configFile;
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
+    public AuthorizationFilterTestCase(String configFile)
+    {
+        this.configFile = configFile;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"http-transport-filter-test.xml"},
+                {"http-module-filter-test.xml"}
+        });
+    }
 
     @Override
     protected String getConfigFile()
     {
-        return "http-filter-test.xml";
+        return configFile;
     }
 
     @Test
@@ -55,7 +81,7 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
 
     protected String getUrl()
     {
-        return "http://localhost:4567/authorize";
+        return "http://localhost:" + port1.getNumber() + "/authorize";
     }
 
     private void doRequest(String host,

@@ -11,10 +11,6 @@
     <name>JBoss Transactions Integration</name>
     <description>Provides access to the JBoss Transaction Service for User and Xa transactions.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

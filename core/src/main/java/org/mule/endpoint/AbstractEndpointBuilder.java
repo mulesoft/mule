@@ -6,11 +6,13 @@
  */
 package org.mule.endpoint;
 
+import static org.mule.util.ObjectNameHelper.getEndpointNameFor;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
-import org.mule.api.AnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.NamedObject;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
@@ -21,7 +23,9 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.CloneableMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -47,17 +51,16 @@ import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,7 +72,7 @@ import org.apache.commons.logging.LogFactory;
  * repeatable fashion (global endpoints), ii) Allow for much more extensibility in
  * endpoint creation for transport specific endpoints, streaming endpoints etc.<br/>
  */
-public abstract class AbstractEndpointBuilder implements EndpointBuilder, AnnotatedObject
+public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject implements EndpointBuilder
 {
 
     public static final String PROPERTY_RESPONSE_TIMEOUT = "responseTimeout";
@@ -98,11 +101,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     protected String mimeType;
     protected AbstractRedeliveryPolicy redeliveryPolicy;
 
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
-
     // not included in equality/hash
     protected String registryId = null;
     protected MuleContext muleContext;
+    protected ObjectNameHelper objectNameHelper;
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -194,7 +196,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
 
         checkInboundExchangePattern();
 
-        // Filters on inbound endpoints need to throw exceptions in case the reciever needs to reject the message 
+        // Filters on inbound endpoints need to throw exceptions in case the receiver needs to reject the message
         for (MessageProcessor mp :messageProcessors)
         {
             if (mp instanceof MessageFilter)
@@ -295,22 +297,51 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     }
 
     
-    protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI)
-        throws TransportFactoryException
+    protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
     {
         List<MessageProcessor> tempProcessors = new LinkedList<MessageProcessor>(messageProcessors);
         tempProcessors.addAll(getTransformersFromUri(endpointURI));
         tempProcessors.addAll(transformers);
+
+        registerMessageProcessors(endpointURI, tempProcessors);
+
         return tempProcessors;
     }
 
-    protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI)
-        throws TransportFactoryException
+    private void registerMessageProcessors(EndpointURI endpointURI, List<MessageProcessor> tempProcessors) throws TransportFactoryException
+    {
+        for (MessageProcessor messageProcessor : tempProcessors)
+        {
+            registerMessageProcessor(messageProcessor, endpointURI);
+        }
+    }
+
+    private void registerMessageProcessor(MessageProcessor messageProcessor, EndpointURI uri) throws TransportFactoryException {
+        try
+        {
+            registerComponent(messageProcessor, uri);
+        }
+        catch (RegistrationException e)
+        {
+            throw new TransportFactoryException(e);
+        }
+    }
+
+    private void registerComponent(Object component, EndpointURI uri) throws RegistrationException
+    {
+        String name = component instanceof NamedObject ? ((NamedObject) component).getName() + "-" : "";
+        name += objectNameHelper.getUniqueName(getEndpointNameFor(uri));
+        muleContext.getRegistry().registerObject(name, component);
+    }
+
+    protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
     {
         List<MessageProcessor> tempResponseProcessors = new LinkedList<MessageProcessor>(
             responseMessageProcessors);
         tempResponseProcessors.addAll(getResponseTransformersFromUri(endpointURI));
         tempResponseProcessors.addAll(responseTransformers);
+
+        registerMessageProcessors(endpointURI, tempResponseProcessors);
         return tempResponseProcessors;
     }
 
@@ -844,6 +875,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        objectNameHelper = new ObjectNameHelper(muleContext);
     }
 
     public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
@@ -915,7 +947,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         EndpointBuilder builder = (EndpointBuilder)super.clone();
         builder.setConnector(connector);
         builder.setURIBuilder(uriBuilder);
-        builder.setMessageProcessors(messageProcessors);
+        builder.setMessageProcessors(cloneMessageProcessors(messageProcessors));
         builder.setResponseMessageProcessors(responseMessageProcessors);
         builder.setName(name);
         builder.setProperties(properties);
@@ -949,19 +981,22 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         return builder;
     }
 
-    public final Object getAnnotation(QName name)
+    private List<MessageProcessor> cloneMessageProcessors(List<MessageProcessor> messageProcessors)
     {
-        return annotations.get(name);
-    }
+        List<MessageProcessor> result = new ArrayList<>(messageProcessors.size());
 
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
+        for (MessageProcessor messageProcessor : messageProcessors)
+        {
+            if (messageProcessor instanceof CloneableMessageProcessor)
+            {
+                result.add(((CloneableMessageProcessor) messageProcessor).clone());
+            }
+            else
+            {
+                result.add(messageProcessor);
+            }
+        }
 
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
+        return result;
     }
 }

@@ -10,11 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/file"
-                schemaLocation="http://www.mulesoft.org/schema/mule/file/3.5/mule-file.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/file/3.7/mule-file.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd"/>
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -64,6 +64,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             A class that extends FtpConnectionFactory. The FtpConnectionFactory is responsible for creating a connection to the server using the credentials provided by the endpoint. The default implementation supplied with Mule uses the Commons Net project from Apache.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="connectionTimeout" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Number of milliseconds to wait until an outbound connection to a remote server is successfully created. No timeout is configured by default.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

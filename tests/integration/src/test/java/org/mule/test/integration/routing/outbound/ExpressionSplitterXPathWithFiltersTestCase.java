@@ -9,6 +9,7 @@ package org.mule.test.integration.routing.outbound;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Ignore;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -16,6 +17,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 
+@Ignore("MULE-4483")
 public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCase
 {
     private static final String MESSAGE = "<Foo>\n" +

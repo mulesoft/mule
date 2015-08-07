@@ -9,7 +9,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <flow name="helloWorldFlow">
-        <inbound-endpoint address="${scheme}://localhost:${port1}/service/helloWorld" connector-ref="sharedHttpConnector"/>
+        <http:listener path="/service/helloWorld" config-ref="sharedListenerConfig"/>
         <set-payload value="hello world"/>
     </flow>
 

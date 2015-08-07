@@ -7,30 +7,27 @@
 package org.mule.session;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.serialization.ObjectSerializer;
+import org.mule.api.serialization.SerializationException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.SerializationUtils;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.SerializationException;
 import org.junit.Test;
 
 public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
@@ -97,7 +94,7 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
     public void asyncInterceptingProcessorInvocationPropertyPropagation() throws Exception
     {
         AsyncInterceptingMessageProcessor async = new AsyncInterceptingMessageProcessor(
-            muleContext.getDefaultThreadingProfile(), "async", 0);
+                muleContext.getDefaultThreadingProfile(), "async", 0);
         SensingNullMessageProcessor asyncListener = new SensingNullMessageProcessor();
         async.setListener(asyncListener);
         async.start();
@@ -139,8 +136,8 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         message.setInvocationProperty("key", "value");
 
-        MuleEvent deserializedEvent = (MuleEvent) SerializationUtils.deserialize(
-            SerializationUtils.serialize(event), muleContext);
+        ObjectSerializer serializer = muleContext.getObjectSerializer();
+        MuleEvent deserializedEvent = serializer.deserialize(serializer.serialize(event));
 
         // Event and session are both copied
         assertNotSame(deserializedEvent, event);
@@ -172,9 +169,11 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
         message.setInvocationProperty("key", nonSerializable);
         message.setInvocationProperty("key2", "value2");
 
+        ObjectSerializer serializer = muleContext.getObjectSerializer();
+
         try
         {
-            SerializationUtils.deserialize(SerializationUtils.serialize(event), muleContext);
+            serializer.deserialize(serializer.serialize(event));
             fail("Serialization should have failed.");
         }
         catch (Exception e)
@@ -195,7 +194,7 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
         Flow flow = new Flow("flow", muleContext);
-        flow.setMessageProcessors(Collections.<MessageProcessor> singletonList(flowListener));
+        flow.setMessageProcessors(Collections.<MessageProcessor>singletonList(flowListener));
         flow.initialise();
         flow.start();
 

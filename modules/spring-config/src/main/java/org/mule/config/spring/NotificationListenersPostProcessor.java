@@ -18,7 +18,9 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * 
  * @see org.mule.api.context.MuleContextAware
  * @see org.mule.api.MuleContext
+ * @deprecated as of 3.7.0 because it's not being used. Will be removed in Mule 4.0
  */
+@Deprecated
 public class NotificationListenersPostProcessor implements BeanPostProcessor
 {
 

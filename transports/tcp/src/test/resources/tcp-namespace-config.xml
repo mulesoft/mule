@@ -50,12 +50,16 @@
     <tcp:connector name="messageDispatcherFactoryConnector" dispatcherFactory-ref="messageDispatcherFactory" >
     </tcp:connector>
 
-    <tcp:server-socket-properties name="serverSocketProperties" connectionTimeout="500" keepAlive="true" receiveBacklog="200"
+    <tcp:server-socket-properties name="defaultServerSocketProperties" />
+
+    <tcp:server-socket-properties name="serverSocketProperties" keepAlive="true" receiveBacklog="200"
                                   receiveBufferSize="1024" reuseAddress="true" sendBufferSize="2048"
-                                  sendTcpNoDelay="true" serverSoTimeout="600" socketSoLinger="700" />
+                                  sendTcpNoDelay="true" serverTimeout="600" timeout="800" linger="700" />
+
+    <tcp:client-socket-properties name="defaultClientSocketProperties" />
 
     <tcp:client-socket-properties name="clientSocketProperties" connectionTimeout="500" keepAlive="true"
                                   receiveBufferSize="1024" sendBufferSize="2048"
-                                  sendTcpNoDelay="true" clientSoTimeout="600" socketSoLinger="700" />
+                                  sendTcpNoDelay="true" timeout="600" linger="700" />
 
 </mule>

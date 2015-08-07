@@ -52,6 +52,8 @@ import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.registry.RegistryDelegatingInjector;
+import org.mule.serialization.internal.JavaObjectSerializer;
 import org.mule.util.ClassUtils;
 import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
@@ -100,13 +102,22 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setworkListener(getWorkListener());
         muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
         muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
-        muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(),muleContext));
+        muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(), muleContext));
+
         DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
         muleContext.setRegistryBroker(registryBroker);
-        muleContext.setMuleRegistry(new MuleRegistryHelper(registryBroker, muleContext));
+        MuleRegistryHelper muleRegistry = new MuleRegistryHelper(registryBroker, muleContext);
+        muleContext.setMuleRegistry(muleRegistry);
+        muleContext.setInjector(new RegistryDelegatingInjector(muleRegistry));
+
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
         muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
+
+        JavaObjectSerializer defaultObjectSerializer = new JavaObjectSerializer();
+        defaultObjectSerializer.setMuleContext(muleContext);
+        muleContext.setObjectSerializer(defaultObjectSerializer);
+
         return muleContext;
     }
 
@@ -119,7 +130,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     {
         this.config = config;
     }
-    
+
     public void setWorkManager(WorkManager workManager)
     {
         this.workManager = workManager;
@@ -129,12 +140,12 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     {
         this.workListener = workListener;
     }
-    
+
     public void setNotificationManager(ServerNotificationManager notificationManager)
     {
         this.notificationManager = notificationManager;
     }
-    
+
     protected MuleConfiguration getMuleConfiguration()
     {
         if (config != null)
@@ -173,10 +184,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         if (!(manager instanceof MuleContextLifecycleManager))
         {
             Message msg = MessageFactory.createStaticMessage(
-                "lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
+                    "lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
             throw new MuleRuntimeException(msg);
         }
-        
+
         lifecycleManager = (MuleContextLifecycleManager) manager;
     }
 
@@ -251,8 +262,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         final MuleConfiguration config = getMuleConfiguration();
         // still can be embedded, but in container mode, e.g. in a WAR
         final String threadPrefix = config.isContainerMode()
-                ? String.format("[%s].Mule", config.getId())
-                : "MuleServer";
+                                    ? String.format("[%s].Mule", config.getId())
+                                    : "MuleServer";
         ImmutableThreadingProfile threadingProfile = createMuleWorkManager();
         return new MuleWorkManager(threadingProfile, threadPrefix, config.getShutdownTimeout());
     }
@@ -260,16 +271,16 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     protected ImmutableThreadingProfile createMuleWorkManager()
     {
         return new ImmutableThreadingProfile(
-                    Integer.valueOf(System.getProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE))),
-                    ThreadingProfile.DEFAULT_MAX_THREADS_IDLE,
-                    ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE,
-                    ThreadingProfile.DEFAULT_MAX_THREAD_TTL,
-                    ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT,
-                    ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION,
-                    ThreadingProfile.DEFAULT_DO_THREADING,
-                    null,
-                    null
-            );
+                Integer.valueOf(System.getProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE))),
+                ThreadingProfile.DEFAULT_MAX_THREADS_IDLE,
+                ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE,
+                ThreadingProfile.DEFAULT_MAX_THREAD_TTL,
+                ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT,
+                ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION,
+                ThreadingProfile.DEFAULT_DO_THREADING,
+                null,
+                null
+        );
     }
 
     protected DefaultWorkListener createWorkListener()
@@ -278,6 +289,11 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     }
 
     protected ServerNotificationManager createNotificationManager()
+    {
+        return createDefaultNotificationManager();
+    }
+
+    public static ServerNotificationManager createDefaultNotificationManager()
     {
         ServerNotificationManager manager = new ServerNotificationManager();
         manager.addInterfaceToType(MuleContextNotificationListener.class,
@@ -300,7 +316,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
                                    TransactionNotification.class);
         manager.addInterfaceToType(PipelineMessageNotificationListener.class,
                                    PipelineMessageNotification.class);
-        manager.addInterfaceToType(AsyncMessageNotificationListener.class, 
+        manager.addInterfaceToType(AsyncMessageNotificationListener.class,
                                    AsyncMessageNotification.class);
         manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
         return manager;
@@ -310,10 +326,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public String toString()
     {
         return ClassUtils.getClassName(getClass()) +
-            "{muleConfiguration=" + config +
-            ", lifecycleManager=" + lifecycleManager +
-            ", workManager=" + workManager +
-            ", workListener=" + workListener +
-            ", notificationManager=" + notificationManager + "}";
+               "{muleConfiguration=" + config +
+               ", lifecycleManager=" + lifecycleManager +
+               ", workManager=" + workManager +
+               ", workListener=" + workListener +
+               ", notificationManager=" + notificationManager + "}";
     }
 }

@@ -9,9 +9,9 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -142,6 +142,83 @@
                                             <xsd:annotation>
                                                 <xsd:documentation>
                                                     The time difference between creation and expiry time in seconds.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
+                                <xsd:element name="wss-sign" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Signs the SOAP request, adding the signature as a security header in the SOAP envelope.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="tlsContext-ref" type="xsd:string" use="required" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Reference to a TLS context that will be used to sign the request. This context must have a
+                                                    key store defined. The private key of this store will be used to sign the request.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
+                                <xsd:element name="wss-verify-signature" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Verifies the signature of the SOAP response.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="tlsContext-ref" type="xsd:string" use="optional" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Reference to a TLS context that will be used to verify the signature of the response. The certificates in the
+                                                    trust store of this context will be used to validate the signature. If no TLS context is provided, the default
+                                                    certificates of the JVM will be used.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
+                                <xsd:element name="wss-encrypt" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Encrypts the SOAP request.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="tlsContext-ref" type="xsd:string" use="optional" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Reference to a TLS context that will be used to encrypt the request. The public key for the specified
+                                                    alias will be used to encrypt the request. If no TLS context is provided, the default
+                                                    certificates of the JVM will be used.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                        <xsd:attribute name="alias" type="xsd:string" use="required" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Alias of the certificate to use for encryption. An entry in the trust store must exist for this alias.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
+                                <xsd:element name="wss-decrypt" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Decrypts the SOAP response.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="tlsContext-ref" type="xsd:string" use="required" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    Reference to a TLS context that will be used. The private key of this key store
+                                                    will be used to decrypt the response.
                                                 </xsd:documentation>
                                             </xsd:annotation>
                                         </xsd:attribute>

@@ -264,9 +264,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     private static org.w3c.dom.Document parseXML(InputSource source) throws Exception
     {
-        DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
-
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
         return factory.newDocumentBuilder().parse(source);
     }
 
@@ -274,8 +273,20 @@ public class XMLUtils extends org.mule.util.XMLUtils
      * Returns an XMLStreamReader for an object of unknown type if possible.
      * @return null if no XMLStreamReader can be created for the object type
      * @throws XMLStreamException
+     * @deprecated As of 3.7.0, use {@link #toXMLStreamReader(javax.xml.stream.XMLInputFactory, org.mule.api.MuleEvent, Object)} instead.
      */
+    @Deprecated
     public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, Object obj) throws XMLStreamException
+    {
+        return toXMLStreamReader(factory, RequestContext.getEvent(), obj);
+    }
+
+    /**
+     * Returns an XMLStreamReader for an object of unknown type if possible.
+     * @return null if no XMLStreamReader can be created for the object type
+     * @throws XMLStreamException
+     */
+    public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, MuleEvent event, Object obj) throws XMLStreamException
     {
         if (obj instanceof javax.xml.stream.XMLStreamReader)
         {
@@ -333,6 +344,19 @@ public class XMLUtils extends org.mule.util.XMLUtils
         {
             // TODO Handle encoding/charset?
             return factory.createXMLStreamReader(new ByteArrayInputStream((byte[]) obj));
+        }
+        else if (obj instanceof OutputHandler)
+        {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try
+            {
+                ((OutputHandler)obj).write(event, outputStream);
+            }
+            catch (IOException e)
+            {
+                throw new XMLStreamException(e);
+            }
+            return factory.createXMLStreamReader(new ByteArrayInputStream(outputStream.toByteArray()));
         }
         else
         {

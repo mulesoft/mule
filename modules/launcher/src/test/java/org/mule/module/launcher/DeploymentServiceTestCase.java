@@ -6,12 +6,16 @@
  */
 package org.mule.module.launcher;
 
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -34,11 +38,13 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.TestApplicationFactory;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.domain.TestDomainFactory;
 import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -82,6 +88,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final String MULE_CONFIG_XML_FILE = "mule-config.xml";
     private static final String EMPTY_APP_CONFIG_XML = "/empty-config.xml";
     private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
+    private static final String PROPERTIES_APP_CONFIG_XML = "/app-properties-config.xml";
 
     //APP constants
     private static final ArtifactDescriptor dummyAppDescriptor = new ArtifactDescriptor("dummy-app", "/dummy-app.zip", "/dummy-app", null, null);
@@ -90,6 +97,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor brokenAppWithFunkyNameDescriptor = new ArtifactDescriptor("broken-app+", "/broken-app+.zip", null, "brokenApp+.zip", null);
     private static final ArtifactDescriptor incompleteAppDescriptor = new ArtifactDescriptor("incompleteApp", "/incompleteApp.zip", "/incompleteApp", "incompleteApp.zip", null);
     private static final ArtifactDescriptor waitAppDescriptor = new ArtifactDescriptor("wait-app", "/wait-app.zip", "/wait-app", "wait-app.zip", "mule-config.xml");
+    private static final ArtifactDescriptor sharedPluginLibAppDescriptor = new ArtifactDescriptor("shared-plugin-lib-app", "/shared-plugin-lib-app.zip", "/shared-plugin-lib-app", "shared-plugin-lib-app.zip", "mule-config.xml");
 
     //Domain constants
     private static final ArtifactDescriptor brokenDomainDescriptor = new ArtifactDescriptor("brokenDomain", "/broken-domain.zip", null, "brokenDomain.zip", "/broken-config.xml");
@@ -104,6 +112,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor httpSharedDomainBundle = new ArtifactDescriptor("http-shared-domain", "/http-shared-domain.zip", null, null, null);
     private static final ArtifactDescriptor waitDomainDescriptor = new ArtifactDescriptor("wait-domain", "/wait-domain.zip", "/wait-domain", "wait-domain.zip", "mule-domain-config.xml");
 
+    private static final ArtifactDescriptor sharedHttpDomainDescriptor = new ArtifactDescriptor("shared-http-domain", "/shared-http-domain.zip", "/shared-http-domain", "shared-http-domain.zip", "mule-domain-config.xml");
+    private static final ArtifactDescriptor sharedHttpAppADescriptor = new ArtifactDescriptor("shared-http-app-a", "/shared-http-app-a.zip", "/shared-http-app-a", "shared-http-app-a.zip", "mule-config.xml");
+    private static final ArtifactDescriptor sharedHttpAppBDescriptor = new ArtifactDescriptor("shared-http-app-b", "/shared-http-app-b.zip", "/shared-http-app-b", "shared-http-app-b.zip", "mule-config.xml");
 
     protected File muleHome;
     protected File appsDir;
@@ -115,13 +126,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Rule
     public SystemProperty changeChangeInterval = new SystemProperty(DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY, "10");
 
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("httpPort");
+
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         // set up some mule home structure
         final String tmpDir = System.getProperty("java.io.tmpdir");
-        muleHome = new File(tmpDir, getClass().getSimpleName() + System.currentTimeMillis());
+        muleHome = new File(new File(tmpDir, "mule home"), getClass().getSimpleName() + System.currentTimeMillis());
         appsDir = new File(muleHome, "apps");
         appsDir.mkdirs();
         domainsDir = new File(muleHome, "domains");
@@ -171,6 +185,38 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // mule-app.properties from the zip archive must have loaded properly
         assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+    }
+
+    @Test
+    public void extensionManagerPresent() throws Exception
+    {
+        addPackedAppFromResource(dummyAppDescriptor.zipPath);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+
+        final Application app = findApp(dummyAppDescriptor.id, 1);
+        assertThat(app.getMuleContext().getExtensionManager(), is(notNullValue()));
+    }
+
+    @Test
+    public void appHomePropertyIsPresent() throws Exception
+    {
+        addExplodedAppFromResource(dummyAppDescriptor.zipPath);
+        changeConfigFile(dummyAppDescriptor.path, PROPERTIES_APP_CONFIG_XML);
+
+        deploymentService.start();
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+
+        final Application app = findApp(dummyAppDescriptor.id, 1);
+        final MuleRegistry registry = getMuleRegistry(app);
+
+        Map<String, Object> appProperties = registry.get("appProperties");
+        assertThat(appProperties, is(notNullValue()));
+
+        String appHome = (String) appProperties.get("appHome");
+        assertThat(new File(appHome).exists(), is(true));
     }
 
     @Test
@@ -1148,6 +1194,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void deploysAppWithPluginSharedLibrary() throws IOException
+    {
+        addPackedAppFromResource(sharedPluginLibAppDescriptor.zipPath);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedPluginLibAppDescriptor.id);
+        assertAppsDir(NONE, new String[] {sharedPluginLibAppDescriptor.id}, true);
+        assertApplicationAnchorFileExists(sharedPluginLibAppDescriptor.id);
+    }
+
+    @Test
     public void synchronizesDeploymentOnStart() throws Exception
     {
         addPackedAppFromResource(emptyAppDescriptor.zipPath);
@@ -1436,6 +1494,30 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
         assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
         assertDomainDir(NONE, new String[] {dummyDomainDescriptor.id}, true);
+    }
+
+    @Test
+    public void redeployedDomainsAreDifferent() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+        Domain firstDomain = deploymentService.getDomains().get(0);
+
+        reset(domainDeploymentListener);
+
+        addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+
+        assertUndeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+        Domain secondDomain = deploymentService.getDomains().get(0);
+
+        assertNotSame(firstDomain, secondDomain);
     }
 
     @Test
@@ -1828,6 +1910,60 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void refreshDomainClassloaderAfterRedeployment() throws Exception
+    {
+        deploymentService.start();
+
+        ArtifactDescriptor domainDescriptor = sharedHttpDomainDescriptor;
+        ArtifactDescriptor appADescriptor = sharedHttpAppADescriptor;
+        ArtifactDescriptor appBDescriptor = sharedHttpAppBDescriptor;
+
+        // Deploy domain and apps and wait until success
+        addPackedDomainFromResource(domainDescriptor.zipPath);
+        addPackedAppFromResource(appADescriptor.zipPath);
+        addPackedAppFromResource(appBDescriptor.zipPath);
+        assertDeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
+
+        // Ensure resources are registered at domain's registry
+        Domain domain = findADomain(domainDescriptor.id, 1);
+        assertThat(domain.getMuleContext().getRegistry().get("http-listener-config"), not(is(nullValue())));
+
+        ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        // Force redeployment by touching the domain's config file
+        File domainFolder = new File(domainsDir.getPath(), domainDescriptor.id);
+        File configFile = new File(domainFolder, domainDescriptor.configFilePath);
+        FileUtils.touch(configFile);
+
+        assertUndeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
+        assertUndeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
+        assertUndeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
+
+        assertDeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
+
+        domain = findADomain(domainDescriptor.id, 1);
+        ArtifactClassLoader artifactClassLoaderAfterRedeployment = domain.getArtifactClassLoader();
+
+        // Ensure that after redeployment the domain's class loader has changed
+        assertThat(artifactClassLoaderAfterRedeployment, not(sameInstance(initialArtifactClassLoader)));
+
+        // Undeploy domain and apps
+        removeAppAnchorFile(appADescriptor.id);
+        removeAppAnchorFile(appBDescriptor.id);
+        removeDomainAnchorFile(domainDescriptor.id);
+        assertUndeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
+        assertUndeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
+        assertUndeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
+    }
+
+    @Test
     public void redeploysInvalidZipDomainAfterSuccessfulDeploymentOnStartup() throws IOException
     {
         addPackedDomainFromResource(emptyDomainDescriptor.zipPath);
@@ -2096,15 +2232,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void doRedeployAppByChangingConfigFileWithGoodOne(String applicationPath) throws Exception
     {
-        doRedeployAppByChangingConfigFile(applicationPath, EMPTY_APP_CONFIG_XML);
+        changeConfigFile(applicationPath, EMPTY_APP_CONFIG_XML);
     }
 
     private void doRedeployAppByChangingConfigFileWithBadOne(String applicationPath) throws Exception
     {
-        doRedeployAppByChangingConfigFile(applicationPath, BAD_APP_CONFIG_XML);
+        changeConfigFile(applicationPath, BAD_APP_CONFIG_XML);
     }
 
-    private void doRedeployAppByChangingConfigFile(String applicationPath, String configFile) throws Exception
+    private void changeConfigFile(String applicationPath, String configFile) throws Exception
     {
         File originalConfigFile = new File(appsDir + applicationPath, MULE_CONFIG_XML_FILE);
         URL url = getClass().getResource(configFile);

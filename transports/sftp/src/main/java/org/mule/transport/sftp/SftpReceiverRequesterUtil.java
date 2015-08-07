@@ -188,7 +188,7 @@ public class SftpReceiverRequesterUtil
             String archiveTmpReceivingDir = sftpUtil.getArchiveTempReceivingDir();
             String archiveTmpSendingDir = sftpUtil.getArchiveTempSendingDir();
 
-            InputStream is = new SftpInputStream(client, fileInputStream, fileName, connector.isAutoDelete(),
+            SftpInputStream is = new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(),
                 endpoint);
 
             // TODO ML FIX. Refactor to util-class...
@@ -213,13 +213,28 @@ public class SftpReceiverRequesterUtil
         // This special InputStream closes the SftpClient when the stream is closed.
         // The stream will be materialized in a Message Dispatcher or Service
         // Component
-        return new SftpInputStream(client, fileInputStream, fileName, connector.isAutoDelete(), endpoint);
+        return new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(), endpoint);
+    }
+
+    private boolean determineAutoDelete()
+    {
+        boolean autoDelete;
+        String autoDeleteProperty = (String) endpoint.getProperty("autoDelete");
+        if (autoDeleteProperty == null)
+        {
+            autoDelete = connector.isAutoDelete();
+        }
+        else
+        {
+            autoDelete = Boolean.valueOf(autoDeleteProperty);
+        }
+        return autoDelete;
     }
 
     private InputStream archiveFileUsingTempDirs(String archive,
                                                  String archiveTmpReceivingDir,
                                                  String archiveTmpSendingDir,
-                                                 InputStream is,
+                                                 SftpInputStream is,
                                                  String fileNamePart,
                                                  File archiveFile) throws IOException
     {
@@ -271,10 +286,10 @@ public class SftpReceiverRequesterUtil
             logger.debug("Return SftpFileArchiveInputStream for archiveTmpSendingFile ("
                          + archiveTmpSendingFile + ")...");
         }
-        return new SftpFileArchiveInputStream(archiveTmpSendingFile, archiveFile);
+        return new SftpFileArchiveInputStream(archiveTmpSendingFile, archiveFile, is);
     }
 
-    private InputStream archiveFile(InputStream is, File archiveFile) throws IOException
+    private InputStream archiveFile(SftpInputStream is, File archiveFile) throws IOException
     {
         File archiveFolder = FileUtils.newFile(archiveFile.getParentFile().getPath());
         if (!archiveFolder.exists())
@@ -297,7 +312,7 @@ public class SftpReceiverRequesterUtil
         {
             logger.debug("*** Return SftpFileArchiveInputStream for archiveFile...");
         }
-        return new SftpFileArchiveInputStream(archiveFile);
+        return new SftpFileArchiveInputStream(archiveFile, is);
     }
 
     /**

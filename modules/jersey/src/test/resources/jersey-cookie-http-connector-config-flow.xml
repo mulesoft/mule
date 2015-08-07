@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:jersey="http://www.mulesoft.org/schema/mule/jersey"
+	xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    	http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/current/mule-jersey.xsd
+    	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config host="localhost" port="${httpPort}" name="httpConfig" />
+
+	<spring:bean id="jerseyComponent" class="org.mule.module.jersey.HelloWorldCookieResource" />
+
+	<flow name="RequestEchoService">
+        <http:listener config-ref="httpConfig" path="*" />
+
+		<jersey:resources>
+			<component>
+				<spring-object bean="jerseyComponent" />
+			</component>
+		</jersey:resources>
+	</flow>
+
+</mule>

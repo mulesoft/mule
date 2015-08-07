@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.plugin;
 
+import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
@@ -24,6 +25,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 public class PluginDescriptorParser
 {
+
     protected static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
 
     private ApplicationDescriptor appDescriptor;
@@ -38,7 +40,7 @@ public class PluginDescriptorParser
     public Set<PluginDescriptor> parse() throws IOException
     {
         // parse plugins
-        final File pluginsDir = new File(appDir, "plugins");
+        final File pluginsDir = new File(appDir, MuleFoldersUtil.PLUGINS_FOLDER);
         // TODO decide if we want to support 'exploded' plugins, for now no
         String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
         if (pluginZips == null || pluginZips.length == 0)

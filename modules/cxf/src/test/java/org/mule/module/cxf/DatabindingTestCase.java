@@ -6,94 +6,102 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
-
+import static org.junit.Assume.assumeThat;
+import static org.junit.runners.Parameterized.Parameter;
+import static org.junit.runners.Parameterized.Parameters;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class DatabindingTestCase extends FunctionalTestCase
 {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
+    private static final String DATABINDING_CONF_HTTPN_XML = "databinding-conf-httpn.xml";
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Parameter(0)
+    public String configFile;
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"databinding-conf.xml"},
+                {DATABINDING_CONF_HTTPN_XML}
+        });
+    }
 
     @Override
     protected String getConfigFile()
     {
-        return "databinding-conf.xml";
+        return configFile;
     }
 
     @Test
     public void testEchoWsdl() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInbound")).getAddress()
-                                            + "?wsdl", 5000);
-        assertNotNull(result.getPayload());
+        assumeThat(configFile, is(not(equalTo(DATABINDING_CONF_HTTPN_XML)))); // New http module doesn't support urls like "cxf:*"
+        doTest("Echo");
     }
 
     @Test
     public void testEchoWsdlAegisBinding() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInboundAegis")).getAddress()
-                                            + "?wsdl", 5000);
-        assertNotNull(result.getPayload());
+        doTest("aegis");
     }
 
     @Test
     public void testEchoWsdlSourceBinding() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInboundSource")).getAddress()
-                                            + "?wsdl", 5000);
-        assertNotNull(result.getPayload());
+        doTest("source");
     }
 
     @Test
     public void testEchoWsdlJaxbBinding() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInboundJaxb")).getAddress()
-                                            + "?wsdl", 5000);
-        assertNotNull(result.getPayload());
+        doTest("jaxb");
     }
 
     @Test
     public void testEchoWsdlJibxBinding() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInboundJibx")).getAddress()
-                                            + "?wsdl", 5000);
-        assertNotNull(result.getPayload());
+        doTest("jibx");
     }
+
     @Test
     public void testEchoWsdlStaxBinding() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInboundStax")).getAddress()
-                                            + "?wsdl", 5000);
-        assertNotNull(result.getPayload());
+        doTest("stax");
     }
 
     @Test
     public void testEchoWsdlCustomBinding() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInboundCustom")).getAddress()
-                                            + "?wsdl", 5000);
+        doTest("custom");
+    }
+
+    private void doTest(String service) throws Exception
+    {
+        MuleMessage result = muleContext.getClient().send(String.format("http://localhost:%d/services/%s?wsdl", dynamicPort.getNumber(), service), getTestMuleMessage(null), HTTP_REQUEST_OPTIONS);
         assertNotNull(result.getPayload());
     }
 }

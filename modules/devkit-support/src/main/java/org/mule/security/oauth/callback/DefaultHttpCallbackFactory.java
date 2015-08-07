@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 public class DefaultHttpCallbackFactory implements HttpCallbackFactory
 {
+    private boolean forceOldHttpTransport = false;
 
     @Override
     public HttpCallback createCallback(HttpCallbackAdapter adapter,
@@ -31,10 +32,13 @@ public class DefaultHttpCallbackFactory implements HttpCallbackFactory
                                        MuleContext muleContext,
                                        FlowConstruct flowConstruct) throws MuleException
     {
-        return new DefaultHttpCallback(this.buildCallbackProcessor(authCodeRegex,
+        DefaultHttpCallback callback = new DefaultHttpCallback(this.buildCallbackProcessor(authCodeRegex,
             fetchAccessTokenMessageProcessor, listener), muleContext, adapter.getDomain(),
             adapter.getLocalPort(), adapter.getRemotePort(), adapter.getPath(), adapter.getAsync(),
             flowConstruct.getExceptionListener(), adapter.getConnector());
+
+        callback.setForceOldHttpTransport(forceOldHttpTransport);
+        return callback;
     }
 
     private MessageProcessor buildCallbackProcessor(String authCodeRegex,
@@ -42,8 +46,13 @@ public class DefaultHttpCallbackFactory implements HttpCallbackFactory
                                                     MessageProcessor listener) throws MuleException
     {
         return new DefaultMessageProcessorChainBuilder().chain(
-            new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(authCodeRegex)),
+            new  ExtractAuthorizationCodeMessageProcessor(Pattern.compile(authCodeRegex)),
             fetchAccessTokenMessageProcessor, new CallbackContinuationMessageProcessor(listener)).build();
     }
 
+    @Override
+    public void forceOldHttpTransport(boolean forceOld)
+    {
+        forceOldHttpTransport = forceOld;
+    }
 }

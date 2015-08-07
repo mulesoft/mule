@@ -7,9 +7,12 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -17,6 +20,8 @@ import org.junit.Test;
 
 public class ProxySoapVersionTestCase extends FunctionalTestCase
 {
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+
     String doGoogleSearch = "<urn:doGoogleSearch xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:urn=\"urn:GoogleSearch\">";
 
     // Message using Soap 1.2 version
@@ -53,14 +58,14 @@ public class ProxySoapVersionTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "proxy-soap-version-conf-flow.xml";
+        return "proxy-soap-version-conf-flow-httpn.xml";
     }
 
     @Test
     public void testProxyWithCommentInRequest() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy-soap-version", msgWithComment, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy-soap-version", getTestMuleMessage(msgWithComment), HTTP_REQUEST_OPTIONS);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains(doGoogleSearch));
     }

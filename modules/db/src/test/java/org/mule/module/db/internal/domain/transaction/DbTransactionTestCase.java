@@ -7,6 +7,7 @@
 package org.mule.module.db.internal.domain.transaction;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -39,10 +40,15 @@ public class DbTransactionTestCase extends AbstractMuleTestCase
     private DbTransaction tx;
     private Connection connection;
 
+    private MuleContext muleContext;
+
     @Before
     public void initializeMocks() throws SQLException, TransactionException
     {
-        tx = new DbTransaction(mock(MuleContext.class));
+        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+        when(muleContext.getConfiguration().getId()).thenReturn("myApp");
+
+        tx = new DbTransaction(muleContext);
 
         connection = mock(Connection.class);
 

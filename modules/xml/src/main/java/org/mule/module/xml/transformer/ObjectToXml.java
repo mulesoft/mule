@@ -26,7 +26,7 @@ public class ObjectToXml extends AbstractXStreamTransformer
     public ObjectToXml()
     {
         this.registerSourceType(DataTypeFactory.OBJECT);
-        this.setReturnDataType(DataTypeFactory.STRING);
+        this.setReturnDataType(DataTypeFactory.XML_STRING);
     }
 
     public boolean isAcceptMuleMessage()

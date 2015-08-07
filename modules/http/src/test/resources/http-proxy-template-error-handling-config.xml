@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+
+    <spring:bean name="catchSensingMessageProcessor" class="org.mule.tck.SensingNullMessageProcessor" scope="singleton" />
+    <spring:bean name="rollbackSensingMessageProcessor" class="org.mule.tck.SensingNullMessageProcessor" scope="singleton" />
+
+    <http:listener-config name="proxyConfig" host="localhost" port="${proxyPort}" />
+    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+
+    <flow name="noExceptionStrategyFlow">
+        <http:listener config-ref="proxyConfig" path="noExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
+        <http:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false" />
+    </flow>
+
+    <flow name="catchExceptionStrategyFlow">
+        <http:listener config-ref="proxyConfig" path="catchExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
+        <http:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false" />
+        <catch-exception-strategy>
+            <processor ref="catchSensingMessageProcessor"/>
+            <set-payload value="#[org.mule.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE]"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="rollbackExceptionStrategyFlow">
+        <http:listener config-ref="proxyConfig" path="rollbackExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
+        <http:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false" />
+        <rollback-exception-strategy>
+            <processor ref="rollbackSensingMessageProcessor"/>
+            <set-payload value="#[org.mule.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE]"/>
+        </rollback-exception-strategy>
+    </flow>
+</mule>

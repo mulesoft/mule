@@ -44,6 +44,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
         ir.setThrowOnUnaccepted(false);
         ir.setStorePrefix("foo");
         ir.setStore(new InMemoryObjectStore<String>());
+        ir.setMuleContext(muleContext);
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, getTestFlow(), session);

@@ -9,6 +9,7 @@ package org.mule.test.integration.transport.cxf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
@@ -23,6 +24,7 @@ import java.util.Map;
 import org.apache.cxf.endpoint.Client;
 import org.junit.Test;
 
+@Ignore("BL-38 Need to port for CXF changes")
 public class CxfClientPassivateTestCase extends FunctionalTestCase
 {
     @Override

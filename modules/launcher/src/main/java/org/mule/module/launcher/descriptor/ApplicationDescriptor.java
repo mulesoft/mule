@@ -9,6 +9,7 @@ package org.mule.module.launcher.descriptor;
 import org.mule.module.launcher.plugin.PluginDescriptor;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -42,6 +43,7 @@ public class ApplicationDescriptor
     private Set<String> loaderOverride = new HashSet<String>();
 
     private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>(0);
+    private URL[] sharedPluginLibs = new URL[0];
 
     public String getAppName()
     {
@@ -153,6 +155,16 @@ public class ApplicationDescriptor
     public Set<PluginDescriptor> getPlugins()
     {
         return plugins;
+    }
+
+    public void setSharedPluginLibs(URL[] sharedPluginLibs)
+    {
+        this.sharedPluginLibs = sharedPluginLibs;
+    }
+
+    public URL[] getSharedPluginLibs()
+    {
+        return sharedPluginLibs;
     }
 
     public void setPlugins(Set<PluginDescriptor> plugins)

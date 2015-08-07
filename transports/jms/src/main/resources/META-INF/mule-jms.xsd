@@ -12,9 +12,9 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>The JMS transport provides support for sending messages via JMS queues.</xsd:documentation>
@@ -147,10 +147,10 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="cacheJmsSessions" type="mule:substitutableBoolean">
+        <xsd:attribute name="cacheJmsSessions" type="mule:substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether to cache and re-use the JMS session object instead of recreating the connection each time. NOTE: meant for non-transactional use ONLY.
+                    Whether to cache and re-use the JMS session and producer object instead of recreating them for each request. The default behaviour is to cache JMS Sessions and Producers (previous to 3.6, the default behaviuor was to not cache them). NOTE: This is NOT supported with XA transactions or JMS 1.0.2b.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -757,9 +757,7 @@
     <xsd:element name="caching-connection-factory" type="connectionFactoryPoolType" substitutionGroup="mule:abstract-shared-extension">
         <xsd:annotation>
             <xsd:documentation>
-                Allows to configure a connection factory that caches JMS sessions and producers for a single non-XA JMS connection. You must reference a connection factory though the
-                connectionFactory-ref attribute, and then use this element as the connection factory in the JMS connector.
-                NOTE: as there is a single JMS connection is not recommended to reference the same caching connection factory in multiple connectors.
+                DEPRECATED: This element is deprecated from Mule 3.6.  This can still but used in 3.6, but it not necessary given that from Mule 3.6 JMS connections cache Sessions/Producers by default when a CachingConnectionFactory has not been configured explicitly.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

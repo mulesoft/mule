@@ -9,10 +9,12 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.Methods;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -21,7 +23,6 @@ import org.mule.util.IOUtils;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -32,6 +33,9 @@ import org.junit.Test;
 
 public class CxfBasicTestCase extends FunctionalTestCase
 {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(Methods.POST.name()).build();
+
     private String echoWsdl;
 
     @Rule
@@ -40,7 +44,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "basic-conf-flow.xml";
+        return "basic-conf-flow-httpn.xml";
     }
 
     @Override
@@ -66,24 +70,9 @@ public class CxfBasicTestCase extends FunctionalTestCase
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInbound")).getAddress(), xml, props);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", new DefaultMuleMessage(xml, props, muleContext), HTTP_REQUEST_OPTIONS);
         assertTrue(result.getPayloadAsString().contains("Hello!"));
         String ct = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
-        assertEquals("text/xml; charset=UTF-8", ct);
-    }
-
-    @Test
-    public void testEchoServiceEncoding() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        String message = LocaleMessageHandler.getString("test-data",
-            Locale.JAPAN, "CxfBasicTestCase.testEchoServiceEncoding", new Object[]{});
-        MuleMessage result = client.send("cxf:" + ((InboundEndpoint) muleContext.getRegistry()
-                        .lookupObject("httpInbound")).getAddress() + "?method=echo", message, null);
-        String ct = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
-
-        assertEquals(message, result.getPayload());
         assertEquals("text/xml; charset=UTF-8", ct);
     }
 
@@ -91,8 +80,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
     public void testEchoWsdl() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request(((InboundEndpoint) muleContext.getRegistry()
-                        .lookupObject("httpInbound")).getAddress() + "?wsdl", 5000);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", getTestMuleMessage(null), HTTP_REQUEST_OPTIONS);
         assertNotNull(result.getPayload());
         XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
     }

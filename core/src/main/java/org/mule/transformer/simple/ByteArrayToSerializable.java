@@ -6,12 +6,12 @@
  */
 package org.mule.transformer.simple;
 
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.SerializationUtils;
 
 import java.io.InputStream;
 
@@ -36,16 +36,17 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
     @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
+        ObjectSerializer serializer = muleContext.getObjectSerializer();
         try
         {
             final Object result;
             if (src instanceof byte[])
             {
-                result = SerializationUtils.deserialize((byte[]) src, muleContext);
+                result = serializer.deserialize((byte[]) src);
             }
             else
             {
-                result = SerializationUtils.deserialize((InputStream) src, muleContext);
+                result = serializer.deserialize((InputStream) src);
             }
             return result;
         }

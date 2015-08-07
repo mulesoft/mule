@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.client.MuleClient;
 import org.mule.lifecycle.AbstractLifecycleTracker;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 
 import org.junit.Test;
 
@@ -39,7 +40,8 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
     @Test
     public void testSpringBeanServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, setFlowConstruct, start, stop, springDestroy]";
+        //TODO(pablo.kraan): MERGE - is this correct to have initialise and setFlowConstruct as expected phases?
+        String expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, initialise, setFlowConstruct, start, stop, dispose, springDestroy]";
 
         testComponentLifecycle("SpringBeanService", expectedLifeCycle);
     }
@@ -56,7 +58,8 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
     @Test
     public void testSpringBeanService2Lifecycle() throws Exception
     {
-        String expectedLifeCycle = "[setProperty, setMuleContext, setFlowConstruct, start, stop]";
+        //TODO(pablo.kraan): MERGE - is this correct to have initialise and setFlowConstruct as expected phases?
+        String expectedLifeCycle = "[setProperty, setMuleContext, initialise, setFlowConstruct, start, stop, dispose]";
 
         testComponentLifecycle("SpringBeanService2", expectedLifeCycle);
     }
@@ -134,7 +137,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
     {
         MuleClient client = muleContext.getClient();
         final AbstractLifecycleTracker ltc = (AbstractLifecycleTracker) client.send(
-            "vm://" + serviceName + ".In", null, null).getPayload();
+            "vm://" + serviceName + ".In", getTestMuleMessage(NullPayload.getInstance())).getPayload();
 
         assertNotNull(ltc);
 

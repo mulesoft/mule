@@ -3,4 +3,6 @@ http\://www.mulesoft.org/schema/mule/atom/3.2/mule-atom.xsd=META-INF/mule-atom.x
 http\://www.mulesoft.org/schema/mule/atom/3.3/mule-atom.xsd=META-INF/mule-atom.xsd
 http\://www.mulesoft.org/schema/mule/atom/3.4/mule-atom.xsd=META-INF/mule-atom.xsd
 http\://www.mulesoft.org/schema/mule/atom/3.5/mule-atom.xsd=META-INF/mule-atom.xsd
+http\://www.mulesoft.org/schema/mule/atom/3.6/mule-atom.xsd=META-INF/mule-atom.xsd
+http\://www.mulesoft.org/schema/mule/atom/3.7/mule-atom.xsd=META-INF/mule-atom.xsd
 http\://www.mulesoft.org/schema/mule/atom/current/mule-atom.xsd=META-INF/mule-atom.xsd

@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
@@ -25,6 +26,9 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractFilteringMessageProcessor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link InterceptingMessageProcessor} that filters message flow
@@ -39,6 +43,8 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
  */
 public class MessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Lifecycle
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageFilter.class);
+
     protected Filter filter;
 
     /**
@@ -137,6 +143,8 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         {
             ((Initialisable) unacceptedMessageProcessor).initialise();
         }
+
+        LifecycleUtils.initialiseIfNeeded(filter);
     }
 
     public void start() throws MuleException
@@ -161,5 +169,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         {
             ((Disposable) unacceptedMessageProcessor).dispose();
         }
+
+        LifecycleUtils.disposeIfNeeded(filter, LOGGER);
     }
 }

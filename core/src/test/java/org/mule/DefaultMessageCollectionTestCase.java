@@ -9,9 +9,14 @@ package org.mule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.transformer.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -32,7 +37,7 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
     GrapeFruit grapeFruit = new GrapeFruit();
     Orange orange = new Orange();
 
-    MuleContext muleContext = Mockito.mock(MuleContext.class);
+    MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
 
     @Test
     public void addMuleMessage()
@@ -61,10 +66,10 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
     @Test
     public void addMuleMessageCollection()
     {
-        MuleMessageCollection messageCollection1 = Mockito.mock(MuleMessageCollection.class);
-        MuleMessageCollection messageCollection2 = Mockito.mock(MuleMessageCollection.class);
-        Mockito.when(messageCollection1.getPayload()).thenReturn(new Fruit[]{apple, banana});
-        Mockito.when(messageCollection2.getPayload()).thenReturn(new Fruit[]{grapeFruit, orange});
+        MuleMessageCollection messageCollection1 = mock(MuleMessageCollection.class);
+        MuleMessageCollection messageCollection2 = mock(MuleMessageCollection.class);
+        when(messageCollection1.getPayload()).thenReturn(new Fruit[] {apple, banana});
+        when(messageCollection2.getPayload()).thenReturn(new Fruit[] {grapeFruit, orange});
 
         DefaultMessageCollection messageCollectionUnderTest = new DefaultMessageCollection(muleContext);
         messageCollectionUnderTest.addMessage(messageCollection1);
@@ -88,8 +93,8 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
         MuleMessage message3 = new DefaultMuleMessage(grapeFruit, muleContext);
         MuleMessage message4 = new DefaultMuleMessage(orange, muleContext);
 
-        MuleMessageCollection messageCollection1 = Mockito.mock(MuleMessageCollection.class);
-        Mockito.when(messageCollection1.getPayload()).thenReturn(new Fruit[]{apple, banana});
+        MuleMessageCollection messageCollection1 = mock(MuleMessageCollection.class);
+        when(messageCollection1.getPayload()).thenReturn(new Fruit[] {apple, banana});
 
         DefaultMessageCollection messageCollectionUnderTest = new DefaultMessageCollection(muleContext);
         messageCollectionUnderTest.addMessage(messageCollection1);
@@ -112,12 +117,16 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
     @Test
     public void ensureOnlyOneArrayConversionOnCopy()
     {
-        DefaultMessageCollection original = Mockito.mock(DefaultMessageCollection.class);
-        Mockito.when(original.getMessagesAsArray()).thenReturn(new MuleMessage[]{Mockito.mock(MuleMessage.class)});
+        DefaultMessageCollection original = mock(DefaultMessageCollection.class);
+        MuleMessage message = mock(MuleMessage.class);
+        DataType dataType = mock(DataType.class);
+        when(dataType.cloneDataType()).thenReturn(dataType);
+        when(message.getDataType()).thenReturn(dataType);
+        when(original.getMessagesAsArray()).thenReturn(new MuleMessage[] {message});
 
         new DefaultMessageCollection(original, muleContext, true);
 
-        Mockito.verify(original, Mockito.times(1)).getMessagesAsArray();
+        verify(original, Mockito.times(1)).getMessagesAsArray();
     }
 
 }

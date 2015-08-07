@@ -9,10 +9,10 @@ package org.mule.module.xml.expression;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.expression.AbstractExpressionEvaluator;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
@@ -33,7 +33,7 @@ import org.w3c.dom.Document;
  * quirks with JXPath and the performance is not good.
  */
 @Deprecated
-public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
+public class JXPathExpressionEvaluator extends AbstractExpressionEvaluator implements MuleContextAware
 {
     public static final String NAME = "jxpath";
     /**

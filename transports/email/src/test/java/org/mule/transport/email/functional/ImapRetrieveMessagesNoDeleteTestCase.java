@@ -6,8 +6,23 @@
  */
 package org.mule.transport.email.functional;
 
+import java.util.Collection;
+
+import org.junit.runners.Parameterized;
+
 public class ImapRetrieveMessagesNoDeleteTestCase extends AbstractImapRetrieveMessagesTestCase
 {
+
+    public ImapRetrieveMessagesNoDeleteTestCase(int initialReadMessages)
+    {
+        super(initialReadMessages);
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return READ_MESSAGES_PARAMETERS;
+    }
 
     @Override
     protected String getConfigFile()

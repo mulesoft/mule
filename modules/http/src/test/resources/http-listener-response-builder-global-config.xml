@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
+    <http:response-builder name="globalResponseBuilder">
+        <http:header headerName="User-Agent" value="Mule 3.6.0"/>
+        <http:header headerName="Date" value="#[server.dateTime]" />
+    </http:response-builder>
+
+    <http:response-builder name="globalCompositeResponseBuilder">
+        <http:builder ref="globalResponseBuilder"/>
+        <http:header headerName="User-Agent" value="Mule 3.8.0"/>
+    </http:response-builder>
+
+    <flow name="globalResponseBuilderFlow">
+        <http:listener config-ref="listenerConfig" path="${globalResponseBuilderPath}">
+            <http:response-builder>
+                <http:builder ref="globalResponseBuilder"/>
+            </http:response-builder>
+        </http:listener>
+        <echo-component/>
+    </flow>
+
+    <flow name="globalResponseBuilderCustomizedFlow">
+        <http:listener config-ref="listenerConfig" path="${globalResponseBuilderCustomizedPath}">
+            <http:response-builder>
+                <http:builder ref="globalResponseBuilder"/>
+                <http:header headerName="User-Agent" value="Mule 3.7.0"/>
+            </http:response-builder>
+        </http:listener>
+        <echo-component/>
+    </flow>
+
+    <flow name="globalCompositeResponseBuilderFlow">
+        <http:listener config-ref="listenerConfig" path="${globalCompositeResponseBuilderPath}">
+            <http:response-builder>
+                <http:builder ref="globalCompositeResponseBuilder"/>
+                <http:header headerName="User-Agent" value="Mule 3.7.0"/>
+            </http:response-builder>
+        </http:listener>
+        <echo-component/>
+    </flow>
+
+</mule>

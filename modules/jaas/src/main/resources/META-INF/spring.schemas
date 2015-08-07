@@ -3,4 +3,6 @@ http\://www.mulesoft.org/schema/mule/jaas/3.2/mule-jaas.xsd=META-INF/mule-jaas.x
 http\://www.mulesoft.org/schema/mule/jaas/3.3/mule-jaas.xsd=META-INF/mule-jaas.xsd
 http\://www.mulesoft.org/schema/mule/jaas/3.4/mule-jaas.xsd=META-INF/mule-jaas.xsd
 http\://www.mulesoft.org/schema/mule/jaas/3.5/mule-jaas.xsd=META-INF/mule-jaas.xsd
+http\://www.mulesoft.org/schema/mule/jaas/3.6/mule-jaas.xsd=META-INF/mule-jaas.xsd
+http\://www.mulesoft.org/schema/mule/jaas/3.7/mule-jaas.xsd=META-INF/mule-jaas.xsd
 http\://www.mulesoft.org/schema/mule/jaas/current/mule-jaas.xsd=META-INF/mule-jaas.xsd

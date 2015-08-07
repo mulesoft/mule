@@ -7,6 +7,7 @@
 package org.mule.registry;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
 import org.mule.DefaultMuleMessage;
@@ -29,6 +30,7 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
@@ -40,7 +42,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 {
 
     private boolean threadSafeEvent;
-    private MuleContext muleContext = mock(MuleContext.class);
+    private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
 
     @Test
     public void testSetExceptionPayloadAcrossThreads() throws InterruptedException
@@ -323,8 +325,20 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         }
 
         @Override
+        public DataType<?> getFlowVariableDataType(String key)
+        {
+            return null;
+        }
+
+        @Override
         public void clearFlowVariables()
         {
+        }
+
+        @Override
+        public DataType<?> getSessionVariableDataType(String key)
+        {
+            return null;
         }
 
         @Override
@@ -336,6 +350,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         @Override
         public void setFlowVariable(String key, Object value)
         {
+        }
+
+        @Override
+        public void setFlowVariable(String key, Object value, DataType dataType)
+        {
+
         }
 
         @Override
@@ -358,6 +378,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         @Override
         public void setSessionVariable(String key, Object value)
         {
+        }
+
+        @Override
+        public void setSessionVariable(String key, Serializable value, DataType dataType)
+        {
+
         }
 
         @Override
@@ -385,6 +411,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         @Override
         public void setEnableNotifications(boolean enabled)
         {
+        }
+
+        @Override
+        public boolean isAllowNonBlocking()
+        {
+            return false;
         }
     }
 

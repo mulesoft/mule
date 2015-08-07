@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.coreextension;
 
+import org.mule.CoreExtensionsAware;
 import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
@@ -29,7 +30,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
 
     private final MuleCoreExtensionDiscoverer coreExtensionDiscoverer;
     private final MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver;
-    private List<MuleCoreExtension> coreExtensions = new LinkedList<MuleCoreExtension>();
+    private List<MuleCoreExtension> coreExtensions = new LinkedList<>();
     private DeploymentService deploymentService;
     private List<MuleCoreExtension> orderedCoreExtensions;
     private PluginClassLoaderManager pluginClassLoaderManager;
@@ -116,7 +117,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
     {
         logger.info("Initializing core extensions");
 
-        for (MuleCoreExtension extension : coreExtensions)
+        for (MuleCoreExtension extension : orderedCoreExtensions)
         {
             if (extension instanceof DeploymentServiceAware)
             {
@@ -131,6 +132,11 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
             if (extension instanceof PluginClassLoaderManagerAware)
             {
                 ((PluginClassLoaderManagerAware) extension).setPluginClassLoaderManager(pluginClassLoaderManager);
+            }
+
+            if (extension instanceof CoreExtensionsAware)
+            {
+                ((CoreExtensionsAware) extension).setCoreExtensions(orderedCoreExtensions);
             }
 
             extension.initialise();

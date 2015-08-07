@@ -20,6 +20,9 @@
                 <cxf:features>
                     <cxf-core:logging/>
                 </cxf:features>
+                <cxf:inInterceptors>
+                    <spring:bean class="org.apache.cxf.interceptor.URIMappingInterceptor"/>
+                </cxf:inInterceptors>
             </cxf:jaxws-service>
         </inbound-endpoint>
         <component>

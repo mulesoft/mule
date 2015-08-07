@@ -2,7 +2,7 @@ GETTING STARTED WITH MULE
 =========================
 
 This file describes the basics of how to get started using Mule.
-For full details, see http://www.mulesoft.org/documentation/display/current/Installation+Guide.
+For full details, see https://developer.mulesoft.com/docs/display/current/Installing.
 
 
 Setting Up Your Environment
@@ -39,7 +39,6 @@ The Mule distribution contains the following directories and files:
                 line
 /conf           Configuration files
 /docs           API documentation (Javadoc) for Mule and its sub-projects
-/examples       Example applications you can run and try building yourself
 /lib/boot       Libraries used by the Java Service Wrapper to boot the server
 /lib/endorsed   Endorsed Java libraries used by Mule
 /lib/mule       Mule libraries
@@ -62,12 +61,13 @@ Running Mule
 Starting with the Examples
 --------------------------
 
-The examples directory provides you with several Mule
-applications , which you can use as templates for creating a Mule project.
+Up-to-date Mule ESB examples can be found in:
 
-All of the examples come pre-built. To test an example, just copy
-its zip file into the applications folder ($MULE_HOME/apps), then
-start Mule. For more information see http://www.mulesoft.org/documentation/display/current/Mule+Examples.
+- MuleSoft documentation - http://developer.mulesoft.com/docs
+- Anypoint Studio - downloadable from https://www.mulesoft.com/platform/studio
+- Anypoint Exchange - https://anypoint.mulesoft.com/exchange/
+
+From the Exchange, you can also access the direct URL for the example that you can download using a utility like wget.
 
 
 Using the Command Prompt
@@ -87,7 +87,7 @@ using start, stop, or restart as the first parameter as needed.
     mule start|stop|restart
 
 For more information on running Mule, see
-http://www.mulesoft.org/documentation/display/current/Downloading+Launching+Mule+ESB.
+https://developer.mulesoft.com/docs/display/current/Downloading+and+Starting+Mule+ESB.
 
 
 Where Do I Go Next?
@@ -96,17 +96,14 @@ Where Do I Go Next?
 This document has provided a brief overview of getting started with Mule. What follows is information about where to go next.
 
 - For complete information on using Mule, go to the Mule User Guide at:
-http://www.mulesoft.org/documentation/display/current/Home. To access these pages, register a Mule Community user.  Registration is free and only takes a few moments.
-
-- To run the examples you can launch Mule ESB with the command:
-$MULE_HOME/bin/mule_examples
+https://developer.mulesoft.com/docs/display/current/Home
 
 - As a Mule Enterprise user, if you need assistance see the support page at
-http://www.mulesoft.com/enterprise-subscriptions-and-support
+https://www.mulesoft.com/support-and-services/mule-esb-support-license-subscription
 
 - If you are evaluating Mule and want to find out about subscription
 options, you can submit a request for MuleSoft to contact you by
-going to http://www.mulesoft.com/buy-mule-esb.
+going to https://www.mulesoft.com/platform/soa/mule-esb-open-source-esb.
 
 - If you experience problems with the Mule software or documentation,
 please log an issue in the MuleSoft issue-tracking system, located at

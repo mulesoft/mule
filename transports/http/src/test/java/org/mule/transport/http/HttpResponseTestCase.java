@@ -6,10 +6,11 @@
  */
 package org.mule.transport.http;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -31,7 +32,10 @@ public class HttpResponseTestCase extends FunctionalTestCase
     private static final String HTTP_BODY = "<html><head></head><body><p>This is the response body</p></body></html>";
 
     @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
     protected String getConfigFile()
@@ -46,7 +50,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("errorMessage", "ERROR !!!! ");
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/error", muleMessage, properties);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/error", muleMessage);
         assertTrue(response.getPayloadAsString().contains("ERROR !!!!"));
         assertEquals("" + HttpConstants.SC_INTERNAL_SERVER_ERROR, response.getInboundProperty("http.status"));
     }
@@ -55,8 +59,8 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testHttpResponseMove() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/move", muleMessage);
+        MuleMessage muleMessage = getTestMuleMessage(HTTP_BODY);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/move", muleMessage);
         assertEquals(HTTP_BODY, response.getPayloadAsString());
         assertEquals("" + HttpConstants.SC_MOVED_PERMANENTLY, response.getInboundProperty("http.status"));
         assertEquals("http://localhost:9090/resources/moved", response.<Object>getInboundProperty("Location"));
@@ -66,8 +70,8 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testHttpResponseAll() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/all", muleMessage);
+        MuleMessage muleMessage = getTestMuleMessage(HTTP_BODY);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/all", muleMessage);
         assertEquals("Custom body", response.getPayloadAsString());
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
         assertEquals("public,no-cache,must-revalidate,max-age=3600,no-transform", response.getInboundProperty("Cache-Control"));
@@ -87,7 +91,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         Map<String, Object> properties = populateProperties();
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/allExpressions",  muleMessage, properties);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/allExpressions",  muleMessage);
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
         assertEquals("max-age=3600", response.getInboundProperty("Cache-Control"));
         assertEquals("Thu, 01 Dec 2014 16:00:00 GMT", response.getInboundProperty("Expires"));
@@ -97,6 +101,38 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertEquals(2, cookies.length);
         validateCookie(cookies[0]);
         validateCookie(cookies[1]);
+    }
+
+    @Test
+    public void headersAreAddedWithNestedResponseBuilderFromHttpModule() throws Exception
+    {
+        assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/nested");
+    }
+
+    @Test
+    public void headersAreAddedWithGlobalResponseBuilderFromHttpModule() throws Exception
+    {
+        assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/global");
+    }
+
+    @Test
+    public void headersAreAddedWithNestedErrorResponseBuilderFromHttpModule() throws Exception
+    {
+        assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/nestedError");
+    }
+
+    @Test
+    public void headersAreAddedWithGlobalErrorResponseBuilderFromHttpModule() throws Exception
+    {
+        assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/globalError");
+    }
+
+
+    private void assertHeaderInResponse(String url) throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage response = client.request(url, RECEIVE_TIMEOUT);
+        assertThat((String) response.getOutboundProperty("testHeader"), equalTo("testValue"));
     }
 
     private Map<String, Object> populateProperties()

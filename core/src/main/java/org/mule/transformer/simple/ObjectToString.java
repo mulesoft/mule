@@ -39,9 +39,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         registerSourceType(DataTypeFactory.BYTE_ARRAY);
         registerSourceType(DataTypeFactory.INPUT_STREAM);
         registerSourceType(DataTypeFactory.create(OutputHandler.class));
-        //deliberately set the mime for this transformer to text plain so that other transformers
-        //that serialize string types such as XML or JSON will not match this
-        setReturnDataType(DataTypeFactory.TEXT_STRING);
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
     @Override

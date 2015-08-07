@@ -7,7 +7,6 @@
 package org.mule.module.launcher.domain;
 
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -33,7 +32,9 @@ import org.mule.util.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -62,11 +63,22 @@ public class DefaultMuleDomain implements Domain
         this.domainClassLoaderRepository = domainClassLoaderRepository;
         this.deploymentListener = new NullDeploymentListener();
         this.name = name;
+        refreshClassLoaderAndLoadConfigResourceFile();
+    }
+
+    private void refreshClassLoaderAndLoadConfigResourceFile(){
         this.deploymentClassLoader = domainClassLoaderRepository.getDomainClassLoader(name);
-        URL resource = deploymentClassLoader.findLocalResource(this.DOMAIN_CONFIG_FILE_LOCATION);
+        URL resource = deploymentClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION);
         if (resource != null)
         {
-            this.configResourceFile = new File(resource.getFile());
+            try
+            {
+                this.configResourceFile = new File(URLDecoder.decode(resource.getFile(), "UTF-8"));
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                throw new RuntimeException("Unable to find config resource file: " + resource.getFile());
+            }
         }
     }
 
@@ -136,6 +148,7 @@ public class DefaultMuleDomain implements Domain
         {
             logger.info(miniSplash(String.format("New domain '%s'", getArtifactName())));
         }
+        refreshClassLoaderAndLoadConfigResourceFile();
     }
 
 

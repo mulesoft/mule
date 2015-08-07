@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="config" host="localhost" port="${httpPort}" />
+
+    <flow name="headerList">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:header headerName="testName1" value="testValue1" />
+                <http:header headerName="#[headerName]" value="#[headerValue]" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="headerMap">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:headers expression="#[headers]" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="headerOverride">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:header headerName="testName1" value="testValue1" />
+                <http:headers expression="#[headers]" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="httpHeaders">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:header headerName="http.scheme" value="testValue1" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="connectionHeader">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:header headerName="Connection" value="close" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="outboundProperties">
+        <http:request config-ref="config" path="testPath" method="POST"/>
+    </flow>
+
+    <flow name="hostHeader">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:header headerName="Host" value="${host}" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="transferEncodingHeader">
+        <http:request config-ref="config" path="testPath" method="POST">
+            <http:request-builder>
+                <http:header headerName="Transfer-Encoding" value="${encoding}" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+</mule>

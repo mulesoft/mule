@@ -9,9 +9,11 @@ package org.mule.test.integration.transport.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
@@ -65,7 +67,8 @@ public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
         muleContext.setExceptionListener(exceptionStrategy);
 
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:28181/ScratchCardServiceV1", msg, null);
+        MuleMessage result = client.send("http://localhost:28181/ScratchCardServiceV1", getTestMuleMessage(msg),
+                                         HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull("The result shouln't have been null", result);
         final String payloadAsString = result.getPayloadAsString();
         assertNotNull("The payloadAsString shouln't have been null", payloadAsString);

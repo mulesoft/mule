@@ -1035,6 +1035,16 @@ public class CoreMessages extends MessageFactory
 
     public static Message transformerNotImplementDiscoverable(Transformer transformer)
     {
+        return transformerNotImplementDiscoverable(transformer.toString());
+    }
+
+    public static Message transformerNotImplementDiscoverable(Class<? extends Transformer> transformer)
+    {
+        return transformerNotImplementDiscoverable(transformer.getName());
+    }
+
+    private static Message transformerNotImplementDiscoverable(String transformer)
+    {
         return factory.createMessage(BUNDLE_PATH, 255, transformer);
     }
 

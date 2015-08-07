@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/heisenberg" attributeFormDefault="unqualified" elementFormDefault="qualified">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+    <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
+    <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:annotation>
+                        <xs:documentation>Default configuration</xs:documentation>
+                    </xs:annotation>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element minOccurs="0" maxOccurs="1" name="enemies">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="enemy">
+                                        <xs:complexType>
+                                            <xs:simpleContent>
+                                                <xs:extension base="xs:string">
+                                                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                                </xs:extension>
+                                            </xs:simpleContent>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="next-door">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.module.extension.KnockeableDoor"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="ricin-packs">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ricin-pack">
+                                        <xs:complexType>
+                                            <xs:complexContent>
+                                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.module.extension.Ricin"></xs:extension>
+                                            </xs:complexContent>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:choice>
+                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="optional" name="age"></xs:attribute>
+                    <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="required" name="dateOfBirth"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="required" name="dateOfDeath"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.HealthStatusEnumType" use="required" name="initialHealth"></xs:attribute>
+                    <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="myName"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="nextDoor"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.module.extension.KnockeableDoor">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="previous">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.module.extension.KnockeableDoor"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="door">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.module.extension.KnockeableDoor">
+                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.module.extension.Ricin">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="destination">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.module.extension.KnockeableDoor"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionLong" use="required" name="microgramsPerKilo"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="ricin">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.module.extension.Ricin">
+                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-message-processor" abstract="true" name="heisenberg-empire"></xs:element>
+    <xs:group name="heisenberg-empire-group">
+        <xs:choice>
+            <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" ref="heisenberg-empire"></xs:element>
+        </xs:choice>
+    </xs:group>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="AliasType" substitutionGroup="heisenberg-empire" name="alias"></xs:element>
+    <xs:complexType name="AliasType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="greeting"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="myName"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="age"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="DieType" substitutionGroup="heisenberg-empire" name="die"></xs:element>
+    <xs:complexType name="DieType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetEnemyType" substitutionGroup="heisenberg-empire" name="get-enemy"></xs:element>
+    <xs:complexType name="GetEnemyType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="required" name="index"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetInjectedExtensionManagerType" substitutionGroup="heisenberg-empire" name="get-injected-extension-manager"></xs:element>
+    <xs:complexType name="GetInjectedExtensionManagerType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="HideMethInEventType" substitutionGroup="heisenberg-empire" name="hide-meth-in-event"></xs:element>
+    <xs:complexType name="HideMethInEventType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="HideMethInMessageType" substitutionGroup="heisenberg-empire" name="hide-meth-in-message"></xs:element>
+    <xs:complexType name="HideMethInMessageType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillType" substitutionGroup="heisenberg-empire" name="kill"></xs:element>
+    <xs:complexType name="KillType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="goodbyeMessage"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillManyType" substitutionGroup="heisenberg-empire" name="kill-many"></xs:element>
+    <xs:complexType name="KillManyType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="1" name="kill-operations">
+                        <xs:complexType>
+                            <xs:group xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="unbounded" ref="heisenberg-empire-group"></xs:group>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="reason"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillOneType" substitutionGroup="heisenberg-empire" name="kill-one"></xs:element>
+    <xs:complexType name="KillOneType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="1" name="kill-operation">
+                        <xs:complexType>
+                            <xs:group xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg-empire-group"></xs:group>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="reason"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithCustomMessageType" substitutionGroup="heisenberg-empire" name="kill-with-custom-message"></xs:element>
+    <xs:complexType name="KillWithCustomMessageType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="victim"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="goodbyeMessage"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="LaunderType" substitutionGroup="heisenberg-empire" name="launder"></xs:element>
+    <xs:complexType name="LaunderType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionLong" use="required" name="amount"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="SayMyNameType" substitutionGroup="heisenberg-empire" name="say-my-name"></xs:element>
+    <xs:complexType name="SayMyNameType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="org.mule.module.extension.HealthStatusEnumType">
+        <xs:union>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="HEALTHY"></xs:enumeration>
+                    <xs:enumeration value="CANCER"></xs:enumeration>
+                    <xs:enumeration value="DEAD"></xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType>
+                <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+    </xs:simpleType>
+</xs:schema>

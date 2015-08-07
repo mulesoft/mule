@@ -6,10 +6,11 @@
  */
 package org.mule.routing.requestreply;
 
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 
-public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier
+public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier implements NonBlockingSupported
 {
 
     @Override

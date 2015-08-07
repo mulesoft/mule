@@ -9,11 +9,13 @@ package org.mule.transport.http.transformers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -40,7 +42,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
     public void testSetCookieOnOutbound() throws Exception
     {
         MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
-        MuleMessage msg = mock(MuleMessage.class);
+        MuleMessage msg = createMockMessage();
 
         Cookie[] cookiesOutbound = new Cookie[2];
         cookiesOutbound[0] = new Cookie("domain", "name-out-1", "value-out-1");
@@ -68,7 +70,8 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
     public void testSetDateOnOutbound() throws Exception
     {
         MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
-        MuleMessage msg = mock(MuleMessage.class);
+        MuleMessage msg =
+                createMockMessage();
 
         HttpResponse response = transformer.createResponse(null, "UTF-8", msg);
         Header[] headers = response.getHeaders();
@@ -95,7 +98,15 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         }
         assertThat("Missing 'Date' header", hasDateHeader, is(true));
     }
-    
+
+    private MuleMessage createMockMessage()
+    {
+        MuleMessage msg = mock(MuleMessage.class);
+        DataType objectDataType = DataType.OBJECT_DATA_TYPE;
+        when(msg.getDataType()).thenReturn(objectDataType);
+        return msg;
+    }
+
     @Test
     public void testContentTypeOnOutbound() throws Exception
     {
@@ -104,7 +115,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         final String wrongContentType = "text/json";
         Map<String, Object> outboundProperties =  new HashMap<String, Object>();
         outboundProperties.put(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
-        MuleContext muleContext = mock(MuleContext.class);
+        MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
         MuleMessage msg = new DefaultMuleMessage(null,outboundProperties, muleContext);
         //Making sure that the outbound property overrides both invocation and inbound
         msg.setInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);

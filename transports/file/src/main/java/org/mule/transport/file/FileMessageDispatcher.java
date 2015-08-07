@@ -134,7 +134,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                     }
                     if (files.length > 0)
                     {
-                        result = files[0];
+                        result = getFirstFile(files);
                     }
                 }
             }
@@ -144,6 +144,19 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new DefaultMuleException(FileMessages.errorWhileListingFiles(), e);
         }
+    }
+
+    private static File getFirstFile(File[] files)
+    {
+        for (File file : files)
+        {
+            if (file.isFile())
+            {
+                return  file;
+            }
+        }
+
+        return null;
     }
 
     @Override

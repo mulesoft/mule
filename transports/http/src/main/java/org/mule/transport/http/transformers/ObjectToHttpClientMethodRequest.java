@@ -18,19 +18,20 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.PatchMethod;
 import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
+import org.mule.transport.http.multipart.MultiPartInputStream;
+import org.mule.transport.http.multipart.PartDataSource;
 import org.mule.util.IOUtils;
 import org.mule.util.ObjectUtils;
-import org.mule.util.SerializationUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -340,8 +341,18 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             if (outboundMimeType == null)
             {
-                outboundMimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                logger.info("Content-Type not set on outgoing request, defaulting to: " + outboundMimeType);
+                if (!msg.getDataType().getMimeType().equals(MimeTypes.ANY))
+                {
+                    outboundMimeType = msg.getDataType().getMimeType();
+                }
+                else
+                {
+                    outboundMimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Content-Type not set on outgoing request, defaulting to: " + outboundMimeType);
+                    }
+                }
             }
 
             if (encoding != null && !"UTF-8".equals(encoding.toUpperCase())
@@ -407,7 +418,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             else
             {
-                final byte[] buffer = SerializationUtils.serialize((Serializable) src);
+                final byte[] buffer = muleContext.getObjectSerializer().serialize(src);
                 postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, outboundMimeType));
             }
         }
@@ -465,9 +476,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
         for (final Iterator<String> iterator = msg.getOutboundAttachmentNames().iterator(); iterator.hasNext(); i++)
         {
-            final String attachmentNames = iterator.next();
-            String fileName = attachmentNames;
-            final DataHandler dh = msg.getOutboundAttachment(attachmentNames);
+            final String attachmentName = iterator.next();
+            final DataHandler dh = msg.getOutboundAttachment(attachmentName);
+            String fileName = dh.getName();
             if (dh.getDataSource() instanceof StringDataSource)
             {
                 final StringDataSource ds = (StringDataSource) dh.getDataSource();
@@ -489,7 +500,20 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                         fileName = fileName.substring(x + 1);
                     }
                 }
-                parts[i] = new FilePart(fileName, new ByteArrayPartSource(fileName,
+                else if (dh.getDataSource() instanceof PartDataSource)
+                {
+                    org.mule.transport.http.multipart.Part part = ((PartDataSource) dh.getDataSource()).getPart();
+                    if (part instanceof MultiPartInputStream.MultiPart)
+                    {
+                        String partFileName = ((MultiPartInputStream.MultiPart) part).getContentDispositionFilename();
+                        if (!StringUtils.isEmpty(partFileName))
+                        {
+                            fileName = partFileName;
+                        }
+                    }
+                }
+
+                parts[i] = new FilePart(attachmentName, new ByteArrayPartSource(StringUtils.defaultString(fileName, attachmentName),
                     IOUtils.toByteArray(dh.getInputStream())), dh.getContentType(), null);
             }
         }

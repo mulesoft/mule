@@ -143,6 +143,7 @@
             <xsd:element ref="custom-processor"/>
             <xsd:element ref="abstract-empty-processor"/>
             <xsd:element ref="invoke"/>
+            <xsd:element ref="set-payload"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
             <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
@@ -1313,10 +1314,17 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="useHttpTransportByDefault" type="substitutableBoolean" default="false">
+                <xsd:attribute name="defaultObjectSerializer-ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Backwards Compatabilty Flag: Since Mule 3.6, default HTTP URIs are resolved with the new HTTP connector. If set to true, this behavior is changed so that the HTTP transport is used.
+                            An optional reference to an ObjectSerializer to be used as the application's default
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="defaultProcessingStrategy" type="flowProcessingStrategyType" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default processing strategy to use in all flows which don't specify otherwise
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1459,6 +1467,7 @@
             <xsd:enumeration value="SECURITY"/>
             <xsd:enumeration value="ASYNC-MESSAGE"/>
             <xsd:enumeration value="ENDPOINT-MESSAGE"/>
+            <xsd:enumeration value="CONNECTOR-MESSAGE"/>
             <xsd:enumeration value="COMPONENT-MESSAGE"/>
             <xsd:enumeration value="PIPELINE-MESSAGE"/>
             <xsd:enumeration value="MANAGEMENT"/>
@@ -2076,6 +2085,76 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+
+    <xsd:simpleType name="flowProcessingStrategyType">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of a globally configured processing strategy
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="default">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This processing strategy uses the 'queued-asynchronous' strategy where possible, but if an event is synchronous it processes it synchronously rather than failing.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="synchronous">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Processes all message processors in the calling thread, waiting for any IO operations (e.g. http request) before continuing processing.  This is also known as 'blocking'.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="non-blocking">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Processes message processors in the calling thread, but supported non components will release the calling thread once a request has been sent.  Once a response is available the Flow will continue processing a worker thread.  In order to configure the thread pool used you can configure a custom 'non-blocking-processing-strategy' global element and reference it by name.
+                                NOTE: This processing strategy is currently only supported with a  a single 'HTTP Listener’ or when there is no message source configured.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="asynchronous">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Uses a thread pool to process the pipeline of message processors asynchronously.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="queued-asynchronous">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Decouples the recieving of a new message from it's processing using a queue.
+                                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="thread-per-processor">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                EXPERIMENTAL: Uses a thread pool to process each message processors asynchronously. (each processor has it's own thread pool currently)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="queued-thread-per-processor">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                EXPERIMENTAL:  Decouples the processing of each message processor using a queue.
+                                The queue is polled and use a thread pool to process each message processor asynchronously. (each processor has it's own thread pool currently)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
     <xsd:complexType name="flowType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
@@ -2120,74 +2199,16 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                 <xsd:attribute name="processingStrategy" use="optional" default="default">
+                 <xsd:attribute name="processingStrategy" use="optional" type="flowProcessingStrategyType">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.  
-                            This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a gloablly defined strategy.
+                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.
+                            This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a globally defined strategy.
+                            If not specified, it will be taken from the defaultProcessingStrategy attribute of the &lt;configuration&gt; element. If that one
+                            is not defined either, then the mule.default.processing.strategy system property will be checked. If that's not setup
+                            either, then the value 'default' will be used
                         </xsd:documentation>
                     </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:union>
-                            <xsd:simpleType>
-                                <xsd:restriction base="xsd:string">
-                                    <xsd:annotation>
-                                        <xsd:documentation>
-                                            The name of a globally configured processing strategy
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:restriction>
-                            </xsd:simpleType>
-                            <xsd:simpleType>
-                                <xsd:restriction base="xsd:NMTOKEN">
-                                    <xsd:enumeration value="default">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                This processing strategy uses the 'queued-asynchronous' strategy where possible, but if an event is synchronous it processes it synchronously rather than failing.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="synchronous">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Processes all message processors in the calling thread.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="asynchronous">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Uses a thread pool to process the pipeline of message processors asynchronously.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="queued-asynchronous">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Decouples the recieving of a new message from it's processing using a queue. 
-                                                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="thread-per-processor">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                EXPERIMENTAL: Uses a thread pool to process each message processors asynchronously. (each processor has it's own thread pool currently)
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="queued-thread-per-processor">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                EXPERIMENTAL:  Decouples the processing of each message processor using a queue. 
-                                                The queue is polled and use a thread pool to process each message processor asynchronously. (each processor has it's own thread pool currently)
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                </xsd:restriction>
-                            </xsd:simpleType>
-                        </xsd:union>
-                    </xsd:simpleType>
                 </xsd:attribute>
                 <xsd:attribute name="initialState" default="started">
                     <xsd:annotation>
@@ -2201,11 +2222,11 @@
                             <xsd:enumeration value="stopped"/>
                         </xsd:restriction>
                     </xsd:simpleType>
-                </xsd:attribute>                
+                </xsd:attribute>
            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <!--  Processing Strategies -->
     
     <xsd:element name="abstract-processing-strategy" type="processingStrategyType" abstract="true">
@@ -2288,7 +2309,7 @@
                 <xsd:attribute name="maxQueueSize" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines the maximum number of messages that can be queued.
+                            Defines the maximum number of messages that can be queued or '-1' for unlimited.  From 3.6 the default value used is four times the value of the 'maxThreads' attribute, previously the default value was '-1' (unlimited).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2312,7 +2333,21 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
+    <xsd:element name="non-blocking-processing-strategy" type="nonBlockingProcessingStrategy" substitutionGroup="abstract-processing-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Processes message processors in the calling thread, but supported non-blocking components will release the calling thread once a request has been sent.  Once a response is available the Flow will continue processing a worker thread.
+                NOTE: This processing strategy is currently only supported with a  a single 'HTTP Listener’ or when there is no message source configured.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="nonBlockingProcessingStrategy">
+        <xsd:complexContent>
+            <xsd:extension base="asynchronousProcessingStrategy"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="custom-processing-strategy" type="customProcessingStrategy" substitutionGroup="abstract-processing-strategy">
         <xsd:annotation>
             <xsd:documentation>
@@ -3698,7 +3733,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="add-message-property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="add-message-property" type="propertyWithDataType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Add a message property.
@@ -3745,7 +3780,28 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
+    <xsd:complexType name="abstractAddPropertyTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="commonMessagePartTransformerType">
+                <xsd:attributeGroup ref="mimeTypeAttributes">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The mime type of the value assigned to the property
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attributeGroup>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The encoding of the value assigned to the property
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="set-property" type="setPropertyType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
@@ -3755,7 +3811,7 @@
     </xsd:element>
     <xsd:complexType name="setPropertyType">
         <xsd:complexContent>
-            <xsd:extension base="commonMessagePartTransformerType">
+            <xsd:extension base="abstractAddPropertyTransformerType">
                 <xsd:attribute name="propertyName" type="attributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
@@ -3801,7 +3857,7 @@
     </xsd:element>
     <xsd:complexType name="setVariableType">
         <xsd:complexContent>
-            <xsd:extension base="commonMessagePartTransformerType">
+            <xsd:extension base="abstractAddPropertyTransformerType">
                 <xsd:attribute name="variableName" type="attributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
@@ -4099,7 +4155,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="abstract-transformer">
+    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that sets the paylaod with the provided value
@@ -4109,7 +4165,43 @@
 
     <xsd:complexType name="setPayloadTransformerType">
         <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the message processor so that other elements can reference it. Required if the message processor is defined at the global level.
+                            Deprecated. Provided only to maintain backwards compatibility at XML level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="returnClass" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Deprecated. Provided only to maintain backwards compatibility at XML level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreBadInput" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Deprecated. Provided only to maintain backwards compatibility at XML level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attributeGroup ref="mimeTypeAttributes">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The mime type of the value assigned to the payload
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attributeGroup>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The encoding of the value assigned to the payload
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="value" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -6521,7 +6613,7 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
-            <xsd:pattern value="(\#\[.+\]|\$\{[^\}]+\})"/>
+            <xsd:pattern value="((\#|\!)\[.+\]|\$\{[^\}]+\})"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -6550,26 +6642,6 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:union>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                    <xsd:pattern value=".*[^ ]+.*"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:union>
-    </xsd:simpleType>
-
-    <xsd:simpleType name="expression">
-        <xsd:annotation>
-            <xsd:documentation>
-                A custom xsd:string-like type that represents a MEL expresions.
-                Attributes should use this type to declare that they support expressions.
-                Those which don't will be assumed not to support them
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:union>
-            <xsd:simpleType>
-                <xsd:restriction base="propertyPlaceholderType"/>
-            </xsd:simpleType>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
                     <xsd:pattern value=".*[^ ]+.*"/>
@@ -6629,6 +6701,38 @@
         </xsd:union>
     </xsd:simpleType>
 
+    <xsd:simpleType name="substitutableDecimal">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:decimal type that also allows for Ant-style property placeholders.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:decimal"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="substitutableDateTime">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:dateTime type that also allows for Ant-style property placeholders.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:dateTime"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
     <xsd:simpleType name="substitutableLong">
         <xsd:annotation>
             <xsd:documentation>
@@ -6659,6 +6763,115 @@
                 <xsd:restriction base="xsd:boolean"/>
             </xsd:simpleType>
         </xsd:union>
+    </xsd:simpleType>
+
+
+    <xsd:simpleType name="expression">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:string-like type that represents a MEL expression.
+                Attributes should use this type to declare that they support expressions.
+                It allows property placeholders and requires the value to not be blank.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="nonBlankString"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionString">
+        <xsd:annotation>
+            <xsd:documentation>
+                An embeddable expression that outputs a String
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionBoolean">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Boolean
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionInt">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs an Integer
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionLong">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Long
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionDouble">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Double
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionDecimal">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Decimal
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionObject">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a generic object
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionList">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Collection type
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionMap">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Map
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionDateTime">
+        <xsd:annotation>
+            <xsd:documentation>
+                A non-embeddable expression that outputs a Date
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="expression" />
     </xsd:simpleType>
 
     <!-- i found this a bit confusing, so here is some background...
@@ -6726,6 +6939,29 @@
             <xsd:extension base="keyType">
                 <xsd:attribute name="value" type="xsd:string"/>
                 <xsd:attribute name="value-ref" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="propertyWithDataType">
+        <xsd:complexContent>
+            <xsd:extension base="keyType">
+                <xsd:attribute name="value" type="xsd:string"/>
+                <xsd:attribute name="value-ref" type="xsd:string"/>
+                <xsd:attributeGroup ref="mimeTypeAttributes">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The mime type for the property
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attributeGroup>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            String encoding for the property.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

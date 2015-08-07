@@ -6,6 +6,8 @@
  */
 package org.mule.security.oauth.processor;
 
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -15,6 +17,7 @@ import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.http.api.HttpParameters;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
@@ -22,6 +25,7 @@ import org.mule.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -97,20 +101,10 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
     private MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
     {
-        String state = event.getMessage().getInboundProperty("state");
+        String state = getState(event);
         if (StringUtils.isEmpty(state))
         {
             return event;
-        }
-
-        try
-        {
-            state = URLDecoder.decode(state, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new MessagingException(
-                MessageFactory.createStaticMessage("State query param had invalid encoding: " + state), event);
         }
 
         String eventId = StringUtils.match(EVENT_ID_PATTERN, state, 1);
@@ -147,20 +141,96 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
                 "Error retrieving authorization event %s from object store", eventId)), event, e);
         }
 
-        MuleMessage restoredMessage = restoredEvent.getMessage();
+        InboundPropertiesDelegate properties = getPropertiesDelegate(restoredEvent);
         String cleanedState = StringUtils.match(ORIGINAL_STATE_PATTERN, state, 1);
 
         if (cleanedState != null)
         {
-            restoredMessage.setProperty("state", cleanedState, PropertyScope.INBOUND);
+            properties.set("state", cleanedState);
         }
         else
         {
             // user did not use the state at all, just blank it
-            restoredMessage.setProperty("state", StringUtils.EMPTY, PropertyScope.INBOUND);
+            properties.set("state", StringUtils.EMPTY);
         }
 
         RequestContext.setEvent(restoredEvent);
         return restoredEvent;
+    }
+
+    private String getState(MuleEvent event) throws MuleException
+    {
+        String state = getPropertiesDelegate(event).get("state");
+
+        try
+        {
+            return StringUtils.isEmpty(state) ? StringUtils.EMPTY : URLDecoder.decode(state, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new MessagingException(
+                    MessageFactory.createStaticMessage("State query param had invalid encoding: " + state), event);
+        }
+    }
+
+    private InboundPropertiesDelegate getPropertiesDelegate(MuleEvent event)
+    {
+        Object parameters = event.getMessage().getInboundProperty("http.query.params");
+        return parameters instanceof HttpParameters ? new HttpConnectorDelegate(event) : new OldHttpTransport(event);
+    }
+
+    private interface InboundPropertiesDelegate
+    {
+
+        String get(String key);
+
+        void set(String key, String value);
+    }
+
+    private class HttpConnectorDelegate implements InboundPropertiesDelegate
+    {
+        private final HashMap<String, String> parameters;
+
+        private HttpConnectorDelegate(MuleEvent event)
+        {
+            //Query parameters are immutable so we copy them and change the query parameters map.
+            this.parameters = new HashMap(((HttpParameters) event.getMessage().getInboundProperty(HTTP_QUERY_PARAMS)));
+            event.getMessage().setProperty(HTTP_QUERY_PARAMS, this.parameters, PropertyScope.INBOUND);
+        }
+
+        @Override
+        public String get(String key)
+        {
+            return parameters.get(key);
+        }
+
+        @Override
+        public void set(String key, String value)
+        {
+            parameters.remove(key);
+            parameters.put(key, value);
+        }
+    }
+
+    private class OldHttpTransport implements InboundPropertiesDelegate
+    {
+        private final MuleEvent event;
+
+        private OldHttpTransport(MuleEvent event)
+        {
+            this.event = event;
+        }
+
+        @Override
+        public String get(String key)
+        {
+            return event.getMessage().getInboundProperty(key);
+        }
+
+        @Override
+        public void set(String key, String value)
+        {
+            event.getMessage().setProperty(key, value, PropertyScope.INBOUND);
+        }
     }
 }

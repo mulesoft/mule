@@ -7,9 +7,15 @@
 package org.mule.module.ws.consumer;
 
 
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.connector.ConnectorOperationLocator;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -17,10 +23,10 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.module.http.HttpRequestConfig;
-import org.mule.module.http.HttpRequester;
-import org.mule.module.http.SuccessStatusCodeValidator;
-import org.mule.module.http.request.HttpRequesterBuilder;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.Preconditions;
@@ -36,7 +42,7 @@ public class WSConsumerConfig implements MuleContextAware
     private String port;
     private String serviceAddress;
     private Connector connector;
-    private HttpRequestConfig connectorConfig;
+    private HttpRequesterConfig connectorConfig;
     private WSSecurity security;
 
     @Override
@@ -82,7 +88,7 @@ public class WSConsumerConfig implements MuleContextAware
         {
             return false;
         }
-        if (muleContext.getConfiguration().useHttpTransportByDefault())
+        if (HttpConfiguration.useTransportForUris(muleContext))
         {
             return false;
         }
@@ -109,23 +115,32 @@ public class WSConsumerConfig implements MuleContextAware
 
     private MessageProcessor createHttpRequester() throws MuleException
     {
-        HttpRequesterBuilder requesterBuilder = new HttpRequesterBuilder(muleContext);
-
-        requesterBuilder.setAddress(serviceAddress).setMethod("POST").setParseResponse(false);
-
-        if (connectorConfig != null)
+        return new MessageProcessor()
         {
-            requesterBuilder.setConfig(connectorConfig);
-        }
+            private HttpRequestOptions requestOptions;
 
-        HttpRequester httpRequester = requesterBuilder.build();
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                ConnectorOperationLocator connectorOperationLocator = muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
+                MessageProcessor messageProcessor = connectorOperationLocator.locateConnectorOperation(serviceAddress, getRequestOptions(), REQUEST_RESPONSE);
+                return messageProcessor.process(event);
+            }
 
-        // Do not throw exception on invalid status code, let CXF process it.
-        httpRequester.setStatusCodeValidator(new SuccessStatusCodeValidator("0..599"));
-
-        httpRequester.initialise();
-
-        return httpRequester;
+            private HttpRequestOptions getRequestOptions()
+            {
+                if (requestOptions == null)
+                {
+                    final HttpRequestOptionsBuilder builder = newOptions().method(POST.name()).disableStatusCodeValidation().disableParseResponse();
+                    if (connectorConfig != null)
+                    {
+                        builder.requestConfig(connectorConfig);
+                    }
+                    requestOptions = builder.build();
+                }
+                return requestOptions;
+            }
+        };
     }
 
     private boolean isHttp()
@@ -193,12 +208,12 @@ public class WSConsumerConfig implements MuleContextAware
         this.connector = connector;
     }
 
-    public HttpRequestConfig getConnectorConfig()
+    public HttpRequesterConfig getConnectorConfig()
     {
         return connectorConfig;
     }
 
-    public void setConnectorConfig(HttpRequestConfig connectorConfig)
+    public void setConnectorConfig(HttpRequesterConfig connectorConfig)
     {
         this.connectorConfig = connectorConfig;
     }

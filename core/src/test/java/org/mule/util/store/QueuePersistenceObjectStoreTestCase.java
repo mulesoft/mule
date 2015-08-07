@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -27,7 +27,6 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.FileUtils;
-import org.mule.util.SerializationUtils;
 import org.mule.util.UUID;
 import org.mule.util.queue.objectstore.QueueKey;
 
@@ -68,7 +67,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         mockMuleContext = mock(MuleContext.class);
         when(mockMuleContext.getConfiguration()).thenReturn(mockConfig);
         when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
-        when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
+        addJavaSerializerToMockMuleContext(mockMuleContext);
     }
 
     @Override
@@ -197,7 +196,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         storeFile.getParentFile().mkdir();
 
         FileOutputStream fos = new FileOutputStream(storeFile);
-        SerializationUtils.serialize(payload, fos);
+        muleContext.getObjectSerializer().serialize(payload, fos);
 
         return storeFile;
     }

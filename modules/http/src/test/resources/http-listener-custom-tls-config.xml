@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <tls:context name="globalTlsContext" >
+        <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    </tls:context>
+
+    <http:listener-config name="globalConfig" protocol="HTTPS" host="localhost" port="${port1}" tlsContext-ref="globalTlsContext" />
+
+    <http:listener-config name="nestedConfig" protocol="HTTPS" host="localhost" port="${port2}">
+        <tls:context>
+            <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        </tls:context>
+    </http:listener-config>
+
+    <http:request-config name="clientGlobalConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="globalTlsContext" />
+
+    <flow name="testFlowGlobalContext">
+        <http:listener config-ref="globalConfig" path="/" allowedMethods="GET"/>
+        <expression-component>payload = 'ok'</expression-component>
+    </flow>
+
+    <flow name="testFlowNestedContext">
+        <http:listener config-ref="nestedConfig" path="/" allowedMethods="POST"/>
+        <expression-component>payload = 'all right'</expression-component>
+    </flow>
+
+
+    <flow name="testFlowGlobalContextClient">
+        <http:request config-ref="clientGlobalConfig" port="${port1}" path="/" method="GET" />
+    </flow>
+
+    <flow name="testFlowNestedContextClient">
+        <http:request config-ref="clientGlobalConfig" port="${port2}" path="/" method="POST" />
+    </flow>
+
+</mule>

@@ -23,11 +23,12 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
 
     private static final long serialVersionUID = -6819292692339684915L;
 
-    private final String MESSAGE = "message";
-    private final String PAYLOAD = "payload";
-    private final String EXCEPTION = "exception";
-    private final String FLOW_VARS = "flowVars";
-    private final String SESSION_VARS = "sessionVars";
+    private static final String MESSAGE = "message";
+    private static final String EXCEPTION = "exception";
+    public static final String PAYLOAD = "payload";
+    public static final String MESSAGE_PAYLOAD = MESSAGE + "." + PAYLOAD;
+    public static final String FLOW_VARS = "flowVars";
+    public static final String SESSION_VARS = "sessionVars";
 
     private MuleMessage muleMessage;
 
@@ -74,7 +75,8 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
             }
             else if (PAYLOAD.equals(name))
             {
-                return new MuleVariableResolver<Object>(PAYLOAD, muleMessage.getPayload(), null,
+                return new MuleVariableResolver<Object>(PAYLOAD, new MessageContext(
+                        muleMessage).getPayload(), null,
                     new VariableAssignmentCallback<Object>()
                     {
                         @Override

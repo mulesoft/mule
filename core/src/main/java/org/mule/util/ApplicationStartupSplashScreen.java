@@ -20,7 +20,7 @@ public class ApplicationStartupSplashScreen extends SplashScreen
     {
         header.add("Application: " + context.getConfiguration().getId());
         header.add(String.format("OS encoding: %s, Mule encoding: %s",
-                                 System.getProperty("file.encoding"),
+                                 SystemUtils.FILE_SEPARATOR,
                                  context.getConfiguration().getDefaultEncoding()));
         header.add(" ");
     }

@@ -3,4 +3,6 @@ http\://www.mulesoft.org/schema/mule/jersey/3.2/mule-jersey.xsd=META-INF/mule-je
 http\://www.mulesoft.org/schema/mule/jersey/3.3/mule-jersey.xsd=META-INF/mule-jersey.xsd
 http\://www.mulesoft.org/schema/mule/jersey/3.4/mule-jersey.xsd=META-INF/mule-jersey.xsd
 http\://www.mulesoft.org/schema/mule/jersey/3.5/mule-jersey.xsd=META-INF/mule-jersey.xsd
+http\://www.mulesoft.org/schema/mule/jersey/3.6/mule-jersey.xsd=META-INF/mule-jersey.xsd
+http\://www.mulesoft.org/schema/mule/jersey/3.7/mule-jersey.xsd=META-INF/mule-jersey.xsd
 http\://www.mulesoft.org/schema/mule/jersey/current/mule-jersey.xsd=META-INF/mule-jersey.xsd

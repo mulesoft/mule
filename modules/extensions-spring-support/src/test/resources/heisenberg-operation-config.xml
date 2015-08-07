@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+
+    <context:property-placeholder location="heisenberg.properties"/>
+
+    <heisenberg:config name="heisenberg"
+                       myName="Heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="1000000"
+                       recipe="recipes"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER"
+                       candidateDoors="candidateDoors">
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:ricin-packs>
+            <heisenberg:ricin-pack microgramsPerKilo="22">
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+            </heisenberg:ricin-pack>
+        </heisenberg:ricin-packs>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
+    </heisenberg:config>
+
+    <flow name="sayMyName">
+        <heisenberg:say-my-name />
+    </flow>
+
+    <flow name="die">
+        <heisenberg:die />
+    </flow>
+
+    <flow name="getFixedEnemy">
+        <heisenberg:get-enemy index="0"/>
+    </flow>
+
+    <flow name="expressionEnemy">
+        <heisenberg:get-enemy index="#[flowVars['enemy']]"/>
+    </flow>
+
+    <flow name="hideInEvent">
+        <heisenberg:hide-meth-in-event />
+    </flow>
+
+    <flow name="hideInMessage">
+        <heisenberg:hide-meth-in-message />
+    </flow>
+
+    <flow name="killFromPayload">
+        <heisenberg:kill goodbyeMessage="#[flowVars['goodbye']]"/>
+    </flow>
+
+    <flow name="customKillWithDefault">
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[flowVars['goodbye']]"/>
+    </flow>
+
+    <flow name="customKillWithoutDefault">
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[flowVars['goodbye']]"
+                                             victim="#[flowVars['victim']]"/>
+    </flow>
+
+    <flow name="killMany">
+        <heisenberg:kill-many  reason="I'm the one who knocks">
+            <heisenberg:kill-operations>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>
+            </heisenberg:kill-operations>
+        </heisenberg:kill-many>
+    </flow>
+
+    <flow name="killManyButOnlyOneProvided">
+        <heisenberg:kill-many  reason="I'm the one who knocks">
+            <heisenberg:kill-operations>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+            </heisenberg:kill-operations>
+        </heisenberg:kill-many>
+    </flow>
+
+    <flow name="killOne">
+        <heisenberg:kill-one  reason="I'm the one who knocks">
+            <heisenberg:kill-operation>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+            </heisenberg:kill-operation>
+        </heisenberg:kill-one>
+    </flow>
+
+    <flow name="injectedExtensionManager">
+        <heisenberg:get-injected-extension-manager />
+    </flow>
+
+    <flow name="alias">
+        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52"  />
+    </flow>
+
+</mule>

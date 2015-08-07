@@ -20,6 +20,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.devkit.processor.DevkitBasedMessageProcessor;
+import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.security.oauth.callback.DefaultHttpCallbackFactory;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
@@ -34,7 +35,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends DevkitBasedMessa
     private String accessTokenUrl = null;
     private HttpCallback oauthCallback;
     private String state;
-    private HttpCallbackFactory callbackFactory;
+    protected HttpCallbackFactory callbackFactory;
 
     public AbstractAuthorizeMessageProcessor()
     {
@@ -46,8 +47,10 @@ public abstract class AbstractAuthorizeMessageProcessor extends DevkitBasedMessa
     @Override
     public void start() throws MuleException
     {
-        if (this.callbackFactory == null) {
-            this.callbackFactory = new DefaultHttpCallbackFactory();
+        if (callbackFactory == null)
+        {
+            callbackFactory = new DefaultHttpCallbackFactory();
+            callbackFactory.forceOldHttpTransport(HttpConfiguration.useTransportForUris(muleContext));
         }
     }
     
@@ -59,6 +62,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends DevkitBasedMessa
         {
             this.oauthCallback = this.callbackFactory.createCallback(adapter, this.getAuthCodeRegex(),
                 fetchAccessTokenMessageProcessor, this.listener, muleContext, flowConstruct);
+
             this.oauthCallback.start();
         }
         

@@ -17,7 +17,6 @@
 
     <properties>
         <skipExportTests>false</skipExportTests>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <dependencies>
@@ -37,6 +36,11 @@
 		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-spring-config</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-http</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

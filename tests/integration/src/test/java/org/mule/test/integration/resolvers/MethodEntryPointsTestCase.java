@@ -61,7 +61,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
     public void testValidCallToReverse() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
+        MuleMessage msg = getTestMuleMessage("hello");
         msg.setOutboundProperty("method", "reverseString");
         MuleMessage message = client.send("vm://service", msg);
         assertNotNull(message);
@@ -72,7 +72,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
     public void testValidCallToUpperCase() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
+        MuleMessage msg = getTestMuleMessage("hello");
         msg.setOutboundProperty("method", "upperCaseString");
         MuleMessage message = client.send("vm://service", msg);
         assertNotNull(message);

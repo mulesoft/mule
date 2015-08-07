@@ -1,11 +1,10 @@
 This directory is used for tracing the execution of the Mule container.
 
-Top-level logger for the Mule container is configured in "$MULE_HOME/conf/log4j.properties" or
-"$MULE_HOME/conf/log4j.xml".
+Top-level logger for the Mule container is configured in "$MULE_HOME/conf/log4j2.xml"
 
 *** Xml format has higher priority and will be used if found or in presence of both xml and properties configs. ***
 
-Log4j xml docs: http://wiki.apache.org/logging-log4j/Log4jXmlFormat
+Log4j2 docs: http://logging.apache.org/log4j/2.x/
 
 Container-level logging is written to the $MULE_HOME/logs/mule.log file.
 
@@ -22,7 +21,7 @@ Application-level logging supports 2 modes:
        by Mule and app has a full control (and responsibility) to configure logging.
 
 
-*** TIP: use ${mule.home} placeholder in log4j.properties to resolve the Mule's directory (e.g. for file appenders). ***
+*** TIP: use ${sys:mule.home} placeholder in log4j2.xml to resolve the Mule's directory (e.g. for file appenders). ***
 
 In addition to the application's output, the wrapper also sends any JVM-level or 
 OS-level errors/warnings to the log file.  This means that if the JVM crashes 

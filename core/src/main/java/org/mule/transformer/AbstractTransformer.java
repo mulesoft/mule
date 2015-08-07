@@ -6,15 +6,14 @@
  */
 package org.mule.transformer;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
@@ -28,19 +27,16 @@ import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
@@ -51,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer implements Transformer, AnnotatedObject
+public abstract class AbstractTransformer extends AbstractAnnotatedObject implements Transformer
 {
     public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
 
@@ -98,7 +94,6 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
      */
     protected String mimeType;
     protected String encoding;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     /**
      * default constructor required for discovery
@@ -367,7 +362,8 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     @Override
     public final Object transform(Object src) throws TransformerException
     {
-        return transform(src, getEncoding(src));
+        String enc = encoding != null ? encoding : getEncoding(src);
+        return transform(src, enc);
     }
 
     @Override
@@ -459,7 +455,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         }
         else if (enc == null)
         {
-            enc = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+            enc = SystemUtils.getDefaultEncoding(muleContext);
         }
         return enc;
     }
@@ -507,18 +503,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
 
     protected String generateTransformerName()
     {
-        String transformerName = ClassUtils.getSimpleName(this.getClass());
-        int i = transformerName.indexOf("To");
-        if (i > 0 && returnType != null)
-        {
-            String target = ClassUtils.getSimpleName(returnType.getType());
-            if (target.equals("byte[]"))
-            {
-                target = "byteArray";
-            }
-            transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
-        }
-        return transformerName;
+        return TransformerUtils.generateTransformerName(getClass(), returnType);
     }
 
     @Deprecated
@@ -575,24 +560,5 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-    }
-
-    @Override
-    public final Object getAnnotation(QName qName)
-    {
-        return annotations.get(qName);
-    }
-
-    @Override
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    @Override
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 }

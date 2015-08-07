@@ -8,28 +8,48 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class MultipleExceptionMapperTestCase extends org.mule.tck.junit4.FunctionalTestCase
 {
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
+    private String configFile;
+
+    public MultipleExceptionMapperTestCase(String configFile)
+    {
+        this.configFile = configFile;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                new Object[] {"multiple-exception-mapper-config.xml"},
+                new Object[] {"multiple-exception-mapper-http-connector-config.xml"}
+        });
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "multiple-exception-mapper-config.xml";
+        return configFile;
     }
 
     @Test
@@ -37,12 +57,14 @@ public class MultipleExceptionMapperTestCase extends org.mule.tck.junit4.Functio
     {
         LocalMuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwBadRequestException", TEST_MESSAGE, props);
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwBadRequestException", getTestMuleMessage(), getHttpOptions());
 
         assertEquals((Integer) HttpConstants.SC_BAD_REQUEST, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+    }
+
+    private HttpRequestOptions getHttpOptions()
+    {
+        return newOptions().disableStatusCodeValidation().build();
     }
 
 
@@ -51,10 +73,7 @@ public class MultipleExceptionMapperTestCase extends org.mule.tck.junit4.Functio
     {
         LocalMuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwException", TEST_MESSAGE, props);
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwException", getTestMuleMessage(), getHttpOptions());
 
         assertEquals((Integer) HttpConstants.SC_SERVICE_UNAVAILABLE, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }

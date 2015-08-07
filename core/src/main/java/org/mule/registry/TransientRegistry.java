@@ -38,12 +38,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.InstanceofPredicate;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
+ * @deprecated as of 3.7.0. Use {@link SimpleRegistry instead}.
  */
-//@ThreadSafe
+@Deprecated
 public class TransientRegistry extends AbstractRegistry
 {
 
@@ -64,7 +65,7 @@ public class TransientRegistry extends AbstractRegistry
 
     private void putDefaultEntriesIntoRegistry()
     {
-        Map<String, Object> processors = new HashMap<String, Object>();
+        Map<String, Object> processors = new HashMap<>();
         processors.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
         //processors("_muleNotificationProcessor", new NotificationListenersProcessor(muleContext));
         processors.put("_muleExpressionEvaluatorProcessor", new ExpressionEvaluatorProcessor(muleContext));
@@ -95,19 +96,16 @@ public class TransientRegistry extends AbstractRegistry
     {
         for (Object obj : registryMap.getLostObjects())
         {
-            if (obj != null && obj instanceof Disposable)
+            try
             {
-                try
+                ((Disposable) obj).dispose();
+            }
+            catch (Exception e)
+            {
+                logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
+                if (logger.isDebugEnabled())
                 {
-                    ((Disposable) obj).dispose();
-                }
-                catch (Exception e)
-                {
-                    logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
-                    }
+                    logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
                 }
             }
         }
@@ -115,12 +113,12 @@ public class TransientRegistry extends AbstractRegistry
 
     protected Map<String, Object> applyProcessors(Map<String, Object> objects)
     {
-        if (objects == null)
+        if (objects == null || !isInitialised())
         {
             return null;
         }
 
-        Map<String, Object> results = new HashMap<String, Object>();
+        Map<String, Object> results = new HashMap<>();
         for (Map.Entry<String, Object> entry : objects.entrySet())
         {
             // We do this inside the loop in case the map contains ObjectProcessors
@@ -178,7 +176,13 @@ public class TransientRegistry extends AbstractRegistry
 
     public <T> T lookupObject(String key)
     {
-        return registryMap.<T>get(key);
+        return doGet(key);
+    }
+
+    @Override
+    public <T> T lookupObject(Class<T> type) throws RegistrationException
+    {
+        return super.lookupObject(type);
     }
 
     @SuppressWarnings("unchecked")
@@ -215,8 +219,13 @@ public class TransientRegistry extends AbstractRegistry
         return object;
     }
 
-    Object applyProcessors(Object object, Object metadata)
+    protected Object applyProcessors(Object object, Object metadata)
     {
+        if (!isInitialised())
+        {
+            return object;
+        }
+
         Object theObject = object;
 
         if (!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG))
@@ -279,7 +288,17 @@ public class TransientRegistry extends AbstractRegistry
             return;
         }
 
-        registryMap.putAndLogWarningIfDuplicate(key, object);
+        doRegisterObject(key, object, metadata);
+    }
+
+    protected <T> T doGet(String key)
+    {
+        return registryMap.get(key);
+    }
+
+    protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException
+    {
+        doPut(key, object);
 
         try
         {
@@ -298,6 +317,11 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
+    protected void doPut(String key, Object object)
+    {
+        registryMap.putAndLogWarningIfDuplicate(key, object);
+    }
+
     protected void checkDisposed() throws RegistrationException
     {
         if (getLifecycleManager().isPhaseComplete(Disposable.PHASE_NAME))
@@ -311,36 +335,10 @@ public class TransientRegistry extends AbstractRegistry
         return !(metaData == null || !(metaData instanceof Integer)) && ((Integer) metaData & flag) != 0;
     }
 
-    /**
-     * Will remove an object by name from the registry. By default the registry will apply all remaining lifecycle phases
-     * to the object when it is removed.
-     *
-     * @param key      the name or key of the object to remove from the registry
-     * @param metadata Meta data flags supported are {@link org.mule.api.registry.MuleRegistry#LIFECYCLE_BYPASS_FLAG}
-     * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
-     *                               the object's lifecycle threw an exception
-     */
-    public void unregisterObject(String key, Object metadata) throws RegistrationException
+    @Override
+    protected Object doUnregisterObject(String key) throws RegistrationException
     {
-        Object obj = registryMap.remove(key);
-
-        try
-        {
-            if (!hasFlag(metadata, MuleRegistry.LIFECYCLE_BYPASS_FLAG))
-            {
-                getLifecycleManager().applyPhase(obj, lifecycleManager.getCurrentPhase(), Disposable.PHASE_NAME);
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new RegistrationException(e);
-        }
-
-    }
-
-    public void unregisterObject(String key) throws RegistrationException
-    {
-        unregisterObject(key, Object.class);
+        return registryMap.remove(key);
     }
 
     // /////////////////////////////////////////////////////////////////////////
@@ -362,7 +360,7 @@ public class TransientRegistry extends AbstractRegistry
      * transient registry and also shields client code from having to deal with locking the
      * {@link ReadWriteLock} for the exposed Map operations.
      */
-    private static class RegistryMap
+    protected static class RegistryMap
     {
 
         private final Map<String, Object> registry = new HashMap<String, Object>();
@@ -381,9 +379,9 @@ public class TransientRegistry extends AbstractRegistry
             }
         });
 
-        private Log logger;
+        private Logger logger;
 
-        public RegistryMap(Log log)
+        public RegistryMap(Logger log)
         {
             super();
             logger = log;
@@ -428,7 +426,10 @@ public class TransientRegistry extends AbstractRegistry
                 final Object previousObject = registry.put(key, object);
                 if (previousObject != null && previousObject != object)
                 {
-                    lostObjects.add(previousObject);
+                    if (previousObject instanceof Disposable)
+                    {
+                        lostObjects.add(previousObject);
+                    }
                     // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
                     // Not sure whether to throw an exception or log a warning here.
                     //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");

@@ -13,10 +13,6 @@
     <name>Mule Modules</name>
     <description>Modules which extend the Mule Core but do not qualify as Transports</description>
 
-    <properties>
-        <licensePath>../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <modules>
         <module>atom</module>
         <module>annotations</module>
@@ -28,14 +24,17 @@
         <module>db</module>
         <module>devkit-support</module>
         <module>drools</module>
+        <module>extensions-support</module>
         <module>launcher</module>
         <module>client</module>
+        <module>http</module>
         <module>jaas</module>
         <module>jboss-transactions</module>
         <module>jbpm</module>
         <module>jersey</module>
         <module>json</module>
         <module>management</module>
+        <module>oauth</module>
         <module>pgp</module>
         <module>reboot</module>
         <module>rss</module>
@@ -43,6 +42,10 @@
         <module>scripting</module>
         <module>spring-extras</module>
         <module>spring-config</module>
+
+        <!-- depends on spring-config so it has to go after it -->
+        <module>extensions-spring-support</module>
+        
         <module>spring-security</module>
         <module>tomcat</module>
         <module>ws</module>

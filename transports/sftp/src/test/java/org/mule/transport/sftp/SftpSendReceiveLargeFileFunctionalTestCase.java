@@ -37,9 +37,10 @@ public class SftpSendReceiveLargeFileFunctionalTestCase extends AbstractSftpTest
         return "mule-send-receive-large-file-test-config-flow.xml";
     }
 
-    public void before() throws Exception
+    @Override
+    public void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        super.before();
+        super.doSetUpBeforeMuleContextCreation();
         sftpClient.mkdir(INBOUND_ENDPOINT_DIR);
         sftpClient.mkdir(OUTBOUND_ENDPOINT_DIR);
     }

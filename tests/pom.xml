@@ -18,10 +18,6 @@
         <module>integration</module>
     </modules>
 
-    <properties>
-        <licensePath>../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <build>
         <plugins>
             <plugin>

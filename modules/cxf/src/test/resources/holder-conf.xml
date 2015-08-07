@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:https="http://www.mulesoft.org/schema/mule/https"
-      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
            http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
@@ -21,7 +16,7 @@
 
     <flow name="echoService">
         <inbound-endpoint address="http://localhost:${port1}/echo" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.HolderService"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.HolderService" />
         <component class="org.mule.module.cxf.HolderServiceImpl" />
     </flow>
 
@@ -40,6 +35,13 @@
         <outbound-endpoint address="http://localhost:${port1}/echo" />
     </flow>
 
+
+    <flow name="echo2ServiceClient" processingStrategy="synchronous">
+        <inbound-endpoint address="vm://echo2Client" exchange-pattern="request-response"/>
+        <transformer ref="holderTransformer2"/>
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.HolderService" operation="echo2" />
+        <outbound-endpoint address="http://localhost:${port1}/echo" />
+    </flow>
     <flow name="echo2ServiceClientProxy" processingStrategy="synchronous">
         <inbound-endpoint address="vm://echo2ClientProxy" exchange-pattern="request-response"/>
         <transformer ref="holderTransformer2"/>
@@ -48,6 +50,13 @@
         <outbound-endpoint address="http://localhost:${port1}/echo" />
     </flow>
 
+
+    <flow name="echo3ServiceClient" processingStrategy="synchronous">
+        <inbound-endpoint address="vm://echo3Client" exchange-pattern="request-response"/>
+        <transformer ref="holderTransformer3"/>
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.HolderService" operation="echo3" />
+        <outbound-endpoint address="http://localhost:${port1}/echo" />
+    </flow>
     <flow name="echo3ServiceClientProxy" processingStrategy="synchronous">
         <inbound-endpoint address="vm://echo3ClientProxy" exchange-pattern="request-response"/>
         <transformer ref="holderTransformer3"/>

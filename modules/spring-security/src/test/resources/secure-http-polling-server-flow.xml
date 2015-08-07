@@ -33,7 +33,7 @@
 
     <flow name="SecureUMO">
 
-        <inbound-endpoint address="http://localhost:4567"
+        <inbound-endpoint address="http://localhost:${port1}"
             exchange-pattern="request-response" connector-ref="HttpConnector">
             <mule-ss:http-security-filter
                 realm="mule-realm" />

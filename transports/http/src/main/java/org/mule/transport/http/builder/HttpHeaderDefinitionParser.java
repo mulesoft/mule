@@ -6,23 +6,57 @@
  */
 package org.mule.transport.http.builder;
 
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.module.http.config.HttpRequestSingleParamDefinitionParser;
-import org.mule.module.http.request.HttpParamType;
-import org.mule.module.http.request.HttpSingleParam;
+import org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser;
+import org.mule.module.http.internal.HttpParamType;
+import org.mule.module.http.internal.HttpSingleParam;
+import org.mule.module.http.internal.config.HttpMessageSingleParamDefinitionParser;
+
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
- * Custom bean definition parser for the "header" element that works for both the old "header" element in the
- * HTTP transport (inside the response builder) and the new "header" element in the HTTP module (inside the
- * request builder).
+ * The header element may appear either inside a request-builder element of the HTTP module, a response-builder
+ * element of the HTTP module, or a response-builder element of the HTTP transport. This bean definition parser delegates
+ * into the corresponding parsers for each case.
  */
-public class HttpHeaderDefinitionParser extends ParentContextDefinitionParser
+public class HttpHeaderDefinitionParser extends AbstractParallelDelegatingDefinitionParser
 {
-    public HttpHeaderDefinitionParser()
+
+    protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext)
     {
-        super("response-builder", new ChildMapEntryDefinitionParser("headers", "name", "value"));
-        otherwise(new HttpRequestSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.HEADER));
+        Node parentNode = element.getParentNode();
+        String parentContext = parentNode.getLocalName();
+
+        if (parentContext.equals("response-builder") || parentContext.equals("error-response-builder"))
+        {
+            String responseBuilderParent = parentNode.getParentNode().getLocalName();
+
+            if (responseBuilderParent.equals(AbstractMuleBeanDefinitionParser.ROOT_ELEMENT) ||
+                    responseBuilderParent.equals("listener"))
+            {
+                // header element is used in a response-builder element from the HTTP module
+                return new HttpMessageSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.HEADER);
+            }
+            else
+            {
+                // header element is used in a response-builder element from the HTTP transport
+                MuleDefinitionParser parser = new ChildMapEntryDefinitionParser("headers", "name", "value");
+                parser.addCollection("headers");
+                return parser;
+            }
+        }
+        else if (parentContext.equals("request-builder"))
+        {
+            return new HttpMessageSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.HEADER);
+        }
+        else
+        {
+            throw new IllegalStateException("No parser defined for " + element.getLocalName() + " in the context " + parentContext);
+        }
     }
 
 }

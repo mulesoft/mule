@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd">
+
+    <http:request-config name="requestConfig">
+        <oauth2:authorization-code-grant-type
+                clientId="${client.id}"
+                clientSecret="${client.secret}"
+                redirectionUrl="${redirect.url}">
+            <oauth2:authorization-request
+                    localAuthorizationUrl="${local.authorization.url}"
+                    authorizationUrl="${authorization.url}">
+            </oauth2:authorization-request>
+            <oauth2:token-request
+                    tokenUrl="${token.url}"/>
+        </oauth2:authorization-code-grant-type>
+    </http:request-config>
+
+</mule>

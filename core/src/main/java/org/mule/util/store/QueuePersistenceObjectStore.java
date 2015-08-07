@@ -9,6 +9,7 @@ package org.mule.util.store;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.serialization.SerializationException;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
@@ -16,7 +17,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FileUtils;
-import org.mule.util.SerializationUtils;
 import org.mule.util.queue.objectstore.QueueKey;
 
 import java.io.File;
@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.SerializationException;
 
 /**
  * <p>
@@ -261,7 +260,8 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         try
         {
             FileOutputStream out = new FileOutputStream(outputFile);
-            SerializationUtils.serialize(value, out);
+            out.write(muleContext.getObjectSerializer().serialize(value));
+            out.flush();
         }
         catch (SerializationException se)
         {
@@ -270,6 +270,10 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         catch (FileNotFoundException fnfe)
         {
             throw new ObjectStoreException(fnfe);
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not write to file"), e);
         }
     }
 
@@ -308,7 +312,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         try
         {
             FileInputStream in = new FileInputStream(file);
-            return (T) SerializationUtils.deserialize(in, muleContext);
+            return muleContext.getObjectSerializer().deserialize(in);
         }
         catch (SerializationException se)
         {

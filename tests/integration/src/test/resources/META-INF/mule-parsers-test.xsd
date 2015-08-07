@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/parsers-test"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.mulesoft.org/schema/mule/parsers-test"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
+
+    <xsd:element name="orphan" type="orphanType"/>
+    <xsd:element name="orphan1" type="namedType"/>
+    <xsd:element name="orphan2" type="namedType"/>
+    <xsd:element name="missing" type="abstractBeanType"/>
+    <xsd:element name="named" type="dynamicNamedType"/>
+    <xsd:element name="inherit" type="inheritType"/>
+    <xsd:element name="container" type="containerType"/>
+
+    <xsd:complexType name="orphanType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBeanType">
+                <xsd:sequence>
+                    <xsd:element name="parent" type="parentType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="child" type="childType" minOccurs="0"/>
+                    <xsd:element name="mapped-child" type="childType" minOccurs="0"/>
+                    <xsd:element name="factory" type="childType" minOccurs="0"/>
+                    <xsd:element name="kid" type="childType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="list-element-test-1" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="list-element-test-3" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="offspring-ref" type="xsd:NMTOKEN"/>
+             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="parentType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBeanType">
+                <xsd:sequence>
+                    <xsd:element name="child" type="childType" minOccurs="0"/>
+                    <xsd:element name="kid" type="childType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="offspring-ref" type="xsd:NMTOKEN"/>
+             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="namedType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBeanType">
+                <xsd:sequence>
+                    <xsd:element name="child" type="childType" minOccurs="0"/>
+                    <xsd:element name="kid" type="childType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="offspring-ref" type="xsd:NMTOKEN"/>
+             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="dynamicNamedType">
+        <xsd:complexContent>
+            <xsd:extension base="namedType">
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="inheritType">
+        <xsd:complexContent>
+            <xsd:extension base="dynamicNamedType">
+                <xsd:attribute name="inherit" type="xsd:boolean"/>
+                <xsd:attribute name="id" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="childType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBeanType">
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="abstractBeanType">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="map-entry" type="mapEntry" minOccurs="0"/>
+            <xsd:element name="map-entry-combiner" type="mapEntry" minOccurs="0"/>
+            <xsd:element name="list-entry" type="xsd:string" minOccurs="0"/>
+            <xsd:element ref="properties" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="string" type="xsd:string"/>
+        <xsd:attribute name="bar" type="xsd:int"/>
+        <xsd:attribute name="ignored" fixed="false"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="mapEntry">
+        <xsd:attribute name="key" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="value" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
+
+    <xsd:element name="orphan-endpoint" type="stringEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="stringEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractGlobalEndpointType">
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="child-endpoint" type="childEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="childEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractInboundEndpointType">
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="addressed-orphan-endpoint" type="addressedEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="addressedEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractGlobalEndpointType">
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attribute name="path" type="xsd:string"/>
+                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="addressed-child-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractInboundEndpointType">
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attribute name="address" type="xsd:string"/>
+                <xsd:attribute name="ref" type="xsd:string"/>
+                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
+                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="unaddressed-endpoint" type="unaddressedEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:element name="unaddressed-orphan-endpoint" type="unaddressedEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="unaddressedEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractGlobalEndpointType">
+                <xsd:sequence>
+                    <xsd:element name="address">
+                        <xsd:complexType>
+                            <xsd:attribute name="address" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:group ref="mule:defaultEndpointElements"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- this combines standard global endpoint elements, address-specific attributes, and
+          transport-specific attributes -->
+    <xsd:element name="complex-endpoint" type="complexEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="complexEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractGlobalEndpointType">
+                <!-- standard endpoint elements -->
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <!-- standard endpoint attributes -->
+                <xsd:attribute name="path" type="xsd:string"/>
+                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+                <!-- these are for child bean and will be set as properties
+                     - they could be any transport related values -->
+                <xsd:attribute name="string" type="xsd:string"/>
+                <xsd:attribute name="bar" type="xsd:int"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="list-element-test-1">
+        <xsd:complexType>
+            <xsd:attribute name="listAttribute" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="list-element-test-2">
+        <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+            <xsd:attribute name="kid1" type="xsd:string"/>
+            <xsd:attribute name="kid2" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="list-element-test-3">
+        <xsd:complexType>
+            <xsd:attribute name="attr1" type="xsd:string"/>
+            <xsd:attribute name="attr2" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="no-name">
+        <xsd:complexType>
+            <xsd:attribute name="id" type="xsd:NMTOKEN"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="no-name-2">
+        <xsd:complexType>
+            <xsd:attribute name="id" type="xsd:NMTOKEN"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="properties" type="mapType"/>
+    <xsd:complexType name="mapType">
+        <xsd:complexContent>
+            <xsd:extension base="spring:mapType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="containerType">
+        <xsd:sequence>
+            <xsd:any minOccurs="1"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+</xsd:schema>

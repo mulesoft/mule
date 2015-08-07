@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration shutdownHook="disable">
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
+        <Console name="ConsoleForDomain" target="SYSTEM_OUT">
             <PatternLayout pattern="%-5p %d [%t] %c: %m%n"/>
         </Console>
     </Appenders>
@@ -21,8 +21,8 @@
         <AsyncLogger name="org.mule" level="WARN"/>
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
-        <AsyncRoot level="DEBUG">
-            <AppenderRef ref="Console"/>
+        <AsyncRoot level="WARN" >
+            <AppenderRef ref="ConsoleForDomain"/>
         </AsyncRoot>
     </Loggers>
 

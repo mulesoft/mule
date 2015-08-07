@@ -19,6 +19,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transport.NullPayload;
 import org.mule.util.ExceptionUtils;
 
 import java.util.HashMap;
@@ -117,7 +118,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         props.remove("foo");
 
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://headers", null, null);
+        MuleMessage message = client.send("vm://headers", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(RequiredValueException.class,
@@ -204,7 +205,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
         printResult(result);
         //Will match all Mule headers
-        assertEquals(4, result.size());
+        assertEquals(3, result.size());
         assertEquals("vm://headersWildcard", result.get(MuleProperties.MULE_ENDPOINT_PROPERTY));
         assertTrue(result.keySet().contains(MuleProperties.MULE_SESSION_PROPERTY));
     }
@@ -219,7 +220,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
         printResult(result);
         //Will match all Mule headers
-        assertEquals(6, result.size());
+        assertEquals(5, result.size());
 
         //Match on MULE_*
         assertEquals("vm://headersMultiWildcard", result.get(MuleProperties.MULE_ENDPOINT_PROPERTY));
@@ -355,7 +356,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         List<?> result = (List<?>) message.getPayload();
         printResult(result);
         //Will match all Mule headers
-        assertEquals(4, result.size());
+        assertEquals(3, result.size());
 
         //MULE_ENDPOINT
         assertTrue(result.contains("vm://headersListWildcard"));
@@ -372,7 +373,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         List<?> result = (List<?>) message.getPayload();
         printResult(result);
         //Will match on MULE_* and ba*
-        assertEquals(6, result.size());
+        assertEquals(5, result.size());
 
         //Match on MULE_*
 

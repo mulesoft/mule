@@ -7,7 +7,6 @@
 package org.mule.transformer.types;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.DataType;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
@@ -33,7 +32,7 @@ public class DataTypeFactory
 {
     public static final DataType<String> TEXT_STRING = new SimpleDataType<String>(String.class, MimeTypes.TEXT);
     public static final DataType<String> XML_STRING = new SimpleDataType<String>(String.class, MimeTypes.XML);
-    public static final DataType<String> JSON_STRING = new SimpleDataType<String>(String.class, MimeTypes.JSON);
+    public static final DataType<String> JSON_STRING = new SimpleDataType<String>(String.class, MimeTypes.APPLICATION_JSON);
     public static final DataType<String> HTML_STRING = new SimpleDataType<String>(String.class, MimeTypes.HTML);
     public static final DataType<String> ATOM_STRING = new SimpleDataType<String>(String.class, MimeTypes.ATOM);
     public static final DataType<String> RSS_STRING = new SimpleDataType<String>(String.class, MimeTypes.RSS);
@@ -99,42 +98,42 @@ public class DataTypeFactory
 
     /**
      * Will create a {@link org.mule.api.transformer.DataType} object from an object instance. This method will check
-     * if the object o is a {@link org.mule.api.MuleMessage} instance and will take the type from the message payload
+     * if the object value is a {@link org.mule.api.MuleMessage} instance and will take the type from the message payload
      * and check if a mime type is set on the message and used that when constructing the {@link org.mule.api.transformer.DataType}
      * object.
      *
-     * @param o an object instance.  This can be a {@link org.mule.api.MuleMessage}, a collection, a proxy instance or any other
+     * @param value an object instance.  This can be a {@link org.mule.api.MuleMessage}, a collection, a proxy instance or any other
      *          object
      * @return a data type that represents the object type.
      */
-    public static DataType<?> createFromObject(Object o)
+    public static DataType<?> createFromObject(Object value)
     {
-        Class<?> type = o.getClass();
+        if (value instanceof DataType)
+        {
+            return (DataType<?>) value;
+        }
+
+        Class<?> type = getObjectType(value);
+        String mime = getObjectMimeType(value);
+
+        return create(type, mime);
+    }
+
+    private static String getObjectMimeType(Object value)
+    {
         String mime = null;
-        if (o instanceof DataType)
+        if (value instanceof MuleMessage)
         {
-            return (DataType<?>)o;
+            MuleMessage mm = (MuleMessage) value;
+            mm.getDataType().getMimeType();
         }
-        else if (o instanceof MuleMessage)
+        else if (value instanceof DataHandler)
         {
-            MuleMessage mm = (MuleMessage) o;
-            type = mm.getPayload().getClass();
-            //TODO better mime handling, see MULE-4639
-            //case insensitive
-            mime = mm.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY);
-            if (mime == null)
-            {
-                //case insensitive
-                mime = mm.getInboundProperty("ContentType");
-            }
+            mime = ((DataHandler) value).getContentType();
         }
-        else if (o instanceof DataHandler)
+        else if (value instanceof DataSource)
         {
-            mime = ((DataHandler) o).getContentType();
-        }
-        else if (o instanceof DataSource)
-        {
-            mime = ((DataSource) o).getContentType();
+            mime = ((DataSource) value).getContentType();
         }
 
         if (mime != null)
@@ -148,7 +147,29 @@ public class DataTypeFactory
             mime = MimeTypes.ANY;
         }
 
-        return create(type, mime);
+        return mime;
+    }
+
+    private static Class<?> getObjectType(Object value)
+    {
+        Class<?> type;
+        if (value == null)
+        {
+            type = Object.class;
+        }
+        else
+        {
+            if (value instanceof MuleMessage)
+            {
+                MuleMessage mm = (MuleMessage) value;
+                type = mm.getPayload().getClass();
+            }
+            else
+            {
+                type = value.getClass();
+            }
+        }
+        return type;
     }
 
     public static DataType<?> createFromReturnType(Method m)

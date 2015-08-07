@@ -25,6 +25,7 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.UUID;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.HashSet;
@@ -279,6 +280,12 @@ public class OutboundRoutingTestEvent implements MuleEvent
     }
 
     @Override
+    public DataType<?> getFlowVariableDataType(String key)
+    {
+        return null;
+    }
+
+    @Override
     public Object getFlowVariable(String key)
     {
         return null;
@@ -287,6 +294,12 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public void setFlowVariable(String key, Object value)
     {
+    }
+
+    @Override
+    public void setFlowVariable(String key, Object value, DataType dataType)
+    {
+
     }
 
     @Override
@@ -306,6 +319,12 @@ public class OutboundRoutingTestEvent implements MuleEvent
     }
 
     @Override
+    public DataType<?> getSessionVariableDataType(String key)
+    {
+        return null;
+    }
+
+    @Override
     public Object getSessionVariable(String key)
     {
         return null;
@@ -314,6 +333,12 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public void setSessionVariable(String key, Object value)
     {
+    }
+
+    @Override
+    public void setSessionVariable(String key, Serializable value, DataType dataType)
+    {
+
     }
 
     @Override
@@ -341,5 +366,11 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public void setEnableNotifications(boolean enabled)
     {
+    }
+
+    @Override
+    public boolean isAllowNonBlocking()
+    {
+        return false;
     }
 }

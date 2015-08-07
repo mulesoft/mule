@@ -6,14 +6,17 @@
  */
 package org.mule.registry;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.registry.RegistryBroker;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.concurrent.CountDownLatch;
@@ -154,6 +157,24 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
         {
             fail();
         }
+    }
+
+    @Test
+    public void registerWhenNoRegistriesManuallyAddedYet() throws Exception
+    {
+        final String KEY1 = "apple";
+        final Object VALUE1 = new Apple();
+        final String KEY2 = "Kiwi";
+        final Object VALUE2 = new Kiwi();
+
+        muleContext.getRegistry().registerObject(KEY1, VALUE1);
+        muleContext.getRegistry().registerObject(KEY2, VALUE2);
+
+        assertThat(muleContext.getRegistry().get(KEY1), is(VALUE1));
+        assertThat(muleContext.getRegistry().get(KEY2), is(VALUE2));
+
+        assertThat(muleContext.getRegistry().lookupObject(Apple.class), is(VALUE1));
+        assertThat(muleContext.getRegistry().lookupObject(Kiwi.class), is(VALUE2));
     }
 
 }

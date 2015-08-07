@@ -6,6 +6,11 @@
  */
 package org.mule.api.config;
 
+import org.mule.api.MuleContext;
+import org.mule.api.processor.ProcessingStrategy;
+import org.mule.api.serialization.ObjectSerializer;
+import org.mule.construct.Flow;
+
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
  * immutable after startup.
@@ -94,9 +99,23 @@ public interface MuleConfiguration
     <T> T getExtension(final Class<T> extensionType);
 
     /**
-     * For the cases where HTTP needs to be used by default (no connector or endpoint is explicitly defined), this
-     * determines if the old HTTP transport should be used by default. If false, the new HTTP connector will be used.
-     * This applies, for example, when specifying an HTTP URI in MuleClient.
+     * Returns the default instance of {@link ObjectSerializer} to be
+     * used. This instance will be accessible through {@link MuleContext#getObjectSerializer()}.
+     * <p/>
+     * If not provided, if defaults to an instance of {@link ObjectSerializer}
+     *
+     * @return a {@link ObjectSerializer}
+     * @since 3.7.0
      */
-    boolean useHttpTransportByDefault();
+    ObjectSerializer getDefaultObjectSerializer();
+
+    /**
+     * The default {@link ProcessingStrategy} to be used by
+     * all {@link Flow}s which doesn't specify otherwise
+     *
+     * @return a {@link ProcessingStrategy}
+     * @since 3.7.0
+     */
+    ProcessingStrategy getDefaultProcessingStrategy();
+
 }

@@ -6,6 +6,8 @@
  */
 package org.mule.transaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -14,9 +16,6 @@ import org.mule.context.notification.TransactionNotification;
 import org.mule.util.UUID;
 
 import java.text.MessageFormat;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This base class provides low level features for transactions.
@@ -27,6 +26,8 @@ public abstract class AbstractTransaction implements Transaction
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected String id = UUID.getUUID();
+
+    protected int timeout;
 
     protected MuleContext muleContext;
 
@@ -63,7 +64,7 @@ public abstract class AbstractTransaction implements Transaction
         logger.debug("Beginning transaction");
         doBegin();
         TransactionCoordination.getInstance().bindTransaction(this);
-        fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_BEGAN));
+        fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_BEGAN, getApplicationName()));
     }
 
     public void commit() throws TransactionException
@@ -78,7 +79,7 @@ public abstract class AbstractTransaction implements Transaction
             }
 
             doCommit();
-            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_COMMITTED));
+            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_COMMITTED, getApplicationName()));
         }
         finally
         {
@@ -93,7 +94,7 @@ public abstract class AbstractTransaction implements Transaction
             logger.debug("Rolling back transaction");
             setRollbackOnly();
             doRollback();
-            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_ROLLEDBACK));
+            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_ROLLEDBACK, getApplicationName()));
         }
         finally
         {
@@ -175,5 +176,21 @@ public abstract class AbstractTransaction implements Transaction
             status = -1;
         }
         return MessageFormat.format("{0}[id={1} , status={2}]", getClass().getName(), id, status);
+    }
+
+    private String getApplicationName()
+    {
+        return muleContext.getConfiguration().getId();
+    }
+
+    @Override
+    public int getTimeout()
+    {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout)
+    {
+        this.timeout = timeout;
     }
 }

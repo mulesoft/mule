@@ -6,6 +6,7 @@
  */
 package org.mule.api.transport;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -18,5 +19,14 @@ import org.mule.api.MuleMessage;
 public interface ReplyToHandler
 {
     void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
+
+    /**
+     * Processes replyTo in the case an exception occurred.  Not all implementations will implement this if for example
+     * they should only send a reply message in the sucess case.
+     *
+     * @param exception the exception thrown by processing
+     * @param replyTo name of the channel that exception message should be sent if relevant
+     */
+    void processExceptionReplyTo(MessagingException exception, Object replyTo);
 
 }

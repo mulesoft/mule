@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}" />
+    <http:request-config name="requestConfig" host="localhost" port="${port}" />
+
+    <flow name="testFlow1">
+        <http:listener path="${path}" allowedMethods="GET" config-ref="listenerConfig"/>
+        <vm:outbound-endpoint path="out" />
+        <set-payload value="GET"/>
+    </flow>
+
+    <flow name="testFlow2">
+        <http:listener path="${path}" allowedMethods="POST" config-ref="listenerConfig"/>
+        <vm:outbound-endpoint path="out" />
+        <set-payload value="POST"/>
+    </flow>
+
+    <flow name="testFlow3">
+        <http:listener path="${path}" allowedMethods="OPTIONS, DELETE" config-ref="listenerConfig"/>
+        <vm:outbound-endpoint path="out" />
+        <set-payload value="OPTIONS-DELETE"/>
+    </flow>
+
+    <flow name="testFlow4">
+        <http:listener path="${path}" config-ref="listenerConfig" />
+        <vm:outbound-endpoint path="out" />
+        <set-payload value="ALL"/>
+    </flow>
+
+    <flow name="requestFlow">
+        <http:request path="${path}" method="#[method]" config-ref="requestConfig" sendBodyMode="ALWAYS" />
+    </flow>
+
+
+</mule>

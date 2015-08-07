@@ -15,6 +15,8 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.component.AbstractComponent;
+import org.mule.component.BindingUtils;
+import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.jersey.exception.FallbackErrorMapper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -39,7 +41,6 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 
-import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.jackson1.Jackson1Feature;
 import org.glassfish.jersey.server.ApplicationHandler;
@@ -112,13 +113,12 @@ public class JerseyResourcesComponent extends AbstractComponent
             throw new IllegalStateException("There must be at least one component in the Jersey resources.");
         }
 
-        initializeResources(resources);
         initializeOtherResources(exceptionMappers, resources);
         initializeOtherResources(contextResolvers, resources);
 
-        application = createApplication(resources);
         try
         {
+            application = createApplication(resources);
             ServerRuntime serverRuntime = ClassUtils.getFieldValue(application, "runtime", false);
             backgroundScheduler = ClassUtils.getFieldValue(serverRuntime, "backgroundScheduler", false);
         }
@@ -128,21 +128,14 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
     }
 
-    protected void initializeResources(Set<Class<?>> resources) throws InitialisationException
+    protected void initializeResources(ResourceConfig config) throws Exception
     {
         // Initialize the Jersey resources using the components
         for (JavaComponent component : components)
         {
-            Class<?> c;
-            try
-            {
-                c = component.getObjectType();
-                resources.add(c);
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(e, this);
-            }
+            Object resource = component.getObjectFactory().getInstance(muleContext);
+            BindingUtils.configureBinding(component, resource);
+            config.register(resource);
         }
     }
 
@@ -154,7 +147,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
     }
 
-    protected ApplicationHandler createApplication(final Set<Class<?>> resources)
+    protected ApplicationHandler createApplication(final Set<Class<?>> resources) throws Exception
     {
         if (!properties.containsKey(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED))
         {
@@ -162,6 +155,8 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
 
         resourceConfig = new ResourceConfig();
+
+        initializeResources(resourceConfig);
 
         for (String pkg : packages)
         {
@@ -177,7 +172,7 @@ public class JerseyResourcesComponent extends AbstractComponent
             resourceConfig.register(new FallbackErrorMapper());
         }
 
-        return new ApplicationHandler(resourceConfig, getComponentProvider());
+        return new ApplicationHandler(resourceConfig);
     }
 
     @Override
@@ -214,23 +209,34 @@ public class JerseyResourcesComponent extends AbstractComponent
     {
         for (Object prop : message.getInboundPropertyNames())
         {
-            if (prop.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
+            if (HttpConnector.HTTP_COOKIES_PROPERTY.equals(prop) || HttpHeaders.Names.COOKIE.equals(prop))
             {
-                org.apache.commons.httpclient.Cookie[] apacheCookies = message.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
-                for (org.apache.commons.httpclient.Cookie apacheCookie : apacheCookies)
+                Object cookies = message.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+                if (cookies instanceof org.apache.commons.httpclient.Cookie[])
                 {
-                    Cookie cookie = new Cookie(apacheCookie.getName(), apacheCookie.getValue());
-                    request.header(HttpConstants.HEADER_COOKIE, cookie);
+                    for (org.apache.commons.httpclient.Cookie apacheCookie : (org.apache.commons.httpclient.Cookie[]) cookies)
+                    {
+                        Cookie cookie = new Cookie(apacheCookie.getName(), apacheCookie.getValue());
+                        request.header(HttpConstants.HEADER_COOKIE, cookie);
+                    }
+                }
+                else
+                {
+                    addHeader(request, prop, cookies);
                 }
             }
             else
             {
-                Object property = message.getInboundProperty(prop.toString());
-                if (property != null)
-                {
-                    request.header(prop.toString(), property.toString());
-                }
+                addHeader(request, prop, message.getInboundProperty(prop.toString()));
             }
+        }
+    }
+
+    private void addHeader(ContainerRequest request, Object prop, Object property)
+    {
+        if (property != null)
+        {
+            request.header(prop.toString(), property.toString());
         }
     }
 
@@ -239,16 +245,11 @@ public class JerseyResourcesComponent extends AbstractComponent
         return message.getPayload(InputStream.class);
     }
 
-    protected Binder getComponentProvider()
-    {
-        return new MuleComponentBinder(muleContext, components);
-    }
-
     private ContainerRequest buildRequest(MuleEvent event) throws URISyntaxException
     {
         MuleMessage message = event.getMessage();
-        String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-        String contextPath = message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+        String path = resolvePath(message);
+        String contextPath = resolveContextPath(message);
         String query = null;
         int queryIdx = path.indexOf('?');
         if (queryIdx != -1)
@@ -257,22 +258,13 @@ public class JerseyResourcesComponent extends AbstractComponent
             path = path.substring(0, queryIdx);
         }
 
-        URI endpointUri = event.getMessageSourceURI();
-        String host = message.getInboundProperty("Host", endpointUri.getHost());
+        String host = message.getInboundProperty("Host", event.getMessageSourceURI().getHost());
         String method = message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
 
-        String scheme;
-        if ("servlet".equals(endpointUri.getScheme()))
-        {
-            scheme = "http";
-        }
-        else
-        {
-            scheme = endpointUri.getScheme();
-        }
+        String scheme = resolveScheme(event);
 
         URI baseUri = getBaseUri(scheme, host, contextPath);
-        URI completeUri = getCompleteUri(endpointUri, scheme, host, path, query);
+        URI completeUri = getCompleteUri(scheme, host, path, query);
 
         if (logger.isDebugEnabled())
         {
@@ -283,8 +275,68 @@ public class JerseyResourcesComponent extends AbstractComponent
         return new ContainerRequest(baseUri, completeUri, method, null, new MapPropertiesDelegate());
     }
 
-    private URI getCompleteUri(URI endpointUri,
-                               String scheme,
+
+    /**
+     * Resolves the path of the request, supporting properties from both the HTTP transport and the HTTP module.
+     */
+    private String resolvePath(MuleMessage message)
+    {
+        String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+
+        if (path == null)
+        {
+            path = message.getInboundProperty(org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI);
+        }
+
+        return path;
+    }
+
+    /**
+     * Resolves the context path of the request, supporting properties from both the HTTP transport and
+     * the HTTP module.
+     */
+    private String resolveContextPath(MuleMessage message)
+    {
+        String contextPath = message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+
+        if (contextPath == null)
+        {
+            contextPath = message.getInboundProperty(org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
+
+            if (contextPath != null)
+            {
+                if (contextPath.endsWith("*"))
+                {
+                    contextPath = contextPath.substring(0, contextPath.length() - 1);
+                }
+            }
+        }
+
+        return contextPath;
+    }
+
+    /**
+     * Resolves the scheme the URL in the request (http or https), supporting properties from both the HTTP transport
+     * (by reading the message source URI in the endpoint) and the HTTP module (an inbound property with the scheme).
+     */
+    private String resolveScheme(MuleEvent event)
+    {
+        String scheme = event.getMessageSourceURI().getScheme();
+
+        if (scheme == null)
+        {
+            scheme = event.getMessage().getInboundProperty(org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME);
+        }
+
+        if ("servlet".equals(scheme))
+        {
+            scheme = org.mule.module.http.api.HttpConstants.Protocols.HTTP.getScheme();
+        }
+
+        return scheme;
+    }
+
+    private URI getCompleteUri(String scheme,
                                String host,
                                String path,
                                String query) throws URISyntaxException

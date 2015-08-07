@@ -27,7 +27,7 @@ public class UsernameTokenTestCase extends FunctionalTestCase
     protected String[] getConfigFiles()
     {
         return new String[] {
-                "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml",
+                "org/mule/module/cxf/wssec/cxf-secure-service-flow-httpn.xml",
                 "org/mule/module/cxf/wssec/username-token-conf.xml"
         };
     }

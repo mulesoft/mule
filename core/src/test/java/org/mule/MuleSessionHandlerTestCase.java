@@ -6,13 +6,22 @@
  */
 package org.mule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.Credentials;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.serialization.SerializationException;
 import org.mule.api.transport.SessionHandler;
 import org.mule.security.DefaultMuleAuthentication;
 import org.mule.security.DefaultSecurityContextFactory;
@@ -22,21 +31,16 @@ import org.mule.session.LegacySessionHandler;
 import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import com.google.common.base.Charsets;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.SerializationException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 {
@@ -48,8 +52,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     @Before
     public void setUp() throws Exception
     {
-        muleContext = Mockito.mock(MuleContext.class);
-        Mockito.when(muleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+        muleContext = mock(MuleContext.class);
+        MuleConfiguration configuration = mock(MuleConfiguration.class);
+        when(configuration.getDefaultEncoding()).thenReturn(Charsets.UTF_8.name());
+        when(muleContext.getConfiguration()).thenReturn(configuration);
+        when(muleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+        addJavaSerializerToMockMuleContext(muleContext);
     }
 
     @BeforeClass

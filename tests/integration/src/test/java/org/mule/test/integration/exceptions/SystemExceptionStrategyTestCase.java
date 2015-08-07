@@ -9,6 +9,7 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.construct.Flow;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
+@Ignore("BL-186")
 public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {
     @Override

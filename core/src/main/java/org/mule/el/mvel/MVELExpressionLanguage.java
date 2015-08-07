@@ -6,6 +6,8 @@
  */
 package org.mule.el.mvel;
 
+import static org.mule.expression.DefaultExpressionManager.OBJECT_FOR_ENRICHMENT;
+import static org.mule.expression.DefaultExpressionManager.removeExpressionMarker;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -17,6 +19,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.el.mvel.datatype.MvelEnricherDataTypePropagator;
+import org.mule.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
@@ -25,12 +29,15 @@ import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -58,6 +65,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     protected Map<String, String> aliases = new HashMap<String, String>();
     protected Map<String, Class<?>> imports = new HashMap<String, Class<?>>();
     protected boolean autoResolveVariables = true;
+    protected MvelDataTypeResolver dataTypeResolver = new MvelDataTypeResolver();
+    protected MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator();
 
     public MVELExpressionLanguage(MuleContext muleContext)
     {
@@ -67,7 +76,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @Override
     public void initialise() throws InitialisationException
     {
-        parserConfiguration = createParserConfiguration();
+        parserConfiguration = createParserConfiguration(imports);
         expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
 
         loadGlobalFunctions();
@@ -99,7 +108,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
         // Global functions defined in configuration file (take precedence over functions in file)
         globalFunctions.putAll(CompilerTools.extractAllDeclaredFunctions(new ExpressionCompiler(
-            globalFunctionsString).compile()));
+                globalFunctionsString).compile()));
     }
 
     @Override
@@ -183,15 +192,36 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         return evaluateInternal(expression, context);
     }
 
+    @Override
+    public void enrich(String expression, MuleMessage message, TypedValue typedValue)
+    {
+        evaluate(expression, message, Collections.singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
+
+        expression = removeExpressionMarker(expression);
+
+        final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
+
+        dataTypePropagator.propagate(typedValue, message, compiledExpression);
+    }
+
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    {
+        expression = removeExpressionMarker(expression);
+
+        final Object value = evaluate(expression, message);
+        final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
+        final DataType dataType = dataTypeResolver.resolve(value, message, compiledExpression);
+
+        return new TypedValue(value, dataType);
+    }
+
     @SuppressWarnings("unchecked")
     protected <T> T evaluateInternal(String expression, MVELExpressionLanguageContext variableResolverFactory)
     {
         validate(expression);
 
-        if (expression.startsWith(ExpressionManager.DEFAULT_EXPRESSION_PREFIX))
-        {
-            expression = expression.substring(2, expression.length() - 1);
-        }
+        expression = removeExpressionMarker(expression);
 
         try
         {
@@ -244,14 +274,14 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         return new MVELExpressionLanguageContext(parserConfiguration, muleContext);
     }
 
-    protected ParserConfiguration createParserConfiguration()
+    public static ParserConfiguration createParserConfiguration(Map<String, Class<?>> imports)
     {
         ParserConfiguration ParserConfiguration = new ParserConfiguration();
-        configureParserConfiguration(ParserConfiguration);
+        configureParserConfiguration(ParserConfiguration, imports);
         return ParserConfiguration;
     }
 
-    protected void configureParserConfiguration(ParserConfiguration parserConfiguration)
+    protected static void configureParserConfiguration(ParserConfiguration parserConfiguration, Map<String, Class<?>> imports)
     {
         // defaults imports
 
@@ -300,6 +330,11 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         this.autoResolveVariables = autoResolveVariables;
     }
 
+    public void setDataTypeResolver(MvelDataTypeResolver dataTypeResolver)
+    {
+        this.dataTypeResolver = dataTypeResolver;
+    }
+
     public void addGlobalFunction(String name, Function function)
     {
         this.globalFunctions.put(name, function);
@@ -345,14 +380,19 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
     }
 
-    protected Map<String, String> getAliases()
+    public Map<String, String> getAliases()
     {
         return aliases;
     }
 
-    protected Map<String, Function> getGlobalFunctions()
+    public Map<String, Function> getGlobalFunctions()
     {
         return globalFunctions;
+    }
+
+    public ParserConfiguration getParserConfiguration()
+    {
+        return parserConfiguration;
     }
 
 }

@@ -10,6 +10,10 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
     <flow name="proxy-gzip">
         <http:inbound-endpoint host="localhost" port="${port2}" path="proxy" exchange-pattern="request-response"/>
         <cxf:proxy-service payload="body" service="ArtistRegistryWebServicesService" namespace="http://example.cxf.module.mule.org/" port="ArtistRegistryWebServicesPort"

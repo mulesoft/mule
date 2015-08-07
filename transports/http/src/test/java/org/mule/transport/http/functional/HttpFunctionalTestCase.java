@@ -18,22 +18,19 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class HttpFunctionalTestCase extends FunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
     protected boolean checkPathProperties = true;
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigFile()

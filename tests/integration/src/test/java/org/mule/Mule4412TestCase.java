@@ -57,7 +57,7 @@ public class Mule4412TestCase extends FunctionalTestCase
     @Test
     public void testFilterOnce() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE);
         msg.setOutboundProperty("pass", "true");
 
         MuleClient client = muleContext.getClient();
@@ -82,7 +82,7 @@ public class Mule4412TestCase extends FunctionalTestCase
     @Test
     public void testWrongPropertyKey() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE);
         msg.setProperty("fail", "true", PropertyScope.INVOCATION);
 
         MuleClient client = muleContext.getClient();
@@ -101,8 +101,8 @@ public class Mule4412TestCase extends FunctionalTestCase
     @Test
     public void testWrongPropertyValue() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        msg.setInboundProperty("pass", "false");
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE);
+        msg.setProperty("pass", "false", PropertyScope.INBOUND);
 
         MuleClient client = muleContext.getClient();
         client.send("vm://async", msg);
@@ -120,7 +120,7 @@ public class Mule4412TestCase extends FunctionalTestCase
     @Test
     public void testNoProperty() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage msg = getTestMuleMessage(TEST_MESSAGE);
 
         MuleClient client = muleContext.getClient();
         client.send("vm://async", msg);

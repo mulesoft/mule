@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.config.processor;
 
+import static org.mule.module.db.internal.domain.query.QueryType.MERGE;
 import static org.mule.module.db.internal.domain.query.QueryType.STORE_PROCEDURE_CALL;
 import static org.mule.module.db.internal.domain.query.QueryType.TRUNCATE;
 import static org.mule.module.db.internal.domain.query.QueryType.UPDATE;
@@ -21,6 +22,6 @@ public class UpdateProcessorBeanDefinitionParser extends AbstractUpdateProcessor
     @Override
     protected List<QueryType> getQueryType()
     {
-        return Arrays.asList(UPDATE, STORE_PROCEDURE_CALL, TRUNCATE);
+        return Arrays.asList(UPDATE, STORE_PROCEDURE_CALL, TRUNCATE, MERGE);
     }
 }

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+
+    <spring:beans>
+        <spring:bean id="customExceptionFactory" class="org.mule.extension.validation.ValidationExceptionTestCase$TestExceptionFactory" />
+    </spring:beans>
+    
+    <validation:exception-factory name="globalExceptionFactory" class="org.mule.extension.validation.ValidationExceptionTestCase$TestExceptionFactory" />
+
+    <validation:config name="byClassExceptionFactoryValidator">
+        <validation:exception-factory class="org.mule.extension.validation.ValidationExceptionTestCase$TestExceptionFactory" />
+    </validation:config>
+
+    <validation:config name="byRefExceptionFactoryValidator">
+        <validation:exception-factory ref="customExceptionFactory" />
+    </validation:config>
+
+    <validation:config name="standard" />
+
+    <validation:config name="globalExceptionFactoryValidator" exceptionFactory="globalExceptionFactory" />
+
+    <flow name="byRefExceptionFactoryFlow">
+        <validation:is-true expression="false" config-ref="byRefExceptionFactoryValidator" />
+    </flow>
+
+    <flow name="byClassExceptionFactoryFlow">
+        <validation:is-true expression="false" config-ref="byClassExceptionFactoryValidator" />
+    </flow>
+
+    <flow name="globalExceptionFactoryFlow">
+        <validation:is-true expression="false" config-ref="globalExceptionFactoryValidator" />
+    </flow>
+
+    <flow name="customMessage">
+        <validation:is-true expression="false" config-ref="standard" message="Hello World!" />
+    </flow>
+
+    <flow name="customExceptionType">
+        <validation:is-true expression="false" config-ref="standard" exceptionClass="java.lang.IllegalArgumentException" />
+    </flow>
+
+</mule>

@@ -10,9 +10,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.filter.Filter;
+import org.mule.processor.NonBlockingMessageProcessor;
 
 /**
  * Routes the event to a single<code>MessageProcessor</code> using a {@link Filter}
@@ -21,7 +23,7 @@ import org.mule.api.routing.filter.Filter;
  * If a default route has been configured and no match has been found, the default
  * route will be used. Otherwise it throws a {@link RoutePathNotFoundException}.
  */
-public class ChoiceRouter extends AbstractSelectiveRouter
+public class ChoiceRouter extends AbstractSelectiveRouter implements NonBlockingMessageProcessor
 {
     @Override
     protected Collection<MessageProcessor> selectProcessors(MuleEvent event)

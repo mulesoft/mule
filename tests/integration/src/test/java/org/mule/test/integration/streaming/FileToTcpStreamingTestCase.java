@@ -15,9 +15,11 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-6926: Flaky test - fails on build server")
 public class FileToTcpStreamingTestCase extends FunctionalTestCase
 {
     @Rule

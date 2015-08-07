@@ -3,4 +3,6 @@ http\://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xs
 http\://www.mulesoft.org/schema/mule/spring-security/3.3/mule-spring-security.xsd=META-INF/mule-spring-security.xsd
 http\://www.mulesoft.org/schema/mule/spring-security/3.4/mule-spring-security.xsd=META-INF/mule-spring-security.xsd
 http\://www.mulesoft.org/schema/mule/spring-security/3.5/mule-spring-security.xsd=META-INF/mule-spring-security.xsd
+http\://www.mulesoft.org/schema/mule/spring-security/3.6/mule-spring-security.xsd=META-INF/mule-spring-security.xsd
+http\://www.mulesoft.org/schema/mule/spring-security/3.7/mule-spring-security.xsd=META-INF/mule-spring-security.xsd
 http\://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd=META-INF/mule-spring-security.xsd

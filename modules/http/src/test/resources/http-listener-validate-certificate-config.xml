@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!-- HTTPS listener configured with a trust-store, client certificates should be validated. -->
+    <http:listener-config name="listenerConfigWithTrustStore" protocol="HTTPS" host="localhost" port="${port1}">
+        <tls:context>
+            <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        </tls:context>
+    </http:listener-config>
+
+    <flow name="listenerWithTrustStoreFlow">
+        <http:listener config-ref="listenerConfigWithTrustStore" path="/" allowedMethods="POST"/>
+        <test:assert expression="#[message.inboundProperties['http.client.cert'] != null]"/>
+        <test:assert expression="#[message.inboundProperties['http.client.cert'] instanceof java.security.cert.Certificate]"/>
+        <!-- Only the client certificate contains CN=OLEKSIYS-W3T this way we validate that we are actually publishing the client cert -->
+        <test:assert expression="#[message.inboundProperties['http.client.cert'].getSubjectDN().getName().contains('CN=OLEKSIYS-W3T')]"/>
+        <echo-component />
+    </flow>
+
+
+    <!-- HTTPS listener configured without a trust-store, client certificates should not be validated. -->
+    <http:listener-config name="listenerConfigWithoutTrustStore" protocol="HTTPS" host="localhost" port="${port2}">
+        <tls:context>
+            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        </tls:context>
+    </http:listener-config>
+
+    <flow name="listenerWithoutTrustStoreFlow">
+        <http:listener config-ref="listenerConfigWithoutTrustStore" path="/" allowedMethods="POST"/>
+        <echo-component />
+    </flow>
+
+
+
+</mule>

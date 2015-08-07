@@ -69,14 +69,16 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
         assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.7");
 		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+		setJdkVersion("1.8");
+		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 
 		//not supported
 		setJdkVersion("1.4.2");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.4.2_12");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
-        setJdkVersion("1.8");
-        assertFalse(JdkVersionUtils.isSupportedJdkVersion());
+		setJdkVersion("1.9");
+		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
 	}
 	
 	@Test

@@ -44,6 +44,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
+    protected long threadTimeout;
     protected WorkManager workManager;
 
     private MessagingExceptionHandler messagingExceptionHandler;
@@ -58,6 +59,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                                              int shutdownTimeout)
     {
         this.doThreading = threadingProfile.isDoThreading();
+        this.threadTimeout = threadingProfile.getThreadWaitTimeout();
         workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
         workManagerSource = new WorkManagerSource()
         {
@@ -70,7 +72,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     public void start() throws MuleException
     {
-        if (workManager != null)
+        if (workManager != null && !workManager.isStarted())
         {
             workManager.start();
         }
@@ -178,7 +180,12 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         public AsyncMessageProcessorWorker(MuleEvent event)
         {
-            super(event);
+            super(event, true);
+        }
+
+        public AsyncMessageProcessorWorker(MuleEvent event, boolean copy)
+        {
+            super(event, copy);
         }
 
         @Override
@@ -231,6 +238,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected void firePipelineNotification(MuleEvent event, MessagingException exception)
     {
+        // Async completed notification uses same event instance as async listener
         if (event.getFlowConstruct() instanceof MessageProcessorPathResolver)
         {
             muleContext.getNotificationManager().fireNotification(

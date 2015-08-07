@@ -83,7 +83,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertSame(responseMessage, result.getMessage());
 
-        assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
+        assertEqualMessages(responseMessage, result.getMessage());
     }
 
     @Test
@@ -114,7 +114,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertSame(responseMessage, result.getMessage());
 
-        assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
+        assertEqualMessages(responseMessage, result.getMessage());
     }
 
     @Test
@@ -232,18 +232,6 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     }
 
     @Test
-    public void testTransaction()
-    {
-        // TODO
-    }
-
-    @Test
-    public void testExceptionHandling()
-    {
-        // TODO
-    }
-
-    @Test
     public void cachesResolvedStaticEndpoints() throws Exception
     {
         OutboundEndpoint prototypeEndpoint = mock(OutboundEndpoint.class);
@@ -271,16 +259,12 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
     }
 
-    protected void assertMessageEqualEncodingPropertyAdded(MuleMessage expect, MuleMessage actual)
+    protected void assertEqualMessages(MuleMessage expect, MuleMessage actual)
     {
         assertEquals(expect.getPayload(), actual.getPayload());
         assertEquals(expect.getEncoding(), actual.getEncoding());
         assertEquals(expect.getUniqueId(), actual.getUniqueId());
         assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());
-
-        assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
-                     actual.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
-
     }
 
     private void assertEventDispatched()

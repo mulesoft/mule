@@ -120,7 +120,7 @@ public class ExpiryMonitor implements Runnable, Disposable
             {
                 logger.debug("Adding new expirable: " + expirable);
             }
-            monitors.put(expirable, new ExpirableHolder(timeUnit.toNanos(value), expirable));
+            monitors.put(expirable, new ExpirableHolder(timeUnit.toMillis(value), expirable));
         }
     }
 
@@ -196,20 +196,20 @@ public class ExpiryMonitor implements Runnable, Disposable
     private static class ExpirableHolder
     {
 
-        private long nanoseconds;
         private Expirable expirable;
+        private long milliseconds;
         private long created;
 
-        public ExpirableHolder(long nanoseconds, Expirable expirable)
+        public ExpirableHolder(long milliseconds, Expirable expirable)
         {
-            this.nanoseconds = nanoseconds;
+            this.milliseconds = milliseconds;
             this.expirable = expirable;
-            created = System.nanoTime();
+            created = System.currentTimeMillis();
         }
 
-        public long getNanoSeconds()
+        public long getMilliSeconds()
         {
-            return nanoseconds;
+            return milliseconds;
         }
 
         public Expirable getExpirable()
@@ -219,12 +219,12 @@ public class ExpiryMonitor implements Runnable, Disposable
 
         public boolean isExpired()
         {
-            return (System.nanoTime() - nanoseconds) > created;
+            return (System.currentTimeMillis() - milliseconds) > created;
         }
 
         public void reset()
         {
-            created = System.nanoTime();
+            created = System.currentTimeMillis();
         }
     }
 }

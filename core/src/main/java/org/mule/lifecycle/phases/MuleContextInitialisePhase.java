@@ -8,6 +8,7 @@ package org.mule.lifecycle.phases;
 
 import org.mule.api.agent.Agent;
 import org.mule.api.component.Component;
+import org.mule.api.config.Config;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -50,6 +51,7 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase
         registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
 
         Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
+        startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));

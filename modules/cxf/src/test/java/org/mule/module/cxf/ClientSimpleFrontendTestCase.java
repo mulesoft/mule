@@ -24,7 +24,7 @@ public class ClientSimpleFrontendTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "aegis-conf-flow.xml";
+        return "aegis-conf-flow-httpn.xml";
     }
 
     @Test

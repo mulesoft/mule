@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               ">
+
+    <spring:bean name="sensingRequestResponseProcessorEcho" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+
+    <http:request-config host="localhost" port="${port}" name="requestConfig" />
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
+    <ws:consumer-config wsdlLocation="Test.wsdl" service="TestService" port="TestPort"
+                        serviceAddress="http://localhost:${port}/services/Test" connectorConfig="requestConfig"
+                        name="globalConfig"/>
+
+    <flow name="client" processingStrategy="non-blocking">
+        <http:listener path="in" config-ref="listenerConfig"/>
+        <processor ref="sensingRequestResponseProcessorEcho" />
+        <ws:consumer operation="echo" />
+    </flow>
+
+    <flow name="server">
+        <http:listener path="services/Test" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
+        <component class="org.mule.module.ws.consumer.TestService"/>
+    </flow>
+
+    <flow name="clientMidFlow" processingStrategy="non-blocking">
+        <http:listener path="inMidFlow" config-ref="listenerConfig"/>
+        <ws:consumer operation="echo" />
+        <set-payload value="#[org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE]"/>
+    </flow>
+
+</mule>

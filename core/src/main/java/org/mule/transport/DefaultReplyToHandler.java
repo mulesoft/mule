@@ -6,16 +6,14 @@
  */
 package org.mule.transport;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
@@ -27,6 +25,10 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.service.TransportFactory;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.store.DeserializationPostInitialisable;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -121,6 +123,13 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
                 replyToEvent, endpoint, e);
         }
 
+    }
+
+    @Override
+    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
+    {
+       // DefaultReplyToHandler does not send a reply message when an exception errors, this is rather handled by
+       // using an exception strategy.
     }
 
     protected synchronized OutboundEndpoint getEndpoint(MuleEvent event, String endpointUri) throws MuleException

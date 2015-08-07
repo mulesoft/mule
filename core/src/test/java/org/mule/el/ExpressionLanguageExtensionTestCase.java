@@ -6,10 +6,9 @@
  */
 package org.mule.el;
 
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-
+import static org.junit.Assert.assertThat;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
@@ -26,6 +25,7 @@ import org.mule.el.context.AbstractELTestCase;
 import org.mule.el.context.AppContext;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.el.mvel.MVELExpressionLanguageContext;
+import org.mule.mvel2.compiler.AbstractParser;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -34,7 +34,6 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mule.mvel2.compiler.AbstractParser;
 
 public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
 {

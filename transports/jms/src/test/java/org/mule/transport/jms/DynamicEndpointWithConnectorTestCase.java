@@ -8,8 +8,6 @@ package org.mule.transport.jms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -29,14 +27,13 @@ public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
 
-        String testMessage = "TEST";
-        DefaultMuleMessage message = new DefaultMuleMessage(testMessage, muleContext);
+        MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("queueName", "test.out");
 
-        MuleMessage test = client.send("vm://input", message, null);
+        MuleMessage test = client.send("vm://input", message);
         assertNotNull(test);
 
         MuleMessage response = client.request("jms://test.out", 5000);
-        assertEquals(testMessage, response.getPayload());
+        assertEquals(TEST_PAYLOAD, response.getPayload());
     }
 }

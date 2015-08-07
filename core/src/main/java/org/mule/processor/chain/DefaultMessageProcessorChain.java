@@ -77,29 +77,8 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         }
         else
         {
-            FlowConstruct flowConstruct = event.getFlowConstruct();
-            MuleEvent copy = null;
-            
-            for (int i = 0; i < processors.size(); i++)
-            {
-                MessageProcessor processor = processors.get(i);
-                if (processorMayReturnNull(processor))
-                {
-                    copy = OptimizedRequestContext.criticalSetEvent(event);
-                }
-
-                event = messageProcessorExecutionTemplate.execute(processor, event);
-
-                if (VoidMuleEvent.getInstance().equals(event))
-                {
-                        event = copy;
-                }
-                else if (event == null)
-                {
-                    return null;
-                }
-            }
-            return event;
+            return new ProcessorExecutorFactory().createProcessorExecutor(event, processors,
+                                                                          messageProcessorExecutionTemplate, true).execute();
         }
     }
 

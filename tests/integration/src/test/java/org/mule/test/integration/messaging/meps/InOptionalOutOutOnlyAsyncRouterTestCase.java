@@ -35,7 +35,7 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNull(result);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("some data", muleContext);
+        MuleMessage msg = getTestMuleMessage("some data");
         msg.setOutboundProperty("foo", "bar");
         result = client.send("inboundEndpoint", msg);
         assertNotNull(result);

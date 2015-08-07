@@ -8,11 +8,15 @@ package org.mule.transformer.simple;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
+import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.StringUtils;
 
 import java.text.MessageFormat;
 
@@ -46,16 +50,30 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
         }
         else
         {
-            Object value = valueEvaluator.resolveValue(message);
-            if (value == null)
+            TypedValue typedValue = valueEvaluator.resolveTypedValue(message);
+            if (typedValue.getValue() == null || typedValue.getValue() instanceof NullPayload)
             {
-                logger.info(MessageFormat.format(
-                        "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
-                        key, valueEvaluator.getRawValue()));
+                message.removeProperty(key, getScope());
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(MessageFormat.format(
+                            "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
+                            key, valueEvaluator.getRawValue()));
+                }
             }
             else
             {
-                message.setProperty(key, value, getScope());
+                if (!StringUtils.isEmpty(mimeType) || !StringUtils.isEmpty(encoding))
+                {
+                    DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType());
+                    dataType.setEncoding(getEncoding());
+                    message.setProperty(key, typedValue.getValue(), getScope(), dataType);
+                }
+                else
+                {
+                    message.setProperty(key, typedValue.getValue(), getScope(), typedValue.getDataType());
+                }
             }
         }
         return message;

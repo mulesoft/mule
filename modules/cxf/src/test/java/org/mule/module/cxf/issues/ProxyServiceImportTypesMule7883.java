@@ -11,28 +11,46 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.NullPayload;
 
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
+@RunWith(Parameterized.class)
 public class ProxyServiceImportTypesMule7883 extends FunctionalTestCase
 {
 
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
 
+    @Parameterized.Parameter(0)
+    public String config;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"issues/proxy-wsdl-import-conf.xml"},
+                {"issues/proxy-wsdl-import-conf-httpn.xml"}
+        });
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "issues/proxy-wsdl-import-conf.xml";
+        return config;
     }
 
     @Test
@@ -50,7 +68,7 @@ public class ProxyServiceImportTypesMule7883 extends FunctionalTestCase
     private void testImportType(String targetUrl, String expectedImportUrl, String importType, String locationAttributeName) throws Exception
     {
         String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/test";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + targetUrl, null, null);
+        MuleMessage response = muleContext.getClient().send(proxyAddress + targetUrl, getTestMuleMessage(NullPayload.getInstance()));
 
         Document wsdl = XMLUnit.buildTestDocument(new InputSource(new StringReader(response.getPayloadAsString())));
         List<Element> imports = DOMUtils.findAllElementsByTagName(wsdl.getDocumentElement(), importType + ":import");

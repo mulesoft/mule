@@ -9,6 +9,10 @@ package org.mule.transport.ssl;
 
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
+import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
+import org.mule.util.FileUtils;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -59,6 +63,16 @@ public class DefaultTlsContextFactory implements TlsContextFactory
         tlsConfiguration.setKeyStoreType(keyStoreType);
     }
 
+    public String getKeyAlias()
+    {
+        return tlsConfiguration.getKeyAlias();
+    }
+
+    public void setKeyAlias(String keyAlias)
+    {
+        tlsConfiguration.setKeyAlias(keyAlias);
+    }
+
     public String getKeyStorePassword()
     {
         return tlsConfiguration.getKeyStorePassword();
@@ -96,6 +110,11 @@ public class DefaultTlsContextFactory implements TlsContextFactory
 
     public void setTrustStorePath(String trustStorePath) throws IOException
     {
+        String trustStoreResource = FileUtils.getResourcePath(trustStorePath, getClass());
+        if (trustStoreResource == null)
+        {
+            throw new IOException(String.format("Resource %s could not be found", trustStorePath));
+        }
         tlsConfiguration.setTrustStore(trustStorePath);
     }
 
@@ -137,7 +156,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory
         {
             if (!initialized)
             {
-                tlsConfiguration.initialise(null == getKeyStorePath(), TlsConfiguration.JSSE_NAMESPACE);
+                tlsConfiguration.initialise(null == getKeyStorePath(), null);
                 initialized = true;
             }
         }
@@ -160,5 +179,113 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     public boolean isKeyStoreConfigured()
     {
         return tlsConfiguration.getKeyStore() != null;
+    }
+
+    @Override
+    public boolean isTrustStoreConfigured()
+    {
+        return tlsConfiguration.getTrustStore() != null;
+    }
+
+    @Override
+    public TlsContextKeyStoreConfiguration getKeyStoreConfiguration()
+    {
+        return new TlsContextKeyStoreConfiguration()
+        {
+            @Override
+            public String getAlias()
+            {
+                return getKeyAlias();
+            }
+
+            @Override
+            public String getKeyPassword()
+            {
+                return getKeyManagerPassword();
+            }
+
+            @Override
+            public String getPath()
+            {
+                return getKeyStorePath();
+            }
+
+            @Override
+            public String getPassword()
+            {
+                return getKeyStorePassword();
+            }
+
+            @Override
+            public String getType()
+            {
+                return getKeyStoreType();
+            }
+
+            @Override
+            public String getAlgorithm()
+            {
+                return getKeyManagerAlgorithm();
+            }
+        };
+    }
+
+    @Override
+    public TlsContextTrustStoreConfiguration getTrustStoreConfiguration()
+    {
+        return new TlsContextTrustStoreConfiguration()
+        {
+            @Override
+            public String getPath()
+            {
+                return getTrustStorePath();
+            }
+
+            @Override
+            public String getPassword()
+            {
+                return getTrustStorePassword();
+            }
+
+            @Override
+            public String getType()
+            {
+                return getTrustStoreType();
+            }
+
+            @Override
+            public String getAlgorithm()
+            {
+                return getTrustManagerAlgorithm();
+            }
+        };
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof DefaultTlsContextFactory))
+        {
+            return false;
+        }
+
+        DefaultTlsContextFactory that = (DefaultTlsContextFactory) o;
+
+        if (!tlsConfiguration.equals(that.tlsConfiguration))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return tlsConfiguration.hashCode();
     }
 }

@@ -30,6 +30,7 @@ public class ExpressionConfig
 
     private String expressionPrefix = ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
     private String expressionPostfix = ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+    private volatile boolean parsed = false;
 
     public ExpressionConfig()
     {
@@ -58,6 +59,26 @@ public class ExpressionConfig
 
     public void parse(String expressionString)
     {
+        if (parsed)
+        {
+            return;
+        }
+
+        synchronized (this)
+        {
+            if (parsed)
+            {
+                return;
+            }
+
+            doParse(expressionString);
+
+            parsed = true;
+        }
+    }
+
+    private void doParse(String expressionString)
+    {
         if (expressionString.startsWith(expressionPrefix) && evaluator == null)
         {
             expressionString = expressionString.substring(expressionPrefix.length());
@@ -77,7 +98,7 @@ public class ExpressionConfig
             }
             else
             {
-                this.evaluator = expressionString.substring(0, i);
+                this.evaluator = candidateEvaluator;
                 this.expression = expressionString.substring(i + 1);
             }
         }
@@ -182,5 +203,6 @@ public class ExpressionConfig
         this.unParsedExpression = expression;
         this.expression = null;
         this.fullExpression = null;
+        this.parsed = false;
     }
 }

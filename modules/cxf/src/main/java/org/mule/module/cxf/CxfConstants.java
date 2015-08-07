@@ -15,7 +15,8 @@ public class CxfConstants
     
     public static final String CXF_OUTBOUND_MESSAGE_PROCESSOR = "cxf_outbound_message_processor";
     public static final String MULE_EVENT = "mule.event";
-    
+    public static final String NON_BLOCKING_RESPONSE = "mule.nonBlockingResponse";
+
     public static final String ATTACHMENTS = "cxf_attachments";
     public static final String INBOUND_SERVICE= "cxf_service";
     public static final String INBOUND_OPERATION= "cxf_operation";

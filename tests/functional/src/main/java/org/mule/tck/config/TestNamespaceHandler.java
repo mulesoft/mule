@@ -7,10 +7,13 @@
 package org.mule.tck.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.tck.functional.AssertionMessageProcessor;
 import org.mule.tck.functional.InvocationCountMessageProcessor;
+import org.mule.tck.functional.ResponseAssertionMessageProcessor;
+import org.mule.tck.functional.TestNonBlockingProcessor;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.services.TestServiceComponent;
 import org.mule.tck.transformer.NoActionTransformer;
@@ -32,5 +35,7 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("no-action-transformer", new MessageProcessorDefinitionParser(NoActionTransformer.class));
         registerMuleBeanDefinitionParser("assert", new MessageProcessorDefinitionParser(AssertionMessageProcessor.class));
         registerMuleBeanDefinitionParser("invocation-counter", new MessageProcessorDefinitionParser(InvocationCountMessageProcessor.class));
+        registerMuleBeanDefinitionParser("non-blocking-processor", new MessageProcessorDefinitionParser(TestNonBlockingProcessor.class));
+        registerMuleBeanDefinitionParser("assert-intercepting", new MessageProcessorDefinitionParser(ResponseAssertionMessageProcessor.class));
     }
 }

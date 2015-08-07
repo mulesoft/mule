@@ -57,6 +57,20 @@ public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase
         assertNotContainsUserDefinedType(typeManager, connection, UDT_STRUCT);
     }
 
+    @Test
+    public void ignoreDuplicatedTypes() throws Exception
+    {
+        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+        when(metaData.getTypeInfo()).thenReturn(createResultSetWithDuplicatedTypes());
+
+        DbConnection connection = mock(DbConnection.class);
+        when(connection.getMetaData()).thenReturn(metaData);
+
+        MetadataDbTypeManager typeManager = new MetadataDbTypeManager();
+
+        assertThat(typeManager.lookup(connection, UDT_OK.getId(), UDT_OK.getName()), instanceOf(DbType.class));
+    }
+
     private void assertNotContainsUserDefinedType(MetadataDbTypeManager typeManager, DbConnection connection, DbType udtDbType)
     {
         try
@@ -72,9 +86,7 @@ public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase
 
     private ResultSet createResultSetWithUserDefinedTypes() throws SQLException
     {
-        List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
-        columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, 1));
-        columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, 2));
+        List<ColumnMetadata> columns = getTypeMedataColumns();
 
         ResultSetBuilder resultSetBuilder = new ResultSetBuilder(columns, mock(Statement.class));
 
@@ -84,6 +96,26 @@ public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase
         addRecord(resultSetBuilder, UDT_OK);
 
         return resultSetBuilder.build();
+    }
+
+    private ResultSet createResultSetWithDuplicatedTypes() throws SQLException
+    {
+        List<ColumnMetadata> columns = getTypeMedataColumns();
+
+        ResultSetBuilder resultSetBuilder = new ResultSetBuilder(columns, mock(Statement.class));
+
+        addRecord(resultSetBuilder, UDT_OK);
+        addRecord(resultSetBuilder, UDT_OK);
+
+        return resultSetBuilder.build();
+    }
+
+    private List<ColumnMetadata> getTypeMedataColumns()
+    {
+        List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
+        columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, 1));
+        columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, 2));
+        return columns;
     }
 
     private void addRecord(ResultSetBuilder resultSetBuilder, DbType dbType)

@@ -11,6 +11,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 
 import java.util.regex.Pattern;
 
@@ -94,6 +96,23 @@ public class AttributeEvaluator
         else
         {
             return attributeValue;
+        }
+    }
+
+    public TypedValue resolveTypedValue(MuleMessage message)
+    {
+        if (isExpression())
+        {
+            return expressionManager.evaluateTyped(attributeValue, message);
+        }
+        else if (isParseExpression())
+        {
+            final String value = expressionManager.parse(attributeValue, message);
+            return new TypedValue(value, DataTypeFactory.create(String.class, null));
+        }
+        else
+        {
+            return new TypedValue(attributeValue, DataTypeFactory.create(attributeValue == null ? Object.class : attributeValue.getClass(), null));
         }
     }
 

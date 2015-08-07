@@ -15,7 +15,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.SerializationUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +41,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     public void testTransform() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), "payload", null);
+        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), getTestMuleMessage("payload"));
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setMuleContext(muleContext);
@@ -58,7 +57,9 @@ public class HttpTransformTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         ArrayList<Integer> payload = new ArrayList<Integer>();
         payload.add(42);
-        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()), SerializationUtils.serialize(payload), null);
+        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()),
+                                          muleContext.getObjectSerializer().serialize(payload),
+                                          null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);
@@ -72,7 +73,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         Object payload = Arrays.asList(42);
-        MuleMessage message = client.send("vm://LocalService", payload, null);
+        MuleMessage message = client.send("vm://LocalService", getTestMuleMessage(payload));
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);

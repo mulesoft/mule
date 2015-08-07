@@ -14,10 +14,13 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.OAuthProperties;
 import org.mule.security.oauth.exception.AuthorizationCodeNotFoundException;
+import org.mule.transport.NullPayload;
 
 import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 public class ExtractAuthorizationCodeMessageProcessor implements MessageProcessor
 {
@@ -33,8 +36,7 @@ public class ExtractAuthorizationCodeMessageProcessor implements MessageProcesso
     {
         try
         {
-            event.getMessage().setInvocationProperty(OAuthProperties.VERIFIER,
-                extractAuthorizationCode(event.getMessageAsString()));
+            event.getMessage().setInvocationProperty(OAuthProperties.VERIFIER,  extractAuthorizationCode(event));
         }
         catch (Exception e)
         {
@@ -44,8 +46,22 @@ public class ExtractAuthorizationCodeMessageProcessor implements MessageProcesso
         return event;
     }
 
-    private String extractAuthorizationCode(String response) throws Exception
+    private String extractAuthorizationCode(MuleEvent event) throws Exception
     {
+        String response;
+        if (event.getMessage().getPayload() instanceof NullPayload)
+        {
+            response = event.getMessage().getInboundProperty("http.query.string");
+            if (StringUtils.isBlank(response))
+            {
+                throw new AuthorizationCodeNotFoundException(this.pattern, response);
+            }
+        }
+        else
+        {
+            response = event.getMessageAsString();
+        }
+
         Matcher matcher = pattern.matcher(response);
         if (matcher.find() && (matcher.groupCount() >= 1))
         {

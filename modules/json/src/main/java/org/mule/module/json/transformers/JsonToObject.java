@@ -13,6 +13,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.json.JsonData;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -33,7 +34,7 @@ import java.util.Map;
  */
 public class JsonToObject extends AbstractJsonTransformer
 {
-    private static final DataType<JsonData> JSON_TYPE = DataTypeFactory.create(JsonData.class);
+    private static final DataType<JsonData> JSON_TYPE = DataTypeFactory.create(JsonData.class, MimeTypes.APPLICATION_JSON);
 
     private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<Class<?>, Class<?>>();
 

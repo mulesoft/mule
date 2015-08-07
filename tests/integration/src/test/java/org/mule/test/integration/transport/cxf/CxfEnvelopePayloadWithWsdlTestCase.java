@@ -7,9 +7,11 @@
 package org.mule.test.integration.transport.cxf;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transport.http.HttpConstants;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
@@ -36,8 +38,7 @@ public class CxfEnvelopePayloadWithWsdlTestCase extends FunctionalTestCase
     public void testEnvelopePayloadIsProcessedWhenMessageAndWsdlContainsHeaders() throws Exception
     {
         MuleClient client = muleContext.getClient();
-
-        MuleMessage result = client.send("http://localhost:28182/ScratchCardServiceV1", msg, null);
+        MuleMessage result = client.send("http://localhost:28182/ScratchCardServiceV1", getTestMuleMessage(msg), newOptions().disableStatusCodeValidation().method(HttpConstants.METHOD_POST).build());
         assertNotNull("The result shouln't have been null", result);
 
         final String payloadAsString = result.getPayloadAsString();

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="nonBlockingSecurity" processingStrategy="non-blocking">
+        <test:assert-intercepting responseSameThread="false" />
+        <logger />  <!-- We need an intermediate message processor before the security message processor in order to check its asynchronicity -->
+        <custom-security-filter class="org.mule.test.config.SecurityFilterTestCase$CustomSecurityFilter"/>
+        <test:non-blocking-processor />
+    </flow>
+</mule>

@@ -7,6 +7,7 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -73,7 +74,7 @@ public class ServletTestCase extends FunctionalTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT + getContextPath()
-                                         + "/services/mycomponent", request, null);
+                                         + "/services/mycomponent", getTestMuleMessage(request));
         String res = result.getPayloadAsString();
 
         assertTrue(res.indexOf("Test String") != -1);
@@ -86,7 +87,7 @@ public class ServletTestCase extends FunctionalTestCase
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT + getContextPath()
-                                         + "/services/mycomponent/echo/text/Test String", "", props);
+                                         + "/services/mycomponent/echo/text/Test String", new DefaultMuleMessage("", props, muleContext));
         String res = result.getPayloadAsString();
         assertTrue(res.indexOf("Test String") != -1);
     }

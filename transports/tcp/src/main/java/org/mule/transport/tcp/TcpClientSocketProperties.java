@@ -21,9 +21,9 @@ public interface TcpClientSocketProperties
 
     public Integer getConnectionTimeout();
 
-    public Integer getClientSoTimeout();
+    public Integer getTimeout();
 
-    public Integer getSocketSoLinger();
+    public Integer getLinger();
 
     public Boolean getKeepAlive();
 

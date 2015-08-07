@@ -13,16 +13,22 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.RoutingException;
-import org.mule.api.store.*;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.api.lifecycle.LifecycleUtils;
+import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.store.InMemoryObjectStore;
 
 import java.text.MessageFormat;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>IdempotentMessageFilter</code> ensures that only unique messages are passed
@@ -34,8 +40,10 @@ import java.text.MessageFormat;
  * href="http://www.eaipatterns.com/IdempotentReceiver.html">
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
-public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Initialisable
+public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Initialisable, Disposable
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdempotentMessageFilter.class);
+
     protected volatile ObjectStore<String> store;
     protected FlowConstruct flowConstruct;
     protected String storePrefix;
@@ -63,12 +71,19 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         {
             this.store = createMessageIdStore();
         }
+
+        LifecycleUtils.initialiseIfNeeded(store);
+    }
+
+    @Override
+    public void dispose()
+    {
+        LifecycleUtils.disposeIfNeeded(store, LOGGER);
     }
 
     protected ObjectStore<String> createMessageIdStore() throws InitialisationException
     {
-        ObjectStoreManager objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
-                MuleProperties.OBJECT_STORE_MANAGER);
+        ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
         return objectStoreManager.getObjectStore(storePrefix, false, -1,  60 * 5 * 1000, 6000 );
     }
 

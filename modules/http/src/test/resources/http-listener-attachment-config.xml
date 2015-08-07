@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
+    <flow name="testFlow1">
+        <http:listener config-ref="listenerConfig" path="${formDataPath}"/>
+        <copy-attachments attachmentName="*"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="testFlow2">
+        <http:listener config-ref="listenerConfig" path="${mixedPath}"/>
+        <copy-attachments attachmentName="*"/>
+        <set-property propertyName="Content-Type" value="multipart/mixed"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="testFlow3">
+        <http:listener config-ref="listenerConfig" path="${contentLength}"/>
+        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+    </flow>
+
+    <flow name="testFlow4">
+        <http:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS"/>
+        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+    </flow>
+
+    <flow name="testFlow5">
+        <http:listener config-ref="listenerConfig" path="${filePath}" />
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerAttachmentsTestCase$CustomAttachmentMessageProcessor"/>
+        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+    </flow>
+
+</mule>

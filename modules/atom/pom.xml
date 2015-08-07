@@ -13,7 +13,6 @@
 
     <properties>
         <abderaVersion>0.4.0-incubating</abderaVersion>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <!-- Common Dependencies -->
@@ -207,7 +206,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
+            <artifactId>activemq-broker</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -26,6 +26,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.FilterUnacceptedException;
+import org.mule.api.serialization.SerializationException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -47,7 +48,6 @@ import org.mule.util.ObjectUtils;
 import java.io.OutputStream;
 import java.util.List;
 
-import org.apache.commons.lang.SerializationException;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message
@@ -532,17 +532,16 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                 applyResponseTransformers(resultEvent);
             }
 
-            if (connector.isEnableMessageEvents())
+            if (connector.isEnableMessageEvents(muleEvent))
             {
                 connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(),
-                                                                           endpoint, resultEvent.getFlowConstruct(), EndpointMessageNotification.MESSAGE_RESPONSE));
+                                                                           endpoint,
+                                                                           resultEvent.getFlowConstruct(),
+                                                                           EndpointMessageNotification.MESSAGE_RESPONSE),
+                                           muleEvent);
             }
-            return resultEvent;
         }
-        else
-        {
-            return null;
-        }
+        return resultEvent;
     }
 
     protected void processMessage(final MessageProcessTemplate messageProcessTemplate, final MessageProcessContext messageProcessContext)

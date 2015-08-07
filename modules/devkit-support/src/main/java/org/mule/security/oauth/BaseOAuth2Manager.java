@@ -674,6 +674,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         }
         catch (Exception e)
         {
+            boolean tokenRefreshed = false;
             if (accessTokenId != null)
             {
                 for (Class<? extends Exception> clazz : this.refreshAccessTokenOn())
@@ -691,6 +692,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
                         {
                             this.refreshTokenManager.refreshToken(adapter, accessTokenId);
                             adapter.postAuth();
+                            tokenRefreshed = true;
                         }
                         catch (Exception re)
                         {
@@ -703,7 +705,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
                 }
             }
 
-            throw e;
+            if (!tokenRefreshed)
+            {
+                throw e;
+            }
         }
     }
 

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenberg"
+                       myName="#[myName]"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       recipe="recipes"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER" />
+
+    <heisenberg:config name="staticHeisenberg"
+                       myName="heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       recipe="recipes"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER" />
+
+
+    <flow name="laundry">
+        <heisenberg:launder config-ref="heisenberg" amount="#[payload]" />
+    </flow>
+
+    <flow name="staticLaundry">
+        <heisenberg:launder config-ref="staticHeisenberg" amount="#[payload]" />
+    </flow>
+
+</mule>

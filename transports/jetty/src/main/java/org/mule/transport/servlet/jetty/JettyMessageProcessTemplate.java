@@ -12,14 +12,17 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.ThrottlingPhaseTemplate;
+import org.mule.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpThrottlingHeadersMapBuilder;
 import org.mule.transport.servlet.ServletResponseWriter;
+
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +35,7 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
     private final HttpServletRequest request;
     private final HttpServletResponse servletResponse;
     private final MuleContext muleContext;
+    private boolean failureResponseSentToClient;
 
     public JettyMessageProcessTemplate(HttpServletRequest request, HttpServletResponse response, AbstractMessageReceiver messageReceiver, MuleContext muleContext)
     {
@@ -45,6 +49,17 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
     public Object acquireMessage() throws MuleException
     {
         return request;
+    }
+
+    @Override
+    protected MuleMessage createMessageFromSource(Object message) throws MuleException
+    {
+        MuleMessage muleMessage = super.createMessageFromSource(message);
+
+        String contextPath = HttpConnector.normalizeUrl(getInboundEndpoint().getEndpointURI().getPath());
+        muleMessage.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, contextPath, PropertyScope.INBOUND);
+
+        return muleMessage;
     }
 
     @Override
@@ -98,6 +113,29 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
         catch (Exception e)
         {
             throw new DefaultMuleException(e);
+        }
+        failureResponseSentToClient = true;
+    }
+
+    @Override
+    public void afterFailureProcessingFlow(MuleException exception) throws MuleException
+    {
+        if (!failureResponseSentToClient)
+        {
+            String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), exception.getClass(), getMuleContext());
+            int httpStatus = Integer.valueOf(temp);
+            try
+            {
+                servletResponseWriter.writeErrorResponse(servletResponse, httpStatus, exception.getMessage(), new HashMap<String, String>());
+            }
+            catch (Exception e)
+            {
+                logger.warn("Exception sending Jetty HTTP response after error: " + e.getMessage());
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(e);
+                }
+            }
         }
     }
 

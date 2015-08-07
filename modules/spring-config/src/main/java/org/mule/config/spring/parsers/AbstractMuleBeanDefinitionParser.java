@@ -7,9 +7,7 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.api.MuleContext;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.routing.OutboundRouter;
@@ -22,8 +20,6 @@ import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.processor.AbstractMessageProcessorOwner;
-import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.XMLUtils;
@@ -37,6 +33,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -263,14 +260,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         builder.getRawBeanDefinition().setSource(context.extractSource(element));
         builder.setScope(isSingleton() ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
 
-        // Marker for MULE-4813
-        // We don't want lifcycle for the following from spring
-        if (!Component.class.isAssignableFrom(beanClass) && !MessageSource.class.isAssignableFrom(beanClass)
-            && !OutboundRouter.class.isAssignableFrom(beanClass)
-            && !AbstractMessageProcessorOwner.class.isAssignableFrom(beanClass)
-            && !MessagingExceptionHandler.class.isAssignableFrom(beanClass)
-            && !Transformer.class.isAssignableFrom(beanClass)
-            && !AbstractAsyncRequestReplyRequester.class.isAssignableFrom(beanClass))
+        if (FactoryBean.class.isAssignableFrom(beanClass))
         {
             if (Initialisable.class.isAssignableFrom(beanClass))
             {
@@ -287,7 +277,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         {
             // Inner bean definition must receive same singleton status as containing bean.
             builder.setScope(context.getContainingBeanDefinition().isSingleton()
-                ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
+                             ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
         }
 
         doParse(element, context, builder);

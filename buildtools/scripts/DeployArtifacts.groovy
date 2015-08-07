@@ -1,30 +1,30 @@
 /*
- * (c) 2003-2014 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
-import groovy.transform.Field
 import groovy.transform.AutoClone
+import groovy.transform.Field
 
 @Field String GET_PLUGIN = "org.apache.maven.plugins:maven-dependency-plugin:2.8:get"
 @Field long FIVE_MINUTES = 300000
-@FIELD int INVALID_ARGUMENTS = 1
+@Field int INVALID_ARGUMENTS = 1
 @Field String help = '\nDeploys to a remote Maven repository Mule CE and EE artifacts including distributions, poms, jars, test jars, javadoc jars and source jars.\n'
 @Field String ceRepoId
 @Field String ceRepoUrl
 @Field Boolean deployDistro
 @Field String version
 @Field String m2repo
+@Field String settings
+@Field deploySignatures = true
 @Field packagingExceptions = ['geomail': 'war']
 @Field deployExceptions = []
 @Field artifactIdExceptions = ['jboss-transactions'      : 'mule-module-jbossts']
 
 parseArguments(args)
 deployJars()
-if (deployDistro) { deployCeDistributions(version) }
+if (deployDistro) { deployCeDistributions() }
 
 def parseArguments(def arguments)
 {
@@ -35,8 +35,10 @@ def parseArguments(def arguments)
         System.exit(INVALID_ARGUMENTS)
     }
     version = options.v
-    m2repo = options.r
+    m2repo = options.r ? options.r : null
+    settings = options.s ? options.s : null
     deployDistro = options.d ? true : false
+    deploySignatures = options.g ? true : false
     ceRepoId = options.ce.split('::')[0]
     ceRepoUrl = options.ce.split('::')[1]
 }
@@ -44,11 +46,13 @@ def parseArguments(def arguments)
 private OptionAccessor parseOptions(arguments)
 {
     def cliBuilder = new CliBuilder(usage: 'deploy_mule_artifacts [options]\n\n')
-    cliBuilder.r(longOpt: "local-repository", required: true, args: 1, "Maven 2 repository to get artifacts from.")
+    cliBuilder.r(longOpt: "local-repository", required: false, args: 1, "Maven 2 repository to get artifacts from.")
+    cliBuilder.s(longOpt: "settings", required: false, args: 1, "Maven settings.xml.")
     cliBuilder.v(longOpt: "version", required: true, args: 1, "Mule ESB version")
     cliBuilder.h(longOpt: "help", "show usage info")
     cliBuilder.d(longOpt: "deploy-distributions", "Deploy Distribution Artifacts")
     cliBuilder.ce(longOpt: "ce-repository", required: true, args: 1, "CE Remote repository (id::repository)")
+    cliBuilder.g(longOpt: "deploy-gpg-signatures", required: false, args: 0, "Configures the script to upload GPG signatures")
     return cliBuilder.parse(arguments)
 }
 
@@ -57,7 +61,6 @@ def deployJars()
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule', version, 'pom')
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule-core', version, 'jar')
     [
-            'examples',
             'modules',
             'patterns',
             'tests',
@@ -76,7 +79,7 @@ def deployJars()
             else
             {
                 String group = ['tests', 'tools'].contains(it) ? it : it.minus(~/s$/)
-                String packaging = it.equals('examples') ? 'zip' : 'jar'
+                String packaging = 'jar'
                 packaging = packagingExceptions.get(module.text()) ? packagingExceptions.get(module.text()) : packaging
                 String artifact = "mule-${group}-${module.text()}"
                 artifact = artifactIdExceptions.get(module.text()) ? artifactIdExceptions.get(module.text()) : artifact
@@ -99,11 +102,14 @@ protected void deployToRemote(String repoUrl, String repoId, String groupId, Str
 
     log("Deploying artifact group: ${artifact}")
 
-    if (getDependency(pom, 'target/pom') && getDependency(artifact, 'target/artifact') && getDependency(signature, 'target/signature') && getDependency(pomSignature, 'target/pom-signature'))
+    if (getDependency(pom, 'target/pom') && getDependency(artifact, 'target/artifact'))
     {
-        assert deployFile(pomSignature, 'target/pom', 'target/pom-signature', repoUrl, repoId): "Failed to deploy [${pomSignature}]"
+        if (deploySignatures && getDependency(pomSignature, 'target/pom-signature')  && getDependency(signature, 'target/signature'))
+        {
+            assert deployFile(pomSignature, 'target/pom', 'target/pom-signature', repoUrl, repoId): "Failed to deploy [${pomSignature}]"
+            assert deployFile(signature, 'target/pom', 'target/signature', repoUrl, repoId): "Failed to deploy [${signature}]"
+        }
         assert deployFile(artifact, 'target/pom', 'target/artifact', repoUrl, repoId): "Failed to deploy [${artifact}]"
-        assert deployFile(signature, 'target/pom', 'target/signature', repoUrl, repoId): "Failed to deploy [${signature}]"
     }
     else
     {
@@ -113,17 +119,20 @@ protected void deployToRemote(String repoUrl, String repoId, String groupId, Str
     ['javadoc', 'tests', 'sources', 'test-sources'].each { it ->
         optional = artifact.having(classifier: it)
         signature = optional.having(packaging: packaging + '.asc')
-        if (getDependency(optional, "target/${it}") && getDependency(signature, "target/${it}-signature"))
+        if (getDependency(optional, "target/${it}"))
         {
+            if (deploySignatures && getDependency(signature, "target/${it}-signature"))
+            {
+                assert deployFile(signature, 'target/pom', "target/${it}-signature", repoUrl, repoId);
+            }
             assert deployFile(optional, 'target/pom', "target/${it}", repoUrl, repoId);
-            assert deployFile(optional, 'target/pom', "target/${it}-signature", repoUrl, repoId);
         }
     }
 }
 
 private boolean getDependency(Artifact artifact, String destFilename)
 {
-    return mvn([GET_PLUGIN, "-Dartifact=${artifact}", "-Ddest=${destFilename}", "-Dtransitive=false"])
+    return mvn([GET_PLUGIN, "-Dartifact=${artifact}", "-Ddest=${destFilename}", "-Dtransitive=false"], false)
 }
 
 private boolean deployFile(Artifact artifact, String pomFile, String artifactFile, String repoUrl, String repoId)
@@ -138,7 +147,7 @@ private boolean deployFile(Artifact artifact, String pomFile, String artifactFil
     return result
 }
 
-protected void deployCeDistributions(String version)
+protected void deployCeDistributions()
 {
     deployToRemote(ceRepoUrl, ceRepoId, "org.mule.distributions", "mule", version, "jar", "embedded")
     deployToRemote(ceRepoUrl, ceRepoId, "org.mule.distributions", "mule", version, "jar", "tests")
@@ -151,19 +160,17 @@ protected void deployCeDistributions(String version)
     deployToRemote(ceRepoUrl, ceRepoId, "org.mule.distributions", "mule-distributions", version, "jar", "tests")
 }
 
-def mvn(List mvnArgs)
+def mvn(List mvnArgs, boolean logErrors=false)
 {
-    boolean errorFound = false;
     mvnArgs = mvnArgs*.replaceAll(' ', "\\\\ ") // escaping spaces: -Dkey=value\ with\ spaces
-    Process proc = "mvn -B -Dmaven.repo.local=$m2repo ${mvnArgs.join(' ')}".execute()
-    proc.in.eachLine {
-        if (it.startsWith('[ERROR]'))
-        {
-            println it; errorFound = true
-        }
-    }
+    String repoConfig = m2repo ? "-Dmaven.repo.local=${m2repo}" : ""
+    String settingsConfig = settings ? "--settings ${settings}" : ""
+    Process proc = "mvn -B ${settingsConfig} ${repoConfig} ${mvnArgs.join(' ')}".execute()
+    List<String> lines = proc.in.readLines()
     proc.waitForOrKill(FIVE_MINUTES)
-    return !errorFound
+    boolean error = lines.find { it.startsWith('[ERROR]') }
+    if (error && logErrors) { lines.each { log it } }
+    return !error
 }
 
 def log(String message)
@@ -174,7 +181,6 @@ def log(String message)
 @AutoClone
 class Artifact
 {
-
     String artifactId;
     String groupId;
     String version;
@@ -186,7 +192,7 @@ class Artifact
         return "${groupId}:${artifactId}:${version}:${packaging}" + (classifier ? ":" + classifier : "")
     }
 
-    Artifact having(Map fields)// String classifier = null, String packaging = null)
+    Artifact having(Map fields)
     {
         Artifact clone = this.clone()
         fields.each { key, value -> clone."${key}" = value }

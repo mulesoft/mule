@@ -14,16 +14,22 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
+    
     @Override
     protected String[] getConfigFiles()
     {

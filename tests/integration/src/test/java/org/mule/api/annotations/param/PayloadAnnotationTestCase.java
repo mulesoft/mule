@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 
@@ -58,7 +59,7 @@ public class PayloadAnnotationTestCase extends FunctionalTestCase
     public void testPayloadFailedTransform() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://payload3", null, null);
+        MuleMessage message = client.send("vm://payload3", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(TransformerException.class,

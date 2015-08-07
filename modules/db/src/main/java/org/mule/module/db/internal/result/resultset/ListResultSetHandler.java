@@ -43,4 +43,10 @@ public class ListResultSetHandler implements ResultSetHandler
 
         return results;
     }
+
+    @Override
+    public boolean requiresMultipleOpenedResults()
+    {
+        return false;
+    }
 }

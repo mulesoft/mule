@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <configuration>
+        <expression-language>
+            <global-functions>
+                def assertPayload(){payload == org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE}
+            </global-functions>
+        </expression-language>
+    </configuration>
+
+    <flow name="foreach">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <foreach collection="#[payload]">
+            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+            <test:non-blocking-processor/>
+            <test:assert count="1" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
+        </foreach>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="wiretap">
+        <test:assert-intercepting message="before" responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <wire-tap>
+            <processor-chain>
+                <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+                <test:non-blocking-processor/>
+                <test:assert count="1" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
+            </processor-chain>
+        </wire-tap>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="async">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <async processingStrategy="asynchronous">
+            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+            <test:non-blocking-processor/>
+            <test:assert count="1" expression="#[Thread.currentThread()==beforeThread and assertPayload()]"/>
+        </async>
+        <test:non-blocking-processor/>
+    </flow>
+
+</mule>

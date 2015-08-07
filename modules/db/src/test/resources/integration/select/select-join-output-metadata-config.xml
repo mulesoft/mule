@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="joinMetadata">
+        <inbound-endpoint address="vm://joinMetadata" exchange-pattern="request-response"/>
+
+        <db:select config-ref="dbConfig">
+            <db:parameterized-query>select NAME, NAME as NAME2 from PLANET</db:parameterized-query>
+        </db:select>
+    </flow>
+
+    <flow name="joinInvalidMetadata">
+        <inbound-endpoint address="vm://joinInvalidMetadata" exchange-pattern="request-response"/>
+
+        <db:select config-ref="dbConfig">
+            <db:parameterized-query>select NAME, NAME from PLANET</db:parameterized-query>
+        </db:select>
+    </flow>
+</mule>

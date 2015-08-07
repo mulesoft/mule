@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+
+    <spring:beans>
+        <spring:bean id="customValidator" class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" />
+    </spring:beans>
+
+    <flow name="email">
+        <validation:is-email email="#[payload]"/>
+    </flow>
+
+    <flow name="ip">
+        <validation:is-ip ip="#[payload]"/>
+    </flow>
+
+    <flow name="url">
+        <validation:is-url url="#[payload]" />
+    </flow>
+
+    <flow name="time">
+        <validation:is-time time="#[payload]" pattern="#[pattern]" locale="#[java.util.Locale.getDefault().getLanguage()]"/>
+    </flow>
+
+    <flow name="matchesRegex">
+        <validation:matches-regex value="#[payload]" regex="#[regexp]" caseSensitive="#[caseSensitive]"/>
+    </flow>
+
+    <flow name="size">
+        <validation:validate-size value="#[payload]" min="#[minLength]" max="#[maxLength]"/>
+    </flow>
+
+    <flow name="isTrue">
+        <validation:is-true expression="#[payload]"/>
+    </flow>
+
+    <flow name="isFalse">
+        <validation:is-false expression="#[payload]"/>
+    </flow>
+
+    <flow name="notEmpty">
+        <validation:is-not-empty value="#[payload]"/>
+    </flow>
+
+    <flow name="empty">
+        <validation:is-empty value="#[payload]"/>
+    </flow>
+
+    <flow name="isNull">
+        <validation:is-null value="#[payload]"/>
+    </flow>
+
+    <flow name="all">
+        <validation:all>
+            <validation:validations>
+                <validation:is-url url="#[url]"/>
+                <validation:is-email email="#[email]"/>
+            </validation:validations>
+        </validation:all>
+    </flow>
+
+    <flow name="choice">
+        <choice>
+            <when expression="#[validator.validateEmail(payload)]">
+                <set-payload value="valid" />
+            </when>
+            <otherwise>
+                <set-payload value="invalid" />
+            </otherwise>
+        </choice>
+    </flow>
+
+    <flow name="customValidationByClass">
+        <validation:custom-validator class="org.mule.extension.validation.BasicValidationTestCase$TestCustomValidator" message="#[customMessage]" />
+    </flow>
+
+    <flow name="customValidationByRef">
+        <validation:custom-validator ref="customValidator" />
+    </flow>
+
+</mule>

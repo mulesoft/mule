@@ -29,7 +29,11 @@ import javax.annotation.PreDestroy;
  * <li>The method MUST NOT be static except for the application client.</li>
  * <li>The method MAY be final or non-final, except in the case of EJBs where it MUST be non-final. Note that Mule is not an EJB container so the EJB case is ignored in Mule.</li>
  * </ol>
+ *
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
  */
+@Deprecated
 public class JSR250ValidatorProcessor implements InjectProcessor
 {
     public Object process(Object object)

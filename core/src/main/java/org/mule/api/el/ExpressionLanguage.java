@@ -10,6 +10,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
+import org.mule.transformer.types.TypedValue;
 
 import java.util.Map;
 
@@ -85,7 +86,7 @@ public interface ExpressionLanguage
     boolean isValid(String expression);
 
     /**
-     * Validates the expression returning. An {@link ExpressionInvalidException} will be thrown is the All
+     * Validates the expression returning. An {@link InvalidExpressionException} will be thrown is the All
      * implementors should should validate expression syntactically. Semantic validation is optional.
      * 
      * @param expression
@@ -109,4 +110,14 @@ public interface ExpressionLanguage
     @Deprecated
     <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars);
 
+    /**
+     * Enriches a message
+     *
+     * @param expression a single expression i.e. header://foo that defines how the message should be enriched
+     * @param message The message to be enriched
+     * @param value The typed value used for enrichment
+     */
+    void enrich(String expression, MuleMessage message, TypedValue value);
+
+    TypedValue evaluateTyped(String expression, MuleMessage message);
 }

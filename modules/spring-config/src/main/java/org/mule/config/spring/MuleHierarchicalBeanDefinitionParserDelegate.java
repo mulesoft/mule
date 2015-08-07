@@ -9,20 +9,28 @@ package org.mule.config.spring;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.util.StringUtils;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+import java.util.Map;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -46,14 +54,16 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     public static final String MULE_NO_REGISTRATION = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
     public static final String MULE_POST_CHILDREN = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_POST_CHILDREN";
     private DefaultBeanDefinitionDocumentReader spring;
+    private final List<ElementValidator> elementValidators;
 
     protected static final Log logger = LogFactory.getLog(MuleHierarchicalBeanDefinitionParserDelegate.class);
 
     public MuleHierarchicalBeanDefinitionParserDelegate(XmlReaderContext readerContext,
-                                                        DefaultBeanDefinitionDocumentReader spring)
+                                                        DefaultBeanDefinitionDocumentReader spring, ElementValidator... elementValidators)
     {
         super(readerContext);
         this.spring = spring;
+        this.elementValidators = ArrayUtils.isEmpty(elementValidators) ? ImmutableList.<ElementValidator>of() : ImmutableList.copyOf(elementValidators);
     }
 
     public BeanDefinition parseCustomElement(Element element, BeanDefinition parent)
@@ -62,6 +72,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             logger.debug("parsing: " + SpringXMLUtils.elementToString(element));
         }
+
+        validate(element);
+
         if (SpringXMLUtils.isBeansNamespace(element))
         {
             return handleSpringElements(element, parent);
@@ -138,6 +151,14 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             }
 
             return finalChild;
+        }
+    }
+
+    private void validate(Element element)
+    {
+        for (ElementValidator validator : elementValidators)
+        {
+            validator.validate(element);
         }
     }
 
@@ -254,6 +275,27 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 && bean.hasAttribute(flag)
                 && bean.getAttribute(flag) instanceof Boolean
                 && ((Boolean) bean.getAttribute(flag)).booleanValue();
+    }
+
+
+    /**
+     * Parse a map element.
+     */
+    public Map parseMapElement(Element mapEle, String mapElementTagName, String mapElementKeyAttributeName, String mapElementValueAttributeName) {
+        List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, mapElementTagName);
+        ManagedMap<Object, Object> map = new ManagedMap<Object, Object>(entryEles.size());
+        map.setSource(extractSource(mapEle));
+        map.setMergeEnabled(parseMergeAttribute(mapEle));
+
+        for (Element entryEle : entryEles) {
+            // Extract key from attribute or sub-element.
+            Object key = buildTypedStringValueForMap(entryEle.getAttribute(mapElementKeyAttributeName), null, entryEle);
+            // Extract value from attribute or sub-element.
+            Object value = buildTypedStringValueForMap(entryEle.getAttribute(mapElementValueAttributeName), null, entryEle);
+            // Add final key and value to the Map.
+            map.put(key, value);
+        }
+        return map;
     }
 
 }

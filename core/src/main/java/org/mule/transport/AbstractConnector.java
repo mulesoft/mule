@@ -6,6 +6,7 @@
  */
 package org.mule.transport;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -20,12 +21,12 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
@@ -55,7 +56,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.context.notification.OptimisedNotificationHandler;
+import org.mule.context.notification.NotificationHelper;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AbstractRedeliveryPolicy;
@@ -94,6 +95,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
@@ -218,7 +221,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * notifications.
      */
     private boolean dynamicNotification = false;
-    private ServerNotificationHandler cachedNotificationHandler;
+    private NotificationHelper notificationHelper;
 
     private final List<String> supportedProtocols;
 
@@ -287,6 +290,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * Whether to test a connection on each take.
      */
     private boolean validateConnections = true;
+
+    private Lock connectionLock = new ReentrantLock();
 
     public AbstractConnector(MuleContext context)
     {
@@ -358,7 +363,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 {
                     if (retryPolicyTemplate == null)
                     {
-                        retryPolicyTemplate = (RetryPolicyTemplate) muleContext.getRegistry().lookupObject(
+                        retryPolicyTemplate = muleContext.getRegistry().lookupObject(
                                 MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
                     }
 
@@ -373,6 +378,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
                     // Initialise the structure of this connector
                     initFromServiceDescriptor();
+
+                    initSessionHandler();
 
                     configureDispatcherPool();
                     setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
@@ -401,6 +408,18 @@ public abstract class AbstractConnector implements Connector, WorkListener
         catch (MuleException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private void initSessionHandler() throws InitialisationException
+    {
+        try
+        {
+            sessionHandler = muleContext.getInjector().inject(sessionHandler);
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
         }
     }
 
@@ -1212,47 +1231,55 @@ public abstract class AbstractConnector implements Connector, WorkListener
                                  MessageProcessor messageProcessorChain,
                                  FlowConstruct flowConstruct) throws Exception
     {
-        if (endpoint == null)
+        connectionLock.lock();
+        try
         {
-            throw new IllegalArgumentException("The endpoint cannot be null when registering a listener");
+            if (endpoint == null)
+            {
+                throw new IllegalArgumentException("The endpoint cannot be null when registering a listener");
+            }
+
+            if (messageProcessorChain == null)
+            {
+                throw new IllegalArgumentException("The messageProcessorChain cannot be null when registering a listener");
+            }
+
+            EndpointURI endpointUri = endpoint.getEndpointURI();
+            if (endpointUri == null)
+            {
+                throw new ConnectorException(CoreMessages.endpointIsNullForListener(), this);
+            }
+
+            logger.info("Registering listener: " + flowConstruct.getName() + " on endpointUri: "
+                    + endpointUri.toString());
+
+            if (getReceiver(flowConstruct, endpoint) != null)
+            {
+                throw new ConnectorException(CoreMessages.listenerAlreadyRegistered(endpointUri), this);
+            }
+
+            MessageReceiver receiver = createReceiver(flowConstruct, endpoint);
+            receiver.setListener(messageProcessorChain);
+
+            Object receiverKey = getReceiverKey(flowConstruct, endpoint);
+            receiver.setReceiverKey(receiverKey.toString());
+            // Since we're managing the creation we also need to initialise
+            receiver.initialise();
+            receivers.put(receiverKey, receiver);
+
+            if (isConnected())
+            {
+                receiver.connect();
+            }
+
+            if (isStarted())
+            {
+                receiver.start();
+            }
         }
-
-        if (messageProcessorChain == null)
+        finally
         {
-            throw new IllegalArgumentException("The messageProcessorChain cannot be null when registering a listener");
-        }
-
-        EndpointURI endpointUri = endpoint.getEndpointURI();
-        if (endpointUri == null)
-        {
-            throw new ConnectorException(CoreMessages.endpointIsNullForListener(), this);
-        }
-
-        logger.info("Registering listener: " + flowConstruct.getName() + " on endpointUri: "
-                + endpointUri.toString());
-
-        if (getReceiver(flowConstruct, endpoint) != null)
-        {
-            throw new ConnectorException(CoreMessages.listenerAlreadyRegistered(endpointUri), this);
-        }
-
-        MessageReceiver receiver = createReceiver(flowConstruct, endpoint);
-        receiver.setListener(messageProcessorChain);
-
-        Object receiverKey = getReceiverKey(flowConstruct, endpoint);
-        receiver.setReceiverKey(receiverKey.toString());
-        // Since we're managing the creation we also need to initialise
-        receiver.initialise();
-        receivers.put(receiverKey, receiver);
-
-        if (isConnected())
-        {
-            receiver.connect();
-        }
-
-        if (isStarted())
-        {
-            receiver.start();
+            connectionLock.unlock();
         }
     }
 
@@ -1460,7 +1487,19 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public void fireNotification(ServerNotification notification)
     {
-        cachedNotificationHandler.fireNotification(notification);
+        notificationHelper.fireNotification(notification);
+    }
+
+    /**
+     * Fires a server notification to all registered listeners
+     * on the {@link MuleContext} of the given {@code event}
+     *
+     * @param notification the notification to fire.
+     * @param event        a {@link MuleEvent}
+     */
+    public void fireNotification(ServerNotification notification, MuleEvent event)
+    {
+        notificationHelper.fireNotification(notification, event);
     }
 
     @Override
@@ -1547,61 +1586,69 @@ public abstract class AbstractConnector implements Connector, WorkListener
             @Override
             public void doWork(RetryContext context) throws Exception
             {
-                // Try validateConnection() rather than connect() which may be a less expensive operation while we're retrying.
-                if (validateConnections && context.getLastFailure() instanceof ConnectException)
+                connectionLock.lock();
+                try
                 {
-                    Connectable failed = ((ConnectException) context.getLastFailure()).getFailed();
-                    if (!failed.validateConnection(context).isOk())
+                    // Try validateConnection() rather than connect() which may be a less expensive operation while we're retrying.
+                    if (validateConnections && context.getLastFailure() instanceof ConnectException)
                     {
-                        throw new ConnectException(
-                                MessageFactory.createStaticMessage("Still unable to connect to resource " + failed.getClass().getName()),
-                                context.getLastFailure(), failed);
-                    }
-                }
-                doConnect();
-
-                if (receivers != null)
-                {
-                    for (MessageReceiver receiver : receivers.values())
-                    {
-                        final List<MuleException> errors = new ArrayList<MuleException>();
-                        try
+                        Connectable failed = ((ConnectException) context.getLastFailure()).getFailed();
+                        if (!failed.validateConnection(context).isOk())
                         {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
-                            }
-                            receiver.connect();
-                            if (isStarted())
-                            {
-                                receiver.start();
-                            }
-                        }
-                        catch (MuleException e)
-                        {
-                            logger.error(e);
-                            errors.add(e);
-                        }
-
-                        if (!errors.isEmpty())
-                        {
-                            // throw the first one in order not to break the reconnection
-                            // strategy logic,
-                            // every exception has been logged above already
-                            // api needs refactoring to support the multi-cause exception
-                            // here
-                            throw errors.get(0);
+                            throw new ConnectException(
+                                    MessageFactory.createStaticMessage("Still unable to connect to resource " + failed.getClass().getName()),
+                                    context.getLastFailure(), failed);
                         }
                     }
+                    doConnect();
+
+                    if (receivers != null)
+                    {
+                        for (MessageReceiver receiver : receivers.values())
+                        {
+                            final List<MuleException> errors = new ArrayList<MuleException>();
+                            try
+                            {
+                                if (logger.isDebugEnabled())
+                                {
+                                    logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                                }
+                                receiver.connect();
+                                if (isStarted())
+                                {
+                                    receiver.start();
+                                }
+                            }
+                            catch (MuleException e)
+                            {
+                                logger.error(e);
+                                errors.add(e);
+                            }
+
+                            if (!errors.isEmpty())
+                            {
+                                // throw the first one in order not to break the reconnection
+                                // strategy logic,
+                                // every exception has been logged above already
+                                // api needs refactoring to support the multi-cause exception
+                                // here
+                                throw errors.get(0);
+                            }
+                        }
+                    }
+
+                    setConnected(true);
+                    setConnecting(false);
+                    logger.info("Connected: " + getWorkDescription());
+
+                    if (startOnConnect && !isStarted() && !isStarting())
+                    {
+                        startAfterConnect();
+                    }
                 }
-
-                setConnected(true);
-                setConnecting(false);
-                logger.info("Connected: " + getWorkDescription());
-
-                if (startOnConnect && !isStarted() && !isStarting())
+                finally
                 {
-                    startAfterConnect();
+                    connectionLock.unlock();
                 }
             }
 
@@ -1678,7 +1725,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 logger.info("Disconnected: " + this.getConnectionDescription());
             }
             this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                    ConnectionNotification.CONNECTION_DISCONNECTED));
+                                                             ConnectionNotification.CONNECTION_DISCONNECTED));
         }
         catch (Exception e)
         {
@@ -1796,21 +1843,25 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         if (null != muleContext)
         {
-            if (dynamicNotification)
-            {
-                cachedNotificationHandler = muleContext.getNotificationManager();
-            }
-            else
-            {
-                cachedNotificationHandler = new OptimisedNotificationHandler(
-                        muleContext.getNotificationManager(), EndpointMessageNotification.class);
-            }
+            notificationHelper = new NotificationHelper(muleContext.getNotificationManager(), EndpointMessageNotification.class, dynamicNotification);
         }
     }
 
     public boolean isEnableMessageEvents()
     {
-        return cachedNotificationHandler.isNotificationEnabled(EndpointMessageNotification.class);
+        return notificationHelper.isNotificationEnabled();
+    }
+
+    /**
+     * Indicates if notifications are enabled for the given
+     * {@code event}
+     *
+     * @param event a {@link MuleEvent}
+     * @return {@code true} if notifications are to be fired for the given {@code event}, {@code false} otherwise
+     */
+    public boolean isEnableMessageEvents(MuleEvent event)
+    {
+        return notificationHelper.isNotificationEnabled(event);
     }
 
     /**
@@ -2205,7 +2256,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     }
                 }
             };
-            result.setPayload(is);
+            result.setPayload(is, result.getDataType());
         }
         else
         {
@@ -2411,33 +2462,32 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public String toString()
     {
         final StringBuilder sb = new StringBuilder(120);
-        final String nl = System.getProperty("line.separator");
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         // format message for multi-line output, single-line is not readable
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("{");
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  name=").append(name);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  lifecycle=").append(
                 lifecycleManager == null ? "<not in lifecycle>" : lifecycleManager.getCurrentPhase());
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  this=").append(Integer.toHexString(System.identityHashCode(this)));
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  numberOfConcurrentTransactedReceivers=").append(numberOfConcurrentTransactedReceivers);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  createMultipleTransactedReceivers=").append(createMultipleTransactedReceivers);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  connected=").append(connected);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  supportedProtocols=").append(supportedProtocols);
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append("  serviceOverrides=");
         if (serviceOverrides != null)
         {
             for (Map.Entry<Object, Object> entry : serviceOverrides.entrySet())
             {
-                sb.append(nl);
+                sb.append(LINE_SEPARATOR);
                 sb.append("    ").append(String.format("%s=%s", entry.getKey(), entry.getValue()));
             }
         }
@@ -2445,9 +2495,9 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             sb.append("<none>");
         }
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         sb.append('}');
-        sb.append(nl);
+        sb.append(LINE_SEPARATOR);
         return sb.toString();
     }
 
@@ -2606,7 +2656,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
-    class DispatcherMessageProcessor implements MessageProcessor
+    class DispatcherMessageProcessor implements MessageProcessor, Disposable
     {
         private OutboundNotificationMessageProcessor notificationMessageProcessor;
         private OutboundEndpoint endpoint;
@@ -2639,7 +2689,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 {
                     // We need to invoke notification message processor with request
                     // message only after successful send/dispatch
-                    notificationMessageProcessor.dispatchNotification(beginNotification);
+                    notificationMessageProcessor.dispatchNotification(beginNotification, event);
                     notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
                             result)) ? result : event);
                 }
@@ -2665,5 +2715,20 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             return ObjectUtils.toString(this);
         }
+
+        @Override
+        public void dispose()
+        {
+            try
+            {
+                dispatchers.clear(endpoint);
+            }
+            catch (Exception e)
+            {
+                logger.warn("Can not clear dispatchers cache for endpoint: " + endpoint);
+            }
+        }
+
     }
+
 }

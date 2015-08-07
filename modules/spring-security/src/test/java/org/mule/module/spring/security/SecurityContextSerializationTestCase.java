@@ -15,22 +15,44 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class SecurityContextSerializationTestCase extends FunctionalTestCase
 {
+
+    private final String configFile;
     @Rule
     public DynamicPort httpPort = new DynamicPort("port1");
+
+    public SecurityContextSerializationTestCase(String configFile)
+    {
+        this.configFile = configFile;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"http-transport-security-context-serialization-test-case.xml"},
+                {"http-module-security-context-serialization-test-case.xml"}
+        });
+    }
 
     @Override
     protected String getConfigFile()
     {
-        return "security-context-serialization-test-case.xml";
+        return configFile;
     }
 
     @Test

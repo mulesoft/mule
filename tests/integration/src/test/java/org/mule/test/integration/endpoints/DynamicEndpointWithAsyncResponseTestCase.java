@@ -31,7 +31,7 @@ public class DynamicEndpointWithAsyncResponseTestCase extends FunctionalTestCase
     @Test
     public void testDynamicEndpointWithAsyncResponse() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("hello", muleContext);
+        MuleMessage message = getTestMuleMessage("hello");
         message.setOutboundProperty("host", "localhost");
         message.setOutboundProperty("port", port1.getNumber());
         message.setOutboundProperty("path", "/TEST");

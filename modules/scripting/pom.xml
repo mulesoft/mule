@@ -11,10 +11,6 @@
     <name>JSR-223 Scripting</name>
     <description>Support for Scripting Mule Services and embedding Mule inside scripts</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -57,7 +53,7 @@
         <dependency>
             <groupId>org.python</groupId>
             <artifactId>jython-standalone</artifactId>
-            <version>2.7-b3</version>
+            <version>2.7.0</version>
         </dependency>
 
         <!--Javascript-->
@@ -76,8 +72,8 @@
         <!--Ruby-->
         <dependency>
             <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>1.0</version>
+            <artifactId>jruby-core</artifactId>
+            <version>1.7.4</version>
         </dependency>
         <dependency>
             <groupId>javax.script</groupId>

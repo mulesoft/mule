@@ -14,10 +14,6 @@
         to embed a Jetty server used to service inbound http endpoints.
     </description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

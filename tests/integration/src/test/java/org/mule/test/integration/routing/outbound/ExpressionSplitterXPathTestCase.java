@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -80,6 +81,7 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testRecipientList() throws Exception
     {
         MuleClient client = muleContext.getClient();

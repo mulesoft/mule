@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="requestConfig" host="#[host]" port="${httpPort}" protocol="HTTPS">
+        <tls:context>
+            <tls:trust-store path="${trustStorePath}" password="changeit"/>
+        </tls:context>
+        <http:proxy host="localhost" port="${proxyPort}" />
+    </http:request-config>
+
+    <http:listener-config name="listenerConfig" host="0.0.0.0" port="${httpPort}" protocol="HTTPS" usePersistentConnections="false">
+        <tls:context>
+            <tls:key-store path="${keyStorePath}" keyPassword="changeit" password="changeit"/>
+        </tls:context>
+    </http:listener-config>
+
+    <flow name="clientFlow">
+        <http:request config-ref="requestConfig" path="#[path]" method="POST" />
+    </flow>
+
+    <flow name="serverFlow">
+        <http:listener config-ref="listenerConfig" path="/*" />
+        <test:component />
+        <set-payload value="OK" />
+    </flow>
+
+</mule>

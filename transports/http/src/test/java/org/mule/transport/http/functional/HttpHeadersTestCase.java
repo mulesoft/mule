@@ -35,7 +35,7 @@ public class HttpHeadersTestCase extends FunctionalTestCase
     public void testJettyHeaders() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint", null, null);
+        MuleMessage result = client.send("clientEndpoint", getTestMuleMessage(null));
 
         String contentTypeProperty = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
         assertNotNull(contentTypeProperty);

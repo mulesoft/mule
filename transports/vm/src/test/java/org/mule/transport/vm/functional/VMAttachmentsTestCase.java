@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -34,7 +35,7 @@ public class VMAttachmentsTestCase extends FunctionalTestCase
     @Test
     public void testAttachments() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage("Mmm... attachments!", muleContext);
+        MuleMessage msg = getTestMuleMessage("Mmm... attachments!");
         FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/"
                                                         + getConfigFile()).getAbsoluteFile());
         msg.addOutboundAttachment("test-attachment", new DataHandler(ds));

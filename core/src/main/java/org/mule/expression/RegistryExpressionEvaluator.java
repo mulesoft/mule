@@ -10,7 +10,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
@@ -26,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see org.mule.expression.DefaultExpressionManager
  */
-public class RegistryExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
+public class RegistryExpressionEvaluator extends AbstractExpressionEvaluator implements MuleContextAware
 {
     /**
      * logger used by this class

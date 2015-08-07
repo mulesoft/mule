@@ -63,6 +63,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertNotNull(ep.getFilter());
         assertTrue(ep.getFilter() instanceof JXPathFilter);
         JXPathFilter filter = (JXPathFilter)ep.getFilter();
+        filter.initialise();
         assertEquals("/bar:foo/bar:bar", filter.getPattern());
         assertEquals(6, filter.getNamespaces().size());
         assertEquals("http://bar.com", filter.getNamespaces().get("bar"));

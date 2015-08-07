@@ -23,10 +23,12 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.MessageDispatcherUtils;
+import org.mule.transport.http.config.HttpNamespaceHandler;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.util.MapUtils;
+import org.mule.util.OneTimeWarning;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -56,6 +58,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
 import org.apache.commons.lang.BooleanUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -91,8 +94,8 @@ public class HttpConnector extends TcpConnector
     /**
      * MuleEvent property to pass back the status for the response
      */
-    public static final String HTTP_STATUS_PROPERTY = HTTP_PREFIX + "status";
-    public static final String HTTP_VERSION_PROPERTY = HTTP_PREFIX + "version";
+    public static final String HTTP_STATUS_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+    public static final String HTTP_VERSION_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
 
     /**
      * @deprecated Instead users can now add properties to the outgoing request using the OUTBOUND property scope on the message.
@@ -109,11 +112,11 @@ public class HttpConnector extends TcpConnector
      * Stores the HTTP query parameters received, supports multiple values per key and both query parameter key and
      * value are unescaped
      */
-    public static final String HTTP_QUERY_PARAMS = HTTP_PREFIX + "query.params";
+    public static final String HTTP_QUERY_PARAMS = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
 
-    public static final String HTTP_QUERY_STRING = HTTP_PREFIX + "query.string";
+    public static final String HTTP_QUERY_STRING = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_STRING;
 
-    public static final String HTTP_METHOD_PROPERTY = HTTP_PREFIX + "method";
+    public static final String HTTP_METHOD_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 
     /**
      * The path and query portions of the URL being accessed.
@@ -123,7 +126,7 @@ public class HttpConnector extends TcpConnector
     /**
      * The path portion of the URL being accessed. No query string is included.
      */
-    public static final String HTTP_REQUEST_PATH_PROPERTY = HTTP_PREFIX + "request.path";
+    public static final String HTTP_REQUEST_PATH_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
 
     /**
      * The context path of the endpoint being accessed. This is the path that the
@@ -161,6 +164,8 @@ public class HttpConnector extends TcpConnector
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
 
     protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
+
+    private static OneTimeWarning deprecationWarning = new OneTimeWarning(LoggerFactory.getLogger(HttpConnector.class), HttpNamespaceHandler.HTTP_TRANSPORT_DEPRECATION_MESSAGE);
 
     static
     {
@@ -219,6 +224,7 @@ public class HttpConnector extends TcpConnector
     public HttpConnector(MuleContext context)
     {
         super(context);
+        deprecationWarning.warn();
         singleDispatcherPerEndpoint = BooleanUtils.toBoolean(System.getProperty(SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY));
         
     }

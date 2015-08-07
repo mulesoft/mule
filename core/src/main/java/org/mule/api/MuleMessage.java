@@ -93,7 +93,17 @@ public interface MuleMessage extends Serializable
     /**
      * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
      */
+    void setInvocationProperty(String key, Object value, DataType<?> dataType);
+
+    /**
+     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     */
     void setOutboundProperty(String key, Object value);
+
+    /**
+     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     */
+    void setOutboundProperty(String key, Object value, DataType<?> dataType);
 
     /**
      * Set a property on the message. End-users should prefer more
@@ -109,6 +119,16 @@ public interface MuleMessage extends Serializable
      * @see #setSessionProperty(String, Object)
      */
     void setProperty(String key, Object value, PropertyScope scope);
+
+    /**
+     * Sets a property on the message
+     *
+     * @param key the key on which to associate the value
+     * @param value the property value
+     * @param scope The scope at which to set the property at
+     * @param dataType the data type for the property value
+     */
+    void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType);
 
     /**
      * Removes a property on this message.
@@ -286,6 +306,15 @@ public interface MuleMessage extends Serializable
     <T> T getProperty(String name, PropertyScope scope, T defaultValue);
 
     /**
+     * Gets a property data type from the message with a given scope.
+     *
+     * @param name the name or key of the property. This must be non-null.
+     * @param scope The scope of the property to retrieve. This must be non-null.
+     * @return the property data type or null if the property does not exist in the specified scope
+     */
+    DataType<?> getPropertyDataType(String name, PropertyScope scope);
+
+    /**
      * Gets an integer property from the message
      *
      * @param name the name or key of the property
@@ -389,9 +418,6 @@ public interface MuleMessage extends Serializable
      */
     @Deprecated
     void setStringProperty(String name, String value);
-
-
-
 
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
@@ -663,6 +689,14 @@ public interface MuleMessage extends Serializable
      * @param payload the object to assign as the message payload
      */
     void setPayload(Object payload);
+
+    /**
+     * Updates the message payload.
+     *
+     * @param payload the object to assign as the message payload
+     * @param dataType payload's dataType. Not null.
+     */
+    void setPayload(Object payload, DataType<?> dataType);
 
     /**
      * Will attempt to obtain the payload of this message with the desired Class type. This will

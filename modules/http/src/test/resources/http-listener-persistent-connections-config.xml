@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="nonPersistentConfig" host="localhost" port="${nonPersistentPort}" usePersistentConnections="false" />
+    <flow name="nonPersistent">
+        <http:listener path="/" config-ref="nonPersistentConfig" />
+        <echo-component/>
+    </flow>
+
+    <http:listener-config name="persistentConfig" host="localhost" port="${persistentPort}" usePersistentConnections="true" connectionIdleTimeout="1000" />
+    <flow name="persistent">
+        <http:listener path="/" config-ref="persistentConfig" />
+        <echo-component/>
+    </flow>
+
+    <http:listener-config name="persistentConfigCloseHeader" host="localhost" port="${persistentPortCloseHeader}" usePersistentConnections="true" connectionIdleTimeout="1000" />
+    <flow name="persistentCloseHeader">
+        <http:listener path="/" config-ref="persistentConfigCloseHeader" >
+            <http:response-builder>
+                <http:header headerName="Connection" value="close"/>
+            </http:response-builder>
+                </http:listener>
+        <echo-component/>
+    </flow>
+
+    <http:listener-config name="persistentConfigCloseProperty" host="localhost" port="${persistentPortCloseProperty}" usePersistentConnections="true" connectionIdleTimeout="1000" />
+    <flow name="persistentCloseProperty">
+        <http:listener path="/" config-ref="persistentConfigCloseProperty"/>
+        <set-property propertyName="Connection" value="close"/>
+        <echo-component/>
+    </flow>
+
+</mule>

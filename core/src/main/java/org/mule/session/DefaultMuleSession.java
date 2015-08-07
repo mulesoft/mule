@@ -10,8 +10,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.CaseInsensitiveConcurrentMap;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
+import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.UUID;
 
 import java.io.IOException;
@@ -19,6 +22,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,7 +60,7 @@ public final class DefaultMuleSession implements MuleSession
      */
     private SecurityContext securityContext;
 
-    private Map<String, Object> properties;
+    private Map<String, TypedValue> properties;
 
     @Deprecated
     private FlowConstruct flowConstruct;
@@ -64,19 +68,7 @@ public final class DefaultMuleSession implements MuleSession
     public DefaultMuleSession()
     {
         id = UUID.getUUID();
-        createPropertiesMap();
-    }
-
-    private void createPropertiesMap()
-    {
-        try
-        {
-            properties = new CaseInsensitiveConcurrentMap<>();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Can not create properties map.", e);
-        }
+        properties = Collections.synchronizedMap(new CaseInsensitiveHashMap());
     }
 
     public DefaultMuleSession(MuleSession session)
@@ -85,11 +77,16 @@ public final class DefaultMuleSession implements MuleSession
         this.securityContext = session.getSecurityContext();
         this.valid = session.isValid();
 
-        createPropertiesMap();
+        this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap());
         for (String key : session.getPropertyNamesAsSet())
         {
-            this.properties.put(key, session.getProperty(key));
+            this.properties.put(key, createTypedValue(session, key));
         }
+    }
+
+    private TypedValue createTypedValue(MuleSession session, String key)
+    {
+        return new TypedValue(session.getProperty(key), session.getPropertyDataType(key));
     }
 
     // Deprecated constructor
@@ -176,7 +173,10 @@ public final class DefaultMuleSession implements MuleSession
         {
             logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key));
         }
-        properties.put(key, value);
+
+        DataType dataType = DataTypeFactory.createFromObject(value);
+
+        properties.put(key, new TypedValue(value, dataType));
     }
 
     /**
@@ -189,7 +189,8 @@ public final class DefaultMuleSession implements MuleSession
     @SuppressWarnings("unchecked")
     public <T> T getProperty(Object key)
     {
-        return (T) properties.get(key);
+        TypedValue typedValue = properties.get(key);
+        return typedValue == null ? null : (T) typedValue.getValue();
     }
 
     /**
@@ -229,39 +230,45 @@ public final class DefaultMuleSession implements MuleSession
         {
             return;
         }
-        Map<String, Object> oldProperties = this.properties;
-        createPropertiesMap();
-        for (String propertyKey : updatedSession.getPropertyNamesAsSet())
+        Iterator<Entry<String, TypedValue>> propertyIterator = properties.entrySet().iterator();
+        while (propertyIterator.hasNext())
         {
-            this.properties.put(propertyKey, updatedSession.<Object> getProperty(propertyKey));
-        }
-        for (Map.Entry<String, Object> property : oldProperties.entrySet())
-        {
-            if (!this.properties.containsKey(property.getKey())
-                && !(oldProperties.get(property.getKey()) instanceof Serializable))
+            final Entry<String, TypedValue> entry = propertyIterator.next();
+            if (entry.getValue().getValue() instanceof Serializable)
             {
-                this.properties.put(property.getKey(), oldProperties.get(property.getKey()));
+                propertyIterator.remove();
             }
+        }
+        for (String updatedPropertyKey : updatedSession.getPropertyNamesAsSet())
+        {
+            this.properties.put(updatedPropertyKey, createTypedValue(updatedSession, updatedPropertyKey));
         }
     }
 
-    /**
-     *
-     * @deprecated use {@link #getProperty()} and/or {@link #getPropertyNamesAsSet()} instead
-     */
-    @Deprecated
     public Map<String, Object> getProperties()
+    {
+        Map<String, Object> result = new HashMap<>();
+        for (String key : properties.keySet())
+        {
+            TypedValue typedValue = properties.get(key);
+            result.put(key, typedValue.getValue());
+        }
+
+        return result;
+    }
+
+    public Map<String, TypedValue> getExtendedProperties()
     {
         return properties;
     }
 
     void removeNonSerializableProperties()
     {
-        Iterator<Entry<String, Object>> propertyIterator = properties.entrySet().iterator();
+        Iterator<Entry<String, TypedValue>> propertyIterator = properties.entrySet().iterator();
         while (propertyIterator.hasNext())
         {
-            final Entry<String, Object> entry = propertyIterator.next();
-            if (!(entry.getValue() instanceof Serializable))
+            final Entry<String, TypedValue> entry = propertyIterator.next();
+            if (!(entry.getValue().getValue() instanceof Serializable))
             {
                 logger.warn(CoreMessages.propertyNotSerializableWasDropped(entry.getKey()));
                 propertyIterator.remove();
@@ -272,7 +279,13 @@ public final class DefaultMuleSession implements MuleSession
     @Override
     public void setProperty(String key, Serializable value)
     {
-        setProperty(key, (Object) value);
+        setProperty(key, value, DataTypeFactory.createFromObject(value));
+    }
+
+    @Override
+    public void setProperty(String key, Serializable value, DataType<?> dataType)
+    {
+        properties.put(key, new TypedValue(value, dataType));
     }
 
     @Override
@@ -296,7 +309,7 @@ public final class DefaultMuleSession implements MuleSession
         // Temporally replaces the properties to write only serializable values into the stream
         DefaultMuleSession copy = new DefaultMuleSession(this);
         copy.removeNonSerializableProperties();
-        Map<String, Object> backupProperties = properties;
+        Map<String, TypedValue> backupProperties = properties;
         try
         {
             properties = copy.properties;
@@ -332,4 +345,11 @@ public final class DefaultMuleSession implements MuleSession
         this.flowConstruct = flowConstruct;
     }
 
+    @Override
+    public DataType<?> getPropertyDataType(String name)
+    {
+        TypedValue typedValue = properties.get(name);
+
+        return typedValue== null ? null : typedValue.getDataType();
+    }
 }

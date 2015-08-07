@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 public class ArtifactArchiveInstaller
 {
 
-    protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to undeployArtifact this artifact in a clean way.";
+    protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to remove the artifact in a clean way.";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 

@@ -26,7 +26,6 @@
                 <include>launcher</include>
                 <include>mule</include>
                 <include>setup_local_instance.sh</include>
-                <include>mule_examples</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -76,90 +75,6 @@
             </includes>
         </fileSet>
 
-        <!--
-        ============================
-            Examples
-        ============================
-        -->
-
-        <!--
-        The entire examples directory is copied over first, then for each example, the contents
-        of the "dist" directory (README.txt, pom.xml, build.xml) are copied over, followed by
-        the executable scripts.
-        -->
-        <fileSet>
-            <directory>../../examples</directory>
-            <outputDirectory>examples</outputDirectory>
-            <fileMode>0644</fileMode>
-            <excludes>
-                <exclude>**/pom.xml</exclude>
-                <exclude>pom.xml</exclude>
-                <exclude>all-examples/**</exclude>
-                <exclude>**/target/**</exclude>
-                <exclude>**/dist/**</exclude>
-                <exclude>**/.*/**</exclude>
-                <exclude>**/*.iml</exclude>
-                <exclude>**/*.ipr</exclude>
-                <exclude>**/*.iws</exclude>
-                <exclude>**/derby.log</exclude>
-                <!-- Exclude this example until someone gets it working -->
-                <exclude>geomail/**</exclude>
-                <!-- Exclude examples that are not Studio compliant -->
-                <exclude>cep/**</exclude>
-                <exclude>errorhandler/**</exclude>
-                <exclude>loanbroker-bpm/**</exclude>
-                <exclude>notifications/**</exclude>
-                <exclude>webapp/**</exclude>
-            </excludes>
-        </fileSet>
-
-        <fileSet>
-            <directory>../../examples/echo/dist</directory>
-            <outputDirectory>examples/echo</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-
-        <fileSet>
-            <directory>../../examples/gpswalker/dist</directory>
-            <outputDirectory>examples/gpswalker</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/hello/dist</directory>
-            <outputDirectory>examples/hello</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/flight-reservation/dist</directory>
-            <outputDirectory>examples/flight-reservation</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/foreach/dist</directory>
-            <outputDirectory>examples/foreach</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/loanbroker-simple/dist</directory>
-            <outputDirectory>examples/loanbroker-simple</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/scripting/dist</directory>
-            <outputDirectory>examples/scripting</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/stockquote/dist</directory>
-            <outputDirectory>examples/stockquote</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/bookstore/dist</directory>
-            <outputDirectory>examples/bookstore</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-
     </fileSets>
 
     <!--
@@ -187,6 +102,7 @@
                 <include>org.apache.logging.log4j:log4j-slf4j-impl</include>
                 <include>org.apache.logging.log4j:log4j-1.2-api</include>
                 <include>org.apache.logging.log4j:log4j-jcl</include>
+                <include>org.apache.logging.log4j:log4j-jul</include>
                 <include>org.slf4j:jcl-over-slf4j</include>
                 <include>com.lmax:disruptor</include>
             </includes>
@@ -198,6 +114,9 @@
             <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
+                <!-- extensions API -->
+                <include>org.mule.extensions:mule-extensions-api</include>
+                <include>org.mule.extensions:mule-extensions-annotations</include>
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
@@ -232,6 +151,8 @@
                 <include>org.mule.modules:mule-module-db</include>
                 <include>org.mule.modules:mule-module-devkit-support</include>
                 <include>org.mule.modules:mule-module-drools</include>
+                <include>org.mule.modules:mule-module-extensions-support</include>
+                <include>org.mule.modules:mule-module-extensions-spring-support</include>
                 <include>org.mule.modules:mule-module-http</include>
                 <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jersey</include>
@@ -239,6 +160,7 @@
                 <include>org.mule.modules:mule-module-jbpm</include>
                 <include>org.mule.modules:mule-module-json</include>
                 <include>org.mule.modules:mule-module-management</include>
+                <include>org.mule.modules:mule-module-oauth</include>
                 <include>org.mule.modules:mule-module-pgp</include>
                 <include>org.mule.modules:mule-module-rss</include>
                 <include>org.mule.modules:mule-module-scripting</include>
@@ -247,9 +169,11 @@
                 <include>org.mule.modules:mule-module-spring-extras</include>
                 <include>org.mule.modules:mule-module-spring-security</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
+                <include>org.mule.modules:mule-module-validation</include>
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
                 <include>org.mule.patterns:mule-pattern-core</include>
+
                 <!-- Tools -->
                 <include>org.mule.tools:mule-tools-anttasks</include>
                 <!-- Shared libs -->
@@ -268,6 +192,9 @@
     _exclude_ all libs which should _not_ go into this directory (usually
     because they are already in a different directory). -->
             <excludes>
+                <!--extensions API-->
+                <exclude>org.mule.extensions:mule-extensions-api</exclude>
+                <exclude>org.mule.extensions:mule-extensions-annotations</exclude>
                 <!-- lib/mule -->
                 <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
@@ -304,6 +231,8 @@
                 <exclude>org.mule.modules:mule-module-db</exclude>
                 <exclude>org.mule.modules:mule-module-devkit-support</exclude>
                 <exclude>org.mule.modules:mule-module-drools</exclude>
+                <exclude>org.mule.modules:mule-module-extensions-support</exclude>
+                <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
                 <exclude>org.mule.modules:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jersey</exclude>
@@ -312,6 +241,7 @@
                 <exclude>org.mule.modules:mule-module-json</exclude>
                 <exclude>org.mule.modules:mule-module-launcher</exclude>
                 <exclude>org.mule.modules:mule-module-management</exclude>
+                <exclude>org.mule.modules:mule-module-oauth</exclude>
                 <exclude>org.mule.modules:mule-module-pgp</exclude>
                 <exclude>org.mule.modules:mule-module-reboot</exclude>
                 <exclude>org.mule.modules:mule-module-rss</exclude>
@@ -321,20 +251,11 @@
                 <exclude>org.mule.modules:mule-module-spring-extras</exclude>
                 <exclude>org.mule.modules:mule-module-spring-security</exclude>
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
+                <exclude>org.mule.modules:mule-module-validation</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
                 <exclude>org.mule.patterns:mule-patterns-all</exclude>
                 <exclude>org.mule.patterns:mule-pattern-core</exclude>
-                <exclude>org.mule.examples:mule-examples-all</exclude>
-                <exclude>org.mule.examples:mule-example-bookstore</exclude>
-                <exclude>org.mule.examples:mule-example-echo</exclude>
-                <exclude>org.mule.examples:mule-example-gpswalker</exclude>
-                <exclude>org.mule.examples:mule-example-hello</exclude>
-                <exclude>org.mule.examples:mule-example-flight-reservation</exclude>
-                <exclude>org.mule.examples:mule-example-foreach</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-simple</exclude>
-                <exclude>org.mule.examples:mule-example-scripting</exclude>
-                <exclude>org.mule.examples:mule-example-stockquote</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
 
                 <!-- mule-tests-functional dependencies -->
@@ -357,6 +278,7 @@
                 <exclude>org.apache.logging.log4j:log4j-slf4j-impl</exclude>
                 <exclude>org.apache.logging.log4j:log4j-1.2-api</exclude>
                 <exclude>org.apache.logging.log4j:log4j-jcl</exclude>
+                <exclude>org.apache.logging.log4j:log4j-jul</exclude>
                 <exclude>org.slf4j:jcl-over-slf4j</exclude>
                 <exclude>commons-logging:commons-logging</exclude>
                 <exclude>com.lmax:disruptor</exclude>
@@ -401,80 +323,6 @@
                 <include>xerces:xercesImpl</include>
                 <include>xerces:xml-serializer</include>
                 <include>xalan:xalan</include>
-            </includes>
-        </dependencySet>
-
-        <!-- Examples -->
-        <dependencySet>
-            <outputDirectory>examples/bookstore</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-bookstore</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/echo</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-echo</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/hello</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-hello</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/flight-reservation</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-flight-reservation</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/foreach</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-foreach</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/loanbroker-simple</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-loanbroker-simple</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/scripting</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-scripting</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/gpswalker</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-gpswalker</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/stockquote</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-stockquote</include>
             </includes>
         </dependencySet>
     </dependencySets>

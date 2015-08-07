@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+
+    <flow name="requestFlow">
+        <http:request config-ref="requestConfig" path="path" method="POST" />
+    </flow>
+
+
+    <!-- Requester with TLS and a small send buffer size to test that big attachments work over HTTPS -->
+
+    <tcp:client-socket-properties name="requesterSocketPropertiesTls" sendBufferSize="${sendBufferSize}" />
+
+    <tls:context name="tlsContext" >
+        <tls:trust-store path="trustStore" password="mulepassword"/>
+        <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+    </tls:context>
+
+    <http:request-config name="requestConfigTls" host="localhost" port="${httpsPort}" protocol="HTTPS"
+                         tlsContext-ref="tlsContext" clientSocketProperties-ref="requesterSocketPropertiesTls" />
+
+    <flow name="requestFlowTls">
+        <http:request config-ref="requestConfigTls" path="path" method="POST" responseTimeout="5000" />
+    </flow>
+
+</mule>

@@ -6,7 +6,7 @@
  */
 package org.mule.endpoint;
 
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
@@ -16,16 +16,12 @@ import java.io.File;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.xml.namespace.QName;
 
 /**
  * This has the following logic:
@@ -44,7 +40,7 @@ import javax.xml.namespace.QName;
  * Not called EndpointURIBuilder because of {@link org.mule.api.endpoint.EndpointURIBuilder}
  *
  */
-public class URIBuilder implements AnnotatedObject
+public class URIBuilder extends AbstractAnnotatedObject
 {
     private static final String DOTS = ":";
     private static final String DOTS_SLASHES = DOTS + "//";
@@ -83,7 +79,6 @@ public class URIBuilder implements AnnotatedObject
     private String path;
     private Map queryMap;
     private MuleContext muleContext;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     private AtomicReference<EndpointURI> cache = new AtomicReference<EndpointURI>();
 
@@ -517,22 +512,6 @@ public class URIBuilder implements AnnotatedObject
             }
             return buffer.toString();
         }
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 
     public String getProtocol()

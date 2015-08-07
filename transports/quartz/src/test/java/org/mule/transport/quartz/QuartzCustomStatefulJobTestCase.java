@@ -49,7 +49,7 @@ public class QuartzCustomStatefulJobTestCase extends FunctionalTestCase
         
         public void execute(JobExecutionContext context) throws JobExecutionException
         {
-            assertTrue(context.getJobDetail().isStateful());
+            assertTrue(context.getJobInstance() instanceof StatefulJob );
             latch.countDown();
         }
     }

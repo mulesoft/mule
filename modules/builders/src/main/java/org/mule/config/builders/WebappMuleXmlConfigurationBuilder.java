@@ -10,6 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.ConfigResource;
 import org.mule.config.spring.MuleArtifactContext;
+import org.mule.config.spring.OptionalObjectsController;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 
 import java.io.FileNotFoundException;
@@ -95,7 +96,8 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
         }
     }
 
-    protected ApplicationContext createApplicationContext(MuleContext muleContext, ConfigResource[] configResources)
+    @Override
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController)
     {
         Resource[] servletContextResources = new Resource[configResources.length];
         for (int i = 0; i < configResources.length; i++)

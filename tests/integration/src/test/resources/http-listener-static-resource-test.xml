@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+    <tls:context name="tlsContext">
+        <tls:key-store path="serverKeystore" password="mulepassword" keyPassword="mulepassword"/>
+    </tls:context>
+
+    <http:listener-config name="listenerConfigPort1" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerConfigPort2" host="localhost" port="${port2}" protocol="HTTPS" tlsContext-ref="tlsContext"/>
+    <http:listener-config name="listenerConfigPort3" host="localhost" port="${port3}"/>
+
+    <flow name="main-http">
+        <http:listener config-ref="listenerConfigPort1" path="static/*"/>
+        <http:static-resource-handler resourceBase="${test.root}/dummy-docroot" defaultFile="index.html"/>
+    </flow>
+
+    <flow name="main-https">
+        <http:listener config-ref="listenerConfigPort2" path="static/*"/>
+        <http:static-resource-handler resourceBase="${test.root}/dummy-docroot"/>
+    </flow>
+
+    <flow name="main-http-root">
+        <http:listener config-ref="listenerConfigPort3" path="*"/>
+        <http:static-resource-handler resourceBase="${test.root}/dummy-docroot" defaultFile="index.html"/>
+    </flow>
+
+    <!-- these services test that we can have flows bound on the same http
+         port but with a different path -->
+    <flow name="main-http-echo">
+        <http:listener config-ref="listenerConfigPort1" path="echo/*"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="main-https-echo">
+        <http:listener config-ref="listenerConfigPort2" path="echo/*"/>
+        <echo-component/>
+    </flow>
+</mule>

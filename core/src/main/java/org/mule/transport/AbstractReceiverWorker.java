@@ -13,6 +13,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
+import org.mule.api.serialization.SerializationException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.SessionHandler;
@@ -28,7 +29,6 @@ import java.util.List;
 
 import javax.resource.spi.work.Work;
 
-import org.apache.commons.lang.SerializationException;
 
 /**
  * A base Worker used by Transport {@link org.mule.api.transport.MessageReceiver} implementations.

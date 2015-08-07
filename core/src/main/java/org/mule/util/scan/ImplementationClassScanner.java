@@ -16,8 +16,11 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.commons.EmptyVisitor;
 
 /**
- * Will determine if the class provide extends and thus is assignable from the implementatation class provied.
+ * Will determine if the class provide extends and thus is assignable from the implementation class provided.
+ *
+ * @deprecated: As ASM 3.3.1 is not fully compliant with Java 8, this class has been deprecated, however you can still use it under Java 7.
  */
+@Deprecated
 public class ImplementationClassScanner extends EmptyVisitor implements ClassScanner
 {
     private Class implementationClass;

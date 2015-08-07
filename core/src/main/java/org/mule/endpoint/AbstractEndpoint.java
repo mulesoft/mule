@@ -6,8 +6,8 @@
  */
 package org.mule.endpoint;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
-import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -36,11 +36,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A
  * endpoint is a grouping of an endpoint, an endpointUri and a transformer.
  */
-public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable, AnnotatedObject
+public abstract class AbstractEndpoint extends AbstractAnnotatedObject implements ImmutableEndpoint, Disposable
 {
 
     private static final long serialVersionUID = -1650380871293160973L;
@@ -130,7 +127,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
     private AbstractRedeliveryPolicy redeliveryPolicy;
 
     private boolean disableTransportTransformer = false;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public AbstractEndpoint(Connector connector,
                             EndpointURI endpointUri,
@@ -505,9 +501,16 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
     public void dispose()
     {
         this.muleContext = null;
-        // this.messageProcessors.clear();
+
+        if (this.messageProcessorChain instanceof Disposable)
+        {
+            ((Disposable) this.messageProcessorChain).dispose();
+        }
+
         // Don't clear this, since it changes the hash code, which can foul up shutdown processing
         // when objects have been keyed by endpoint, e.g. dispatchers
+        // this.messageProcessors.clear();
+
         this.messageProcessorChain = null;
     }
 
@@ -518,22 +521,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
             messageProcessorChain = createMessageProcessorChain(flowContruct);
         }
         return messageProcessorChain;
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 
     abstract protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException;

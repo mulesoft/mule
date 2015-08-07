@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -22,12 +21,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.SerializationUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.lock.MuleLockFactory;
 import org.mule.util.lock.SingleServerLockProvider;
@@ -41,7 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.internal.verification.VerificationModeFactory;
@@ -53,6 +51,9 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
 
     public static final String STRING_MESSAGE = "message";
     public static final int MAX_REDELIVERY_COUNT = 0;
+    private static final String UTF_8 = "utf-8";
+    private static ObjectSerializer serializer;
+
     private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
     private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, Answers.RETURNS_DEEP_STUBS.get());
     private MessageProcessor mockFailingMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
@@ -63,9 +64,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
     private Latch waitLatch = new Latch();
     private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
     private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
-
-    @Rule
-    public SystemProperty systemProperty = new SystemProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY,"utf-8");
 
     @Before
     @SuppressWarnings("rawtypes")
@@ -88,6 +86,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         muleLockFactory.initialise();
         when(mockMuleContext.getLockFactory()).thenReturn(muleLockFactory);
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+        when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8);
         final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
         when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenAnswer(new Answer<ObjectStore>()
         {
@@ -98,6 +97,9 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
             }
         });
         when(event.getMessage()).thenReturn(message);
+
+        IdempotentRedeliveryPolicyTestCase.serializer = SerializationTestUtils.getJavaSerializerWithMockContext();
+
         irp.setMaxRedeliveryCount(MAX_REDELIVERY_COUNT);
         irp.setUseSecureHash(true);
         irp.setFlowConstruct(mock(FlowConstruct.class));
@@ -207,21 +209,21 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         @Override
         public void store(Serializable key, AtomicInteger value) throws ObjectStoreException
         {
-            store.put(key, SerializationUtils.serialize(value));
+            store.put(key, serializer.serialize(value));
         }
 
         @Override
         public AtomicInteger retrieve(Serializable key) throws ObjectStoreException
         {
             Serializable serializable = store.get(key);
-            return (AtomicInteger) SerializationUtils.deserialize((byte[]) serializable);
+            return serializer.deserialize((byte[]) serializable);
         }
 
         @Override
         public AtomicInteger remove(Serializable key) throws ObjectStoreException
         {
             Serializable serializable = store.remove(key);
-            return (AtomicInteger) SerializationUtils.deserialize((byte[]) serializable);
+            return serializer.deserialize((byte[]) serializable);
         }
 
         @Override
@@ -229,7 +231,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         {
             return false;
         }
-        
+
         @Override
         public void clear() throws ObjectStoreException
         {
@@ -264,7 +266,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         {
             return store.remove(key);
         }
-        
+
         @Override
         public void clear() throws ObjectStoreException
         {

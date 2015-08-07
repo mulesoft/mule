@@ -14,7 +14,6 @@
 
     <properties>
         <droolsVersion>5.0.1</droolsVersion>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <dependencies>
@@ -64,12 +63,6 @@
                     <artifactId>antlr</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <!-- required for the java dialect in drools rules -->
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>jasper-jdt</artifactId>
-            <version>6.0.29</version>
         </dependency>
 
         <!-- Unit tests only -->

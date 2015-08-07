@@ -36,7 +36,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint1", null, null);
+        MuleMessage result = client.send("clientEndpoint1", getTestMuleMessage(null));
         assertEquals("boobar", result.getPayloadAsString());
     }
 

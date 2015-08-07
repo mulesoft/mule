@@ -8,15 +8,19 @@ package org.mule.util;
 
 import org.mule.routing.filters.WildcardFilter;
 
+import com.google.common.primitives.Primitives;
+
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
@@ -236,7 +240,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 return (T) primitiveTypeNameMap.get(className);
             }
         }
-        
+
         Class<?> clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
         {
             public Class<?> run()
@@ -424,7 +428,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static <T> T instanciateClass(Class<? extends T> clazz, Object... constructorArgs)
             throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-            IllegalAccessException, InvocationTargetException
+                   IllegalAccessException, InvocationTargetException
     {
         Class<?>[] args;
         if (constructorArgs != null)
@@ -465,7 +469,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 argsString.append(arg.getName()).append(", ");
             }
             throw new NoSuchMethodException("could not find constructor on class: " + clazz + ", with matching arg params: "
-                    + argsString);
+                                            + argsString);
         }
 
         return (T)ctor.newInstance(constructorArgs);
@@ -473,14 +477,14 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Object instanciateClass(String name, Object... constructorArgs)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException
+                   InstantiationException, IllegalAccessException, InvocationTargetException
     {
         return instanciateClass(name, constructorArgs, (ClassLoader) null);
     }
 
     public static Object instanciateClass(String name, Object[] constructorArgs, Class<?> callingClass)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException
+                   InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class<?> clazz = loadClass(name, callingClass);
         return instanciateClass(clazz, constructorArgs);
@@ -488,7 +492,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Object instanciateClass(String name, Object[] constructorArgs, ClassLoader classLoader)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException
+                   InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class<?> clazz;
         if (classLoader != null)
@@ -565,7 +569,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     {
         return getConstructor(clazz, paramTypes, false);
     }
-    
+
     /**
      *  Returns available constructor in the target class that as the parameters specified.
      *
@@ -632,10 +636,10 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *         none, an empty list is returned
      */
     public static List<Method> getSatisfiableMethods(Class<?> implementation,
-                                             Class<?>[] parameterTypes,
-                                             boolean voidOk,
-                                             boolean matchOnObject,
-                                             Set<String> ignoredMethodNames)
+                                                     Class<?>[] parameterTypes,
+                                                     boolean voidOk,
+                                                     boolean matchOnObject,
+                                                     Set<String> ignoredMethodNames)
     {
         return getSatisfiableMethods(implementation, parameterTypes, voidOk, matchOnObject, ignoredMethodNames, null);
     }
@@ -656,11 +660,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *         none, an empty list is returned
      */
     public static List<Method> getSatisfiableMethods(Class<?> implementation,
-                                             Class<?>[] parameterTypes,
-                                             boolean voidOk,
-                                             boolean matchOnObject,
-                                             Collection<String> ignoredMethodNames,
-                                             WildcardFilter filter)
+                                                     Class<?>[] parameterTypes,
+                                                     boolean voidOk,
+                                                     boolean matchOnObject,
+                                                     Collection<String> ignoredMethodNames,
+                                                     WildcardFilter filter)
     {
         List<Method> result = new ArrayList<Method>();
 
@@ -705,9 +709,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @return the list of methods that matched the return type and criteria. If none are found an empty result is returned
      */
     public static List<Method> getSatisfiableMethodsWithReturnType(Class implementation,
-                                                           Class returnType,
-                                                           boolean matchOnObject,
-                                                           Set<String> ignoredMethodNames)
+                                                                   Class returnType,
+                                                                   boolean matchOnObject,
+                                                                   Set<String> ignoredMethodNames)
     {
         List<Method> result = new ArrayList<Method>();
 
@@ -815,7 +819,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * and the arrays are the same size. If matchOnObject argument is true and there
      * is a parameter of type Object in c1 then the method returns false. If
      * acceptNulls argument is true, null values are accepted in c2.
-     * 
+     *
      * @param c1 parameter types array
      * @param c2 parameter types array
      * @param matchOnObject return false if there is a parameter of type Object in c1
@@ -837,8 +841,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 {
                     return false;
                 }
-            } 
-            else 
+            }
+            else
             {
                 if (c1[i] == null)
                 {
@@ -1008,7 +1012,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         {
             throw new IllegalArgumentException(
                     "PANIC: Mule has been started with an unsupported classloader: " + sys.getClass().getName()
-                            + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
+                    + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
         }
 
         // system classloader is in this case the one that launched the application,
@@ -1051,4 +1055,87 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         CodeSource cs = clazz.getProtectionDomain().getCodeSource();
         return (cs != null ? cs.getLocation() : null);
     }
+
+    public static Class<? extends Annotation> resolveAnnotationClass(Annotation annotation)
+    {
+        if (Proxy.isProxyClass(annotation.getClass()))
+        {
+            return (Class<Annotation>) annotation.getClass().getInterfaces()[0];
+        }
+        else
+        {
+            return annotation.getClass();
+        }
+    }
+
+    /**
+     * Checks that {@code value} is an instance of {@code type}.
+     * <p/>
+     * The value that this method adds over something like {@link Class#isInstance(Object)}
+     * is that it also considers the case in which {@code type} and {@code value}
+     * are evaluate by {@link #isWrapperAndPrimitivePair(Class, Class)} as {@code true}
+     *
+     * @param type  the {@link Class} you want to check the {@code value against}
+     * @param value an instance you want to verify is instance of {@code type}
+     * @param <T>   the generic type of {@code type}
+     * @return {@code true} if {@code value} is an instance of {@code type} or if they are a wrapper-primitive pair.
+     * {@code false} otherwise
+     */
+    public static <T> boolean isInstance(Class<T> type, Object value)
+    {
+        if (value == null)
+        {
+            return false;
+        }
+
+        if (type.isInstance(value))
+        {
+            return true;
+        }
+
+        Class<?> valueType = value.getClass();
+        return isWrapperAndPrimitivePair(type, valueType) || isWrapperAndPrimitivePair(valueType, type);
+    }
+
+    /**
+     * Checks that a wrapper-primitive relationship exists between the two types, no matter which one
+     * is the wrapper or which is the primitive.
+     * <p/>
+     * For example, this method will return {@code true} for both the {@link Double}/{@code double}
+     * and the {@code double}/{@link Double} pairs. Notice that {@code false} will be returned for the pair
+     * {@link Long}/{code int} since they don't represent the same data type.
+     * <p/>
+     * If any of the two types is neither wrappers or primitives, it will return {@code false}
+     *
+     * @param type1 a {@link Class} presumed to be a wrapper or primitive type related to {@code type2}
+     * @param type2 a {@link Class} presumed to be a wrapper or primitive type related to {@code type1}
+     * @return {@code true} if the types are a wrapper/primitive pair referring to the same data type. {@code false} otherwise.
+     */
+    private static boolean isWrapperAndPrimitivePair(Class<?> type1, Class<?> type2)
+    {
+        if (isPrimitiveWrapper(type1))
+        {
+            return type2.equals(Primitives.unwrap(type1));
+        }
+        else if (isPrimitiveWrapper(type2))
+        {
+            return type1.equals(Primitives.unwrap(type2));
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks that the given {@code type} is a primitive wrapper such as
+     * {@link Double}, {@link Boolean}, {@link Integer}, etc
+     *
+     * @param type the {@link Class} that is presumed to be a primitive wrapper
+     * @param <T>  the generic type of the argument
+     * @return {@code true} if {@code type} is a primitive wrapper. {@code false} otherwise
+     */
+    private static <T> boolean isPrimitiveWrapper(Class<T> type)
+    {
+        return Primitives.isWrapperType(type);
+    }
+
 }

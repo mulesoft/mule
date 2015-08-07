@@ -38,7 +38,7 @@ public class W3CDocumentXPathNodeEvaluatorTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage message = new DefaultMuleMessage(XML_INPUT, muleContext);
+        MuleMessage message = getTestMuleMessage(XML_INPUT);
         MuleMessage response = client.send("vm://test", message);
         assertNotNull(response);
         assertNotNull(response.getPayload());

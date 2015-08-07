@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transformer.TransformerException;
@@ -19,6 +18,9 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.DataTypeFactory;
 
+import com.google.common.base.Charsets;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -28,6 +30,14 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
 
     private MuleContext muleContext = mock(MuleContext.class);
     private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+
+    @Before
+    public void setUp() throws Exception
+    {
+        when(muleConfiguration.getDefaultEncoding()).thenReturn(Charsets.UTF_8.name());
+        when(muleConfiguration.useExtendedTransformations()).thenReturn(true);
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+    }
 
     @Test
     public void ignoresBadInputIfEnforcementOff() throws TransformerException

@@ -13,9 +13,7 @@
 
     <properties>
         <skipExportTests>false</skipExportTests>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
-
 
     <build>
         <plugins>
@@ -625,6 +623,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -797,7 +800,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
+            <artifactId>activemq-broker</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

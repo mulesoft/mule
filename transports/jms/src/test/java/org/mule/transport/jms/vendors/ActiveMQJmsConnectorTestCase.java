@@ -11,7 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
@@ -24,9 +23,14 @@ import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
+import org.springframework.jms.connection.CachingConnectionFactory;
 
 public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 {
+
+    private static String USERNAME = "username";
+    private static String PASSWORD = "password";
+
     @Override
     protected String getConfigFile()
     {
@@ -71,7 +75,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertFalse(c.isNoLocal());
         assertFalse(c.isPersistentDelivery());
         assertEquals(0, c.getMaxRedelivery());
-        assertFalse(c.isCacheJmsSessions());
+        assertTrue(c.isCacheJmsSessions());
         assertFalse(c.isEagerConsumer());
 
         assertEquals("1.0.2b", c.getSpecification());
@@ -84,9 +88,10 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);
-        
+
         assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory() instanceof ActiveMQConnectionFactory);
+        assertTrue(c.getConnectionFactory() instanceof CachingConnectionFactory);
+        assertTrue(((CachingConnectionFactory) c.getConnectionFactory()).getTargetConnectionFactory() instanceof ActiveMQConnectionFactory);
         assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
         assertNull(c.getUsername());
         assertNull(c.getPassword());
@@ -104,4 +109,23 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
+
+    /**
+     * See MULE-8221
+     */
+    @Test
+    public void testActiveMqConnectorWithUsernameAndPassword() throws Exception
+    {
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnectorWithUsernameAndPassword");
+
+        assertTrue(c instanceof ActiveMQJmsConnector);
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+
+        assertEquals(USERNAME, c.getUsername());
+        assertEquals(PASSWORD, c.getPassword());
+        assertTrue(c.isCacheJmsSessions());
+        assertEquals("1.1", c.getSpecification());
+    }
+
 }

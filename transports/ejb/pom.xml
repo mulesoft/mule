@@ -11,10 +11,6 @@
     <name>EJB Transport</name>
     <description>A Mule transport for Ejb Connectivity that allows you to invoke an ejb object using an endpoint.</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>

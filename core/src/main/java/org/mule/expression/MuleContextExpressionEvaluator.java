@@ -29,7 +29,7 @@ import org.mule.config.i18n.CoreMessages;
  * <li>homeDir - Mule's home directory</li>
  * </ul>
  */
-public class MuleContextExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
+public class MuleContextExpressionEvaluator extends AbstractExpressionEvaluator implements MuleContextAware
 {
     public static final String NAME = "context";
 

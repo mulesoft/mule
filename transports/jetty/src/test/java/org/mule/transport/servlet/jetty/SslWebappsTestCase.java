@@ -6,13 +6,18 @@
  */
 package org.mule.transport.servlet.jetty;
 
+import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class SslWebappsTestCase extends AbstractWebappsTestCase
 {
+    @Rule
+    public SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
+
     @Rule
     public DynamicPort httpPort = new DynamicPort("port");
 

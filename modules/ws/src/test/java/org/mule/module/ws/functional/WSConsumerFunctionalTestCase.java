@@ -32,6 +32,7 @@ public class WSConsumerFunctionalTestCase extends AbstractWSConsumerFunctionalTe
     {
         return Arrays.asList(new Object[] {true, "ws-consumer-http-config.xml"},
                              new Object[] {true, "ws-consumer-http-custom-connector-config.xml"},
+                             new Object[] {true, "ws-consumer-http-dynamic-custom-connector-config.xml"},
                              new Object[] {true, "ws-consumer-http-module-config.xml"},
                              new Object[] {true, "ws-consumer-jms-config.xml"},
                              new Object[] {false, "ws-consumer-http-config.xml"},

@@ -11,12 +11,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 
 import java.util.Set;
 
@@ -25,6 +30,8 @@ import org.junit.Test;
 
 public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCase
 {
+    public static final String CUSTOM_ENCODING = "UTF-16";
+
     @Test
     public void testPropertiesCase() throws Exception
     {
@@ -183,5 +190,25 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         mpc.getPropertyNames(PropertyScope.SESSION).add("other");
     }
 
+    @Test
+    public void setsDefaultPropertyMetaData() throws Exception
+    {
+        MessagePropertiesContext properties = new MessagePropertiesContext();
+        properties.setProperty("Prop", "foo");
+        DataType<?> dataType = properties.getPropertyDataType("Prop", PropertyScope.OUTBOUND);
 
+        assertThat(dataType, like(String.class, MimeTypes.ANY, null));
+    }
+
+    @Test
+    public void setsDefaultScopedPropertyMetaData() throws Exception
+    {
+        DataType dataType = DataTypeFactory.create(Integer.class, MimeTypes.APPLICATION_XML);
+        dataType.setEncoding(CUSTOM_ENCODING);
+        MessagePropertiesContext properties = new MessagePropertiesContext();
+        properties.setProperty("Prop", "foo", PropertyScope.OUTBOUND, dataType);
+        DataType<?> actualDataType = properties.getPropertyDataType("Prop", PropertyScope.OUTBOUND);
+
+        assertThat(actualDataType, like(dataType));
+    }
 }

@@ -1,0 +1,6 @@
+http\://www.mulesoft.org/schema/mule/http/current/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/http/3.6/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/http/3.7/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd=META-INF/mule-httpn.xsd
+http\://www.mulesoft.org/schema/mule/httpn/3.6/mule-httpn.xsd=META-INF/mule-httpn.xsd
+http\://www.mulesoft.org/schema/mule/httpn/3.7/mule-httpn.xsd=META-INF/mule-httpn.xsd

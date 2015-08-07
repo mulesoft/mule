@@ -15,7 +15,6 @@
 
     <properties>
         <skipExportTests>false</skipExportTests>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <build>
@@ -85,13 +84,14 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
+            <artifactId>activemq-broker</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- Used by ActiveMQ if persistent=true -->
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-kahadb-store</artifactId>
+            <version>${activemqVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

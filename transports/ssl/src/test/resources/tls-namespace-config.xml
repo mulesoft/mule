@@ -31,7 +31,7 @@
                          type="testTrustStoreType" algorithm="testTrustStoreAlgorithm"/>
 
         <tls:key-store path="serverKeystore" keyPassword="testKeyPassword" password="testKeyStorePassword"
-                       algorithm="testKeyStoreAlgorithm" type="testKeyStoreType"/>
+                       algorithm="testKeyStoreAlgorithm" alias="testKeyStoreAlias" type="testKeyStoreType"/>
     </tls:context>
 
 

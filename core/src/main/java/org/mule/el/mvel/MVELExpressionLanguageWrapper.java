@@ -7,6 +7,7 @@
 package org.mule.el.mvel;
 
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.expression.DefaultExpressionManager;
 
 /**
@@ -19,10 +20,15 @@ public final class MVELExpressionLanguageWrapper extends MVELExpressionLanguage
     public MVELExpressionLanguageWrapper(MuleContext muleContext)
     {
         super(muleContext);
+    }
 
+    @Override
+    public void initialise() throws InitialisationException
+    {
         if (muleContext.getExpressionManager() instanceof DefaultExpressionManager)
         {
             ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(this);
         }
+        super.initialise();
     }
 }

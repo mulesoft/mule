@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="emptyConfig" host="localhost" port="${emptyConfigPort}"/>
+
+    <http:listener-config name="fullConfig" host="localhost" port="${fullConfigPort}" basePath="${basePath}"/>
+
+    <http:listener-config name="nonLocalHostConfig" host="${nonLocalhostIp}" port="${fullConfigPort}" basePath="${basePath}"/>
+
+    <http:listener-config name="noListenerConfig" host="localhost" port="${noListenerConfigPort}"/>
+
+    <flow name="emptyListenerConfigFlow">
+        <http:listener path="${path}" config-ref="emptyConfig" />
+        <echo-component/>
+    </flow>
+
+    <flow name="fullListenerConfigFlow">
+        <http:listener path="${path}" config-ref="fullConfig" />
+        <echo-component/>
+    </flow>
+
+    <flow name="useDifferentIpSamePathFlow">
+        <http:listener path="${path}" config-ref="nonLocalHostConfig" />
+        <echo-component/>
+    </flow>
+
+    <flow name="restrictedMethodsFlow">
+        <http:listener path="post" config-ref="fullConfig" allowedMethods="POST"/>
+        <echo-component/>
+    </flow>
+
+    <http:listener-config name="slashListenerConfig" host="localhost" port="${slashConfigPort}" basePath="/"/>
+
+    <flow name="useSlashInPathAndBasePath1">
+        <http:listener path="/" config-ref="slashListenerConfig" />
+        <set-payload value="1" />
+    </flow>
+    <flow name="useSlashInPathAndBasePath2">
+        <http:listener path="//" config-ref="slashListenerConfig" />
+        <set-payload value="2" />
+    </flow>
+    <flow name="useSlashInPathAndBasePath3">
+        <http:listener path="///" config-ref="slashListenerConfig" />
+        <set-payload value="3" />
+    </flow>
+
+</mule>

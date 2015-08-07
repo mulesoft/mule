@@ -6,21 +6,20 @@
  */
 package org.mule.module.xml.filters;
 
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import org.junit.Test;
-import org.mule.tck.size.SmallTest;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -34,7 +33,7 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
 
     private static final String INVALID_XML_FILE = "/validation2.xml";
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
 
     @Test

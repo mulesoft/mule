@@ -6,6 +6,7 @@
  */
 package org.mule.config.spring.processors;
 
+import org.mule.api.NameableObject;
 import org.mule.api.agent.Agent;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -22,29 +23,32 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 public class MuleObjectNameProcessor implements BeanPostProcessor
 {
     private boolean overwrite = false;
+    private final Class<? extends NameableObject> managedTypes[] = new Class[]
+            {
+                    Connector.class,
+                    Transformer.class,
+                    Agent.class
+            };
 
-    public Object postProcessBeforeInitialization(Object o, String s) throws BeansException
+    public Object postProcessBeforeInitialization(Object object, String beanName) throws BeansException
     {
+        for (Class<? extends NameableObject> managedType : managedTypes)
+        {
+            if (managedType.isInstance(object))
+            {
+                setNameIfNecessary((NameableObject) object, beanName);
+            }
+        }
 
-        if (o instanceof Connector)
+        return object;
+    }
+
+    private void setNameIfNecessary(NameableObject nameable, String name)
+    {
+        if (nameable.getName() == null || overwrite)
         {
-            if (((Connector)o).getName() == null || overwrite)
-            {
-                ((Connector)o).setName(s);
-            }
+            nameable.setName(name);
         }
-        else if (o instanceof Transformer)
-        {
-            if (((Transformer)o).getName() == null || overwrite)
-            {
-               ((Transformer)o).setName(s);
-            }
-        }
-        else if (o instanceof Agent)
-        {
-            ((Agent)o).setName(s);
-        }
-        return o;
     }
 
     public Object postProcessAfterInitialization(Object o, String s) throws BeansException

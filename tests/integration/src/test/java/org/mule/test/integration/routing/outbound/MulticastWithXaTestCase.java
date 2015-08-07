@@ -8,6 +8,7 @@ package org.mule.test.integration.routing.outbound;
 
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Ignore;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -18,6 +19,7 @@ import org.junit.Test;
 /**
  * Make sure to run an external amq broker, otherwise the test isn't possible.
  */
+@Ignore("test for MULE-5515")
 public class MulticastWithXaTestCase extends FunctionalTestCase
 {
     @Override

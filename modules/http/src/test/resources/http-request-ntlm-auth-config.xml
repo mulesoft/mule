@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="ntlmConfigWithDomain" host="localhost" port="${httpPort}">
+        <http:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor"/>
+    </http:request-config>
+
+    <flow name="ntlmAuthRequestWithDomain">
+        <http:request config-ref="ntlmConfigWithDomain" path="" method="GET"/>
+    </flow>
+
+    <http:request-config name="ntlmConfigWithoutDomain" host="localhost" port="${httpPort}">
+        <http:ntlm-authentication username="Zaphod" password="Beeblebrox"/>
+    </http:request-config>
+
+    <flow name="ntlmAuthRequestWithoutDomain">
+        <http:request config-ref="ntlmConfigWithoutDomain" path="" method="GET"/>
+    </flow>
+
+    <http:request-config name="ntlmConfigWithWorkstation" host="localhost" port="${httpPort}">
+        <http:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor" workstation="LightCity"/>
+    </http:request-config>
+
+    <flow name="ntlmAuthRequestWithWorkstation">
+        <http:request config-ref="ntlmConfigWithWorkstation" path="" method="GET"/>
+    </flow>
+
+</mule>

@@ -6,6 +6,17 @@
  */
 package org.mule.security.oauth.processor;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -14,16 +25,19 @@ import org.mule.api.MuleMessage;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.module.http.internal.ParameterMap;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
 import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 import org.mule.tck.size.SmallTest;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,6 +62,8 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     private OAuth2FetchAccessTokenMessageProcessor processor;
     private MuleEvent event;
     private MuleEvent restoredEvent;
+    private ParameterMap parameters = new ParameterMap();
+    private ParameterMap restoredParameters = new ParameterMap();
 
     @Mock
     private MuleContext muleContext;
@@ -56,26 +72,28 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     @SuppressWarnings({"unchecked", "deprecation"})
     public void setUp() throws Exception
     {
-        this.state = "my state";
-        this.incomingState = String.format(OAuthProperties.EVENT_STATE_TEMPLATE + "%s", eventId, state);
-        this.exception = false;
+        state = "my state";
+        incomingState = String.format(OAuthProperties.EVENT_STATE_TEMPLATE + "%s", eventId, state);
+        exception = false;
 
-        this.restoredEvent = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        restoredEvent = mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        when(restoredEvent.getMessage().getInboundProperty("http.query.params")).thenReturn(restoredParameters);
 
-        this.manager = Mockito.mock(OAuth2Manager.class, Mockito.RETURNS_DEEP_STUBS);
-        Mockito.when(this.manager.restoreAuthorizationEvent(eventId)).thenReturn(restoredEvent);
+        manager = mock(OAuth2Manager.class, Mockito.RETURNS_DEEP_STUBS);
+        when(manager.restoreAuthorizationEvent(eventId)).thenReturn(restoredEvent);
 
-        this.processor = new OAuth2FetchAccessTokenMessageProcessor(this.manager, null);
-        this.processor.setMuleContext(this.muleContext);
+        processor = new OAuth2FetchAccessTokenMessageProcessor(manager, null);
+        processor.setMuleContext(muleContext);
 
-        this.event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
-        Mockito.when(event.getMessage().getInvocationProperty(OAuthProperties.VERIFIER)).thenReturn(verifier);
-        Mockito.when(event.getMessage().getInboundProperty("state")).thenReturn(incomingState);
+        event = mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        when(event.getMessage().getInvocationProperty(OAuthProperties.VERIFIER)).thenReturn(verifier);
+        parameters.put("state", incomingState);
+        when(event.getMessage().getInboundProperty("http.query.params")).thenReturn(parameters);
 
-        Mockito.when(
-            this.restoredEvent.getMuleContext()
-                .getExpressionManager()
-                .parse(Mockito.anyString(), Mockito.any(MuleMessage.class))).thenAnswer(new Answer<String>()
+        when(
+                restoredEvent.getMuleContext()
+                        .getExpressionManager()
+                        .parse(anyString(), any(MuleMessage.class))).thenAnswer(new Answer<String>()
         {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
@@ -90,15 +108,15 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     {
         if (!exception)
         {
-            Mockito.verify(this.manager).restoreAuthorizationEvent(eventId);
-            Assert.assertSame(RequestContext.getEvent(), this.restoredEvent);
-            Mockito.verify(this.muleContext).fireNotification(
+            verify(manager).restoreAuthorizationEvent(eventId);
+            assertSame(RequestContext.getEvent(), restoredEvent);
+            verify(muleContext).fireNotification(
                 Mockito.argThat(new OAuthNotificationMatcher(
-                    OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END, this.event)));
+                    OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END, event)));
 
-            Mockito.verify(this.restoredEvent.getMessage()).removeProperty(OAuthProperties.HTTP_STATUS,
+            verify(restoredEvent.getMessage()).removeProperty(OAuthProperties.HTTP_STATUS,
                 PropertyScope.OUTBOUND);
-            Mockito.verify(this.restoredEvent.getMessage()).removeProperty(OAuthProperties.CALLBACK_LOCATION,
+            verify(restoredEvent.getMessage()).removeProperty(OAuthProperties.CALLBACK_LOCATION,
                 PropertyScope.OUTBOUND);
         }
     }
@@ -106,47 +124,64 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     @Test
     public void stateRestored() throws Exception
     {
-        this.adapterWithUrlUsingConfigAsId();
-        Mockito.verify(this.restoredEvent.getMessage()).setProperty("state", state, PropertyScope.INBOUND);
+        final AtomicReference<HashMap<String, String>> parameters = new AtomicReference<>();
+        MuleMessage mockMessage = mock(MuleMessage.class);
+        when(restoredEvent.getMessage()).thenReturn(mockMessage);
+        when(mockMessage.getInboundProperty(HTTP_QUERY_PARAMS)).thenReturn(restoredParameters);
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                if (invocationOnMock.getArguments()[0].equals(HTTP_QUERY_PARAMS))
+                {
+                    parameters.set((HashMap) invocationOnMock.getArguments()[1]);
+                }
+                return null;
+            }
+        }).when(mockMessage).setProperty(anyString(), any(Map.class), any(PropertyScope.class));
+        adapterWithUrlUsingConfigAsId();
+        assertThat(parameters.get().get("state"), equalTo(state));
     }
 
     @Test
     public void badState() throws Exception
     {
-        this.incomingState = "bad state";
-        this.exception = true;
+        incomingState = "bad state";
+        exception = true;
+        parameters.clear();
+        parameters.put("state", incomingState);
 
-        Mockito.when(event.getMessage().getInboundProperty("state")).thenReturn(incomingState);
         final String accessTokenUrl = "accessTokenUrl";
         final String redirectUri = "redirectUri";
         final String accessTokenId = "accessTokenId";
 
-        this.processor.setRedirectUri(redirectUri);
+        processor.setRedirectUri(redirectUri);
 
-        OAuth2Adapter adapter = Mockito.mock(OAuth2Adapter.class);
+        OAuth2Adapter adapter = mock(OAuth2Adapter.class);
 
-        Mockito.when(this.manager.createAdapter(verifier)).thenReturn(adapter);
-        Mockito.when(this.manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
-        Mockito.when(adapter.getAccessTokenUrl()).thenReturn(accessTokenUrl);
+        when(manager.createAdapter(verifier)).thenReturn(adapter);
+        when(manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
+        when(adapter.getAccessTokenUrl()).thenReturn(accessTokenUrl);
 
-        Assert.assertSame(this.event, this.processor.process(this.event));
+        assertSame(event, processor.process(event));
     }
 
     @Test(expected = MessagingException.class)
     public void noAuthorizationEvent() throws Exception
     {
-        this.exception = true;
-        Mockito.when(this.manager.restoreAuthorizationEvent(eventId)).thenThrow(
+        exception = true;
+        when(manager.restoreAuthorizationEvent(eventId)).thenThrow(
             new ObjectDoesNotExistException());
-        this.adapterWithUrlUsingConfigAsId();
+        adapterWithUrlUsingConfigAsId();
     }
 
     @Test(expected = MessagingException.class)
     public void failToRestoreAuthorizationEvent() throws Exception
     {
-        this.exception = true;
-        Mockito.when(this.manager.restoreAuthorizationEvent(eventId)).thenThrow(new ObjectStoreException());
-        this.adapterWithUrlUsingConfigAsId();
+        exception = true;
+        when(manager.restoreAuthorizationEvent(eventId)).thenThrow(new ObjectStoreException());
+        adapterWithUrlUsingConfigAsId();
     }
 
     @Test
@@ -156,19 +191,19 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         final String redirectUri = "redirectUri";
         final String accessTokenId = "accessTokenId";
 
-        this.processor.setRedirectUri(redirectUri);
+        processor.setRedirectUri(redirectUri);
 
-        OAuth2Adapter adapter = Mockito.mock(OAuth2Adapter.class);
+        OAuth2Adapter adapter = mock(OAuth2Adapter.class);
 
-        Mockito.when(this.manager.createAdapter(verifier)).thenReturn(adapter);
-        Mockito.when(this.manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
-        Mockito.when(adapter.getAccessTokenUrl()).thenReturn(accessTokenUrl);
+        when(manager.createAdapter(verifier)).thenReturn(adapter);
+        when(manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
+        when(adapter.getAccessTokenUrl()).thenReturn(accessTokenUrl);
 
-        Assert.assertSame(this.restoredEvent, this.processor.process(event));
+        assertSame(restoredEvent, processor.process(event));
 
-        Mockito.verify(adapter).fetchAccessToken(redirectUri);
-        Mockito.verify(this.manager.getAccessTokenPoolFactory()).passivateObject(accessTokenId, adapter);
-        Mockito.verify(this.restoredEvent.getMessage()).setInvocationProperty(
+        verify(adapter).fetchAccessToken(redirectUri);
+        verify(manager.getAccessTokenPoolFactory()).passivateObject(accessTokenId, adapter);
+        verify(restoredEvent.getMessage()).setInvocationProperty(
             OAuthProperties.ACCESS_TOKEN_ID, accessTokenId);
 
     }
@@ -180,19 +215,19 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         final String redirectUri = "redirectUri";
         final String accessTokenId = "accessTokenId";
 
-        this.processor.setRedirectUri(redirectUri);
-        this.processor.setAccessTokenUrl(accessTokenUrl);
+        processor.setRedirectUri(redirectUri);
+        processor.setAccessTokenUrl(accessTokenUrl);
 
-        OAuth2Adapter adapter = Mockito.mock(OAuth2Adapter.class);
+        OAuth2Adapter adapter = mock(OAuth2Adapter.class);
 
-        Mockito.when(this.manager.createAdapter(verifier)).thenReturn(adapter);
-        Mockito.when(this.manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
+        when(manager.createAdapter(verifier)).thenReturn(adapter);
+        when(manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
 
-        Assert.assertSame(this.restoredEvent, this.processor.process(event));
+        assertSame(restoredEvent, processor.process(event));
 
-        Mockito.verify(adapter).fetchAccessToken(redirectUri);
-        Mockito.verify(this.manager.getAccessTokenPoolFactory()).passivateObject(accessTokenId, adapter);
-        Mockito.verify(this.restoredEvent.getMessage()).setInvocationProperty(
+        verify(adapter).fetchAccessToken(redirectUri);
+        verify(manager.getAccessTokenPoolFactory()).passivateObject(accessTokenId, adapter);
+        verify(restoredEvent.getMessage()).setInvocationProperty(
             OAuthProperties.ACCESS_TOKEN_ID, accessTokenId);
     }
 
@@ -203,19 +238,19 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         final String redirectUri = "redirectUri";
         final String accessTokenId = "accessTokenId";
 
-        this.processor.setRedirectUri(redirectUri);
-        this.processor.setAccessTokenId(accessTokenId);
+        processor.setRedirectUri(redirectUri);
+        processor.setAccessTokenId(accessTokenId);
 
-        OAuth2Adapter adapter = Mockito.mock(OAuth2Adapter.class);
+        OAuth2Adapter adapter = mock(OAuth2Adapter.class);
 
-        Mockito.when(this.manager.createAdapter(verifier)).thenReturn(adapter);
-        Mockito.when(adapter.getAccessTokenUrl()).thenReturn(accessTokenUrl);
+        when(manager.createAdapter(verifier)).thenReturn(adapter);
+        when(adapter.getAccessTokenUrl()).thenReturn(accessTokenUrl);
 
-        Assert.assertSame(this.restoredEvent, this.processor.process(event));
+        assertSame(restoredEvent, processor.process(event));
 
-        Mockito.verify(adapter).fetchAccessToken(redirectUri);
-        Mockito.verify(this.manager.getAccessTokenPoolFactory()).passivateObject(accessTokenId, adapter);
-        Mockito.verify(this.restoredEvent.getMessage()).setInvocationProperty(
+        verify(adapter).fetchAccessToken(redirectUri);
+        verify(manager.getAccessTokenPoolFactory()).passivateObject(accessTokenId, adapter);
+        verify(restoredEvent.getMessage()).setInvocationProperty(
             OAuthProperties.ACCESS_TOKEN_ID, accessTokenId);
 
     }
@@ -227,19 +262,19 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         final String redirectUri = "redirectUri";
         final String accessTokenId = "accessTokenId";
 
-        this.processor.setRedirectUri(redirectUri);
-        this.processor.setAccessTokenUrl(accessTokenUrl);
-        this.processor.setAccessTokenId(accessTokenId);
+        processor.setRedirectUri(redirectUri);
+        processor.setAccessTokenUrl(accessTokenUrl);
+        processor.setAccessTokenId(accessTokenId);
 
-        OAuth2Adapter adapter = Mockito.mock(OAuth2Adapter.class);
+        OAuth2Adapter adapter = mock(OAuth2Adapter.class);
 
-        Mockito.when(this.manager.createAdapter(verifier)).thenReturn(adapter);
+        when(manager.createAdapter(verifier)).thenReturn(adapter);
 
-        Assert.assertSame(this.restoredEvent, this.processor.process(event));
+        assertSame(restoredEvent, processor.process(event));
 
-        Mockito.verify(adapter).fetchAccessToken(redirectUri);
-        Mockito.verify(this.manager.getAccessTokenPoolFactory()).passivateObject(accessTokenId, adapter);
-        Mockito.verify(this.restoredEvent.getMessage()).setInvocationProperty(
+        verify(adapter).fetchAccessToken(redirectUri);
+        verify(manager.getAccessTokenPoolFactory()).passivateObject(accessTokenId, adapter);
+        verify(restoredEvent.getMessage()).setInvocationProperty(
             OAuthProperties.ACCESS_TOKEN_ID, accessTokenId);
     }
 

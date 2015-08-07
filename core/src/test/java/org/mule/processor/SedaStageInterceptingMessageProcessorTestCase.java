@@ -6,9 +6,11 @@
  */
 package org.mule.processor;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -19,13 +21,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.mule.processor.SedaStageInterceptingMessageProcessor.DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR;
+import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.ThreadSafeAccess;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.notification.AsyncMessageNotificationListener;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -34,15 +40,20 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.service.FailedToQueueEventException;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
+import org.mule.context.notification.AsyncMessageNotification;
 import org.mule.management.stats.QueueStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.service.Pausable;
+import org.mule.tck.MuleTestUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.beans.ExceptionListener;
+import java.io.Serializable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -91,6 +102,41 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         lifeCycleState.stop();
         lifeCycleState.dispose();
 
+    }
+
+    @Test
+    public void defaultQueueSize() throws Exception
+    {
+        SedaStageInterceptingMessageProcessor mp = createAsyncInterceptingMessageProcessor(target);
+        assertThat(mp.queueProfile.getMaxOutstandingMessages(), is(equalTo(muleContext.getDefaultThreadingProfile()
+                                                                                   .getMaxThreadsActive() *
+                                                                           DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR)));
+    }
+
+    @Test
+    public void customQueueSize() throws Exception
+    {
+        int queueSize = 100;
+        queueProfile.setMaxOutstandingMessages(queueSize);
+        SedaStageInterceptingMessageProcessor mp;
+        mp = new SedaStageInterceptingMessageProcessor("name", "name", queueProfile, queueTimeout,
+                                                       muleContext.getDefaultThreadingProfile(), queueStatistics,
+                                                       muleContext);
+        assertThat(mp.queueProfile.getMaxOutstandingMessages(), is(equalTo(queueSize)));
+    }
+
+    @Test
+    public void defaultQueueSizeCustomMaxThreads() throws Exception
+    {
+        int maxThreads = 200;
+        ThreadingProfile tp = new ChainedThreadingProfile();
+        tp.setMaxThreadsActive(maxThreads);
+        SedaStageInterceptingMessageProcessor mp;
+        mp = new SedaStageInterceptingMessageProcessor("name", "name", queueProfile, queueTimeout, tp,
+                                                       queueStatistics, muleContext);
+        assertThat(mp.queueProfile.getMaxOutstandingMessages(), is(equalTo(muleContext.getDefaultThreadingProfile()
+                                                                                   .getMaxThreadsActive() *
+                                                                           DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR)));
     }
 
     @Test
@@ -230,7 +276,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     }
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
+    protected SedaStageInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
         throws Exception
     {
         SedaStageInterceptingMessageProcessor mp = new SedaStageInterceptingMessageProcessor("name", "name",
@@ -256,6 +302,129 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
             assertEquals("testThrowable", mrex.getCause().getMessage());
         }
     }
+
+    @Test(expected = FailedToQueueEventException.class, timeout = 200)
+    public void enqueueQueueFullThreadTimeout() throws Exception
+    {
+        ThreadingProfile threadingProfile = new ChainedThreadingProfile();
+        threadingProfile.setThreadWaitTimeout(10);
+        threadingProfile.setMuleContext(muleContext);
+        // Create queue with capacity of 1, so that for second event queue is already full
+        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+                muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        QueueProfile queueProfile = new QueueProfile(1, queueStore);
+        SedaStageInterceptingMessageProcessor mp;
+        mp = new SedaStageInterceptingMessageProcessor("threadName", "queueMame", queueProfile, queueTimeout,
+                                                       threadingProfile, queueStatistics, muleContext);
+        mp.setListener(target);
+        mp.initialise();
+        // Don't start SedaStageInterceptingMessageProcessor to ensure events queue up and aren't removed from queue
+
+        // First enqueue is successful as queue as max size of 1 defined.
+        mp.enqueue(getTestEvent("foo"));
+
+        // Second enqueue will cause thread to wait until timeout (10ms) and then throw a FailedToQueueEventException.
+        mp.enqueue(getTestEvent("bar"));
+    }
+
+    @Test
+    public void enqueueQueueSizeZero() throws Exception
+    {
+        // Simple check to ensure a zero queue size doesn't disable queue.
+        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+                muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        createMPAndQueueSingleEvent(new QueueProfile(0, queueStore));
+    }
+
+    @Test
+    public void enqueueQueueSizeMinusOne() throws Exception
+    {
+        // Simple check to ensure a negative queue size doesn't cause an issues.
+        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+                muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        createMPAndQueueSingleEvent(new QueueProfile(-1, queueStore));
+    }
+
+    @Test
+    public void testEventCopiedBeforeEnqueueInCallerThread() throws Exception
+    {
+        SedaStageInterceptingMessageProcessor sedaProcessor = (SedaStageInterceptingMessageProcessor) messageProcessor;
+
+        MuleEvent testEvent = getTestEvent("", MessageExchangePattern.ONE_WAY);
+        sedaProcessor.pause();
+        messageProcessor.process(testEvent);
+
+        MuleEvent queuedEvent = (MuleEvent) sedaProcessor.queue.poll(sedaProcessor.queueTimeout);
+
+        assertThat(queuedEvent, is(notNullValue()));
+        assertThat(queuedEvent, is(not(sameInstance(testEvent))));
+    }
+
+    @Test
+    public void oneWayWithAsyncNotificationListener() throws Exception
+    {
+        CountDownLatch notificationLatch = new CountDownLatch(2);
+        AsynMessageFiringNotificationListener listener = new AsynMessageFiringNotificationListener(notificationLatch);
+        muleContext.registerListener(listener);
+
+        MuleEvent event = MuleTestUtils.getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY, muleContext);
+        assertAsync(messageProcessor, event);
+        notificationLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+        // ASYNC_SCHEDULED receives same event instance as is queued
+        assertThat(listener.asyncScheduledEvent, is(notNullValue()));
+        assertThat(listener.asyncScheduledEvent, is(sameInstance(event)));
+        assertThat(listener.asyncScheduledEvent, is(not(sameInstance(target.sensedEvent))));
+
+        // ASYNC_COMPLETE receives same event passed to target processor
+        assertThat(listener.asyncCompleteEvent, is(notNullValue()));
+        assertThat(listener.asyncCompleteEvent, is(not(sameInstance(event))));
+        assertThat(listener.asyncCompleteEvent, is(sameInstance(target.sensedEvent)));
+    }
+
+    private class AsynMessageFiringNotificationListener implements AsyncMessageNotificationListener<AsyncMessageNotification>
+    {
+
+        CountDownLatch latch;
+        MuleEvent asyncScheduledEvent;
+        MuleEvent asyncCompleteEvent;
+
+        public AsynMessageFiringNotificationListener(CountDownLatch latch)
+        {
+            this.latch = latch;
+        }
+
+        @Override
+        public void onNotification(final AsyncMessageNotification notification)
+        {
+            if (notification.getAction() == AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED)
+            {
+                asyncScheduledEvent = (MuleEvent) notification.getSource();
+                ((DefaultMuleMessage) asyncScheduledEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
+            }
+            else if (notification.getAction() == AsyncMessageNotification.PROCESS_ASYNC_COMPLETE)
+            {
+                asyncCompleteEvent = (MuleEvent) notification.getSource();
+                ((DefaultMuleMessage) asyncCompleteEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
+            }
+            latch.countDown();
+        }
+    }
+
+    private void createMPAndQueueSingleEvent(QueueProfile queueProfile) throws Exception
+    {
+        SedaStageInterceptingMessageProcessor mp;
+        mp = new SedaStageInterceptingMessageProcessor("threadName", "queueMame", queueProfile, queueTimeout,
+                                                       muleContext.getDefaultThreadingProfile(), queueStatistics,
+                                                       muleContext);
+        mp.setListener(target);
+        mp.initialise();
+        // Don't start SedaStageInterceptingMessageProcessor to ensure events queue up and aren't removed from queue
+
+        // First enqueue is successful as queue as max size of 1 defined.
+        mp.enqueue(getTestEvent("foo"));
+    }
+
 
     private WorkEvent getTestWorkEvent()
     {

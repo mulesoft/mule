@@ -1,0 +1,41 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+
+    <flow name="cxfClient">
+        <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="1000" repeatCount="0"
+            startDelay="1000">
+            <quartz:event-generator-job/>
+        </quartz:inbound-endpoint>
+        <component>
+            <singleton-object class="org.mule.module.cxf.jaxws.ClientMessageGenerator"/>
+        </component>
+        <cxf:jaxws-client clientClass="org.apache.hello_world_soap_http.SOAPService" port="SoapPort"
+                          wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
+            <cxf:ws-security ref="outboundConfig"/>
+        </cxf:jaxws-client>
+        <http:request config-ref="requestConfig" path="/services/greeter" method="POST" />
+    </flow>
+
+    <flow name="greeterService">
+        <http:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.wssec.GreeterWithLatch">
+            <cxf:ws-security ref="inboundConfig"/>
+        </cxf:jaxws-service>
+        <component>
+            <singleton-object class="org.mule.module.cxf.wssec.GreeterWithLatch"/>
+        </component>
+    </flow>
+
+</mule>

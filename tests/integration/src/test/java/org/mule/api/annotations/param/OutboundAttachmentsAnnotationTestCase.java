@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 import org.mule.util.ExceptionUtils;
 
 import java.util.Map;
@@ -38,7 +39,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     public void testProcessAttachment() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://attachment", null, null);
+        MuleMessage message = client.send("vm://attachment", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<String, DataHandler> result = getMapPayload(message);
@@ -49,7 +50,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     public void testProcessAttachmentWithExistingOutAttachments() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://attachment2", null, null);
+        MuleMessage message = client.send("vm://attachment2", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<String, DataHandler> result = getMapPayload(message);
@@ -61,7 +62,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     public void testInvalidParamType() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://invalid", null, null);
+        MuleMessage message = client.send("vm://invalid", getTestMuleMessage(NullPayload.getInstance()));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(IllegalArgumentException.class,

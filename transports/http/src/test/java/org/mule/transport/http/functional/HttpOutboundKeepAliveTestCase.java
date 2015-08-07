@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.httpclient.Header;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -78,6 +79,7 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky test")
     public void reusesConnectionWhenRequestResponseEndpointHasKeepAlive() throws MuleException
     {
         assertKeepAlive(KEEP_ALIVE_REQUEST_RESPONSE_PATH);

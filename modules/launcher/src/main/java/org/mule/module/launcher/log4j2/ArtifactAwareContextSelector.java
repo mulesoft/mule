@@ -6,27 +6,21 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.module.launcher.DirectoryResourceLocator;
 import org.mule.module.launcher.LocalResourceLocator;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
-import com.google.common.collect.ImmutableList;
-
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
@@ -60,13 +54,12 @@ import org.apache.logging.log4j.status.StatusLogger;
  *
  * @since 3.6.0
  */
-final class ArtifactAwareContextSelector implements ContextSelector
+class ArtifactAwareContextSelector implements ContextSelector, Disposable
 {
 
-    private static final int NO_CCL_CLASSLOADER = 0;
     private static final StatusLogger logger = StatusLogger.getLogger();
 
-    private LoggerContextCache cache = new LoggerContextCache();
+    private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
 
 
     ArtifactAwareContextSelector()
@@ -82,7 +75,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
     @Override
     public LoggerContext getContext(String fqcn, ClassLoader classLoader, boolean currentContext, URI configLocation)
     {
-        return cache.getLoggerContext(resolveClassLoader(classLoader));
+        return cache.getLoggerContext(resolveLoggerContextClassLoader(classLoader));
     }
 
     @Override
@@ -97,9 +90,34 @@ final class ArtifactAwareContextSelector implements ContextSelector
         cache.remove(context);
     }
 
-    private ClassLoader resolveClassLoader(ClassLoader classLoader)
+    /**
+     * Given a {@code classLoader}  this method will resolve which is the {@code classLoader}
+     * associated with the logger context to use for this {@code classLoader} .
+     * <p/>
+     * When the provided {@code classLoader}  is from an application or a domain it will return
+     * the {@code classLoader}  associated with the logger context of the application or domain.
+     * So far the artifact (domain or app) {@code classLoader}  will be resolved to it self.
+     * <p/>
+     * If the {@code classLoader} belongs to the container or any other {@code classLoader}  created from a
+     * library running outside the context of an artifact then the system {@code classLoader}  will be used.
+     *
+     * @param classLoader {@link ClassLoader} running the code where the logging was done
+     * @return the {@link ClassLoader} owner of the logger context
+     */
+    static ClassLoader resolveLoggerContextClassLoader(ClassLoader classLoader)
     {
-        return classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
+        ClassLoader loggerClassLoader = classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
+        if (!(loggerClassLoader instanceof ArtifactClassLoader))
+        {
+            loggerClassLoader = loggerClassLoader.getSystemClassLoader();
+        }
+        return loggerClassLoader;
+    }
+
+    @Override
+    public void dispose()
+    {
+        cache.dispose();
     }
 
     private void destroyLoggersFor(ClassLoader classLoader)
@@ -128,7 +146,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
         return null;
     }
 
-    private LoggerContext buildContext(final ClassLoader classLoader)
+    LoggerContext buildContext(final ClassLoader classLoader)
     {
         NewContextParameters parameters = resolveContextParameters(classLoader);
         if (parameters == null)
@@ -151,7 +169,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
                 @Override
                 public void execute()
                 {
-                    destroyLoggersFor(classLoader);
+                    destroyLoggersFor(resolveLoggerContextClassLoader(classLoader));
                 }
             });
         }
@@ -186,7 +204,17 @@ final class ArtifactAwareContextSelector implements ContextSelector
 
         if (appLogConfig == null)
         {
-            return null;
+            File defaultConfigFile = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
+            defaultConfigFile = new File(defaultConfigFile, "log4j2.xml");
+
+            try
+            {
+                appLogConfig = defaultConfigFile.toURI().toURL();
+            }
+            catch (MalformedURLException e)
+            {
+                throw new MuleRuntimeException(createStaticMessage("Could not locate log config in MULE_HOME"), e);
+            }
         }
 
         try
@@ -195,79 +223,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
         }
         catch (URISyntaxException e)
         {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Could not read log file " + appLogConfig), e);
-        }
-    }
-
-    private class LoggerContextCache
-    {
-
-        private Cache<Integer, LoggerContext> contexts;
-
-        private LoggerContextCache()
-        {
-            contexts = CacheBuilder.newBuilder()
-                    .removalListener(new RemovalListener<Integer, LoggerContext>()
-                    {
-                        @Override
-                        public void onRemoval(RemovalNotification<Integer, LoggerContext> notification)
-                        {
-                            LoggerContext context = notification.getValue();
-                            if (context != null && !context.isStopping() && !context.isStopped())
-                            {
-                                context.stop();
-                            }
-                        }
-                    })
-                    .build();
-        }
-
-        private LoggerContext getLoggerContext(final ClassLoader classLoader)
-        {
-            try
-            {
-                return contexts.get(computeKey(classLoader), new Callable<LoggerContext>()
-                {
-                    @Override
-                    public LoggerContext call() throws Exception
-                    {
-                        return buildContext(classLoader);
-                    }
-                });
-            }
-            catch (ExecutionException e)
-            {
-                throw new MuleRuntimeException(
-                        MessageFactory.createStaticMessage("Could not init logger context "), e);
-            }
-        }
-
-        private void remove(ClassLoader classLoader)
-        {
-            contexts.invalidate(computeKey(classLoader));
-        }
-
-        private void remove(LoggerContext context)
-        {
-            for (Map.Entry<Integer, LoggerContext> entry : contexts.asMap().entrySet())
-            {
-                if (entry.getValue() == context)
-                {
-                    contexts.invalidate(entry.getKey());
-                    return;
-                }
-            }
-        }
-
-        private int computeKey(ClassLoader classLoader)
-        {
-            return classLoader == null ? NO_CCL_CLASSLOADER : classLoader.hashCode();
-        }
-
-        private List<LoggerContext> getAllLoggerContexts()
-        {
-            return ImmutableList.copyOf(contexts.asMap().values());
+            throw new MuleRuntimeException(createStaticMessage("Could not read log file " + appLogConfig), e);
         }
     }
 

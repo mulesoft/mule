@@ -9,7 +9,8 @@ package org.mule.expression;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -22,12 +23,11 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
-    private MuleContext muleContext = Mockito.mock(MuleContext.class);
+    private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     private Map<String, String> messageProperties = new HashMap<String, String>(3);
     private MapPayloadExpressionEvaluator evaluator = new MapPayloadExpressionEvaluator();
     private MuleMessage message;

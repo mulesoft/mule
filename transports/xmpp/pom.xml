@@ -12,10 +12,6 @@
     <name>XMPP Transport</name>
     <description>A Mule transport that enables event sending and receiving over XMPP (Jabber).</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

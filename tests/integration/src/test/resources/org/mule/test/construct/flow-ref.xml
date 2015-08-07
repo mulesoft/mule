@@ -1,18 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-    xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xsi:schemaLocation="
+      xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:thes="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port}"/>
+
+    <spring:bean name="NonBlockingFlow1SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <spring:bean name="NonBlockingFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <spring:bean name="NonBlockingToQueuedAsyncFlow1SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <spring:bean name="NonBlockingToQueuedAsyncFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <spring:bean name="NonBlockingToAsyncFlow1SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <spring:bean name="NonBlockingToAsyncFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <spring:bean name="NonBlockingToSyncFlow1SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+    <spring:bean name="NonBlockingToSyncFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
+
     <flow name="flow1">
         <vm:inbound-endpoint path="two.flow.ref.to.sub.flow"
-            exchange-pattern="request-response" />
+                             exchange-pattern="request-response" />
         <flow-ref name="sub-flow" />
         <flow-ref name="sub-flow" />
     </flow>
@@ -35,7 +48,7 @@
         <append-string-transformer message="y" />
         <append-string-transformer message="z" />
     </sub-flow>
-    
+
     <flow name="flow2">
         <flow-ref name="sub-flow-#[letter]" />
     </flow>
@@ -47,5 +60,61 @@
     <sub-flow name="sub-flow-B">
         <append-string-transformer message="B" />
     </sub-flow>
+
+    <flow name="NonBlockingFlow1" processingStrategy="non-blocking">
+        <http:listener config-ref="listenerConfig" path="nonBlockingFlowRefBasic"/>
+        <processor ref="NonBlockingFlow1SensingProcessor" />
+        <flow-ref name="NonBlockingFlow2"/>
+    </flow>
+    <flow name="NonBlockingFlow2">
+        <processor ref="NonBlockingFlow2SensingProcessor" />
+        <http:request config-ref="requestConfig" path="echo" method="POST"/>
+    </flow>
+
+    <flow name="NonBlockingToQueuedAsyncFlow1" processingStrategy="non-blocking">
+        <http:listener config-ref="listenerConfig" path="nonBlockingFlowRefToQueuedAsyncFlow"/>
+        <processor ref="NonBlockingToQueuedAsyncFlow1SensingProcessor" />
+        <flow-ref name="NonBlockingToQueuedAsyncFlow2"/>
+    </flow>
+    <flow name="NonBlockingToQueuedAsyncFlow2" processingStrategy="queued-asynchronous">
+        <processor ref="NonBlockingToQueuedAsyncFlow2SensingProcessor"/>
+        <http:request config-ref="requestConfig" path="echo" method="POST"/>
+    </flow>
+
+    <flow name="NonBlockingToAsyncFlow1" processingStrategy="non-blocking">
+        <http:listener config-ref="listenerConfig" path="nonBlockingFlowRefToAsyncFlow"/>
+        <processor ref="NonBlockingToAsyncFlow1SensingProcessor" />
+        <flow-ref name="NonBlockingToAsyncFlow2"/>
+    </flow>
+    <flow name="NonBlockingToAsyncFlow2" processingStrategy="asynchronous">
+        <processor ref="NonBlockingToAsyncFlow2SensingProcessor"/>
+        <http:request config-ref="requestConfig" path="echo" method="POST"/>
+    </flow>
+
+    <flow name="NonBlockingToSyncFlow1" processingStrategy="non-blocking">
+        <http:listener config-ref="listenerConfig" path="nonBlockingFlowRefToSyncFlow"/>
+        <processor ref="NonBlockingToSyncFlow1SensingProcessor" />
+        <flow-ref name="NonBlockingToSyncFlow2"/>
+    </flow>
+    <flow name="NonBlockingToSyncFlow2" processingStrategy="synchronous">
+        <processor ref="NonBlockingToSyncFlow2SensingProcessor"/>
+        <http:request config-ref="requestConfig" path="echo" method="POST"/>
+    </flow>
+
+    <flow name="NonBlockingExceptionFlow1" processingStrategy="non-blocking">
+        <http:listener config-ref="listenerConfig" path="nonBlockingFlowRefErrorHandling"/>
+        <flow-ref name="NonBlockingExceptionFlow2"/>
+    </flow>
+    <flow name="NonBlockingExceptionFlow2">
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <set-payload value="ERROR"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="httpEcho">
+        <http:listener config-ref="listenerConfig" path="echo"/>
+        <echo-component/>
+    </flow>
 
 </mule>

@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.resolver.database;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -15,12 +16,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
 import org.mule.api.registry.MuleRegistry;
+import org.mule.common.Result;
+import org.mule.common.TestResult;
+import org.mule.common.metadata.MetaData;
+import org.mule.common.metadata.MetaDataKey;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -33,16 +39,14 @@ public class DefaultDbConfigResolverTestCase extends AbstractMuleTestCase
     @Test
     public void resolvesDefaultDbConfig() throws Exception
     {
+        DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
         DbConfig dbConfig = mock(DbConfig.class);
+        when(dbConfigResolver.resolve(muleEvent)).thenReturn(dbConfig);
 
-        MuleRegistry registry = mock(MuleRegistry.class);
-        Collection<DbConfig> foundDbConfigs = new ArrayList<DbConfig>();
-        foundDbConfigs.add(dbConfig);
+        MuleRegistry registry = createMockRegistry(dbConfigResolver);
+        DefaultDbConfigResolver defaultDbConfigResolver = new DefaultDbConfigResolver(registry);
 
-        when(registry.lookupObjects(DbConfig.class)).thenReturn(foundDbConfigs);
-        DefaultDbConfigResolver dbConfigResolver = new DefaultDbConfigResolver(registry);
-
-        DbConfig resolvedDbConfig = dbConfigResolver.resolve(muleEvent);
+        DbConfig resolvedDbConfig = defaultDbConfigResolver.resolve(muleEvent);
 
         assertThat(dbConfig, sameInstance(resolvedDbConfig));
     }
@@ -68,12 +72,18 @@ public class DefaultDbConfigResolverTestCase extends AbstractMuleTestCase
         DbConfig dbConfig2 = mock(DbConfig.class);
         when(dbConfig2.getName()).thenReturn("dbConfig2");
 
-        MuleRegistry registry = mock(MuleRegistry.class);
-        Collection<DbConfig> foundDbConfigs = new ArrayList<DbConfig>();
-        foundDbConfigs.add(dbConfig1);
-        foundDbConfigs.add(dbConfig2);
+        DbConfigResolver dbConfigResolver1 = mock(DbConfigResolver.class);
+        when(dbConfigResolver1.resolve(null)).thenReturn(dbConfig1);
 
-        when(registry.lookupObjects(DbConfig.class)).thenReturn(foundDbConfigs);
+        DbConfigResolver dbConfigResolver2 = mock(DbConfigResolver.class);
+        when(dbConfigResolver2.resolve(null)).thenReturn(dbConfig2);
+
+        MuleRegistry registry = mock(MuleRegistry.class);
+        Collection<DbConfigResolver> foundDbConfigResolvers = new ArrayList<>();
+        foundDbConfigResolvers.add(dbConfigResolver1);
+        foundDbConfigResolvers.add(dbConfigResolver2);
+
+        when(registry.lookupObjects(DbConfigResolver.class)).thenReturn(foundDbConfigResolvers);
 
         DefaultDbConfigResolver dbConfigResolver = new DefaultDbConfigResolver(registry);
 
@@ -87,5 +97,72 @@ public class DefaultDbConfigResolverTestCase extends AbstractMuleTestCase
             assertThat(e.getMessage(), containsString("dbConfig1"));
             assertThat(e.getMessage(), containsString("dbConfig2"));
         }
+    }
+
+    @Test
+    public void testsConnection() throws Exception
+    {
+        DbConfig dbConfig = mock(DbConfig.class);
+        TestResult expectedTestResult = mock(TestResult.class);
+        when(dbConfig.test()).thenReturn(expectedTestResult);
+
+        DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
+        when(dbConfigResolver.resolve(null)).thenReturn(dbConfig);
+
+        MuleRegistry registry = createMockRegistry(dbConfigResolver);
+        DefaultDbConfigResolver defaultDbConfigResolver = new DefaultDbConfigResolver(registry);
+
+        final TestResult testResult = defaultDbConfigResolver.test();
+
+        assertThat(testResult, is(expectedTestResult));
+    }
+
+
+    @Test
+    public void returnsMetaDataKeys() throws Exception
+    {
+        DbConfig dbConfig = mock(DbConfig.class);
+        final Result<List<MetaDataKey>> expectedMetaDataResult = mock(Result.class);
+        when(dbConfig.getMetaDataKeys()).thenReturn(expectedMetaDataResult);
+
+        DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
+        when(dbConfigResolver.resolve(null)).thenReturn(dbConfig);
+
+        MuleRegistry registry = createMockRegistry(dbConfigResolver);
+        DefaultDbConfigResolver defaultDbConfigResolver = new DefaultDbConfigResolver(registry);
+
+        final Result<List<MetaDataKey>> metaDataResult = defaultDbConfigResolver.getMetaDataKeys();
+
+        assertThat(metaDataResult, is(expectedMetaDataResult));
+    }
+
+    @Test
+    public void returnsMetaData() throws Exception
+    {
+        DbConfig dbConfig = mock(DbConfig.class);
+        final Result<MetaData> expectedMetaData = mock(Result.class);
+        final MetaDataKey metaDataKey = mock(MetaDataKey.class);
+        when(dbConfig.getMetaData(metaDataKey)).thenReturn(expectedMetaData);
+
+        DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
+        when(dbConfigResolver.resolve(null)).thenReturn(dbConfig);
+
+        MuleRegistry registry = createMockRegistry(dbConfigResolver);
+        DefaultDbConfigResolver defaultDbConfigResolver = new DefaultDbConfigResolver(registry);
+
+        final Result<MetaData> metaData = defaultDbConfigResolver.getMetaData(metaDataKey);
+
+        assertThat(metaData, is(expectedMetaData));
+    }
+
+    private MuleRegistry createMockRegistry(DbConfigResolver dbConfigResolver)
+    {
+        Collection<DbConfigResolver> foundDbConfigResolvers = new ArrayList<>();
+        foundDbConfigResolvers.add(dbConfigResolver);
+
+        MuleRegistry registry = mock(MuleRegistry.class);
+        when(registry.lookupObjects(DbConfigResolver.class)).thenReturn(foundDbConfigResolvers);
+
+        return registry;
     }
 }

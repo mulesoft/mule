@@ -85,7 +85,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
      * @param expression Expression to be compiled
      * @return A {@link Serializable} object representing the compiled expression
      */
-    protected Serializable getCompiledExpression(final String expression)
+    public Serializable getCompiledExpression(final String expression)
     {
         try
         {

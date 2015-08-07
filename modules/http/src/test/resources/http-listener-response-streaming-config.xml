@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <configuration>
+        <expression-language>
+            <import class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
+            <alias name="inputStreamPayload" expression="new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())"/>
+            <alias name="stringPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY"/>
+        </expression-language>
+    </configuration>
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
+    <flow name="stringFlow">
+        <http:listener config-ref="listenerConfig" path="/string"/>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="stringWithContentLengthHeaderFlow">
+        <http:listener config-ref="listenerConfig" path="/stringWithContentLengthHeader">
+            <http:response-builder>
+                <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="stringWithContentLengthOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/stringWithContentLengthOutboundProperty"/>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="stringWithTransferEncodingFlow">
+        <http:listener config-ref="listenerConfig" path="/stringWithTransferEncodingHeader">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+    </flow>
+
+    <flow name="stringWithTransferEncodingOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/stringWithTransferEncodingOutboundProperty"/>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+    </flow>
+
+    <flow name="stringWithTransferEncodingAndContentLengthFlow">
+        <http:listener config-ref="listenerConfig" path="/stringWithTransferEncodingAndContentLengthHeader">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked"/>
+                <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="stringWithTransferEncodingAndContentLengthOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/stringWithTransferEncodingAndContentLengthOutboundProperty"/>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="stringWithTransferEncodingHeaderAndContentLengthOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/stringWithTransferEncodingHeaderAndContentLengthOutboundProperty">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="stringWithTransferEncodingOutboundPropertyAndContentLengthHeaderFlow">
+        <http:listener config-ref="listenerConfig" path="/stringWithTransferEncodingOutboundPropertyAndContentLengthHeader">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="inputStreamFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStream"/>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="inputStreamWithContentLengthHeaderFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithContentLengthHeader">
+            <http:response-builder>
+                <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="inputStreamWithContentLengthOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithContentLengthOutboundProperty"/>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="inputStreamWithTransferEncodingFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingHeader">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="inputStreamWithTransferEncodingOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingOutboundProperty"/>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+    </flow>
+
+    <flow name="inputStreamWithTransferEncodingAndContentLengthFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingAndContentLengthHeader">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked"/>
+                <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="inputStreamWithTransferEncodingAndContentLengthOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingAndContentLengthOutboundProperty"/>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+    </flow>
+
+    <flow name="inputStreamWithTransferEncodingHeaderAndContentLengthOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingHeaderAndContentLengthOutboundProperty">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeaderFlow">
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeader">
+            <http:response-builder>
+                <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+    </flow>
+
+    <flow name="neverStringFlow">
+        <http:listener config-ref="listenerConfig" path="/neverString" responseStreamingMode="NEVER"/>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="neverStringTransferEncodingHeaderFlow">
+        <http:listener config-ref="listenerConfig" path="/neverStringTransferEncodingHeader" responseStreamingMode="NEVER">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="neverStringTransferEncodingOutboundPropertyFlow" >
+        <http:listener config-ref="listenerConfig" path="/neverStringTransferEncodingOutboundProperty"  responseStreamingMode="NEVER"/>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+    </flow>
+
+    <flow name="neverInputStreamFlow">
+        <http:listener config-ref="listenerConfig" path="/neverInputStream"  responseStreamingMode="NEVER"/>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="neverInputStreamTransferEncodingHeaderFlow">
+        <http:listener config-ref="listenerConfig" path="/neverInputStreamTransferEncodingHeader"  responseStreamingMode="NEVER">
+            <http:response-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked" />
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+    </flow>
+
+    <flow name="neverInputStreamTransferEncodingOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/neverInputStreamTransferEncodingOutboundProperty"  responseStreamingMode="NEVER"/>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Transfer-Encoding" value="chunked"/>
+    </flow>
+
+    <flow name="alwaysStringFlow">
+        <http:listener config-ref="listenerConfig" path="/alwaysString"  responseStreamingMode="ALWAYS"/>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="alwaysStringContentLengthHeaderFlow">
+        <http:listener config-ref="listenerConfig" path="/alwaysStringContentLengthHeader" responseStreamingMode="ALWAYS">
+            <http:response-builder>
+                <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="alwaysStringContentLengthOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/alwaysStringContentLengthOutboundProperty" responseStreamingMode="ALWAYS"/>
+        <set-payload value="#[stringPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="alwaysInputStreamFlow">
+        <http:listener config-ref="listenerConfig" path="/alwaysInputStream" responseStreamingMode="ALWAYS"/>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="alwaysInputStreamContentLengthHeaderFlow">
+        <http:listener config-ref="listenerConfig" path="/alwaysInputStreamContentLengthHeader" responseStreamingMode="ALWAYS">
+            <http:response-builder>
+                <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+    <flow name="alwaysInputStreamContentLengthOutboundPropertyFlow">
+        <http:listener config-ref="listenerConfig" path="/alwaysInputStreamContentLengthOutboundProperty" responseStreamingMode="ALWAYS"/>
+        <set-payload value="#[inputStreamPayload]"/>
+        <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
+    </flow>
+
+</mule>

@@ -7,11 +7,14 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.MessageExchangePattern;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -43,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
  * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-        implements MessageProcessor, Initialisable, Startable, Stoppable
+        implements MessageProcessor, Initialisable, Startable, Stoppable, NonBlockingSupported
 {
 
     protected Log logger = LogFactory.getLog(getClass());
@@ -127,7 +130,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             // Clone event and make it async
             MuleEvent newEvent = new DefaultMuleEvent(
-                    (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false, false);
+                    (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false, false,
+                    MessageExchangePattern.ONE_WAY);
+            // Update RequestContext ThreadLocal for backwards compatibility
+            OptimizedRequestContext.unsafeSetEvent(newEvent);
             target.process(newEvent);
         }
         if (muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())
@@ -169,6 +175,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         }
     }
 
+    /**
+     * Not used anymore, to be removed in future
+     */
+    @Deprecated
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork
     {
 

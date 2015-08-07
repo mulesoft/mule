@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
+
+    <flow name="RedeliveryPolicy" processingStrategy="synchronous">
+        <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}">
+            <idempotent-redelivery-policy maxRedeliveryCount="${maxRedeliveryAttempts}">
+                <dead-letter-queue>
+                    <vm:outbound-endpoint exchange-pattern="one-way" path="error-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </ftp:inbound-endpoint>
+        <test:component throwException="true"/>
+    </flow>
+</mule>

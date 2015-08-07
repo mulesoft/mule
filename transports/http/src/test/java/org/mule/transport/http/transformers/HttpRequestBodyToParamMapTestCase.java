@@ -8,6 +8,7 @@ package org.mule.transport.http.transformers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.transport.http.HttpConstants.DEFAULT_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
@@ -35,7 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
 {
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
 
     @Test

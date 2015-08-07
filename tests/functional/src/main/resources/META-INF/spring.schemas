@@ -3,4 +3,6 @@ http\://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd=META-INF/mule-test.x
 http\://www.mulesoft.org/schema/mule/test/3.3/mule-test.xsd=META-INF/mule-test.xsd
 http\://www.mulesoft.org/schema/mule/test/3.4/mule-test.xsd=META-INF/mule-test.xsd
 http\://www.mulesoft.org/schema/mule/test/3.5/mule-test.xsd=META-INF/mule-test.xsd
+http\://www.mulesoft.org/schema/mule/test/3.6/mule-test.xsd=META-INF/mule-test.xsd
+http\://www.mulesoft.org/schema/mule/test/3.7/mule-test.xsd=META-INF/mule-test.xsd
 http\://www.mulesoft.org/schema/mule/test/current/mule-test.xsd=META-INF/mule-test.xsd

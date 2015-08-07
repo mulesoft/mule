@@ -9,6 +9,8 @@ package org.mule.module.launcher.log4j2;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -36,6 +38,9 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase
 
     @Mock
     private ClassLoader additionalClassLoader;
+
+    @Mock(extraInterfaces = {ArtifactClassLoader.class})
+    private ClassLoader artifactClassLoader;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Logger originalLogger;
@@ -75,17 +80,32 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void otherClassLoader()
+    public void anotherClassLoader()
     {
         Thread.currentThread().setContextClassLoader(additionalClassLoader);
         try
         {
             logger.info(MESSAGE);
-            verify(contextSelector).getContext(LOGGER_NAME, additionalClassLoader, true);
+            verify(originalLogger).info(MESSAGE);
         }
         finally
         {
             Thread.currentThread().setContextClassLoader(currentClassLoader);
+        }
+    }
+
+    @Test
+    public void artifactClassLoader()
+    {
+        Thread.currentThread().setContextClassLoader(artifactClassLoader);
+        try
+        {
+            logger.info(MESSAGE);
+            verify(contextSelector).getContext(LOGGER_NAME, artifactClassLoader, true);
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(artifactClassLoader);
         }
     }
 

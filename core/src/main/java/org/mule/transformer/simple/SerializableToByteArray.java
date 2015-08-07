@@ -10,7 +10,6 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.SerializationUtils;
 
 import java.io.Serializable;
 
@@ -60,7 +59,7 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
 
         try
         {
-            return SerializationUtils.serialize((Serializable) src);
+            return muleContext.getObjectSerializer().serialize(src);
         }
         catch (Exception e)
         {

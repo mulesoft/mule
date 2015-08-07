@@ -7,9 +7,9 @@
             targetNamespace="http://www.mulesoft.org/schema/mule/ejb"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
-    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/core" schemaLocation = "http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
-    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc" schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
-    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/rmi" schemaLocation = "http://www.mulesoft.org/schema/mule/rmi/3.5/mule-rmi.xsd"/>
+    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/core" schemaLocation = "http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd"/>
+    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc" schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
+    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/rmi" schemaLocation = "http://www.mulesoft.org/schema/mule/rmi/3.7/mule-rmi.xsd"/>
     <xsd:import namespace = "http://www.w3.org/XML/1998/namespace"/>
     <xsd:annotation>
         <xsd:documentation>

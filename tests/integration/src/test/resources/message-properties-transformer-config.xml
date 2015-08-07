@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <message-properties-transformer name="testTransformer" overwrite="true">
+        <delete-message-property key="test-property1"/>
+        <delete-message-property key="test-property2"/>
+        <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
+        <!-- old style for test -->
+        <add-message-properties>
+            <spring:entry key="key" value="value"/>
+        </add-message-properties>
+
+        <rename-message-property key="Foo" value="Faz"/>
+
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addPropertyWithDataType" overwrite="true">
+        <add-message-property key="foo" value="fooValue" encoding="UTF-16BE" mimeType="text/baz"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="renamePropertyWithDataType" overwrite="true">
+        <add-message-property key="foo" value="fooValue" encoding="UTF-16BE" mimeType="text/baz"/>
+        <rename-message-property key="foo" value="bar"/>
+    </message-properties-transformer>
+</mule>

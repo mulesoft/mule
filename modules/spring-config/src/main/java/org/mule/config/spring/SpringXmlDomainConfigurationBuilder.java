@@ -6,7 +6,11 @@
  */
 package org.mule.config.spring;
 
+import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
+import org.mule.config.ConfigResource;
+
+import org.springframework.context.ApplicationContext;
 
 /**
  * Spring configuration builder used to create domains.
@@ -18,5 +22,11 @@ public class SpringXmlDomainConfigurationBuilder extends SpringXmlConfigurationB
     {
         super(configResources);
         setUseMinimalConfigResource(true);
+    }
+
+    @Override
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController)
+    {
+        return new MuleDomainContext(muleContext, configResources, optionalObjectsController);
     }
 }

@@ -33,7 +33,7 @@ public class InboundAggregationNoTimeoutTestCase extends FunctionalTestCase
     @Test
     public void testAggregatorWithNoTimeout() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://distributor.queue", message);
 

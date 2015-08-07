@@ -11,10 +11,6 @@
     <name>Mule Tomcat Integration</name>
     <description>Integrates Mule as a global Tomcat service, to be used with deployable configuration builder</description>
 
-    <properties>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -29,7 +25,7 @@
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>catalina</artifactId>
-            <version>6.0.20</version>
+            <version>${tomcatVersion}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -39,7 +39,7 @@ public class MtomTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "mtom-conf-flow.xml";
+        return "mtom-conf-flow-httpn.xml";
     }
 
     @Test

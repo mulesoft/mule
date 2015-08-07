@@ -7,6 +7,8 @@
 package org.mule.util;
 
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -400,6 +402,22 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 
         // Assume slashes are deliberate.  Change other illegal characters
         return name.replaceAll("[:\\\\]", "_");
+    }
+
+    /**
+     * @return the configured default encoding {@link org.mule.api.config.MuleConfiguration#getDefaultEncoding()}, or
+     * the value of the system property 'mule.encoding' if {@link org.mule.api.MuleContext} is null.
+     */
+    public static String getDefaultEncoding(MuleContext muleContext)
+    {
+        if (muleContext != null)
+        {
+            return muleContext.getConfiguration().getDefaultEncoding();
+        }
+        else
+        {
+            return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+        }
     }
 
 }

@@ -27,7 +27,7 @@ public class ConfigurationTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "configuration-conf-flow.xml";
+        return "configuration-conf-flow-httpn.xml";
     }
 
     @Test
@@ -52,8 +52,8 @@ public class ConfigurationTestCase extends FunctionalTestCase
     @Test
     public void testSpringRefs() throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getRegistry().get("clientEndpoint");
-        FlowConfiguringMessageProcessor processor = (FlowConfiguringMessageProcessor) endpoint.getMessageProcessors().get(0);
+        FlowConfiguringMessageProcessor processor =
+            muleContext.getRegistry().lookupObjects(FlowConfiguringMessageProcessor.class).iterator().next();
         List<Interceptor<? extends Message>> inInterceptors =
             ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
         assertEquals(muleContext.getRegistry().get("foo1"), inInterceptors.get(0));

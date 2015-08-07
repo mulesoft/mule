@@ -6,12 +6,16 @@
  */
 package org.mule.module.cxf;
 
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.processor.CloneableMessageProcessor;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.ExceptionHelper;
@@ -19,6 +23,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.module.cxf.security.WebServiceSecurityException;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.TemplateParser;
 
@@ -38,6 +43,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
@@ -50,7 +56,7 @@ import org.apache.cxf.ws.addressing.WSAContextUtils;
  * The CxfOutboundMessageProcessor performs outbound CXF processing, sending an event
  * through the CXF client, then on to the next MessageProcessor.
  */
-public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor
+public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor implements CloneableMessageProcessor, NonBlockingSupported
 {
 
     private static final String URI_REGEX = "cxf:\\[(.+?)\\]:(.+?)/\\[(.+?)\\]:(.+?)";
@@ -63,6 +69,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     private String operation;
     private BindingProvider clientProxy;
     private String decoupledEndpoint;
+    private String mimeType;
 
     public CxfOutboundMessageProcessor(Client client)
     {
@@ -128,27 +135,39 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             }
             return res;
         }
-        catch (MessagingException e) {
-            throw e;
-        }
-        // Because of CXF API, MuleExceptions can be wrapped in a Fault, in that case we should return the
-        // mule exception
-        catch(Fault f)
-        {
-            if(f.getCause() instanceof MuleException)
-            {
-                throw (MuleException) f.getCause();
-            }
-            throw new DispatchException(MessageFactory.createStaticMessage(f.getMessage()), event,this,f);
-        }
         catch (Exception e)
         {
-            throw new DispatchException(MessageFactory.createStaticMessage(ExceptionHelper.getRootException(e).getMessage()), event, this, e);
+            throw wrapException(event, e, false);
         }
         finally
         {
             cleanup();
         }
+    }
+
+    private MuleException wrapException(MuleEvent event, Throwable ex, boolean alwaysReturnMessagingException)
+    {
+        if (ex instanceof MessagingException)
+        {
+            return (MessagingException) ex;
+        }
+        if (ex instanceof Fault)
+        {
+            // Because of CXF API, MuleExceptions can be wrapped in a Fault, in that case we should return the mule exception
+            Fault fault = (Fault) ex;
+            if(fault.getCause() instanceof MuleException)
+            {
+                MuleException muleException = (MuleException) fault.getCause();
+                return alwaysReturnMessagingException ? new MessagingException(event, muleException) : muleException;
+            }
+            return new DispatchException(MessageFactory.createStaticMessage(fault.getMessage()), event, this, fault);
+        }
+        return new DispatchException(MessageFactory.createStaticMessage(ExceptionHelper.getRootException(ex).getMessage()), event, this, ex);
+    }
+
+    private MessagingException wrapException(MuleEvent event, Throwable ex)
+    {
+        return (MessagingException) wrapException(event, ex, true);
     }
 
     /**
@@ -203,14 +222,14 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         return buildResponseMessage(event, muleRes, objResponse);
     }
 
-    protected MuleEvent doSendWithClient(MuleEvent event) throws Exception
+    protected MuleEvent doSendWithClient(final MuleEvent event) throws Exception
     {
         BindingOperationInfo bop = getOperation(event);
 
         Map<String, Object> props = getInovcationProperties(event);
 
         // Holds the response from the transport
-        Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
+        final Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
 
         Map<String, Object> ctx = new HashMap<String, Object>();
@@ -233,9 +252,37 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         ExchangeImpl exchange = new ExchangeImpl();
         // mule will close the stream so don't let cxf, otherwise cxf will close it too early
         exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
-        Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
 
-        return buildResponseMessage(event, responseHolder.value, response);
+        if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
+        {
+            client.invoke(new ClientCallback()
+            {
+                @Override
+                public void handleResponse(Map<String, Object> ctx, Object[] res)
+                {
+                    try
+                    {
+                        event.getReplyToHandler().processReplyTo(buildResponseMessage(event, responseHolder.value, res), null, null);
+                    }
+                    catch (MuleException ex)
+                    {
+                        handleException(ctx, ex);
+                    }
+                }
+
+                @Override
+                public void handleException(Map<String, Object> ctx, Throwable ex)
+                {
+                    event.getReplyToHandler().processExceptionReplyTo(wrapException(responseHolder.value, ex), null);
+                }
+            }, bop, getArgs(event), ctx, exchange);
+            return NonBlockingVoidMuleEvent.getInstance();
+        }
+        else
+        {
+            Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
+            return buildResponseMessage(event, responseHolder.value, response);
+        }
     }
 
     public Method getMethod(MuleEvent event) throws Exception
@@ -415,13 +462,14 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         MuleMessage message = transportResponse.getMessage();
 
-        String httpStatusCode = message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
-        if(isProxy() && httpStatusCode != null)
+        Object httpStatusCode = message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
+        if (isProxy() && httpStatusCode != null)
         {
             message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, httpStatusCode);
         }
 
-        message.setPayload(payload);
+        Class payloadClass = payload != null ? payload.getClass() : Object.class;
+        message.setPayload(payload, DataTypeFactory.create(payloadClass, getMimeType()));
 
         return transportResponse;
     }
@@ -444,47 +492,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         return responseWithHolders.toArray();
     }
-
-//    public String parseSoapAction(String soapAction, QName method, MuleEvent event)
-//    {
-//        EndpointURI endpointURI = endpoint.getEndpointURI();
-//        Map<String, String> properties = new HashMap<String, String>();
-//        MuleMessage msg = event.getMessage();
-//        // propagate only invocation- and outbound-scoped properties
-//        for (String name : msg.getInvocationPropertyNames())
-//        {
-//            final String value = msg.getInvocationProperty(name, StringUtils.EMPTY);
-//            properties.put(name, value);
-//        }
-//        for (String name : msg.getOutboundPropertyNames())
-//        {
-//            final String value = msg.getOutboundProperty(name, StringUtils.EMPTY);
-//            properties.put(name, value);
-//        }
-//        properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
-//        properties.put("methodNamespace", method.getNamespaceURI());
-//        properties.put("address", endpointURI.getAddress());
-//        properties.put("scheme", endpointURI.getScheme());
-//        properties.put("host", endpointURI.getHost());
-//        properties.put("port", String.valueOf(endpointURI.getPort()));
-//        properties.put("path", endpointURI.getPath());
-//        properties.put("hostInfo",
-//            endpointURI.getScheme() + "://" + endpointURI.getHost()
-//                            + (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
-//        if (event.getFlowConstruct() != null)
-//        {
-//            properties.put("serviceName", event.getFlowConstruct().getName());
-//        }
-//
-//        soapAction = soapActionTemplateParser.parse(properties, soapAction);
-//
-//        if (logger.isDebugEnabled())
-//        {
-//            logger.debug("SoapAction for this call is: " + soapAction);
-//        }
-//
-//        return soapAction;
-//    }
 
     public void setPayloadToArguments(CxfPayloadToArguments payloadToArguments)
     {
@@ -535,5 +542,27 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     {
         this.decoupledEndpoint = decoupledEndpoint;
     }
-    
+
+    @Override
+    public MessageProcessor clone()
+    {
+        CxfOutboundMessageProcessor clone = new CxfOutboundMessageProcessor(client);
+        clone.payloadToArguments = this.payloadToArguments;
+        clone.proxy = this.proxy;
+        clone.operation = this.operation;
+        clone.clientProxy = clientProxy;
+        clone.decoupledEndpoint = decoupledEndpoint;
+
+        return clone;
+    }
+
+    public String getMimeType()
+    {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType)
+    {
+        this.mimeType = mimeType;
+    }
 }

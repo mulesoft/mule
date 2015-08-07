@@ -247,7 +247,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                     message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress, PropertyScope.INBOUND);
                 }
                 MuleEvent event = routeMessage(message);
-                returnMessage = event == null ? null : event.getMessage();
+                returnMessage = !getEndpoint().getExchangePattern().hasResponse() || event == null ? null : event.getMessage();
 
                 if (endpoint.getExchangePattern().hasResponse() && returnMessage != null)
                 {

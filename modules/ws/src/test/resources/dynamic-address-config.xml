@@ -9,16 +9,49 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <configuration useHttpTransportByDefault="${useHttpTransportByDefault}" />
+    <configuration>
+        <http:config useTransportForUris="${useTransportForUris}"/>
+    </configuration>
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/#[message.inboundProperties['path']]" wsdlLocation="Test.wsdl"
-                        service="TestService" port="TestPort" name="globalConfig" />
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[message.inboundProperties['pathInboundProperty']]" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfigInboundProperty" />
 
-    <flow name="client">
-        <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
-        <ws:consumer operation="echo"/>
+    <flow name="clientInboundProperty">
+        <inbound-endpoint address="vm://clientInboundProperty" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="globalConfigInboundProperty"/>
+    </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[message.outboundProperties['pathOutboundProperty']]" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfigOutboundProperty" />
+
+    <flow name="clientOutboundProperty">
+        <inbound-endpoint address="vm://clientOutboundProperty" exchange-pattern="request-response"/>
+        <set-property propertyName="pathOutboundProperty" value="services/Test" />
+        <ws:consumer operation="echo" config-ref="globalConfigOutboundProperty"/>
+    </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[pathFlowVar]" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfigFlowVar" />
+
+    <flow name="clientFlowVar">
+        <inbound-endpoint address="vm://clientFlowVar" exchange-pattern="request-response"/>
+        <set-variable variableName="pathFlowVar" value="services/Test" />
+        <ws:consumer operation="echo" config-ref="globalConfigFlowVar"/>
+    </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[pathSessionVar]" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfigSessionVar" />
+
+    <flow name="clientSessionVar">
+        <inbound-endpoint address="vm://clientSessionVar" exchange-pattern="request-response"/>
+        <set-session-variable variableName="pathSessionVar" value="services/Test" />
+        <ws:consumer operation="echo" config-ref="globalConfigSessionVar"/>
     </flow>
 
 

@@ -28,6 +28,7 @@ import org.junit.runners.Parameterized;
 public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
 {
 
+    public static final String USE_TRANSPORT_FOR_URIS = "useTransportForUris";
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
 
@@ -40,7 +41,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
 
 
     @Parameterized.Parameter(value = 0)
-    public boolean useHttpTransportByDefault;
+    public boolean useTransportForUris;
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
@@ -51,13 +52,13 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        System.setProperty("useHttpTransportByDefault", Boolean.toString(useHttpTransportByDefault));
+        System.setProperty(USE_TRANSPORT_FOR_URIS, Boolean.toString(useTransportForUris));
     }
 
     @Override
     protected void doTearDownAfterMuleContextDispose() throws Exception
     {
-        System.clearProperty("useHttpTransportByDefault");
+        System.clearProperty(USE_TRANSPORT_FOR_URIS);
     }
 
 

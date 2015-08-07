@@ -15,16 +15,21 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.transport.ConnectException;
 import org.mule.transport.sftp.notification.SftpNotifier;
+import org.mule.util.ValueHolder;
 import org.mule.util.lock.LockFactory;
 
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -38,6 +43,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     private SftpReceiverRequesterUtil sftpRRUtil = null;
     private LockFactory lockFactory;
     private boolean poolOnPrimaryInstanceOnly;
+    protected AtomicBoolean connected = new AtomicBoolean(false);
 
     public SftpMessageReceiver(SftpConnector connector,
                                FlowConstruct flow,
@@ -69,7 +75,23 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         }
         try
         {
-            String[] files = sftpRRUtil.getAvailableFiles(false);
+            if (!connected.get())
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Skipping poll since message receiver is not yet connected");
+                }
+                return;
+            }
+            String[] files;
+            try
+            {
+                files = sftpRRUtil.getAvailableFiles(false);
+            }
+            catch (Exception e)
+            {
+                throw new ConnectException(e, this);
+            }
 
             if (files.length == 0)
             {
@@ -91,14 +113,14 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         break;
                     }
-                    Lock fileLock = lockFactory.createLock(connector.getName() + file);
+                    Lock fileLock = lockFactory.createLock(createLockId(file));
                     if (fileLock.tryLock(10, TimeUnit.MILLISECONDS))
                     {
                         try
                         {
                             routeFile(file);
                         }
-                        catch (Exception e)
+                        finally
                         {
                             fileLock.unlock();
                         }
@@ -123,6 +145,11 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    String createLockId(String file)
+    {
+        return connector.getName() + "-" + endpoint.getEndpointURI().getPath() + "-" + file;
+    }
+
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -143,40 +170,82 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void routeFile(final String path) throws Exception
     {
+        final ValueHolder<InputStream> inputStreamReference = new ValueHolder<>();
         ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-        executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+
+        try
         {
-            @Override
-            public MuleEvent process() throws Exception
+            executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
-                // A bit tricky initialization of the notifier in this case since we don't
-                // have access to the message yet...
-                SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),
-                        endpoint, flowConstruct.getName());
-
-                InputStream inputStream = sftpRRUtil.retrieveFile(path, notifier);
-
-                if (logger.isDebugEnabled())
+                @Override
+                public MuleEvent process() throws Exception
                 {
-                    logger.debug("Routing file: " + path);
+                    // A bit tricky initialization of the notifier in this case since we don't
+                    // have access to the message yet...
+                    SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),
+                                                             endpoint, flowConstruct.getName());
+
+                    InputStream inputStream = sftpRRUtil.retrieveFile(path, notifier);
+                    inputStreamReference.set(inputStream);
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Routing file: " + path);
+                    }
+
+                    MuleMessage message = createMuleMessage(inputStream);
+
+                    message.setProperty(SftpConnector.PROPERTY_FILENAME, path, PropertyScope.INBOUND);
+                    message.setProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path, PropertyScope.INBOUND);
+
+                    // Now we have access to the message, update the notifier with the message
+                    notifier.setMessage(message);
+                    routeMessage(message);
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Routed file: " + path);
+                    }
+                    return null;
                 }
+            });
 
-                MuleMessage message = createMuleMessage(inputStream);
-
-                message.setProperty(SftpConnector.PROPERTY_FILENAME, path, PropertyScope.INBOUND);
-                message.setProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path, PropertyScope.INBOUND);
-
-                // Now we have access to the message, update the notifier with the message
-                notifier.setMessage(message);
-                routeMessage(message);
-
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Routed file: " + path);
-                }
-                return null;
+            SftpStream sftpStream = getSftpStream(inputStreamReference);
+            if (sftpStream != null)
+            {
+                sftpStream.performPostProcessingOnClose(true);
             }
-        });
+        }
+        catch (Exception e)
+        {
+            SftpStream sftpStream = getSftpStream(inputStreamReference);
+            if (sftpStream != null)
+            {
+                sftpStream.setErrorOccurred();
+            }
+        }
+        finally
+        {
+            SftpStream sftpStream = getSftpStream(inputStreamReference);
+            if (sftpStream != null)
+            {
+                if (sftpStream.isClosed())
+                {
+                    sftpStream.postProcess();
+                }
+            }
+        }
+    }
+
+    private SftpStream getSftpStream(ValueHolder<InputStream> inputStreamReference)
+    {
+        InputStream inputStream = inputStreamReference.get();
+        if (inputStream instanceof SftpStream)
+        {
+            return (SftpStream) inputStream;
+        }
+
+        return null;
     }
 
     /**
@@ -197,7 +266,40 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
     public void doConnect() throws Exception
     {
-        // no op
+        retryTemplate.execute(new RetryCallback()
+        {
+            @Override
+            public void doWork(RetryContext context) throws Exception
+            {
+                try
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Trying to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
+                    }
+                    sftpRRUtil.getAvailableFiles(false);
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Successfully connected/reconnected to SFTP server " + endpoint.getEndpointURI());
+                    }
+                    connected.set(true);
+                }
+                catch (Exception e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Unable to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
+                    }
+                    throw new Exception("Fail to connect", e);
+                }
+            }
+
+            @Override
+            public String getWorkDescription()
+            {
+                return "Trying to reconnect to SFTP server " + endpoint.getEndpointURI();
+            }
+        }, getConnector().getMuleContext().getWorkManager());
     }
 
     public void doDisconnect() throws Exception

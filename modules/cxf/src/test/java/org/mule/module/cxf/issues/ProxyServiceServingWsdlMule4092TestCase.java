@@ -41,7 +41,7 @@ public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "issues/proxy-service-serving-wsdl-mule4092-flow.xml";
+        return  "issues/proxy-service-serving-wsdl-mule4092-flow-httpn.xml";
     }
 
     @Override

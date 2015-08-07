@@ -12,7 +12,7 @@ public class BasicJerseyWithExceptionMapperTestCase extends BasicJerseyTestCase
     @Override
     protected String getConfigFile()
     {
-        return "basic-exception-mapper-conf-flow.xml";
+        return "basic-exception-mapper-http-connector-conf-flow.xml";
     }
 
     @Override

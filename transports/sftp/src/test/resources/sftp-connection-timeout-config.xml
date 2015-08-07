@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+      xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+
+    <sftp:connector name="testConnector" autoDelete="false"/>
+
+    <flow name="simpleLogin">
+        <vm:inbound-endpoint path="simpleLogin" exchange-pattern="request-response" />
+
+        <sftp:outbound-endpoint outputPattern="test.txt" host="localhost" port="${sftpPort}" path="~" user="muletest1" password="muletest1" responseTimeout="10"/>
+    </flow>
+
+    <flow name="passphraseLogin">
+        <vm:inbound-endpoint path="passphraseLogin" exchange-pattern="request-response" />
+
+        <sftp:outbound-endpoint outputPattern="test.txt" host="localhost" port="${sftpPort}" path="~" user="muletest1" password="muletest1" passphrase="muletest1" responseTimeout="10"/>
+    </flow>
+</mule>

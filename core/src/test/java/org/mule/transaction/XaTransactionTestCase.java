@@ -11,27 +11,32 @@ import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.util.xa.XaResourceFactoryHolder;
 
 import java.util.Random;
 
 import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
+@SmallTest
 public class XaTransactionTestCase extends AbstractMuleTestCase
 {
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleContext mockMuleContext;
     @Mock
     private TransactionManager mockTransactionManager;
@@ -39,11 +44,14 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
     private XaResourceFactoryHolder mockXaResourceFactoryHolder1;
     @Mock
     private XaResourceFactoryHolder mockXaResourceFactoryHolder2;
+    @Mock
+    private XAResource mockXaResource;
 
     @Before
     public void setUpMuleContext()
     {
         when(mockMuleContext.getTransactionManager()).thenReturn(mockTransactionManager);
+        when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
     }
 
     @Test
@@ -92,6 +100,20 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
         assertTrue(xaTransaction.isRollbackOnly());
         assertTrue(xaTransaction.isRollbackOnly());
         assertTrue(xaTransaction.isRollbackOnly());
+    }
+
+    @Test
+    public void setTxTimeoutWhenEnlistingResource() throws Exception
+    {
+        javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+        when(mockTransactionManager.getTransaction()).thenReturn(tx);
+        XaTransaction xaTransaction = new XaTransaction(mockMuleContext);
+        int timeoutValue = 1500;
+        int timeoutValueInSeconds = 1500 / 1000;
+        xaTransaction.setTimeout(timeoutValue);
+        xaTransaction.begin();
+        xaTransaction.enlistResource(mockXaResource);
+        verify(mockXaResource).setTransactionTimeout(timeoutValueInSeconds);
     }
 
     private class BadHashCodeImplementation

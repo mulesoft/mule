@@ -7,11 +7,10 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -25,6 +24,10 @@ import org.junit.Test;
 
 public class HttpSecurityTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
+
     private static String soapRequest =
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
            "<soapenv:Header/>" +
@@ -44,7 +47,7 @@ public class HttpSecurityTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "http-security-conf-flow.xml";
+        return "http-security-conf-flow-httpn.xml";
     }
 
     /**
@@ -74,16 +77,5 @@ public class HttpSecurityTestCase extends FunctionalTestCase
 
         result = client.executeMethod(method);
         assertEquals(401, result);
-    }
-
-    @Test
-    public void testBasicAuthWithCxfClient() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage result = client.send("cxf:http://admin:admin@localhost:" + dynamicPort1.getNumber() + "/services/Echo?method=echo", "Hello", null);
-
-        final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
-        assertEquals(200, status);
     }
 }

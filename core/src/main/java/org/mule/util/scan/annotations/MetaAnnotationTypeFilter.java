@@ -19,7 +19,10 @@ import org.objectweb.asm.ClassReader;
 /**
  * Will filter for a meta annotation type specified as the annotation class.  Meta annotations are annotations on other
  * annotations.  this filter allows discovery of annotations on a class that have the same meta annotation.
+ *
+ * @deprecated: As ASM 3.3.1 is not fully compliant with Java 8, this class has been deprecated, however you can still use it under Java 7.
  */
+@Deprecated
 public class MetaAnnotationTypeFilter implements AnnotationFilter
 {
     /**

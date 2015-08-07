@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="httpConfig" host="localhost" port="${port1}" />
+    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+
+    <flow name="serverEcho">
+        <http:listener config-ref="httpConfig" path="services/Echo"/>
+        <cxf:proxy-service soapVersion="1.2"/>
+        <vm:outbound-endpoint path="test" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="echoService">
+        <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
+        <log-component/>
+    </flow>
+
+    <flow name="serverClientProxySoapVersion">
+        <http:listener config-ref="httpConfig" path="services/proxy-soap-version" allowedMethods="GET, POST"/>
+        <cxf:proxy-service payload="envelope" soapVersion="1.2"/>
+
+        <cxf:proxy-client payload="envelope" soapVersion="1.2"/>
+        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+    </flow>
+</mule>

@@ -9,10 +9,15 @@
 
 4. Copy the following libraries from $MULE_HOME/lib/boot/ to $CATALINA_HOME/mule-libs/opt/:
 
-    jcl104-over-slf4j-1.5.0.jar
-    log4j-1.2.14.jar
-    slf4j-api-1.5.0.jar
-    slf4j-log4j12-1.5.0.jar
+    jcl-over-slf4j-1.7.7.jar
+    log4j-1.2-api-2.1.jar
+    log4j-api-2.1.jar
+    log4j-core-2.1.jar
+    log4j-jcl-2.1.jar
+    log4j-jul-2.1.jar
+    log4j-slf4j-impl-2.1.jar
+    slf4j-api-1.7.7.jar
+    disruptor-3.3.0.jar
 
 5. Edit $CATALINA_HOME/conf/catalina.properties and add the following to the "common.loader" (separate by a comma):
 

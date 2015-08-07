@@ -25,7 +25,7 @@ class ValidateTransactionalStateInterceptor<T> implements ExecutionInterceptor<T
     }
 
     @Override
-    public T execute(ExecutionCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (transactionConfig.getAction() == TransactionConfig.ACTION_NEVER && tx != null)
@@ -37,6 +37,6 @@ class ValidateTransactionalStateInterceptor<T> implements ExecutionInterceptor<T
             throw new IllegalTransactionStateException(
                     CoreMessages.transactionNotAvailableButActionIs("Always Join"));
         }
-        return this.next.execute(callback);
+        return this.next.execute(callback, executionContext);
     }
 }

@@ -8,6 +8,7 @@ package org.mule.lifecycle.phases;
 
 import org.mule.api.agent.Agent;
 import org.mule.api.component.Component;
+import org.mule.api.config.Config;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -62,6 +63,7 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         orderedObjects.add(new NotificationLifecycleObject(Agent.class));
         orderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        orderedObjects.add(new NotificationLifecycleObject(Config.class));
         orderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
         orderedObjects.add(new NotificationLifecycleObject(Object.class));
 

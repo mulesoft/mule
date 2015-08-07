@@ -32,51 +32,25 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase
     @Test
     public void detectsSelect() throws Exception
     {
-        String sql = "SELECT * FROM PLANET";
-        QueryTemplate queryTemplate = parser.parse(sql);
-        assertEquals(QueryType.SELECT, queryTemplate.getType());
-        assertEquals(sql, queryTemplate.getSqlText());
-        assertEquals(0, queryTemplate.getInputParams().size());
-    }
-
-    @Test
-    public void detectsSelectWithLineBreak() throws Exception
-    {
-        String sql = "SELECT *\nFROM PLANET";
-        QueryTemplate queryTemplate = parser.parse(sql);
-        assertEquals(QueryType.SELECT, queryTemplate.getType());
-        assertEquals(sql, queryTemplate.getSqlText());
-        assertEquals(0, queryTemplate.getInputParams().size());
+        doKeywordParsingTest("SELECT", QueryType.SELECT);
+        doKeywordParsingTest("Select", QueryType.SELECT);
+        doKeywordParsingTest("select", QueryType.SELECT);
     }
 
     @Test
     public void detectsUpdate() throws Exception
     {
-        String sql = "update PLANET set NAME='Mercury' where ID=1";
-        QueryTemplate queryTemplate = parser.parse(sql);
-        assertEquals(QueryType.UPDATE, queryTemplate.getType());
-        assertEquals(sql, queryTemplate.getSqlText());
-        assertEquals(0, queryTemplate.getInputParams().size());
-    }
-
-    @Test
-    public void detectsUpdatewithLineBreak() throws Exception
-    {
-        String sql = "update PLANET set NAME='Mercury' \nwhere ID=1";
-        QueryTemplate queryTemplate = parser.parse(sql);
-        assertEquals(QueryType.UPDATE, queryTemplate.getType());
-        assertEquals(sql, queryTemplate.getSqlText());
-        assertEquals(0, queryTemplate.getInputParams().size());
+        doKeywordParsingTest("UPDATE", QueryType.UPDATE);
+        doKeywordParsingTest("Update", QueryType.UPDATE);
+        doKeywordParsingTest("update", QueryType.UPDATE);
     }
 
     @Test
     public void detectsInsert() throws Exception
     {
-        String sql = "INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Mercury')";
-        QueryTemplate queryTemplate = parser.parse(sql);
-        assertEquals(QueryType.INSERT, queryTemplate.getType());
-        assertEquals(sql, queryTemplate.getSqlText());
-        assertEquals(0, queryTemplate.getInputParams().size());
+        doKeywordParsingTest("INSERT", QueryType.INSERT);
+        doKeywordParsingTest("Insert", QueryType.INSERT);
+        doKeywordParsingTest("insert", QueryType.INSERT);
     }
 
     @Test
@@ -92,33 +66,47 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase
     @Test
     public void detectsDelete() throws Exception
     {
-        String sql = "delete from PLANET";
-        QueryTemplate queryTemplate = parser.parse(sql);
-        assertEquals(QueryType.DELETE, queryTemplate.getType());
-        assertEquals(sql, queryTemplate.getSqlText());
-        assertEquals(0, queryTemplate.getInputParams().size());
-    }
-
-    @Test
-    public void detectsDeleteWithLineBreak() throws Exception
-    {
-        String sql = "delete from PLANET";
-        QueryTemplate queryTemplate = parser.parse(sql);
-        assertEquals(QueryType.DELETE, queryTemplate.getType());
-        assertEquals(sql, queryTemplate.getSqlText());
-        assertEquals(0, queryTemplate.getInputParams().size());
+        doKeywordParsingTest("DELETE", QueryType.DELETE);
+        doKeywordParsingTest("Delete", QueryType.DELETE);
+        doKeywordParsingTest("delete", QueryType.DELETE);
     }
 
     @Test
     public void detectsDdl() throws Exception
     {
-        String sql = "drop table PLANET";
+        doKeywordParsingTest("DROP", QueryType.DDL);
+        doKeywordParsingTest("Drop", QueryType.DDL);
+        doKeywordParsingTest("drop", QueryType.DDL);
+    }
 
+    @Test
+    public void detectsTruncate() throws Exception
+    {
+        doKeywordParsingTest("TRUNCATE TABLE", QueryType.TRUNCATE);
+        doKeywordParsingTest("Truncate table", QueryType.TRUNCATE);
+        doKeywordParsingTest("truncate table", QueryType.TRUNCATE);
+    }
+
+    @Test
+    public void detectsMerge() throws Exception
+    {
+        doKeywordParsingTest("MERGE", QueryType.MERGE);
+        doKeywordParsingTest("Merge", QueryType.MERGE);
+        doKeywordParsingTest("merge", QueryType.MERGE);
+    }
+
+    private void doKeywordParsingTest(String keyword, QueryType expectedQueryType)
+    {
+        doSqlParsingTest(expectedQueryType, keyword + " some unused SQL");
+        doSqlParsingTest(expectedQueryType, keyword + "\nsome\nunused\nSQL");
+    }
+
+    private void doSqlParsingTest(QueryType expectedQueryType, String sql)
+    {
         QueryTemplate queryTemplate = parser.parse(sql);
-
-        assertThat(queryTemplate.getType(), equalTo(QueryType.DDL));
-        assertThat(queryTemplate.getSqlText(), equalTo(sql));
-        assertThat(queryTemplate.getParams().size(), equalTo(0));
+        assertEquals(expectedQueryType, queryTemplate.getType());
+        assertEquals(sql, queryTemplate.getSqlText());
+        assertEquals(0, queryTemplate.getInputParams().size());
     }
 
     @Test

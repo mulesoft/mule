@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="${useTransportForUris}"/>
+    </configuration>
+
+    <tls:context name="tlsContext">
+        <tls:trust-store path="ssltest-cacerts.jks" password="changeit" type="jks" />
+    </tls:context>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configValidKey">
+        <ws:security>
+            <ws:wss-encrypt tlsContext-ref="tlsContext" alias="s1as" />
+        </ws:security>
+    </ws:consumer-config>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configInvalidKey">
+        <ws:security>
+            <ws:wss-encrypt tlsContext-ref="tlsContext" alias="entrustgsslca" />
+        </ws:security>
+    </ws:consumer-config>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configNoKey" />
+
+    <flow name="requestEncryptedWithValidKey">
+        <inbound-endpoint address="vm://requestEncryptedWithValidKey" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="configValidKey" />
+    </flow>
+
+    <flow name="requestEncryptedWithInvalidKey">
+        <inbound-endpoint address="vm://requestEncryptedWithInvalidKey" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="configInvalidKey" />
+    </flow>
+
+    <flow name="requestNotEncrypted">
+        <inbound-endpoint address="vm://requestNotEncrypted" exchange-pattern="request-response"/>
+        <ws:consumer operation="echo" config-ref="configNoKey" />
+    </flow>
+
+
+    <flow name="server">
+        <inbound-endpoint address="http://localhost:${port}/services/Test"
+                          exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+                <cxf:inInterceptors>
+                    <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                        <spring:constructor-arg>
+                            <spring:map>
+                                <spring:entry key="action" value="Encrypt" />
+                                <spring:entry key="passwordCallbackClass" value="org.mule.module.ws.functional.EncryptSecurityFunctionalTestCase$ServerPasswordCallback" />
+                                <spring:entry key="decryptionPropRefId" value="securityProperties" />
+                                <spring:entry key="securityProperties">
+                                    <spring:props>
+                                        <spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.password">changeit</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.private.password">changeit</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.alias">s1as</spring:prop>
+                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.file">ssltest-keystore.jks</spring:prop>
+                                    </spring:props>
+                                </spring:entry>
+                            </spring:map>
+                        </spring:constructor-arg>
+                    </spring:bean>
+                </cxf:inInterceptors>
+            </cxf:jaxws-service>
+        </inbound-endpoint>
+        <component class="org.mule.module.ws.consumer.TestService"/>
+    </flow>
+
+</mule>

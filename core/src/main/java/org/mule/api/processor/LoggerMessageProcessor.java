@@ -6,13 +6,7 @@
  */
 package org.mule.api.processor;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -32,7 +26,7 @@ import org.apache.log4j.Level;
  * level to the 'org.mule.api.processor.LoggerMessageProcessor' category. The level and
  * category can both be configured to suit your needs.
  */
-public class LoggerMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware, AnnotatedObject
+public class LoggerMessageProcessor extends AbstractAnnotatedObject implements MessageProcessor, Initialisable, MuleContextAware
 {
     protected transient Log logger;
 
@@ -42,7 +36,6 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
 
     protected MuleContext muleContext;
     protected ExpressionManager expressionManager;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public void initialise() throws InitialisationException
     {
@@ -120,22 +113,6 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
         this.level = level.toUpperCase();
     }
 
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
-    }
-    
     public enum LogLevel
     {
         ERROR 

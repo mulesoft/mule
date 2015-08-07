@@ -15,6 +15,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.config.builders.ExtensionsManagerConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -38,7 +39,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -169,12 +170,12 @@ public class DefaultMuleApplication implements Application
             ConfigurationBuilder cfgBuilder = domain.createApplicationConfigurationBuilder(this);
             if (!cfgBuilder.isConfigured())
             {
-                List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
+                List<ConfigurationBuilder> builders = new LinkedList<>();
+                builders.add(new ExtensionsManagerConfigurationBuilder());
                 builders.add(createConfigurationBuilderFromApplicationProperties());
 
                 // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
                 addAnnotationsConfigBuilderIfPresent(builders);
-
                 builders.add(cfgBuilder);
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();

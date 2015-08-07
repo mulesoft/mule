@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore" />
+
+    <flow name="withSplitter">
+        <set-payload value="#[['a','b']]" />
+        <collection-splitter />
+        <until-successful objectStore-ref="objectStore" maxRetries="2" secondsBetweenRetries="1">
+            <custom-processor class="org.mule.test.routing.UntilSuccessfulWithSplitterTestCase$FailAtFirstAttempt" />
+        </until-successful>
+    </flow>
+
+
+</mule>

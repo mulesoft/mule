@@ -7,7 +7,7 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MuleContext;
-import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
+import org.mule.transport.jms.xa.XAConnectionFactoryWrapper;
 import org.mule.util.Preconditions;
 
 import javax.jms.ConnectionFactory;
@@ -35,6 +35,6 @@ public abstract class AbstractConnectionFactoryDecorator implements ConnectionFa
 
     protected boolean isConnectionFactoryWrapper(ConnectionFactory connectionFactory)
     {
-        return (connectionFactory instanceof ConnectionFactoryWrapper);
+        return (connectionFactory instanceof XAConnectionFactoryWrapper);
     }
 }

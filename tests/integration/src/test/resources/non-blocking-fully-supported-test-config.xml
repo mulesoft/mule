@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <configuration>
+        <expression-language>
+            <global-functions>
+                def assertPayload(){payload == org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE}
+            </global-functions>
+        </expression-language>
+    </configuration>
+
+    <flow name="defaultFlow">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="nonBlockingFlow">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="subFlow">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <flow-ref name="subFlowChild"/>
+    </flow>
+    <sub-flow name="subFlowChild">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <test:non-blocking-processor/>
+    </sub-flow>
+
+    <flow name="childFlow">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <flow-ref name="childFlowChild"/>
+    </flow>
+    <flow name="childFlowChild">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="processorChain">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <processor-chain>
+            <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+            <test:non-blocking-processor/>
+        </processor-chain>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="filter">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-filter expression="#[true]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="security-filter">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <custom-processor class="org.mule.processor.SecurityFilterMessageProcessor"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="transformer">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-transformer expression="#[true]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="choice">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <choice>
+            <when expression="#[true]">
+                <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+                <test:non-blocking-processor/>
+            </when>
+        </choice>
+        <logger message="#[payload]" level="ERROR"/>
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="enricher">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <enricher source="#[payload]" target="#[payload]">
+            <processor-chain>
+                <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+                <test:non-blocking-processor/>
+            </processor-chain>
+        </enricher>
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+</mule>

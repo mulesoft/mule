@@ -14,14 +14,19 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class PlainTextFunctionalTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
     @Override
     protected String getConfigFile()
     {
@@ -34,7 +39,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
     public void testAuthenticationFailureNoContext() throws Exception
     {
         org.mule.api.client.MuleClient client = muleContext.getClient();
-        MuleMessage m = client.send("http://localhost:4567/index.html", "", null);
+        MuleMessage m = client.send(getUrl(), getTestMuleMessage());
         assertNotNull(m);
         int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
@@ -46,7 +51,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         MuleMessage message = createRequestMessage("anonX", "anonX");
-        MuleMessage response = client.send("http://localhost:4567/index.html", message);
+        MuleMessage response = client.send(getUrl(), message);
         assertNotNull(response);
         int status = response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
@@ -58,7 +63,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         MuleMessage message = createRequestMessage("anon", "anon");
-        MuleMessage response = client.send("http://localhost:4567/index.html", message);
+        MuleMessage response = client.send(getUrl(), message);
         assertNotNull(response);
         int status = response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);
@@ -66,9 +71,14 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
 
     private MuleMessage createRequestMessage(String user, String password)
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleMessage message = getTestMuleMessage();
         String header = MuleCredentials.createHeader(user, password.toCharArray());
         message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, header);
         return message;
+    }
+
+    private String getUrl()
+    {
+        return String.format("http://localhost:%s/index.html", port1.getNumber());
     }
 }

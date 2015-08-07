@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -21,12 +20,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.SerializationUtils;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -159,8 +158,8 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
 
         event.getSession().setProperty("key", "value");
 
-        MuleEvent deserializedEvent = (MuleEvent) SerializationUtils.deserialize(
-            SerializationUtils.serialize(event), muleContext);
+        ObjectSerializer serializer = muleContext.getObjectSerializer();
+        MuleEvent deserializedEvent = serializer.deserialize(serializer.serialize(event));
 
         // Event and session are both copied
         assertNotSame(deserializedEvent, event);
@@ -232,8 +231,8 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         event.getSession().setProperty("key", nonSerializable);
         message.setProperty("key2", "value2", PropertyScope.SESSION);
 
-        MuleEvent deserialized = (MuleEvent) SerializationUtils.deserialize(
-            SerializationUtils.serialize(event), muleContext);
+        ObjectSerializer serializer = muleContext.getObjectSerializer();
+        MuleEvent deserialized = serializer.deserialize(serializer.serialize(event));
 
         // Serialization no longer fails as in 3.1.x/3.2.x
 

@@ -15,7 +15,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,24 +23,24 @@ import org.junit.Assert;
 
 public class AssertionMessageProcessor implements MessageProcessor, FlowConstructAware, Startable
 {
-    private String expression;
-    private String message = "?";
+    protected String expression  = "#[true]";
+    protected String message = "?";
     private int count = 1;
     private int invocationCount = 0;
-    private boolean needToMatchCount = false;
+    protected boolean needToMatchCount = false;
 
     public void setExpression(String expression)
     {
         this.expression = expression;
     }
 
-    private int timeout = AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+    protected int timeout = AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
     private MuleEvent event;
     private CountDownLatch latch;
 
-    private FlowConstruct flowConstruct;
-    private ExpressionManager expressionManager;
+    protected FlowConstruct flowConstruct;
+    protected ExpressionManager expressionManager;
     private boolean result = true;
 
     @Override
@@ -56,10 +55,14 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
+        if (event == null)
+        {
+            return null;
+        }
         this.event = event;
         result = result && expressionManager.evaluateBoolean(expression, event, false, true);
-        latch.countDown();
         increaseCount();
+        latch.countDown();
         return event;
     }
 
@@ -75,7 +78,7 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
     {
         if (countFailOrNullEvent())
         {
-            Assert.fail("Flow assertion '" + message + "' failed. No message recieved or if count attribute was " +
+            Assert.fail("Flow assertion '" + message + "' failed. No message received or if count attribute was " +
                     "set then it was no matched.");
         }
         else if (expressionFailed())
@@ -87,7 +90,7 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
     
     public Boolean countFailOrNullEvent() throws InterruptedException  //added for testing (cant assert on asserts)
     {
-        return !isProcessesCountCorrect() || event == null;
+        return !isProcessesCountCorrect();
     }
 
     public Boolean expressionFailed()  //added for testing (cant assert on asserts)
@@ -116,11 +119,11 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
         this.count = count;
         needToMatchCount = true;
     }
-    
-     synchronized private void increaseCount()
-     {
-         invocationCount++;
-     }
+
+    private void increaseCount()
+    {
+        invocationCount++;
+    }
 
     /**
      * The semantics of the count are as follows:
@@ -133,7 +136,7 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
     synchronized private boolean isProcessesCountCorrect() throws InterruptedException
     {
         boolean countReached = latch.await(timeout, TimeUnit.MILLISECONDS);
-        if(needToMatchCount)
+        if (needToMatchCount)
         {
             return count == invocationCount;
         }

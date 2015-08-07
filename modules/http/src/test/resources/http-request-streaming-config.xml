@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+
+    <flow name="streamingAuto">
+        <http:request config-ref="requestConfig"  method="POST" path="path" />
+    </flow>
+
+    <flow name="streamingAutoHeader">
+        <http:request config-ref="requestConfig"  method="POST" path="path">
+            <http:request-builder>
+                <http:header headerName="Transfer-Encoding" value="chunked" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="streamingAlways">
+        <vm:inbound-endpoint path="streamingAlwaysIn" />
+        <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS" />
+        <vm:outbound-endpoint path="streamingAlwaysOut" />
+    </flow>
+
+    <flow name="streamingNever">
+        <vm:inbound-endpoint path="streamingNeverIn" />
+        <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER" />
+        <vm:outbound-endpoint path="streamingNeverOut" />
+    </flow>
+
+
+
+</mule>

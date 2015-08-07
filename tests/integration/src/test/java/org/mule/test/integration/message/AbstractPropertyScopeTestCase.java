@@ -25,7 +25,7 @@ public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
     public void testRequestResponse() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "fooValue");
 
         MuleMessage result = client.send("inbound", message);

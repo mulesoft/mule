@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="config" host="localhost" port="${httpPort}" />
+
+    <flow name="payloadSourceFlow">
+        <http:request config-ref="config" path="test" method="POST" source="#[payload]" />
+    </flow>
+
+    <flow name="customSourceFlow">
+        <http:request config-ref="config" path="test" method="POST" source="#[customSource]" />
+    </flow>
+
+    <flow name="payloadTargetFlow">
+        <http:request config-ref="config" path="test" method="POST" target="#[payload]" />
+    </flow>
+
+    <flow name="customTargetFlow">
+        <http:request config-ref="config" path="test" method="POST" target="#[header:OUTBOUND:customTarget]" />
+    </flow>
+
+</mule>

@@ -2,7 +2,7 @@
 
 [Maven](http://maven.apache.org/) is the build automation tool used in Mule ESB. To modify or add to Mule source code, it's specially relevant to understand the hierarchy of maven projects that represent the Mule source code.  
 
-To be able to build Mule you will need Maven among other things. Refer to the [CONTRIBUTE.md](CONTRIBUTE.md) file to find the installation instructions and prerequisites necessary to build Mule.
+To be able to build Mule you will need Maven among other things. Refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file to find the installation instructions and prerequisites necessary to build Mule.
 
 In the following sections you will learn how Mule is organized, how to build Mule and how to troubleshoot problems we might find.
 

@@ -6,23 +6,37 @@
  */
 package org.mule.expression;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.transformer.types.MimeTypes.ANY;
+import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
+import org.mule.api.transformer.DataType;
+import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.TypedValue;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class MessageHeaderExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
+
+    private static final String CUSTOM_ENCODING = StandardCharsets.UTF_16.name();
+    public static final String PROP_NAME = "testProp";
+    public static final String PROP_VALUE = "testValue";
+
     private HashMap<String, Object> messageProperties;
     private MessageHeaderExpressionEvaluator evaluator = new MessageHeaderExpressionEvaluator();
     private MuleMessage message;
@@ -75,7 +89,7 @@ public class MessageHeaderExpressionEvaluatorTestCase extends AbstractMuleContex
     @Test
     public void requiredHeaderWithExplicitPropertyScopeShouldReturnValue() throws Exception
     {
-        addInboundMessageProperty("testProp", "testvalue");
+        addInboundMessageProperty(PROP_NAME, "testvalue");
 
         Object result = evaluator.evaluate("INBOUND:testProp", message);
         assertEquals("testvalue", result);
@@ -115,10 +129,32 @@ public class MessageHeaderExpressionEvaluatorTestCase extends AbstractMuleContex
     {
         // default scope for header expression evaluation is OUTBOUND. We add INBOUND message
         // properties here, expecting that the header will not be found
-        addInboundMessageProperty("testProp", "testvalue");
+        addInboundMessageProperty(PROP_NAME, "testvalue");
 
         Object result = evaluator.evaluate("testProp?", message);
         assertNull(result);
+    }
+
+    @Test
+    public void evaluatesWithType() throws Exception
+    {
+        DataType dataType = DataTypeFactory.create(String.class, JSON);
+        dataType.setEncoding(CUSTOM_ENCODING);
+        message.setProperty(PROP_NAME, PROP_VALUE, PropertyScope.OUTBOUND, dataType);
+
+        final TypedValue typedValue = evaluator.evaluateTyped(PROP_NAME, message);
+
+        assertThat((String) typedValue.getValue(), equalTo(PROP_VALUE));
+        assertThat(typedValue.getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
+    }
+
+    @Test
+    public void evaluatesUnExistentPropertyWithType() throws Exception
+    {
+        final TypedValue typedValue = evaluator.evaluateTyped("UNKNOWN?", message);
+
+        assertThat(typedValue.getValue(), equalTo(null));
+        assertThat(typedValue.getDataType(), like(Object.class, ANY, null));
     }
 
     private void addInboundMessageProperty(String key, Object value)

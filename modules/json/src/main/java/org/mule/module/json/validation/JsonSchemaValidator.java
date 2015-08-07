@@ -17,7 +17,6 @@ import org.mule.module.json.DefaultJsonParser;
 import org.mule.util.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.load.Dereferencing;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfigurationBuilder;
@@ -58,6 +57,7 @@ public class JsonSchemaValidator
     public static final class Builder
     {
 
+        private static final String RESOURCE_PREFIX = "resource:/";
         private String schemaLocation;
         private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
         private final Map<String, String> schemaRedirects = new HashMap<>();
@@ -146,7 +146,7 @@ public class JsonSchemaValidator
          */
         public JsonSchemaValidator build()
         {
-            checkState(schemaLocation != null, "schemaLocation has not been provided");
+
             final URITranslatorConfigurationBuilder translatorConfigurationBuilder = URITranslatorConfiguration.newBuilder();
             for (Map.Entry<String, String> redirect : schemaRedirects.entrySet())
             {
@@ -159,18 +159,50 @@ public class JsonSchemaValidator
                                    : Dereferencing.INLINE)
                     .setURITranslatorConfiguration(translatorConfigurationBuilder.freeze());
 
+            LoadingConfiguration loadingConfiguration = loadingConfigurationBuilder.freeze();
             JsonSchemaFactory factory = JsonSchemaFactory.newBuilder()
-                    .setLoadingConfiguration(loadingConfigurationBuilder.freeze())
+                    .setLoadingConfiguration(loadingConfiguration)
                     .freeze();
 
             try
             {
-                return new JsonSchemaValidator(factory.getJsonSchema(schemaLocation));
+                return new JsonSchemaValidator(loadSchema(factory, loadingConfiguration));
             }
-            catch (ProcessingException e)
+            catch (Exception e)
             {
                 throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not initialise JsonSchemaValidator"), e);
             }
+        }
+
+        private JsonSchema loadSchema(JsonSchemaFactory factory, LoadingConfiguration loadingConfiguration) throws Exception
+        {
+            checkState(schemaLocation != null, "schemaLocation has not been provided");
+            URI uri = URI.create(schemaLocation);
+
+            String scheme = uri.getScheme();
+            if (scheme == null || "resource".equals(scheme))
+            {
+                try (InputStream in = openSchema(uri.getPath()))
+                {
+                    if (in != null)
+                    {
+                        JsonNode schema = loadingConfiguration.getReader().fromInputStream(in);
+                        return factory.getJsonSchema(schema);
+                    }
+                }
+            }
+            return factory.getJsonSchema(schemaLocation);
+        }
+
+        private InputStream openSchema(String path)
+        {
+            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+            if (in == null && path.startsWith("/"))
+            {
+                return openSchema(path.substring(1));
+            }
+
+            return in;
         }
 
         private String formatUri(String location)
@@ -184,7 +216,7 @@ public class JsonSchemaValidator
                     location = location.substring(1);
                 }
 
-                location = "resource:/" + location;
+                location = RESOURCE_PREFIX + location;
             }
 
             return location;

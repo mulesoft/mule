@@ -15,7 +15,7 @@ public class MtomProxyTestCase extends MtomTestCase
     @Override
     protected String getConfigFile()
     {
-        return "mtom-proxy-conf.xml";
+        return "mtom-proxy-conf-httpn.xml";
     }
 }
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+       http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd">
+
+    <oauth2:token-manager-config name="tokenManagerConfig"/>
+
+    <http:request-config name="requestConfig">
+        <oauth2:authorization-code-grant-type
+                clientId="${client.id}"
+                clientSecret="${client.secret}"
+                redirectionUrl="${redirect.url}"
+                tokenManager-ref="tokenManagerConfig">
+            <tls:context>
+                <tls:trust-store path="ssltest-cacerts.jks" password="changeit" />
+                <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+            <oauth2:authorization-request
+                    localAuthorizationUrl="${local.authorization.url}"
+                    authorizationUrl="${authorization.url}"
+                    scopes="${scopes}"
+                    state="${state}">
+                <oauth2:custom-parameters>
+                    <oauth2:custom-parameter paramName="${auth.request.param1}" value="${auth.request.value1}"/>
+                    <oauth2:custom-parameter paramName="${auth.request.param2}" value="${auth.request.value2}"/>
+                </oauth2:custom-parameters>
+            </oauth2:authorization-request>
+            <oauth2:token-request
+                    tokenUrl="${token.url}">
+                <oauth2:token-response accessToken="#[payload['access_token']]"
+                                       expiresIn="#[payload['expires_in']]"
+                                       refreshToken="#[payload['refresh_token']]">
+                    <oauth2:custom-parameter-extractor paramName="${custom.param.extractor1}"
+                                                       value="#[payload['${custom.param.extractor1}']]"/>
+                    <oauth2:custom-parameter-extractor paramName="${custom.param.extractor2}"
+                                                       value="#[payload['${custom.param.extractor2}']]"/>
+                </oauth2:token-response>
+            </oauth2:token-request>
+        </oauth2:authorization-code-grant-type>
+    </http:request-config>
+
+</mule>

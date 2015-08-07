@@ -756,7 +756,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 reverse = Boolean.valueOf((String) reverseProperty);
             }
 
-            Class<?> clazz = Class.forName(comparatorClassName.toString());
+            Class<?> clazz = endpoint.getMuleContext().getExecutionClassLoader().loadClass(comparatorClassName.toString());
             Comparator<?> comparator = (Comparator<?>)clazz.newInstance();
             return reverse ? new ReverseComparator(comparator) : comparator;
         }

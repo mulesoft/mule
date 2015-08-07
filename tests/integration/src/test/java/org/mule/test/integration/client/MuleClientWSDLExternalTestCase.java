@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.client;
 
+import org.junit.Ignore;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+@Ignore("Requires tools.jar in the classpath")
 public class MuleClientWSDLExternalTestCase extends AbstractMuleContextTestCase
 {
 

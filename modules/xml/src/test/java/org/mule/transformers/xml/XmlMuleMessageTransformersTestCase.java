@@ -6,6 +6,11 @@
  */
 package org.mule.transformers.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -17,12 +22,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.util.Set;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestCase
 {
@@ -82,7 +81,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
 
         assertEquals(1, msg.getInvocationPropertyNames().size());
         Set<String> outboundProps = msg.getOutboundPropertyNames();
-        assertEquals(4, outboundProps.size());
+        assertEquals(3, outboundProps.size());
 
         //Remove Mule properties
         outboundProps.remove(MuleProperties.MULE_CORRELATION_ID_PROPERTY);

@@ -35,7 +35,7 @@ public class WsdlCallTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "wsdl-conf-flow.xml";
+        return "wsdl-conf-flow-httpn.xml";
     }
 
     @Override

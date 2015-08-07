@@ -15,7 +15,6 @@
 
     <properties>
         <skipExportTests>false</skipExportTests>
-        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <build>
@@ -100,7 +99,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http</artifactId>
-            <version>3.6.0-M3-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Unit tests -->

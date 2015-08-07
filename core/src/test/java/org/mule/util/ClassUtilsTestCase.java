@@ -7,6 +7,7 @@
 package org.mule.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,6 +23,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
@@ -81,7 +83,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         }
 
     }
-    
+
     @Test
     public void testLoadPrimitiveClass() throws Exception
     {
@@ -94,7 +96,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertSame(ClassUtils.loadClass("long", getClass()), Long.TYPE);
         assertSame(ClassUtils.loadClass("short", getClass()), Short.TYPE);
     }
-    
+
     @Test
     public void testLoadClassOfType() throws Exception
     {
@@ -106,7 +108,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
         try
         {
-            ClassUtils.loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);            
+            ClassUtils.loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);
             fail("IllegalArgumentException should be thrown since class is not of expected type");
         }
         catch (IllegalArgumentException e)
@@ -185,37 +187,37 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     public void testGetSatisfiableMethods() throws Exception
     {
         List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true,
-                true, ignoreMethods);
+                                                        true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true,
-                ignoreMethods);
+                                                   ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being unacceptible
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
-                false, ignoreMethods);
+                                                   false, ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being acceptible
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
-                true, ignoreMethods);
+                                                   true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         // Test object param being acceptible but not void
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false,
-                true, ignoreMethods);
+                                                   true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("doSomethingElse", ((Method) methods.get(0)).getName());
 
         // Test object param being acceptible by interface Type
         methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{WaterMelon[].class}, true,
-                true, ignoreMethods);
+                                                   true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("setFruit", ((Method) methods.get(0)).getName());
@@ -252,10 +254,10 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     {
         Object a = new HashBlob(1);
         Object b = new HashBlob(2);
-        assertTrue(ClassUtils.hash(new Object[]{a, b, a, b}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertTrue(ClassUtils.hash(new Object[] {a, b, a, b}) == ClassUtils.hash(new Object[] {a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{a, b, a, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
-        assertFalse(ClassUtils.hash(new Object[]{b, a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertFalse(ClassUtils.hash(new Object[] {b, a, b, a}) == ClassUtils.hash(new Object[] {a, b, a, b}));
     }
 
     @Test
@@ -350,6 +352,26 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     public void setInheritedFieldValueWithoutRecurse() throws Exception
     {
         ClassUtils.setFieldValue(new ExtendedHashBlob(1), "hash", 0, false);
+    }
+
+    @Test
+    public void isInstance()
+    {
+        assertThat(ClassUtils.isInstance(String.class, null), is(false));
+        assertThat(ClassUtils.isInstance(String.class, ""), is(true));
+        assertThat(ClassUtils.isInstance(Fruit.class, new Apple()), is(true));
+        assertThat(ClassUtils.isInstance(Apple.class, new Kiwi()), is(false));
+
+        assertThat(ClassUtils.isInstance(Integer.class, 0), is(true));
+        assertThat(ClassUtils.isInstance(int.class, 0), is(true));
+        assertThat(ClassUtils.isInstance(long.class, new Long(0)), is(true));
+        assertThat(ClassUtils.isInstance(Double.class, new Double(0).doubleValue()), is(true));
+        assertThat(ClassUtils.isInstance(double.class, new Double(0).doubleValue()), is(true));
+        assertThat(ClassUtils.isInstance(boolean.class, true), is(true));
+        assertThat(ClassUtils.isInstance(boolean.class, Boolean.TRUE), is(true));
+        assertThat(ClassUtils.isInstance(Boolean.class, true), is(true));
+        assertThat(ClassUtils.isInstance(String.class, true), is(false));
+        assertThat(ClassUtils.isInstance(long.class, Boolean.FALSE), is(false));
     }
 
     private void simpleNameHelper(String target, Class clazz)

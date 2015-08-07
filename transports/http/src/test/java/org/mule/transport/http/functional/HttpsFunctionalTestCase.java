@@ -15,6 +15,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpsConnector;
 
@@ -22,9 +23,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.Rule;
+
 public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
 
+    public static final String SERVER_KEYSTORE_PATH = "serverKeystorePath";
+    public static final String SERVER_KEYSTORE = "serverKeystore";
+
+    @Rule
+    public SystemProperty serverKeystoreProperty = new SystemProperty(SERVER_KEYSTORE_PATH, SERVER_KEYSTORE);
+
+    
     @Override
     protected String getConfigFile()
     {

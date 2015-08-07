@@ -17,7 +17,6 @@ import org.mule.api.client.MuleClient;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
-import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -41,16 +40,17 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
     }
 
     @Override
-    public void before() throws Exception
+    public void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        super.before();
+        super.doSetUpBeforeMuleContextCreation();
         sftpClient.mkdir(INBOUND_LOW_AGE);
         sftpClient.mkdir(INBOUND_HIGH_AGE);
     }
 
-    @After
-    public void after() throws Exception
+    @Override
+    protected void doTearDownAfterMuleContextDispose() throws Exception
     {
+        super.doTearDownAfterMuleContextDispose();
         sftpClient.changeWorkingDirectory("..");
         sftpClient.recursivelyDeleteDirectory(INBOUND_HIGH_AGE);
         sftpClient.recursivelyDeleteDirectory(INBOUND_LOW_AGE);
@@ -63,8 +63,6 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
         MuleClient muleClient = muleContext.getClient();
         sftpClient.changeWorkingDirectory(INBOUND_HIGH_AGE);
         sftpClient.storeFile(FILENAME, new ByteArrayInputStream(FILE_CONTENT.getBytes()));
-        muleClient.dispatch("sftp://localhost:" + port.getNumber() + "/" + INBOUND_HIGH_AGE, TEST_MESSAGE,
-            MESSAGE_PROPERTIES);
         assertNull(muleClient.request("vm://out.higAge", READ_FILE_TIMEOUT));
         assertTrue(Arrays.asList(sftpClient.listFiles()).contains(FILENAME));
     }
@@ -75,11 +73,10 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
         MuleClient muleClient = muleContext.getClient();
         sftpClient.changeWorkingDirectory(INBOUND_LOW_AGE);
         sftpClient.storeFile(FILENAME, new ByteArrayInputStream(FILE_CONTENT.getBytes()));
-        muleClient.dispatch("sftp://localhost:" + port.getNumber() + "/" + INBOUND_LOW_AGE, TEST_MESSAGE,
-            MESSAGE_PROPERTIES);
         MuleMessage message = muleClient.request("vm://out.lowAge", READ_FILE_TIMEOUT);
         assertNotNull(message);
         assertEquals(FILE_CONTENT, message.getPayloadAsString());
         assertFalse(Arrays.asList(sftpClient.listFiles()).contains(FILENAME));
     }
+
 }

@@ -8,9 +8,10 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.DefaultMuleMessage;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -29,10 +30,12 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+
     @Override
     protected String getConfigFile()
     {
-        return "soap-request-conf-flow.xml";
+        return "soap-request-conf-flow-httpn.xml";
     }
 
     @Test
@@ -47,8 +50,8 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
                              + "</ssss>"
                              + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent", new DefaultMuleMessage(
-            soapRequest, muleContext));
+        MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent", getTestMuleMessage(
+            soapRequest), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

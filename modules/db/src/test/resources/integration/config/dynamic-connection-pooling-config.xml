@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="defaultQueryRequestResponse">
+        <vm:inbound-endpoint path="testIn" exchange-pattern="one-way"/>
+
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+
+        <transactional>
+            <db:delete config-ref="pooledJdbcConfig">
+                <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
+            </db:delete>
+
+            <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$JoinRequests"/>
+        </transactional>
+
+        <vm:outbound-endpoint path="testOut" exchange-pattern="one-way"/>
+
+        <catch-exception-strategy>
+            <vm:outbound-endpoint path="connectionError" exchange-pattern="one-way"/>
+        </catch-exception-strategy>
+    </flow>
+</mule>

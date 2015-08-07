@@ -6,10 +6,14 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -24,7 +28,11 @@ import org.junit.Test;
 
 public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
 {
-    private static String soapRequest = 
+    
+    @Rule
+    public SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
+
+    private static String soapRequest =
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
            "<soapenv:Header/>" +
            "<soapenv:Body>" +
@@ -43,7 +51,7 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "http-security-filter-test-flow.xml";
+        return "http-security-filter-test-flow-httpn.xml";
     }
 
     /**
@@ -70,11 +78,8 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals(
-                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:" + dynamicPort1.getNumber() + "/services/Echo. Message payload is of type: "
-                                + "String", get.getResponseBodyAsString());
+            assertThat(get.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
+                                                                 + "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
@@ -98,11 +103,8 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(post);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals(
-                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:" + dynamicPort1.getNumber() + "/services/Echo. Message payload is of type: "
-                                + "ContentLengthInputStream",   post.getResponseBodyAsString());
+            assertThat(post.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
+                                                                  + "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
@@ -155,7 +157,7 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testAuthenticationAuthorisedWithHandshakeGet() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 200);
+         doGet(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 200);
     }
 
     @Test

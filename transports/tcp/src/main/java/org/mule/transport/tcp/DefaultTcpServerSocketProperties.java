@@ -11,16 +11,28 @@ package org.mule.transport.tcp;
  */
 public class DefaultTcpServerSocketProperties implements TcpServerSocketProperties
 {
+    // Use default value of 'true' even though Socket default is false because optimizing to reduce amount of network
+    // traffic over latency is hardly ever a concern today.
+    private static final boolean DEFAULT_SEND_TCP_NO_DELAY = true;
+    // Use default value of 'true' to avoid BindException's when restarting Mule applications.
+    private static final boolean DEFAULT_REUSE_ADDRESS = true;
 
     private String name;
+
+    private Boolean sendTcpNoDelay = DEFAULT_SEND_TCP_NO_DELAY;
+    private Boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
+
+    // These options are undefined by default so that java.net.Socket/java.net.ServerSocket defaults are used.  We do
+    // however document the java.net.Socket/java.net.ServerSocket defaults in the schema for usability.
+    private Integer serverTimeout ;
+    private Integer timeout;
+    private Integer linger;
+
+    // These options are undefined by default so that by default it is the OS TCP/IP stack that configures, or dynamically
+    // manages, these values.
     private Integer sendBufferSize;
     private Integer receiveBufferSize;
     private Integer receiveBacklog;
-    private Boolean sendTcpNoDelay;
-    private Boolean reuseAddress;
-    private Integer connectionTimeout;
-    private Integer serverSoTimeout;
-    private Integer socketSoLinger;
     private Boolean keepAlive;
 
     public String getName()
@@ -89,36 +101,36 @@ public class DefaultTcpServerSocketProperties implements TcpServerSocketProperti
     }
 
     @Override
-    public Integer getConnectionTimeout()
+    public Integer getTimeout()
     {
-        return connectionTimeout;
+        return timeout;
     }
 
-    public void setConnectionTimeout(Integer connectionTimeout)
+    public void setTimeout(Integer timeout)
     {
-        this.connectionTimeout = connectionTimeout;
-    }
-
-    @Override
-    public Integer getServerSoTimeout()
-    {
-        return serverSoTimeout;
-    }
-
-    public void setServerSoTimeout(Integer serverSoTimeout)
-    {
-        this.serverSoTimeout = serverSoTimeout;
+        this.timeout = timeout;
     }
 
     @Override
-    public Integer getSocketSoLinger()
+    public Integer getServerTimeout()
     {
-        return socketSoLinger;
+        return serverTimeout;
     }
 
-    public void setSocketSoLinger(Integer socketSoLinger)
+    public void setServerTimeout(Integer serverTimeout)
     {
-        this.socketSoLinger = socketSoLinger;
+        this.serverTimeout = serverTimeout;
+    }
+
+    @Override
+    public Integer getLinger()
+    {
+        return linger;
+    }
+
+    public void setLinger(Integer linger)
+    {
+        this.linger = linger;
     }
 
     @Override

@@ -43,7 +43,7 @@ public class HttpReturnsJaxbObject5531TestCase extends FunctionalTestCase
     {
         String testUrl = "http://localhost:" + port1.getNumber() + "/test/weather";
         MuleClient client = muleContext.getClient();
-        Object response = client.send(testUrl, "hello", null);
+        Object response = client.send(testUrl, getTestMuleMessage("hello"));
         assertNotNull(response);
         String stringResponse = (String) new ObjectToString().transform(response, "UTF-8");
         assertTrue(stringResponse.contains("<Success>true</Success>"));

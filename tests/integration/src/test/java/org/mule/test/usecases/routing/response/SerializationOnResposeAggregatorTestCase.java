@@ -8,13 +8,16 @@ package org.mule.test.usecases.routing.response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.SerializationUtils;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
@@ -37,19 +40,25 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
     public void testSyncResponse() throws Exception
     {
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
-                                                 new TestObjectStore<Serializable>());
+                                                 new TestObjectStore(muleContext));
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , "request", null);
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , getTestMuleMessage("request"), newOptions().method(POST.name()).build());
         assertNotNull(message);
         assertEquals("request processed", new String(message.getPayloadAsBytes()));
     }
 
-    private static class TestObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>
+    private static class TestObjectStore extends SimpleMemoryObjectStore<Serializable>
     {
+        private ObjectSerializer serializer;
+
+        private TestObjectStore(MuleContext muleContext) {
+            serializer = muleContext.getObjectSerializer();
+        }
+
         @Override
         protected void doStore(Serializable key, Serializable value) throws ObjectStoreException
         {
-            byte[] serialized = SerializationUtils.serialize(value);
+            byte[] serialized = serializer.serialize(value);
             super.doStore(key, serialized);
         }
 
@@ -57,7 +66,7 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
         protected Serializable doRetrieve(Serializable key)
         {
             Serializable serialized = super.doRetrieve(key);
-            return (Serializable) SerializationUtils.deserialize((byte[]) serialized);
+            return serializer.deserialize((byte[]) serialized);
         }
     }
 }

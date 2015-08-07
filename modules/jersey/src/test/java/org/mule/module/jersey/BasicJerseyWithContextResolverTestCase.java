@@ -19,7 +19,7 @@ public class BasicJerseyWithContextResolverTestCase extends BasicJerseyTestCase
     @Override
     protected String getConfigFile()
     {
-        return "basic-context-resolver-conf-flow.xml";
+        return "basic-context-resolver-http-connector-conf-flow.xml";
     }
 
     @Override

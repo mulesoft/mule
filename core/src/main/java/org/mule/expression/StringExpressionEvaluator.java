@@ -9,12 +9,11 @@ package org.mule.expression;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionEvaluator;
 
 /**
  * Will process an expression string that can contain other expressions
  */
-public class StringExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
+public class StringExpressionEvaluator extends AbstractExpressionEvaluator implements MuleContextAware
 {
     public static final String NAME = "string";
 

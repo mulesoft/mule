@@ -8,10 +8,10 @@ package org.mule.module.cxf.jaxws;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.construct.Flow;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -26,13 +26,14 @@ import org.junit.Test;
 
 public class HeaderPropertiesTestCase extends FunctionalTestCase
 {
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigFile()
     {
-        return "header-conf.xml";
+        return "header-conf-httpn.xml";
     }
 
     private GreeterImpl getGreeter() throws Exception
@@ -59,11 +60,10 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
         };
         testComponent.setEventCallback(callback);
 
-        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("operation", "greetMe");
         props.put("FOO", "BAR");
-        MuleMessage result = client.send("clientEndpoint", "Dan", props);
+        MuleMessage result = ((Flow) getFlowConstruct("clientFlow")).process(getTestEvent(new DefaultMuleMessage("Dan", props, muleContext))).getMessage();
         assertEquals("Hello Dan Received", result.getPayload());
 
         GreeterImpl impl = getGreeter();

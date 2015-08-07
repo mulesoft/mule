@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/pojo-test" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:nest="http://www.mulesoft.org/schema/mule/nest-example-base"
+    xmlns:spring="http://www.springframework.org/schema/beans" targetNamespace="http://www.mulesoft.org/schema/mule/pojo-test"
+    elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
+    <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd" />
+
+    <xsd:element name="config" substitutionGroup="mule:abstract-extension">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractExtensionType">
+                    <xsd:attribute name="name" type="xsd:string" />
+                    <xsd:attribute name="config1" type="xsd:string" />
+                    <xsd:attribute name="config2" type="xsd:string" />
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <xsd:element name="method1" substitutionGroup="mule:abstract-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType">
+                    <xsd:attribute name="config-ref" type="xsd:string" />
+                    <xsd:attribute name="arg1" type="xsd:string" />
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="method2" substitutionGroup="mule:abstract-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType">
+                    <xsd:attribute name="config-ref" type="xsd:string" />
+                    <xsd:attribute name="arg1" type="xsd:string" use="required"/>
+                    <xsd:attribute name="arg2" type="xsd:string" />
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

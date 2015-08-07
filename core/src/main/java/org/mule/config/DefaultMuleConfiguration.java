@@ -13,15 +13,18 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
+import org.mule.api.processor.ProcessingStrategy;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.Flow;
 import org.mule.util.FileUtils;
+import org.mule.util.NetworkUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -179,11 +182,19 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     private List<Object> extensions;
 
     /**
-     * For the cases where HTTP needs to be used by default (no connector or endpoint is explicitly defined), this
-     * determines if the old HTTP transport should be used by default. If false, the new HTTP connector will be used.
-     * This applies, for example, when specifying an HTTP URI in MuleClient.
+     * The instance of {@link ObjectSerializer} to use by default
+     *
+     * @since 3.7.0
      */
-    private boolean useHttpTransportByDefault;
+    private ObjectSerializer defaultObjectSerializer;
+
+    /**
+     * The default {@link ProcessingStrategy} to be used by all
+     * {@link Flow}s which doesn't specify otherwise
+     *
+     * @since 3.7.0
+     */
+    private ProcessingStrategy defaultProcessingStrategy;
 
     public DefaultMuleConfiguration()
     {
@@ -206,7 +217,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             try
             {
-                domainId = InetAddress.getLocalHost().getHostName();
+                domainId = NetworkUtils.getLocalHost().getHostName();
             }
             catch (UnknownHostException e)
             {
@@ -730,6 +741,34 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return disableTimeouts;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectSerializer getDefaultObjectSerializer()
+    {
+        return defaultObjectSerializer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ProcessingStrategy getDefaultProcessingStrategy()
+    {
+        return defaultProcessingStrategy;
+    }
+
+    public void setDefaultProcessingStrategy(ProcessingStrategy defaultProcessingStrategy)
+    {
+        this.defaultProcessingStrategy = defaultProcessingStrategy;
+    }
+
+    public void setDefaultObjectSerializer(ObjectSerializer defaultObjectSerializer)
+    {
+        this.defaultObjectSerializer = defaultObjectSerializer;
+    }
+
     public void setExtensions(List<Object> extensions)
     {
         this.extensions = extensions;
@@ -754,17 +793,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             return Collections.emptyList();
         }
         return Collections.unmodifiableList(extensions);
-    }
-
-    @Override
-    public boolean useHttpTransportByDefault()
-    {
-        return useHttpTransportByDefault;
-    }
-
-    public void setUseHttpTransportByDefault(boolean useHttpTransportByDefault)
-    {
-        this.useHttpTransportByDefault = useHttpTransportByDefault;
     }
 
     @Override

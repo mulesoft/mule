@@ -7,8 +7,9 @@
 package org.mule.el.context;
 
 import org.mule.el.datetime.DateTime;
+import org.mule.util.NetworkUtils;
+import org.mule.util.SystemUtils;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Locale;
@@ -64,12 +65,12 @@ public class ServerContext
 
     public String getHost() throws UnknownHostException
     {
-        return InetAddress.getLocalHost().getCanonicalHostName();
+        return NetworkUtils.getLocalHost().getCanonicalHostName();
     }
 
     public String getIp() throws UnknownHostException
     {
-        return InetAddress.getLocalHost().getHostAddress();
+        return NetworkUtils.getLocalHost().getHostAddress();
     }
 
     public TimeZone getTimeZone()
@@ -84,12 +85,12 @@ public class ServerContext
 
     public String getTmpDir()
     {
-        return System.getProperty("java.io.tmpdir");
+        return SystemUtils.JAVA_IO_TMPDIR;
     }
 
     public String getFileSeparator()
     {
-        return System.getProperty("file.separator");
+        return SystemUtils.FILE_SEPARATOR;
     }
 
     public Map<String, String> getEnv()
@@ -104,42 +105,42 @@ public class ServerContext
 
     public String getOsName()
     {
-        return System.getProperty("os.name");
+        return SystemUtils.OS_NAME;
     }
 
     public String getOsArch()
     {
-        return System.getProperty("os.arch");
+        return SystemUtils.OS_ARCH;
     }
 
     public String getOsVersion()
     {
-        return System.getProperty("os.version");
+        return SystemUtils.OS_VERSION;
     }
 
     public String getJavaVersion()
     {
-        return System.getProperty("java.version");
+        return SystemUtils.JAVA_VERSION;
     }
 
     public String getJavaVendor()
     {
-        return System.getProperty("java.vendor");
+        return SystemUtils.JAVA_VENDOR;
     }
 
     public String getUserName()
     {
-        return System.getProperty("user.name");
+        return SystemUtils.USER_NAME;
     }
 
     public String getUserHome()
     {
-        return System.getProperty("user.home");
+        return SystemUtils.USER_HOME;
     }
 
     public String getUserDir()
     {
-        return System.getProperty("user.dir");
+        return SystemUtils.USER_DIR;
     }
 
     public DateTime getDateTime()

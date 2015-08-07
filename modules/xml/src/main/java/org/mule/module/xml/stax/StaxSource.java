@@ -207,9 +207,17 @@ public class StaxSource extends StAXSource
             }
             catch (XMLStreamException e)
             {
+                // determine location
+                int lineNumber = -1;
+                int columnNumber = -1;
+                if (e.getLocation() != null)
+                {
+                    lineNumber = e.getLocation().getLineNumber();
+                    columnNumber = e.getLocation().getColumnNumber();
+                }
+                
                 // wrap it in a SAXException
-                SAXParseException se = new SAXParseException(e.getMessage(), null, null, e.getLocation()
-                    .getLineNumber(), e.getLocation().getColumnNumber(), e);
+                SAXParseException se = new SAXParseException(e.getMessage(), null, null, lineNumber, columnNumber, e);
 
                 // if the consumer sets an error handler, it is our responsibility
                 // to notify it.

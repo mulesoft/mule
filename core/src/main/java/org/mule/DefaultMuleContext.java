@@ -6,7 +6,9 @@
  */
 package org.mule;
 
+import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -35,6 +37,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionManagerFactory;
@@ -50,6 +53,7 @@ import org.mule.context.notification.ServerNotificationManager;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
+import org.mule.extension.ExtensionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.ProcessingTimeWatcher;
@@ -112,6 +116,13 @@ public class DefaultMuleContext implements MuleContext
     private MuleRegistry muleRegistryHelper;
 
     /**
+     * Default component to perform dependency injection
+     *
+     * @since 3.7.0
+     */
+    private Injector injector;
+
+    /**
      * stats used for management
      */
     private AllStatistics stats = new AllStatistics();
@@ -167,6 +178,11 @@ public class DefaultMuleContext implements MuleContext
     private final Latch startLatch = new Latch();
 
     private QueueManager queueManager;
+
+    private ExtensionManager extensionManager;
+
+    private ObjectSerializer objectSerializer;
+    private DataTypeConversionResolver dataTypeConversionResolver;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -559,9 +575,24 @@ public class DefaultMuleContext implements MuleContext
     }
 
     @Override
+    public ExtensionManager getExtensionManager()
+    {
+        return extensionManager;
+    }
+
+    @Override
     public ObjectStoreManager getObjectStoreManager()
     {
         return this.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectSerializer getObjectSerializer()
+    {
+        return objectSerializer;
     }
 
     /**
@@ -594,7 +625,7 @@ public class DefaultMuleContext implements MuleContext
 
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
     {
-        registryBroker.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+        getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
         this.queueManager = queueManager;
     }
 
@@ -650,6 +681,7 @@ public class DefaultMuleContext implements MuleContext
                     try
                     {
                         transactionManager = (((TransactionManagerFactory) temp.iterator().next()).create(config));
+                        registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, transactionManager);
                     }
                     catch (Exception e)
                     {
@@ -677,9 +709,22 @@ public class DefaultMuleContext implements MuleContext
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MuleRegistry getRegistry()
     {
         return muleRegistryHelper;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Injector getInjector()
+    {
+        return injector;
     }
 
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
@@ -753,11 +798,19 @@ public class DefaultMuleContext implements MuleContext
         return executionClassLoader;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
     public void addRegistry(Registry registry)
     {
         registryBroker.addRegistry(registry);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
     public void removeRegistry(Registry registry)
     {
         registryBroker.removeRegistry(registry);
@@ -879,19 +932,29 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public DataTypeConversionResolver getDataTypeConverterResolver()
     {
-        DataTypeConversionResolver dataTypeConversionResolver = getRegistry().lookupObject(MuleProperties.OBJECT_CONVERTER_RESOLVER);
         if (dataTypeConversionResolver == null)
         {
-            dataTypeConversionResolver = new DynamicDataTypeConversionResolver(this);
+            synchronized (this)
+            {
+                if (dataTypeConversionResolver == null)
+                {
+                    dataTypeConversionResolver = getRegistry().lookupObject(MuleProperties.OBJECT_CONVERTER_RESOLVER);
 
-            try
-            {
-                getRegistry().registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER, dataTypeConversionResolver);
-            }
-            catch (RegistrationException e)
-            {
-                // Should not occur
-                throw new IllegalStateException(e);
+                    if (dataTypeConversionResolver == null)
+                    {
+                        dataTypeConversionResolver = new DynamicDataTypeConversionResolver(this);
+
+                        try
+                        {
+                            getRegistry().registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER, dataTypeConversionResolver);
+                        }
+                        catch (RegistrationException e)
+                        {
+                            // Should not occur
+                            throw new IllegalStateException(e);
+                        }
+                    }
+                }
             }
         }
 
@@ -903,7 +966,7 @@ public class DefaultMuleContext implements MuleContext
     {
         if (this.expressionLanguage == null)
         {
-            this.expressionLanguage = this.registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+            this.expressionLanguage = this.registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
         }
 
         return this.expressionLanguage;
@@ -989,6 +1052,11 @@ public class DefaultMuleContext implements MuleContext
         this.registryBroker = registryBroker;
     }
 
+    public void setInjector(Injector injector)
+    {
+        this.injector = injector;
+    }
+
     public void setMuleRegistry(MuleRegistryHelper muleRegistry)
     {
         this.muleRegistryHelper = muleRegistry;
@@ -997,5 +1065,15 @@ public class DefaultMuleContext implements MuleContext
     public void setLocalMuleClient(DefaultLocalMuleClient localMuleContext)
     {
         this.localMuleClient = localMuleContext;
+    }
+
+    public void setExtensionManager(ExtensionManager extensionManager)
+    {
+        this.extensionManager = extensionManager;
+    }
+
+    public void setObjectSerializer(ObjectSerializer objectSerializer)
+    {
+        this.objectSerializer = objectSerializer;
     }
 }

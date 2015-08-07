@@ -24,10 +24,10 @@ import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
 import org.mule.module.db.internal.config.domain.connection.PoolingProfileBeanDefinitionParser;
 import org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser;
-import org.mule.module.db.internal.config.domain.database.DbConfigFactoryBean;
-import org.mule.module.db.internal.config.domain.database.DerbyConfigFactoryBean;
-import org.mule.module.db.internal.config.domain.database.MySqlConfigFactoryBean;
-import org.mule.module.db.internal.config.domain.database.OracleConfigFactoryBean;
+import org.mule.module.db.internal.config.domain.database.DbConfigResolverFactoryBean;
+import org.mule.module.db.internal.config.domain.database.DerbyConfigResolverFactoryBean;
+import org.mule.module.db.internal.config.domain.database.MySqlConfigResolverFactoryBean;
+import org.mule.module.db.internal.config.domain.database.OracleConfigResolverFactoryBean;
 import org.mule.module.db.internal.config.domain.param.InOutParamDefinitionDefinitionParser;
 import org.mule.module.db.internal.config.domain.param.InputParamValueBeanDefinitionParser;
 import org.mule.module.db.internal.config.domain.param.OutputParamDefinitionDefinitionParser;
@@ -72,22 +72,30 @@ public class DbNamespaceHandler extends NamespaceHandlerSupport
 
     private void registerConfigDefinitionParsers()
     {
-        registerBeanDefinitionParser("generic-config", new DbConfigDefinitionParser(DbConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
+        registerBeanDefinitionParser("generic-config", new DbConfigDefinitionParser(DbConfigResolverFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {DRIVER_ATTRIBUTE, URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}})));
 
-        registerBeanDefinitionParser("derby-config", new DbConfigDefinitionParser(DerbyConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
+        registerBeanDefinitionParser("derby-config", new DbConfigDefinitionParser(DerbyConfigResolverFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}})));
 
-        DbConfigDefinitionParser oracleDbConfigFactoryBean = new DbConfigDefinitionParser(OracleConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
+        DbConfigDefinitionParser oracleDbConfigFactoryBean = new DbConfigDefinitionParser(OracleConfigResolverFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}}));
-        oracleDbConfigFactoryBean.registerPreProcessor(new CheckRequiredAttributes(new String[][] {{DATA_SOURCE_REF_ATTRIBUTE}, {USER_ATTRIBUTE, PASSWORD_ATTRIBUTE}}));
+        oracleDbConfigFactoryBean.registerPreProcessor(
+                new CheckRequiredAttributes(new String[][] {
+                        {DATA_SOURCE_REF_ATTRIBUTE},
+                        {DATA_SOURCE_REF_ATTRIBUTE, USER_ATTRIBUTE, PASSWORD_ATTRIBUTE},
+                        {URL_ATTRIBUTE},
+                        {USER_ATTRIBUTE, PASSWORD_ATTRIBUTE, URL_ATTRIBUTE},
+                        {USER_ATTRIBUTE, PASSWORD_ATTRIBUTE, HOST_ATTRIBUTE, PORT_ATTRIBUTE}
+                }));
+
         oracleDbConfigFactoryBean.addAlias("instance", "database");
         registerBeanDefinitionParser("oracle-config", oracleDbConfigFactoryBean);
 
-        registerBeanDefinitionParser("mysql-config", new DbConfigDefinitionParser(MySqlConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
+        registerBeanDefinitionParser("mysql-config", new DbConfigDefinitionParser(MySqlConfigResolverFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {HOST_ATTRIBUTE, PORT_ATTRIBUTE, DATABASE_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}})));

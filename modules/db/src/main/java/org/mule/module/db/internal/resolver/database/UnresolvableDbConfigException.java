@@ -19,4 +19,9 @@ public class UnresolvableDbConfigException extends RuntimeException
     {
         super(message);
     }
+
+    public UnresolvableDbConfigException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

@@ -19,6 +19,7 @@ package org.mule.transport.sftp;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transport.OutputHandler;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -57,7 +58,7 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
     protected void doDispatch(MuleEvent event) throws Exception
     {
         String filename = buildFilename(event);
-        InputStream inputStream = generateInputStream(event);
+        InputStream inputStream = null;
         if (logger.isDebugEnabled())
         {
             logger.debug("Writing file to: " + endpoint.getEndpointURI() + " [" + filename + "]");
@@ -105,11 +106,27 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
             // choose appropriate writing mode
             if (sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND))
             {
-                client.storeFile(transferFilename, inputStream, SftpClient.WriteMode.APPEND);
+                if (event.getMessage().getPayload() instanceof OutputHandler)
+                {
+                    client.storeFile(transferFilename, event, (OutputHandler) event.getMessage().getPayload(), SftpClient.WriteMode.APPEND);
+                }
+                else
+                {
+                    inputStream = generateInputStream(event);
+                    client.storeFile(transferFilename, inputStream, SftpClient.WriteMode.APPEND);
+                }
             }
             else
             {
-                client.storeFile(transferFilename, inputStream);
+                if (event.getMessage().getPayload() instanceof OutputHandler)
+                {
+                    client.storeFile(transferFilename, event, (OutputHandler) event.getMessage().getPayload());
+                }
+                else
+                {
+                    inputStream = generateInputStream(event);
+                    client.storeFile(transferFilename, inputStream);
+                }
             }
 
             if (useTempDir)
@@ -144,7 +161,10 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
                 connector.releaseClient(endpoint, client);
             }
 
-            inputStream.close();
+            if (inputStream != null)
+            {
+                inputStream.close();
+            }
 
         }
 

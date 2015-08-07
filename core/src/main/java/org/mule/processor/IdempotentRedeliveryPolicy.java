@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -102,6 +103,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         idrId = String.format("%s-%s-%s",appName,flowName,"idr");
         lockFactory = muleContext.getLockFactory();
         store = createStore();
+        initialiseIfNeeded(objectToByteArray, muleContext);
+        initialiseIfNeeded(byteArrayToHexString, muleContext);
     }
 
     private ObjectStore<AtomicInteger> createStore() throws InitialisationException

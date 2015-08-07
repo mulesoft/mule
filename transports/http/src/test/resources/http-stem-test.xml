@@ -10,6 +10,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+    
     <flow name="/foo">
         <http:inbound-endpoint address="http://localhost:${port1}/foo" exchange-pattern="request-response"/>
         <test:component appendString=" Received"/>

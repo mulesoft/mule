@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<spring:beans>
+
+		<spring:bean name="prototypeApple" class="org.mule.tck.testmodels.fruit.Apple"
+			scope="prototype" />
+
+		<spring:bean name="singletonApple" class="org.mule.tck.testmodels.fruit.Apple"
+			scope="singleton" lazy-init="true" />
+
+		<spring:bean name="cleaner"
+			class="org.mule.tck.testmodels.fruit.FruitBowl" />
+
+		<aop:config>
+			<aop:aspect id="aspect" ref="cleaner">
+				<aop:pointcut id="pointcut"
+					expression="execution(* org.mule.tck.testmodels.fruit.Apple.*(..))" />
+				<aop:around pointcut-ref="pointcut" method="hasApple" />
+			</aop:aspect>
+		</aop:config>
+	</spring:beans>
+
+
+	<flow name="flow">
+		<component>
+			<spring-object bean="prototypeApple" />
+		</component>
+		<component>
+			<spring-object bean="singletonApple" />
+		</component>
+	</flow>
+
+</mule>

@@ -10,7 +10,10 @@ import static org.mule.transport.sftp.notification.SftpTransportNotification.SFT
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
+
+import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.OutputHandler;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.StringUtils;
 
@@ -26,6 +29,7 @@ import com.jcraft.jsch.SftpException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -67,6 +71,8 @@ public class SftpClient
     private static final Object lock = new Object();
 
     private String preferredAuthenticationMethods;
+
+    private int connectionTimeoutMillis = 0; // No timeout by default
 
     public SftpClient(String host)
     {
@@ -135,6 +141,7 @@ public class SftpClient
             session.setConfig(hash);
             session.setPort(port);
             session.setPassword(password);
+            session.setTimeout(connectionTimeoutMillis);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -182,6 +189,7 @@ public class SftpClient
             session = jsch.getSession(user, host);
             session.setConfig(hash);
             session.setPort(port);
+            session.setTimeout(connectionTimeoutMillis);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -209,6 +217,11 @@ public class SftpClient
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public void setConnectionTimeoutMillis(int connectionTimeoutMillis)
+    {
+        this.connectionTimeoutMillis = connectionTimeoutMillis;
     }
 
     public void rename(String filename, String dest) throws IOException
@@ -242,10 +255,7 @@ public class SftpClient
     public void deleteFile(String fileName) throws IOException
     {
         // Notify sftp delete file action
-        if (notifier != null)
-        {
-            notifier.notify(SFTP_DELETE_ACTION, currentDirectory + "/" + fileName);
-        }
+    	notifyAction(SFTP_DELETE_ACTION, fileName);
 
         try
         {
@@ -378,10 +388,7 @@ public class SftpClient
         {
 
             // Notify sftp put file action
-            if (notifier != null)
-            {
-                notifier.notify(SFTP_PUT_ACTION, currentDirectory + "/" + fileName);
-            }
+        	notifyAction(SFTP_PUT_ACTION, fileName);
 
             if (logger.isDebugEnabled())
             {
@@ -392,11 +399,45 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            logger.error("Error writing data over SFTP service, error was: " + e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
     }
 
+    public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler) throws IOException
+    {
+    	storeFile(fileName, event, outputHandler, WriteMode.OVERWRITE);
+    }
+
+    public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler, WriteMode mode) throws IOException
+    {
+        OutputStream os = null;
+        try
+        {
+
+            // Notify sftp put file action
+            notifyAction(SFTP_PUT_ACTION, fileName);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Sending to SFTP service: OutputHandler = " + outputHandler + " , filename = " + fileName);
+            }
+
+            os = channelSftp.put(fileName, mode.intValue());
+            outputHandler.write(event, os);
+        }
+        catch (SftpException e)
+        {
+            throw new IOException(e.getMessage());
+        }
+        finally
+        {
+            if (os != null)
+            {
+                os.close();
+            }
+        }
+    }
+    
     public void storeFile(String fileNameLocal, String fileNameRemote) throws IOException
     {
         storeFile(fileNameLocal, fileNameRemote, WriteMode.OVERWRITE);
@@ -414,6 +455,14 @@ public class SftpClient
         }
     }
 
+    private void notifyAction(int action, String fileName)
+    {
+        if (notifier != null)
+        {
+            notifier.notify(action, currentDirectory + "/" + fileName);
+        }
+    }
+    
     public long getSize(String filename) throws IOException
     {
         try

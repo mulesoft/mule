@@ -13,6 +13,7 @@ import java.net.URI;
 
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
 
@@ -36,8 +37,6 @@ import org.apache.logging.log4j.message.MessageFactory;
 class MuleLoggerContext extends LoggerContext
 {
 
-    protected static final int NO_CCL_CLASSLOADER = 0;
-
     private final URI configFile;
     private final boolean standlone;
     private final ContextSelector contextSelector;
@@ -57,7 +56,7 @@ class MuleLoggerContext extends LoggerContext
         configFile = configLocn;
         this.contextSelector = contextSelector;
         this.standlone = standalone;
-        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : NO_CCL_CLASSLOADER;
+        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : getClass().getClassLoader().getSystemClassLoader().hashCode();
 
         if (ownerClassLoader instanceof ArtifactClassLoader)
         {
@@ -77,7 +76,35 @@ class MuleLoggerContext extends LoggerContext
     public synchronized void reconfigure()
     {
         super.reconfigure();
+        applyContainerConfiguration();
+    }
+
+    private void applyContainerConfiguration()
+    {
         new LoggerContextConfigurer().configure(this);
+    }
+
+    /**
+     * This is workaround for log4j2 issue
+     * <a href="https://issues.apache.org/jira/browse/LOG4J2-998">
+     * LOG4J2-998</a>. When we upgrade to a version which includes
+     * that fix then there will no longer be a need
+     * for this method since {@link DispatchingLogger}
+     * will be able to override {@link Logger#updateConfiguration(Configuration)}
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateLoggers(Configuration config)
+    {
+        applyContainerConfiguration();
+        super.updateLoggers(config);
+        for (Logger logger : getLoggers())
+        {
+            if (logger instanceof DispatchingLogger)
+            {
+                ((DispatchingLogger) logger).updateConfiguration(config);
+            }
+        }
     }
 
     /**

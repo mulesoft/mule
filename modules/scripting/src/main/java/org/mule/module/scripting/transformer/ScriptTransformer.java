@@ -7,19 +7,40 @@
 package org.mule.module.scripting.transformer;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.transformer.AbstractMessageTransformer;
 
-import javax.script.ScriptException;
 import javax.script.Bindings;
+import javax.script.ScriptException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runs a script to perform transformation on an object.
  */
 public class ScriptTransformer extends AbstractMessageTransformer
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptTransformer.class);
+
     private Scriptable script;
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        LifecycleUtils.initialiseIfNeeded(script, muleContext);
+    }
+
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+        LifecycleUtils.disposeIfNeeded(script, LOGGER);
+    }
 
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException

@@ -6,8 +6,12 @@
  */
 package org.mule.module.launcher.log4j2;
 
-import static org.mule.module.launcher.log4j2.MuleLoggerContext.NO_CCL_CLASSLOADER;
+import static org.mule.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
+import static org.reflections.ReflectionUtils.withName;
+import static org.reflections.ReflectionUtils.withParameters;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -17,11 +21,13 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
 import org.apache.logging.log4j.spi.ExtendedLogger;
+import org.reflections.ReflectionUtils;
 
 /**
  * Suppose that class X is used in applications Y and Z. If X
@@ -33,7 +39,7 @@ import org.apache.logging.log4j.spi.ExtendedLogger;
  * which is capable of detecting that the log event is being generated from an application
  * which {@link org.apache.logging.log4j.core.LoggerContext} is different than L's, and thus
  * forward the event to the correct context.
- *
+ * <p/>
  * Because this class is a fix for issues in static loggers,
  * it must not hold any reference to any {@link java.lang.ClassLoader} since otherwise
  * that class loader would be GC unreachable. For that reason, it uses {@link #ownerClassLoaderHash}
@@ -45,6 +51,7 @@ abstract class DispatchingLogger extends Logger
 {
 
     private final Logger originalLogger;
+    private Method updateConfigurationMethod = null;
     private final ContextSelector contextSelector;
     private final int ownerClassLoaderHash;
 
@@ -59,8 +66,8 @@ abstract class DispatchingLogger extends Logger
 
     private Logger getLogger()
     {
-        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-        if (isRootLogger(currentClassLoader))
+        final ClassLoader currentClassLoader = resolveLoggerContextClassLoader(Thread.currentThread().getContextClassLoader());
+        if (useThisLoggerContextClassLoader(currentClassLoader))
         {
             return originalLogger;
         }
@@ -71,9 +78,56 @@ abstract class DispatchingLogger extends Logger
         return contextSelector.getContext(getName(), currentClassLoader, true).getLogger(getName(), getMessageFactory());
     }
 
-    private boolean isRootLogger(ClassLoader currentClassLoader)
+    /**
+     * @param currentClassLoader execution classloader of the logging operation
+     * @return true if the logger context associated with this instance must be used for logging,
+     *      false if we still need to continue searching for the right logger context
+     */
+    private boolean useThisLoggerContextClassLoader(ClassLoader currentClassLoader)
     {
-        return currentClassLoader == null || ownerClassLoaderHash == NO_CCL_CLASSLOADER || currentClassLoader.hashCode() == ownerClassLoaderHash;
+        return currentClassLoader.hashCode() == ownerClassLoaderHash;
+    }
+
+
+    /**
+     * This is workaround for log4j2 issue
+     * <a href="https://issues.apache.org/jira/browse/LOG4J2-998">
+     * LOG4J2-998</a>. When we upgrade to a version which includes
+     * that fix then we should simply override {@link Logger#updateConfiguration(Configuration)}
+     * and invoke the same method on {@code originalLogger}. Meanwhile, we
+     * keep this method (which doesn't override the other) and use
+     * reflection to update the {@code originalLogger}
+     *
+     * @param config
+     */
+    void updateConfiguration(final Configuration config)
+    {
+        if (lookupUpdateConfigurationMethod())
+        {
+            try
+            {
+                updateConfigurationMethod.invoke(originalLogger, config);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private boolean lookupUpdateConfigurationMethod()
+    {
+        if (updateConfigurationMethod == null)
+        {
+            Collection<Method> candidateMethods = ReflectionUtils.getAllMethods(originalLogger.getClass(), withName("updateConfiguration"), withParameters(Configuration.class));
+            if (candidateMethods.size() == 1)
+            {
+                updateConfigurationMethod = candidateMethods.iterator().next();
+                updateConfigurationMethod.setAccessible(true);
+            }
+        }
+
+        return updateConfigurationMethod != null;
     }
 
     @Override

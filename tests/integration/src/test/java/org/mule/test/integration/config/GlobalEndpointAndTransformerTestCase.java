@@ -31,7 +31,7 @@ public class GlobalEndpointAndTransformerTestCase extends FunctionalTestCase
     public void testNormal() throws MuleException
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage msg=client.send("vm://in",new DefaultMuleMessage("HELLO!", muleContext));
+        MuleMessage msg=client.send("vm://in", getTestMuleMessage("HELLO!"));
         assertTrue(msg.getPayload() instanceof byte[]);
     }
 }

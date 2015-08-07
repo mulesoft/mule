@@ -9,14 +9,15 @@ package org.mule.module.jersey;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,21 +43,20 @@ public class BasicJerseyTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send(String.format(URL, "/helloworld"), "", null);
+        final HttpRequestOptions httpPostRequestOptions = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+        MuleMessage result = client.send(String.format(URL, "/helloworld"), getTestMuleMessage(), httpPostRequestOptions);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello World", result.getPayloadAsString());
 
         // try invalid url
-        result = client.send(String.format(URL, "/hello"), "", null);
+        final HttpRequestOptions disableValidationOptions = newOptions().disableStatusCodeValidation().build();
+        result = client.send(String.format(URL, "/hello"), getTestMuleMessage(), disableValidationOptions);
         assertEquals((Integer)404, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        result = client.send(String.format(URL, "/helloworld"), "", props);
+        result = client.send(String.format(URL, "/helloworld"), getTestMuleMessage(), disableValidationOptions);
         assertEquals((Integer)405, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_DELETE);
-        result = client.send(String.format(URL, "/helloworld"), "", props);
+        result = client.send(String.format(URL, "/helloworld"), getTestMuleMessage(""), newOptions().method(org.mule.module.http.api.HttpConstants.Methods.DELETE.name()).build());
         assertEquals("Hello World Delete", result.getPayloadAsString());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
@@ -97,10 +97,7 @@ public class BasicJerseyTestCase extends FunctionalTestCase
     protected void callThrowException(Integer expectedErrorCode, String expectedData) throws Exception
     {
         MuleClient client = muleContext.getClient();
-
-        Map<String, Object> props = new HashMap<>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        MuleMessage result = client.send(String.format(URL, "/helloworld/throwException"), "", props);
+        MuleMessage result = client.send(String.format(URL, "/helloworld/throwException"), getTestMuleMessage(), newOptions().disableStatusCodeValidation().build());
         assertEquals(expectedErrorCode, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertTrue(result.getPayloadAsString().contains(expectedData));
     }

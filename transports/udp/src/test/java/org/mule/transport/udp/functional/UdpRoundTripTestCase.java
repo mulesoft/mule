@@ -9,6 +9,7 @@ package org.mule.transport.udp.functional;
 import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.NetworkUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,7 +43,7 @@ public class UdpRoundTripTestCase extends FunctionalTestCase
     public void testSendAndReceiveUDP() throws IOException
     {
         // the socket we talk to
-        DatagramSocket socket = new DatagramSocket(inPort.getNumber(), InetAddress.getLocalHost());
+        DatagramSocket socket = new DatagramSocket(inPort.getNumber(), NetworkUtils.getLocalHost());
 
         // prepare outgoing packet
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
@@ -52,7 +53,7 @@ public class UdpRoundTripTestCase extends FunctionalTestCase
         byte[] bytesToSend = bytesOut.toByteArray();
 
         DatagramPacket outboundPacket = new DatagramPacket(bytesToSend, bytesToSend.length,
-            InetAddress.getLocalHost(), outPort.getNumber());
+            NetworkUtils.getLocalHost(), outPort.getNumber());
         socket.send(outboundPacket);
 
         // receive whatever came back

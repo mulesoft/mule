@@ -7,6 +7,8 @@
 package org.mule.module.ws.security;
 
 
+import static org.apache.ws.security.handler.WSHandlerConstants.PW_CALLBACK_REF;
+
 import java.util.Map;
 
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -28,4 +30,19 @@ public abstract class AbstractSecurityStrategy implements SecurityStrategy
         configProperties.put(WSHandlerConstants.ACTION, previousAction + action);
     }
 
+    /**
+     * Adds a password callback to a config properties map, allowing to compose many handlers from different security strategies.
+     */
+    protected void addPasswordCallbackHandler(Map<String, Object> configProperties, WSPasswordCallbackHandler handler)
+    {
+        CompositeCallbackHandler compositeCallbackHandler = (CompositeCallbackHandler) configProperties.get(PW_CALLBACK_REF);
+
+        if (compositeCallbackHandler == null)
+        {
+            compositeCallbackHandler = new CompositeCallbackHandler();
+            configProperties.put(PW_CALLBACK_REF, compositeCallbackHandler);
+        }
+
+        compositeCallbackHandler.addCallbackHandler(handler);
+    }
 }

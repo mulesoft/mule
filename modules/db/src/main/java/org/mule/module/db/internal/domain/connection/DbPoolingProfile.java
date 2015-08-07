@@ -7,6 +7,8 @@
 
 package org.mule.module.db.internal.domain.connection;
 
+import java.util.Objects;
+
 /**
  * Describes a database pooling profile
  */
@@ -66,6 +68,48 @@ public class DbPoolingProfile
 
     public void setMaxWaitMillis(int maxWaitMillis)
     {
+
         this.maxWaitMillis = maxWaitMillis;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(minPoolSize, maxPoolSize, acquireIncrement, preparedStatementCacheSize, maxWaitMillis);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+
+        DbPoolingProfile that = (DbPoolingProfile) obj;
+
+        if (maxPoolSize != that.maxPoolSize)
+        {
+            return false;
+        }
+        if (minPoolSize != that.minPoolSize)
+        {
+            return false;
+        }
+        if (acquireIncrement != that.acquireIncrement)
+        {
+            return false;
+        }
+        if (preparedStatementCacheSize != that.preparedStatementCacheSize)
+        {
+            return false;
+        }
+        return maxWaitMillis == that.maxWaitMillis;
+
     }
 }

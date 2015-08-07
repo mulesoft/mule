@@ -6,7 +6,7 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.mule.api.AnnotatedObject;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -24,16 +24,14 @@ import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.module.cxf.support.WSDLQueryHandler;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
@@ -50,6 +48,7 @@ import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.ws.security.handler.WSHandlerConstants;
 
 /**
  * An abstract builder for CXF services. It handles all common operations such
@@ -57,7 +56,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
  * this and control how the Server is created and how the {@link CxfInboundMessageProcessor}
  * is configured.
  */
-public abstract class AbstractInboundMessageProcessorBuilder implements MuleContextAware, MessageProcessorBuilder, AnnotatedObject
+public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnnotatedObject implements MuleContextAware, MessageProcessorBuilder
 {
     private CxfConfiguration configuration;
     private Server server;
@@ -78,8 +77,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private Map<String,Object> properties = new HashMap<String, Object>();
     private boolean validationEnabled;
     private List<String> schemaLocations;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
-
     private WsSecurity wsSecurity;
 
     @Override
@@ -209,8 +206,14 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         processor.setServer(server);
         processor.setProxy(isProxy());
         processor.setWSDLQueryHandler(getWSDLQueryHandler());
+        processor.setMimeType(getMimeType());
 
         return processor;
+    }
+
+    protected String getMimeType()
+    {
+        return MimeTypes.ANY;
     }
 
     protected QueryHandler getWSDLQueryHandler()
@@ -294,6 +297,15 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             if(wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty())
             {
                 sfb.getInInterceptors().add(new WSS4JInInterceptor(wsSecurity.getConfigProperties()));
+
+                // CXF changed the way it validates SAML subject confirmation from 2.5.x to 2.7.x
+                // see https://issues.apache.org/jira/browse/CXF-4655
+                // In order to keep backwards compatibility we use the previous approach
+                String actionProperty = (String) wsSecurity.getConfigProperties().get(WSHandlerConstants.ACTION);
+                if (!StringUtils.isEmpty(actionProperty) && actionProperty.contains(WSHandlerConstants.SAML_TOKEN_UNSIGNED))
+                {
+                    properties.put("ws-security.validate.saml.subject.conf", false);
+                }
             }
         }
     }
@@ -487,22 +499,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         this.schemaLocations = schemaLocations;
     }
 
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
-    }
-    
     public void setWsSecurity(WsSecurity wsSecurity)
     {
         this.wsSecurity = wsSecurity;

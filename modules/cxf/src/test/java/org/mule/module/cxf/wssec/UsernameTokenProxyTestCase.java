@@ -9,10 +9,12 @@ package org.mule.module.cxf.wssec;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -24,6 +26,9 @@ import org.junit.Test;
 
 public class UsernameTokenProxyTestCase extends FunctionalTestCase
 {
+
+    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -64,13 +69,10 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
 
     protected MuleMessage sendRequest(String url) throws MuleException
     {
-        MuleClient client = muleContext.getClient();
-
         InputStream stream = getClass().getResourceAsStream(getMessageResource());
         assertNotNull(stream);
 
-        MuleMessage result = client.send(url, new DefaultMuleMessage(stream, muleContext));
-        return result;
+        return muleContext.getClient().send(url, new DefaultMuleMessage(stream, muleContext), HTTP_REQUEST_OPTIONS);
     }
 
     protected String getMessageResource()

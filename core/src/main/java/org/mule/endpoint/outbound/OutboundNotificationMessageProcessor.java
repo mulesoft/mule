@@ -31,7 +31,7 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-        if (connector.isEnableMessageEvents())
+        if (connector.isEnableMessageEvents(event))
         {
             int notificationAction;
             if (endpoint.getExchangePattern().hasResponse())
@@ -43,12 +43,25 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
                 notificationAction = EndpointMessageNotification.MESSAGE_DISPATCH_END;
             }
             dispatchNotification(new EndpointMessageNotification(event.getMessage(), endpoint,
-                    event.getFlowConstruct(), notificationAction));
+                    event.getFlowConstruct(), notificationAction), event);
         }
 
         return event;
     }
 
+    public void dispatchNotification(EndpointMessageNotification notification, MuleEvent event)
+    {
+        AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
+        if (notification != null && connector.isEnableMessageEvents(event))
+        {
+            connector.fireNotification(notification, event);
+        }
+    }
+
+    /**
+     * @deprecated as of 3.7.2. Use {@link #dispatchNotification(EndpointMessageNotification, MuleEvent)} instead
+     */
+    @Deprecated
     public void dispatchNotification(EndpointMessageNotification notification)
     {
         AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
@@ -61,7 +74,7 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
     public EndpointMessageNotification createBeginNotification(MuleEvent event)
     {
         AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-        if (connector.isEnableMessageEvents())
+        if (connector.isEnableMessageEvents(event))
         {
             int notificationAction;
             if (endpoint.getExchangePattern().hasResponse())

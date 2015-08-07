@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:util="http://www.springframework.org/schema/util"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <context:property-placeholder location="heisenberg.properties" />
+
+    <heisenberg:config name="heisenberg"
+                       myName="Heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="1000000"
+                       recipe="recipes"
+                       initialHealth="CANCER"
+                       finalHealth="DEAD"
+                       candidateDoors="candidateDoors">
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:ricin-packs>
+            <heisenberg:ricin-pack microgramsPerKilo="22">
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+            </heisenberg:ricin-pack>
+        </heisenberg:ricin-packs>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
+    </heisenberg:config>
+
+    <heisenberg:config name="heisenbergWithPlaceHolders"
+                       myName="${myName}"
+                       age="${age}"
+                       cancer="${cancer}"
+                       dateOfBirth="${dateOfBirth}"
+                       dateOfDeath="${dateOfDeath}"
+                       money="${money}"
+                       recipe="${recipe}"
+                       initialHealth="${initialHealth}"
+                       finalHealth="${finalHealth}"
+                       candidateDoors="${candidateDoors}">
+        <heisenberg:enemies>
+            <heisenberg:enemy value="${fring}"/>
+            <heisenberg:enemy value="${hank}"/>
+        </heisenberg:enemies>
+        <heisenberg:ricin-packs>
+            <heisenberg:ricin-pack microgramsPerKilo="${microgramsPerKilo}">
+                <heisenberg:destination victim="${lidia}" address="${steviaCoffeShop}"/>
+            </heisenberg:ricin-pack>
+        </heisenberg:ricin-packs>
+        <heisenberg:next-door address="${pollosHermanos}" victim="${fring}">
+            <heisenberg:previous victim="${krazy8}" address="${jesseAddress}"/>
+        </heisenberg:next-door>
+    </heisenberg:config>
+
+    <heisenberg:config name="heisenbergByRef"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="1000000"
+                       initialHealth="CANCER"
+                       finalHealth="DEAD"
+                       enemies="enemies"
+                       recipe="recipes"
+                       ricinPacks="ricinPacks"
+                       nextDoor="door"
+                       candidateDoors="candidateDoors">
+    </heisenberg:config>
+
+    <heisenberg:config name="expressionHeisenberg"
+                       myName="#[myName]"
+                       age="#[age]"
+                       cancer="#[true]"
+                       initialHealth="#[initialHealth]"
+                       finalHealth="#[finalHealth]"
+                       dateOfBirth="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfBirth().getTime()]"
+                       dateOfDeath="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfDeath()]"
+                       money="#[money]"
+                       recipe="#[app.registry.recipes]"
+                       candidateDoors="#[app.registry.candidateDoors]">
+        <heisenberg:enemies>
+            <heisenberg:enemy value="#[gustavoFring]"/>
+            <heisenberg:enemy value="#[hank]"/>
+        </heisenberg:enemies>
+        <heisenberg:ricin-packs>
+            <heisenberg:ricin-pack microgramsPerKilo="#[microgramsPerKilo]">
+                <heisenberg:destination victim="#[lidia]" address="#[steviaCoffeShop]"/>
+            </heisenberg:ricin-pack>
+        </heisenberg:ricin-packs>
+        <heisenberg:next-door address="#[pollosHermanos]" victim="#[gustavoFring]">
+            <heisenberg:previous victim="#[krazy8]" address="#[jesses]"/>
+        </heisenberg:next-door>
+    </heisenberg:config>
+
+    <heisenberg:config name="expressionHeisenbergByRef"
+                       myName="#[myName]"
+                       age="#[age]"
+                       cancer="#[true]"
+                       initialHealth="#[initialHealth]"
+                       finalHealth="#[finalHealth]"
+                       dateOfBirth="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfBirth().getTime()]"
+                       dateOfDeath="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfDeath()]"
+                       money="#[money]"
+                       recipe="#[app.registry.recipes]"
+                       candidateDoors="#[app.registry.candidateDoors]"
+                       enemies="#[app.registry.enemies]"
+                       ricinPacks="#[app.registry.ricinPacks]"
+                       nextDoor="#[app.registry.door]">
+    </heisenberg:config>
+
+    <spring:beans>
+        <util:map id="recipes" value-type="java.lang.Long">
+            <spring:entry key="methylamine" value="75"/>
+            <spring:entry key="pseudoephedrine" value="0"/>
+            <spring:entry key="P2P" value="25"/>
+        </util:map>
+
+        <util:map id="candidateDoors">
+            <spring:entry key="skyler" value-ref="skylerDoor"/>
+            <spring:entry key="saul" value-ref="saulDoor"/>
+        </util:map>
+
+        <util:list id="enemies">
+            <spring:value>Gustavo Fring</spring:value>
+            <spring:value>Hank</spring:value>
+        </util:list>
+
+        <util:set id="ricinPacks">
+            <spring:ref bean="ricin"/>
+        </util:set>
+        </spring:beans>
+    
+    <heisenberg:door victim="Gustavo Fring" address="pollos hermanos" name="door">
+        <heisenberg:previous victim="Krazy-8" address="Jesse's" />
+    </heisenberg:door>
+    
+    <heisenberg:ricin microgramsPerKilo="22" name="ricin">
+        <heisenberg:destination victim="Lidia" address="Stevia coffe shop" />
+    </heisenberg:ricin>
+    
+    <heisenberg:door victim="Skyler" address="308 Negra Arroyo Lane" name="skylerDoor" />
+    
+    <heisenberg:door victim="Saul" address="Shopping Mall" name="saulDoor" />
+
+</mule>

@@ -11,8 +11,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.SessionHandler;
-import org.mule.util.SerializationUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  * support Tcp, Udp, etc. unless the MuleMessage object is serialised across the
  * wire). The session is stored in the "MULE_SESSION" property as an array of bytes (byte[])
  */
-public class SerializeOnlySessionHandler implements SessionHandler
+public class SerializeOnlySessionHandler extends AbstractSessionHandler
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -34,7 +32,7 @@ public class SerializeOnlySessionHandler implements SessionHandler
 
         if (serializedSession != null)
         {
-            session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext());
+            session = deserialize(message, serializedSession);
         }
         return session;
     }
@@ -49,8 +47,10 @@ public class SerializeOnlySessionHandler implements SessionHandler
 
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
-        byte[] serializedSession = SerializationUtils.serialize(removeNonSerializableProperties(session,message.getMuleContext()));
-        
+        MuleContext muleContext = message.getMuleContext();
+        byte[] serializedSession = muleContext.getObjectSerializer().serialize(
+                removeNonSerializableProperties(session, muleContext));
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Adding serialized Session header to message: " + serializedSession);

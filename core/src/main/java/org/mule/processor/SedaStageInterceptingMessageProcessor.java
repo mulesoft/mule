@@ -37,6 +37,7 @@ import org.mule.util.queue.QueueSession;
 import org.mule.work.MuleWorkManager;
 
 import java.text.MessageFormat;
+import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -49,6 +50,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     implements Work, Lifecycle, Pausable, Resumable
 {
     protected static final String QUEUE_NAME_PREFIX = "seda.queue";
+    public static int DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR = 4;
 
     protected QueueProfile queueProfile;
     protected int queueTimeout;
@@ -74,6 +76,18 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         this.queueStatistics = queueStatistics;
         this.muleContext = muleContext;
         lifecycleManager = new SedaStageLifecycleManager(queueName, this);
+
+        // If user has not set an explicit queue size set one here, to prevent OutOfMemoryException's.
+        configureDefaultQueueSize(queueProfile, threadingProfile);
+    }
+
+    protected void configureDefaultQueueSize(QueueProfile queueProfile, ThreadingProfile threadingProfile)
+    {
+        if (queueProfile != null && queueProfile.getMaxOutstandingMessages() == 0)
+        {
+            queueProfile.setMaxOutstandingMessages(threadingProfile.getMaxThreadsActive() *
+                                                   DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR);
+        }
     }
 
     @Override
@@ -109,10 +123,21 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         if (logger.isDebugEnabled())
         {
             logger.debug(MessageFormat.format("{1}: Putting event on queue {2}", queue.getName(),
-                getStageDescription(), event));
+                                              getStageDescription(), event));
         }
-        queue.put(event);
-        fireAsyncScheduledNotification(event);
+        // Copy event to ensure message is not mutated by processors executed in another thread.
+        boolean queued = queue.offer(DefaultMuleEvent.copy(event), threadTimeout);
+        if (queued)
+        {
+            // Async scheduled notification uses same event instance pre-async
+            fireAsyncScheduledNotification(event);
+        }
+        else
+        {
+            String message = String.format("The queue for '%1s' did not accept new event within %2d %3s",
+                                           getStageDescription(), threadTimeout, TimeUnit.MILLISECONDS);
+            throw new FailedToQueueEventException(CoreMessages.createStaticMessage(message), event);
+        }
     }
 
     protected MuleEvent dequeue() throws Exception
@@ -233,7 +258,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                             logger.debug(MessageFormat.format("{0}: Dequeued event from {1}",
                                 getStageDescription(), getQueueName()));
                         }
-                        AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(eventToProcess);
+                        AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(eventToProcess, false);
                         try
                         {
                             // TODO Remove this thread handoff to ensure Zero Message Loss

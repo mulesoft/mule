@@ -28,7 +28,7 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     public void testRequestResponse() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "fooValue");
         message.setReplyTo("jms://reply");
 
