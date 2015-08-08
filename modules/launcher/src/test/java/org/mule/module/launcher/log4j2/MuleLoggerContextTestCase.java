@@ -9,6 +9,7 @@ package org.mule.module.launcher.log4j2;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.logging.TestAppender;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
