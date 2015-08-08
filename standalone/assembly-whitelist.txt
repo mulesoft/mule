@@ -133,6 +133,8 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-devkit-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-drools-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
@@ -347,7 +349,6 @@
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.4.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.5.jar
-/mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
