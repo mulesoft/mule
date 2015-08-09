@@ -172,7 +172,6 @@
                 <include>org.mule.modules:mule-module-validation</include>
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
-                <include>org.mule.patterns:mule-pattern-core</include>
 
                 <!-- Tools -->
                 <include>org.mule.tools:mule-tools-anttasks</include>
@@ -254,8 +253,6 @@
                 <exclude>org.mule.modules:mule-module-validation</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
-                <exclude>org.mule.patterns:mule-patterns-all</exclude>
-                <exclude>org.mule.patterns:mule-pattern-core</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
 
                 <!-- mule-tests-functional dependencies -->
