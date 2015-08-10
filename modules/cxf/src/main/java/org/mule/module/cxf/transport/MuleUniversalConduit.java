@@ -94,7 +94,7 @@ public class MuleUniversalConduit extends AbstractConduit
         this.endpoint = ei;
         this.configuration = configuration;
     }
-    
+
     @Override
     public void close(Message msg) throws IOException
     {
@@ -247,34 +247,34 @@ public class MuleUniversalConduit extends AbstractConduit
 
             MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
 
-            if (resEvent == null || VoidMuleEvent.getInstance().equals(resEvent))
+            if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent))
             {
-                m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
-                return;
-            }
 
-            m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
-            
-            // If we have a result, send it back to CXF
-            MuleMessage result = resEvent.getMessage();
-            InputStream is = getResponseBody(m, result);
-            if (is != null)
-            {
-                Message inMessage = new MessageImpl();
+                m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
 
-                String encoding = result.getEncoding();
-                inMessage.put(Message.ENCODING, encoding);
-                
-                String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-                if (encoding != null && contentType.indexOf("charset") < 0)
+                // If we have a result, send it back to CXF
+                MuleMessage result = resEvent.getMessage();
+                InputStream is = getResponseBody(m, result);
+                if (is != null)
                 {
-                    contentType += "; charset=" + result.getEncoding();
+                    Message inMessage = new MessageImpl();
+
+                    String encoding = result.getEncoding();
+                    inMessage.put(Message.ENCODING, encoding);
+
+                    String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+                    if (encoding != null && contentType.indexOf("charset") < 0)
+                    {
+                        contentType += "; charset=" + result.getEncoding();
+                    }
+                    inMessage.put(Message.CONTENT_TYPE, contentType);
+                    inMessage.setContent(InputStream.class, is);
+                    inMessage.setExchange(m.getExchange());
+                    getMessageObserver().onMessage(inMessage);
+                    return;
                 }
-                inMessage.put(Message.CONTENT_TYPE, contentType);
-                inMessage.setContent(InputStream.class, is);
-                inMessage.setExchange(m.getExchange());
-                getMessageObserver().onMessage(inMessage);
-            }
+            }   
+            m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
         }
         catch(MuleException me)
         {
@@ -307,7 +307,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 return pb;
             }
         }
-        
+
         return null;
     }
 
