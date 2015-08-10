@@ -12,7 +12,7 @@ import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.extension.resources.spi.GenerableResourceContributor;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
-import org.mule.module.extension.internal.config.ExtensionsNamespaceHandler;
+import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.module.extension.internal.util.CapabilityUtils;
 
 /**
@@ -47,7 +47,7 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
 
     private void writeSpringHandlerBundle(XmlCapability capability, ResourcesGenerator resourcesGenerator)
     {
-        String content = String.format("%s=%s", capability.getSchemaLocation(), ExtensionsNamespaceHandler.class.getName());
+        String content = String.format("%s=%s", capability.getSchemaLocation(), ExtensionNamespaceHandler.class.getName());
         resourcesGenerator.get("spring.handlers").getContentBuilder().append(springBundleScape(content));
     }
 

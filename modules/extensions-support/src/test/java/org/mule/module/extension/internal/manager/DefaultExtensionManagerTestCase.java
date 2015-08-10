@@ -28,6 +28,7 @@ import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
 import org.mule.extension.runtime.OperationExecutor;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
+import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
@@ -107,6 +108,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
         extensionsManager.setExtensionsDiscoverer(discoverer);
         extensionsManager.setMuleContext(muleContext);
+        when(muleContext.getConfiguration().getExtension(ExtensionConfig.class)).thenReturn(null);
         extensionsManager.initialise();
         this.extensionsManager = extensionsManager;
 
@@ -134,14 +136,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         classLoader = getClass().getClassLoader();
         setDiscoverableExtensions(extension1, extension2);
 
-        when(discoverer.discover(same(classLoader))).thenAnswer(new Answer<List<Extension>>()
-        {
-            @Override
-            public List<Extension> answer(InvocationOnMock invocation) throws Throwable
-            {
-                return getTestExtensions();
-            }
-        });
+        when(discoverer.discover(same(classLoader))).thenAnswer(invocation -> getTestExtensions());
 
         ExtensionsTestUtils.stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
     }

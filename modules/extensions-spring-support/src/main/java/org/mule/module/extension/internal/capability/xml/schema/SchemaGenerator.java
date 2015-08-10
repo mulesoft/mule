@@ -9,8 +9,6 @@ package org.mule.module.extension.internal.capability.xml.schema;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
@@ -48,15 +46,8 @@ public class SchemaGenerator
         validate(extension, xmlCapability);
         SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(xmlCapability.getSchemaLocation());
 
-        for (Configuration configuration : extension.getConfigurations())
-        {
-            schemaBuilder.registerConfigElement(configuration);
-        }
-
-        for (Operation operation : extension.getOperations())
-        {
-            schemaBuilder.registerOperation(operation);
-        }
+        extension.getConfigurations().forEach(schemaBuilder::registerConfigElement);
+        extension.getOperations().forEach(schemaBuilder::registerOperation);
 
         schemaBuilder.registerEnums();
 

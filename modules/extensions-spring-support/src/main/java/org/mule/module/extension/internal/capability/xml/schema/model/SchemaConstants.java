@@ -18,12 +18,16 @@ public final class SchemaConstants
     public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION = "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
     public static final String MULE_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
     public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+    public static final String MULE_EXTENSION_NAMESPACE = "http://www.mulesoft.org/schema/mule/extension";
+    public static final String MULE_EXTENSION_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd";
     public static final String MULE_PREFIX = "mule";
+    public static final String MULE_EXTENSION_PREFIX = "extension";
     public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
     public static final String GROUP_SUFFIX = "-group";
 
     public static final QName MULE_ABSTRACT_EXTENSION = new QName(MULE_NAMESPACE, "abstract-extension", MULE_PREFIX);
     public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE = new QName(MULE_NAMESPACE, "propertyPlaceholderType", MULE_PREFIX);
+    public static final QName MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_TYPE = new QName(MULE_EXTENSION_NAMESPACE, "dynamic-config-policy", MULE_EXTENSION_PREFIX);
     public static final QName MULE_ABSTRACT_EXTENSION_TYPE = new QName(MULE_NAMESPACE, "abstractExtensionType", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR = new QName(MULE_NAMESPACE, "abstract-message-processor", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractMessageProcessorType", MULE_PREFIX);

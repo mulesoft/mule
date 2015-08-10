@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:extension="http://www.mulesoft.org/schema/mule/extension"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+               http://www.mulesoft.org/schema/mule/extension http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd">
+
+
+    <configuration>
+        <extension:extensions-config>
+            <extension:dynamic-configuration-expiration frequency="1000" timeUnit="MILLISECONDS" />
+        </extension:extensions-config>
+    </configuration>
+
+    <heisenberg:config name="heisenberg"
+                       myName="#[payload]"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       recipe="recipes"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER">
+        <extension:dynamic-config-policy>
+            <extension:expiration-policy maxIdleTime="100" timeUnit="MILLISECONDS" />
+        </extension:dynamic-config-policy>
+    </heisenberg:config>
+
+    <flow name="dynamic">
+        <heisenberg:say-my-name />
+    </flow>
+
+</mule>

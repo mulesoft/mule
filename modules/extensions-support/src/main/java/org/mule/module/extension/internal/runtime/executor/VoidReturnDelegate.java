@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.module.extension.internal.runtime.executor;
 
 import org.mule.api.MuleEvent;
 import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
  * An implementation of {@link ReturnDelegate} intended

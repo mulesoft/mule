@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.module.extension.internal.runtime.config;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Parameter;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
+import org.mule.module.extension.internal.runtime.BaseObjectBuilder;
+import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.GroupValueSetter;
@@ -38,25 +38,15 @@ import java.util.List;
 public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
 {
 
-    private final String name;
-    private final Extension extension;
     private final Configuration configuration;
-    private final ConfigurationInstanceRegistrationCallback registrationCallback;
     private final ResolverSet resolverSet;
     private final List<ValueSetter> groupValueSetters;
     private final List<ValueSetter> singleValueSetters;
 
-    public ConfigurationObjectBuilder(String name,
-                                      Extension extension,
-                                      Configuration configuration,
-                                      ResolverSet resolverSet,
-                                      ConfigurationInstanceRegistrationCallback registrationCallback)
+    public ConfigurationObjectBuilder(Configuration configuration, ResolverSet resolverSet)
     {
-        this.name = name;
-        this.extension = extension;
         this.configuration = configuration;
         this.resolverSet = resolverSet;
-        this.registrationCallback = registrationCallback;
 
         singleValueSetters = createSingleValueSetters(configuration, resolverSet);
         groupValueSetters = GroupValueSetter.settersFor(configuration);
@@ -94,8 +84,6 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
         setValues(configurationInstance, result, groupValueSetters);
         setValues(configurationInstance, result, singleValueSetters);
 
-        registerInstance(configurationInstance);
-
         return configurationInstance;
     }
 
@@ -115,9 +103,5 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
         {
             setter.set(target, result);
         }
-    }
-    private void registerInstance(Object configurationInstance)
-    {
-        registrationCallback.registerConfigurationInstance(extension, name, configurationInstance);
     }
 }

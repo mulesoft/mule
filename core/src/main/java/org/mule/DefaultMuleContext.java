@@ -8,6 +8,8 @@ package org.mule;
 
 import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -290,6 +292,7 @@ public class DefaultMuleContext implements MuleContext
 
         startDate = System.currentTimeMillis();
 
+        startIfNeeded(extensionManager);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
         getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
         overridePollingController();
@@ -316,6 +319,7 @@ public class DefaultMuleContext implements MuleContext
     {
         startLatch.release();
 
+        stopIfNeeded(extensionManager);
         getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
         getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);

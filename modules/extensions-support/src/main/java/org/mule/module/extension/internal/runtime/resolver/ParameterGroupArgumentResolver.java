@@ -15,7 +15,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.ReflectiveMethodOperationExecutor;
+import org.mule.module.extension.internal.runtime.executor.ReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Field;
 import java.util.Collection;

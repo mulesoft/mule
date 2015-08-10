@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.module.extension.internal.runtime.executor;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.runtime.OperationExecutor;
+import org.mule.module.extension.internal.runtime.AbstractOperationExecutor;
 
 import java.lang.reflect.Method;
 
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class ReflectiveMethodOperationExecutor implements OperationExecutor, MuleContextAware, Lifecycle
+public final class ReflectiveMethodOperationExecutor extends AbstractOperationExecutor implements MuleContextAware, Lifecycle
 {
 
     private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate
@@ -74,7 +75,7 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
      * {@inheritDoc}
      */
     @Override
-    public Object execute(OperationContext operationContext) throws Exception
+    protected Object doExecute(OperationContext operationContext) throws Exception
     {
         Object result = invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext));
         return returnDelegate.asReturnValue(result, operationContext);

@@ -11,19 +11,30 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.extension.ExtensionManager;
+import org.mule.extension.runtime.ExpirationPolicy;
+import org.mule.extension.runtime.event.OperationSuccessfulSignal;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
-import org.mule.module.extension.internal.runtime.DynamicConfigurationInstanceProvider;
+import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
+import org.mule.module.extension.internal.runtime.config.DynamicConfigurationInstanceProvider;
+import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.util.TestTimeSupplier;
+
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -31,9 +42,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -57,6 +66,10 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
     @Mock
     private ExtensionManager extensionManager;
 
+    private ExpirationPolicy expirationPolicy;
+
+    private TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
+
     private ConfigurationObjectBuilder configurationObjectBuilder;
 
     @Before
@@ -64,14 +77,7 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
     {
         ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIG_NAME);
         when(configuration.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
-        when(configuration.getInstantiator().newInstance()).thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return MODULE_CLASS.newInstance();
-            }
-        });
+        when(configuration.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
         when(configuration.getCapabilities(any(Class.class))).thenReturn(null);
 
         when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
@@ -79,8 +85,15 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
 
         when(operationContext.getEvent()).thenReturn(event);
 
-        configurationObjectBuilder = new ConfigurationObjectBuilder(CONFIG_NAME, extension, configuration, resolverSet, configurationInstanceRegistrationCallback);
-        instanceProvider = new DynamicConfigurationInstanceProvider(configurationObjectBuilder, resolverSet);
+        configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
+        expirationPolicy = new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);
+
+        instanceProvider = new DynamicConfigurationInstanceProvider(CONFIG_NAME,
+                                                                    extension,
+                                                                    configurationInstanceRegistrationCallback,
+                                                                    configurationObjectBuilder,
+                                                                    resolverSet,
+                                                                    expirationPolicy);
     }
 
     @Test
@@ -90,7 +103,7 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
         HeisenbergExtension config = (HeisenbergExtension) instanceProvider.get(operationContext);
         for (int i = 1; i < count; i++)
         {
-            assertThat((HeisenbergExtension) instanceProvider.get(operationContext), is(sameInstance(config)));
+            assertThat(instanceProvider.get(operationContext), is(sameInstance(config)));
         }
 
         verify(resolverSet, times(count)).resolve(event);
@@ -100,12 +113,49 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
     public void resolveDifferentInstances() throws Exception
     {
         HeisenbergExtension instance1 = (HeisenbergExtension) instanceProvider.get(operationContext);
+        HeisenbergExtension instance2 = makeAlternateInstance();
 
+        assertThat(instance2, is(not(sameInstance(instance1))));
+    }
+
+    @Test
+    public void getExpired() throws Exception
+    {
+        final String key1 = "key1";
+        final String key2 = "key2";
+
+        when(configurationInstanceRegistrationCallback.registerConfigurationInstance(same(extension), same(CONFIG_NAME), any(Object.class)))
+                .thenReturn(key1)
+                .thenReturn(key2);
+
+        doAnswer(invocation -> {
+            ((Consumer<OperationSuccessfulSignal>) invocation.getArguments()[0]).accept(mock(OperationSuccessfulSignal.class));
+            return null;
+        }).when(operationContext).onOperationSuccessful(any(Consumer.class));
+
+        HeisenbergExtension instance1 = (HeisenbergExtension) instanceProvider.get(operationContext);
+        HeisenbergExtension instance2 = makeAlternateInstance();
+
+        DynamicConfigurationInstanceProvider provider = (DynamicConfigurationInstanceProvider) instanceProvider;
+        timeSupplier.move(1, TimeUnit.MINUTES);
+
+        Map<String, Object> expired = provider.getExpired();
+        assertThat(expired.isEmpty(), is(true));
+
+        timeSupplier.move(10, TimeUnit.MINUTES);
+
+        expired = provider.getExpired();
+        assertThat(expired.isEmpty(), is(false));
+        assertThat(expired.get(key1), is(sameInstance(instance1)));
+        assertThat(expired.get(key2), is(sameInstance(instance2)));
+    }
+
+    private HeisenbergExtension makeAlternateInstance() throws MuleException
+    {
         ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
         when(resolverSet.resolve(event)).thenReturn(alternateResult);
 
-        HeisenbergExtension instance2 = (HeisenbergExtension) instanceProvider.get(operationContext);
-        assertThat(instance2, is(not(sameInstance(instance1))));
+        return (HeisenbergExtension) instanceProvider.get(operationContext);
     }
 
     @Test

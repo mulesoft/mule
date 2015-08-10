@@ -15,7 +15,7 @@ import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Parameter;
 import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
+import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
@@ -59,12 +59,7 @@ final class DefaultImplicitConfigurationFactory implements ImplicitConfiguration
             }
 
             final String instanceName = String.format("%s-%s", extension.getName(), implicitConfiguration.getName());
-            ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(
-                    instanceName,
-                    extension,
-                    implicitConfiguration,
-                    buildImplicitConfigurationResolverSet(implicitConfiguration),
-                    registrationCallback);
+            ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(implicitConfiguration, buildImplicitConfigurationResolverSet(implicitConfiguration));
 
             Object configurationInstance;
             try

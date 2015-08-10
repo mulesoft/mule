@@ -19,7 +19,7 @@ import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.module.extension.internal.capability.xml.ImmutableXmlCapability;
 import org.mule.module.extension.internal.capability.xml.SpringBundleResourceContributor;
-import org.mule.module.extension.internal.config.ExtensionsNamespaceHandler;
+import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -92,7 +92,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
 
         GeneratedResource resource = generator.get("spring.handlers");
         assertNotNull(resource);
-        assertEquals(String.format("%s=%s", ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, ExtensionsNamespaceHandler.class.getName()), resource.getContentBuilder().toString());
+        assertEquals(String.format("%s=%s", ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, ExtensionNamespaceHandler.class.getName()), resource.getContentBuilder().toString());
     }
 
     @Test

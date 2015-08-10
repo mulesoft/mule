@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.util;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.DefaultMuleEvent;
@@ -17,14 +18,9 @@ import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Described;
 import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
+import org.mule.extension.introspection.Parameter;
 import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
-import org.mule.module.extension.internal.runtime.DynamicConfigurationInstanceProvider;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.module.extension.internal.runtime.StaticConfigurationInstanceProvider;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.util.ArrayUtils;
 
@@ -124,6 +120,11 @@ public class MuleExtensionUtils
         return false;
     }
 
+    public static List<Parameter> getDynamicParameters(Configuration configuration)
+    {
+        return configuration.getParameters().stream().filter(parameter -> parameter.isDynamic()).collect(toList());
+    }
+
     /**
      * Sorts the given {@code list} in ascending alphabetic order, using {@link Described#getName()}
      * as the sorting criteria
@@ -141,27 +142,6 @@ public class MuleExtensionUtils
 
         Collections.sort(list, new DescribedComparator());
         return list;
-    }
-
-    public static <T> ConfigurationInstanceProvider<T> createConfigurationInstanceProvider(
-            String name,
-            Extension extension,
-            Configuration configuration,
-            ResolverSet resolverSet,
-            MuleContext muleContext,
-            ConfigurationInstanceRegistrationCallback registrationCallback) throws Exception
-    {
-        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(name, extension, configuration, resolverSet, registrationCallback);
-
-        if (resolverSet.isDynamic())
-        {
-            return new DynamicConfigurationInstanceProvider<>(configurationObjectBuilder, resolverSet);
-        }
-        else
-        {
-            MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
-            return new StaticConfigurationInstanceProvider<>((T) configurationObjectBuilder.build(event));
-        }
     }
 
     public static OperationContextAdapter asOperationContextAdapter(OperationContext operationContext)
