@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:ss="http://www.springframework.org/schema/security"
+      xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+               http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
+
+    <http:request-config host="localhost" port="${port}" name="customConfig" responseTimeout="1000">
+        <http:basic-authentication username="user" password="#[password]" preemptive="true" />
+    </http:request-config>
+
+    <http:listener-config host="localhost" port="${port}" name="listenerConfig" />
+
+    <ws:consumer-config wsdlLocation="Test.wsdl" service="TestService" port="TestPort"
+                        serviceAddress="http://localhost:${port}/services/Test" name="wsConfig"
+                        connectorConfig="customConfig"/>
+
+    <ws:consumer-config wsdlLocation="Test.wsdl" service="TestService" port="TestPort"
+                        serviceAddress="http://localhost:${port}/services/TestEmptyResponse" name="wsConfigEmptyResponse"
+                        connectorConfig="customConfig"/>
+
+    <flow name="clientValidCredentials">
+        <set-variable variableName="password" value="pass" />
+        <ws:consumer config-ref="wsConfig" operation="echo" />
+    </flow>
+
+    <flow name="clientInvalidCredentials">
+        <set-variable variableName="password" value="invalidPassword" />
+        <ws:consumer config-ref="wsConfig" operation="echo" />
+    </flow>
+
+    <flow name="clientInvalidCredentialsEmptyResponse">
+        <set-variable variableName="password" value="invalidPassword" />
+        <ws:consumer config-ref="wsConfigEmptyResponse" operation="echo" />
+    </flow>
+
+    <mule-ss:security-manager>
+        <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+        <mule-ss:delegate-security-provider name="memory-dao-with-provider" delegate-ref="authenticationManager"
+                                            authenticationProvider-ref="authenticationProvider"  />
+    </mule-ss:security-manager>
+
+    <spring:beans>
+        <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
+
+        <ss:authentication-manager alias="authenticationManager">
+            <ss:authentication-provider>
+                <ss:user-service id="userService">
+                    <ss:user name="user" password="pass" authorities="ROLE_ADMIN" />
+                </ss:user-service>
+            </ss:authentication-provider>
+        </ss:authentication-manager>
+
+    </spring:beans>
+
+    <flow name="server">
+        <http:listener config-ref="listenerConfig" path="/services/Test" />
+        <mule-ss:http-security-filter realm="mule-realm"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
+        <component class="org.mule.module.ws.consumer.TestService"/>
+    </flow>
+
+    <flow name="serverEmptyResponse">
+        <http:listener config-ref="listenerConfig" path="/services/TestEmptyResponse">
+            <http:response-builder statusCode="401" reasonPhrase="Unauthorized" />
+        </http:listener>
+        <set-property propertyName="WWW-Authenticate" value="Basic realm=&quot;test&quot;" />
+        <set-payload value="#[null]" />
+    </flow>
+
+</mule>
