@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.resource.spi.work.Work;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestCase
@@ -144,6 +145,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     }
 
     @Test
+    @Ignore("See MULE-8830")
     public void returnsNullWhenInterruptedWhileWaitingForReply() throws Exception
     {
         final Latch fakeLatch = new Latch()
@@ -203,6 +205,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     }
 
     @Test
+    @Ignore("See MULE-8830")
     public void testMultiple() throws Exception
     {
         asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);

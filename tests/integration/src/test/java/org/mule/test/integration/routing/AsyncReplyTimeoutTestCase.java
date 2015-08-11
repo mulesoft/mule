@@ -20,8 +20,10 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("See MULE-8830")
 public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
 {
     private CountDownLatch latch;
