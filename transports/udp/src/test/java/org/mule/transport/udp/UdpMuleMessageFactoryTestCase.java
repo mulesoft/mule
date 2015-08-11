@@ -6,8 +6,9 @@
  */
 package org.mule.transport.udp;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
@@ -49,7 +50,7 @@ public class UdpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
         MuleMessage message = factory.create(getValidTransportMessage(), encoding, muleContext);
         assertNotNull(message);
         assertPayload(message);
-        assertEquals(PORT, message.getInboundProperty(UdpConnector.PORT_PROPERTY));
+        assertThat(message.getInboundProperty(UdpConnector.PORT_PROPERTY), is(PORT));
         assertNotNull(message.getInboundProperty(UdpConnector.ADDRESS_PROPERTY));
     }
 

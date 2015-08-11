@@ -6,8 +6,10 @@
  */
 package org.mule.transport.http.servlet;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -109,11 +111,11 @@ public class MuleServletTestCase extends AbstractMuleTestCase
         MuleHttpServletResponse response = new MuleHttpServletResponse(event);
 
         response.setStatus(404);
-        assertEquals(404, message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertThat(message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY), is(404));
 
         // nothing happens with message, the parameter is deprecated
         response.setStatus(200, "status message");
-        assertEquals(200, message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertThat(message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY), is(200));
 
         response.setContentType("application/octet-stream");
         assertEquals("application/octet-stream",
@@ -129,7 +131,7 @@ public class MuleServletTestCase extends AbstractMuleTestCase
 
         response.sendRedirect("http://anotherplace");
         assertEquals("http://anotherplace", message.getOutboundProperty("Location"));
-        assertEquals(302, message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertThat(message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY), is(302));
     }
 
     @Test

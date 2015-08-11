@@ -6,8 +6,10 @@
  */
 package org.mule.routing;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -198,8 +200,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         for (MuleMessage msg : splits)
         {
             assertTrue(msg.getPayload() instanceof String);
-            assertEquals(counted ? count : -1,
-                msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
+            assertThat(msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY), is(counted ? count : -1));
             actualSequences.add(msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
             String str = (String)msg.getPayload();
             assertTrue(TEST_LIST_MULTIPLE.contains(str));

@@ -106,7 +106,7 @@ public class LegacySessionHandler implements SessionHandler
         for (String key : session.getPropertyNamesAsSet())
         {
             buf.append(";");
-            buf.append(key).append("=").append(session.getProperty(key));
+            buf.append(key).append("=").append((Object) session.getProperty(key));
             if (logger.isDebugEnabled())
             {
                 logger.debug(String.format("Adding property to session header: %s=%s", key, session.getProperty(key)));
