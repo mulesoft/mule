@@ -125,7 +125,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-atom-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-bpm-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-builders-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-client-${productVersion}.jar
@@ -183,12 +182,6 @@
 # /lib/opt
 #
 /mule-standalone-${productVersion}/lib/opt
-/mule-standalone-${productVersion}/lib/opt/abdera-client-0.4.0-incubating.jar
-/mule-standalone-${productVersion}/lib/opt/abdera-core-0.4.0-incubating.jar
-/mule-standalone-${productVersion}/lib/opt/abdera-i18n-0.4.0-incubating.jar
-/mule-standalone-${productVersion}/lib/opt/abdera-parser-0.4.0-incubating.jar
-/mule-standalone-${productVersion}/lib/opt/abdera-server-0.4.0-incubating.jar
-/mule-standalone-${productVersion}/lib/opt/abdera-spring-0.4.0-incubating.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
@@ -201,8 +194,6 @@
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.27.jar
-/mule-standalone-${productVersion}/lib/opt/axiom-api-1.2.5.jar
-/mule-standalone-${productVersion}/lib/opt/axiom-impl-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/bcmail-jdk16-1.46.jar
 /mule-standalone-${productVersion}/lib/opt/bcpg-jdk16-1.46.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk16-1.46.jar
@@ -260,7 +251,6 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
-/mule-standalone-${productVersion}/lib/opt/geronimo-stax-api_1.0_spec-1.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.21.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.21.jar

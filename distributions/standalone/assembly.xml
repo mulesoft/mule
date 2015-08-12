@@ -143,7 +143,6 @@
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-launcher</include>
                 <include>org.mule.modules:mule-module-annotations</include>
-                <include>org.mule.modules:mule-module-atom</include>
                 <include>org.mule.modules:mule-module-bpm</include>
                 <include>org.mule.modules:mule-module-builders</include>
                 <include>org.mule.modules:mule-module-client</include>
@@ -221,7 +220,6 @@
                 <exclude>org.mule.transports:mule-transport-xmpp</exclude>
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-annotations</exclude>
-                <exclude>org.mule.modules:mule-module-atom</exclude>
                 <exclude>org.mule.modules:mule-module-boot</exclude>
                 <exclude>org.mule.modules:mule-module-bpm</exclude>
                 <exclude>org.mule.modules:mule-module-builders</exclude>

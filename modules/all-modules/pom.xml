@@ -22,11 +22,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-atom</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-boot</artifactId>
             <version>${project.version}</version>
         </dependency>
