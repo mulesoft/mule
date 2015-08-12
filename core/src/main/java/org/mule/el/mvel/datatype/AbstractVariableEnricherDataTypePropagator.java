@@ -10,17 +10,13 @@ package org.mule.el.mvel.datatype;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.mvel2.ast.ASTNode;
+import org.mule.mvel2.ast.Assignment;
 import org.mule.mvel2.ast.AssignmentNode;
 import org.mule.mvel2.ast.DeepAssignmentNode;
-import org.mule.mvel2.compiler.AccessorNode;
-import org.mule.mvel2.compiler.CompiledAccExpression;
-import org.mule.mvel2.compiler.ExecutableLiteral;
-import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessor;
-import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessorNest;
-import org.mule.mvel2.optimizers.impl.refl.nodes.VariableAccessor;
 import org.mule.transformer.types.TypedValue;
 
-import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Base class {@link EnricherDataTypePropagator} that propagate data type to message properties.
@@ -28,29 +24,17 @@ import java.lang.reflect.Field;
 public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator
 {
 
+    private static final Pattern mapSyntaxAccessorMatcher = Pattern.compile("\\['(.*)'\\]");
+    private static final Pattern escapedDotSyntaxAccessorMatcher = Pattern.compile(".'(.*)'");
+    private static final Pattern dotSyntaxAccessorMatcher = Pattern.compile(".(.*)");
+
     private final String propertyName;
     private final PropertyScope scope;
-    private final Field accExprFieldForMapSyntax;
-    private final Field accExprFieldForDotSyntax;
 
     public AbstractVariableEnricherDataTypePropagator(String propertyName, PropertyScope scope)
     {
         this.propertyName = propertyName;
         this.scope = scope;
-
-        try
-        {
-            // Needs to use reflection to access parsing information not available on the available interfaces
-            accExprFieldForMapSyntax = AssignmentNode.class.getDeclaredField("accExpr");
-            accExprFieldForMapSyntax.setAccessible(true);
-
-            accExprFieldForDotSyntax = DeepAssignmentNode.class.getDeclaredField("acc");
-            accExprFieldForDotSyntax.setAccessible(true);
-        }
-        catch (NoSuchFieldException e)
-        {
-            throw new IllegalStateException(e);
-        }
     }
 
     @Override
@@ -58,73 +42,45 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
     {
         if (isAssignmentNode(node))
         {
-            CompiledAccExpression compiledAccExpression = getCompiledAccExpression(node);
+            Assignment assignmentNode = (Assignment) node;
 
-            if (compiledAccExpression.getAccessor() instanceof VariableAccessor)
+            String propertyName = getPropertyName(assignmentNode.getAssignmentVar());
+
+            if (propertyName != null && message.getPropertyNames(scope).contains(propertyName))
             {
-                VariableAccessor variableAccessor = (VariableAccessor) compiledAccExpression.getAccessor();
-                if (variableAccessor.getProperty().equals(propertyName))
-                {
-                    final AccessorNode nextNode = variableAccessor.getNextNode();
-                    String propertyName = null;
-                    if (nextNode instanceof MapAccessorNest)
-                    {
-                        final MapAccessorNest mapAccesorNest = (MapAccessorNest) nextNode;
-                        if (mapAccesorNest.getProperty().isLiteralOnly())
-                        {
-                            propertyName = (String) ((ExecutableLiteral) mapAccesorNest.getProperty()).getLiteral();
-                        }
-                    }
-                    else if (nextNode instanceof MapAccessor)
-                    {
-                        propertyName = (String) ((MapAccessor) nextNode).getProperty();
-                    }
+                message.setProperty(propertyName, typedValue.getValue(), scope, typedValue.getDataType());
 
-                    if (propertyName != null && message.getPropertyNames(scope).contains(propertyName))
-                    {
-                        propertyName = getUnescapedPropertyName(propertyName);
-                        message.setProperty(propertyName, typedValue.getValue(), scope, typedValue.getDataType());
-                        return true;
-                    }
-                }
+                return true;
             }
         }
 
         return false;
     }
 
-    private String getUnescapedPropertyName(String propertyName)
+    private String getPropertyName(String assignmentVar)
     {
-        if (propertyName.startsWith("'") && propertyName.endsWith("'"))
+        String subExpression = assignmentVar.substring(propertyName.length()).trim();
+
+        Matcher matcher = mapSyntaxAccessorMatcher.matcher(subExpression);
+        if (!matcher.matches())
         {
-            propertyName = propertyName.substring(1, propertyName.length() -1);
+            matcher = escapedDotSyntaxAccessorMatcher.matcher(subExpression);
+            if (!matcher.matches())
+            {
+                matcher = dotSyntaxAccessorMatcher.matcher(subExpression);
+                if (!matcher.matches())
+                {
+                    return null;
+                }
+            }
         }
 
-        return propertyName;
+        return matcher.group(1);
     }
 
     private boolean isAssignmentNode(ASTNode node)
     {
         return node instanceof AssignmentNode && ((AssignmentNode) node).getAssignmentVar().startsWith(propertyName)
                || node instanceof DeepAssignmentNode && ((DeepAssignmentNode) node).getAssignmentVar().startsWith(propertyName);
-    }
-
-    private CompiledAccExpression getCompiledAccExpression(ASTNode node)
-    {
-        try
-        {
-            if (node instanceof AssignmentNode)
-            {
-                return (CompiledAccExpression) accExprFieldForMapSyntax.get(node);
-            }
-            else
-            {
-                return (CompiledAccExpression) accExprFieldForDotSyntax.get(node);
-            }
-        }
-        catch (IllegalAccessException e)
-        {
-            throw new IllegalStateException(e);
-        }
     }
 }

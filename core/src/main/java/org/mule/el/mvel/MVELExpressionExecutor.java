@@ -10,6 +10,7 @@ package org.mule.el.mvel;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.expression.InvalidExpressionException;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
@@ -40,12 +41,14 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
     protected static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
 
     protected ParserConfiguration parserConfiguration;
+    protected final ObjectSerializer objectSerializer;
 
     protected LoadingCache<String, Serializable> compiledExpressionsCache;
 
-    public MVELExpressionExecutor(final ParserConfiguration parserConfiguration)
+    public MVELExpressionExecutor(final ParserConfiguration parserConfiguration, ObjectSerializer objectSerializer)
     {
         this.parserConfiguration = parserConfiguration;
+        this.objectSerializer = objectSerializer;
 
         MVEL.COMPILER_OPT_PROPERTY_ACCESS_DOESNT_FAIL = true;
         OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
@@ -69,7 +72,8 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
         {
             log.trace("Executing MVEL expression '" + expression + "' with context: \n" + context.toString());
         }
-        return MVEL.executeExpression(getCompiledExpression(expression), context);
+        Serializable compiledExpression = getCompiledExpression(expression);
+        return MVEL.executeExpression(compiledExpression, context);
     }
 
     @Override
@@ -89,7 +93,10 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
     {
         try
         {
-            return compiledExpressionsCache.getUnchecked(expression);
+            Serializable serializedExpression = compiledExpressionsCache.getUnchecked(expression);
+
+            byte[] serialized = objectSerializer.serialize(serializedExpression);
+            return (Serializable) objectSerializer.deserialize(serialized);
         }
         catch (UncheckedExecutionException e)
         {

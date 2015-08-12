@@ -118,7 +118,7 @@ public class MVELExpressionLanguageContext extends MuleBaseVariableResolverFacto
     @Override
     public void addAlias(String alias, String expression)
     {
-        addResolver(alias, new MuleAliasVariableResolver(alias, expression, this, parserConfiguration));
+        addResolver(alias, new MuleAliasVariableResolver(alias, expression, this, muleContext.getObjectSerializer()));
     }
 
     @Override

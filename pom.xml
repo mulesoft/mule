@@ -1771,6 +1771,7 @@
                             <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
                             <exclude>**/ModuleArchetypeMojo.java</exclude>
                             <exclude>**/MultipartConfiguration.java</exclude>
+                            <exclude>**/ClassLoaderObjectInputStream.java</exclude>
 
                             <exclude>**/ParamReader.java</exclude>
                             <exclude>**/Part.java</exclude>

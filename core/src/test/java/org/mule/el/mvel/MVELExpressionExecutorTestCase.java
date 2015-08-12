@@ -38,7 +38,7 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase
     @Before
     public void setupMVEL() throws InitialisationException
     {
-        mvel = new MVELExpressionExecutor(new ParserConfiguration());
+        mvel = new MVELExpressionExecutor(new ParserConfiguration(), muleContext.getObjectSerializer());
         context = Mockito.mock(MVELExpressionLanguageContext.class);
         Mockito.when(context.isResolveable(Mockito.anyString())).thenReturn(false);
     }
@@ -76,10 +76,12 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase
     @Test
     public void useContextClassLoader() throws ClassNotFoundException
     {
+        MyClassClassLoader classLoader = new MyClassClassLoader();
+        muleContext.setExecutionClassLoader(classLoader);
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            Thread.currentThread().setContextClassLoader(new MyClassClassLoader());
+            Thread.currentThread().setContextClassLoader(classLoader);
             assertFalse((Boolean) mvel.execute("1 is org.MyClass", null));
         }
         catch (Exception e)
