@@ -7,10 +7,11 @@
 package org.mule.test.routing;
 
 import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -23,6 +24,7 @@ import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +35,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.RandomStringUtils;
-import java.io.ByteArrayInputStream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -184,7 +185,7 @@ public class ForeachTestCase extends FunctionalTestCase
         assertEquals(3, resultPayload.size());
         assertSame(payload, resultPayload);
 
-        assertEquals(result.getInboundProperty("msg-last-index"), 3);
+        assertThat(result.getInboundProperty("msg-last-index"), is(3));
     }
 
     @Test
@@ -199,7 +200,7 @@ public class ForeachTestCase extends FunctionalTestCase
         }
 
         MuleMessage result = client.send("vm://input-7", msgCollection);
-        assertEquals(10, result.getInboundProperty("totalMessages"));
+        assertThat(result.getInboundProperty("totalMessages"), is(10));
         assertEquals(msgCollection.getPayload(), result.getPayload());
         FlowAssert.verify("message-collection-config");
     }
@@ -231,7 +232,7 @@ public class ForeachTestCase extends FunctionalTestCase
         assertTrue(result.getPayload() instanceof Map);
         Map<?, ?> resultPayload = (Map<?, ?>) result.getPayload();
         assertEquals(payload.size(), resultPayload.size());
-        assertEquals(payload.size(), result.getInboundProperty("totalMessages"));
+        assertThat(result.getInboundProperty("totalMessages"), is(payload.size()));
         assertSame(payload, resultPayload);
     }
 
@@ -249,7 +250,7 @@ public class ForeachTestCase extends FunctionalTestCase
         MuleMessage result = client.send("vm://input-9", message);
         assertTrue(result.getPayload() instanceof String);
         assertEquals(names.size(), ((Collection<?>) message.getOutboundProperty("names")).size());
-        assertEquals(names.size(), result.getInboundProperty("totalMessages"));
+        assertThat(result.getInboundProperty("totalMessages"), is(names.size()));
     }
 
     static String sampleXml = "<PurchaseOrder>" + "<Address><Name>Ellen Adams</Name></Address>" + "<Items>"
@@ -338,7 +339,7 @@ public class ForeachTestCase extends FunctionalTestCase
         assertEquals(3, resultPayload.size());
         assertSame(payload, resultPayload);
 
-        assertEquals(3, result.getInboundProperty("msg-total-messages"));
+        assertThat(result.getInboundProperty("msg-total-messages"), is(3));
     }
 
     @Test
@@ -383,10 +384,10 @@ public class ForeachTestCase extends FunctionalTestCase
             for(int j = 0; j < payload.get(i).size(); j++)
             {
                 out = client.request("vm://out", getTestTimeoutSecs());
-                assertEquals("The nested counters are not consistent.", j+1, out.getInboundProperty("j"));
+                assertEquals("The nested counters are not consistent.", out.getInboundProperty("j"), is(j+1));
             }
             out = client.request("vm://out", getTestTimeoutSecs());
-            assertEquals("The nested counters are not consistent", i+1, out.getInboundProperty("i"));
+            assertThat("The nested counters are not consistent", out.getInboundProperty("i"), is(i +1));
         }
     }
 

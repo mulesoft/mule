@@ -104,7 +104,8 @@ public class MessageExpressionEvaluator implements ExpressionEvaluator
     public TypedValue evaluateTyped(String expression, MuleMessage message)
     {
         Object value = evaluate(expression, message);
-        DataType dataType = expression.equals(PAYLOAD)? message.getDataType() : DataTypeFactory.create(value == null ? Object.class : value.getClass(), null);
+        Class<?> type = value == null ? Object.class : value.getClass();
+        DataType dataType = expression.equals(PAYLOAD)? message.getDataType() : DataTypeFactory.create(type, null);
 
         return new TypedValue(value, dataType);
     }

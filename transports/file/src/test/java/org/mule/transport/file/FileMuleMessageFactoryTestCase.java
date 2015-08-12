@@ -6,6 +6,7 @@
  */
 package org.mule.transport.file;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -88,7 +89,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     {
         assertEquals(tempFile.getName(), message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
         assertEquals(tempFile.getParent(), message.getInboundProperty(FileConnector.PROPERTY_DIRECTORY));
-        assertEquals(0l, message.getInboundProperty(FileConnector.PROPERTY_FILE_SIZE));
+        assertThat(message.getInboundProperty(FileConnector.PROPERTY_FILE_SIZE), is(0l));
     }
 }
 

@@ -6,10 +6,12 @@
  */
 package org.mule.transformers.xml;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -67,9 +69,9 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         assertNull(msg.getInvocationProperty("string"));
         assertNull(msg.getSessionProperty("string"));
 
-        assertEquals(1, msg.getInvocationProperty("number"));
+        assertThat(msg.getInvocationProperty("number"), is(1));
         //with different case
-        assertEquals(1, msg.getInvocationProperty("NUMBER"));
+        assertThat(msg.getInvocationProperty("NUMBER"), is(1));
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("number"));
         assertNull(msg.getOutboundProperty("number"));
