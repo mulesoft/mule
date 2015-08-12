@@ -24,7 +24,8 @@ public abstract class AbstractExpressionEvaluator implements ExpressionEvaluator
     public TypedValue evaluateTyped(String expression, MuleMessage message)
     {
         Object value = evaluate(expression, message);
-        final DataType<?> dataType = DataTypeFactory.create(value == null ? Object.class : value.getClass(), null);
+        Class<?> type = value == null ? Object.class : value.getClass();
+        final DataType<?> dataType = DataTypeFactory.create(type, null);
 
         return new TypedValue(value, dataType);
     }

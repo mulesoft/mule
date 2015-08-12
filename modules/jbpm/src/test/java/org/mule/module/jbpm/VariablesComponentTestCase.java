@@ -6,8 +6,10 @@
  */
 package org.mule.module.jbpm;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -48,7 +50,7 @@ public class VariablesComponentTestCase extends FunctionalTestCase
         response = client.request("vm://queueA", TIMEOUT);
         assertNotNull(response);
         assertEquals("bar", response.getInboundProperty("foo"));
-        assertEquals(0.75, response.getInboundProperty("fraction"));
+        assertThat(response.getInboundProperty("fraction"), is(0.75));
 
         // Advance the process
         props = new HashMap<String, Object>();
@@ -60,7 +62,7 @@ public class VariablesComponentTestCase extends FunctionalTestCase
         response = client.request("vm://queueB", TIMEOUT);
         assertNotNull(response);
         assertEquals("bar", response.getInboundProperty("foo"));
-        assertEquals(0.75, response.getInboundProperty("fraction"));
+        assertThat(response.getInboundProperty("fraction"), is(0.75));
         assertEquals("berry", response.getInboundProperty("straw"));
         final Object o = response.getInboundProperty("time");
         assertTrue(o instanceof Date);
