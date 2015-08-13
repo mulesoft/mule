@@ -130,7 +130,6 @@
                 <include>org.mule.transports:mule-transport-jetty</include>
                 <include>org.mule.transports:mule-transport-jms</include>
                 <include>org.mule.transports:mule-transport-multicast</include>
-                <include>org.mule.transports:mule-transport-quartz</include>
                 <include>org.mule.transports:mule-transport-rmi</include>
                 <include>org.mule.transports:mule-transport-servlet</include>
                 <include>org.mule.transports:mule-transport-sftp</include>
@@ -207,7 +206,6 @@
                 <exclude>org.mule.transports:mule-transport-jetty</exclude>
                 <exclude>org.mule.transports:mule-transport-jms</exclude>
                 <exclude>org.mule.transports:mule-transport-multicast</exclude>
-                <exclude>org.mule.transports:mule-transport-quartz</exclude>
                 <exclude>org.mule.transports:mule-transport-rmi</exclude>
                 <exclude>org.mule.transports:mule-transport-servlet</exclude>
                 <exclude>org.mule.transports:mule-transport-sftp</exclude>

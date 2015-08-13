@@ -203,12 +203,6 @@
     <link><item>pop3s:inbound-endpoint</item><page>POP3S+Transport</page></link>
     <link><item>pop3s:endpoint</item><page>POP3S+Transport</page></link>
 
-    <link><item>quartz:connector</item><page>Quartz+Transport</page></link>
-    <link><item>quartz:factory-property</item><page>Quartz+Transport</page></link>
-    <link><item>quartz:factory-properties</item><page>Quartz+Transport</page></link>
-    <link><item>quartz:outbound-endpoint</item><page>Quartz+Transport</page></link>
-    <link><item>quartz:endpoint</item><page>Quartz+Transport</page></link>
-
     <link><item>rmi:connector</item><page>RMI+Transport</page></link>
     <link><item>rmi:inbound-endpoint</item><page>RMI+Transport</page></link>
     <link><item>rmi:outbound-endpoint</item><page>RMI+Transport</page></link>

@@ -13,10 +13,6 @@ org.mule.module.cxf.CxfWsdlTestCase
 # MULE-3257
 org.mule.module.cxf.client.GeneratedClientTestCase
 
-# Doesn't work on build server for some reason?
-# MULE-3054
-org.mule.module.cxf.jaxws.ClientTestCase
-
 ###########################
 # Broken by BL-137
 ###########################

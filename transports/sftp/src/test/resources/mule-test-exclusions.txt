@@ -9,7 +9,6 @@ org.mule.transport.sftp.SftpExpressionFilenameParserTestCase
 org.mule.transport.sftp.SftpFilterTestCase
 org.mule.transport.sftp.SftpIdentityFileFunctionalTestCase
 org.mule.transport.sftp.SftpNotificationFunctionalTestCase
-org.mule.transport.sftp.SftpQuartzRequesterFunctionalTestCase
 org.mule.transport.sftp.SftpSizeCheckFunctionalTestCase
 org.mule.transport.sftp.SftpTempDirFunctionalTestCase
 
