@@ -161,7 +161,6 @@
                 <include>org.mule.modules:mule-module-management</include>
                 <include>org.mule.modules:mule-module-oauth</include>
                 <include>org.mule.modules:mule-module-pgp</include>
-                <include>org.mule.modules:mule-module-rss</include>
                 <include>org.mule.modules:mule-module-scripting</include>
                 <include>org.mule.modules:mule-module-schedulers</include>
                 <include>org.mule.modules:mule-module-spring-config</include>
@@ -241,7 +240,6 @@
                 <exclude>org.mule.modules:mule-module-oauth</exclude>
                 <exclude>org.mule.modules:mule-module-pgp</exclude>
                 <exclude>org.mule.modules:mule-module-reboot</exclude>
-                <exclude>org.mule.modules:mule-module-rss</exclude>
                 <exclude>org.mule.modules:mule-module-scripting</exclude>
                 <exclude>org.mule.modules:mule-module-schedulers</exclude>
                 <exclude>org.mule.modules:mule-module-spring-config</exclude>

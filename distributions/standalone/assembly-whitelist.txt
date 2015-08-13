@@ -144,7 +144,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-management-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-oauth-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-pgp-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-rss-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-scripting-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-schedulers-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
@@ -363,7 +362,6 @@
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
-/mule-standalone-${productVersion}/lib/opt/rome-0.9.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-1.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-1-xqj.jar
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar

@@ -36,7 +36,6 @@
         <module>oauth</module>
         <module>pgp</module>
         <module>reboot</module>
-        <module>rss</module>
         <module>schedulers</module>
         <module>scripting</module>
         <module>spring-extras</module>
