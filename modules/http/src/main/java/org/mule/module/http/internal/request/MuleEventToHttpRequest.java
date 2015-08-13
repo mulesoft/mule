@@ -10,6 +10,7 @@ import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREF
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.module.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
@@ -43,7 +44,9 @@ import com.google.common.collect.Maps;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -100,6 +103,28 @@ public class MuleEventToHttpRequest
             {
                 builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
             }
+        }
+
+        if (requester.getConfig().isEnableCookies())
+        {
+            try
+            {
+                Map<String, List<String>> headers = requester.getConfig().getCookieManager().get(URI.create(resolvedUri),
+                                                                                                 Collections.<String, List<String>>emptyMap());
+                List<String> cookies = headers.get(COOKIE);
+                if (cookies != null)
+                {
+                    for (String cookie : cookies)
+                    {
+                        builder.addHeader(COOKIE, cookie);
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                logger.warn("Error reading cookies for URI " + resolvedUri, e);
+            }
+
         }
 
         builder.setEntity(createRequestEntity(builder, event, resolvedMethod));

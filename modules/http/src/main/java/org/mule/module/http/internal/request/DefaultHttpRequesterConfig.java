@@ -33,6 +33,8 @@ import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.concurrent.ThreadNameHelper;
 
+import java.net.CookieManager;
+
 
 public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
 {
@@ -63,6 +65,9 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
 
+    private boolean enableCookies = false;
+    private CookieManager cookieManager;
+
     private MuleContext muleContext;
 
     @Override
@@ -85,6 +90,11 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         if (protocol.equals(HTTPS) && tlsContext == null)
         {
             tlsContext = new TlsContextFactoryBuilder(muleContext).buildDefault();
+        }
+
+        if (enableCookies)
+        {
+            cookieManager = new CookieManager();
         }
 
         String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), name);
@@ -142,6 +152,11 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     public HttpClient getHttpClient()
     {
         return httpClient;
+    }
+
+    public CookieManager getCookieManager()
+    {
+        return cookieManager;
     }
 
     @Override
@@ -315,6 +330,16 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     public void setConnectionIdleTimeout(int connectionIdleTimeout)
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
+    }
+
+    public boolean isEnableCookies()
+    {
+        return enableCookies;
+    }
+
+    public void setEnableCookies(boolean enableCookies)
+    {
+        this.enableCookies = enableCookies;
     }
 
     @Override
