@@ -165,7 +165,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-transport-jetty-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-jms-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-multicast-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-quartz-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-rmi-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-servlet-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-sftp-${productVersion}.jar

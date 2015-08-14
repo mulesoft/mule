@@ -13,7 +13,7 @@ import javax.activation.FileDataSource;
 
 public class EmployeeMessageGenerator
 {
-    public Employee submitEmployee() throws Exception
+    public Employee submitEmployee(Object payload) throws Exception
     {
         Employee employee = new Employee();
         employee.setName("Albert Einstein");

@@ -17,7 +17,6 @@
     <transport dist="ce" artifactName="jetty">jetty-ssl</transport>
     <transport dist="ce">jms</transport>
     <transport dist="ce">multicast</transport>
-    <transport dist="ce">quartz</transport>
     <transport dist="ce">rmi</transport>
     <transport dist="ce" artifactName="rmi">jnp</transport>
     <transport dist="ce">servlet</transport>
