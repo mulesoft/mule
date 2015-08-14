@@ -120,7 +120,6 @@
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
-                <include>org.mule.transports:mule-transport-ajax</include>
                 <include>org.mule.transports:mule-transport-ejb</include>
                 <include>org.mule.transports:mule-transport-email</include>
                 <include>org.mule.transports:mule-transport-file</include>
@@ -196,7 +195,6 @@
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
-                <exclude>org.mule.transports:mule-transport-ajax</exclude>
                 <exclude>org.mule.transports:mule-transport-ejb</exclude>
                 <exclude>org.mule.transports:mule-transport-email</exclude>
                 <exclude>org.mule.transports:mule-transport-file</exclude>
