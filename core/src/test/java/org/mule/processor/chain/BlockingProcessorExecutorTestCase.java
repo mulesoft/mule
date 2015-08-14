@@ -9,9 +9,11 @@ package org.mule.processor.chain;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -22,6 +24,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.ProcessorExecutor;
+import org.mule.construct.Flow;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.processor.BlockingProcessorExecutor;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -71,7 +74,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
         processors.add(processor2);
         processors.add(processor3);
 
-        when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+        when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
         when(event.getMessage()).thenReturn(message);
@@ -91,26 +94,43 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     @Test
     public void executeRequestResponse() throws MuleException
     {
-        when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
-        when(event.isSynchronous()).thenReturn(true);
+        setupRequestResponseEvent();
         assertBlockingExecution(processors);
     }
 
     @Test
-    public void executeRequestResponseNonBlocking() throws MuleException, InterruptedException
+    public void executeRequestResponseNullResponse() throws MuleException
     {
-        when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
-        when(event.isSynchronous()).thenReturn(false);
-        when(event.isAllowNonBlocking()).thenReturn(true);
-        assertBlockingExecution(processors);
+        processors.add(new MessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return null;
+            }
+        });
+        setupRequestResponseEvent();
+        assertThat(createProcessorExecutor(processors).execute(), is(nullValue()));
     }
 
     @Test
     public void executeOneWay() throws MuleException
     {
-        when(event.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
-        when(event.isSynchronous()).thenReturn(false);
+        setupOneWayEvent();
         assertBlockingExecution(processors);
+    }
+
+    private void setupOneWayEvent()
+    {
+        when(event.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
+        when(event.isAllowNonBlocking()).thenReturn(false);
+        when(event.isSynchronous()).thenReturn(false);
+    }
+
+    protected void setupRequestResponseEvent()
+    {
+        when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+        when(event.isSynchronous()).thenReturn(true);
     }
 
     protected void assertBlockingExecution(List<MessageProcessor> processors) throws MuleException

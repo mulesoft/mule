@@ -310,7 +310,10 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         MuleEvent result = flow.process(event);
         if (NonBlockingVoidMuleEvent.getInstance() == result)
         {
-            nullReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+            if (!nullReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
+            {
+                throw new RuntimeException("No Non-Blocking Response");
+            }
             if (nullReplyToHandler.exception != null)
             {
                 throw nullReplyToHandler.exception;
