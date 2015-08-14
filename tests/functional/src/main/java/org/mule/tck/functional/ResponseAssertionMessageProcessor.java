@@ -8,25 +8,20 @@ package org.mule.tck.functional;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.processor.chain.ProcessorExecutorFactory;
-import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;

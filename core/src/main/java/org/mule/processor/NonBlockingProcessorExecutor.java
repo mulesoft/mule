@@ -7,8 +7,8 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
-import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -16,9 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.processor.MessageRouter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 
@@ -81,10 +79,12 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
         }
     }
 
-    private void resume() throws MessagingException
+    private void resume(final MuleEvent event) throws MessagingException
     {
+        this.event = recreateEventWithOriginalReplyToHandler(event);
+
         MuleEvent result = execute();
-        if (result != null && !(result instanceof VoidMuleEvent))
+        if (!(result instanceof NonBlockingVoidMuleEvent))
         {
             try
             {
@@ -92,23 +92,31 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             }
             catch (MuleException e)
             {
-                replyToHandler.processExceptionReplyTo(new MessagingException(event, e), null);
+                replyToHandler.processExceptionReplyTo(new MessagingException(this.event, e), null);
             }
         }
+    }
+
+    private MuleEvent recreateEventWithOriginalReplyToHandler(MuleEvent event)
+    {
+        if (event != null)
+        {
+            event = new DefaultMuleEvent(event, replyToHandler);
+            // Update RequestContext ThreadLocal for backwards compatibility
+            OptimizedRequestContext.unsafeSetEvent(event);
+        }
+        return event;
     }
 
     class NonBlockingProcessorExecutorReplyToHandler implements ReplyToHandler
     {
 
         @Override
-        public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
+        public void processReplyTo(final MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
         {
-            NonBlockingProcessorExecutor.this.event = new DefaultMuleEvent(event, replyToHandler);
-            // Update RequestContext ThreadLocal for backwards compatibility
-            OptimizedRequestContext.unsafeSetEvent(event);
             try
             {
-                resume();
+                resume(event);
             }
             catch (MessagingException e)
             {
