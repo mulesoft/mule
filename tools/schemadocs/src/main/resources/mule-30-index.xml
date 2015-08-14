@@ -1,6 +1,5 @@
 <index version="3.0">
     <transport dist="ce">bpm</transport>
-    <transport dist="ce">ejb</transport>
     <transport dist="ce">email</transport>
     <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-smtp.xsd">smtp</transport>
     <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-smtps.xsd">smtps</transport>
