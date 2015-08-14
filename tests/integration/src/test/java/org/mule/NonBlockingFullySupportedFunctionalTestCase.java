@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -142,5 +143,20 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
         assertThat(result, is(nullValue()));
     }
 
+    @Test
+    public void enricherIssue() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("enricherIssue");
+        FlowAssert.verify("enricherIssue");
+        assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    }
+
+    @Test
+    public void enricherIssueNonBlocking() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("enricherIssueNonBlocking");
+        FlowAssert.verify("enricherIssueNonBlocking");
+        assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    }
 }
 

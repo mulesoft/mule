@@ -79,21 +79,14 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
         }
     }
 
-    private void resume(final MuleEvent event) throws MessagingException
+    private void resume(final MuleEvent event) throws MuleException
     {
         this.event = recreateEventWithOriginalReplyToHandler(event);
 
         MuleEvent result = execute();
         if (!(result instanceof NonBlockingVoidMuleEvent))
         {
-            try
-            {
-                replyToHandler.processReplyTo(result, null, null);
-            }
-            catch (MuleException e)
-            {
-                replyToHandler.processExceptionReplyTo(new MessagingException(this.event, e), null);
-            }
+            replyToHandler.processReplyTo(result, null, null);
         }
     }
 
@@ -118,9 +111,16 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             {
                 resume(event);
             }
-            catch (MessagingException e)
+            catch (Throwable e)
             {
-                processExceptionReplyTo(e, replyTo);
+                if (e instanceof MessagingException)
+                {
+                    processExceptionReplyTo((MessagingException) e, replyTo);
+                }
+                else
+                {
+                    processExceptionReplyTo(new MessagingException(event, e), replyTo);
+                }
             }
         }
 
