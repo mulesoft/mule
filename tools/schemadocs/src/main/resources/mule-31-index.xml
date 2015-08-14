@@ -1,6 +1,5 @@
 <index version="3.1">
     <transport dist="ce">ajax</transport>
-    <transport dist="ce">ejb</transport>
     <transport dist="ce" artifactName="email">smtp</transport>
     <transport dist="ce" artifactName="email">smtps</transport>
     <transport dist="ce" artifactName="email">imap</transport>

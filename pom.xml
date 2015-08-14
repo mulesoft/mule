@@ -713,11 +713,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-ejb_2.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
             </dependency>

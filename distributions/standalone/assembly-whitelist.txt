@@ -155,7 +155,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-007.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-ejb-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-email-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-file-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ftp-${productVersion}.jar
@@ -241,7 +240,6 @@
 /mule-standalone-${productVersion}/lib/opt/drools-core-5.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/ecj-4.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/el-api-6.0.44.jar
-/mule-standalone-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar

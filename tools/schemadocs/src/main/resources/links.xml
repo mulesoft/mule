@@ -96,11 +96,6 @@
     <link><item>wsdl-cxf:outbound-endpoint</item><page>CXF+Transport</page></link>
     <link><item>wsdl-cxf:endpoint</item><page>CXF+Transport</page></link>
 
-    <link><item>ejb:connector</item><page>EJB+Transport</page></link>
-    <link><item>ejb:inbound-endpoint</item><page>EJB+Transport</page></link>
-    <link><item>ejb:outbound-endpoint</item><page>EJB+Transport</page></link>
-    <link><item>ejb:endpoint</item><page>EJB+Transport</page></link>
-
     <link><item>email:email-to-string-transformer</item><page>Email+Transport</page></link>
     <link><item>email:string-to-email-transformer</item><page>Email+Transport</page></link>
     <link><item>email:object-to-mime-transformer</item><page>Email+Transport</page></link>

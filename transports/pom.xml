@@ -13,7 +13,6 @@
 
     <modules>
         <module>all-transports</module>
-        <module>ejb</module>
         <module>email</module>
         <module>file</module>
         <module>ftp</module>
