@@ -155,7 +155,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-007.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-ajax-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ejb-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-email-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-file-${productVersion}.jar
@@ -200,8 +199,6 @@
 /mule-standalone-${productVersion}/lib/opt/btf-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/bytelist-1.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
-/mule-standalone-${productVersion}/lib/opt/cometd-api-1.1.1.jar
-/mule-standalone-${productVersion}/lib/opt/cometd-server-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.1.jar
@@ -313,8 +310,6 @@
 /mule-standalone-${productVersion}/lib/opt/jetty-util-9.0.7.v20131107.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-webapp-9.0.7.v20131107.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-xml-9.0.7.v20131107.jar
-/mule-standalone-${productVersion}/lib/opt/jetty-util-6.1.26.jar
-/mule-standalone-${productVersion}/lib/opt/jetty-util5-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jffi-1.2.9.jar
 /mule-standalone-${productVersion}/lib/opt/jffi-1.2.9-native.jar
 /mule-standalone-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
