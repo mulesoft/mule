@@ -3,7 +3,6 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
@@ -55,9 +54,48 @@
         <test:non-blocking-processor/>
     </flow>
 
-    <flow name="filter">
+    <flow name="filterAccepts">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <expression-filter expression="#[true]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="filterRejects">
+        <test:assert-intercepting responseCount="0"/>
+        <expression-filter expression="#[false]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="filterAfterNonBlockingAccepts">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <test:non-blocking-processor/>
+        <expression-filter expression="#[true]"/>
+    </flow>
+
+    <flow name="filterAfterNonBlockingRejects">
+        <test:assert-intercepting responseCount="0"/>
+        <test:non-blocking-processor/>
+        <expression-filter expression="#[false]"/>
+    </flow>
+
+    <flow name="filterAfterEnricherBeforeNonBlocking">
+        <test:assert-intercepting responseCount="0"/>
+        <enricher source="#[payload]" target="#[payload]">
+            <set-payload value="#[payload]"/>
+        </enricher>
+        <expression-filter expression="#[false]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="filterBeforeNonBlockingAccepts">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-filter expression="#[true]"/>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="filterBeforeNonBlockingRejects">
+        <test:assert-intercepting responseCount="0"/>
+        <expression-filter expression="#[false]"/>
         <test:non-blocking-processor/>
     </flow>
 
@@ -96,6 +134,23 @@
         </enricher>
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="response">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <response>
+            <test:assert expression="#[assertPayload()]"/>
+        </response>
+        <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="responseWithNullEvent">
+        <test:assert-intercepting responseCount="0"/>
+        <response>
+            <test:assert count="0"/>
+        </response>
+        <test:non-blocking-processor/>
+        <expression-filter expression="#[false]"/>
     </flow>
 
 </mule>

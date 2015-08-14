@@ -6,16 +6,12 @@
  */
 package org.mule;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
-import org.mule.tck.functional.EventCallback;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import org.mule.api.MuleEvent;
 import org.mule.tck.functional.FlowAssert;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -59,9 +55,53 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     }
 
     @Test
-    public void filter() throws Exception
+    public void filterAccepts() throws Exception
     {
-        testFlowNonBlocking("filter");
+        testFlowNonBlocking("filterAccepts");
+    }
+
+    @Test
+    public void filterRejects() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("filterRejects");
+        FlowAssert.verify("filterRejects");
+        assertThat(result, is(nullValue()));
+    }
+
+    @Test
+    public void filterAfterNonBlockingAccepts() throws Exception
+    {
+        testFlowNonBlocking("filterAfterNonBlockingAccepts");
+    }
+
+    @Test
+    public void filterAfterNonBlockingRejects() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("filterAfterNonBlockingRejects");
+        FlowAssert.verify("filterAfterNonBlockingRejects");
+        assertThat(result, is(nullValue()));
+    }
+
+    @Test
+    public void filterBeforeNonBlockingAccepts() throws Exception
+    {
+        testFlowNonBlocking("filterAfterNonBlockingAccepts");
+    }
+
+    @Test
+    public void filterBeforeNonBlockingRejects() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("filterAfterNonBlockingRejects");
+        FlowAssert.verify("filterAfterNonBlockingRejects");
+        assertThat(result, is(nullValue()));
+    }
+
+    @Test
+    public void filterAfterEnricherBeforeNonBlocking() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("filterAfterEnricherBeforeNonBlocking");
+        FlowAssert.verify("filterAfterEnricherBeforeNonBlocking");
+        assertThat(result, is(nullValue()));
     }
 
     @Test
@@ -86,6 +126,20 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void enricher() throws Exception
     {
         testFlowNonBlocking("enricher");
+    }
+
+    @Test
+    public void response() throws Exception
+    {
+        testFlowNonBlocking("response");
+    }
+
+    @Test
+    public void responseWithNullEvent() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("responseWithNullEvent");
+        FlowAssert.verify("responseWithNullEvent");
+        assertThat(result, is(nullValue()));
     }
 
 }
