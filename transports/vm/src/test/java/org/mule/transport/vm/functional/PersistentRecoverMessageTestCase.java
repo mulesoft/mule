@@ -53,7 +53,7 @@ public class PersistentRecoverMessageTestCase extends FunctionalTestCase
         transactionalQueueManager.initialise();
         transactionalQueueManager.start();
         MuleEvent testEvent = getTestEvent("echo");
-        transactionalQueueManager.getQueueSession().getQueue(TEST_QUEUE_NAME).put(testEvent);
+        transactionalQueueManager.getQueueSession().getQueue(TEST_QUEUE_NAME).put(testEvent.getMessage());
 
         transactionalQueueManager.stop();
 
