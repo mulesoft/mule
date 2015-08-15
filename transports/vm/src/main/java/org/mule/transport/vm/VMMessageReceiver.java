@@ -27,6 +27,7 @@ import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -168,15 +169,18 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
         if (isReceiveMessagesInTransaction())
         {
-            MuleEvent message = getFirstMessage();
+            MuleMessage message = getFirstMessage();
             if (message == null)
             {
                 return null;
             }
 
             List<MuleMessage> messages = new ArrayList<MuleMessage>(1);
-            ((DefaultMuleMessage)message.getMessage()).setMuleContext(endpoint.getMuleContext());
-            messages.add(message.getMessage());
+            if (message instanceof DefaultMuleMessage)
+            {
+                ((DefaultMuleMessage) message).setMuleContext(endpoint.getMuleContext());
+            }
+            messages.add(message);
             return messages;
         }
         else
@@ -197,21 +201,24 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         int batchSize = getBatchSize(queue.size());
 
         // try to get the first event off the queue
-        MuleEvent message = (MuleEvent) queue.poll(connector.getQueueTimeout());
+        MuleMessage message = getMessage(queue, connector.getQueueTimeout());
 
         if (message != null)
         {
-            // keep first dequeued event
-            ((DefaultMuleMessage)message.getMessage()).setMuleContext(endpoint.getMuleContext());
-            messages.add(message.getMessage());
+            // keep first dequeued message
+            if (message instanceof DefaultMuleMessage)
+            {
+                ((DefaultMuleMessage) message).setMuleContext(endpoint.getMuleContext());
+            }
+            messages.add(message);
 
             // keep batching if more events are available
             for (int i = 0; i < batchSize && message != null; i++)
             {
-                message = (MuleEvent)queue.poll(0);
+                message = getMessage(queue, 0);
                 if (message != null)
                 {
-                    messages.add(new DefaultMuleMessage(message.getMessage(), endpoint.getMuleContext()));
+                    messages.add(new DefaultMuleMessage(message, endpoint.getMuleContext()));
                 }
             }
         }
@@ -220,13 +227,26 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         return messages;
     }
 
-    protected MuleEvent getFirstMessage() throws Exception
+    private MuleMessage getMessage(Queue queue, int timeout) throws InterruptedException
+    {
+        Serializable polledItem = queue.poll(timeout);
+        if (polledItem instanceof MuleEvent)
+        {
+            return ((MuleEvent) polledItem).getMessage();
+        }
+        else
+        {
+            return (MuleMessage) polledItem;
+        }
+    }
+
+    protected MuleMessage getFirstMessage() throws Exception
     {
         // The queue from which to pull events
         QueueSession qs = connector.getTransactionalResource(endpoint);
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
-        // try to get the first event off the queue
-        return (MuleEvent) queue.poll(connector.getQueueTimeout());
+
+        return getMessage(queue, connector.getQueueTimeout());
     }
 
     @Override
