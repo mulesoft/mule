@@ -14,6 +14,8 @@ import org.mule.transport.AbstractMessageRequester;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
+import java.io.Serializable;
+
 /**
  * <code>VMMessageDispatcher</code> is used for providing in memory interaction
  * between components.
@@ -57,31 +59,40 @@ public class VMMessageRequester extends AbstractMessageRequester
             }
             else
             {
-                MuleEvent event = null;
+                MuleMessage message = null;
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Waiting for a message on " + endpoint.getEndpointURI().getAddress());
                 }
                 try
                 {
-                    event = (MuleEvent) queue.poll(timeout);
+                    Serializable polledItem = queue.poll(timeout);
+
+                    if (polledItem instanceof MuleEvent)
+                    {
+                        message = ((MuleEvent) polledItem).getMessage();
+                    }
+                    else
+                    {
+                        message = (MuleMessage) polledItem;
+                    }
                 }
                 catch (InterruptedException e)
                 {
                     logger.error("Failed to receive message from queue: " + endpoint.getEndpointURI());
                 }
-                if (event != null)
+                if (message != null)
                 {
                     //The message will contain old thread information, we need to reset it
-                    if(event.getMessage() instanceof ThreadSafeAccess)
+                    if(message instanceof ThreadSafeAccess)
                     {
-                        ((ThreadSafeAccess) event.getMessage()).resetAccessControl();
+                        ((ThreadSafeAccess) message).resetAccessControl();
                     }
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Message received: " + event);
+                        logger.debug("Message received: " + message);
                     }
-                    return event.getMessage();
+                    return message;
                 }
                 else
                 {
