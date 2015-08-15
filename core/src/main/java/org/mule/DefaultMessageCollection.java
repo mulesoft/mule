@@ -8,6 +8,7 @@ package org.mule;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.ThreadSafeAccess;
@@ -321,6 +322,12 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
             return super.newThreadCopy();
         }
         return new DefaultMessageCollection(this, muleContext, true);
+    }
+
+    @Override
+    public void initAfterDeserialisation(MuleContext context) throws MuleException
+    {
+        super.initAfterDeserialisation(context);
     }
 
     /**
