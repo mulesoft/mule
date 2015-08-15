@@ -13,7 +13,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.lifecycle.LifecycleUtils;
@@ -71,11 +70,11 @@ public class VMUsersDefaultObjectSerializerTestCase extends FunctionalTestCase
         assertThat(response, is(notNullValue()));
         assertThat(response.getPayloadAsString(), is(payload));
 
-        ArgumentCaptor<MuleEvent> eventArgumentCaptor = ArgumentCaptor.forClass(MuleEvent.class);
-        verify(objectSerializer, atLeastOnce()).serialize(eventArgumentCaptor.capture());
-        MuleEvent capturedEvent = eventArgumentCaptor.getValue();
-        assertThat(capturedEvent, is(notNullValue()));
-        assertThat(capturedEvent.getMessage().getPayloadAsString(), is(payload));
+        ArgumentCaptor<MuleMessage> messageArgumentCaptor = ArgumentCaptor.forClass(MuleMessage.class);
+        verify(objectSerializer, atLeastOnce()).serialize(messageArgumentCaptor.capture());
+        MuleMessage capturedMessage = messageArgumentCaptor.getValue();
+        assertThat(capturedMessage, is(notNullValue()));
+        assertThat(capturedMessage.getPayloadAsString(), is(payload));
 
         verify(objectSerializer, atLeastOnce()).deserialize(any(byte[].class));
     }
