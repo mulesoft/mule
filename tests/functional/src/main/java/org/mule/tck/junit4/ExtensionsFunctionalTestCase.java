@@ -7,6 +7,7 @@
 package org.mule.tck.junit4;
 
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createManifestFileIfNecessary;
 import static org.mule.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.DefaultMuleContext;
@@ -151,6 +152,8 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
     private void createExtensionsManager() throws Exception
     {
         extensionManager = new DefaultExtensionManager();
+        generatedResourcesDirectory = getGenerationTargetDirectory();
+        createManifestFileIfNecessary(generatedResourcesDirectory);
 
         Describer[] describers = getDescribers();
         if (ArrayUtils.isEmpty(describers))
@@ -175,8 +178,6 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         {
             loadExtensionsFromDescribers(extensionManager, describers);
         }
-
-        generatedResourcesDirectory = getGenerationTargetDirectory();
 
         ResourcesGenerator generator = new ExtensionsTestInfrastructureResourcesGenerator(serviceRegistry, generatedResourcesDirectory);
 

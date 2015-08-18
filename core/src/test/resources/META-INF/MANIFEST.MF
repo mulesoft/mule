@@ -1,17 +1,17 @@
 Manifest-Version: 1.0
 Archiver-Version: Plexus Archiver
 Created-By: Apache Maven
-Built-By: chrismordue
-Build-Jdk: 1.6.0_31
-Specification-Title: Core Configuration Patterns
-Specification-Version: 3.3.0-RC3-SNAPSHOT
+Built-By: anafelisatti
+Build-Jdk: 1.8.0_40
+Specification-Title: Mule Core
+Specification-Version: 4.0-SNAPSHOT
 Specification-Vendor: MuleSoft, Inc.
-Implementation-Title: Core Configuration Patterns
-Implementation-Version: 3.3.0-RC3-SNAPSHOT
-Implementation-Vendor-Id: org.mule.patterns
+Implementation-Title: Mule Core
+Implementation-Version: 4.0-SNAPSHOT
+Implementation-Vendor-Id: org.mule
 Implementation-Vendor: MuleSoft, Inc.
-Build-Date: 2012-Apr-13 16:46:57
-Build-Revision: 24242
+Build-Date: 2015-Aug-12 16:04:17
+Build-Revision: f019180d
 Description: Mule ESB and Integration Platform
 Dev-List-Email: mule-esb@mulesoft.com
 License: CPAL v1.0 http://www.mulesoft.com/CPAL/

@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.config.MuleManifest;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
@@ -28,6 +29,12 @@ import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.jar.Manifest;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.mockito.ArgumentCaptor;
@@ -126,5 +133,31 @@ public abstract class ExtensionsTestUtils
                                            mock(ResolverSetResult.class),
                                            event,
                                            extractExtensionManager(event));
+    }
+
+    public static File getMetaInfDirectory(Class clazz)
+    {
+        URL classUrl = clazz.getResource(clazz.getSimpleName() + ".class");
+        if (classUrl.toString().startsWith("jar"))
+        {
+            //we are dealing with a jar file, no need to modify test-classes resources
+            return null;
+        }
+        String classPath = classUrl.getPath();
+        return new File(String.format("%starget/test-classes/META-INF", classPath.substring(0, classPath.indexOf("target"))));
+    }
+
+    public static File createManifestFileIfNecessary(File targetDirectory) throws IOException
+    {
+        File manifestFile = new File(targetDirectory.getPath(), "MANIFEST.MF");
+        if (!manifestFile.exists())
+        {
+            Manifest manifest = new Manifest(MuleManifest.getManifest());
+            try (FileOutputStream fileOutputStream = new FileOutputStream(manifestFile))
+            {
+                manifest.write(fileOutputStream);
+            }
+        }
+        return manifestFile;
     }
 }

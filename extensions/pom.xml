@@ -81,6 +81,9 @@
                             <processors>
                                 <processor>org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor</processor>
                             </processors>
+                            <options>
+                                <extension.version>${project.version}</extension.version>
+                            </options>
                         </configuration>
                     </execution>
                 </executions>
