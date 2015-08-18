@@ -24,7 +24,6 @@
         <module>servlet</module>
         <module>sftp</module>
         <module>ssl</module>
-        <module>stdio</module>
         <module>tcp</module>
         <module>udp</module>
         <module>vm</module>
