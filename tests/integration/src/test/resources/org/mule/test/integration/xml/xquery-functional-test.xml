@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--// START SNIPPET: full-config -->
+
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="
-      http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
-      http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
@@ -28,7 +25,6 @@
             ]]>
         </mxml:xquery-text>
     </mxml:xquery-transformer>
-    <!--// END SNIPPET: transformer-config -->
 
     <flow name="Echo">
         <!-- this endpoint is used by the functional test -->
@@ -37,9 +33,8 @@
         <echo-component/>
         <all>
             <vm:outbound-endpoint path="test.out" exchange-pattern="one-way"/>
-            <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way"/>
+            <vm:outbound-endpoint path="OUT" exchange-pattern="one-way"/>
         </all>
     </flow>
 
 </mule>
-<!--// END SNIPPET: full-config -->
