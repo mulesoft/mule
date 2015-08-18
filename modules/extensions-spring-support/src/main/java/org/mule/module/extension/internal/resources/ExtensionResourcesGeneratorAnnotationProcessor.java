@@ -16,6 +16,7 @@ import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.module.extension.internal.introspection.VersionResolver;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.ExceptionUtils;
 
@@ -85,7 +86,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
     private Extension parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment)
     {
         Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
-        Describer describer = new AnnotationsBasedDescriber(extensionClass);
+        Describer describer = new AnnotationsBasedDescriber(extensionClass, new FixedVersionResolver());
 
         DescribingContext context = new DefaultDescribingContext(describer.describe().getRootDeclaration());
         context.getCustomParameters().put(EXTENSION_ELEMENT, extensionElement);
@@ -103,5 +104,19 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
     private void log(String message)
     {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, message);
+    }
+
+    private class FixedVersionResolver implements VersionResolver
+    {
+        @Override
+        public String resolveVersion(org.mule.extension.annotations.Extension extension)
+        {
+            String extensionVersion = processingEnv.getOptions().get("extension.version");
+            if (extensionVersion == null)
+            {
+                throw new RuntimeException(String.format("Cannot resolve version for extension %s: option extension.version is missing.", extension.name()));
+            }
+            return extensionVersion;
+        }
     }
 }

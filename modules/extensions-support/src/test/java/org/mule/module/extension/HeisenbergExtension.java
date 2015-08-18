@@ -28,7 +28,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-@Extension(name = HeisenbergExtension.EXTENSION_NAME, description = HeisenbergExtension.EXTENSION_DESCRIPTION, version = HeisenbergExtension.EXTENSION_VERSION)
+@Extension(name = HeisenbergExtension.EXTENSION_NAME, description = HeisenbergExtension.EXTENSION_DESCRIPTION)
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
 @Xml(schemaLocation = HeisenbergExtension.SCHEMA_LOCATION, namespace = HeisenbergExtension.NAMESPACE, schemaVersion = HeisenbergExtension.SCHEMA_VERSION)
 @Extensible(alias = "heisenberg-empire")
@@ -43,7 +43,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public static final String AGE = "50";
     public static final String EXTENSION_NAME = "heisenberg";
     public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";
-    public static final String EXTENSION_VERSION = "1.0";
 
     private int initialise = 0;
     private int start = 0;

@@ -15,11 +15,11 @@ import static org.mule.extension.annotations.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
-import static org.mule.module.extension.HeisenbergExtension.EXTENSION_VERSION;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.HeisenbergExtension.NAMESPACE;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_LOCATION;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
+import org.mule.config.MuleManifest;
 import org.mule.extension.annotations.Configurations;
 import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
@@ -72,6 +72,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String LAUNDER_MONEY = "launder";
     private static final String INJECTED_EXTENSION_MANAGER = "getInjectedExtensionManager";
     private static final String ALIAS = "alias";
+    private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
 
     @Before
     public void setUp()
@@ -261,7 +262,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         // template method for asserting custom capabilities in modules that define them
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
     @Configurations(HeisenbergExtension.class)
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
@@ -270,7 +271,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
     @Configurations({HeisenbergExtension.class, NamedHeisenbergAlternateConfig.class})
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
@@ -286,7 +287,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     public static class HeisenbergWithOperations extends HeisenbergExtension
     {
 
