@@ -131,7 +131,6 @@
                 <include>org.mule.transports:mule-transport-servlet</include>
                 <include>org.mule.transports:mule-transport-sftp</include>
                 <include>org.mule.transports:mule-transport-ssl</include>
-                <include>org.mule.transports:mule-transport-stdio</include>
                 <include>org.mule.transports:mule-transport-tcp</include>
                 <include>org.mule.transports:mule-transport-udp</include>
                 <include>org.mule.transports:mule-transport-vm</include>
@@ -204,7 +203,6 @@
                 <exclude>org.mule.transports:mule-transport-servlet</exclude>
                 <exclude>org.mule.transports:mule-transport-sftp</exclude>
                 <exclude>org.mule.transports:mule-transport-ssl</exclude>
-                <exclude>org.mule.transports:mule-transport-stdio</exclude>
                 <exclude>org.mule.transports:mule-transport-tcp</exclude>
                 <exclude>org.mule.transports:mule-transport-udp</exclude>
                 <exclude>org.mule.transports:mule-transport-vm</exclude>

@@ -166,7 +166,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-transport-servlet-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-sftp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ssl-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-stdio-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-tcp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-udp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-vm-${productVersion}.jar
