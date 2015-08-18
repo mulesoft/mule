@@ -44,26 +44,20 @@ public class ReplyToSerializationTestCase extends FunctionalTestCase
     {
         EndpointBuilder jmsEndpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("jmsEndpoint");
         EndpointBuilder vmEndpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("vmEndpoint");
-        EndpointBuilder ajaxEndpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("ajaxEndpoint");
 
         InboundEndpoint jmsEndpoint = jmsEndpointBuilder.buildInboundEndpoint();
         Connector jmsConnector = jmsEndpoint.getConnector();
         InboundEndpoint vmEndpoint = vmEndpointBuilder.buildInboundEndpoint();
         Connector vmConnector = vmEndpoint.getConnector();
-        InboundEndpoint ajaxEndpoint = ajaxEndpointBuilder.buildInboundEndpoint();
-        Connector ajaxConnector = ajaxEndpoint.getConnector();
 
         DefaultReplyToHandler jmsHandler = (DefaultReplyToHandler) ((AbstractConnector)jmsConnector).getReplyToHandler(jmsEndpoint);
         DefaultReplyToHandler vmHandler = (DefaultReplyToHandler) ((AbstractConnector)vmConnector).getReplyToHandler(vmEndpoint);
-        DefaultReplyToHandler ajaxHandler = (DefaultReplyToHandler) ((AbstractConnector)ajaxConnector).getReplyToHandler(ajaxEndpoint);
 
         DefaultReplyToHandler jmsHandler2 = serialize(jmsHandler);
         DefaultReplyToHandler vmHandler2 = serialize(vmHandler);
-        DefaultReplyToHandler ajaxHandler2 = serialize(ajaxHandler);
 
         assertEquals(jmsHandler.getConnector(), jmsHandler2.getConnector());
         assertEquals(vmHandler.getConnector(), vmHandler2.getConnector());
-        assertEquals(ajaxHandler.getConnector(), ajaxHandler2.getConnector());
     }
 
     private DefaultReplyToHandler serialize(ReplyToHandler handler) throws IOException, ClassNotFoundException, MuleException

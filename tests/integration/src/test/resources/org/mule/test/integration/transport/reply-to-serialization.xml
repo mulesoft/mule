@@ -1,24 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-    xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
-    xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/current/mule-ajax.xsd">
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector"/>
-    <ajax:connector name="ajaxConnector" serverUrl="http://0.0.0.0:${port1}"/>
 
     <jms:endpoint name="jmsEndpoint" queue="xxx"/>
     <vm:endpoint name="vmEndpoint" path="xxx"/>
-    <ajax:endpoint name="ajaxEndpoint" channel="/xxx"/>
-
 </mule>

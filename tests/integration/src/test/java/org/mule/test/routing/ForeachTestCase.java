@@ -384,7 +384,7 @@ public class ForeachTestCase extends FunctionalTestCase
             for(int j = 0; j < payload.get(i).size(); j++)
             {
                 out = client.request("vm://out", getTestTimeoutSecs());
-                assertEquals("The nested counters are not consistent.", out.getInboundProperty("j"), is(j+1));
+                assertEquals("The nested counters are not consistent.", (Object) out.getInboundProperty("j"), j+1);
             }
             out = client.request("vm://out", getTestTimeoutSecs());
             assertThat("The nested counters are not consistent", out.getInboundProperty("i"), is(i +1));

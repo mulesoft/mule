@@ -187,7 +187,7 @@ public class DefaultMuleSessionTestCase
         // assertions
         assertEquals(before.getId(), after.getId());
         assertEquals(before.isValid(), after.isValid());
-        assertEquals(before.getProperty("foo"), after.getProperty("foo"));
+        assertEquals((Object) before.getProperty("foo"), after.getProperty("foo"));
         assertEquals(before.getSecurityContext().getAuthentication().getPrincipal(),
             after.getSecurityContext().getAuthentication().getPrincipal());
         assertEquals(before.getSecurityContext().getAuthentication().getProperties().get("key1"),
