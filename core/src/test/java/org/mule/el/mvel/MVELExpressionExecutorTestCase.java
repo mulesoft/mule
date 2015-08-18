@@ -6,16 +6,21 @@
  */
 package org.mule.el.mvel;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.el.context.AbstractELTestCase;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.size.SmallTest;
+
+import java.io.Serializable;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +31,8 @@ import org.objectweb.asm.Opcodes;
 @SmallTest
 public class MVELExpressionExecutorTestCase extends AbstractELTestCase
 {
+
+    public static final String SIMPLE_EXPRESSION = "'hi'";
 
     protected MVELExpressionExecutor mvel;
     protected MVELExpressionLanguageContext context;
@@ -145,6 +152,31 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase
     public void invalidMethodCallFails()
     {
         assertNull(mvel.execute("new Object().doesntExist()", context));
+    }
+
+    @Test
+    public void cachesCompiledExpressions() throws Exception
+    {
+        final Serializable compiledExpression1 = mvel.getCompiledExpression(SIMPLE_EXPRESSION);
+        final Serializable compiledExpression2 = mvel.getCompiledExpression(SIMPLE_EXPRESSION);
+        assertThat(compiledExpression1, is(compiledExpression2));
+    }
+
+    @Test
+    public void doesNotCachesCompiledExpressions() throws Exception
+    {
+        MuleTestUtils.testWithSystemProperty(MVELExpressionExecutor.DISABLE_MEL_EXPRESSION_CACHE, "", new MuleTestUtils.TestCallback()
+        {
+            @Override
+            public void run() throws Exception
+            {
+                setupMVEL();
+
+                final Serializable compiledExpression1 = mvel.getCompiledExpression(SIMPLE_EXPRESSION);
+                final Serializable compiledExpression2 = mvel.getCompiledExpression(SIMPLE_EXPRESSION);
+                assertThat(compiledExpression1, is(not(compiledExpression2)));
+            }
+        });
     }
 
     static class MyClassClassLoader extends ClassLoader
