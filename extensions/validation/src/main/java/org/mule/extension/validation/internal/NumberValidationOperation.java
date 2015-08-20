@@ -7,6 +7,7 @@
 package org.mule.extension.validation.internal;
 
 import org.mule.api.MuleEvent;
+import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.param.UseConfig;
@@ -24,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @since 3.7.0
  */
+@ExtensionOf(ValidationExtension.class)
 public class NumberValidationOperation extends ValidationSupport
 {
 
