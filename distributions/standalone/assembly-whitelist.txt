@@ -138,7 +138,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbpm-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-jersey-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-json-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-launcher-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-management-${productVersion}.jar
@@ -255,9 +254,6 @@
 /mule-standalone-${productVersion}/lib/opt/hibernate-commons-annotations-3.2.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/hibernate-core-3.6.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/hibernate-jpa-2.0-api-1.0.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/hk2-api-2.3.0-b05.jar
-/mule-standalone-${productVersion}/lib/opt/hk2-locator-2.3.0-b05.jar
-/mule-standalone-${productVersion}/lib/opt/hk2-utils-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/invokebinder-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.4.0.jar
@@ -265,7 +261,6 @@
 /mule-standalone-${productVersion}/lib/opt/jackson-coreutils-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-asl-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-databind-2.4.3.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-xc-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-6.0.44.jar
@@ -273,7 +268,6 @@
 /mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
-/mule-standalone-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.9.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.9.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
@@ -286,13 +280,6 @@
 /mule-standalone-${productVersion}/lib/opt/jcifs-1.3.3.jar
 /mule-standalone-${productVersion}/lib/opt/jcodings-1.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/jdom-1.1.3.jar
-/mule-standalone-${productVersion}/lib/opt/jersey-client-2.11.jar
-/mule-standalone-${productVersion}/lib/opt/jersey-common-2.11.jar
-/mule-standalone-${productVersion}/lib/opt/jersey-guava-2.11.jar
-/mule-standalone-${productVersion}/lib/opt/jersey-media-json-jackson1-2.11.jar
-/mule-standalone-${productVersion}/lib/opt/jersey-media-json-jettison-2.11.jar
-/mule-standalone-${productVersion}/lib/opt/jersey-server-2.11.jar
-/mule-standalone-${productVersion}/lib/opt/jettison-1.3.3.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-annotations-9.0.7.v20131107.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-continuation-9.0.7.v20131107.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-deploy-9.0.7.v20131107.jar
@@ -347,7 +334,6 @@
 /mule-standalone-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/neethi-3.0.3.jar
 /mule-standalone-${productVersion}/lib/opt/oro-2.0.8.jar
-/mule-standalone-${productVersion}/lib/opt/osgi-resource-locator-1.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
@@ -398,7 +384,6 @@
 /mule-standalone-${productVersion}/lib/opt/xmlbeans-2.3.0.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
-/mule-standalone-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt
 /mule-standalone-${productVersion}/lib/user

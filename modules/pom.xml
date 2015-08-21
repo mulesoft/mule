@@ -30,7 +30,6 @@
         <module>jaas</module>
         <module>jboss-transactions</module>
         <module>jbpm</module>
-        <module>jersey</module>
         <module>json</module>
         <module>management</module>
         <module>oauth</module>

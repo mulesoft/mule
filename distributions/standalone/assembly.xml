@@ -149,7 +149,6 @@
                 <include>org.mule.modules:mule-module-extensions-spring-support</include>
                 <include>org.mule.modules:mule-module-http</include>
                 <include>org.mule.modules:mule-module-jaas</include>
-                <include>org.mule.modules:mule-module-jersey</include>
                 <include>org.mule.modules:mule-module-jbossts</include>
                 <include>org.mule.modules:mule-module-jbpm</include>
                 <include>org.mule.modules:mule-module-json</include>
@@ -221,7 +220,6 @@
                 <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
                 <exclude>org.mule.modules:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
-                <exclude>org.mule.modules:mule-module-jersey</exclude>
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
                 <exclude>org.mule.modules:mule-module-jbpm</exclude>
                 <exclude>org.mule.modules:mule-module-json</exclude>
