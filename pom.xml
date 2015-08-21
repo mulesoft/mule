@@ -195,7 +195,6 @@
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
-        <hk2Version>2.3.0-b05</hk2Version>
         <jacksonVersion>1.9.11</jacksonVersion>
         <jackson2Version>2.4.3</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
@@ -1265,17 +1264,6 @@
 
             <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>
-                <artifactId>jersey-server</artifactId>
-                <version>${jerseyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.glassfish.hk2.external</groupId>
-                        <artifactId>javax.inject</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-common</artifactId>
                 <version>${jerseyVersion}</version>
                 <exclusions>
@@ -1294,40 +1282,6 @@
                     <exclusion>
                         <groupId>javax.annotation</groupId>
                         <artifactId>javax.annotation-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jersey.media</groupId>
-                <artifactId>jersey-media-json-jackson1</artifactId>
-                <version>${jerseyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.codehaus.jackson</groupId>
-                        <artifactId>jackson-lgpl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.jettison</groupId>
-                        <artifactId>jettison</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.xml.stream</groupId>
-                        <artifactId>stax-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>stax-api</artifactId>
-                        <groupId>stax</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jersey.media</groupId>
-                <artifactId>jersey-media-json-jettison</artifactId>
-                <version>${jerseyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>stax</groupId>
-                        <artifactId>stax-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
