@@ -16,7 +16,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
+ * ComponentStatistics is a basic metrics aggregation class that is accessible
+ * via the JMX api. This class is not thread-safe - occasional errors in 
+ * reported statistics should be expected, especially when the {@code clear()} 
+ * method is used.
  */
 public class ComponentStatistics implements Statistics
 {
@@ -43,6 +46,7 @@ public class ComponentStatistics implements Statistics
      * are measured for from the property statIntervalTime. If the property is 
      * not set or cannot be parsed, disable interval time and just compute 
      * stats from start of mule.
+     * 
      * TODO: The code to create and use an interval time for measuring average execution 
      * time could be removed once a complete solution is available in MuleHQ to
      * monitor this
@@ -70,7 +74,12 @@ public class ComponentStatistics implements Statistics
         }
     }
 
-    public void clear()
+    /**
+     * Resets the state of this component statistics collector. If called
+     * while a branch is being executed, then statistics may be slightly
+     * erroneous.
+     */
+    public synchronized void clear()
     {
         minExecutionTime = 0;
         maxExecutionTime = 0;
@@ -79,6 +88,15 @@ public class ComponentStatistics implements Statistics
         averageExecutionTime = 0;
     }
 
+    /**
+     * Returns true if this stats collector is enabled.
+     * This value does not affect statistics tabulation directly - it is
+     * up to the component to enable/disable collection based on the value
+     * of this method.
+     * 
+     * @return True if stats collection is enabled, otherwise false.
+     */
+    @Override
     public boolean isEnabled()
     {
         return enabled;
@@ -94,28 +112,55 @@ public class ComponentStatistics implements Statistics
         printer.print(this);
     }
 
+    /**
+     * Tags this stats collector as enabled or disabled. Does not affect
+     * stats calculation - it is up to the caller to check this flag.
+     * 
+     * @param b True if stats should be enabled, otherwise false.
+     */
     public void setEnabled(boolean b)
     {
         this.enabled = b;
     }
 
+    /**
+     * The maximum total event execution time seen since last cleared.
+     *  
+     * @return The maximum time, or zero if no events have been started.
+     */
     public long getMaxExecutionTime()
     {
         return maxExecutionTime;
     }
 
+    /**
+     * The minimum total event execution time seen since last cleared.
+     *  
+     * @return The maximum time, or zero if no events have been completed.
+     */
     public long getMinExecutionTime()
     {
         return minExecutionTime;
     }
 
+    /**
+     * The total cumulative execution time since statistics were last cleared.
+     * Includes the sum of all branch times plus any directly recorded execution
+     * times.
+     * 
+     * @return The total cumulative execution time, in milliseconds.
+     */
     public long getTotalExecutionTime()
     {
         return totalExecTime;
     }
 
-    /*
-     * executedEvents is since interval started
+    /**
+     * Then number of events executed since last cleared. NOTE: When branch times
+     * are recorded, an event will typically be recorded as 'executed' on the
+     * first branch event. See {@link #addExecutionBranchTime(boolean, long, long)}.
+     * 
+     * @return The number of events executed since last cleared.
      */
     public long getExecutedEvents()
     {
@@ -123,13 +168,22 @@ public class ComponentStatistics implements Statistics
     }
 
     /**
-     * Add a new execution-time measurement for one branch of processing an event
+     * Add a new execution-time measurement for one branch of processing an event.
      * @param first true if this is the first branch for this event
      * @param branch the time to execute this branch
      * @param total the total time (so far) for  processing this event
      */
     public synchronized void addExecutionBranchTime(boolean first, long branch, long total)
     {
+        // TODO: ComponentStatistics should really create distinct Event
+        // objects that can be used to aggregate statistics and then atomically
+        // log them at completion time. 
+        //
+        // As-written, any calls made to clear() after the first call to 
+        // addExecutionBranchTime(...) but before the call to 
+        // addCompleteExecutionTime(...) will necessarily lead to the collection 
+        // of incomplete/incorrect statistics for that event.
+        
         if (statIntervalTimeEnabled)
         {
             long currentTime = System.currentTimeMillis();
@@ -150,31 +204,39 @@ public class ComponentStatistics implements Statistics
             executedEvent++;
         }
 
-        totalExecTime += ProcessingTime.getEffectiveTime(branch);
-        long effectiveTotal = ProcessingTime.getEffectiveTime(total);
-        if (maxExecutionTime == 0 || effectiveTotal > maxExecutionTime)
+        if (executedEvent > 0)
         {
-            maxExecutionTime = effectiveTotal;
+            totalExecTime += ProcessingTime.getEffectiveTime(branch);
+            long effectiveTotal = ProcessingTime.getEffectiveTime(total);
+            if (maxExecutionTime == 0 || effectiveTotal > maxExecutionTime)
+            {
+                maxExecutionTime = effectiveTotal;
+            }
+            averageExecutionTime = totalExecTime / executedEvent;
         }
-        averageExecutionTime = Math.round(totalExecTime / executedEvent);
     }
 
     /**
-     * Add the complete execution time for a flow that also reports branhc execution times
+     * Add the complete execution time for a flow that also reports branch execution times.
      */
     public synchronized void addCompleteExecutionTime(long time)
     {
-        long effectiveTime = ProcessingTime.getEffectiveTime(time);
-        if (minExecutionTime == 0 || effectiveTime < minExecutionTime)
+        if (executedEvent > 0) 
         {
-            minExecutionTime = effectiveTime;
+            long effectiveTime = ProcessingTime.getEffectiveTime(time);
+            if (minExecutionTime == 0 || effectiveTime < minExecutionTime)
+            {
+                minExecutionTime = effectiveTime;
+            }
         }
     }
 
     /**
      * Add a new execution-time measurement for processing an event.
+     * Do not use when reporting branch execution times; see
+     * {@link #addCompleteExecutionTime(long)}.
      *
-     * @param time
+     * @param time The total event time to be logged/recorded.
      */
     public synchronized void addExecutionTime(long time)
     {
@@ -206,9 +268,15 @@ public class ComponentStatistics implements Statistics
         {
             maxExecutionTime = time;
         }
-        averageExecutionTime = Math.round(totalExecTime / executedEvent);
+        averageExecutionTime = totalExecTime / executedEvent;
     }
 
+    /** 
+     * Returns the average execution time, rounded downwards.
+     * 
+     * @return the total event time accumulated to this point, 
+     * divided by the total number of events recorded.
+     */
     public long getAverageExecutionTime()
     {
         return averageExecutionTime;
