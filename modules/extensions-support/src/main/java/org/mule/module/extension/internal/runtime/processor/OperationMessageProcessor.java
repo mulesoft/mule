@@ -29,6 +29,7 @@ import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.util.ExceptionUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,15 +105,18 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         }
         catch (Exception e)
         {
-            throw handledException(String.format("Operation '%s' threw exception", operation.getName()),
-                                   ((OperationContextAdapter) operationContext).getEvent(),
-                                   e);
+            throw handledException(operationContext, e);
         }
     }
 
-    private MuleException handledException(String message, MuleEvent event, Exception e)
+    private MuleException handledException(OperationContext operationContext, Exception e)
     {
-        return new MessagingException(createStaticMessage(message), event, e, this);
+        Throwable root = ExceptionUtils.getRootCause(e);
+        if (root == null)
+        {
+            root = e;
+        }
+        return new MessagingException(createStaticMessage(root.getMessage()), ((OperationContextAdapter) operationContext).getEvent(), root, this);
     }
 
     private OperationContext createOperationContext(MuleEvent event) throws MuleException
