@@ -134,4 +134,37 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
         // num, total, avg, max, min
         assertValues(stats, 2L, 5L, 2L /*note: floor*/, 3L, 2L);
     }
+    
+    @Test
+    public void testStatIntervalReset() {
+        // configure to reset continuously
+        // this functionality is flawed in many ways, but we'll test the basics anyways
+        System.setProperty("statIntervalTime", "-1");
+        ComponentStatistics stats = new ComponentStatistics();
+
+        // single
+        stats.addExecutionTime(100L); // reset and then collect
+        assertValues(stats, 1L, 100L, 100L, 100L, 100L);
+        stats.addExecutionTime(200L); // reset and then collect
+        assertValues(stats, 1L, 200L, 200L, 200L, 200L);
+        
+        // branch
+        stats.addExecutionBranchTime(true, 100L, 100L); // reset and then collect
+        assertValues(stats, 1L, 100L, 100L, 100L, 0L);
+        stats.addExecutionBranchTime(true, 200L, 200L); // reset and then collect
+        assertValues(stats, 1L, 200L, 200L, 200L, 0L);
+        stats.addCompleteExecutionTime(200L); // currently doesn't reset
+        assertValues(stats, 1L, 200L, 200L, 200L, 200L);  
+    }
+
+    @Test
+    public void testStatIntervalNoReset() {
+        // configure to reset far into the future
+        System.setProperty("statIntervalTime", "9999");
+        ComponentStatistics stats = new ComponentStatistics();
+        stats.addExecutionTime(100L);
+        assertValues(stats, 1L, 100L, 100L, 100L, 100L);
+        stats.addExecutionBranchTime(true, 100L, 100L); // no reset expected
+        assertValues(stats, 2L, 200L, 100L, 100L, 100L);
+    }
 }

@@ -169,9 +169,10 @@ public class ComponentStatistics implements Statistics
 
     /**
      * Add a new execution-time measurement for one branch of processing an event.
+     * 
      * @param first true if this is the first branch for this event
      * @param branch the time to execute this branch
-     * @param total the total time (so far) for  processing this event
+     * @param total the total time (so far) for processing this event
      */
     public synchronized void addExecutionBranchTime(boolean first, long branch, long total)
     {
@@ -218,6 +219,9 @@ public class ComponentStatistics implements Statistics
 
     /**
      * Add the complete execution time for a flow that also reports branch execution times.
+     * Use in conjunction with {@link #addExecutionBranchTime(boolean, long, long)}.
+     * 
+     * @param time the total time required to process this event
      */
     public synchronized void addCompleteExecutionTime(long time)
     {
@@ -233,7 +237,7 @@ public class ComponentStatistics implements Statistics
 
     /**
      * Add a new execution-time measurement for processing an event.
-     * Do not use when reporting branch execution times; see
+     * Do not use when reporting branch execution times; instead see
      * {@link #addCompleteExecutionTime(long)}.
      *
      * @param time The total event time to be logged/recorded.
