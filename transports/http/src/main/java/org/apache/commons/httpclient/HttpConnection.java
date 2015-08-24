@@ -739,11 +739,11 @@ public class HttpConnection {
                 socket.setReceiveBufferSize(rcvBufSize);
             }
             int outbuffersize = socket.getSendBufferSize();
-            if (outbuffersize <= 0) {
+            if (outbuffersize <= 0 || sndBufSize < 0) {
                 outbuffersize = 2048;
             }
             int inbuffersize = socket.getReceiveBufferSize();
-            if (inbuffersize <= 0) {
+            if (inbuffersize <= 0 || rcvBufSize < 0) {
                 inbuffersize = 2048;
             }
             inputStream = new BufferedInputStream(socket.getInputStream(), inbuffersize);
@@ -789,15 +789,21 @@ public class HttpConnection {
 
         socket = socketFactory.createSocket(socket, hostName, portNumber, true);
         int sndBufSize = this.params.getSendBufferSize();
+        int outbuffersize;
         if (sndBufSize >= 0) {
             socket.setSendBufferSize(sndBufSize);
+            outbuffersize = sndBufSize;
+        } else {
+            outbuffersize = 2048;
         }
         int rcvBufSize = this.params.getReceiveBufferSize();
+        int inbuffersize;
         if (rcvBufSize >= 0) {
             socket.setReceiveBufferSize(rcvBufSize);
+            inbuffersize = rcvBufSize;
+        } else {
+            inbuffersize = 2048;
         }
-        int outbuffersize = socket.getSendBufferSize();
-        int inbuffersize = socket.getReceiveBufferSize();
         inputStream = new BufferedInputStream(socket.getInputStream(), inbuffersize);
         outputStream = new BufferedOutputStream(socket.getOutputStream(), outbuffersize);
         usingSecureSocket = true;
