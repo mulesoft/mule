@@ -19,6 +19,7 @@ import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.HeisenbergExtension.NAMESPACE;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_LOCATION;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
+import org.mule.config.MuleManifest;
 import org.mule.extension.annotations.Configurations;
 import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
@@ -71,6 +72,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String LAUNDER_MONEY = "launder";
     private static final String INJECTED_EXTENSION_MANAGER = "getInjectedExtensionManager";
     private static final String ALIAS = "alias";
+    private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
 
     @Before
     public void setUp()
@@ -153,6 +155,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         assertThat(declaration.getName(), is(EXTENSION_NAME));
         assertThat(declaration.getDescription(), is(EXTENSION_DESCRIPTION));
+        assertThat(declaration.getVersion(), is(EXTENSION_VERSION));
     }
 
     private void assertTestModuleOperations(Declaration declaration) throws Exception

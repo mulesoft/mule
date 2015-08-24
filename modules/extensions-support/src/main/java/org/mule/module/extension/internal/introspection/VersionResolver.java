@@ -6,33 +6,21 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleRuntimeException;
 import org.mule.extension.annotations.Extension;
 
 /**
- * This class infers the version of an extension from the MANIFEST.MF contained in it's JAR.
- * If this cannot be accomplished, a fallback method is executed.
+ * Component that resolves an extension's version.
+ *
+ * @since 4.0
  */
-public abstract class VersionResolver
+public interface VersionResolver
 {
 
-    public String resolveVersion(Class extensionType, Extension extension)
-    {
-        String version = extensionType.getPackage().getImplementationVersion();
-        if (version == null)
-        {
-            version = fallback(extensionType);
-        }
-        if (version == null)
-        {
-            throw new MuleRuntimeException(createStaticMessage(String.format("Could not resolve version from MANIFEST.MF for extension %s", extension.name())));
-        }
-        return version;
-    }
-
     /**
-     * This method will be invoked when the default mechanism fails. It should return a proper version or null if it fails too.
+     * Resolves the version of a given {@link Extension}
+     *
+     * @param extension the {@link Extension} for which the version will be resolved
+     * @return a {@link String} representing the version
      */
-    public abstract String fallback(Class extensionType);
+    String resolveVersion(Extension extension);
 }

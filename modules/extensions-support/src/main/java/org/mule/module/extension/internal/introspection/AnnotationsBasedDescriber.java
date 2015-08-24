@@ -66,7 +66,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     public AnnotationsBasedDescriber(Class<?> extensionType)
     {
-        this(extensionType, new DefaultVersionResolver());
+        this(extensionType, new ManifestBasedVersionResolver(extensionType));
     }
 
     public AnnotationsBasedDescriber(Class<?> extensionType, VersionResolver versionResolver)
@@ -101,7 +101,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private String getVersion(Extension extension)
     {
-        return versionResolver.resolveVersion(extensionType, extension);
+        return versionResolver.resolveVersion(extension);
     }
 
     private void declareConfigurations(DeclarationDescriptor declaration, Class<?> extensionType)

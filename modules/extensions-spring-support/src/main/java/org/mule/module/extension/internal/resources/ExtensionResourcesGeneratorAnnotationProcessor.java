@@ -106,12 +106,17 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, message);
     }
 
-    private class FixedVersionResolver extends VersionResolver
+    private class FixedVersionResolver implements VersionResolver
     {
         @Override
-        public String fallback(Class extensionType)
+        public String resolveVersion(org.mule.extension.annotations.Extension extension)
         {
-            return processingEnv.getOptions().get("extension.version");
+            String extensionVersion = processingEnv.getOptions().get("extension.version");
+            if (extensionVersion == null)
+            {
+                throw new RuntimeException(String.format("Cannot resolve version for extension %s: option extension.version is missing.", extension.name()));
+            }
+            return extensionVersion;
         }
     }
 }

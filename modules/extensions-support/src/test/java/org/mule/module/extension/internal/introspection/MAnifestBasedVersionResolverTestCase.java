@@ -6,7 +6,6 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createManifestFileIfNecessary;
@@ -22,17 +21,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class VersionResolverTestCase extends AbstractMuleTestCase
+public class ManifestBasedVersionResolverTestCase extends AbstractMuleTestCase
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private VersionResolver versionResolver = new DefaultVersionResolver();
+    private Class<?> clazz = HeisenbergExtension.class;
+    private VersionResolver versionResolver = new ManifestBasedVersionResolver(clazz);
 
     @Test
     public void failsWithOutManifest()
     {
-        thrown.expectMessage(containsString("Could not resolve version from MANIFEST.MF for extension"));
+        thrown.expectMessage(is("Cannot resolve version for extension heisenberg: MANIFEST.MF could not be found."));
         testResolution();
     }
 
@@ -57,7 +57,6 @@ public class VersionResolverTestCase extends AbstractMuleTestCase
 
     private String testResolution()
     {
-        Class<?> clazz = HeisenbergExtension.class;
-        return versionResolver.resolveVersion(clazz, clazz.getAnnotation(Extension.class));
+        return versionResolver.resolveVersion(clazz.getAnnotation(Extension.class));
     }
 }
