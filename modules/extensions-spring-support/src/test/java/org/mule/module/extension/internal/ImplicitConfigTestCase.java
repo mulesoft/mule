@@ -60,7 +60,7 @@ public class ImplicitConfigTestCase extends ExtensionsFunctionalTestCase
         assertThat(config.getOptionalWithDefault(), is(defaultValue));
     }
 
-    @Extension(name = "implicit", version = "1.0")
+    @Extension(name = "implicit")
     @Operations({ImplicitOperations.class})
     @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/implicit", namespace = "implicit", schemaVersion = "1.0")
     public static class ImplicitConfigExtension implements Initialisable, Startable, MuleContextAware

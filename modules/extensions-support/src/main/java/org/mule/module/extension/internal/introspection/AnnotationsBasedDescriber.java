@@ -62,12 +62,20 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private CapabilitiesResolver capabilitiesResolver = new DefaultCapabilitiesResolver(new SpiServiceRegistry());
     private final Class<?> extensionType;
+    private final VersionResolver versionResolver;
 
     public AnnotationsBasedDescriber(Class<?> extensionType)
     {
+        this(extensionType, new ManifestBasedVersionResolver(extensionType));
+    }
+
+    public AnnotationsBasedDescriber(Class<?> extensionType, VersionResolver versionResolver)
+    {
         checkArgument(extensionType != null, String.format("describer %s does not specify an extension type", getClass().getName()));
         this.extensionType = extensionType;
+        this.versionResolver = versionResolver;
     }
+
 
     /**
      * {@inheritDoc}
@@ -88,7 +96,12 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private DeclarationDescriptor newDeclarationDescriptor(Extension extension)
     {
-        return new DeclarationDescriptor(extension.name(), extension.version()).describedAs(extension.description());
+        return new DeclarationDescriptor(extension.name(), getVersion(extension)).describedAs(extension.description());
+    }
+
+    private String getVersion(Extension extension)
+    {
+        return versionResolver.resolveVersion(extension);
     }
 
     private void declareConfigurations(DeclarationDescriptor declaration, Class<?> extensionType)

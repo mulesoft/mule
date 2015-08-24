@@ -42,7 +42,7 @@ import java.util.Locale;
  *
  * @since 3.7.0
  */
-@Extension(name = "validation", description = "Mule Validation Extension", version = "3.7")
+@Extension(name = "validation", description = "Mule Validation Extension")
 @Operations({CommonValidationOperations.class, CustomValidatorOperation.class, ValidationStrategies.class, NumberValidationOperation.class})
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/validation", namespace = "validation", schemaVersion = "3.7")
 @Extensible(alias = "validator-message-processor")

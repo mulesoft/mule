@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
-import static org.mule.module.extension.HeisenbergExtension.EXTENSION_VERSION;
 import org.mule.extension.annotations.Extensible;
 import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
@@ -67,7 +66,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
         assertThat(capability.getType(), is(sameInstance(capabilityType)));
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations(ExtensibleExtensionOperation.class)
     @Extensible
     public static class ExtensibleExtension
@@ -75,14 +74,14 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations({ClassLevelExtensionOfOperation.class, MethodLevelExtensionOfOperation.class})
     public static class ExtendingExtension
     {
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations({MethodLevelExtensionOfOperation.class, ExtensibleExtensionOperation.class})
     @Extensible
     public static class ExtensibleExtendingExtension
