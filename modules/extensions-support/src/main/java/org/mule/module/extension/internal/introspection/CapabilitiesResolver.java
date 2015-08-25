@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.introspection;
 
 import org.mule.extension.introspection.Capable;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 
 /**
@@ -22,7 +22,7 @@ public interface CapabilitiesResolver
      * Resolves the capabilities present in {@code extensionType} and registers them in
      * {@code builder}
      *
-     * @param declaration     a {@link DeclarationDescriptor} describing the {@link Extension} to be built
+     * @param declaration     a {@link DeclarationDescriptor} describing the {@link ExtensionModel} to be built
      * @param capableType     the type of the {@link Capable} class
      * @throws java.lang.IllegalArgumentException if any argument is {@code null}
      */

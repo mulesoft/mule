@@ -10,16 +10,16 @@ import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConfigName;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
 import org.mule.api.registry.Registry;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
 /**
  * Implementation of {@link BaseExtensionBeanDefinitionParser} capable of parsing instances
- * which are compliant with the model defined in a {@link Configuration}. The outcome of
- * this parser will be a {@link ConfigurationInstanceProviderFactoryBean}.
+ * which are compliant with the model defined in a {@link ConfigurationModel}. The outcome of
+ * this parser will be a {@link ConfigurationProviderFactoryBean}.
  * <p/>
  * It supports simple attributes, pojos, lists/sets of simple attributes, list/sets of beans,
  * and maps of simple attributes
@@ -32,14 +32,14 @@ import org.w3c.dom.Element;
 final class ConfigurationBeanDefinitionParser extends BaseExtensionBeanDefinitionParser
 {
 
-    private final Extension extension;
-    private final Configuration configuration;
+    private final ExtensionModel extensionModel;
+    private final ConfigurationModel configurationModel;
 
-    ConfigurationBeanDefinitionParser(Extension extension, Configuration configuration)
+    ConfigurationBeanDefinitionParser(ExtensionModel extensionModel, ConfigurationModel configurationModel)
     {
-        super(ConfigurationInstanceProviderFactoryBean.class);
-        this.extension = extension;
-        this.configuration = configuration;
+        super(ConfigurationProviderFactoryBean.class);
+        this.extensionModel = extensionModel;
+        this.configurationModel = configurationModel;
     }
 
     @Override
@@ -47,8 +47,8 @@ final class ConfigurationBeanDefinitionParser extends BaseExtensionBeanDefinitio
     {
         parseConfigName(element, builder);
 
-        builder.addConstructorArgValue(extension);
-        builder.addConstructorArgValue(configuration);
+        builder.addConstructorArgValue(extensionModel);
+        builder.addConstructorArgValue(configurationModel);
         builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
         builder.addConstructorArgReference(OBJECT_MULE_CONTEXT);
     }

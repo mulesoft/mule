@@ -16,7 +16,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.extension.annotations.Configuration;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
@@ -39,7 +39,7 @@ import org.apache.commons.collections.Predicate;
 
 /**
  * Utility class that picks a {@link Declaration}
- * on which a {@link Extension} has already been described
+ * on which a {@link ExtensionModel} has already been described
  * and enriches such description with the javadocs extracted from the extension's acting classes.
  * <p/>
  * This is necessary because such documentation is not available on runtime, thus this class

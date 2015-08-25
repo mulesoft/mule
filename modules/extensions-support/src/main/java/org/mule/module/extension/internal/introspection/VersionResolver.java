@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.introspection;
 
 import org.mule.extension.annotations.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 
 /**
  * Component that resolves an extension's version.
@@ -17,7 +18,7 @@ public interface VersionResolver
 {
 
     /**
-     * Resolves the version of a given {@link Extension}
+     * Resolves the version of a given {@link ExtensionModel}
      *
      * @param extension the {@link Extension} for which the version will be resolved
      * @return a {@link String} representing the version

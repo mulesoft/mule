@@ -19,7 +19,7 @@ import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataQualifierVisitor;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.introspection.SimpleTypeDataQualifierVisitor;
@@ -27,12 +27,12 @@ import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.CachingValueResolverWrapper;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
-import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.TemplateParser;
@@ -108,13 +108,13 @@ final class XmlExtensionParserUtils
      * {@code parameter}. It then returns a {@link ValueResolver} which will provide
      * the actual value extracted from the {@code element}
      *
-     * @param element   a {@link ElementDescriptor}
-     * @param parameter a {@link Parameter}
+     * @param element        a {@link ElementDescriptor}
+     * @param parameterModel a {@link ParameterModel}
      * @return a {@link ValueResolver}
      */
-    static ValueResolver parseParameter(ElementDescriptor element, Parameter parameter)
+    static ValueResolver parseParameter(ElementDescriptor element, ParameterModel parameterModel)
     {
-        return parseElement(element, parameter.getName(), parameter.getType(), parameter.getDefaultValue());
+        return parseElement(element, parameterModel.getName(), parameterModel.getType(), parameterModel.getDefaultValue());
     }
 
     /**
@@ -202,50 +202,50 @@ final class XmlExtensionParserUtils
 
     /**
      * Creates a new {@link ResolverSet} which provides a {@link ValueResolver valueResolvers}
-     * for each {@link Parameter} in the {@code parameters} list,
+     * for each {@link ParameterModel} in the {@code parameters} list,
      * taking the same {@code element} as source
      *
-     * @param element    a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
-     * @param parameters a {@link List} of {@link Parameter}s
+     * @param element         a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
+     * @param parameterModels a {@link List} of {@link ParameterModel parameterModels}
      * @return a {@link ResolverSet}
      */
-    static ResolverSet getResolverSet(ElementDescriptor element, List<Parameter> parameters)
+    static ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels)
     {
-        return getResolverSet(element, parameters, ImmutableMap.<String, List<MessageProcessor>>of());
+        return getResolverSet(element, parameterModels, ImmutableMap.<String, List<MessageProcessor>>of());
     }
 
     /**
      * Creates a new {@link ResolverSet} which provides a {@link ValueResolver valueResolvers}
-     * for each {@link Parameter} in the {@code parameters} list, taking as source the given {@code element}
-     * an a {@code nestedOperations} {@link Map} which has {@link Parameter} names as keys, and {@link List}s
+     * for each {@link ParameterModel} in the {@code parameters} list, taking as source the given {@code element}
+     * an a {@code nestedOperations} {@link Map} which has {@link ParameterModel} names as keys, and {@link List}s
      * of {@link MessageProcessor} as values.
      * <p/>
-     * For each {@link Parameter} in the {@code parameters} list, if an entry exists in the {@code nestedOperations}
+     * For each {@link ParameterModel} in the {@code parameters} list, if an entry exists in the {@code nestedOperations}
      * {@link Map}, a {@link ValueResolver} that generates {@link NestedProcessor} instances will be added to the
      * {@link ResolverSet}. Otherwise, a {@link ValueResolver} will be inferred from the given {@code element} just
      * like the {@link #getResolverSet(ElementDescriptor, List)} method does
      *
      * @param element          a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
-     * @param parameters       a {@link List} of {@link Parameter}s
-     * @param nestedOperations a {@link Map} which has {@link Parameter} names as keys, and {@link List}s
+     * @param parameterModels  a {@link List} of {@link ParameterModel parameterModels}
+     * @param nestedOperations a {@link Map} which has {@link ParameterModel} names as keys, and {@link List}s
      *                         of {@link MessageProcessor} as values
      * @return a {@link ResolverSet}
      */
-    static ResolverSet getResolverSet(ElementDescriptor element, List<Parameter> parameters, Map<String, List<MessageProcessor>> nestedOperations)
+    static ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels, Map<String, List<MessageProcessor>> nestedOperations)
     {
         ResolverSet resolverSet = new ResolverSet();
 
-        for (Parameter parameter : parameters)
+        for (ParameterModel parameterModel : parameterModels)
         {
-            List<MessageProcessor> nestedProcessors = nestedOperations.get(parameter.getName());
+            List<MessageProcessor> nestedProcessors = nestedOperations.get(parameterModel.getName());
             if (!CollectionUtils.isEmpty(nestedProcessors))
             {
-                addNestedProcessorResolver(resolverSet, parameter, nestedProcessors);
+                addNestedProcessorResolver(resolverSet, parameterModel, nestedProcessors);
             }
             else
             {
-                ValueResolver<?> resolver = parseParameter(element, parameter);
-                resolverSet.add(parameter, resolver != null ? resolver : new StaticValueResolver(null));
+                ValueResolver<?> resolver = parseParameter(element, parameterModel);
+                resolverSet.add(parameterModel, resolver != null ? resolver : new StaticValueResolver(null));
             }
         }
 
@@ -517,7 +517,7 @@ final class XmlExtensionParserUtils
         }
     }
 
-    private static void addNestedProcessorResolver(ResolverSet resolverSet, Parameter parameter, List<MessageProcessor> nestedProcessors)
+    private static void addNestedProcessorResolver(ResolverSet resolverSet, ParameterModel parameterModel, List<MessageProcessor> nestedProcessors)
     {
         List<ValueResolver<NestedProcessor>> nestedProcessorResolvers = new ArrayList<>(nestedProcessors.size());
         for (MessageProcessor nestedProcessor : nestedProcessors)
@@ -525,13 +525,13 @@ final class XmlExtensionParserUtils
             nestedProcessorResolvers.add(new NestedProcessorValueResolver(nestedProcessor));
         }
 
-        if (nestedProcessors.size() == 1 && parameter.getType().getQualifier() != DataQualifier.LIST)
+        if (nestedProcessors.size() == 1 && parameterModel.getType().getQualifier() != DataQualifier.LIST)
         {
-            resolverSet.add(parameter, new NestedProcessorValueResolver(nestedProcessors.get(0)));
+            resolverSet.add(parameterModel, new NestedProcessorValueResolver(nestedProcessors.get(0)));
         }
         else
         {
-            resolverSet.add(parameter, CollectionValueResolver.of(ArrayList.class, nestedProcessorResolvers));
+            resolverSet.add(parameterModel, CollectionValueResolver.of(ArrayList.class, nestedProcessorResolvers));
         }
     }
 

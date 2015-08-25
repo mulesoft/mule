@@ -11,8 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import org.hamcrest.core.IsInstanceOf;
@@ -42,11 +42,11 @@ public class HeisenbergDefaultConfigTestCase extends ExtensionsFunctionalTestCas
     public void twoConfigsAndNoConfigRef() throws Exception
     {
         ExtensionManager extensionManager = muleContext.getExtensionManager();
-        Extension extension = extensionManager.getExtensions().iterator().next();
-        assertThat(extension.getName(), is(EXTENSION_NAME));
+        ExtensionModel extensionModel = extensionManager.getExtensions().iterator().next();
+        assertThat(extensionModel.getName(), is(EXTENSION_NAME));
 
-        ConfigurationInstanceProvider<Object> configurationInstanceProvider = mock(ConfigurationInstanceProvider.class);
-        extensionManager.registerConfigurationInstanceProvider(extension, "secondConfig", configurationInstanceProvider);
+        ConfigurationProvider<Object> configurationProvider = mock(ConfigurationProvider.class);
+        extensionManager.registerConfigurationProvider(extensionModel, "secondConfig", configurationProvider);
 
         expectedException.expectCause(IsInstanceOf.<IllegalStateException>instanceOf(IllegalStateException.class));
         runFlow("sayMyName");

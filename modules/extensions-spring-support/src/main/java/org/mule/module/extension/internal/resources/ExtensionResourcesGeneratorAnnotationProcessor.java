@@ -7,8 +7,9 @@
 package org.mule.module.extension.internal.resources;
 
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.annotations.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.resources.ResourcesGenerator;
@@ -35,7 +36,7 @@ import javax.tools.Diagnostic;
 
 /**
  * Annotation processor that picks up all the extensions annotated with
- * {@link Extension} and use a
+ * {@link ExtensionModel} and use a
  * {@link ResourcesGenerator} to generated
  * the required resources.
  * <p/>
@@ -67,8 +68,8 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         {
             for (TypeElement extensionElement : findExtensions(roundEnv))
             {
-                Extension extension = parseExtension(extensionElement, roundEnv);
-                generator.generateFor(extension);
+                ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
+                generator.generateFor(extensionModel);
             }
 
             generator.dumpAll();
@@ -83,7 +84,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         }
     }
 
-    private Extension parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment)
+    private ExtensionModel parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment)
     {
         Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
         Describer describer = new AnnotationsBasedDescriber(extensionClass, new FixedVersionResolver());
@@ -109,7 +110,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
     private class FixedVersionResolver implements VersionResolver
     {
         @Override
-        public String resolveVersion(org.mule.extension.annotations.Extension extension)
+        public String resolveVersion(Extension extension)
         {
             String extensionVersion = processingEnv.getOptions().get("extension.version");
             if (extensionVersion == null)

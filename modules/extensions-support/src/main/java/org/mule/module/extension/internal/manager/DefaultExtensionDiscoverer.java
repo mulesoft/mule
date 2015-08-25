@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.manager;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.declaration.Describer;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
@@ -39,7 +39,7 @@ final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
      * {@inheritDoc}
      */
     @Override
-    public List<Extension> discover(ClassLoader classLoader)
+    public List<ExtensionModel> discover(ClassLoader classLoader)
     {
         checkArgument(classLoader != null, "classloader cannot be null");
 
@@ -49,7 +49,7 @@ final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
             return ImmutableList.of();
         }
 
-        ImmutableList.Builder<Extension> builder = ImmutableList.builder();
+        ImmutableList.Builder<ExtensionModel> builder = ImmutableList.builder();
         for (Describer describer : describers)
         {
             builder.add(extensionFactory.createFrom(describer.describe()));

@@ -10,10 +10,10 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.asOpera
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Parameter;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.ParameterModel;
+import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -23,7 +23,7 @@ import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 /**
  * Default implementation of {@link ImplicitConfigurationFactory}.
- * Implicit configurations are created from {@link Configuration configurations} which have all
+ * Implicit configurations are created from {@link ConfigurationModel configurations} which have all
  * parameters that are either not required or have a default value defined that's not {@code null}.
  *
  * @since 3.8.0
@@ -41,82 +41,82 @@ final class DefaultImplicitConfigurationFactory implements ImplicitConfiguration
     }
 
     @Override
-    public ConfigurationInstanceHolder createImplicitConfigurationInstance(Extension extension, OperationContext operationContext, ConfigurationInstanceRegistrationCallback registrationCallback)
+    public ConfigurationHolder createImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext, ConfigurationRegistrationCallback registrationCallback)
     {
-        Configuration implicitConfiguration = getImplicitConfiguration(extension);
+        ConfigurationModel implicitConfigurationModel = getImplicitConfiguration(extensionModel);
 
-        if (implicitConfiguration == null)
+        if (implicitConfigurationModel == null)
         {
-            throw new IllegalStateException(String.format("Could not find a config for extension '%s' and none can be created automatically. Please define one", extension.getName()));
+            throw new IllegalStateException(String.format("Could not find a config for extension '%s' and none can be created automatically. Please define one", extensionModel.getName()));
         }
 
-        synchronized (implicitConfiguration)
+        synchronized (implicitConfigurationModel)
         {
             //check that another thread didn't beat us to create the instance
-            if (!extensionRegistry.getExtensionState(extension).getConfigurationInstanceProviders().isEmpty())
+            if (!extensionRegistry.getExtensionState(extensionModel).getConfigurationProviders().isEmpty())
             {
                 return null;
             }
 
-            final String instanceName = String.format("%s-%s", extension.getName(), implicitConfiguration.getName());
-            ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(implicitConfiguration, buildImplicitConfigurationResolverSet(implicitConfiguration));
+            final String instanceName = String.format("%s-%s", extensionModel.getName(), implicitConfigurationModel.getName());
+            ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(implicitConfigurationModel, buildImplicitConfigurationResolverSet(implicitConfigurationModel));
 
-            Object configurationInstance;
+            Object configuration;
             try
             {
-                configurationInstance = configurationObjectBuilder.build(asOperationContextAdapter(operationContext).getEvent());
+                configuration = configurationObjectBuilder.build(asOperationContextAdapter(operationContext).getEvent());
             }
             catch (MuleException e)
             {
                 throw new MuleRuntimeException(e);
             }
-            return new ConfigurationInstanceHolder(instanceName, configurationInstance);
+            return new ConfigurationHolder(instanceName, configuration);
         }
     }
 
-    private ResolverSet buildImplicitConfigurationResolverSet(Configuration configuration)
+    private ResolverSet buildImplicitConfigurationResolverSet(ConfigurationModel configurationModel)
     {
         ResolverSet resolverSet = new ResolverSet();
-        for (Parameter parameter : configuration.getParameters())
+        for (ParameterModel parameterModel : configurationModel.getParameterModels())
         {
-            Object defaultValue = parameter.getDefaultValue();
+            Object defaultValue = parameterModel.getDefaultValue();
             if (defaultValue != null)
             {
                 ValueResolver<Object> valueResolver;
                 if (defaultValue instanceof String && muleContext.getExpressionManager().isExpression((String) defaultValue))
                 {
-                    valueResolver = new TypeSafeExpressionValueResolver<>((String) defaultValue, parameter.getType());
+                    valueResolver = new TypeSafeExpressionValueResolver<>((String) defaultValue, parameterModel.getType());
                 }
                 else
                 {
                     valueResolver = new StaticValueResolver<>(defaultValue);
                 }
 
-                resolverSet.add(parameter, valueResolver);
+                resolverSet.add(parameterModel, valueResolver);
             }
         }
 
         return resolverSet;
     }
 
-    private Configuration getImplicitConfiguration(Extension extension)
+    private ConfigurationModel getImplicitConfiguration(ExtensionModel extensionModel)
     {
-        for (Configuration configuration : extension.getConfigurations())
+        for (ConfigurationModel configurationModel : extensionModel.getConfigurations())
         {
-            if (canBeUsedImplicitly(configuration))
+            if (canBeUsedImplicitly(configurationModel))
             {
-                return configuration;
+                return configurationModel;
             }
         }
 
         return null;
     }
 
-    private boolean canBeUsedImplicitly(Configuration configuration)
+    private boolean canBeUsedImplicitly(ConfigurationModel configurationModel)
     {
-        for (Parameter parameter : configuration.getParameters())
+        for (ParameterModel parameterModel : configurationModel.getParameterModels())
         {
-            if (parameter.isRequired() && parameter.getDefaultValue() == null)
+            if (parameterModel.isRequired() && parameterModel.getDefaultValue() == null)
             {
                 return false;
             }

@@ -10,9 +10,9 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.asOpera
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.ExpirableContainer;
@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * A {@link ConfigurationInstanceProvider} which continuously evaluates the same
+ * A {@link ConfigurationProvider} which continuously evaluates the same
  * {@link ResolverSet} and then uses the resulting {@link ResolverSetResult}
  * to build an instance of a given type.
  * <p/>
@@ -39,17 +39,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @since 4.0.0
  */
-public final class DynamicConfigurationInstanceProvider<T> implements ConfigurationInstanceProvider<T>, ExpirableContainer<Object>
+public final class DynamicConfigurationProvider<T> implements ConfigurationProvider<T>, ExpirableContainer<Object>
 {
 
     private final String name;
-    private final Extension extension;
-    private final ConfigurationInstanceRegistrationCallback registrationCallback;
+    private final ExtensionModel extensionModel;
+    private final ConfigurationRegistrationCallback registrationCallback;
     private final ConfigurationObjectBuilder configurationObjectBuilder;
     private final ResolverSet resolverSet;
     private final ExpirationPolicy expirationPolicy;
 
-    private final Map<ResolverSetResult, ExpirableDynamicConfigurationInstance> cache = new ConcurrentHashMap<>();
+    private final Map<ResolverSetResult, ExpirableDynamicConfiguration> cache = new ConcurrentHashMap<>();
     private final ReadWriteLock cacheLock = new ReentrantReadWriteLock();
     private final Lock cacheReadLock = cacheLock.readLock();
     private final Lock cacheWriteLock = cacheLock.writeLock();
@@ -60,15 +60,15 @@ public final class DynamicConfigurationInstanceProvider<T> implements Configurat
      * @param configurationObjectBuilder the {@link ConfigurationObjectBuilder} that will build the configuration instances
      * @param resolverSet                the {@link ResolverSet} that's going to be evaluated
      */
-    public DynamicConfigurationInstanceProvider(String name,
-                                                Extension extension,
-                                                ConfigurationInstanceRegistrationCallback registrationCallback,
-                                                ConfigurationObjectBuilder configurationObjectBuilder,
-                                                ResolverSet resolverSet,
-                                                ExpirationPolicy expirationPolicy)
+    public DynamicConfigurationProvider(String name,
+                                        ExtensionModel extensionModel,
+                                        ConfigurationRegistrationCallback registrationCallback,
+                                        ConfigurationObjectBuilder configurationObjectBuilder,
+                                        ResolverSet resolverSet,
+                                        ExpirationPolicy expirationPolicy)
     {
         this.name = name;
-        this.extension = extension;
+        this.extensionModel = extensionModel;
         this.registrationCallback = registrationCallback;
         this.configurationObjectBuilder = configurationObjectBuilder;
         this.resolverSet = resolverSet;
@@ -89,12 +89,12 @@ public final class DynamicConfigurationInstanceProvider<T> implements Configurat
         try
         {
             ResolverSetResult result = resolverSet.resolve(asOperationContextAdapter(operationContext).getEvent());
-            ExpirableDynamicConfigurationInstance configurationInstance = getConfigurationInstance(result);
+            ExpirableDynamicConfiguration configuration = getConfiguration(result);
 
-            operationContext.onOperationSuccessful(signal -> discountUsage(configurationInstance));
-            operationContext.onOperationFailed(signal -> discountUsage(configurationInstance));
+            operationContext.onOperationSuccessful(signal -> discountUsage(configuration));
+            operationContext.onOperationFailed(signal -> discountUsage(configuration));
 
-            return (T) configurationInstance.getConfigurationInstance();
+            return (T) configuration.getConfiguration();
         }
         catch (Exception e)
         {
@@ -102,18 +102,18 @@ public final class DynamicConfigurationInstanceProvider<T> implements Configurat
         }
     }
 
-    private ExpirableDynamicConfigurationInstance getConfigurationInstance(ResolverSetResult resolverSetResult) throws Exception
+    private ExpirableDynamicConfiguration getConfiguration(ResolverSetResult resolverSetResult) throws Exception
     {
-        ExpirableDynamicConfigurationInstance configurationInstance;
+        ExpirableDynamicConfiguration configuration;
         cacheReadLock.lock();
         try
         {
-            configurationInstance = cache.get(resolverSetResult);
-            if (configurationInstance != null)
+            configuration = cache.get(resolverSetResult);
+            if (configuration != null)
             {
                 //important to account between the boundaries of the lock to prevent race condition
-                configurationInstance.accountUsage();
-                return configurationInstance;
+                configuration.accountUsage();
+                return configuration;
             }
         }
         finally
@@ -125,16 +125,16 @@ public final class DynamicConfigurationInstanceProvider<T> implements Configurat
         try
         {
             // re-check in case some other thread beat us to it...
-            configurationInstance = cache.get(resolverSetResult);
-            if (configurationInstance == null)
+            configuration = cache.get(resolverSetResult);
+            if (configuration == null)
             {
-                configurationInstance = createConfigurationInstance(resolverSetResult);
-                cache.put(resolverSetResult, configurationInstance);
+                configuration = createConfiguration(resolverSetResult);
+                cache.put(resolverSetResult, configuration);
             }
 
             // accounting here for the same reasons as above
-            configurationInstance.accountUsage();
-            return configurationInstance;
+            configuration.accountUsage();
+            return configuration;
         }
         finally
         {
@@ -142,11 +142,11 @@ public final class DynamicConfigurationInstanceProvider<T> implements Configurat
         }
     }
 
-    private ExpirableDynamicConfigurationInstance createConfigurationInstance(ResolverSetResult result) throws MuleException
+    private ExpirableDynamicConfiguration createConfiguration(ResolverSetResult result) throws MuleException
     {
-        Object configurationInstance = configurationObjectBuilder.build(result);
-        String registrationName = registrationCallback.registerConfigurationInstance(extension, name, configurationInstance);
-        return new ExpirableDynamicConfigurationInstance(registrationName, configurationInstance);
+        Object configuration = configurationObjectBuilder.build(result);
+        String registrationName = registrationCallback.registerConfiguration(extensionModel, name, configuration);
+        return new ExpirableDynamicConfiguration(registrationName, configuration);
     }
 
     @Override
@@ -161,8 +161,8 @@ public final class DynamicConfigurationInstanceProvider<T> implements Configurat
                     .filter(config -> config.getValue().isExpired(expirationPolicy))
                     .forEach(config -> {
                         cache.remove(config.getKey());
-                        ExpirableDynamicConfigurationInstance configurationInstance = config.getValue();
-                        expiredConfigs.put(configurationInstance.getRegistrationName(), configurationInstance.getConfigurationInstance());
+                        ExpirableDynamicConfiguration configuration = config.getValue();
+                        expiredConfigs.put(configuration.getRegistrationName(), configuration.getConfiguration());
                     });
         }
         finally
@@ -173,8 +173,8 @@ public final class DynamicConfigurationInstanceProvider<T> implements Configurat
         return expiredConfigs.build();
     }
 
-    private void discountUsage(ExpirableDynamicConfigurationInstance configurationInstanceHolder)
+    private void discountUsage(ExpirableDynamicConfiguration configuration)
     {
-        configurationInstanceHolder.discountUsage();
+        configuration.discountUsage();
     }
 }

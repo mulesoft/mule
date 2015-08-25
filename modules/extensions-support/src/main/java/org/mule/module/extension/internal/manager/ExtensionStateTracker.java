@@ -9,8 +9,8 @@ package org.mule.module.extension.internal.manager;
 import static org.mule.util.MapUtils.idempotentPut;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.runtime.ConfigurationProvider;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Holds state regarding the use that the platform is doing of a
- * certain {@link Extension}
+ * certain {@link ExtensionModel}
  *
  * @since 3.7.0
  */
@@ -30,84 +30,84 @@ final class ExtensionStateTracker
 {
 
     /**
-     * Correlates instances of {@link ConfigurationInstanceProvider} by the key in which they were defined
-     * through the {@link ExtensionManager#registerConfigurationInstanceProvider(Extension, String, ConfigurationInstanceProvider)}
+     * Correlates instances of {@link ConfigurationProvider} by the key in which they were defined
+     * through the {@link ExtensionManager#registerConfigurationProvider(ExtensionModel, String, ConfigurationProvider)}
      * method.
      */
-    private final Map<String, ExpirableConfigurationInstanceProviderContainer> configurationInstanceProviders = new ConcurrentHashMap<>();
+    private final Map<String, ExpirableConfigurationProviderContainer> configurationProviders = new ConcurrentHashMap<>();
 
     /**
-     * Registers the {@code configurationInstanceProvider} than should be used when a configuration instance
+     * Registers the {@code configurationProvider} than should be used when a configuration instance
      * for the given {@code key} is requested
      *
-     * @param key                           the name under which the {@code configurationInstanceProvider} will be registered
-     * @param configurationInstanceProvider the {@link ConfigurationInstanceProvider} to use
-     * @param <C>                           the generic type of the configuration instances that will be provisioned by {@code configurationInstanceProvider}
+     * @param key                   the name under which the {@code configurationProvider} will be registered
+     * @param configurationProvider the {@link ConfigurationProvider} to use
+     * @param <C>                   the generic type of the configuration instances that will be provisioned by {@code configurationProvider}
      */
-    <C> void registerConfigurationInstanceProvider(String key, ConfigurationInstanceProvider<C> configurationInstanceProvider)
+    <C> void registerConfigurationProvider(String key, ConfigurationProvider<C> configurationProvider)
     {
-        idempotentPut(configurationInstanceProviders, key, new ExpirableConfigurationInstanceProviderContainer(configurationInstanceProvider));
+        idempotentPut(configurationProviders, key, new ExpirableConfigurationProviderContainer(configurationProvider));
     }
 
     /**
-     * Returns the {@link ConfigurationInstanceProvider} that was registered under {@code configurationInstanceProviderName}
-     * through the {@link #registerConfigurationInstanceProvider(String, ConfigurationInstanceProvider)} method
+     * Returns the {@link ConfigurationProvider} that was registered under {@code configurationProviderName}
+     * through the {@link #registerConfigurationProvider(String, ConfigurationProvider)} method
      *
-     * @param configurationInstanceProviderName the registration name of the {@link ConfigurationInstanceProvider} you're looking for
-     * @param <C>                               the generic type of the {@link ConfigurationInstanceProvider}
-     * @return a registered {@link ConfigurationInstanceProvider} or {@code null} if no such provider was registered
+     * @param configurationProviderName the registration name of the {@link ConfigurationProvider} you're looking for
+     * @param <C>                       the generic type of the {@link ConfigurationProvider}
+     * @return a registered {@link ConfigurationProvider} or {@code null} if no such provider was registered
      */
-    <C> ConfigurationInstanceProvider<C> getConfigurationInstanceProvider(String configurationInstanceProviderName)
+    <C> ConfigurationProvider<C> getConfigurationProvider(String configurationProviderName)
     {
-        return (ConfigurationInstanceProvider<C>) getWrapper(configurationInstanceProviderName).getConfigurationInstanceProvider();
+        return (ConfigurationProvider<C>) getWrapper(configurationProviderName).getConfigurationProvider();
     }
 
     /**
-     * Returns an immutable {@link List} with all the {@link ConfigurationInstanceProvider} instances
-     * that were registered through {@link #registerConfigurationInstanceProvider(String, ConfigurationInstanceProvider)}
+     * Returns an immutable {@link List} with all the {@link ConfigurationProvider} instances
+     * that were registered through {@link #registerConfigurationProvider(String, ConfigurationProvider)}
      *
-     * @return a immutable {@link List} with the registered {@link ConfigurationInstanceProvider}. May be empty but will never be {@code null}
+     * @return a immutable {@link List} with the registered {@link ConfigurationProvider}. May be empty but will never be {@code null}
      */
-    List<ConfigurationInstanceProvider<?>> getConfigurationInstanceProviders()
+    List<ConfigurationProvider<?>> getConfigurationProviders()
     {
         return ImmutableList.copyOf(
-                configurationInstanceProviders.values()
+                configurationProviders.values()
                         .stream()
-                        .map(wrapper -> wrapper.getConfigurationInstanceProvider())
+                        .map(wrapper -> wrapper.getConfigurationProvider())
                         .collect(Collectors.toList()));
     }
 
     /**
      * Registers the creation of a new configuration instance
      *
-     * @param providerName          the name of a registered {@link ConfigurationInstanceProvider}
-     * @param registrationName      the name on which the {@code configurationInstance} has been registered on the {@link MuleRegistry}
-     * @param configurationInstance the configuration instance. Cannot be {@code null}
-     * @param <C>                   the generic type for the {@code configurationInstance}
+     * @param providerName     the name of a registered {@link ConfigurationProvider}
+     * @param registrationName the name on which the {@code configuration} has been registered on the {@link MuleRegistry}
+     * @param configuration    the configuration instance. Cannot be {@code null}
+     * @param <C>              the generic type for the {@code configuration}
      */
-    <C> void registerConfigurationInstance(String providerName, String registrationName, C configurationInstance)
+    <C> void registerConfiguration(String providerName, String registrationName, C configuration)
     {
-        ExpirableConfigurationInstanceProviderContainer wrapper = getWrapper(providerName);
-        wrapper.addConfigurationInstance(registrationName, configurationInstance);
+        ExpirableConfigurationProviderContainer wrapper = getWrapper(providerName);
+        wrapper.addConfiguration(registrationName, configuration);
     }
 
-    private ExpirableConfigurationInstanceProviderContainer getWrapper(String configurationInstanceProviderName)
+    private ExpirableConfigurationProviderContainer getWrapper(String configurationProviderName)
     {
-        ExpirableConfigurationInstanceProviderContainer wrapper = configurationInstanceProviders.get(configurationInstanceProviderName);
+        ExpirableConfigurationProviderContainer wrapper = configurationProviders.get(configurationProviderName);
         if (wrapper == null)
         {
             throw new IllegalArgumentException(String.format("No %s was registered with name %s",
-                                                             ConfigurationInstanceProvider.class.getName(),
-                                                             configurationInstanceProviderName));
+                                                             ConfigurationProvider.class.getName(),
+                                                             configurationProviderName));
         }
         return wrapper;
     }
 
 
-    Map<String, Object> getExpiredConfigInstances()
+    Map<String, Object> getExpiredConfigs()
     {
         ImmutableMap.Builder<String, Object> expired = ImmutableMap.builder();
-        configurationInstanceProviders.values().stream().map(wrapper -> wrapper.getExpired()).forEach(expired::putAll);
+        configurationProviders.values().stream().map(wrapper -> wrapper.getExpired()).forEach(expired::putAll);
 
         return expired.build();
     }

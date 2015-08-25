@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.Capable;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.util.CapabilityUtils;
@@ -31,7 +31,7 @@ import java.util.Set;
  * describes the nested group.
  * <p/>
  * To decouple this class from the representation model (which depending on the
- * context could be a {@link Declaration} or an actual {@link Parameter}, this class
+ * context could be a {@link Declaration} or an actual {@link ParameterModel}, this class
  * references parameters by name
  *
  * @since 3.7.0

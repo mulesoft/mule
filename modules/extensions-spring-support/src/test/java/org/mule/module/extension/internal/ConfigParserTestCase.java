@@ -142,7 +142,7 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
 
     private HeisenbergExtension lookupHeisenberg(String key, MuleEvent event) throws Exception
     {
-        return ExtensionsTestUtils.getConfigurationInstanceFromRegistry(key, event);
+        return ExtensionsTestUtils.getConfigurationFromRegistry(key, event);
     }
 
     private MuleEvent getHeisenbergEvent() throws Exception

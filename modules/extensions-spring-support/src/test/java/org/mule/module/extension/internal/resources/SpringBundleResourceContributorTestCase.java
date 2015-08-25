@@ -13,7 +13,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
@@ -48,7 +48,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     private static final String SCHEMA_NAME = "mule-extension.xsd";
 
     @Mock
-    private Extension extension;
+    private ExtensionModel extensionModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private ServiceRegistry serviceRegistry;
@@ -65,12 +65,12 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
         xmlCapability = new ImmutableXmlCapability(EXTENSION_VERSION, "test", UNSCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
         Set<XmlCapability> capabilities = new HashSet<>();
         capabilities.add(xmlCapability);
-        when(extension.getCapabilities(XmlCapability.class)).thenReturn(capabilities);
+        when(extensionModel.getCapabilities(XmlCapability.class)).thenReturn(capabilities);
 
         generator = new AnnotationProcessorResourceGenerator(mock(ProcessingEnvironment.class), serviceRegistry);
 
-        when(extension.getName()).thenReturn(EXTENSION_NAME);
-        when(extension.getVersion()).thenReturn(EXTENSION_VERSION);
+        when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
+        when(extensionModel.getVersion()).thenReturn(EXTENSION_VERSION);
 
         contributor = new SpringBundleResourceContributor();
     }
@@ -78,7 +78,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     @Test
     public void generateSchema()
     {
-        contributor.contribute(extension, generator);
+        contributor.contribute(extensionModel, generator);
 
         GeneratedResource resource = generator.get(SCHEMA_NAME);
         assertNotNull(resource);
@@ -88,7 +88,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     @Test
     public void springHandlers()
     {
-        contributor.contribute(extension, generator);
+        contributor.contribute(extensionModel, generator);
 
         GeneratedResource resource = generator.get("spring.handlers");
         assertNotNull(resource);
@@ -98,7 +98,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     @Test
     public void springSchemas()
     {
-        contributor.contribute(extension, generator);
+        contributor.contribute(extensionModel, generator);
 
         GeneratedResource resource = generator.get("spring.schemas");
         assertNotNull(resource);

@@ -12,11 +12,11 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.runtime.config.DefaultConfigurationInstanceProviderFactory;
+import org.mule.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.size.SmallTest;
 
@@ -31,7 +31,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigurationInstanceProviderTestCase extends AbstractConfigurationInstanceProviderTestCase
+public class ConfigurationProviderTestCase extends AbstractConfigurationInstanceProviderTestCase
 {
 
     private static final Class MODULE_CLASS = HeisenbergExtension.class;
@@ -62,20 +62,20 @@ public class ConfigurationInstanceProviderTestCase extends AbstractConfiguration
         when(muleContext.getExtensionManager()).thenReturn(extensionManager);
         ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIG_NAME);
 
-        when(configuration.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
-        when(configuration.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-        when(configuration.getCapabilities(any(Class.class))).thenReturn(null);
+        when(configurationModel.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
+        when(configurationModel.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
+        when(configurationModel.getCapabilities(any(Class.class))).thenReturn(null);
 
         when(operationContext.getEvent()).thenReturn(event);
 
-        Map<Parameter, ValueResolver> parameters = new HashMap<>();
+        Map<ParameterModel, ValueResolver> parameters = new HashMap<>();
         parameters.put(getParameter("myName", String.class), new StaticValueResolver(MY_NAME));
         parameters.put(getParameter("age", Integer.class), new StaticValueResolver(AGE));
         when(resolverSet.getResolvers()).thenReturn(parameters);
         when(resolverSet.isDynamic()).thenReturn(false);
 
-        instanceProvider = new DefaultConfigurationInstanceProviderFactory()
-                .createStaticConfigurationInstanceProvider(CONFIG_NAME, extension, configuration, resolverSet, muleContext, extensionManager);
+        instanceProvider = new DefaultConfigurationProviderFactory()
+                .createStaticConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet, muleContext, extensionManager);
     }
 
     @Test

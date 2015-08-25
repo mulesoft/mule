@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
@@ -39,10 +39,10 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     private static final String VALUE = "Do you want to build a snowman?";
 
     @Mock
-    private Extension extension;
+    private ExtensionModel extensionModel;
 
     @Mock
-    private Operation operation;
+    private OperationModel operationModel;
 
     @Mock
     private ResolverSetResult resolverSetResult;
@@ -58,11 +58,11 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
-        Map<Parameter, Object> parametersMap = new HashMap<>();
+        Map<ParameterModel, Object> parametersMap = new HashMap<>();
         parametersMap.put(ExtensionsTestUtils.getParameter(PARAM_NAME, String.class), VALUE);
         when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
-        operationContext = new DefaultOperationContext(extension, operation, null, resolverSetResult, event, extensionManager);
+        operationContext = new DefaultOperationContext(extensionModel, operationModel, null, resolverSetResult, event, extensionManager);
     }
 
     @Test
@@ -88,28 +88,28 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void getImplicitConfigurationInstance()
+    public void getImplicitConfiguration()
     {
         final Object configurationInstance = new Object();
-        when(extensionManager.getConfigurationInstance(extension, operationContext)).thenReturn(configurationInstance);
-        assertThat(operationContext.getConfigurationInstance(), is(sameInstance(configurationInstance)));
+        when(extensionManager.getConfiguration(extensionModel, operationContext)).thenReturn(configurationInstance);
+        assertThat(operationContext.getConfiguration(), is(sameInstance(configurationInstance)));
     }
 
     @Test
-    public void getSpecificConfigurationInstance()
+    public void getSpecificConfiguration()
     {
         final String configurationInstanceName = "myConfig";
-        operationContext = new DefaultOperationContext(extension, operation, configurationInstanceName, resolverSetResult, event, extensionManager);
+        operationContext = new DefaultOperationContext(extensionModel, operationModel, configurationInstanceName, resolverSetResult, event, extensionManager);
 
         final Object configurationInstance = new Object();
-        when(extensionManager.getConfigurationInstance(extension, configurationInstanceName, operationContext)).thenReturn(configurationInstance);
-        assertThat(operationContext.getConfigurationInstance(), is(sameInstance(configurationInstance)));
+        when(extensionManager.getConfiguration(extensionModel, configurationInstanceName, operationContext)).thenReturn(configurationInstance);
+        assertThat(operationContext.getConfiguration(), is(sameInstance(configurationInstance)));
     }
 
     @Test
     public void getOperation()
     {
-        assertThat(operationContext.getOperation(), is(operation));
+        assertThat(operationContext.getOperationModel(), is(operationModel));
     }
 
     @Test

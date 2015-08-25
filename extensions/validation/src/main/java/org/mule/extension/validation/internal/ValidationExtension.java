@@ -21,8 +21,9 @@ import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Operation;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.Validator;
 import org.mule.util.ObjectNameHelper;
@@ -31,9 +32,9 @@ import java.util.Locale;
 
 /**
  * An extension which provides validation capabilities by exposing a series of
- * {@link Validator}s as {@link org.mule.extension.introspection.Extension} {@link Operation}s
+ * {@link Validator}s as {@link ExtensionModel} {@link OperationModel}s
  *
- * This class not only defines the extension but also acts as the only available {@link Configuration}
+ * This class not only defines the extension but also acts as the only available {@link ConfigurationModel}
  * for it. It allows parametrizing the {@link Validator}s with custom {@link ExceptionFactory} and
  * i18n bundles (through a {@link I18NConfig}
  *

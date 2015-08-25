@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ParameterModel;
 
 import com.google.common.base.Objects;
 
@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
 
 /**
  * This class represents the outcome of the evaluation of a {@link ResolverSet}.
- * This class maps a set of {@link Parameter} to a set of result {@link Object}s.
+ * This class maps a set of {@link ParameterModel} to a set of result {@link Object}s.
  * <p/>
  * This classes {@link #equals(Object)} and {@link #hashCode()} methods have been redefined
  * to be consistent with the result objects. This is so that given two instances of this class
@@ -43,7 +43,7 @@ public class ResolverSetResult
     {
 
         private int hashCode = 1;
-        private Map<Parameter, Object> values = new LinkedHashMap<>();
+        private Map<ParameterModel, Object> values = new LinkedHashMap<>();
 
         private Builder()
         {
@@ -52,15 +52,15 @@ public class ResolverSetResult
         /**
          * Adds a new result {@code value} for the given {@code parameter}
          *
-         * @param parameter a not {@code null} {@link Parameter}
+         * @param parameterModel a not {@code null} {@link ParameterModel parameterModel}
          * @param value     the associated value. It can be {@code null}
          * @return this builder
          * @throws IllegalArgumentException is {@code parameter} is {@code null}
          */
-        public Builder add(Parameter parameter, Object value)
+        public Builder add(ParameterModel parameterModel, Object value)
         {
-            checkArgument(parameter != null, "parameter cannot be null");
-            values.put(parameter, value);
+            checkArgument(parameterModel != null, "parameter cannot be null");
+            values.put(parameterModel, value);
             hashCode = 31 * hashCode + (value == null ? 0 : value.hashCode());
             return this;
         }
@@ -87,15 +87,15 @@ public class ResolverSetResult
         return new Builder();
     }
 
-    private final Map<Parameter, Object> evaluationResult;
+    private final Map<ParameterModel, Object> evaluationResult;
     private final Map<String, Object> parameterToResult;
     private final int hashCode;
 
-    private ResolverSetResult(Map<Parameter, Object> evaluationResult, int hashCode)
+    private ResolverSetResult(Map<ParameterModel, Object> evaluationResult, int hashCode)
     {
         this.evaluationResult = evaluationResult;
         parameterToResult = new HashMap<>(evaluationResult.size());
-        for (Map.Entry<Parameter, Object> entry : evaluationResult.entrySet())
+        for (Map.Entry<ParameterModel, Object> entry : evaluationResult.entrySet())
         {
             parameterToResult.put(entry.getKey().getName(), entry.getValue());
         }
@@ -106,24 +106,24 @@ public class ResolverSetResult
     /**
      * Returns the value associated with the given {@code parameter}
      *
-     * @param parameter a {@link Parameter} which was registered with the builder
+     * @param parameterModel a {@link ParameterModel} which was registered with the builder
      * @return the value associated to that {@code parameter}
      * @throws NoSuchElementException if the {@code parameter} has not been registered through the builder
      */
-    public Object get(Parameter parameter)
+    public Object get(ParameterModel parameterModel)
     {
-        if (!evaluationResult.containsKey(parameter))
+        if (!evaluationResult.containsKey(parameterModel))
         {
-            throw new NoSuchElementException("This result contains no information for the parameter: " + parameter.getName());
+            throw new NoSuchElementException("This result contains no information for the parameter: " + parameterModel.getName());
         }
 
-        return evaluationResult.get(parameter);
+        return evaluationResult.get(parameterModel);
     }
 
     /**
-     * Returns the value associated with the {@link Parameter} of the given {@code parameterName}
+     * Returns the value associated with the {@link ParameterModel} of the given {@code parameterName}
      *
-     * @param parameterName the name of the {@link Parameter} which value you seek
+     * @param parameterName the name of the {@link ParameterModel} which value you seek
      * @return the value associated to that {@code parameterName}
      * @throws NoSuchElementException if the {@code parameterName} has not been registered through the builder
      */
@@ -137,7 +137,7 @@ public class ResolverSetResult
         return parameterToResult.get(parameterName);
     }
 
-    public Map<Parameter, Object> asMap()
+    public Map<ParameterModel, Object> asMap()
     {
         return Collections.unmodifiableMap(evaluationResult);
     }
@@ -145,7 +145,7 @@ public class ResolverSetResult
     /**
      * Defines equivalence by comparing the values in both objects. To consider that
      * two instances are equal, they both must have equivalent results for every
-     * registered {@link Parameter}. Values will be tested for equality using
+     * registered {@link ParameterModel}. Values will be tested for equality using
      * their own implementation of {@link Object#equals(Object)}. For the case of a
      * {@code null} value, equality requires the other one to be {@code null} as well.
      * <p/>
@@ -161,7 +161,7 @@ public class ResolverSetResult
         if (obj instanceof ResolverSetResult)
         {
             ResolverSetResult other = (ResolverSetResult) obj;
-            for (Map.Entry<Parameter, Object> entry : evaluationResult.entrySet())
+            for (Map.Entry<ParameterModel, Object> entry : evaluationResult.entrySet())
             {
                 Object otherValue = other.get(entry.getKey());
                 if (!Objects.equal(entry.getValue(), otherValue))

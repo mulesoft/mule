@@ -6,13 +6,13 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
 
 /**
- * Provides implicit configurations instances which are compliant with a {@link Configuration} model.
+ * Provides implicit configurations instances which are compliant with a {@link ConfigurationModel}.
  * These are used when no configuration has been specified. A best effort is made to automatically
  * provide a default one but it may not be possible.
  *
@@ -20,13 +20,14 @@ import org.mule.extension.runtime.OperationContext;
  */
 interface ImplicitConfigurationFactory
 {
+
     /**
      * Creates an implicit configuration instance
      *
-     * @param extension an {@link Extension}
-     * @param operationContext an {@link OperationContext}
-     * @param registrationCallback a {@link ConfigurationInstanceRegistrationCallback}
-     * @return a {@link ConfigurationInstanceHolder} or {@code null} if it's not possible to create an implicit configuration
+     * @param extensionModel       an {@link ExtensionModel}
+     * @param operationContext     an {@link OperationContext}
+     * @param registrationCallback a {@link ConfigurationRegistrationCallback}
+     * @return a {@link ConfigurationHolder} or {@code null} if it's not possible to create an implicit configuration
      */
-    ConfigurationInstanceHolder createImplicitConfigurationInstance(Extension extension, OperationContext operationContext, ConfigurationInstanceRegistrationCallback registrationCallback);
+    ConfigurationHolder createImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext, ConfigurationRegistrationCallback registrationCallback);
 }

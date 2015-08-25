@@ -7,10 +7,10 @@
 package org.mule.module.extension.internal.manager;
 
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
 
 /**
@@ -20,26 +20,26 @@ import org.mule.extension.runtime.OperationContext;
  *
  * @since 3.7.0
  */
-public interface ExtensionManagerAdapter extends ExtensionManager, ConfigurationInstanceRegistrationCallback
+public interface ExtensionManagerAdapter extends ExtensionManager, ConfigurationRegistrationCallback
 {
 
     /**
-     * Returns a configuration instance obtained through a {@link ConfigurationInstanceProvider}
-     * previously registered using the {@link #registerConfigurationInstanceProvider(Extension, String, ConfigurationInstanceProvider)}
-     * under the given {@code configurationInstanceProviderName}.
+     * Returns a configuration instance obtained through a {@link ConfigurationProvider}
+     * previously registered using the {@link #registerConfigurationProvider(ExtensionModel, String, ConfigurationProvider)}
+     * under the given {@code configurationProviderName}.
      * <p/>
-     * After the {@link ConfigurationInstanceProvider} has been located, an instance is returned by
-     * invoking its {@link ConfigurationInstanceProvider#get(OperationContext)} with {@code operationContext}
+     * After the {@link ConfigurationProvider} has been located, an instance is returned by
+     * invoking its {@link ConfigurationProvider#get(OperationContext)} with {@code operationContext}
      * as the argument.
      *
-     * @param extension                         the {@link Extension} that owns the {@link Configuration}
-     * @param configurationInstanceProviderName the name of a previously registered {@link ConfigurationInstanceProvider}
-     * @param operationContext                  a {@link OperationContext}
-     * @param <C>                               the type of the configuration instance to be returned
+     * @param extensionModel            the {@link ExtensionModel} that owns the {@link ConfigurationModel}
+     * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
+     * @param operationContext          a {@link OperationContext}
+     * @param <C>                       the type of the configuration instance to be returned
      * @return a configuration instance
      */
-    <C> C getConfigurationInstance(Extension extension, String configurationInstanceProviderName, OperationContext operationContext);
+    <C> C getConfiguration(ExtensionModel extensionModel, String configurationProviderName, OperationContext operationContext);
 
-    <C> C getConfigurationInstance(Extension extension, OperationContext operationContext);
+    <C> C getConfiguration(ExtensionModel extensionModel, OperationContext operationContext);
 
 }

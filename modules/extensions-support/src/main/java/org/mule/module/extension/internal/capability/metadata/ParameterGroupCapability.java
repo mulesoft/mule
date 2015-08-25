@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.capability.metadata;
 
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 
 import com.google.common.collect.ImmutableList;
@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
- * A metadata capability to specify that a certain group of {@link Parameter}s
+ * A metadata capability to specify that a certain group of {@link ParameterModel parameterModels}
  * are grouped. This grouping is transparent and is not reflected on the introspection
  * model because it's implementation specific.
  * <p/>

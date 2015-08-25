@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.runtime;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.event.OperationFailedSignal;
 import org.mule.extension.runtime.event.OperationSuccessfulSignal;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -33,56 +33,57 @@ import java.util.function.Consumer;
 public class DefaultOperationContext implements OperationContextAdapter
 {
 
-    private final String configurationInstanceProviderName;
-    private final Extension extension;
-    private final Operation operation;
+    private final String configurationProviderName;
+    private final ExtensionModel extensionModel;
+    private final OperationModel operationModel;
     private final Map<String, Object> parameters;
     private final MuleEvent event;
     private final ExtensionManagerAdapter extensionManager;
     private final EventBus eventBus = new EventBus();
 
-    private Object configurationInstance;
+    private Object configuration;
 
     /**
      * Creates a new instance with the given state
      *
-     * @param operation        the {@link Operation} that will be executed
+     * @param operationModel   the {@link OperationModel} that will be executed
      * @param parameters       the parameters that the operation will use
      * @param event            the current {@link MuleEvent}
-     * @param extensionManager the {@link ExtensionManagerAdapter} on which the {@link Extension} that owns the {@link Operation} is registered
+     * @param extensionManager the {@link ExtensionManagerAdapter} on which the {@link ExtensionModel} that owns the {@link OperationModel} is registered
+     * @oaram extensionModel the {@link ExtensionModel} that owns the {@code operationModel}
      */
-    public DefaultOperationContext(Extension extension,
-                                   Operation operation,
-                                   String configurationInstanceProviderName,
+    public DefaultOperationContext(ExtensionModel extensionModel,
+                                   OperationModel operationModel,
+                                   String configurationProviderName,
                                    ResolverSetResult parameters,
                                    MuleEvent event,
                                    ExtensionManagerAdapter extensionManager)
     {
-        this.extension = extension;
-        this.operation = operation;
-        this.configurationInstanceProviderName = configurationInstanceProviderName;
+        this.extensionModel = extensionModel;
+        this.operationModel = operationModel;
+        this.configurationProviderName = configurationProviderName;
         this.event = event;
         this.extensionManager = extensionManager;
 
-        Map<Parameter, Object> parameterMap = parameters.asMap();
+        Map<ParameterModel, Object> parameterMap = parameters.asMap();
         this.parameters = new HashMap<>(parameterMap.size());
-        for (Map.Entry<Parameter, Object> parameter : parameterMap.entrySet())
+        for (Map.Entry<ParameterModel, Object> parameter : parameterMap.entrySet())
         {
             this.parameters.put(parameter.getKey().getName(), parameter.getValue());
         }
     }
 
     @Override
-    public <C> C getConfigurationInstance()
+    public <C> C getConfiguration()
     {
-        if (configurationInstance == null)
+        if (configuration == null)
         {
-            configurationInstance = StringUtils.isBlank(configurationInstanceProviderName)
-                                    ? extensionManager.getConfigurationInstance(extension, this)
-                                    : extensionManager.getConfigurationInstance(extension, configurationInstanceProviderName, this);
+            configuration = StringUtils.isBlank(configurationProviderName)
+                                    ? extensionManager.getConfiguration(extensionModel, this)
+                                    : extensionManager.getConfiguration(extensionModel, configurationProviderName, this);
         }
 
-        return (C) configurationInstance;
+        return (C) configuration;
     }
 
     /**
@@ -136,9 +137,9 @@ public class DefaultOperationContext implements OperationContextAdapter
     }
 
     @Override
-    public Operation getOperation()
+    public OperationModel getOperationModel()
     {
-        return operation;
+        return operationModel;
     }
 
     @Override

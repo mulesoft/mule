@@ -9,8 +9,8 @@ package org.mule.module.extension.internal.runtime.config;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.runtime.BaseObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -26,9 +26,9 @@ import java.util.List;
 
 /**
  * Implementation of {@link ObjectBuilder} to create instances that
- * implement a given {@link Configuration}.
+ * match a given {@link ConfigurationModel}.
  * <p/>
- * The object instances are created through the {@link Configuration#getInstantiator()#instantiateObject()}
+ * The object instances are created through the {@link ConfigurationModel#getInstantiator()#instantiateObject()}
  * method. A {@link ResolverSet} is also used to automatically set this builders
  * properties. The name of the properties in the {@link ResolverSet} must match the
  * name of an actual property in the prototype class
@@ -38,33 +38,33 @@ import java.util.List;
 public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
 {
 
-    private final Configuration configuration;
+    private final ConfigurationModel configurationModel;
     private final ResolverSet resolverSet;
     private final List<ValueSetter> groupValueSetters;
     private final List<ValueSetter> singleValueSetters;
 
-    public ConfigurationObjectBuilder(Configuration configuration, ResolverSet resolverSet)
+    public ConfigurationObjectBuilder(ConfigurationModel configurationModel, ResolverSet resolverSet)
     {
-        this.configuration = configuration;
+        this.configurationModel = configurationModel;
         this.resolverSet = resolverSet;
 
-        singleValueSetters = createSingleValueSetters(configuration, resolverSet);
-        groupValueSetters = GroupValueSetter.settersFor(configuration);
+        singleValueSetters = createSingleValueSetters(configurationModel, resolverSet);
+        groupValueSetters = GroupValueSetter.settersFor(configurationModel);
     }
 
-    private List<ValueSetter> createSingleValueSetters(Configuration configuration, ResolverSet resolverSet)
+    private List<ValueSetter> createSingleValueSetters(ConfigurationModel configurationModel, ResolverSet resolverSet)
     {
         ImmutableList.Builder<ValueSetter> singleValueSetters = ImmutableList.builder();
-        Class<?> prototypeClass = configuration.getInstantiator().getObjectType();
-        for (Parameter parameter : resolverSet.getResolvers().keySet())
+        Class<?> prototypeClass = configurationModel.getInstantiator().getObjectType();
+        for (ParameterModel parameterModel : resolverSet.getResolvers().keySet())
         {
 
-            Field field = getField(prototypeClass, parameter);
+            Field field = getField(prototypeClass, parameterModel);
 
             // if no field, then it means this is a group attribute
             if (field != null)
             {
-                singleValueSetters.add(new SingleValueSetter(parameter, field));
+                singleValueSetters.add(new SingleValueSetter(parameterModel, field));
             }
         }
 
@@ -79,22 +79,22 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
 
     public Object build(ResolverSetResult result) throws MuleException
     {
-        Object configurationInstance = instantiateObject();
+        Object configuration = instantiateObject();
 
-        setValues(configurationInstance, result, groupValueSetters);
-        setValues(configurationInstance, result, singleValueSetters);
+        setValues(configuration, result, groupValueSetters);
+        setValues(configuration, result, singleValueSetters);
 
-        return configurationInstance;
+        return configuration;
     }
 
     /**
-     * Creates a new instance by calling {@link Configuration#getInstantiator()#instantiateObject()}
+     * Creates a new instance by calling {@link ConfigurationModel#getInstantiator()#instantiateObject()}
      * {@inheritDoc}
      */
     @Override
     protected Object instantiateObject()
     {
-        return configuration.getInstantiator().newInstance();
+        return configurationModel.getInstantiator().newInstance();
     }
 
     private void setValues(Object target, ResolverSetResult result, List<ValueSetter> setters) throws MuleException

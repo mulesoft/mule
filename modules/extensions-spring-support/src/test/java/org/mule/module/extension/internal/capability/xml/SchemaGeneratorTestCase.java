@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
@@ -47,11 +47,11 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
         String expectedSchema = IOUtils.getResourceAsString("heisenberg.xsd", getClass());
 
         Descriptor descriptor = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe().getRootDeclaration();
-        Extension extension = extensionFactory.createFrom(descriptor);
+        ExtensionModel extensionModel = extensionFactory.createFrom(descriptor);
 
-        XmlCapability capability = extension.getCapabilities(XmlCapability.class).iterator().next();
+        XmlCapability capability = extensionModel.getCapabilities(XmlCapability.class).iterator().next();
 
-        String schema = generator.generate(extension, capability);
+        String schema = generator.generate(extensionModel, capability);
         System.out.println(schema);
 
         XMLUnit.setIgnoreWhitespace(true);

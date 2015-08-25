@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
@@ -52,7 +52,7 @@ public class ExtensionsAsInjectedDependenciesTestCase extends ExtensionsFunction
     public void staticHeisenbergWasInjected() throws Exception
     {
         assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
-        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationInstanceFromRegistry(STATIC_HEISENBERG, getTestEvent(""));
+        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, getTestEvent(""));
         assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
     }
 
@@ -65,11 +65,11 @@ public class ExtensionsAsInjectedDependenciesTestCase extends ExtensionsFunction
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("age", age);
 
-        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationInstanceFromRegistry(DYNAMIC_AGE_HEISENBERG, event);
+        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(DYNAMIC_AGE_HEISENBERG, event);
         assertThat(heisenberg.getPersonalInfo().getAge(), is(age));
     }
 
-    private void assertCorrectProviderInjected(String key, ConfigurationInstanceProvider<?> expected)
+    private void assertCorrectProviderInjected(String key, ConfigurationProvider<?> expected)
     {
         assertThat(expected, is(sameInstance(muleContext.getRegistry().get(key))));
     }
@@ -79,18 +79,18 @@ public class ExtensionsAsInjectedDependenciesTestCase extends ExtensionsFunction
 
         @Inject
         @Named(STATIC_HEISENBERG)
-        private ConfigurationInstanceProvider<HeisenbergExtension> staticHeisenberg;
+        private ConfigurationProvider<HeisenbergExtension> staticHeisenberg;
 
         @Inject
         @Named(DYNAMIC_AGE_HEISENBERG)
-        private ConfigurationInstanceProvider<HeisenbergExtension> dynamicAgeHeisenberg;
+        private ConfigurationProvider<HeisenbergExtension> dynamicAgeHeisenberg;
 
-        public ConfigurationInstanceProvider<HeisenbergExtension> getStaticHeisenberg()
+        public ConfigurationProvider<HeisenbergExtension> getStaticHeisenberg()
         {
             return staticHeisenberg;
         }
 
-        public ConfigurationInstanceProvider<HeisenbergExtension> getDynamicAgeHeisenberg()
+        public ConfigurationProvider<HeisenbergExtension> getDynamicAgeHeisenberg()
         {
             return dynamicAgeHeisenberg;
         }

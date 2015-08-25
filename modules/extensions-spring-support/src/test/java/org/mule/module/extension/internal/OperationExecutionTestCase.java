@@ -180,6 +180,6 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
 
     private HeisenbergExtension getConfig(String name) throws Exception
     {
-        return ExtensionsTestUtils.getConfigurationInstanceFromRegistry(name, getTestEvent(""));
+        return ExtensionsTestUtils.getConfigurationFromRegistry(name, getTestEvent(""));
     }
 }

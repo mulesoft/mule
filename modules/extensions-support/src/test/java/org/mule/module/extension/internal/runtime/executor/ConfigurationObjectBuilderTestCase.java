@@ -13,9 +13,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getResolver;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -40,36 +40,36 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
     private static final String DESCRIPTION_VALUE = "description";
 
     @Mock
-    private Extension extension;
+    private ExtensionModel extensionModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private Configuration configuration;
+    private ConfigurationModel configurationModel;
 
     @Mock
     private MuleEvent event;
 
-    private TestConfig configurationInstance;
+    private TestConfig configuration;
 
     private ConfigurationObjectBuilder configurationObjectBuilder;
     private ResolverSet resolverSet;
-    private Parameter nameParameter = getParameter("name", String.class);
-    private Parameter descriptionParameter = getParameter("description", String.class);
+    private ParameterModel nameParameterModel = getParameter("name", String.class);
+    private ParameterModel descriptionParameterModel = getParameter("description", String.class);
 
     @Before
     public void before() throws Exception
     {
-        configurationInstance = new TestConfig();
+        configuration = new TestConfig();
 
-        when(configuration.getParameters()).thenReturn(Arrays.asList(nameParameter, descriptionParameter));
-        when(configuration.getInstantiator().newInstance()).thenReturn(configurationInstance);
-        when(configuration.getInstantiator().getObjectType()).thenAnswer(invocation -> TestConfig.class);
-        when(configuration.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
+        when(configurationModel.getParameterModels()).thenReturn(Arrays.asList(nameParameterModel, descriptionParameterModel));
+        when(configurationModel.getInstantiator().newInstance()).thenReturn(configuration);
+        when(configurationModel.getInstantiator().getObjectType()).thenAnswer(invocation -> TestConfig.class);
+        when(configurationModel.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
 
         resolverSet = new ResolverSet();
-        resolverSet.add(nameParameter, getResolver(NAME_VALUE));
-        resolverSet.add(descriptionParameter, getResolver(DESCRIPTION_VALUE));
+        resolverSet.add(nameParameterModel, getResolver(NAME_VALUE));
+        resolverSet.add(descriptionParameterModel, getResolver(DESCRIPTION_VALUE));
 
-        configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
+        configurationObjectBuilder = new ConfigurationObjectBuilder(configurationModel, resolverSet);
     }
 
     @Test

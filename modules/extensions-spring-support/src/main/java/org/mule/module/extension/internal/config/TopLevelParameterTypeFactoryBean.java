@@ -9,10 +9,10 @@ package org.mule.module.extension.internal.config;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.api.MuleContext;
-import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * A {@link FactoryBean} that creates instances of a type defined by a
  * {@link DataType}. It will be defined as a top level element and will
- * serve as a reusable {@link Parameter} of a {@link Configuration} or {@link Operation}
+ * serve as a reusable {@link ParameterModel} of a {@link ConfigurationModel} or {@link OperationModel}
  *
  * @since 3.7.0
  */

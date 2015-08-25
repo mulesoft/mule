@@ -11,21 +11,21 @@ package org.mule.module.extension.internal.manager;
  *
  * @since 3.8.0
  */
-final class ConfigurationInstanceHolder
+final class ConfigurationHolder
 {
 
     private final String name;
-    private final Object configurationInstance;
+    private final Object configuration;
 
-    public ConfigurationInstanceHolder(String instanceName, Object configurationInstance)
+    public ConfigurationHolder(String instanceName, Object configuration)
     {
         this.name = instanceName;
-        this.configurationInstance = configurationInstance;
+        this.configuration = configuration;
     }
 
-    public Object getConfigurationInstance()
+    public Object getConfiguration()
     {
-        return configurationInstance;
+        return configuration;
     }
 
     public String getName()

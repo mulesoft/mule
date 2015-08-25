@@ -20,8 +20,8 @@ import org.mule.api.NestedProcessor;
 import org.mule.extension.annotations.param.Ignore;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
@@ -105,9 +105,9 @@ public class IntrospectionUtils
         return toDataType(ResolvableType.forField(field));
     }
 
-    public static Field getField(Class<?> clazz, Parameter parameter)
+    public static Field getField(Class<?> clazz, ParameterModel parameterModel)
     {
-        return getField(clazz, getMemberName(parameter, parameter.getName()), parameter.getType().getRawType());
+        return getField(clazz, getMemberName(parameterModel, parameterModel.getName()), parameterModel.getType().getRawType());
     }
 
     public static Field getField(Class<?> clazz, ParameterDeclaration parameterDeclaration)
@@ -133,14 +133,14 @@ public class IntrospectionUtils
 
         if (isOperation(rawClass))
         {
-            return DataType.of(Operation.class);
+            return DataType.of(OperationModel.class);
         }
 
         if (List.class.isAssignableFrom(rawClass))
         {
             if (!ArrayUtils.isEmpty(generics) && isOperation(generics[0].getRawClass()))
             {
-                return DataType.of(rawClass, Operation.class);
+                return DataType.of(rawClass, OperationModel.class);
             }
         }
 
@@ -191,9 +191,9 @@ public class IntrospectionUtils
         return object.getAnnotation(Optional.class) == null;
     }
 
-    public static boolean isRequired(Parameter parameter, boolean forceOptional)
+    public static boolean isRequired(ParameterModel parameterModel, boolean forceOptional)
     {
-        return !forceOptional && parameter.isRequired();
+        return !forceOptional && parameterModel.isRequired();
     }
 
     public static boolean isDynamic(AccessibleObject object)
@@ -223,31 +223,31 @@ public class IntrospectionUtils
         return getAllMethods(declaringClass, withAnnotation(org.mule.extension.annotations.Operation.class), withModifier(Modifier.PUBLIC));
     }
 
-    public static Method getOperationMethod(Class<?> declaringClass, Operation operation)
+    public static Method getOperationMethod(Class<?> declaringClass, OperationModel operationModel)
     {
         Class<?>[] parameterTypes;
-        if (operation.getParameters().isEmpty())
+        if (operationModel.getParameterModels().isEmpty())
         {
             parameterTypes = org.apache.commons.lang.ArrayUtils.EMPTY_CLASS_ARRAY;
         }
         else
         {
-            parameterTypes = new Class<?>[operation.getParameters().size()];
+            parameterTypes = new Class<?>[operationModel.getParameterModels().size()];
             int i = 0;
-            for (Parameter parameter : operation.getParameters())
+            for (ParameterModel parameterModel : operationModel.getParameterModels())
             {
-                parameterTypes[i++] = parameter.getType().getRawType();
+                parameterTypes[i++] = parameterModel.getType().getRawType();
             }
         }
 
         Collection<Method> methods = getAllMethods(declaringClass,
                                                    withAnnotation(org.mule.extension.annotations.Operation.class),
                                                    withModifier(Modifier.PUBLIC),
-                                                   withName(operation.getName()),
+                                                   withName(operationModel.getName()),
                                                    withParameters(parameterTypes));
 
-        checkArgument(!methods.isEmpty(), String.format("Could not find method %s in class %s", operation.getName(), declaringClass.getName()));
-        checkArgument(methods.size() == 1, String.format("More than one matching method was found in class %s for operation %s", declaringClass.getName(), operation.getName()));
+        checkArgument(!methods.isEmpty(), String.format("Could not find method %s in class %s", operationModel.getName(), declaringClass.getName()));
+        checkArgument(methods.size() == 1, String.format("More than one matching method was found in class %s for operation %s", declaringClass.getName(), operationModel.getName()));
 
         return methods.iterator().next();
     }

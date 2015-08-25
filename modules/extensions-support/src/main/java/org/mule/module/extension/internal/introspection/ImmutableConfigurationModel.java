@@ -9,22 +9,22 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.validateRepeatedNames;
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ConfigurationInstantiator;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ParameterModel;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * Immutable implementation of {@link Configuration}
+ * Immutable implementation of {@link ConfigurationModel}
  *
  * @since 3.7.0
  */
-final class ImmutableConfiguration extends AbstractCapableDescribed implements Configuration
+final class ImmutableConfigurationModel extends AbstractCapableDescribed implements ConfigurationModel
 {
 
-    private final List<Parameter> parameters;
+    private final List<ParameterModel> parameterModels;
     private final ConfigurationInstantiator instantiator;
 
     /**
@@ -33,20 +33,20 @@ final class ImmutableConfiguration extends AbstractCapableDescribed implements C
      * @param name         the configuration's name
      * @param description  the configuration's description
      * @param instantiator the {@link ConfigurationInstantiator}. Cannot be {@code null}
-     * @param parameters   a {@link List} with the configuration's {@link Parameter}s
+     * @param parameterModels   a {@link List} with the configuration's {@link ParameterModel parameterModels}
      * @param capabilities a {@link Set} with the configuration's capabilities
      */
-    protected ImmutableConfiguration(String name,
-                                     String description,
-                                     ConfigurationInstantiator instantiator,
-                                     List<Parameter> parameters,
-                                     Set<Object> capabilities)
+    protected ImmutableConfigurationModel(String name,
+                                          String description,
+                                          ConfigurationInstantiator instantiator,
+                                          List<ParameterModel> parameterModels,
+                                          Set<Object> capabilities)
     {
         super(name, description, capabilities);
-        validateRepeatedNames(parameters);
+        validateRepeatedNames(parameterModels);
         checkArgument(instantiator != null, "instantiator cannot be null");
 
-        this.parameters = immutableList(parameters);
+        this.parameterModels = immutableList(parameterModels);
         this.instantiator = instantiator;
     }
 
@@ -54,9 +54,9 @@ final class ImmutableConfiguration extends AbstractCapableDescribed implements C
      * {@inheritDoc}
      */
     @Override
-    public final List<Parameter> getParameters()
+    public final List<ParameterModel> getParameterModels()
     {
-        return parameters;
+        return parameterModels;
     }
 
     /**

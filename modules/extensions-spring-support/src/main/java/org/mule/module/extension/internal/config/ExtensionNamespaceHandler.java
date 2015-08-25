@@ -11,11 +11,11 @@ import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.config.spring.MuleArtifactContext;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.util.ArrayUtils;
@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 
 /**
  * Generic implementation of {@link org.springframework.beans.factory.xml.NamespaceHandler}
- * capable of parsing configurations and operations for any given {@link Extension}
+ * capable of parsing configurations and operations for any given {@link ExtensionModel}
  * which supports the given namespace.
  * <p/>
  * For this namespace handler to function, an instance of {@link ExtensionManager}
@@ -48,8 +48,8 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 {
 
     private ExtensionManager extensionManager;
-    private final Map<String, Extension> handledExtensions = new HashMap<>();
-    private final Multimap<Extension, String> topLevelParameters = HashMultimap.create();
+    private final Map<String, ExtensionModel> handledExtensions = new HashMap<>();
+    private final Multimap<ExtensionModel, String> topLevelParameters = HashMultimap.create();
 
     /**
      * Attempts to get a hold on a {@link ExtensionManager}
@@ -89,13 +89,13 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
     {
         try
         {
-            Extension extension = locateExtensionByNamespace(namespace);
+            ExtensionModel extensionModel = locateExtensionByNamespace(namespace);
 
-            registerTopLevelParameters(extension);
-            registerConfigurations(extension);
-            registerOperations(extension);
+            registerTopLevelParameters(extensionModel);
+            registerConfigurations(extensionModel);
+            registerOperations(extensionModel);
 
-            handledExtensions.put(namespace, extension);
+            handledExtensions.put(namespace, extensionModel);
         }
         catch (Exception e)
         {
@@ -103,36 +103,36 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         }
     }
 
-    private void registerOperations(Extension extension) throws Exception
+    private void registerOperations(ExtensionModel extensionModel) throws Exception
     {
-        for (Operation operation : extension.getOperations())
+        for (OperationModel operationModel : extensionModel.getOperations())
         {
-            registerBeanDefinitionParser(hyphenize(operation.getName()), new OperationBeanDefinitionParser(extension, operation));
+            registerBeanDefinitionParser(hyphenize(operationModel.getName()), new OperationBeanDefinitionParser(extensionModel, operationModel));
         }
     }
 
-    private void registerConfigurations(Extension extension) throws Exception
+    private void registerConfigurations(ExtensionModel extensionModel) throws Exception
     {
-        for (Configuration configuration : extension.getConfigurations())
+        for (ConfigurationModel configurationModel : extensionModel.getConfigurations())
         {
-            registerBeanDefinitionParser(configuration.getName(), new ConfigurationBeanDefinitionParser(extension, configuration));
+            registerBeanDefinitionParser(configurationModel.getName(), new ConfigurationBeanDefinitionParser(extensionModel, configurationModel));
         }
     }
 
-    private void registerTopLevelParameters(Extension extension)
+    private void registerTopLevelParameters(ExtensionModel extensionModel)
     {
-        for (Configuration configuration : extension.getConfigurations())
+        for (ConfigurationModel configurationModel : extensionModel.getConfigurations())
         {
-            registerTopLevelParameter(extension, configuration.getParameters());
+            registerTopLevelParameter(extensionModel, configurationModel.getParameterModels());
         }
 
-        for (Operation operation : extension.getOperations())
+        for (OperationModel operationModel : extensionModel.getOperations())
         {
-            registerTopLevelParameter(extension, operation.getParameters());
+            registerTopLevelParameter(extensionModel, operationModel.getParameterModels());
         }
     }
 
-    private void registerTopLevelParameter(final Extension extension, final DataType parameterType)
+    private void registerTopLevelParameter(final ExtensionModel extensionModel, final DataType parameterType)
     {
         parameterType.getQualifier().accept(new AbstractDataQualifierVisitor()
         {
@@ -141,7 +141,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
             public void onPojo()
             {
                 String name = hyphenize(getTopLevelTypeName(parameterType));
-                if (topLevelParameters.put(extension, name))
+                if (topLevelParameters.put(extensionModel, name))
                 {
                     registerBeanDefinitionParser(name, new TopLevelParameterTypeBeanDefinitionParser(parameterType));
                 }
@@ -152,7 +152,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
             {
                 if (!ArrayUtils.isEmpty(parameterType.getGenericTypes()))
                 {
-                    registerTopLevelParameter(extension, parameterType.getGenericTypes()[0]);
+                    registerTopLevelParameter(extensionModel, parameterType.getGenericTypes()[0]);
                 }
             }
 
@@ -167,36 +167,36 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 
                 DataType keyType = genericTypes[0];
                 keyType.getQualifier().accept(this);
-                registerTopLevelParameter(extension, keyType);
+                registerTopLevelParameter(extensionModel, keyType);
             }
         });
 
     }
 
-    private void registerTopLevelParameter(Extension extension, Collection<Parameter> parameters)
+    private void registerTopLevelParameter(ExtensionModel extensionModel, Collection<ParameterModel> parameterModels)
     {
-        for (final Parameter parameter : parameters)
+        for (final ParameterModel parameterModel : parameterModels)
         {
-            registerTopLevelParameter(extension, parameter.getType());
+            registerTopLevelParameter(extensionModel, parameterModel.getType());
         }
     }
 
 
-    private Extension locateExtensionByNamespace(String namespace)
+    private ExtensionModel locateExtensionByNamespace(String namespace)
     {
-        Collection<Extension> capableExtensions = extensionManager.getExtensionsCapableOf(XmlCapability.class);
-        if (CollectionUtils.isEmpty(capableExtensions))
+        Collection<ExtensionModel> capableExtensionModels = extensionManager.getExtensionsCapableOf(XmlCapability.class);
+        if (CollectionUtils.isEmpty(capableExtensionModels))
         {
             throw new IllegalArgumentException(
                     String.format("Could not find any extensions supporting XML capabilities. Can't process namespace %s", namespace));
         }
 
-        for (Extension extension : capableExtensions)
+        for (ExtensionModel extensionModel : capableExtensionModels)
         {
-            XmlCapability capability = extension.getCapabilities(XmlCapability.class).iterator().next();
+            XmlCapability capability = extensionModel.getCapabilities(XmlCapability.class).iterator().next();
             if (namespace.equals(capability.getSchemaLocation()))
             {
-                return extension;
+                return extensionModel;
             }
         }
 

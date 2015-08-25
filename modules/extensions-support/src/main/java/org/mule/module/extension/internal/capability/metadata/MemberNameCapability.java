@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.capability.metadata;
 import org.mule.api.NamedObject;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.introspection.Capable;
-import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.Described;
 
 /**
@@ -18,7 +18,7 @@ import org.mule.extension.introspection.Described;
  * to the actual member in which it was defined.
  *
  * The most common use case for this metadata capability is to support the
- * {@link Parameter#alias()} attribute. For example, consider a {@link Configuration}
+ * {@link Parameter#alias()} attribute. For example, consider a {@link ConfigurationModel}
  * parameter which is obtained through inspecting fields in a class. This capability
  * allows for the introspection model to list the parameter by a given alias, while
  * this parameter still provides the real name of the field which is going to be needed
