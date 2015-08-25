@@ -17,15 +17,24 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_NAMESPACE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
 import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isDynamic;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
@@ -36,8 +45,8 @@ import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Operation;
 import org.mule.extension.introspection.Parameter;
-import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
+import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
 import org.mule.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
@@ -92,6 +101,8 @@ import org.apache.commons.collections.CollectionUtils;
 public class SchemaBuilder
 {
 
+    private static final String UNBOUNDED = "unbounded";
+
     private final Set<DataType> registeredEnums = new HashSet<>();
     private final Map<DataType, ComplexTypeHolder> registeredComplexTypesHolders = new HashMap<>();
     private final Map<String, NamedGroup> substitutionGroups = new HashMap<>();
@@ -109,7 +120,8 @@ public class SchemaBuilder
         builder.schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
         builder.importXmlNamespace()
                 .importSpringFrameworkNamespace()
-                .importMuleNamespace();
+                .importMuleNamespace()
+                .importMuleExtensionNamespace();
 
         return builder;
     }
@@ -122,7 +134,7 @@ public class SchemaBuilder
     private SchemaBuilder importXmlNamespace()
     {
         Import xmlImport = new Import();
-        xmlImport.setNamespace(SchemaConstants.XML_NAMESPACE);
+        xmlImport.setNamespace(XML_NAMESPACE);
         schema.getIncludeOrImportOrRedefine().add(xmlImport);
         return this;
     }
@@ -130,8 +142,8 @@ public class SchemaBuilder
     private SchemaBuilder importSpringFrameworkNamespace()
     {
         Import springFrameworkImport = new Import();
-        springFrameworkImport.setNamespace(SchemaConstants.SPRING_FRAMEWORK_NAMESPACE);
-        springFrameworkImport.setSchemaLocation(SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION);
+        springFrameworkImport.setNamespace(SPRING_FRAMEWORK_NAMESPACE);
+        springFrameworkImport.setSchemaLocation(SPRING_FRAMEWORK_SCHEMA_LOCATION);
         schema.getIncludeOrImportOrRedefine().add(springFrameworkImport);
         return this;
     }
@@ -139,23 +151,31 @@ public class SchemaBuilder
     private SchemaBuilder importMuleNamespace()
     {
         Import muleSchemaImport = new Import();
-        muleSchemaImport.setNamespace(SchemaConstants.MULE_NAMESPACE);
-        muleSchemaImport.setSchemaLocation(SchemaConstants.MULE_SCHEMA_LOCATION);
+        muleSchemaImport.setNamespace(MULE_NAMESPACE);
+        muleSchemaImport.setSchemaLocation(MULE_SCHEMA_LOCATION);
         schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
+        return this;
+    }
+
+    private SchemaBuilder importMuleExtensionNamespace()
+    {
+        Import muleExtensionImport = new Import();
+        muleExtensionImport.setNamespace(MULE_EXTENSION_NAMESPACE);
+        muleExtensionImport.setSchemaLocation(MULE_EXTENSION_SCHEMA_LOCATION);
+        schema.getIncludeOrImportOrRedefine().add(muleExtensionImport);
         return this;
     }
 
     public SchemaBuilder registerConfigElement(final Configuration configuration)
     {
-        Map<QName, String> otherAttributes = new HashMap<>();
-        final ExtensionType config = registerExtension(configuration.getName(), otherAttributes);
+        final ExtensionType config = registerExtension(configuration.getName());
         config.getAttributeOrAttributeGroup().add(createNameAttribute());
 
         final ExplicitGroup choice = new ExplicitGroup();
         choice.setMinOccurs(new BigInteger("0"));
-        choice.setMaxOccurs("unbounded");
+        choice.setMaxOccurs(UNBOUNDED);
 
-
+        addDynamicConfigPolicyElement(choice, configuration);
 
         for (final Parameter parameter : configuration.getParameters())
         {
@@ -214,6 +234,19 @@ public class SchemaBuilder
         registerOperationType(typeName, operation);
 
         return this;
+    }
+
+    private void addDynamicConfigPolicyElement(ExplicitGroup all, Configuration configuration)
+    {
+        if (!getDynamicParameters(configuration).isEmpty())
+        {
+            TopLevelElement objectElement = new TopLevelElement();
+            objectElement.setMinOccurs(BigInteger.ZERO);
+            objectElement.setMaxOccurs("1");
+            objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_TYPE);
+
+            all.getParticle().add(objectFactory.createElement(objectElement));
+        }
     }
 
     /**
@@ -403,7 +436,7 @@ public class SchemaBuilder
         return objectComplexType;
     }
 
-    private ExtensionType registerExtension(String name, Map<QName, String> otherAttributes)
+    private ExtensionType registerExtension(String name)
     {
         LocalComplexType complexType = new LocalComplexType();
 
@@ -411,8 +444,6 @@ public class SchemaBuilder
         extension.setName(name);
         extension.setSubstitutionGroup(MULE_ABSTRACT_EXTENSION);
         extension.setComplexType(complexType);
-
-        extension.getOtherAttributes().putAll(otherAttributes);
 
         ComplexContent complexContent = new ComplexContent();
         complexType.setComplexContent(complexContent);
@@ -644,7 +675,7 @@ public class SchemaBuilder
 
             if (isOperation(parameterType))
             {
-                String maxOccurs = parameterQualifier == DataQualifier.LIST ? "unbounded" : "1";
+                String maxOccurs = parameterQualifier == DataQualifier.LIST ? UNBOUNDED : "1";
                 generateNestedProcessorElement(all, parameter, maxOccurs);
             }
             else

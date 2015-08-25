@@ -4,12 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.module.extension.internal.runtime.executor;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getResolver;
@@ -17,8 +16,8 @@ import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.introspection.Parameter;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
+import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -29,9 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -47,9 +44,6 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private Configuration configuration;
-
-    @Mock
-    private ConfigurationInstanceRegistrationCallback registrationCallback;
 
     @Mock
     private MuleEvent event;
@@ -68,21 +62,14 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
 
         when(configuration.getParameters()).thenReturn(Arrays.asList(nameParameter, descriptionParameter));
         when(configuration.getInstantiator().newInstance()).thenReturn(configurationInstance);
-        when(configuration.getInstantiator().getObjectType()).thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return TestConfig.class;
-            }
-        });
+        when(configuration.getInstantiator().getObjectType()).thenAnswer(invocation -> TestConfig.class);
         when(configuration.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
 
         resolverSet = new ResolverSet();
         resolverSet.add(nameParameter, getResolver(NAME_VALUE));
         resolverSet.add(descriptionParameter, getResolver(DESCRIPTION_VALUE));
 
-        configurationObjectBuilder = new ConfigurationObjectBuilder(CONFIG_NAME, extension, configuration, resolverSet, registrationCallback);
+        configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
     }
 
     @Test
@@ -91,13 +78,6 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
         TestConfig testConfig = (TestConfig) configurationObjectBuilder.build(event);
         assertThat(testConfig.getName(), is(NAME_VALUE));
         assertThat(testConfig.getDescription(), is(DESCRIPTION_VALUE));
-    }
-
-    @Test
-    public void registerOnBuild() throws Exception
-    {
-        configurationObjectBuilder.build(event);
-        verify(registrationCallback).registerConfigurationInstance(extension, CONFIG_NAME, configurationInstance);
     }
 
     public static class TestConfig

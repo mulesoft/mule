@@ -38,7 +38,7 @@ import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
-import org.mule.module.extension.internal.runtime.ReflectiveOperationExecutorFactory;
+import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.CollectionUtils;

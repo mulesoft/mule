@@ -12,6 +12,7 @@ import org.mule.util.CollectionUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Map;
@@ -103,18 +104,26 @@ final class ExtensionRegistry
         if (CollectionUtils.isEmpty(cachedCapables))
         {
             ImmutableSet.Builder<Extension> capables = ImmutableSet.builder();
-            for (Extension extension : getExtensions())
-            {
-                if (extension.isCapableOf(capabilityType))
-                {
-                    capables.add(extension);
-                }
-            }
-
+            getExtensions().stream().filter(extension -> extension.isCapableOf(capabilityType)).forEach(capables::add);
             cachedCapables = capables.build();
             capabilityToExtension.put(capabilityType, cachedCapables);
         }
 
         return cachedCapables;
     }
+
+    /**
+     * Returns a {@link Map} which keys are registrations keys and the values are the configuration instances
+     * which are expired
+     *
+     * @return an immutable {@link Map}
+     */
+    Map<String, Object> getExpiredConfigInstances()
+    {
+        ImmutableMap.Builder<String, Object> expired = ImmutableMap.builder();
+        extensionStates.asMap().values().stream().map(tracker -> tracker.getExpiredConfigInstances()).forEach(expired::putAll);
+
+        return expired.build();
+    }
+
 }

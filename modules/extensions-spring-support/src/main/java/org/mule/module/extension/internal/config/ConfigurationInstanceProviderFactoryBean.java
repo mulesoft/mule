@@ -7,17 +7,20 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
 import org.mule.extension.introspection.Configuration;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
-import org.mule.module.extension.internal.runtime.DynamicConfigurationInstanceProvider;
-import org.mule.module.extension.internal.runtime.StaticConfigurationInstanceProvider;
+import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
+import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
+import org.mule.module.extension.internal.runtime.config.ConfigurationInstanceProviderFactory;
+import org.mule.module.extension.internal.runtime.config.DefaultConfigurationInstanceProviderFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.time.TimeSupplier;
+
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.FactoryBean;
 
@@ -32,6 +35,7 @@ final class ConfigurationInstanceProviderFactoryBean implements FactoryBean<Conf
 {
 
     private final ConfigurationInstanceProvider<Object> configurationInstanceProvider;
+    private final ConfigurationInstanceProviderFactory configurationInstanceProviderFactory = new DefaultConfigurationInstanceProviderFactory();
 
     ConfigurationInstanceProviderFactoryBean(String name,
                                              Extension extension,
@@ -42,30 +46,32 @@ final class ConfigurationInstanceProviderFactoryBean implements FactoryBean<Conf
         final ExtensionManagerAdapter extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
 
         ResolverSet resolverSet = getResolverSet(element, configuration.getParameters());
-        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(name, extension, configuration, resolverSet, extensionManager);
-
-        if (resolverSet.isDynamic())
-        {
-            configurationInstanceProvider = new DynamicConfigurationInstanceProvider<>(configurationObjectBuilder, resolverSet);
-        }
-        else
-        {
-            Object configurationInstance = instantiateStaticConfiguration(muleContext, configurationObjectBuilder);
-            configurationInstanceProvider = new StaticConfigurationInstanceProvider<>(configurationInstance);
-        }
-
-        extensionManager.registerConfigurationInstanceProvider(extension, name, configurationInstanceProvider);
-    }
-
-    private Object instantiateStaticConfiguration(MuleContext muleContext, ConfigurationObjectBuilder configurationObjectBuilder)
-    {
         try
         {
-            return configurationObjectBuilder.build(getInitialiserEvent(muleContext));
+            if (resolverSet.isDynamic())
+            {
+                configurationInstanceProvider = configurationInstanceProviderFactory.createDynamicConfigurationInstanceProvider(
+                        name,
+                        extension,
+                        configuration,
+                        resolverSet,
+                        extensionManager,
+                        getDynamicConfigPolicy(element));
+            }
+            else
+            {
+                configurationInstanceProvider = configurationInstanceProviderFactory.createStaticConfigurationInstanceProvider(
+                        name,
+                        extension,
+                        configuration,
+                        resolverSet,
+                        muleContext,
+                        extensionManager);
+            }
         }
         catch (Exception e)
         {
-            throw new MuleRuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -89,4 +95,26 @@ final class ConfigurationInstanceProviderFactoryBean implements FactoryBean<Conf
     {
         return true;
     }
+
+    private DynamicConfigPolicy getDynamicConfigPolicy(ElementDescriptor element)
+    {
+        ElementDescriptor policyElement = element.getChildByName("dynamic-config-policy");
+        return policyElement == null ? DynamicConfigPolicy.DEFAULT : new DynamicConfigPolicy(getExpirationPolicy(policyElement));
+    }
+
+    private ExpirationPolicy getExpirationPolicy(ElementDescriptor dynamicConfigPolicyElement)
+    {
+        ElementDescriptor expirationPolicyElement = dynamicConfigPolicyElement.getChildByName("expiration-policy");
+        if (expirationPolicyElement == null)
+        {
+            return ImmutableExpirationPolicy.DEFAULT;
+        }
+
+        //TODO: When MULE-8869 is implemented, the TimeSupplier should be injected
+        return new ImmutableExpirationPolicy(
+                Long.valueOf(expirationPolicyElement.getAttribute("maxIdleTime")),
+                TimeUnit.valueOf(expirationPolicyElement.getAttribute("timeUnit")),
+                TimeSupplier.INSTANCE);
+    }
+
 }

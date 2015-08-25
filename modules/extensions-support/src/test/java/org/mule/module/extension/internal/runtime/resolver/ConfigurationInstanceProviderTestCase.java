@@ -13,10 +13,11 @@ import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getPar
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.Parameter;
+import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.module.extension.internal.runtime.config.DefaultConfigurationInstanceProviderFactory;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
@@ -26,14 +27,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationInstanceProviderTestCase extends AbstractConfigurationInstanceProviderTestCase
 {
+
     private static final Class MODULE_CLASS = HeisenbergExtension.class;
     private static final String MY_NAME = "heisenberg";
     private static final int AGE = 50;
@@ -53,6 +53,9 @@ public class ConfigurationInstanceProviderTestCase extends AbstractConfiguration
     @Mock
     private ExtensionManagerAdapter extensionManager;
 
+    @Mock
+    private ExpirationPolicy expirationPolicy;
+
     @Before
     public void before() throws Exception
     {
@@ -60,14 +63,7 @@ public class ConfigurationInstanceProviderTestCase extends AbstractConfiguration
         ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIG_NAME);
 
         when(configuration.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
-        when(configuration.getInstantiator().newInstance()).thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return MODULE_CLASS.newInstance();
-            }
-        });
+        when(configuration.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
         when(configuration.getCapabilities(any(Class.class))).thenReturn(null);
 
         when(operationContext.getEvent()).thenReturn(event);
@@ -78,7 +74,8 @@ public class ConfigurationInstanceProviderTestCase extends AbstractConfiguration
         when(resolverSet.getResolvers()).thenReturn(parameters);
         when(resolverSet.isDynamic()).thenReturn(false);
 
-        instanceProvider = MuleExtensionUtils.createConfigurationInstanceProvider(CONFIG_NAME, extension, configuration, resolverSet, muleContext, extensionManager);
+        instanceProvider = new DefaultConfigurationInstanceProviderFactory()
+                .createStaticConfigurationInstanceProvider(CONFIG_NAME, extension, configuration, resolverSet, muleContext, extensionManager);
     }
 
     @Test

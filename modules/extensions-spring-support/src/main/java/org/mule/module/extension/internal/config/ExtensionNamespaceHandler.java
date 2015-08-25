@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
  *
  * @since 3.7.0
  */
-public class ExtensionsNamespaceHandler extends NamespaceHandlerSupport
+public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 {
 
     private ExtensionManager extensionManager;

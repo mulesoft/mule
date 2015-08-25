@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.manager;
 
+import static org.mule.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -13,21 +14,27 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
 import org.mule.extension.introspection.Extension;
 import org.mule.extension.runtime.ConfigurationInstanceProvider;
 import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
-import org.mule.module.extension.internal.runtime.StaticConfigurationInstanceProvider;
+import org.mule.module.extension.internal.runtime.config.StaticConfigurationInstanceProvider;
 import org.mule.registry.SpiServiceRegistry;
+import org.mule.time.Time;
 import org.mule.util.ObjectNameHelper;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +45,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class DefaultExtensionManager implements ExtensionManagerAdapter, MuleContextAware, Initialisable
+public final class DefaultExtensionManager implements ExtensionManagerAdapter, MuleContextAware, Initialisable, Startable, Stoppable
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
@@ -50,12 +57,36 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     private ObjectNameHelper objectNameHelper;
     private ExtensionDiscoverer extensionDiscoverer = new DefaultExtensionDiscoverer(new DefaultExtensionFactory(serviceRegistry), serviceRegistry);
     private ImplicitConfigurationFactory implicitConfigurationFactory;
+    private ConfigurationExpirationMonitor configurationExpirationMonitor;
 
     @Override
     public void initialise() throws InitialisationException
     {
         objectNameHelper = new ObjectNameHelper(muleContext);
         implicitConfigurationFactory = new DefaultImplicitConfigurationFactory(extensionRegistry, muleContext);
+    }
+
+    /**
+     * Starts the {@link #configurationExpirationMonitor}
+     *
+     * @throws MuleException if it fails to start
+     */
+    @Override
+    public void start() throws MuleException
+    {
+        configurationExpirationMonitor = newConfigurationExpirationMonitor();
+        configurationExpirationMonitor.beginMonitoring();
+    }
+
+    /**
+     * Stops the {@link #configurationExpirationMonitor}
+     *
+     * @throws MuleException if it fails to stop
+     */
+    @Override
+    public void stop() throws MuleException
+    {
+        configurationExpirationMonitor.stopMonitoring();
     }
 
     /**
@@ -69,11 +100,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         List<Extension> discovered = extensionDiscoverer.discover(classLoader);
         LOGGER.info("Discovered {} extensions", discovered.size());
 
-        for (Extension extension : discovered)
-        {
-            registerExtension(extension);
-        }
-
+        discovered.forEach(this::registerExtension);
         return ImmutableList.copyOf(extensionRegistry.getExtensions());
     }
 
@@ -149,7 +176,9 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         ConfigurationInstanceHolder configurationInstanceHolder = implicitConfigurationFactory.createImplicitConfigurationInstance(extension, operationContext, this);
         if (configurationInstanceHolder != null)
         {
-            registerConfigurationInstanceProvider(extension, configurationInstanceHolder.getName(), new StaticConfigurationInstanceProvider<>(configurationInstanceHolder.getConfigurationInstance()));
+            Object configurationInstance = configurationInstanceHolder.getConfigurationInstance();
+            registerConfigurationInstanceProvider(extension, configurationInstanceHolder.getName(), new StaticConfigurationInstanceProvider<>(configurationInstance));
+            registerConfigurationInstance(extension, configurationInstanceHolder.getName(), configurationInstance);
         }
     }
 
@@ -176,14 +205,16 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
      * {@inheritDoc}
      */
     @Override
-    public <C> void registerConfigurationInstance(Extension extension, String configurationInstanceName, C configurationInstance)
+    public <C> String registerConfigurationInstance(Extension extension, String configurationInstanceProviderName, C configurationInstance)
     {
         ExtensionStateTracker extensionStateTracker = extensionRegistry.getExtensionState(extension);
-        configurationInstanceName = objectNameHelper.getUniqueName(configurationInstanceName);
+        final String registrationName = objectNameHelper.getUniqueName(configurationInstanceProviderName);
 
-        extensionStateTracker.registerConfigurationInstance(configurationInstanceName, configurationInstance);
+        extensionStateTracker.registerConfigurationInstance(configurationInstanceProviderName, registrationName, configurationInstance);
 
-        putInRegistryAndApplyLifecycle(configurationInstanceName, configurationInstance);
+        putInRegistryAndApplyLifecycle(registrationName, configurationInstance);
+
+        return registrationName;
     }
 
     private void putInRegistryAndApplyLifecycle(String key, Object object)
@@ -259,6 +290,41 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
                     extension.getName(),
                     actual.getVersion(),
                     extension.getVersion()));
+        }
+    }
+
+    private ConfigurationExpirationMonitor newConfigurationExpirationMonitor()
+    {
+        Time freq = getConfigurationExpirationFrequency();
+        return newBuilder(extensionRegistry, muleContext)
+                .runEvery(freq.getTime(), freq.getUnit())
+                .onExpired((key, object) -> unregisterConfigurationInstance(key, object))
+                .build();
+    }
+
+    private void unregisterConfigurationInstance(String key, Object object)
+    {
+        try
+        {
+            muleContext.getRegistry().unregisterObject(key);
+        }
+        catch (RegistrationException e)
+        {
+            LOGGER.error(String.format("Could not unregister expired dynamic config of key '%s' and type %s",
+                                       key, object.getClass().getName()), e);
+        }
+    }
+
+    private Time getConfigurationExpirationFrequency()
+    {
+        ExtensionConfig extensionConfig = muleContext.getConfiguration().getExtension(ExtensionConfig.class);
+        if (extensionConfig != null)
+        {
+            return extensionConfig.getDynamicConfigExpirationFrequency();
+        }
+        else
+        {
+            return new Time(5L, TimeUnit.MINUTES);
         }
     }
 
