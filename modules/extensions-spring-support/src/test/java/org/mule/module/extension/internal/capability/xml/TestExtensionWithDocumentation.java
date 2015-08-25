@@ -12,7 +12,7 @@ import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.capability.Xml;
 
-@Extension(name = "documentation", version = "1.0")
+@Extension(name = "documentation")
 @Operations({TestDocumentedExtensionOperations.class})
 @Xml(schemaLocation = "schemaLocation", namespace = "documentation", schemaVersion = "1.0")
 public class TestExtensionWithDocumentation
