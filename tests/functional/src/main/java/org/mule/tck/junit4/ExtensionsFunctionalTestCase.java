@@ -16,7 +16,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.resources.GeneratedResource;
@@ -182,11 +182,11 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         ResourcesGenerator generator = new ExtensionsTestInfrastructureResourcesGenerator(serviceRegistry, generatedResourcesDirectory);
 
         List<GenerableResourceContributor> resourceContributors = getGenerableResourceContributors();
-        for (Extension extension : extensionManager.getExtensions())
+        for (ExtensionModel extensionModel : extensionManager.getExtensions())
         {
             for (GenerableResourceContributor contributor : resourceContributors)
             {
-                contributor.contribute(extension, generator);
+                contributor.contribute(extensionModel, generator);
             }
         }
 

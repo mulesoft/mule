@@ -11,10 +11,10 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -26,23 +26,23 @@ abstract class AbstractConfigurationInstanceProviderTestCase extends AbstractMul
     protected static final String CONFIG_NAME = "config";
 
     @Mock
-    protected Extension extension;
+    protected ExtensionModel extensionModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    protected Configuration configuration;
+    protected ConfigurationModel configurationModel;
 
     @Mock
     protected DefaultOperationContext operationContext;
 
     @Mock
-    protected ConfigurationInstanceRegistrationCallback configurationInstanceRegistrationCallback;
+    protected ConfigurationRegistrationCallback configurationRegistrationCallback;
 
-    protected ConfigurationInstanceProvider<Object> instanceProvider;
+    protected ConfigurationProvider<Object> instanceProvider;
 
 
     protected <T> void assertConfigInstanceRegistered(T configurationInstance)
     {
-        verify(configurationInstanceRegistrationCallback).registerConfigurationInstance(extension, CONFIG_NAME, configurationInstance);
+        verify(configurationRegistrationCallback).registerConfiguration(extensionModel, CONFIG_NAME, configurationInstance);
     }
 
     protected void assertSameInstancesResolved() throws Exception

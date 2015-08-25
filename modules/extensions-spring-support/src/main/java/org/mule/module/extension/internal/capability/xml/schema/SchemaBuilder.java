@@ -39,12 +39,12 @@ import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeN
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.annotations.Extensible;
-import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
 import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
@@ -94,7 +94,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Builder class to generate a XSD schema that describes a
- * {@link Extension}
+ * {@link ExtensionModel}
  *
  * @since 3.7.0
  */
@@ -166,20 +166,20 @@ public class SchemaBuilder
         return this;
     }
 
-    public SchemaBuilder registerConfigElement(final Configuration configuration)
+    public SchemaBuilder registerConfigElement(final ConfigurationModel configurationModel)
     {
-        final ExtensionType config = registerExtension(configuration.getName());
+        final ExtensionType config = registerExtension(configurationModel.getName());
         config.getAttributeOrAttributeGroup().add(createNameAttribute());
 
         final ExplicitGroup choice = new ExplicitGroup();
         choice.setMinOccurs(new BigInteger("0"));
         choice.setMaxOccurs(UNBOUNDED);
 
-        addDynamicConfigPolicyElement(choice, configuration);
+        addDynamicConfigPolicyElement(choice, configurationModel);
 
-        for (final Parameter parameter : configuration.getParameters())
+        for (final ParameterModel parameterModel : configurationModel.getParameterModels())
         {
-            parameter.getType().getQualifier().accept(new AbstractDataQualifierVisitor()
+            parameterModel.getType().getQualifier().accept(new AbstractDataQualifierVisitor()
             {
 
                 private boolean forceOptional = false;
@@ -189,7 +189,7 @@ public class SchemaBuilder
                 {
                     forceOptional = true;
                     defaultOperation();
-                    generateCollectionElement(choice, parameter, true);
+                    generateCollectionElement(choice, parameterModel, true);
                 }
 
                 @Override
@@ -198,21 +198,21 @@ public class SchemaBuilder
                     forceOptional = false;
                     defaultOperation();
                     registerComplexTypeChildElement(choice,
-                                                    parameter.getName(),
-                                                    parameter.getDescription(),
-                                                    parameter.getType(),
-                                                    isRequired(parameter, forceOptional));
+                                                    parameterModel.getName(),
+                                                    parameterModel.getDescription(),
+                                                    parameterModel.getType(),
+                                                    isRequired(parameterModel, forceOptional));
                 }
 
                 @Override
                 protected void defaultOperation()
                 {
-                    config.getAttributeOrAttributeGroup().add(createAttribute(parameter, isRequired(parameter, forceOptional)));
+                    config.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
                 }
             });
         }
 
-        config.setAnnotation(createDocAnnotation(configuration.getDescription()));
+        config.setAnnotation(createDocAnnotation(configurationModel.getDescription()));
 
         if (!choice.getParticle().isEmpty())
         {
@@ -227,18 +227,18 @@ public class SchemaBuilder
         return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, DataType.of(String.class), true, false);
     }
 
-    public SchemaBuilder registerOperation(Operation operation)
+    public SchemaBuilder registerOperation(OperationModel operationModel)
     {
-        String typeName = StringUtils.capitalize(operation.getName()) + SchemaConstants.TYPE_SUFFIX;
-        registerProcessorElement(operation, typeName);
-        registerOperationType(typeName, operation);
+        String typeName = StringUtils.capitalize(operationModel.getName()) + SchemaConstants.TYPE_SUFFIX;
+        registerProcessorElement(operationModel, typeName);
+        registerOperationType(typeName, operationModel);
 
         return this;
     }
 
-    private void addDynamicConfigPolicyElement(ExplicitGroup all, Configuration configuration)
+    private void addDynamicConfigPolicyElement(ExplicitGroup all, ConfigurationModel configurationModel)
     {
-        if (!getDynamicParameters(configuration).isEmpty())
+        if (!getDynamicParameters(configurationModel).isEmpty())
         {
             TopLevelElement objectElement = new TopLevelElement();
             objectElement.setMinOccurs(BigInteger.ZERO);
@@ -456,9 +456,9 @@ public class SchemaBuilder
         return complexContentExtension;
     }
 
-    private Attribute createAttribute(Parameter parameter, boolean required)
+    private Attribute createAttribute(ParameterModel parameterModel, boolean required)
     {
-        return createAttribute(parameter.getName(), parameter.getDescription(), parameter.getType(), required, parameter.isDynamic());
+        return createAttribute(parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), required, parameterModel.isDynamic());
     }
 
     private Attribute createAttribute(String name, DataType type, boolean required, boolean dynamic)
@@ -495,10 +495,10 @@ public class SchemaBuilder
         return attribute;
     }
 
-    private void generateCollectionElement(ExplicitGroup all, Parameter parameter, boolean forceOptional)
+    private void generateCollectionElement(ExplicitGroup all, ParameterModel parameterModel, boolean forceOptional)
     {
-        boolean required = isRequired(parameter, forceOptional);
-        generateCollectionElement(all, parameter.getName(), parameter.getDescription(), parameter.getType(), required);
+        boolean required = isRequired(parameterModel, forceOptional);
+        generateCollectionElement(all, parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), required);
     }
 
     private void generateCollectionElement(ExplicitGroup all, String name, String description, DataType type, boolean required)
@@ -573,20 +573,20 @@ public class SchemaBuilder
         return ArrayUtils.isEmpty(type.getGenericTypes()) ? type : type.getGenericTypes()[0];
     }
 
-    private void registerProcessorElement(Operation operation, String typeName)
+    private void registerProcessorElement(OperationModel operationModel, String typeName)
     {
         Element element = new TopLevelElement();
-        element.setName(getOperationName(operation));
+        element.setName(getOperationName(operationModel));
         element.setType(new QName(schema.getTargetNamespace(), typeName));
-        element.setAnnotation(createDocAnnotation(operation.getDescription()));
-        element.setSubstitutionGroup(getOperationSubstitutionGroup(operation));
+        element.setAnnotation(createDocAnnotation(operationModel.getDescription()));
+        element.setSubstitutionGroup(getOperationSubstitutionGroup(operationModel));
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
-    private QName getOperationSubstitutionGroup(Operation operation)
+    private QName getOperationSubstitutionGroup(OperationModel operationModel)
     {
         QName substitutionGroup = MULE_ABSTRACT_MESSAGE_PROCESSOR;
-        ExtendingOperationCapability extendingOperationCapability = getSingleCapability(operation, ExtendingOperationCapability.class);
+        ExtendingOperationCapability extendingOperationCapability = getSingleCapability(operationModel, ExtendingOperationCapability.class);
         if (extendingOperationCapability != null)
         {
             substitutionGroup = getSubstitutionGroup(extendingOperationCapability.getType());
@@ -635,9 +635,9 @@ public class SchemaBuilder
         return name;
     }
 
-    private String getOperationName(Operation operation)
+    private String getOperationName(OperationModel operationModel)
     {
-        return hyphenize(operation.getName());
+        return hyphenize(operationModel.getName());
     }
 
     private String getGroupName(String name)
@@ -645,7 +645,7 @@ public class SchemaBuilder
         return name + GROUP_SUFFIX;
     }
 
-    private void registerOperationType(String name, Operation operation)
+    private void registerOperationType(String name, OperationModel operationModel)
     {
         final QName base = MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
         TopLevelComplexType complexType = new TopLevelComplexType();
@@ -663,20 +663,20 @@ public class SchemaBuilder
         final ExplicitGroup all = new ExplicitGroup();
         complexContentExtension.setSequence(all);
 
-        for (final Parameter parameter : operation.getParameters())
+        for (final ParameterModel parameterModel : operationModel.getParameterModels())
         {
-            if (isHidden(parameter))
+            if (isHidden(parameterModel))
             {
                 continue;
             }
 
-            DataType parameterType = parameter.getType();
+            DataType parameterType = parameterModel.getType();
             DataQualifier parameterQualifier = parameterType.getQualifier();
 
             if (isOperation(parameterType))
             {
                 String maxOccurs = parameterQualifier == DataQualifier.LIST ? UNBOUNDED : "1";
-                generateNestedProcessorElement(all, parameter, maxOccurs);
+                generateNestedProcessorElement(all, parameterModel, maxOccurs);
             }
             else
             {
@@ -686,13 +686,13 @@ public class SchemaBuilder
                     @Override
                     public void onList()
                     {
-                        generateCollectionElement(all, parameter, false);
+                        generateCollectionElement(all, parameterModel, false);
                     }
 
                     @Override
                     protected void defaultOperation()
                     {
-                        complexContentExtension.getAttributeOrAttributeGroup().add(createAttribute(parameter, parameter.isRequired()));
+                        complexContentExtension.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, parameterModel.isRequired()));
                     }
                 });
             }
@@ -706,9 +706,9 @@ public class SchemaBuilder
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
     }
 
-    private boolean isHidden(Parameter parameter)
+    private boolean isHidden(ParameterModel parameterModel)
     {
-        return !CollectionUtils.isEmpty(parameter.getCapabilities(HiddenCapability.class));
+        return !CollectionUtils.isEmpty(parameterModel.getCapabilities(HiddenCapability.class));
     }
 
     private boolean isOperation(DataType type)
@@ -722,25 +722,25 @@ public class SchemaBuilder
                 OPERATION.equals(genericTypes[0].getQualifier()));
     }
 
-    private void generateNestedProcessorElement(ExplicitGroup all, Parameter parameter, String maxOccurs)
+    private void generateNestedProcessorElement(ExplicitGroup all, ParameterModel parameterModel, String maxOccurs)
     {
         LocalComplexType collectionComplexType = new LocalComplexType();
-        GroupRef group = generateNestedProcessorGroup(parameter, maxOccurs);
+        GroupRef group = generateNestedProcessorGroup(parameterModel, maxOccurs);
         collectionComplexType.setGroup(group);
-        collectionComplexType.setAnnotation(createDocAnnotation(parameter.getDescription()));
+        collectionComplexType.setAnnotation(createDocAnnotation(parameterModel.getDescription()));
 
         TopLevelElement collectionElement = new TopLevelElement();
-        collectionElement.setName(hyphenize(parameter.getName()));
-        collectionElement.setMinOccurs(parameter.isRequired() ? BigInteger.ONE : BigInteger.ZERO);
+        collectionElement.setName(hyphenize(parameterModel.getName()));
+        collectionElement.setMinOccurs(parameterModel.isRequired() ? BigInteger.ONE : BigInteger.ZERO);
         collectionElement.setComplexType(collectionComplexType);
         collectionElement.setAnnotation(createDocAnnotation(EMPTY));
         all.getParticle().add(objectFactory.createElement(collectionElement));
     }
 
-    private GroupRef generateNestedProcessorGroup(Parameter parameter, String maxOccurs)
+    private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs)
     {
         QName ref = MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
-        TypeRestrictionCapability restrictionCapability = getSingleCapability(parameter, TypeRestrictionCapability.class);
+        TypeRestrictionCapability restrictionCapability = getSingleCapability(parameterModel, TypeRestrictionCapability.class);
         if (restrictionCapability != null)
         {
             ref = getSubstitutionGroup(restrictionCapability.getType());
@@ -749,7 +749,7 @@ public class SchemaBuilder
 
         GroupRef group = new GroupRef();
         group.setRef(ref);
-        group.setMinOccurs(parameter.isRequired() ? BigInteger.ONE : BigInteger.ZERO);
+        group.setMinOccurs(parameterModel.isRequired() ? BigInteger.ONE : BigInteger.ZERO);
         group.setMaxOccurs(maxOccurs);
 
         return group;

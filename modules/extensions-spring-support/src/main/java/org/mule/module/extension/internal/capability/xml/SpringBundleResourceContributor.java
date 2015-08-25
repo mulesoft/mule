@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.extension.resources.spi.GenerableResourceContributor;
@@ -25,24 +25,24 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
 {
 
     @Override
-    public void contribute(Extension extension, ResourcesGenerator resourcesGenerator)
+    public void contribute(ExtensionModel extensionModel, ResourcesGenerator resourcesGenerator)
     {
-        XmlCapability capability = CapabilityUtils.getSingleCapability(extension, XmlCapability.class);
+        XmlCapability capability = CapabilityUtils.getSingleCapability(extensionModel, XmlCapability.class);
 
-        generateSchema(extension, capability, resourcesGenerator);
-        generateSpringBundle(extension, capability, resourcesGenerator);
+        generateSchema(extensionModel, capability, resourcesGenerator);
+        generateSpringBundle(extensionModel, capability, resourcesGenerator);
     }
 
-    private void generateSchema(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
+    private void generateSchema(ExtensionModel extensionModel, XmlCapability capability, ResourcesGenerator resourcesGenerator)
     {
-        String schema = new SchemaGenerator().generate(extension, capability);
-        resourcesGenerator.get(getXsdFileName(extension)).getContentBuilder().append(schema);
+        String schema = new SchemaGenerator().generate(extensionModel, capability);
+        resourcesGenerator.get(getXsdFileName(extensionModel)).getContentBuilder().append(schema);
     }
 
-    private void generateSpringBundle(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
+    private void generateSpringBundle(ExtensionModel extensionModel, XmlCapability capability, ResourcesGenerator resourcesGenerator)
     {
         writeSpringHandlerBundle(capability, resourcesGenerator);
-        writeSpringSchemaBundle(extension, capability, resourcesGenerator);
+        writeSpringSchemaBundle(extensionModel, capability, resourcesGenerator);
     }
 
     private void writeSpringHandlerBundle(XmlCapability capability, ResourcesGenerator resourcesGenerator)
@@ -51,22 +51,22 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
         resourcesGenerator.get("spring.handlers").getContentBuilder().append(springBundleScape(content));
     }
 
-    private void writeSpringSchemaBundle(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
+    private void writeSpringSchemaBundle(ExtensionModel extensionModel, XmlCapability capability, ResourcesGenerator resourcesGenerator)
     {
         StringBuilder builder = resourcesGenerator.get("spring.schemas").getContentBuilder();
-        builder.append(getSpringSchemaBundle(extension, capability, capability.getSchemaVersion()));
-        builder.append(getSpringSchemaBundle(extension, capability, "current"));
+        builder.append(getSpringSchemaBundle(extensionModel, capability, capability.getSchemaVersion()));
+        builder.append(getSpringSchemaBundle(extensionModel, capability, "current"));
     }
 
-    private String getSpringSchemaBundle(Extension extension, XmlCapability capability, String version)
+    private String getSpringSchemaBundle(ExtensionModel extensionModel, XmlCapability capability, String version)
     {
-        String filename = getXsdFileName(extension);
+        String filename = getXsdFileName(extensionModel);
         return springBundleScape(String.format("%s/%s/%s=META-INF/%s\n", capability.getSchemaLocation(), version, filename, filename));
     }
 
-    private String getXsdFileName(Extension extension)
+    private String getXsdFileName(ExtensionModel extensionModel)
     {
-        return String.format("mule-%s%s", extension.getName(), SchemaConstants.XSD_EXTENSION);
+        return String.format("mule-%s%s", extensionModel.getName(), SchemaConstants.XSD_EXTENSION);
     }
 
 

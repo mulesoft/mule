@@ -12,8 +12,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -32,23 +32,23 @@ import org.springframework.beans.factory.FactoryBean;
 public class OperationMessageProcessorFactoryBean implements FactoryBean<OperationMessageProcessor>
 {
 
-    private final String configurationInstanceProviderName;
-    private final Extension extension;
-    private final Operation operation;
+    private final String configurationProviderName;
+    private final ExtensionModel extensionModel;
+    private final OperationModel operationModel;
     private final ElementDescriptor element;
     private final ExtensionManagerAdapter extensionManager;
     private final Map<String, List<MessageProcessor>> nestedOperations;
 
-    public OperationMessageProcessorFactoryBean(String configurationInstanceProviderName,
-                                                Extension extension,
-                                                Operation operation,
+    public OperationMessageProcessorFactoryBean(String configurationProviderName,
+                                                ExtensionModel extensionModel,
+                                                OperationModel operationModel,
                                                 ElementDescriptor element,
                                                 Map<String, List<MessageProcessor>> nestedOperations,
                                                 MuleContext muleContext)
     {
-        this.configurationInstanceProviderName = configurationInstanceProviderName;
-        this.extension = extension;
-        this.operation = operation;
+        this.configurationProviderName = configurationProviderName;
+        this.extensionModel = extensionModel;
+        this.operationModel = operationModel;
         this.element = element;
         this.extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
         this.nestedOperations = nestedOperations;
@@ -60,8 +60,8 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
     @Override
     public OperationMessageProcessor getObject() throws Exception
     {
-        ResolverSet resolverSet = getResolverSet(element, operation.getParameters(), nestedOperations);
-        return new OperationMessageProcessor(extension, operation, configurationInstanceProviderName, resolverSet, extensionManager);
+        ResolverSet resolverSet = getResolverSet(element, operationModel.getParameterModels(), nestedOperations);
+        return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, resolverSet, extensionManager);
     }
 
     /**

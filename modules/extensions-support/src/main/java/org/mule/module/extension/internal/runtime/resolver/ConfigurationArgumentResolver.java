@@ -10,30 +10,30 @@ import org.mule.extension.runtime.OperationContext;
 
 /**
  * An implementation of {@link ArgumentResolver} which
- * returns the value obtained through {@link OperationContext#getConfigurationInstance()}
+ * returns the value obtained through {@link OperationContext#getConfiguration()}
  * <p/>
  * Because this {@link ArgumentResolver} is stateless and thread-safe,
  * it is exposed as a singleton
  *
  * @since 3.7.1
  */
-public final class ConfigurationInstanceArgumentResolver implements ArgumentResolver<Object>
+public final class ConfigurationArgumentResolver implements ArgumentResolver<Object>
 {
 
-    private static final ConfigurationInstanceArgumentResolver INSTANCE = new ConfigurationInstanceArgumentResolver();
+    private static final ConfigurationArgumentResolver INSTANCE = new ConfigurationArgumentResolver();
 
-    public static ConfigurationInstanceArgumentResolver getInstance()
+    public static ConfigurationArgumentResolver getInstance()
     {
         return INSTANCE;
     }
 
-    private ConfigurationInstanceArgumentResolver()
+    private ConfigurationArgumentResolver()
     {
     }
 
     @Override
     public Object resolve(OperationContext operationContext)
     {
-        return operationContext.getConfigurationInstance();
+        return operationContext.getConfiguration();
     }
 }

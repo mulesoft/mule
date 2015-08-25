@@ -8,15 +8,15 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleContext;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
-import org.mule.module.extension.internal.runtime.config.ConfigurationInstanceProviderFactory;
-import org.mule.module.extension.internal.runtime.config.DefaultConfigurationInstanceProviderFactory;
+import org.mule.module.extension.internal.runtime.config.ConfigurationProviderFactory;
+import org.mule.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.time.TimeSupplier;
 
@@ -25,45 +25,45 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * A {@link FactoryBean} which returns a {@link ConfigurationInstanceProvider} that provides the actual instances
- * that implement a given {@link Configuration}. Subsequent invokations to {@link #getObject()} method
- * returns always the same {@link ConfigurationInstanceProvider}.
+ * A {@link FactoryBean} which returns a {@link ConfigurationProvider} that provides the actual instances
+ * that implement a given {@link ConfigurationModel}. Subsequent invokations to {@link #getObject()} method
+ * returns always the same {@link ConfigurationProvider}.
  *
  * @since 3.7.0
  */
-final class ConfigurationInstanceProviderFactoryBean implements FactoryBean<ConfigurationInstanceProvider<Object>>
+final class ConfigurationProviderFactoryBean implements FactoryBean<ConfigurationProvider<Object>>
 {
 
-    private final ConfigurationInstanceProvider<Object> configurationInstanceProvider;
-    private final ConfigurationInstanceProviderFactory configurationInstanceProviderFactory = new DefaultConfigurationInstanceProviderFactory();
+    private final ConfigurationProvider<Object> configurationProvider;
+    private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
 
-    ConfigurationInstanceProviderFactoryBean(String name,
-                                             Extension extension,
-                                             Configuration configuration,
-                                             ElementDescriptor element,
-                                             MuleContext muleContext)
+    ConfigurationProviderFactoryBean(String name,
+                                     ExtensionModel extensionModel,
+                                     ConfigurationModel configurationModel,
+                                     ElementDescriptor element,
+                                     MuleContext muleContext)
     {
         final ExtensionManagerAdapter extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
 
-        ResolverSet resolverSet = getResolverSet(element, configuration.getParameters());
+        ResolverSet resolverSet = getResolverSet(element, configurationModel.getParameterModels());
         try
         {
             if (resolverSet.isDynamic())
             {
-                configurationInstanceProvider = configurationInstanceProviderFactory.createDynamicConfigurationInstanceProvider(
+                configurationProvider = configurationProviderFactory.createDynamicConfigurationProvider(
                         name,
-                        extension,
-                        configuration,
+                        extensionModel,
+                        configurationModel,
                         resolverSet,
                         extensionManager,
                         getDynamicConfigPolicy(element));
             }
             else
             {
-                configurationInstanceProvider = configurationInstanceProviderFactory.createStaticConfigurationInstanceProvider(
+                configurationProvider = configurationProviderFactory.createStaticConfigurationProvider(
                         name,
-                        extension,
-                        configuration,
+                        extensionModel,
+                        configurationModel,
                         resolverSet,
                         muleContext,
                         extensionManager);
@@ -76,18 +76,18 @@ final class ConfigurationInstanceProviderFactoryBean implements FactoryBean<Conf
     }
 
     @Override
-    public ConfigurationInstanceProvider<Object> getObject() throws Exception
+    public ConfigurationProvider<Object> getObject() throws Exception
     {
-        return configurationInstanceProvider;
+        return configurationProvider;
     }
 
     /**
-     * @return {@link ConfigurationInstanceProvider}
+     * @return {@link ConfigurationProvider}
      */
     @Override
-    public Class<ConfigurationInstanceProvider> getObjectType()
+    public Class<ConfigurationProvider> getObjectType()
     {
-        return ConfigurationInstanceProvider.class;
+        return ConfigurationProvider.class;
     }
 
     @Override

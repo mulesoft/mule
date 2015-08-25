@@ -15,10 +15,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.introspection.Configuration;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.Described;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
@@ -43,7 +43,7 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 
 /**
- * Utilities for handling {@link Extension extensions}
+ * Utilities for handling {@link ExtensionModel extensions}
  *
  * @since 3.7.0
  */
@@ -120,9 +120,9 @@ public class MuleExtensionUtils
         return false;
     }
 
-    public static List<Parameter> getDynamicParameters(Configuration configuration)
+    public static List<ParameterModel> getDynamicParameters(ConfigurationModel configurationModel)
     {
-        return configuration.getParameters().stream().filter(parameter -> parameter.isDynamic()).collect(toList());
+        return configurationModel.getParameterModels().stream().filter(parameter -> parameter.isDynamic()).collect(toList());
     }
 
     /**

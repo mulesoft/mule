@@ -13,18 +13,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Decorates a {@link #configurationInstance} with extra
+ * Decorates a {@link #configuration} with extra
  * management information such as registration name, usage tracking, etc.
  * <p/>
  * This class is thread safe.
  *
  * @since 4.0
  */
-final class ExpirableDynamicConfigurationInstance implements Expirable
+final class ExpirableDynamicConfiguration implements Expirable
 {
 
     private final String registrationName;
-    private final Object configurationInstance;
+    private final Object configuration;
 
     private final AtomicInteger usageCount = new AtomicInteger(0);
     private long lastUsedMillis = now();
@@ -32,25 +32,25 @@ final class ExpirableDynamicConfigurationInstance implements Expirable
     /**
      * Creates a new instance
      *
-     * @param registrationName      the name under which {@code configurationInstance} was registered
-     * @param configurationInstance the actual configuration instance being decorated
+     * @param registrationName the name under which {@code configuration} was registered
+     * @param configuration    the actual configuration instance being decorated
      */
-    public ExpirableDynamicConfigurationInstance(String registrationName, Object configurationInstance)
+    public ExpirableDynamicConfiguration(String registrationName, Object configuration)
     {
         this.registrationName = registrationName;
-        this.configurationInstance = configurationInstance;
+        this.configuration = configuration;
     }
 
     /**
-     * Determines if the held {@link #configurationInstance} should be expired per
+     * Determines if the held {@link #configuration} should be expired per
      * the given {@code expirationPolicy}.
      * <p/>
      * The first thing this method checks is if there's any ongoing operation using the held
      * configuration instance. If that's not the case, then it compares the timestamp of when
-     * the {@link #configurationInstance} was last used against the {@code expirationPolicy}
+     * the {@link #configuration} was last used against the {@code expirationPolicy}
      *
      * @param expirationPolicy a {@link ExpirationPolicy}
-     * @return {@code true} if the {@link #configurationInstance} should be expired. {@code false} otherwise
+     * @return {@code true} if the {@link #configuration} should be expired. {@code false} otherwise
      */
     @Override
     public boolean isExpired(ExpirationPolicy expirationPolicy)
@@ -61,14 +61,14 @@ final class ExpirableDynamicConfigurationInstance implements Expirable
     /**
      * Returns the held configuration instance
      */
-    public Object getConfigurationInstance()
+    public Object getConfiguration()
     {
-        return configurationInstance;
+        return configuration;
     }
 
     /**
      * acknowledges and tracks the fact that there's an ongoing operation execution
-     * using the {@link #configurationInstance}. This method is thread safe.
+     * using the {@link #configuration}. This method is thread safe.
      *
      * @return the updated usage count.
      */
@@ -79,7 +79,7 @@ final class ExpirableDynamicConfigurationInstance implements Expirable
 
     /**
      * acknowledges and tracks the fact that an ongoing operation execution
-     * using the {@link #configurationInstance} has finished. This method is thread safe.
+     * using the {@link #configuration} has finished. This method is thread safe.
      *
      * @return the updated usage count.
      */
@@ -90,7 +90,7 @@ final class ExpirableDynamicConfigurationInstance implements Expirable
     }
 
     /**
-     * The name under which the {@link #configurationInstance} has been registered
+     * The name under which the {@link #configuration} has been registered
      *
      * @return
      */
@@ -100,7 +100,7 @@ final class ExpirableDynamicConfigurationInstance implements Expirable
     }
 
     /**
-     * @return {@code true} if there's no ongoing operation using the {@link #configurationInstance}. {@code false} otherwise
+     * @return {@code true} if there's no ongoing operation using the {@link #configuration}. {@code false} otherwise
      */
     private boolean isInUse()
     {

@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.util.CollectionUtils;
 
 import com.google.common.cache.CacheBuilder;
@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Hold the state related to registered {@link Extension}s and their instances.
+ * Hold the state related to registered {@link ExtensionModel extensionModels} and their instances.
  * <p/>
  * It also provides utility methods and caches to easily locate pieces of such state.
  *
@@ -29,17 +29,17 @@ import java.util.concurrent.ConcurrentHashMap;
 final class ExtensionRegistry
 {
 
-    private final LoadingCache<Extension, ExtensionStateTracker> extensionStates = CacheBuilder.newBuilder().build(new CacheLoader<Extension, ExtensionStateTracker>()
+    private final LoadingCache<ExtensionModel, ExtensionStateTracker> extensionStates = CacheBuilder.newBuilder().build(new CacheLoader<ExtensionModel, ExtensionStateTracker>()
     {
         @Override
-        public ExtensionStateTracker load(Extension key) throws Exception
+        public ExtensionStateTracker load(ExtensionModel key) throws Exception
         {
             return new ExtensionStateTracker();
         }
     });
 
-    private final Map<String, Extension> extensions = new ConcurrentHashMap<>();
-    private final Map<Class<?>, Set<Extension>> capabilityToExtension = new ConcurrentHashMap<>();
+    private final Map<String, ExtensionModel> extensions = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Set<ExtensionModel>> capabilityToExtension = new ConcurrentHashMap<>();
 
     ExtensionRegistry()
     {
@@ -49,24 +49,24 @@ final class ExtensionRegistry
      * Registers the given {@code extension}
      *
      * @param name      the registration name you want for the {@code extension}
-     * @param extension a {@link Extension}
+     * @param extensionModel a {@link ExtensionModel}
      */
-    void registerExtension(String name, Extension extension)
+    void registerExtension(String name, ExtensionModel extensionModel)
     {
-        extensions.put(name, extension);
+        extensions.put(name, extensionModel);
     }
 
     /**
-     * @return an immutable view of the currently registered {@link Extension}
+     * @return an immutable view of the currently registered {@link ExtensionModel}
      */
-    Set<Extension> getExtensions()
+    Set<ExtensionModel> getExtensions()
     {
         return ImmutableSet.copyOf(extensions.values());
     }
 
     /**
-     * @param name the registration name of the {@link Extension} you want to test
-     * @return {@code true} if an {@link Extension} is registered under {@code name}. {@code false} otherwise
+     * @param name the registration name of the {@link ExtensionModel} you want to test
+     * @return {@code true} if an {@link ExtensionModel} is registered under {@code name}. {@code false} otherwise
      */
     boolean containsExtension(String name)
     {
@@ -74,36 +74,36 @@ final class ExtensionRegistry
     }
 
     /**
-     * Returns a registered {@link Extension} of the given {@code name}
+     * Returns a registered {@link ExtensionModel} of the given {@code name}
      *
      * @param name the name of the extension that is being retrieved
-     * @return the registered {@link Extension} or {@code null} if nothing was registered with that {@code name}
+     * @return the registered {@link ExtensionModel} or {@code null} if nothing was registered with that {@code name}
      */
-    Extension getExtension(String name)
+    ExtensionModel getExtension(String name)
     {
         return extensions.get(name);
     }
 
     /**
-     * @param extension a registered {@link Extension}
+     * @param extensionModel a registered {@link ExtensionModel}
      * @return the {@link ExtensionStateTracker} object related to the given {@code extension}
      */
-    ExtensionStateTracker getExtensionState(Extension extension)
+    ExtensionStateTracker getExtensionState(ExtensionModel extensionModel)
     {
-        return extensionStates.getUnchecked(extension);
+        return extensionStates.getUnchecked(extensionModel);
     }
 
     /**
      * @param capabilityType the {@link Class} of a capability
      * @param <C>            the capability type
-     * @return an immutable view of all registered {@link Extension} which have the given {@code capabilityType}
+     * @return an immutable view of all registered {@link ExtensionModel} which have the given {@code capabilityType}
      */
-    <C> Set<Extension> getExtensionsCapableOf(Class<C> capabilityType)
+    <C> Set<ExtensionModel> getExtensionsCapableOf(Class<C> capabilityType)
     {
-        Set<Extension> cachedCapables = capabilityToExtension.get(capabilityType);
+        Set<ExtensionModel> cachedCapables = capabilityToExtension.get(capabilityType);
         if (CollectionUtils.isEmpty(cachedCapables))
         {
-            ImmutableSet.Builder<Extension> capables = ImmutableSet.builder();
+            ImmutableSet.Builder<ExtensionModel> capables = ImmutableSet.builder();
             getExtensions().stream().filter(extension -> extension.isCapableOf(capabilityType)).forEach(capables::add);
             cachedCapables = capables.build();
             capabilityToExtension.put(capabilityType, cachedCapables);
@@ -118,10 +118,10 @@ final class ExtensionRegistry
      *
      * @return an immutable {@link Map}
      */
-    Map<String, Object> getExpiredConfigInstances()
+    Map<String, Object> getExpiredConfigs()
     {
         ImmutableMap.Builder<String, Object> expired = ImmutableMap.builder();
-        extensionStates.asMap().values().stream().map(tracker -> tracker.getExpiredConfigInstances()).forEach(expired::putAll);
+        extensionStates.asMap().values().stream().map(tracker -> tracker.getExpiredConfigs()).forEach(expired::putAll);
 
         return expired.build();
     }

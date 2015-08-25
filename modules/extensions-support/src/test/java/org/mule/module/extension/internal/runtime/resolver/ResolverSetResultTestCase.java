@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.HealthStatus;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -29,18 +29,18 @@ public class ResolverSetResultTestCase extends AbstractMuleTestCase
     private static final int AGE = 31;
     private static final HealthStatus HEALTH = null;
 
-    private Parameter nameParameter;
-    private Parameter ageParameter;
-    private Parameter healthParameter;
+    private ParameterModel nameParameterModel;
+    private ParameterModel ageParameterModel;
+    private ParameterModel healthParameterModel;
 
     private ResolverSetResult result;
 
     @Before
     public void before() throws Exception
     {
-        nameParameter = getParameter("myName", String.class);
-        ageParameter = getParameter("age", Integer.class);
-        healthParameter = getParameter("initialHealth", HealthStatus.class);
+        nameParameterModel = getParameter("myName", String.class);
+        ageParameterModel = getParameter("age", Integer.class);
+        healthParameterModel = getParameter("initialHealth", HealthStatus.class);
 
         result = buildResult();
     }
@@ -89,9 +89,9 @@ public class ResolverSetResultTestCase extends AbstractMuleTestCase
 
     private void assertResult(ResolverSetResult result)
     {
-        assertThat((String) result.get(nameParameter), is(NAME));
-        assertThat((Integer) result.get(ageParameter), is(AGE));
-        assertThat((HealthStatus) result.get(healthParameter), is(HEALTH));
+        assertThat((String) result.get(nameParameterModel), is(NAME));
+        assertThat((Integer) result.get(ageParameterModel), is(AGE));
+        assertThat((HealthStatus) result.get(healthParameterModel), is(HEALTH));
     }
 
     private ResolverSetResult buildResult()
@@ -102,15 +102,15 @@ public class ResolverSetResultTestCase extends AbstractMuleTestCase
     private ResolverSetResult agelessResult()
     {
         return getBuilder()
-                .add(ageParameter, null)
+                .add(ageParameterModel, null)
                 .build();
     }
 
     private ResolverSetResult.Builder getBuilder()
     {
         return ResolverSetResult.newBuilder()
-                .add(nameParameter, NAME)
-                .add(ageParameter, AGE)
-                .add(healthParameter, HEALTH);
+                .add(nameParameterModel, NAME)
+                .add(ageParameterModel, AGE)
+                .add(healthParameterModel, HEALTH);
     }
 }

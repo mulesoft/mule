@@ -18,9 +18,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -58,10 +58,10 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     private ResolverSetResult parameters;
 
     @Mock
-    private Extension extension;
+    private ExtensionModel extensionModel;
 
     @Mock
-    private Operation operation;
+    private OperationModel operationModel;
 
     @Mock
     private ExtensionManagerAdapter extensionManager;
@@ -76,8 +76,8 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     public void init()
     {
         initHeisenberg();
-        operationContext = spy(new DefaultOperationContext(extension, operation, CONFIG_NAME, parameters, muleEvent, extensionManager));
-        when(extensionManager.getConfigurationInstance(extension, CONFIG_NAME, operationContext)).thenReturn(config);
+        operationContext = spy(new DefaultOperationContext(extensionModel, operationModel, CONFIG_NAME, parameters, muleEvent, extensionManager));
+        when(extensionManager.getConfiguration(extensionModel, CONFIG_NAME, operationContext)).thenReturn(config);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     @Test
     public void withArgumentsAndReturnValue() throws Exception
     {
-        Map<Parameter, Object> parametersMap = new HashMap<>();
+        Map<ParameterModel, Object> parametersMap = new HashMap<>();
         parametersMap.put(ExtensionsTestUtils.getParameter("index", int.class), 0);
         when(parameters.asMap()).thenReturn(parametersMap);
         init();

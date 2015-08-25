@@ -8,18 +8,18 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ParameterModel;
 
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Immutable implementation of {@link Parameter}
+ * Immutable implementation of {@link ParameterModel}
  *
  * @since 3.7.0
  */
-final class ImmutableParameter extends AbstractCapableDescribed implements Parameter
+final class ImmutableParameterModel extends AbstractCapableDescribed implements ParameterModel
 {
 
     private final DataType type;
@@ -39,13 +39,13 @@ final class ImmutableParameter extends AbstractCapableDescribed implements Param
      * @param capabilities this parameter's capabilities
      * @throws IllegalArgumentException if {@code required} is {@code true} and {@code defaultValue} is not {@code null} at the same time
      */
-    protected ImmutableParameter(String name,
-                                 String description,
-                                 DataType type,
-                                 boolean required,
-                                 boolean dynamic,
-                                 Object defaultValue,
-                                 Set<Object> capabilities)
+    protected ImmutableParameterModel(String name,
+                                      String description,
+                                      DataType type,
+                                      boolean required,
+                                      boolean dynamic,
+                                      Object defaultValue,
+                                      Set<Object> capabilities)
     {
         super(name, description, capabilities);
 

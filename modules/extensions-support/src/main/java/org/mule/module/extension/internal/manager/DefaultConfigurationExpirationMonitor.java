@@ -146,7 +146,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
         LOGGER.debug("Running configuration expiration cycle");
         try
         {
-            Map<String, Object> expired = extensionRegistry.getExpiredConfigInstances();
+            Map<String, Object> expired = extensionRegistry.getExpiredConfigs();
             if (LOGGER.isDebugEnabled())
             {
                 LOGGER.debug(expired.isEmpty()

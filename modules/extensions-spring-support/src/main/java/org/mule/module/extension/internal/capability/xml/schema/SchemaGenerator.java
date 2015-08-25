@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.capability.xml.schema;
 
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
@@ -25,7 +25,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
 /**
- * Generator class that takes a {@link Extension}
+ * Generator class that takes a {@link ExtensionModel}
  * with a {@link org.mule.extension.introspection.capability.XmlCapability} and returns
  * a XSD schema as a String
  *
@@ -34,20 +34,20 @@ import org.dom4j.io.XMLWriter;
 public class SchemaGenerator
 {
 
-    private void validate(Extension extension, XmlCapability xmlCapability)
+    private void validate(ExtensionModel extensionModel, XmlCapability xmlCapability)
     {
-        checkArgument(extension != null, "extension cannot be null");
+        checkArgument(extensionModel != null, "extension cannot be null");
         checkArgument(xmlCapability != null, "capability cannot be null");
         checkState(!StringUtils.isBlank(xmlCapability.getNamespace()), "capability cannot provide a blank namespace");
     }
 
-    public String generate(Extension extension, XmlCapability xmlCapability)
+    public String generate(ExtensionModel extensionModel, XmlCapability xmlCapability)
     {
-        validate(extension, xmlCapability);
+        validate(extensionModel, xmlCapability);
         SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(xmlCapability.getSchemaLocation());
 
-        extension.getConfigurations().forEach(schemaBuilder::registerConfigElement);
-        extension.getOperations().forEach(schemaBuilder::registerOperation);
+        extensionModel.getConfigurations().forEach(schemaBuilder::registerConfigElement);
+        extensionModel.getOperations().forEach(schemaBuilder::registerOperation);
 
         schemaBuilder.registerEnums();
 

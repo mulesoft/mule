@@ -12,13 +12,13 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser;
 import org.mule.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
-import org.mule.module.extension.internal.runtime.resolver.ConfigurationInstanceArgumentResolver;
+import org.mule.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.EventArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * Resolves the values of an {@link Operation}'s {@link Parameter}s by
+ * Resolves the values of an {@link OperationModel}'s {@link ParameterModel parameterModels} by
  * matching them to the arguments in a {@link Method}
  *
  * @since 3.7.0
@@ -72,7 +72,7 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 
             if (annotations.containsKey(UseConfig.class))
             {
-                argumentResolver = ConfigurationInstanceArgumentResolver.getInstance();
+                argumentResolver = ConfigurationArgumentResolver.getInstance();
             }
             else if (MuleEvent.class.isAssignableFrom(parameterType))
             {

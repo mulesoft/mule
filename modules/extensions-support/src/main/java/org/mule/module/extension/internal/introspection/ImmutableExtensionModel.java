@@ -11,10 +11,10 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.validat
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.exception.NoSuchConfigurationException;
 import org.mule.extension.exception.NoSuchOperationException;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 
 import com.google.common.collect.ImmutableList;
 
@@ -25,16 +25,16 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Immutable implementation of {@link Extension}
+ * Immutable implementation of {@link ExtensionModel}
  *
  * @since 3.7.0
  */
-final class ImmutableExtension extends AbstractCapableDescribed implements Extension
+final class ImmutableExtensionModel extends AbstractCapableDescribed implements ExtensionModel
 {
 
     private final String version;
-    private final Map<String, Configuration> configurations;
-    private final Map<String, Operation> operations;
+    private final Map<String, ConfigurationModel> configurations;
+    private final Map<String, OperationModel> operations;
 
     /**
      * Creates a new instance with the given state
@@ -42,25 +42,25 @@ final class ImmutableExtension extends AbstractCapableDescribed implements Exten
      * @param name           the extension's name. Cannot be blank
      * @param description    the extension's description
      * @param version        the extension's version
-     * @param configurations a {@link List} with the extension's {@link Configuration}s
-     * @param operations     a {@link List} with the extension's {@link Operation}s
+     * @param configurationModels a {@link List} with the extension's {@link ConfigurationModel configurationModels}
+     * @param operationModels     a {@link List} with the extension's {@link OperationModel operationModels}
      * @param capabilities   a {@link Set} with the extension's capabilities
-     * @throws IllegalArgumentException if {@code configurations} or {@link Parameter} are null or contain instances with non unique names
+     * @throws IllegalArgumentException if {@code configurations} or {@link ParameterModel} are null or contain instances with non unique names
      */
-    protected ImmutableExtension(String name,
-                                 String description,
-                                 String version,
-                                 List<Configuration> configurations,
-                                 List<Operation> operations,
-                                 Set<Object> capabilities)
+    protected ImmutableExtensionModel(String name,
+                                      String description,
+                                      String version,
+                                      List<ConfigurationModel> configurationModels,
+                                      List<OperationModel> operationModels,
+                                      Set<Object> capabilities)
     {
         super(name, description, capabilities);
 
         checkArgument(!name.contains(" "), "Extension name cannot contain spaces");
-        validateRepeatedNames(configurations, operations);
+        validateRepeatedNames(configurationModels, operationModels);
 
-        this.configurations = toMap(configurations);
-        this.operations = toMap(operations);
+        this.configurations = toMap(configurationModels);
+        this.operations = toMap(operationModels);
 
         checkArgument(!StringUtils.isBlank(version), "version cannot be blank");
         this.version = version;
@@ -70,7 +70,7 @@ final class ImmutableExtension extends AbstractCapableDescribed implements Exten
      * {@inheritDoc}
      */
     @Override
-    public List<Configuration> getConfigurations()
+    public List<ConfigurationModel> getConfigurations()
     {
         return ImmutableList.copyOf(configurations.values());
     }
@@ -79,22 +79,22 @@ final class ImmutableExtension extends AbstractCapableDescribed implements Exten
      * {@inheritDoc}
      */
     @Override
-    public Configuration getConfiguration(String name) throws NoSuchConfigurationException
+    public ConfigurationModel getConfiguration(String name) throws NoSuchConfigurationException
     {
-        Configuration configuration = configurations.get(name);
-        if (configuration == null)
+        ConfigurationModel configurationModel = configurations.get(name);
+        if (configurationModel == null)
         {
             throw new NoSuchConfigurationException(this, name);
         }
 
-        return configuration;
+        return configurationModel;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Operation> getOperations()
+    public List<OperationModel> getOperations()
     {
         return ImmutableList.copyOf(operations.values());
     }
@@ -112,14 +112,14 @@ final class ImmutableExtension extends AbstractCapableDescribed implements Exten
      * {@inheritDoc}
      */
     @Override
-    public Operation getOperation(String name) throws NoSuchOperationException
+    public OperationModel getOperation(String name) throws NoSuchOperationException
     {
-        Operation operation = operations.get(name);
-        if (operation == null)
+        OperationModel operationModel = operations.get(name);
+        if (operationModel == null)
         {
             throw new NoSuchOperationException(this, name);
         }
 
-        return operation;
+        return operationModel;
     }
 }

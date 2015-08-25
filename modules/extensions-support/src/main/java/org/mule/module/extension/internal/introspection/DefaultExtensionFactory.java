@@ -10,11 +10,11 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSo
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
@@ -58,7 +58,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
-    public Extension createFrom(Descriptor descriptor)
+    public ExtensionModel createFrom(Descriptor descriptor)
     {
         return createFrom(descriptor, new DefaultDescribingContext(descriptor.getRootDeclaration()));
     }
@@ -67,16 +67,16 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
-    public Extension createFrom(Descriptor descriptor, DescribingContext describingContext)
+    public ExtensionModel createFrom(Descriptor descriptor, DescribingContext describingContext)
     {
         applyPostProcessors(describingContext);
         return toExtension(descriptor.getRootDeclaration().getDeclaration());
     }
 
-    private Extension toExtension(Declaration declaration)
+    private ExtensionModel toExtension(Declaration declaration)
     {
         validateMuleVersion(declaration);
-        return new ImmutableExtension(declaration.getName(),
+        return new ImmutableExtensionModel(declaration.getName(),
                                       declaration.getDescription(),
                                       declaration.getVersion(),
                                       sortConfigurations(toConfigurations(declaration.getConfigurations())),
@@ -84,103 +84,103 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                       declaration.getCapabilities());
     }
 
-    private List<Configuration> sortConfigurations(List<Configuration> configurations)
+    private List<ConfigurationModel> sortConfigurations(List<ConfigurationModel> configurationModels)
     {
-        List<Configuration> sorted = new ArrayList<>(configurations.size());
+        List<ConfigurationModel> sorted = new ArrayList<>(configurationModels.size());
 
         // first one is kept as default while the rest are alpha sorted
-        sorted.add(configurations.get(0));
+        sorted.add(configurationModels.get(0));
 
-        if (configurations.size() > 1)
+        if (configurationModels.size() > 1)
         {
-            sorted.addAll(alphaSortDescribedList(configurations.subList(1, configurations.size())));
+            sorted.addAll(alphaSortDescribedList(configurationModels.subList(1, configurationModels.size())));
         }
 
         return sorted;
     }
 
 
-    private List<Configuration> toConfigurations(List<ConfigurationDeclaration> declarations)
+    private List<ConfigurationModel> toConfigurations(List<ConfigurationDeclaration> declarations)
     {
         checkArgument(!declarations.isEmpty(), "A extension must have at least one configuration");
 
-        List<Configuration> configurations = new ArrayList<>(declarations.size());
+        List<ConfigurationModel> configurationModels = new ArrayList<>(declarations.size());
         for (ConfigurationDeclaration declaration : declarations)
         {
-            configurations.add(toConfiguration(declaration));
+            configurationModels.add(toConfiguration(declaration));
         }
 
-        return configurations;
+        return configurationModels;
     }
 
-    private Configuration toConfiguration(ConfigurationDeclaration declaration)
+    private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration)
     {
-        return new ImmutableConfiguration(declaration.getName(),
+        return new ImmutableConfigurationModel(declaration.getName(),
                                           declaration.getDescription(),
                                           declaration.getConfigurationInstantiator(),
                                           toConfigParameters(declaration.getParameters()),
                                           declaration.getCapabilities());
     }
 
-    private List<Operation> toOperations(List<OperationDeclaration> declarations)
+    private List<OperationModel> toOperations(List<OperationDeclaration> declarations)
     {
         if (declarations.isEmpty())
         {
             return ImmutableList.of();
         }
 
-        List<Operation> operations = new ArrayList<>(declarations.size());
+        List<OperationModel> operationModels = new ArrayList<>(declarations.size());
         for (OperationDeclaration declaration : declarations)
         {
-            operations.add(toOperation(declaration));
+            operationModels.add(toOperation(declaration));
         }
 
-        return operations;
+        return operationModels;
     }
 
-    private Operation toOperation(OperationDeclaration declaration)
+    private OperationModel toOperation(OperationDeclaration declaration)
     {
-        List<Parameter> parameters = toOperationParameters(declaration.getParameters());
-        return new ImmutableOperation(declaration.getName(),
+        List<ParameterModel> parameterModels = toOperationParameters(declaration.getParameters());
+        return new ImmutableOperationModel(declaration.getName(),
                                       declaration.getDescription(),
                                       declaration.getExecutorFactory(),
-                                      parameters,
+                                           parameterModels,
                                       declaration.getCapabilities());
     }
 
-    private List<Parameter> toConfigParameters(List<ParameterDeclaration> declarations)
+    private List<ParameterModel> toConfigParameters(List<ParameterDeclaration> declarations)
     {
 
-        List<Parameter> parameters = toParameters(declarations);
-        alphaSortDescribedList(parameters);
+        List<ParameterModel> parameterModels = toParameters(declarations);
+        alphaSortDescribedList(parameterModels);
 
-        return parameters;
+        return parameterModels;
     }
 
-    private List<Parameter> toOperationParameters(List<ParameterDeclaration> declarations)
+    private List<ParameterModel> toOperationParameters(List<ParameterDeclaration> declarations)
     {
         return toParameters(declarations);
     }
 
-    private List<Parameter> toParameters(List<ParameterDeclaration> declarations)
+    private List<ParameterModel> toParameters(List<ParameterDeclaration> declarations)
     {
         if (declarations.isEmpty())
         {
             return ImmutableList.of();
         }
 
-        List<Parameter> parameters = new ArrayList<>(declarations.size());
+        List<ParameterModel> parameterModels = new ArrayList<>(declarations.size());
         for (ParameterDeclaration declaration : declarations)
         {
-            parameters.add(toParameter(declaration));
+            parameterModels.add(toParameter(declaration));
         }
 
-        return parameters;
+        return parameterModels;
     }
 
-    private Parameter toParameter(ParameterDeclaration parameter)
+    private ParameterModel toParameter(ParameterDeclaration parameter)
     {
-        return new ImmutableParameter(parameter.getName(),
+        return new ImmutableParameterModel(parameter.getName(),
                                       parameter.getDescription(),
                                       parameter.getType(),
                                       parameter.isRequired(),

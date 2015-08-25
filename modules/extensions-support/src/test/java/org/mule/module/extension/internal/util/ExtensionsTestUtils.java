@@ -20,10 +20,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.config.MuleManifest;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.introspection.ParameterModel;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
@@ -69,13 +69,13 @@ public abstract class ExtensionsTestUtils
         return resolver;
     }
 
-    public static Parameter getParameter(String name, Class<?> type)
+    public static ParameterModel getParameter(String name, Class<?> type)
     {
-        Parameter parameter = mock(Parameter.class);
-        when(parameter.getName()).thenReturn(name);
-        when(parameter.getType()).thenReturn(DataType.of(type));
+        ParameterModel parameterModel = mock(ParameterModel.class);
+        when(parameterModel.getName()).thenReturn(name);
+        when(parameterModel.getType()).thenReturn(DataType.of(type));
 
-        return parameter;
+        return parameterModel;
     }
 
     public static void stubRegistryKeys(MuleContext muleContext, final String... keys)
@@ -109,15 +109,15 @@ public abstract class ExtensionsTestUtils
         assertThat(captor.getValue(), containsString(key));
     }
 
-    public static <C> C getConfigurationInstanceFromExtensionManager(String key, Extension extension, MuleEvent muleEvent) throws Exception
+    public static <C> C getConfigurationInstanceFromExtensionManager(String key, ExtensionModel extensionModel, MuleEvent muleEvent) throws Exception
     {
-        return extractExtensionManager(muleEvent).getConfigurationInstance(extension, key, getOperationContext(muleEvent));
+        return extractExtensionManager(muleEvent).getConfiguration(extensionModel, key, getOperationContext(muleEvent));
     }
 
-    public static <C> C getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent) throws Exception
+    public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent) throws Exception
     {
-        ConfigurationInstanceProvider<C> configurationInstanceProvider = muleEvent.getMuleContext().getRegistry().get(key);
-        return configurationInstanceProvider.get(getOperationContext(muleEvent));
+        ConfigurationProvider<C> configurationProvider = muleEvent.getMuleContext().getRegistry().get(key);
+        return configurationProvider.get(getOperationContext(muleEvent));
     }
 
     private static ExtensionManagerAdapter extractExtensionManager(MuleEvent muleEvent)
@@ -127,8 +127,8 @@ public abstract class ExtensionsTestUtils
 
     private static OperationContext getOperationContext(MuleEvent event) throws Exception
     {
-        return new DefaultOperationContext(mock(Extension.class),
-                                           mock(Operation.class),
+        return new DefaultOperationContext(mock(ExtensionModel.class),
+                                           mock(OperationModel.class),
                                            "",
                                            mock(ResolverSetResult.class),
                                            event,

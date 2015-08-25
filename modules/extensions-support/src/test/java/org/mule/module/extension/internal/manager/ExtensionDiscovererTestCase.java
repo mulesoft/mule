@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.declaration.Describer;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
@@ -52,7 +52,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     private Describer describer;
 
     @Mock
-    private Extension extension;
+    private ExtensionModel extensionModel;
 
     private ExtensionDiscoverer discoverer;
 
@@ -67,12 +67,12 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     {
         when(serviceRegistry.lookupProviders(Describer.class, getClass().getClassLoader())).thenReturn(Arrays.asList(describer));
         when(describer.describe()).thenReturn(descriptor);
-        when(extensionFactory.createFrom(descriptor)).thenReturn(extension);
+        when(extensionFactory.createFrom(descriptor)).thenReturn(extensionModel);
 
-        List<Extension> extensions = discoverer.discover(getClass().getClassLoader());
-        assertThat(extensions, hasSize(1));
+        List<ExtensionModel> extensionModels = discoverer.discover(getClass().getClassLoader());
+        assertThat(extensionModels, hasSize(1));
 
-        assertThat(extensions.get(0), is(sameInstance(extension)));
+        assertThat(extensionModels.get(0), is(sameInstance(extensionModel)));
 
         verify(serviceRegistry).lookupProviders(Describer.class, getClass().getClassLoader());
         verify(describer).describe();

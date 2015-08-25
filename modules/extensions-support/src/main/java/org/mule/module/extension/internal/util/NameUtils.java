@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.util;
 
 import org.mule.extension.annotations.Alias;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.introspection.ExtensionModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Utilities for manipulating names of {@link Extension extensions} and
+ * Utilities for manipulating names of {@link ExtensionModel extensions} and
  * their components
  *
  * @since 3.7.0

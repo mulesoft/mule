@@ -20,8 +20,8 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.runtime.OperationExecutor;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -38,10 +38,10 @@ import org.slf4j.LoggerFactory;
  * A {@link MessageProcessor} capable of executing extension operations.
  * <p/>
  * It obtains a configuration instance, evaluate all the operation parameters
- * and executes a {@link Operation} by using a {@link #operationExecutor}. This message processor is capable
- * of serving the execution of any {@link Operation} of any {@link Extension}.
+ * and executes a {@link OperationModel} by using a {@link #operationExecutor}. This message processor is capable
+ * of serving the execution of any {@link OperationModel} of any {@link ExtensionModel}.
  * <p/>
- * A {@link #operationExecutor} is obtained by invoking {@link Operation#getExecutor()}. That instance
+ * A {@link #operationExecutor} is obtained by invoking {@link OperationModel#getExecutor()}. That instance
  * will be use to serve all invokations of {@link #process(MuleEvent)} on {@code this} instance but
  * will not be shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle}
  * events that {@code this} instace receives will be propagated to the {@link #operationExecutor}
@@ -53,24 +53,24 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
 
-    private final Extension extension;
-    private final String configurationInstanceProviderName;
-    private final Operation operation;
+    private final ExtensionModel extensionModel;
+    private final String configurationProviderName;
+    private final OperationModel operationModel;
     private final ResolverSet resolverSet;
     private final ExtensionManagerAdapter extensionManager;
 
     private MuleContext muleContext;
     private OperationExecutor operationExecutor;
 
-    public OperationMessageProcessor(Extension extension,
-                                     Operation operation,
-                                     String configurationInstanceProviderName,
+    public OperationMessageProcessor(ExtensionModel extensionModel,
+                                     OperationModel operationModel,
+                                     String configurationProviderName,
                                      ResolverSet resolverSet,
                                      ExtensionManagerAdapter extensionManager)
     {
-        this.extension = extension;
-        this.operation = operation;
-        this.configurationInstanceProviderName = configurationInstanceProviderName;
+        this.extensionModel = extensionModel;
+        this.operationModel = operationModel;
+        this.configurationProviderName = configurationProviderName;
         this.resolverSet = resolverSet;
         this.extensionManager = extensionManager;
     }
@@ -122,13 +122,13 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private OperationContext createOperationContext(MuleEvent event) throws MuleException
     {
         ResolverSetResult parameters = resolverSet.resolve(event);
-        return new DefaultOperationContext(extension, operation, configurationInstanceProviderName, parameters, event, extensionManager);
+        return new DefaultOperationContext(extensionModel, operationModel, configurationProviderName, parameters, event, extensionManager);
     }
 
     @Override
     public void initialise() throws InitialisationException
     {
-        operationExecutor = operation.getExecutor();
+        operationExecutor = operationModel.getExecutor();
         initialiseIfNeeded(operationExecutor, muleContext);
     }
 

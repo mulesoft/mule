@@ -26,7 +26,7 @@ import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.extension.runtime.event.OperationSuccessfulSignal;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
-import org.mule.module.extension.internal.runtime.config.DynamicConfigurationInstanceProvider;
+import org.mule.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.size.SmallTest;
@@ -46,7 +46,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfigurationInstanceProviderTestCase
+public class DynamicConfigurationProviderTestCase extends AbstractConfigurationInstanceProviderTestCase
 {
 
     private static final Class MODULE_CLASS = HeisenbergExtension.class;
@@ -76,21 +76,21 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
     public void before() throws Exception
     {
         ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIG_NAME);
-        when(configuration.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
-        when(configuration.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-        when(configuration.getCapabilities(any(Class.class))).thenReturn(null);
+        when(configurationModel.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
+        when(configurationModel.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
+        when(configurationModel.getCapabilities(any(Class.class))).thenReturn(null);
 
         when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
         when(muleContext.getExtensionManager()).thenReturn(extensionManager);
 
         when(operationContext.getEvent()).thenReturn(event);
 
-        configurationObjectBuilder = new ConfigurationObjectBuilder(configuration, resolverSet);
+        configurationObjectBuilder = new ConfigurationObjectBuilder(configurationModel, resolverSet);
         expirationPolicy = new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);
 
-        instanceProvider = new DynamicConfigurationInstanceProvider(CONFIG_NAME,
-                                                                    extension,
-                                                                    configurationInstanceRegistrationCallback,
+        instanceProvider = new DynamicConfigurationProvider(CONFIG_NAME,
+                                                                    extensionModel,
+                                                            configurationRegistrationCallback,
                                                                     configurationObjectBuilder,
                                                                     resolverSet,
                                                                     expirationPolicy);
@@ -124,7 +124,7 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
         final String key1 = "key1";
         final String key2 = "key2";
 
-        when(configurationInstanceRegistrationCallback.registerConfigurationInstance(same(extension), same(CONFIG_NAME), any(Object.class)))
+        when(configurationRegistrationCallback.registerConfiguration(same(extensionModel), same(CONFIG_NAME), any(Object.class)))
                 .thenReturn(key1)
                 .thenReturn(key2);
 
@@ -136,7 +136,7 @@ public class DynamicConfigurationInstanceProviderTestCase extends AbstractConfig
         HeisenbergExtension instance1 = (HeisenbergExtension) instanceProvider.get(operationContext);
         HeisenbergExtension instance2 = makeAlternateInstance();
 
-        DynamicConfigurationInstanceProvider provider = (DynamicConfigurationInstanceProvider) instanceProvider;
+        DynamicConfigurationProvider provider = (DynamicConfigurationProvider) instanceProvider;
         timeSupplier.move(1, TimeUnit.MINUTES);
 
         Map<String, Object> expired = provider.getExpired();
