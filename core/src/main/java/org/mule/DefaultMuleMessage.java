@@ -6,6 +6,9 @@
  */
 package org.mule;
 
+import static org.mule.api.transport.PropertyScope.INBOUND;
+import static org.mule.api.transport.PropertyScope.INVOCATION;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import static org.mule.util.SystemUtils.LINE_SEPARATOR;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
@@ -23,7 +26,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
-import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.message.ds.StringDataSource;
@@ -213,8 +215,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             setPayload(message, dataType);
             originalPayload = message;
         }
-        addProperties(inboundProperties, PropertyScope.INBOUND);
-        addProperties(outboundProperties);
+        addProperties(inboundProperties, INBOUND);
+        addProperties(outboundProperties, OUTBOUND);
 
         //Add inbound attachments
         if (attachments != null)
@@ -284,7 +286,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     
     protected void copyMessageProperties(MuleMessage muleMessage)
     {
-        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND, PropertyScope.OUTBOUND})
+        for (PropertyScope scope : new PropertyScope[]{INBOUND, PropertyScope.OUTBOUND})
         {
             try
             {
@@ -482,24 +484,24 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public void setInboundProperty(String key, Object value)
     {
-        setProperty(key, value, PropertyScope.INBOUND);
+        setProperty(key, value, INBOUND);
     }
 
     public void setInboundProperty(String key, Object value, DataType<?> dataType)
     {
-        setProperty(key, value, PropertyScope.INBOUND, dataType);
+        setProperty(key, value, INBOUND, dataType);
     }
 
     @Override
     public void setInvocationProperty(String key, Object value)
     {
-        setProperty(key, value, PropertyScope.INVOCATION);
+        setProperty(key, value, INVOCATION);
     }
 
     @Override
     public void setInvocationProperty(String key, Object value, DataType<?> dataType)
     {
-        setProperty(key, value, PropertyScope.INVOCATION, dataType);
+        setProperty(key, value, INVOCATION, dataType);
     }
 
     @Override
@@ -512,12 +514,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setOutboundProperty(String key, Object value, DataType<?> dataType)
     {
        setProperty(key, value, PropertyScope.OUTBOUND, dataType);
-    }
-
-    @Override
-    public void setSessionProperty(String key, Object value)
-    {
-        setProperty(key, value, PropertyScope.SESSION);
     }
 
     /**
@@ -590,73 +586,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * {@inheritDoc}
      */
     @Override
-    @Deprecated
-    public Object getProperty(String key)
-    {
-        assertAccess(READ);
-        return properties.getProperty(key, PropertyScope.OUTBOUND);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object removeProperty(String key)
-    {
-        assertAccess(WRITE);
-        return properties.removeProperty(key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Object removeProperty(String key, PropertyScope scope)
     {
         assertAccess(WRITE);
         return properties.removeProperty(key, scope);
-    }
-
-    /**
-     * Set a property on the message. This method will now set a value on the outbound scope only.
-     *
-     * @param key   the key on which to associate the value
-     * @param value the property value
-     * @see #setInboundProperty(String, Object)
-     * @see #setInvocationProperty(String, Object)
-     * @see #setOutboundProperty(String, Object)
-     * @see #setSessionProperty(String, Object)
-     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} or
-     *             preferrably any of the scope-specific set methods.
-     */
-    @Override
-    @Deprecated
-    public void setProperty(String key, Object value)
-    {
-        assertAccess(WRITE);
-        if (key != null)
-        {
-            if (value != null)
-            {
-                properties.setProperty(key, value, PropertyScope.OUTBOUND);
-            }
-            else
-            {
-                logger.warn("setProperty(key, value) called with null value; removing key: " + key
-                        + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
-                        new Throwable());
-                properties.removeProperty(key);
-            }
-
-            updateDataTypeWithProperty(key, value);
-        }
-        else
-        {
-            logger.warn("setProperty(key, value) ignored because of null key for object: " + value
-                    + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
-                    new Throwable());
-        }
     }
 
     /**
@@ -741,19 +674,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * {@inheritDoc}
-     *
-     * @deprecated use {@link #getPropertyNames(org.mule.api.transport.PropertyScope)}
-     */
-    @Override
-    @Deprecated
-    public Set<String> getPropertyNames()
-    {
-        assertAccess(READ);
-        return properties.getPropertyNames(PropertyScope.OUTBOUND);
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     public Set<String> getPropertyNames(PropertyScope scope)
@@ -765,13 +685,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public Set<String> getInvocationPropertyNames()
     {
-        return getPropertyNames(PropertyScope.INVOCATION);
+        return getPropertyNames(INVOCATION);
     }
 
     @Override
     public Set<String> getInboundPropertyNames()
     {
-        return getPropertyNames(PropertyScope.INBOUND);
+        return getPropertyNames(INBOUND);
     }
 
     @Override
@@ -779,14 +699,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         return getPropertyNames(PropertyScope.OUTBOUND);
     }
-
-    @Override
-    public Set<String> getSessionPropertyNames()
-    {
-        return getPropertyNames(PropertyScope.SESSION);
-    }
-
-    //** {@inheritDoc} */
 
     /**
      * {@inheritDoc}
@@ -832,16 +744,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * {@inheritDoc}
      */
     @Override
-    public Object getProperty(String name, Object defaultValue)
-    {
-        assertAccess(READ);
-        return properties.getProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String name, PropertyScope scope)
     {
@@ -852,19 +754,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public <T> T getInboundProperty(String name, T defaultValue)
     {
-        return getProperty(name, PropertyScope.INBOUND, defaultValue);
+        return getProperty(name, INBOUND, defaultValue);
     }
 
     @Override
     public <T> T getInboundProperty(String name)
     {
-        return getProperty(name, PropertyScope.INBOUND, (T) null);
+        return getProperty(name, INBOUND, (T) null);
     }
 
     @Override
     public <T> T getInvocationProperty(String name, T defaultValue)
     {
-        return getProperty(name, PropertyScope.INVOCATION, defaultValue);
+        return getProperty(name, INVOCATION, defaultValue);
     }
 
     @Override
@@ -883,18 +785,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public <T> T getOutboundProperty(String name)
     {
         return getOutboundProperty(name, (T) null);
-    }
-
-    @Override
-    public <T> T getSessionProperty(String name, T defaultValue)
-    {
-        return getProperty(name, PropertyScope.SESSION, defaultValue);
-    }
-
-    @Override
-    public <T> T getSessionProperty(String name)
-    {
-        return getSessionProperty(name, (T) null);
     }
 
     /**
@@ -978,7 +868,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
-            removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+            removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, OUTBOUND);
+            removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, INVOCATION);
         }
     }
 
@@ -1011,8 +902,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
-            removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-            removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.INBOUND);
+            removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, OUTBOUND);
+            removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, INVOCATION);
         }
     }
 
@@ -1027,7 +918,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         if (replyTo == null)
         {
             // fallback to inbound, use the requestor's setting if the invocation didn't set any
-            replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.INBOUND);
+            replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, INBOUND);
         }
         return replyTo;
     }
@@ -1042,7 +933,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         // need to wrap with another getInt() as some transports operate on it as a String
         Object correlationSequence = findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
                                                                    PropertyScope.OUTBOUND,
-                                                                   PropertyScope.INBOUND);
+                                                                   INBOUND);
         return ObjectUtils.getInt(correlationSequence, -1);
     }
 
@@ -1066,7 +957,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         // need to wrap with another getInt() as some transports operate on it as a String
         Object correlationGroupSize = findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
                                                                     PropertyScope.OUTBOUND,
-                                                                    PropertyScope.INBOUND);
+                                                                    INBOUND);
         return ObjectUtils.getInt(correlationGroupSize, -1);
     }
 
@@ -1130,50 +1021,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         // no new line here, as headersToString() adds one
         buf.append('}');
         return buf.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void addAttachment(String name, DataHandler dataHandler) throws Exception
-    {
-        logger.warn("MuleMessage.addAttachment() method is deprecated, use MuleMessage.addOutboundAttachment() instead.  This method will be removed in the next point release");
-        addOutboundAttachment(name, dataHandler);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void removeAttachment(String name) throws Exception
-    {
-        logger.warn("MuleMessage.removeAttachment() method is deprecated, use MuleMessage.removeOutboundAttachment() instead.  This method will be removed in the next point release");
-        removeOutboundAttachment(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public DataHandler getAttachment(String name)
-    {
-        logger.warn("MuleMessage.getAttachment() method is deprecated, use MuleMessage.getInboundAttachment() instead.  This method will be removed in the next point release");
-        return getInboundAttachment(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public Set<String> getAttachmentNames()
-    {
-        logger.warn("MuleMessage.getAttachmentNames() method is deprecated, use MuleMessage.getInboundAttachmentNames() instead.  This method will be removed in the next point release");
-        return getInboundAttachmentNames();
     }
 
     @Override
@@ -1283,9 +1130,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         Object value = findPropertyInSpecifiedScopes(name,
                                                      PropertyScope.OUTBOUND,
-                                                     PropertyScope.INVOCATION,
+                                                     INVOCATION,
                                                      PropertyScope.SESSION,
-                                                     PropertyScope.INBOUND);
+                                                     INBOUND);
         if (value == null)
         {
             return defaultValue;
@@ -1344,15 +1191,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * {@inheritDoc}
      */
     @Override
-    public void addProperties(Map<String, Object> props)
-    {
-        addProperties(props, properties.getDefaultScope());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void addProperties(Map<String, Object> props, PropertyScope scope)
     {
         assertAccess(WRITE);
@@ -1370,19 +1208,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public void addInboundProperties(Map<String, Object> props)
     {
-        addProperties(props, PropertyScope.INBOUND);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clearProperties()
-    {
-        assertAccess(WRITE);
-        //Inbound scope is read-only
-        properties.clearProperties(PropertyScope.INVOCATION);
-        properties.clearProperties(PropertyScope.OUTBOUND);
+        addProperties(props, INBOUND);
     }
 
     /**
@@ -1957,126 +1783,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return dataType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public int getIntProperty(String name, int defaultValue)
-    {
-        assertAccess(READ);
-        logger.warn("MuleMessage.getIntProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
-        return getInboundProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public long getLongProperty(String name, long defaultValue)
-    {
-        assertAccess(READ);
-        logger.warn("MuleMessage.getLongProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
-        return getInboundProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public double getDoubleProperty(String name, double defaultValue)
-    {
-        assertAccess(READ);
-        logger.warn("MuleMessage.getDoubleProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
-        return getInboundProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public boolean getBooleanProperty(String name, boolean defaultValue)
-    {
-        assertAccess(READ);
-        logger.warn("MuleMessage.getBooleanProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
-        return getInboundProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void setBooleanProperty(String name, boolean value)
-    {
-        assertAccess(WRITE);
-        logger.warn("MuleMessage.setBooleanProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
-        setOutboundProperty(name, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void setIntProperty(String name, int value)
-    {
-        assertAccess(WRITE);
-        logger.warn("MuleMessage.setIntProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
-        setOutboundProperty(name, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void setLongProperty(String name, long value)
-    {
-        assertAccess(WRITE);
-        logger.warn("MuleMessage.setLongProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
-        setOutboundProperty(name, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void setDoubleProperty(String name, double value)
-    {
-        assertAccess(WRITE);
-        logger.warn("MuleMessage.setDoubleProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
-        setOutboundProperty(name, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public String getStringProperty(String name, String defaultValue)
-    {
-        assertAccess(READ);
-        logger.warn("MuleMessage.getStringProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
-        return getInboundProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void setStringProperty(String name, String value)
-    {
-        assertAccess(WRITE);
-        logger.warn("MuleMessage.setStringProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
-        setOutboundProperty(name, value);
-    }
-
     @Override
     public DataType<?> getPropertyDataType(String name, PropertyScope scope)
     {
@@ -2129,8 +1835,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             newInboundProperties.put(name, getOutboundProperty(name));
         }
 
-        newMessage.clearProperties(PropertyScope.INBOUND);
-        newMessage.clearProperties(PropertyScope.INVOCATION);
+        newMessage.clearProperties(INBOUND);
+        newMessage.clearProperties(INVOCATION);
         newMessage.clearProperties(PropertyScope.OUTBOUND);
 
         for (Map.Entry<String, Object> s : newInboundProperties.entrySet())

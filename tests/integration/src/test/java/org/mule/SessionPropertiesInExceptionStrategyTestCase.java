@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -42,6 +43,6 @@ public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTest
 
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
-        assertThat(result.getSessionProperty("ErrorCount"), is(list.size()));
+        assertThat(result.getProperty("ErrorCount", SESSION), is(list.size()));
     }
 }

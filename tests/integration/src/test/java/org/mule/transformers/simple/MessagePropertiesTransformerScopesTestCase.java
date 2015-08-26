@@ -6,6 +6,9 @@
  */
 package org.mule.transformers.simple;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
@@ -17,9 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleContextTestCase
 {
@@ -44,7 +44,7 @@ public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleCont
 
         assertEquals("bar", msg.getInvocationProperty("foo"));
         assertNull(msg.getOutboundProperty("foo"));
-        assertNull(msg.getSessionProperty("foo"));
+        assertNull(msg.getProperty("foo", SESSION));
 
         // Remove property from the wrong scope
         

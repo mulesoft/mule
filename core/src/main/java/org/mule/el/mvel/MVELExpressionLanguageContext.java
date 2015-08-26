@@ -168,11 +168,4 @@ public class MVELExpressionLanguageContext extends MuleBaseVariableResolverFacto
             AbstractParser.resetParserContext();
         }
     }
-
-    @Override
-    public <T> void addPrivateVariable(String name, T value)
-    {
-        addFinalVariable(name, value);
-    }
-
 }

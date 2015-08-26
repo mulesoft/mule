@@ -2198,16 +2198,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
-    /**
-     * {@inheritDoc}.
-     */
-    @Override
-    public MuleMessage request(String uri, long timeout) throws Exception
-    {
-        return request(getMuleContext().getEndpointFactory().getInboundEndpoint(uri),
-                timeout);
-    }
-
     @Override
     public MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
     {

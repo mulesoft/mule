@@ -16,6 +16,8 @@
 
 package org.mule.transport.sftp;
 
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
+import static org.mule.transport.sftp.SftpConnector.PROPERTY_OUTPUT_PATTERN;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -203,11 +205,17 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
     private String buildFilename(MuleEvent event)
     {
         MuleMessage muleMessage = event.getMessage();
-        String outPattern = (String) endpoint.getProperty(SftpConnector.PROPERTY_OUTPUT_PATTERN);
+        String outPattern = (String) endpoint.getProperty(PROPERTY_OUTPUT_PATTERN);
         if (outPattern == null)
         {
-            outPattern = (String) muleMessage.getProperty(SftpConnector.PROPERTY_OUTPUT_PATTERN,
-                                                          connector.getOutputPattern());
+            if (muleMessage.getPropertyNames(OUTBOUND).contains(PROPERTY_OUTPUT_PATTERN))
+            {
+                outPattern = muleMessage.getProperty(PROPERTY_OUTPUT_PATTERN, OUTBOUND);
+            }
+            else
+            {
+               outPattern = connector.getOutputPattern();
+            }
         }
         String filename = connector.getFilenameParser().getFilename(muleMessage, outPattern);
         if (filename == null)

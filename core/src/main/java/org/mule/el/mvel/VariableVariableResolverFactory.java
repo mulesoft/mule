@@ -6,6 +6,7 @@
  */
 package org.mule.el.mvel;
 
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -43,7 +44,7 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
             return false;
         }
         return message.getInvocationPropertyNames().contains(name)
-               || message.getSessionPropertyNames().contains(name);
+               || message.getPropertyNames(SESSION).contains(name);
     }
 
     @SuppressWarnings("deprecation")
@@ -55,7 +56,7 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
         {
             return new FlowVariableVariableResolver(name);
         }
-        else if (message != null && message.getSessionPropertyNames().contains(name))
+        else if (message != null && message.getPropertyNames(SESSION).contains(name))
         {
             return new SessionVariableVariableResolver(name);
         }
@@ -153,13 +154,13 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
         @Override
         public Object getValue()
         {
-            return message.getSessionProperty(name);
+            return message.getProperty(name, SESSION);
         }
 
         @Override
         public void setValue(Object value)
         {
-            message.setSessionProperty(name, value);
+            message.setProperty(name, value, SESSION);
         }
     }
 

@@ -6,6 +6,8 @@
  */
 package org.mule.transport.sftp.notification;
 
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
@@ -40,7 +42,15 @@ public class EndpointMessageNotificationTestListener implements EndpointMessageN
 
         MuleMessage message = endpointNotification.getSource();
         String msgType = message.getPayload().getClass().getName();
-        String correlationId = (String) message.getProperty("MULE_CORRELATION_ID", "?");
+        String correlationId;
+        if (message.getPropertyNames(OUTBOUND).contains(MULE_CORRELATION_ID_PROPERTY))
+        {
+            correlationId = message.getProperty(MULE_CORRELATION_ID_PROPERTY, OUTBOUND);
+        }
+        else
+        {
+            correlationId = "?";
+        }
         // String endpointUri =
         // endpointNotification.getEndpoint().getEndpointURI().toString();
         String endpointName = endpointNotification.getEndpoint();

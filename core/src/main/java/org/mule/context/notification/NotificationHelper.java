@@ -91,22 +91,6 @@ public class NotificationHelper
 
     /**
      * Fires a {@link ConnectorMessageNotification} for the given arguments
-     * using the {@link #defaultNotificationHandler}
-     *
-     * @param message       a {@link MuleMessage}
-     * @param uri           the uri of the firing endpoint
-     * @param flowConstruct the {@link FlowConstruct} that generated the notification
-     * @param action        the action code for the notification
-     * @deprecated as of 3.7.2. Use {@link #fireNotification(MuleEvent, String, FlowConstruct, int)} instead
-     */
-    @Deprecated
-    public void fireNotification(MuleMessage message, String uri, FlowConstruct flowConstruct, int action)
-    {
-        doFireNotification(defaultNotificationHandler, message, uri, flowConstruct, action);
-    }
-
-    /**
-     * Fires a {@link ConnectorMessageNotification} for the given arguments
      * using the {@link ServerNotificationHandler} associated to the given {@code event}
      *
      * @param event         a {@link MuleEvent}

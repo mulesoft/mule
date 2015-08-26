@@ -6,19 +6,19 @@
  */
 package org.mule.transport.sftp.notification;
 
-import java.util.Date;
-
-import org.mule.api.MuleMessage;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.transport.sftp.notification.SftpTransportNotification;
-import org.mule.transport.sftp.notification.SftpTransportNotificationListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION_MSG;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION_MSG;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION_MSG;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION_MSG;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION_MSG;
+import org.mule.api.MuleMessage;
+import org.mule.api.context.notification.ServerNotification;
+
+import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SftpTransportNotificationTestListener implements SftpTransportNotificationListener
 {
@@ -80,7 +80,14 @@ public class SftpTransportNotificationTestListener implements SftpTransportNotif
         {
             MuleMessage message = (MuleMessage) notification.getSource();
             msgType = message.getPayload().getClass().getName();
-            correlationId = (String) message.getProperty("MULE_CORRELATION_ID", "?");
+            if (message.getPropertyNames(OUTBOUND).contains(MULE_CORRELATION_ID_PROPERTY))
+            {
+                correlationId = message.getProperty(MULE_CORRELATION_ID_PROPERTY, OUTBOUND);
+            }
+            else
+            {
+                correlationId = "?";
+            }
         }
 
         if (logger.isDebugEnabled())

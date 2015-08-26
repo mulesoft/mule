@@ -6,6 +6,8 @@
  */
 package org.mule.transport;
 
+import static org.mule.api.transport.PropertyScope.INVOCATION;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
@@ -157,7 +159,8 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
         if (!remoteSync)
         {
-            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, OUTBOUND);
+            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, INVOCATION);
         }
         return remoteSync;
     }

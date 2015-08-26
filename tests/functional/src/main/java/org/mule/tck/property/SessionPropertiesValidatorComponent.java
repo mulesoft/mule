@@ -6,14 +6,14 @@
  */
 package org.mule.tck.property;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class SessionPropertiesValidatorComponent implements Callable
 {
@@ -33,7 +33,7 @@ public class SessionPropertiesValidatorComponent implements Callable
         }
         for (String propertyName : expectedProperties.keySet())
         {
-            assertThat((String) eventContext.getMessage().getSessionProperty(propertyName), is(expectedProperties.get(propertyName)));
+            assertThat(eventContext.getMessage().getProperty(propertyName, SESSION), is(expectedProperties.get(propertyName)));
         }
         return eventContext.getMessage();
     }

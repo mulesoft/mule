@@ -133,17 +133,6 @@ public class DefaultEndpointFactory implements EndpointFactory
         this.muleContext = context;
     }
 
-    public org.mule.api.endpoint.InboundEndpoint getInboundEndpoint(EndpointURI uri) throws MuleException
-    {
-        return (InboundEndpoint) getEndpoint(uri, new EndpointSource()
-        {
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                return getInboundEndpoint(builder);
-            }
-        });
-    }
-
     public OutboundEndpoint getOutboundEndpoint(EndpointURI uri) throws MuleException
     {
         return (OutboundEndpoint) getEndpoint(uri, new EndpointSource()

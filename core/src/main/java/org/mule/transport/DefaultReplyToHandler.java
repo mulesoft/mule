@@ -6,6 +6,8 @@
  */
 package org.mule.transport;
 
+import static org.mule.api.transport.PropertyScope.INVOCATION;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
@@ -85,11 +87,13 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
 
         // make sure remove the replyTo property as not cause a a forever
         // replyto loop
-        returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, OUTBOUND);
+        returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, INVOCATION);
 
         // MULE-4617. This is fixed with MULE-4620, but lets remove this property
         // anyway as it should never be true from a replyTo dispatch
-        returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+        returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, OUTBOUND);
+        returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, INVOCATION);
 
         // Create a new copy of the message so that response MessageProcessors don't end up screwing up the reply
         returnMessage = new DefaultMuleMessage(returnMessage.getPayload(), returnMessage, muleContext);
