@@ -6,6 +6,9 @@
  */
 package org.mule.transport.http;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.transport.http.filters.HttpRequestWildcardFilter;
@@ -15,10 +18,6 @@ import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
 {
@@ -50,19 +49,19 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
     @Test
     public void testTransformersOnEndpoints() throws Exception
     {
-        Object transformer1 = lookupInboundEndpoint("ep1").getTransformers().get(0);
+        Object transformer1 = lookupInboundEndpoint("ep1").getMessageProcessors().get(0);
         assertNotNull(transformer1);
         assertEquals(HttpClientMethodResponseToObject.class, transformer1.getClass());
 
-        Object transformer2 = lookupInboundEndpoint("ep2").getTransformers().get(0);
+        Object transformer2 = lookupInboundEndpoint("ep2").getMessageProcessors().get(0);
         assertNotNull(transformer2);
         assertEquals(HttpResponseToString.class, transformer2.getClass());
         
-        Object transformer3 = lookupInboundEndpoint("ep3").getTransformers().get(0);
+        Object transformer3 = lookupInboundEndpoint("ep3").getMessageProcessors().get(0);
         assertNotNull(transformer3);
         assertEquals(MuleMessageToHttpResponse.class, transformer3.getClass());
         
-        Object transformer4 = lookupInboundEndpoint("ep4").getTransformers().get(0);
+        Object transformer4 = lookupInboundEndpoint("ep4").getMessageProcessors().get(0);
         assertNotNull(transformer4);
         assertEquals(ObjectToHttpClientMethodRequest.class, transformer4.getClass());
     }

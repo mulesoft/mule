@@ -21,7 +21,6 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.Set;
 
@@ -64,12 +63,6 @@ public class VoidMuleEvent implements MuleEvent
     }
 
     @Override
-    public Object transformMessage() throws TransformerException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
         throw new UnsupportedOperationException();
@@ -77,12 +70,6 @@ public class VoidMuleEvent implements MuleEvent
 
     @Override
     public <T> T transformMessage(DataType<T> outputType) throws TransformerException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public byte[] transformMessageToBytes() throws TransformerException
     {
         throw new UnsupportedOperationException();
     }
@@ -107,18 +94,6 @@ public class VoidMuleEvent implements MuleEvent
 
     @Override
     public String getId()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object getProperty(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object getProperty(String name, Object defaultValue)
     {
         throw new UnsupportedOperationException();
     }
@@ -221,12 +196,6 @@ public class VoidMuleEvent implements MuleEvent
     }
 
     @Override
-    public void captureReplyToDestination()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean isSynchronous()
     {
         throw new UnsupportedOperationException();
@@ -276,48 +245,6 @@ public class VoidMuleEvent implements MuleEvent
 
     @Override
     public void clearFlowVariables()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T> T getSessionVariable(String key)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public DataType<?> getSessionVariableDataType(String key)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setSessionVariable(String key, Object value)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setSessionVariable(String key, Serializable value, DataType dataType)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void removeSessionVariable(String key)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Set<String> getSessionVariableNames()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void clearSessionVariables()
     {
         throw new UnsupportedOperationException();
     }

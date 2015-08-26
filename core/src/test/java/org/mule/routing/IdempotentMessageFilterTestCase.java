@@ -9,7 +9,6 @@ package org.mule.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -30,7 +29,6 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
         Flow flow = getTestFlow();
 
         MuleSession session = mock(MuleSession.class);
-        when(session.getFlowConstruct()).thenReturn(flow);
 
         InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
 

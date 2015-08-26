@@ -8,7 +8,6 @@ package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -51,7 +50,6 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         flow = getTestFlow();
 
         session = Mockito.mock(MuleSession.class);
-        when(session.getFlowConstruct()).thenReturn(flow);
 
         CountDownLatch cdl = new CountDownLatch(2);
 
@@ -81,7 +79,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         {
             MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
             okMessage.setOutboundProperty("id", "1");
-            MuleEvent event = new DefaultMuleEvent(okMessage, inboundEndpoint, session);
+            MuleEvent event = new DefaultMuleEvent(okMessage, inboundEndpoint, flow, session);
 
             try
             {

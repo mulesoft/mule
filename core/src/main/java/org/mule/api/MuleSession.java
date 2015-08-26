@@ -6,13 +6,11 @@
  */
 package org.mule.api;
 
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -95,9 +93,6 @@ public interface MuleSession extends Serializable
      */
     <T> T getProperty(String key);
 
-    @Deprecated
-    <T> T getProperty(Object key);
-
     /**
      * Will retrieve a session scope property and remove it from the session
      * 
@@ -105,19 +100,6 @@ public interface MuleSession extends Serializable
      * @return the value of the session data or null if the property does not exist
      */
     Object removeProperty(String key);
-
-    @Deprecated
-    Object removeProperty(Object key);
-    
-    /**
-     * Returns an iterater of property keys for the session properties on this
-     * session
-     * 
-     * @return an iterater of property keys for the session properties on this
-     *         session
-     * @deprecated Use getPropertyNamesAsSet() instead  (Will be removed in 4.0)
-     */
-    Iterator getPropertyNames();
 
     /**
      * @return property keys for all session properties
@@ -135,20 +117,6 @@ public interface MuleSession extends Serializable
     
     void clearProperties();
     
-    /**
-     * WARNING: This method will always return null unless you created the DefaultMuleSession with a
-     * flowConstruct or set one using the setter. This method should not be used, and is only here for
-     * backwards compatibility
-     */
-    @Deprecated
-    FlowConstruct getFlowConstruct();
-
-    /**
-     * WARNING: This method should not be used, and is only here for backwards compatibility
-     */
-    @Deprecated
-    void setFlowConstruct(FlowConstruct flowConstruct);
-
     /**
      * Retrieves a session scope property data type
      *

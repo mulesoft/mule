@@ -88,8 +88,8 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
         assertNotNull(endpoint);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("queue4", endpoint.getEndpointURI().getAddress());
-        assertFalse(endpoint.getTransformers().isEmpty());
-        assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
+        assertFalse(endpoint.getMessageProcessors().isEmpty());
+        assertTrue(endpoint.getMessageProcessors().get(0) instanceof ObjectToXml);
         assertTrue(endpoint instanceof InboundEndpoint);
     }
 

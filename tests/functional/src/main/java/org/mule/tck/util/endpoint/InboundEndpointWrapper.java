@@ -20,7 +20,6 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
 
@@ -69,16 +68,6 @@ public abstract class InboundEndpointWrapper implements InboundEndpoint
     public Connector getConnector()
     {
         return delegate.getConnector();
-    }
-
-    public List<Transformer> getTransformers()
-    {
-        return delegate.getTransformers();
-    }
-
-    public List<Transformer> getResponseTransformers()
-    {
-        return delegate.getResponseTransformers();
     }
 
     public Map getProperties()

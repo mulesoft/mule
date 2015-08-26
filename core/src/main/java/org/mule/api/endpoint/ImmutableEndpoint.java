@@ -14,7 +14,6 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
 
@@ -31,7 +30,6 @@ public interface ImmutableEndpoint extends Serializable, NamedObject
 {
 
     String INITIAL_STATE_STARTED = "started";
-    String INITIAL_STATE_STOPPED = "stopped";
 
     /**
      * This specifess the communication endpointUri. This will have a different format
@@ -76,30 +74,6 @@ public interface ImmutableEndpoint extends Serializable, NamedObject
      * @return the endpoint associated with the endpoint
      */
     Connector getConnector();
-
-    /**
-     * Transformers are responsible for transforming data when it is received or
-     * sent by the component (depending on whether this endpoint is a receiver or not). A
-     * tranformation for an inbound event can be forced by the user by calling the
-     * inbound event.getTransformedMessage(). A tranformation for an outbound event
-     * is called or when the Service dispatchEvent() or sendEvent() methods are called.
-     * If an endpoint has no transformers an empty list is returned.
-     *
-     * @return the transformers to use when receiving or sending data
-     * @deprecated use getMessageProcessors() instead
-     */
-    @Deprecated
-    List<Transformer> getTransformers();
-
-    /**
-     * The transformers used when a response is returned from invoking this endpoint.
-     * If an endpoint has no response transformers an empty list is returned.
-     *
-     * @return the transformer to use when receiving the response data
-     * @deprecated use getResponseMessageProcessors() instead
-     */
-    @Deprecated
-    List<Transformer> getResponseTransformers();
 
     /**
      * Returns any properties set on this endpoint

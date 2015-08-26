@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
@@ -41,7 +40,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
-        List <Transformer> transformers = endpoint.getTransformers();
+        List<MessageProcessor> transformers = endpoint.getMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -51,7 +50,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestResponseTransformer);
         // For backwards-compatibility only
-        transformers = endpoint.getResponseTransformers();
+        transformers = endpoint.getResponseMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
@@ -68,7 +67,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         assertTrue(processors.get(1) instanceof TestInboundTransformer);
         // For backwards-compatibility only
-        List <Transformer> transformers = endpoint.getTransformers();
+        List<MessageProcessor> transformers = endpoint.getMessageProcessors();
         assertNotNull(transformers);
         assertEquals(2, transformers.size());
         assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -80,7 +79,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertTrue(processors.get(0) instanceof TestResponseTransformer);
         assertTrue(processors.get(1) instanceof TestResponseTransformer);
         // For backwards-compatibility only
-        transformers = endpoint.getResponseTransformers();
+        transformers = endpoint.getResponseMessageProcessors();
         assertNotNull(transformers);
         assertEquals(2, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
@@ -98,7 +97,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
-        List <Transformer> transformers = endpoint.getTransformers();
+        List<MessageProcessor> transformers = endpoint.getMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -108,7 +107,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestResponseTransformer);
         // For backwards-compatibility only
-        transformers = endpoint.getResponseTransformers();
+        transformers = endpoint.getResponseMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);    
@@ -123,7 +122,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         assertTrue(processors.get(1) instanceof TestInboundTransformer);
         // For backwards-compatibility only
-        transformers = endpoint.getTransformers();
+        transformers = endpoint.getMessageProcessors();
         assertNotNull(transformers);
         assertEquals(2, transformers.size());
         assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -135,7 +134,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertTrue(processors.get(0) instanceof TestResponseTransformer);
         assertTrue(processors.get(1) instanceof TestResponseTransformer);
         // For backwards-compatibility only
-        transformers = endpoint.getResponseTransformers();
+        transformers = endpoint.getResponseMessageProcessors();
         assertNotNull(transformers);
         assertEquals(2, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
@@ -153,7 +152,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
-        List <Transformer> transformers = endpoint.getTransformers();
+        List<MessageProcessor> transformers = endpoint.getMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -163,7 +162,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestResponseTransformer);
         // For backwards-compatibility only
-        transformers = endpoint.getResponseTransformers();
+        transformers = endpoint.getResponseMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
@@ -175,7 +174,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
-        transformers = endpoint.getTransformers();
+        transformers = endpoint.getMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -185,7 +184,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestResponseTransformer);
         // For backwards-compatibility only
-        transformers = endpoint.getResponseTransformers();
+        transformers = endpoint.getResponseMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
