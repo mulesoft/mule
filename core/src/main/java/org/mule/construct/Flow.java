@@ -16,7 +16,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.processor.DynamicPipeline;
@@ -202,15 +201,6 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     protected ProcessingStrategy createDefaultProcessingStrategy()
     {
         return new DefaultFlowProcessingStrategy();
-    }
-
-    /**
-     * @deprecated use setMessageSource(MessageSource) instead
-     */
-    @Deprecated
-    public void setEndpoint(InboundEndpoint endpoint)
-    {
-        this.messageSource = endpoint;
     }
 
     @Override

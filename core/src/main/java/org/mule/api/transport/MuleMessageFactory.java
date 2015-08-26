@@ -25,17 +25,6 @@ public interface MuleMessageFactory
     MuleMessage create(Object transportMessage, String encoding) throws Exception;
 
     /**
-     * Creates a {@link MuleMessage} instance by extracting the payload from 
-     * <code>transportMessage</code>. Additional message properties will be taken from
-     * <code>previousMessage</code>.
-     *
-     * @deprecated use {@link #create(Object, org.mule.api.MuleMessage, String, org.mule.api.MuleContext)} instead.
-     */
-    @Deprecated
-    MuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding)
-        throws Exception;
-
-    /**
      * Creates a {@link MuleMessage} instance from <code>transportMessage</code> by extracting
      * its payload and, if available, any relevant message properties and attachments.
      */

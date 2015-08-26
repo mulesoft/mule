@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf;
 
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -237,7 +238,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         ctx.put(Client.RESPONSE_CONTEXT, props);
 
         // Set Custom Headers on the client
-        Object[] arr = event.getMessage().getPropertyNames().toArray();
+        Object[] arr = event.getMessage().getPropertyNames(OUTBOUND).toArray();
         String head;
 
         for (int i = 0; i < arr.length; i++)
@@ -245,7 +246,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             head = (String)arr[i];
             if ((head != null) && (!head.startsWith("MULE")))
             {
-                props.put((String)arr[i], event.getMessage().getProperty((String)arr[i]));
+                props.put((String)arr[i], event.getMessage().getProperty((String)arr[i], OUTBOUND));
             }
         }
         
@@ -288,7 +289,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     public Method getMethod(MuleEvent event) throws Exception
     {
         Method method = null;
-        String opName = (String)event.getMessage().getProperty(CxfConstants.OPERATION);
+        String opName = (String)event.getMessage().getProperty(CxfConstants.OPERATION, OUTBOUND);
         if (opName != null)
         {
             method = getMethodFromOperation(opName);

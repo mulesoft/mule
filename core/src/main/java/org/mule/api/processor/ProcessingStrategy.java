@@ -16,18 +16,8 @@ import java.util.List;
 public interface ProcessingStrategy
 {
 
-    public void configureProcessors(List<MessageProcessor> processors,
-                                    org.mule.api.processor.StageNameSource nameSource,
-                                    MessageProcessorChainBuilder chainBuilder,
-                                    MuleContext muleContext);
-
-    /**
-     * To be removed in Mule 4. Use {@link org.mule.api.processor.StageNameSource} instead
-     */
-    @Deprecated
-    public interface StageNameSource extends org.mule.api.processor.StageNameSource
-    {
-
-    }
-
+    void configureProcessors(List<MessageProcessor> processors,
+                             org.mule.api.processor.StageNameSource nameSource,
+                             MessageProcessorChainBuilder chainBuilder,
+                             MuleContext muleContext);
 }

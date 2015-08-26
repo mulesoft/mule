@@ -66,7 +66,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 props.put("longParam", (long) 123456789);
                 props.put("booleanParam", Boolean.TRUE);
                 MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props, muleContext);
-                msg.addAttachment("test1", new DataHandler(new DataSource()
+                msg.addOutboundAttachment("test1", new DataHandler(new DataSource()
                 {
                     @Override
                     public InputStream getInputStream() throws IOException

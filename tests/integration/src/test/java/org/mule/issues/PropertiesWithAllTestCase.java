@@ -10,7 +10,7 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -36,9 +36,9 @@ public class PropertiesWithAllTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "Hello", null);
         assertNotNull(response);
-        assertEquals("foo", response.getSessionProperty("foo"));
-        assertEquals("bar", response.getSessionProperty("bar"));
-        assertEquals("baz", response.getSessionProperty("baz"));
+        assertEquals("foo", response.getProperty("foo", SESSION));
+        assertEquals("bar", response.getProperty("bar", SESSION));
+        assertEquals("baz", response.getProperty("baz", SESSION));
         assertNull(response.<String>getOutboundProperty("outbar"));
         assertNull(response.<String>getOutboundProperty("outbaz"));
     }

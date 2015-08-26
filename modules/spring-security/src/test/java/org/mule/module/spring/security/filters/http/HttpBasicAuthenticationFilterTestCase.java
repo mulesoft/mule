@@ -6,6 +6,14 @@
  */
 package org.mule.module.spring.security.filters.http;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -18,14 +26,6 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.filters.HttpBasicAuthenticationFilter;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTestCase
 {
@@ -55,8 +55,8 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
         }
         catch (UnauthorisedException e)
         {
-            assertNotNull(event.getMessage().getProperty("WWW-Authenticate"));
-            assertEquals("Basic realm=", event.getMessage().getProperty("WWW-Authenticate"));
+            assertNotNull(event.getMessage().getProperty("WWW-Authenticate", OUTBOUND));
+            assertEquals("Basic realm=", event.getMessage().getProperty("WWW-Authenticate", OUTBOUND));
             verify(manager);
         }
         RequestContext.setEvent(oldEvent);

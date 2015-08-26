@@ -9,6 +9,9 @@ package org.mule.routing.filters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mule.api.transport.PropertyScope.INVOCATION;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
+import static org.mule.api.transport.PropertyScope.SESSION;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -44,7 +47,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
         filter.setScope(PropertyScope.SESSION_NAME);
         assertFalse(filter.accept(message));
-        message.setSessionProperty("foo", "bar");
+        message.setProperty("foo", "bar", SESSION);
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
@@ -104,7 +107,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertFalse(filter.accept(message));
-        message.removeProperty("foo");
+        removeProperty(message, "foo");
         assertFalse(filter.accept(message));
         message.setOutboundProperty("foo", "car");
         assertTrue("Filter didn't accept the message", filter.accept(message));
@@ -147,15 +150,21 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         filter.setCaseSensitive(false);
 
         filter = new MessagePropertyFilter("foo2 =null");
-        message.removeProperty("foo2");
+        removeProperty(message, "foo2");
         assertTrue("Filter didn't accept the message", filter.accept(message));
 
         filter = new MessagePropertyFilter("foo2 =");
         message.setOutboundProperty("foo2", "");
         assertTrue("Filter didn't accept the message", filter.accept(message));
 
-        message.removeProperty("foo2");
+        removeProperty(message, "foo2");
         assertFalse(filter.accept(message));
+    }
+
+    private void removeProperty(MuleMessage message, String property)
+    {
+        message.removeProperty(property, OUTBOUND);
+        message.removeProperty(property, INVOCATION);
     }
 
     @Test

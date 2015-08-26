@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -39,6 +40,6 @@ public class JdbcSessionVariablesCopyingTestCase extends AbstractJdbcFunctionalT
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
-        assertEquals("test", result.getSessionProperty("test"));
+        assertEquals("test", result.getProperty("test", SESSION));
     }
 }

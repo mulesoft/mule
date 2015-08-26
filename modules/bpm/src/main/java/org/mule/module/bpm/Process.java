@@ -6,6 +6,7 @@
  */
 package org.mule.module.bpm;
 
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -159,7 +160,7 @@ public class Process implements Initialisable, Disposable, MessageService
         }
 
         Object processId;
-        processId = event.getMessage().getSessionProperty(processIdField);
+        processId = event.getMessage().getProperty(processIdField, SESSION);
         if (processId == null)
         {
             processId = event.getMessage().getInvocationProperty(processIdField); 
@@ -279,11 +280,11 @@ public class Process implements Initialisable, Disposable, MessageService
         // Set correlation properties in SESSION scope so that they get propagated to response messages.
         if (messageProperties.get(PROPERTY_PROCESS_TYPE) != null)
         {
-            event.getMessage().setSessionProperty(PROPERTY_PROCESS_TYPE, messageProperties.get(PROPERTY_PROCESS_TYPE));
+            event.getMessage().setProperty(PROPERTY_PROCESS_TYPE, messageProperties.get(PROPERTY_PROCESS_TYPE), SESSION);
         }
         if (messageProperties.get(PROPERTY_PROCESS_ID) != null)
         {
-            event.getMessage().setSessionProperty(PROPERTY_PROCESS_ID, messageProperties.get(PROPERTY_PROCESS_ID));
+            event.getMessage().setProperty(PROPERTY_PROCESS_ID, messageProperties.get(PROPERTY_PROCESS_ID), SESSION);
         }
         
         MuleEvent resultEvent = ep.process(event);

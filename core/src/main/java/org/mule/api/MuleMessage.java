@@ -25,14 +25,6 @@ import javax.activation.DataHandler;
 
 public interface MuleMessage extends Serializable
 {
-    /**
-     * Adds a map of properties to be associated with this message
-     *
-     * @param properties the properties add to this message
-     * @deprecated use {@link #addProperties(java.util.Map, org.mule.api.transport.PropertyScope)} instead
-     */
-    @Deprecated
-    void addProperties(Map<String, Object> properties);
 
     /**
      * Adds a map of properties to be associated with this message
@@ -43,14 +35,6 @@ public interface MuleMessage extends Serializable
     void addProperties(Map<String, Object> properties, PropertyScope scope);
 
     /**
-     * Removes all properties on this message in the {@link org.mule.api.transport.PropertyScope#INVOCATION} and
-     * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
-     * @deprecated use {@link #clearProperties(org.mule.api.transport.PropertyScope)} instead
-     */
-    @Deprecated
-    void clearProperties();
-
-    /**
      * Removes all properties on this message in the given scope. Note that the INBOUND scope is
      * read-only, so attempting to clear this scopee will result in an UnsupportedOperationException.
      *
@@ -58,32 +42,8 @@ public interface MuleMessage extends Serializable
      * @throws UnsupportedOperationException if scope specified is {@link org.mule.api.transport.PropertyScope#INBOUND}
      */
     void clearProperties(PropertyScope scope);
-    /**
-     /**
-     *
-     * @deprecated use the overloaded version with an explicit lookup scope. This method will
-     * now use only the outbound scope.
-     * @see #getInboundProperty(String)
-     * @see #getOutboundProperty(String)
-     * @see #getInvocationProperty(String)
-     * @see #getSessionProperty(String)
-     */
-    @Deprecated
-    Object getProperty(String key);
 
-    /**
-     * Set a property on the message. This method will now set a value on the outbound scope only.
-     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} or
-     * preferrably any of the scope-specific set methods.
-     *
-     * @param key the key on which to associate the value
-     * @param value the property value
-     * @see #setInvocationProperty(String, Object)
-     * @see #setOutboundProperty(String, Object)
-     * @see #setSessionProperty(String, Object)
-     */
-    @Deprecated
-    void setProperty(String key, Object value);
+
 
     /**
      * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
@@ -116,7 +76,6 @@ public interface MuleMessage extends Serializable
      * @see PropertyScope
      * @see #setInvocationProperty(String, Object)
      * @see #setOutboundProperty(String, Object)
-     * @see #setSessionProperty(String, Object)
      */
     void setProperty(String key, Object value, PropertyScope scope);
 
@@ -131,16 +90,6 @@ public interface MuleMessage extends Serializable
     void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType);
 
     /**
-     * Removes a property on this message.
-     *
-     * @param key the property key to remove
-     * @return the removed property value or null if the property did not exist
-     * @deprecated use {@link #removeProperty(String, org.mule.api.transport.PropertyScope)}
-     */
-    @Deprecated
-    Object removeProperty(String key);
-
-    /**
      * Removes a property on this message from the specified scope only.
      *
      * @param key the property key to remove
@@ -150,14 +99,6 @@ public interface MuleMessage extends Serializable
     Object removeProperty(String key, PropertyScope scope);
 
     /**
-     * @return all property keys on this message.
-     * @since 3.0 only the outbound scope properties are returned
-     * @deprecated use {@link #getPropertyNames(org.mule.api.transport.PropertyScope)}
-     */
-    @Deprecated
-    Set<String> getPropertyNames();
-
-    /**
      * Gets all property names in a given scope. Prefer using one of the convenience
      * scope-aware methods instead, this one is meant for internal access mostly.
      * @param scope the scope of property names
@@ -165,17 +106,12 @@ public interface MuleMessage extends Serializable
      * @see #getInvocationPropertyNames()
      * @see #getInboundPropertyNames()
      * @see #getOutboundPropertyNames()
-     * @see #getSessionPropertyNames()
      */
     Set<String> getPropertyNames(PropertyScope scope);
 
     Set<String> getInvocationPropertyNames();
     Set<String> getInboundPropertyNames();
     Set<String> getOutboundPropertyNames();
-
-    @Deprecated
-    Set<String> getSessionPropertyNames();
-
 
     /**
      * @return the current message
@@ -210,21 +146,6 @@ public interface MuleMessage extends Serializable
     void propagateRootId(MuleMessage parent);
 
     /**
-     * Gets a property from the message
-     *
-     * @param name the name or key of the property. This must be non-null.
-     * @param defaultValue a default value if the property doesn't exist in the event. This can be null.
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use scope-aware methods instead
-     * @see #getInboundProperty(String)
-     * @see #getOutboundProperty(String)
-     * @see #getInvocationProperty(String)
-     * @see #getSessionProperty(String)
-     */
-    @Deprecated
-    Object getProperty(String name, Object defaultValue);
-
-    /**
      * Gets a property from the message with a given scope. End-users should prefer more
      * scope-specific methods for readability. This one is more intended for programmatic
      * scope manipulation and Mule internal use.
@@ -235,7 +156,6 @@ public interface MuleMessage extends Serializable
      * @see #getInboundProperty(String)
      * @see #getOutboundProperty(String)
      * @see #getInvocationProperty(String)
-     * @see #getSessionProperty(String)
      */
     <T> T getProperty(String name, PropertyScope scope);
 
@@ -313,111 +233,6 @@ public interface MuleMessage extends Serializable
      * @return the property data type or null if the property does not exist in the specified scope
      */
     DataType<?> getPropertyDataType(String name, PropertyScope scope);
-
-    /**
-     * Gets an integer property from the message
-     *
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use {@link #getInboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    int getIntProperty(String name, int defaultValue);
-
-    /**
-     * Gets a long property from the message
-     *
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use {@link #getInboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    long getLongProperty(String name, long defaultValue);
-
-    /**
-     * Gets a double property from the message
-     *
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use {@link #getInboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    double getDoubleProperty(String name, double defaultValue);
-
-    /**
-     * Gets a String property from the message
-     *
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use {@link #getInboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    String getStringProperty(String name, String defaultValue);
-
-    /**
-     * Gets a boolean property from the message
-     *
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use {@link #getInboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    boolean getBooleanProperty(String name, boolean defaultValue);
-
-    /**
-     * Sets a boolean property on the message
-     *
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    void setBooleanProperty(String name, boolean value);
-
-    /**
-     * Sets a integer property on the message
-     *
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    void setIntProperty(String name, int value);
-
-    /**
-     * Sets a long property on the message
-     *
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    void setLongProperty(String name, long value);
-
-    /**
-     * Sets a double property on the message
-     *
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    void setDoubleProperty(String name, double value);
-
-    /**
-     * Sets a String property on the message
-     *
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
-     */
-    @Deprecated
-    void setStringProperty(String name, String value);
 
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
@@ -515,23 +330,6 @@ public interface MuleMessage extends Serializable
     void setExceptionPayload(ExceptionPayload payload);
 
     /**
-     * Allows for arbitrary data attachments to be associated with the Message. These
-     * attachments work in the same way that email attachments work. Attachments can
-     * be binary or text
-     *
-     * @param name the name to associate with the attachment
-     * @param dataHandler The attachment datahandler to use. This will be used to
-     *            interact with the attachment data.
-     * @throws Exception if the attachment cannot be added for any reason
-     * @see javax.activation.DataHandler
-     * @deprecated use
-     *             {@link #addOutboundAttachment(java.lang.String, javax.activation.DataHandler)}
-     *             instead
-     */
-    @Deprecated
-    void addAttachment(String name, DataHandler dataHandler) throws Exception;
-
-    /**
      * Allows for arbitrary data attachments to be associated with the Message. These attachments work in the
      * same way that email attachments work. Attachments can be binary or text
      * @param name the name to associate with the attachment
@@ -558,29 +356,9 @@ public interface MuleMessage extends Serializable
      * @param name the name of the attachment to remove. If the attachment does not exist, the request may be ignored
      * @throws Exception different messaging systems handle attachments differently, as such some will throw an exception
      * if an attachment does dot exist.
-     * @deprecated use {@link #removeOutboundAttachment(java.lang.String)} instead
-     */
-    @Deprecated
-    void removeAttachment(String name) throws Exception;
-
-    /**
-     * Remove an attachment form this message with the specified name
-     * @param name the name of the attachment to remove. If the attachment does not exist, the request may be ignored
-     * @throws Exception different messaging systems handle attachments differently, as such some will throw an exception
-     * if an attachment does dot exist.
      * @since 3.0
      */
     void removeOutboundAttachment(String name) throws Exception;
-
-    /**
-     * Retrieve an attachment with the given name. If the attachment does not exist, null will be returned
-     * @param name the name of the attachment to retrieve
-     * @return the attachment with the given name or null if the attachment does not exist
-     * @see javax.activation.DataHandler
-     * @deprecated use {@link #getInboundAttachment(String)} instead
-     */
-    @Deprecated
-    DataHandler getAttachment(String name);
 
     /**
      * Retrieve an attachment with the given name. If the attachment does not exist, null will be returned
@@ -599,14 +377,6 @@ public interface MuleMessage extends Serializable
      * @since 3.0
      */
     DataHandler getOutboundAttachment(String name);
-
-    /**
-     * @return a set of the names of the attachments on this message. If there are no attachments an empty set will be
-     * returned.
-     * @deprecated use {@link #getInboundAttachmentNames()}
-     */
-    @Deprecated
-    Set<String> getAttachmentNames();
 
     /**
      * @return a set of the names of the attachments on this message. If there are no attachments an empty set will be
@@ -791,24 +561,6 @@ public interface MuleMessage extends Serializable
      * Returns the data type (if any) associated with the message's payload.
      */
     DataType<?> getDataType();
-
-    /**
-     * @deprecated use {@link org.mule.api.MuleSession#getProperty(String)}
-     */
-    @Deprecated
-    <T> T getSessionProperty(String name, T defaultValue);
-
-    /**
-     * @deprecated use {@link org.mule.api.MuleSession#getProperty(String)}
-     */
-    @Deprecated
-    <T> T getSessionProperty(String name);
-
-    /**
-     * @deprecated use {@link org.mule.api.MuleSession#setProperty(String, Serializable)}
-     */
-    @Deprecated
-    void setSessionProperty(String key, Object value);
 
     /**
      * Copy an inbound message to an outbound one, moving all message properties and attachments

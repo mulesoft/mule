@@ -44,14 +44,6 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void setConnector(Connector connector);
 
-    /** @deprecated Use addMessageProcessor() */
-    @Deprecated
-    void addTransformer(Transformer transformer);
-
-    /** @deprecated Use addResponseMessageProcessor() */
-    @Deprecated
-    void addResponseTransformer(Transformer transformer);
-
     /** @deprecated Use setMessageProcessors() */
     @Deprecated
     void setTransformers(List<Transformer> transformers);

@@ -39,17 +39,7 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
     @Deprecated
     public MuleMessage create(Object transportMessage, String encoding) throws Exception
     {
-        return create(transportMessage, null, encoding);
-    }
-
-    /**
-     * @deprecated use {@link #create(Object, org.mule.api.MuleMessage, String, org.mule.api.MuleContext)} instead.
-     */
-    @Deprecated
-    public MuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding)
-        throws Exception
-    {
-        return doCreate(transportMessage, previousMessage, encoding, muleContext);
+        return create(transportMessage, null, encoding, muleContext);
     }
 
     public MuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext) throws Exception

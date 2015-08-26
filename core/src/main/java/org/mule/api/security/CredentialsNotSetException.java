@@ -9,8 +9,6 @@ package org.mule.api.security;
 import org.mule.api.MuleEvent;
 import org.mule.config.i18n.Message;
 
-import java.net.URI;
-
 /**
  * <code>CredentialsNotSetException</code> is thrown when user credentials cannot
  * be obtained from the current message
@@ -35,14 +33,5 @@ public class CredentialsNotSetException extends UnauthorisedException
     public CredentialsNotSetException(MuleEvent event, SecurityContext context, SecurityFilter filter)
     {
         super(event, context, filter);
-    }
-    
-    @Deprecated
-    public CredentialsNotSetException(MuleEvent event,
-                                      SecurityContext context,
-                                      URI endpointUri,
-                                      SecurityFilter filter)
-    {
-        super(event, context, endpointUri, filter);
     }
 }

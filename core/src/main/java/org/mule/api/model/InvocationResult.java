@@ -26,14 +26,6 @@ public class InvocationResult
         /** The invocation was attempted but failed */
         FAILED
     }
-    @Deprecated
-    public static final State STATE_INVOKE_NOT_SUPPORTED = State.NOT_SUPPORTED;
-
-    @Deprecated
-    public static final State STATE_INVOKED_SUCESSFUL = State.SUCCESSFUL;
-
-    @Deprecated
-    public static final State STATE_INVOKED_FAILED = State.FAILED;
 
     private String errorMessage;
 

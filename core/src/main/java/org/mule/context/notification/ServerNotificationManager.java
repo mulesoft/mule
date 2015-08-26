@@ -20,7 +20,6 @@ import org.mule.util.ClassUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -124,32 +123,12 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener, subscription));
     }
 
-    public void addAllListenerSubscriptionPairs(Collection<?> pairs)
-    {
-        configuration.addAllListenerSubscriptionPairs(pairs);
-    }
-
-    /**
-     * @deprecated Use addAllListenerSubscriptionPairs which better describes the "add" operation that occurs.
-     * @param pairs
-     */
-    @Deprecated
-    public void setAllListenerSubscriptionPairs(Collection<?> pairs)
-    {
-        configuration.addAllListenerSubscriptionPairs(pairs);
-    }
-
     /**
      * This removes *all* registrations that reference this listener
      */
     public void removeListener(ServerNotificationListener<?> listener)
     {
         configuration.removeListener(listener);
-    }
-
-    public void removeAllListeners(Collection<ServerNotificationListener> listeners)
-    {
-        configuration.removeAllListeners(listeners);
     }
 
     public void disableInterface(Class<? extends ServerNotificationListener> iface) throws ClassNotFoundException
@@ -165,11 +144,6 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     public void disableType(Class<? extends ServerNotification> type) throws ClassNotFoundException
     {
         configuration.disableType(type);
-    }
-
-    public void setDisabledTypes(Collection<Class<? extends ServerNotificationListener>> types) throws ClassNotFoundException
-    {
-        configuration.disableAllTypes(types);
     }
 
     @Override
@@ -275,14 +249,6 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
                 Thread.currentThread().interrupt();
             }
         }
-    }
-
-    /**
-     * @return DIRECT reference to an event queue
-     */
-    public Queue<ServerNotification> getEventQueue()
-    {
-        return eventQueue;
     }
 
     /**
