@@ -81,7 +81,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends org.mule.tck.j
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
         ImmutableEndpoint ep = (ImmutableEndpoint) ((CompositeMessageSource) flow.getMessageSource()).getSources().get(0);
         assertNotNull(ep);
-        final List responseTransformers = ep.getResponseTransformers();
+        final List responseTransformers = ep.getResponseMessageProcessors();
         assertNotNull(responseTransformers);
         assertFalse(responseTransformers.isEmpty());
         final Object responseTransformer = responseTransformers.get(0);

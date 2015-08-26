@@ -15,15 +15,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.management.stats.RouterStatistics;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.SystemUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -92,7 +89,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
                              + StringMessageUtils.truncate(message.getPayloadForLogging(), 100, false));
                 if (route instanceof OutboundEndpoint)
                 {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getTransformers());
+                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
                 }
             }
             catch (Exception e)
@@ -100,7 +97,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
                 logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage());
                 if (route instanceof OutboundEndpoint)
                 {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getTransformers());
+                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
                 }
             }
         }

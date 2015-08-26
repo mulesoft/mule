@@ -9,7 +9,6 @@ package org.mule.registry;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
@@ -30,7 +29,6 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
@@ -127,22 +125,9 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public Object transformMessage() throws TransformerException
-        {
-            return null;
-        }
-
-        @Override
         public Object transformMessage(Class outputType) throws TransformerException
         {
             return null;
-        }
-
-        @Override
-        @Deprecated
-        public byte[] transformMessageToBytes() throws TransformerException
-        {
-            return new byte[0];
         }
 
         @Override
@@ -171,18 +156,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 
         @Override
         public String getId()
-        {
-            return null;
-        }
-
-        @Override
-        public Object getProperty(String key)
-        {
-            return null;
-        }
-
-        @Override
-        public Object getProperty(String key, Object defaultValue)
         {
             return null;
         }
@@ -309,11 +282,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public void captureReplyToDestination()
-        {
-        }
-
-        @Override
         public boolean isSynchronous()
         {
             return false;
@@ -333,12 +301,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         @Override
         public void clearFlowVariables()
         {
-        }
-
-        @Override
-        public DataType<?> getSessionVariableDataType(String key)
-        {
-            return null;
         }
 
         @Override
@@ -367,39 +329,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public Set<String> getFlowVariableNames()
         {
             return Collections.emptySet();
-        }
-
-        @Override
-        public Object getSessionVariable(String key)
-        {
-            return null;
-        }
-
-        @Override
-        public void setSessionVariable(String key, Object value)
-        {
-        }
-
-        @Override
-        public void setSessionVariable(String key, Serializable value, DataType dataType)
-        {
-
-        }
-
-        @Override
-        public void removeSessionVariable(String key)
-        {
-        }
-
-        @Override
-        public Set<String> getSessionVariableNames()
-        {
-            return Collections.emptySet();
-        }
-
-        @Override
-        public void clearSessionVariables()
-        {
         }
 
         @Override

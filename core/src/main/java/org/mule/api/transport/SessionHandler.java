@@ -19,12 +19,6 @@ public interface SessionHandler
 
     void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException;
 
-    /**
-     * @deprecated Use retrieveSessionInfoFromMessage(MuleMessage message) instead
-     */
-    @Deprecated
-    void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException;
-
     MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException;
 
     /**

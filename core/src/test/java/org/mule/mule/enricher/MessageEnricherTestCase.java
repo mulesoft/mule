@@ -373,7 +373,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
         MuleEvent out = enricher.process(in);
 
-        assertEquals("bar", out.getSessionVariable("foo"));
+        assertEquals("bar", out.getSession().getProperty("foo"));
     }
 
     @Test

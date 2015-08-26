@@ -80,14 +80,14 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
     {
         Object transformer1 = muleContext.getEndpointFactory()
             .getInboundEndpoint("ep1")
-            .getTransformers()
+            .getMessageProcessors()
             .get(0);
         assertNotNull(transformer1);
         assertEquals(FileToByteArray.class, transformer1.getClass());
 
         Object transformer2 = muleContext.getEndpointFactory()
             .getInboundEndpoint("ep2")
-            .getTransformers()
+            .getMessageProcessors()
             .get(0);
         assertNotNull(transformer2);
         assertEquals(FileToString.class, transformer2.getClass());
