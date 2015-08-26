@@ -23,7 +23,6 @@
     <transport dist="ce">tcp</transport>
     <transport dist="ce">udp</transport>
     <transport dist="ce">vm</transport>
-    <transport dist="ce">xmpp</transport>
     <transport dist="ee">jdbc-ee</transport>
     <transport dist="ee">wmq</transport>
     <transport dist="mf" schema="http://dist.muleforge.org/mule-transport-jcr/schema/2.2/mule-jcr.xsd">jcr</transport>

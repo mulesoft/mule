@@ -25,7 +25,6 @@
     <transport dist="ce">tcp</transport>
     <transport dist="ce">udp</transport>
     <transport dist="ce">vm</transport>
-    <transport dist="ce">xmpp</transport>
     <transport dist="ee">jdbc</transport>
     <transport dist="ee">wmq</transport>
     <!--<transport dist="ee">msmq</transport>-->

@@ -269,11 +269,6 @@
     <link><item>vm:outbound-endpoint</item><page>VM+Transport</page></link>
     <link><item>vm:endpoint</item><page>VM+Transport</page></link>
 
-    <link><item>xmpp:connector</item><page>XMPP+Transport</page></link>
-    <link><item>xmpp:inbound-endpoint</item><page>XMPP+Transport</page></link>
-    <link><item>xmpp:outbound-endpoint</item><page>XMPP+Transport</page></link>
-    <link><item>xmpp:endpoint</item><page>XMPP+Transport</page></link>
-
     <link><item>client:remote-dispatcher-agent</item><page>Client+Module</page></link>
     <link><item>client:remote-endpoint</item><page>Client+Module</page></link>
     <link><item>client:xml-wire-format</item><page>Client+Module</page></link>
