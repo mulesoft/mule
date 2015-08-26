@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.wsdl.Port;
 import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.xml.namespace.QName;
@@ -50,7 +49,6 @@ public class MuleUniversalTransport extends AbstractTransportFactory
         PREFIXES.add("https://");
         PREFIXES.add("jms://");
         PREFIXES.add("vm://");
-        PREFIXES.add("xmpp://");
         PREFIXES.add("smtp://");
         PREFIXES.add("tcp://");
     }

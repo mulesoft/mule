@@ -42,9 +42,6 @@ public class UnsupportedConnectorsMuleArtifactTestCase
                                   "</https:connector>");
         //JMS
         checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\" validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
-        //XMPP
-        //Doesn't work offline
-        //checkUnsupportedConnector("<xmpp:connector name=\"xmppConnector\" user=\"muleinaction@jabber.org\" password=\"manning\" host=\"jabber.org\" xmlns:xmpp=\"http://www.mulesoft.org/schema/mule/xmpp\"/>");
         //FTP
         checkUnsupportedConnector("<ftp:connector name=\"ftpConnector\" streaming=\"true\" xmlns:ftp=\"http://www.mulesoft.org/schema/mule/ftp\"/>");
         //SFTP

@@ -134,7 +134,6 @@
                 <include>org.mule.transports:mule-transport-tcp</include>
                 <include>org.mule.transports:mule-transport-udp</include>
                 <include>org.mule.transports:mule-transport-vm</include>
-                <include>org.mule.transports:mule-transport-xmpp</include>
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-launcher</include>
                 <include>org.mule.modules:mule-module-annotations</include>
@@ -205,7 +204,6 @@
                 <exclude>org.mule.transports:mule-transport-tcp</exclude>
                 <exclude>org.mule.transports:mule-transport-udp</exclude>
                 <exclude>org.mule.transports:mule-transport-vm</exclude>
-                <exclude>org.mule.transports:mule-transport-xmpp</exclude>
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-annotations</exclude>
                 <exclude>org.mule.modules:mule-module-boot</exclude>
