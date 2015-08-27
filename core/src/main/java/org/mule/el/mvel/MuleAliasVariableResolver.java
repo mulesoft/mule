@@ -6,7 +6,7 @@
  */
 package org.mule.el.mvel;
 
-import org.mule.mvel2.ParserConfiguration;
+import org.mule.api.serialization.ObjectSerializer;
 
 class MuleAliasVariableResolver extends MuleVariableResolver<Object>
 {
@@ -18,12 +18,12 @@ class MuleAliasVariableResolver extends MuleVariableResolver<Object>
     public MuleAliasVariableResolver(String name,
                                      String expression,
                                      MVELExpressionLanguageContext context,
-                                     ParserConfiguration parserConfiguration)
+                                     ObjectSerializer objectSerializer)
     {
         super(name, null, null, null);
         this.expression = expression;
         this.context = context;
-        this.executor = new MVELExpressionExecutor(context.parserConfiguration);
+        this.executor = new MVELExpressionExecutor(context.parserConfiguration, objectSerializer);
     }
 
     public MuleAliasVariableResolver(MuleAliasVariableResolver aliasVariableResolver,

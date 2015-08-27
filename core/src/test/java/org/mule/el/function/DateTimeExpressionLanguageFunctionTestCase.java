@@ -38,7 +38,7 @@ public class DateTimeExpressionLanguageFunctionTestCase extends AbstractMuleTest
     public void setup() throws InitialisationException
     {
         ParserConfiguration parserConfiguration = new ParserConfiguration();
-        expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
+        expressionExecutor = new MVELExpressionExecutor(parserConfiguration, null);
         context = new MVELExpressionLanguageContext(parserConfiguration, Mockito.mock(MuleContext.class));
         dateTimeFunction = new DateTimeExpressionLanguageFuntion();
         context.declareFunction("dateTime", dateTimeFunction);

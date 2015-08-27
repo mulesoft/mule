@@ -20,6 +20,7 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.construct.Flow;
 import org.mule.el.context.AbstractELTestCase;
 import org.mule.expression.DefaultExpressionManager;
+import org.mule.serialization.internal.JavaObjectSerializer;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -55,6 +56,9 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
         MuleRegistry muleRegistry = mock(MuleRegistry.class);
         Mockito.when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
         Mockito.when(muleContext.getRegistry()).thenReturn(muleRegistry);
+        JavaObjectSerializer objectSerializer = new JavaObjectSerializer();
+        objectSerializer.setMuleContext(muleContext);
+        Mockito.when(muleContext.getObjectSerializer()).thenReturn(objectSerializer);
         Mockito.when(muleRegistry.lookupObjectsForLifecycle(Mockito.any(Class.class))).thenReturn(
             Collections.<Object> emptyList());
         expressionManager.setMuleContext(muleContext);

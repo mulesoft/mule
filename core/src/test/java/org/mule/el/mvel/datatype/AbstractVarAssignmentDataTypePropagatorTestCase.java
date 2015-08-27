@@ -14,18 +14,10 @@ import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
-import org.mule.el.mvel.DelegateVariableResolverFactory;
-import org.mule.el.mvel.GlobalVariableResolverFactory;
 import org.mule.el.mvel.MVELExpressionLanguage;
-import org.mule.el.mvel.MVELExpressionLanguageContext;
-import org.mule.el.mvel.MessageVariableResolverFactory;
-import org.mule.el.mvel.StaticVariableResolverFactory;
-import org.mule.el.mvel.VariableVariableResolverFactory;
-import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
-import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
@@ -52,29 +44,14 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
         expectedDataType.setEncoding(CUSTOM_ENCODING);
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+        testEvent.getMessage().setProperty("foo", TEST_MESSAGE, scope);
 
         final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
-        final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(testEvent, parserConfiguration);
 
         CompiledExpression compiledExpression = (CompiledExpression) compileExpression(expression, new ParserContext(parserConfiguration));
-        // Expression must be executed, otherwise the variable accessor is not properly configured
-        MVEL.executeExpression(compiledExpression, context);
 
         dataTypePropagator.propagate(testEvent.getMessage(), new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 
         assertThat(testEvent.getMessage().getPropertyDataType(PROPERTY_NAME, scope), like(String.class, JSON, CUSTOM_ENCODING));
-    }
-
-    protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(MuleEvent testEvent, ParserConfiguration parserConfiguration)
-    {
-        final MVELExpressionLanguageContext context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
-        final StaticVariableResolverFactory staticContext = new StaticVariableResolverFactory(parserConfiguration, muleContext);
-        final GlobalVariableResolverFactory globalContext = new GlobalVariableResolverFactory(Collections.EMPTY_MAP, Collections.EMPTY_MAP, parserConfiguration, muleContext);
-
-        context.setNextFactory(new CachedMapVariableResolverFactory(Collections.EMPTY_MAP,
-                                                                    new DelegateVariableResolverFactory(staticContext, new MessageVariableResolverFactory(
-                                                                            parserConfiguration, muleContext, testEvent.getMessage(), new DelegateVariableResolverFactory(
-                                                                            globalContext, new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent))))));
-        return context;
     }
 }

@@ -77,7 +77,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public void initialise() throws InitialisationException
     {
         parserConfiguration = createParserConfiguration(imports);
-        expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
+        expressionExecutor = new MVELExpressionExecutor(parserConfiguration, muleContext.getObjectSerializer());
 
         loadGlobalFunctions();
         createStaticContext();

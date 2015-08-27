@@ -9,6 +9,8 @@ package org.mule.el.function;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -20,6 +22,7 @@ import org.mule.el.mvel.MVELExpressionExecutor;
 import org.mule.el.mvel.MVELExpressionLanguageContext;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
+import org.mule.serialization.internal.JavaObjectSerializer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -42,8 +45,11 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     public void setup() throws InitialisationException
     {
         ParserConfiguration parserConfiguration = new ParserConfiguration();
-        expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
-        context = new MVELExpressionLanguageContext(parserConfiguration, Mockito.mock(MuleContext.class));
+        MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+        JavaObjectSerializer objectSerializer = new JavaObjectSerializer();
+        objectSerializer.setMuleContext(muleContext);
+        expressionExecutor = new MVELExpressionExecutor(parserConfiguration, objectSerializer);
+        context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
         regexFuntion = new RegexExpressionLanguageFuntion();
         context.declareFunction("regex", regexFuntion);
     }
@@ -215,7 +221,7 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
 
     protected void addMessageToContextWithPayload(String payload) throws TransformerException
     {
-        MuleMessage message = Mockito.mock(MuleMessage.class);
+        MuleMessage message = mock(MuleMessage.class);
         Mockito.when(message.getPayload(Mockito.any(Class.class))).thenReturn(payload);
         context.addFinalVariable("message", new MessageContext(message));
     }
