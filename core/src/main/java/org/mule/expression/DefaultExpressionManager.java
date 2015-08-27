@@ -113,17 +113,6 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     }
 
     /**
-     * Checks whether an enricher is registered with the manager
-     * 
-     * @param name the name of the expression enricher
-     * @return true if the enricher is registered with the manager, false otherwise
-     */
-    public boolean isEnricherRegistered(String name)
-    {
-        return name != null ? enrichers.containsKey(name) : false;
-    }
-
-    /**
      * Removes the evaluator with the given name
      * 
      * @param name the name of the evaluator to remove
@@ -141,26 +130,6 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
             ((Disposable) evaluator).dispose();
         }
         return evaluator;
-    }
-
-    /**
-     * Removes the evaluator with the given name
-     * 
-     * @param name the name of the evaluator to remove
-     */
-    public ExpressionEnricher unregisterEnricher(String name)
-    {
-        if (name == null)
-        {
-            return null;
-        }
-
-        ExpressionEnricher enricher = (ExpressionEnricher) enrichers.remove(name);
-        if (enricher instanceof Disposable)
-        {
-            ((Disposable) enricher).dispose();
-        }
-        return enricher;
     }
 
     /**
@@ -362,12 +331,6 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
             logger.debug(MessageFormat.format("Result of expression: {0}:{1} is: {2}", evaluator, expression,
                                               value));
         }
-    }
-
-    public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message)
-        throws ExpressionRuntimeException
-    {
-        return evaluateBoolean(expression, evaluator, message, false, false);
     }
 
     public boolean evaluateBoolean(String expression, MuleMessage message) throws ExpressionRuntimeException

@@ -11,16 +11,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.io.File;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -39,6 +29,16 @@ import org.mule.execution.MessageProcessingManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.UUID;
+
+import java.io.File;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -210,14 +210,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
         when(mockInboundEndpoint.getMuleContext()).thenReturn(mockMuleContext);
         when(mockInboundEndpoint.getFilter()).thenReturn(null);
         when(mockFileConnector.createMuleMessageFactory()).thenReturn(mockMessageFactory);
-        mockMessageFactory = new FileMuleMessageFactory() {
-            @Override
-            public MuleMessage create(Object transportMessage, String encoding) throws Exception
-            {
-                when(mockMessage.getPayload()).thenReturn(transportMessage);
-                return mockMessage;
-            }
-        };
+        mockMessageFactory = new FileMuleMessageFactory();
         when(mockMessage.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, PropertyScope.INBOUND, Boolean.FALSE)).thenReturn(true);
         when(mockMessage.getInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY)).thenReturn(UUID.getUUID());
         when(mockHandledMessagingException.getEvent()).thenReturn(mockMuleEvent);

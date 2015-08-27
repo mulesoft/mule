@@ -30,7 +30,6 @@ import org.mule.api.processor.StageNameSourceProvider;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.util.NotificationUtils;
-import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
 import java.util.Collections;
@@ -172,32 +171,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         else
         {
             NotificationUtils.addMessageProcessorPathElements(Collections.singletonList(delegate), pathElement);
-        }
-    }
-
-    /**
-     * Not used anymore, to be removed in future
-     */
-    @Deprecated
-    class AsyncMessageProcessorWorker extends AbstractMuleEventWork
-    {
-
-        public AsyncMessageProcessorWorker(MuleEvent event)
-        {
-            super(event);
-        }
-
-        @Override
-        protected void doRun()
-        {
-            try
-            {
-                delegate.process(event);
-            }
-            catch (MuleException e)
-            {
-                event.getFlowConstruct().getExceptionListener().handleException(e, event);
-            }
         }
     }
 

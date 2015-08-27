@@ -10,10 +10,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.NameableObject;
 import org.mule.api.agent.Agent;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -38,7 +36,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.types.SimpleDataType;
 import org.mule.util.Predicate;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
@@ -174,43 +171,9 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
-    public EndpointFactory lookupEndpointFactory()
-    {
-        return (EndpointFactory) registry.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public Transformer lookupTransformer(String name)
     {
         return (Transformer) registry.lookupObject(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
-     *             method should only be used internally to discover transformers, typically a user does not need ot do this
-     *             directly
-     */
-    @Deprecated
-    public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
-    {
-        return lookupTransformer(new SimpleDataType(inputType), new SimpleDataType(outputType));
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
-     *             method should only be used internally to discover transformers, typically a user does not need ot do this
-     *             directly
-     */
-    @Deprecated
-    public List<Transformer> lookupTransformers(Class input, Class output)
-    {
-        return lookupTransformers(new SimpleDataType(input), new SimpleDataType(output));
     }
 
     /**
@@ -326,38 +289,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
         {
             return results;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<Connector> getConnectors()
-    {
-        return registry.lookupObjects(Connector.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<Agent> getAgents()
-    {
-        return registry.lookupObjects(Agent.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<ImmutableEndpoint> getEndpoints()
-    {
-        return registry.lookupObjects(ImmutableEndpoint.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<Transformer> getTransformers()
-    {
-        return registry.lookupObjects(Transformer.class);
     }
 
     /**
@@ -524,14 +455,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
-    public void unregisterFlowConstruct(String flowConstructName) throws MuleException
-    {
-        registry.unregisterObject(flowConstructName, FlowConstruct.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void unregisterAgent(String agentName) throws MuleException
     {
         registry.unregisterObject(agentName, Agent.class);
@@ -568,22 +491,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
-    public void unregisterConnector(String connectorName) throws MuleException
-    {
-        registry.unregisterObject(connectorName, Connector.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void unregisterEndpoint(String endpointName) throws MuleException
-    {
-        registry.unregisterObject(endpointName, ImmutableEndpoint.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void unregisterTransformer(String transformerName) throws MuleException
     {
         Transformer transformer = lookupTransformer(transformerName);
@@ -609,16 +516,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     public Object applyProcessors(Object object) throws MuleException
     {
         return muleContext.getInjector().inject(object);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public Object applyProcessors(Object object, int flags) throws MuleException
-    {
-        return applyProcessors(object);
     }
 
     /**

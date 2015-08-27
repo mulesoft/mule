@@ -58,19 +58,6 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
         }
     }
 
-    /**
-     * @deprecated as of 3.7.2. Use {@link #dispatchNotification(EndpointMessageNotification, MuleEvent)} instead
-     */
-    @Deprecated
-    public void dispatchNotification(EndpointMessageNotification notification)
-    {
-        AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-        if (notification != null && connector.isEnableMessageEvents())
-        {
-            connector.fireNotification(notification);
-        }
-    }
-
     public EndpointMessageNotification createBeginNotification(MuleEvent event)
     {
         AbstractConnector connector = (AbstractConnector) endpoint.getConnector();

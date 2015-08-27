@@ -115,15 +115,6 @@ public class AllStatistics
         }
     }
 
-    /**
-     * @deprecated use #getServiceStatistics
-     */
-    @Deprecated
-    public synchronized Collection<FlowConstructStatistics> getComponentStatistics()
-    {
-        return flowConstructStats.values();
-    }
-
     public synchronized Collection<FlowConstructStatistics> getServiceStatistics()
     {
         return flowConstructStats.values();

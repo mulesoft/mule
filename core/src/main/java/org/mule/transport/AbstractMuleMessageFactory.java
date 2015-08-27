@@ -23,25 +23,6 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
     {
     }
 
-    /**
-     * @deprecated use {@link #AbstractMuleMessageFactory()}  instead
-     */
-    @Deprecated
-    public AbstractMuleMessageFactory(MuleContext context)
-    {
-        super();
-        muleContext = context;
-    }
-
-    /**
-     * @deprecated use {@link #create(Object, String, org.mule.api.MuleContext)} instead.
-     */
-    @Deprecated
-    public MuleMessage create(Object transportMessage, String encoding) throws Exception
-    {
-        return create(transportMessage, null, encoding, muleContext);
-    }
-
     public MuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext) throws Exception
     {
         return doCreate(transportMessage, previousMessage, encoding, muleContext);
