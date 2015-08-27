@@ -6,8 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleRuntimeException;
+import org.mule.config.MuleManifest;
 import org.mule.extension.annotations.Extension;
 
 import java.io.IOException;
@@ -16,15 +15,19 @@ import java.net.URL;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of {@link VersionResolver} that infers an extension's version based on the MANIFEST.MF file contained
- * on it's JAR. If that attempt fails, it fallbacks to searching for the file under target/test-classes.
+ * on it's JAR. If that attempt fails, it fallbacks to searching for the file under target/test-classes. If the file can
+ * not be found, it uses the version from {@link org.mule.config.MuleManifest}.
  *
  * @since 4.0
  */
 final class ManifestBasedVersionResolver implements VersionResolver
 {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManifestBasedVersionResolver.class);
     private final Class extensionType;
 
     public ManifestBasedVersionResolver(Class extensionType)
@@ -38,11 +41,11 @@ final class ManifestBasedVersionResolver implements VersionResolver
         String version = extensionType.getPackage().getImplementationVersion();
         if (version == null)
         {
+            if (LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug("Could not resolve version from JAR's MANIFEST.MF. Searching for file under target/test-classes.");
+            }
             version = fallback();
-        }
-        if (version == null)
-        {
-            throw new MuleRuntimeException(createStaticMessage(String.format("Cannot resolve version for extension %s: MANIFEST.MF could not be found.", extension.name())));
         }
         return version;
     }
@@ -67,7 +70,11 @@ final class ManifestBasedVersionResolver implements VersionResolver
         }
         catch (IOException e)
         {
-            return null;
+            if (LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug("Could not find MANIFEST.MF under target/test-classes. Using mule-core MANIFEST.MF.");
+            }
+            return MuleManifest.getProductVersion();
         }
     }
 }
