@@ -15,36 +15,36 @@ import org.mule.extension.annotations.Extension;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.jar.Manifest;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class ManifestBasedVersionResolverTestCase extends AbstractMuleTestCase
 {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
+    private static final String TEST_MANIFEST_VERSION = "1.0.0-test";
     private Class<?> clazz = HeisenbergExtension.class;
     private VersionResolver versionResolver = new ManifestBasedVersionResolver(clazz);
 
     @Test
-    public void failsWithOutManifest()
+    public void worksWithoutManifest()
     {
-        thrown.expectMessage(is("Cannot resolve version for extension heisenberg: MANIFEST.MF could not be found."));
-        testResolution();
+        assertThat(testResolution(), is(MuleManifest.getProductVersion()));
     }
 
     @Test
     public void worksWithManifest() throws Exception
     {
         File metaInfDirectory = getMetaInfDirectory(getClass());
-        File manifest = createManifestFileIfNecessary(metaInfDirectory);
+        InputStream testManifestInputStream = IOUtils.getResourceAsStream("test-manifest.mf", getClass());
+        File manifest = createManifestFileIfNecessary(metaInfDirectory, new Manifest(testManifestInputStream));
         try
         {
-            assertThat(testResolution(), is(MuleManifest.getProductVersion()));
+            assertThat(testResolution(), is(TEST_MANIFEST_VERSION));
         }
         finally
         {
@@ -52,6 +52,7 @@ public class ManifestBasedVersionResolverTestCase extends AbstractMuleTestCase
             {
                 FileUtils.deleteQuietly(manifest);
             }
+            testManifestInputStream.close();
         }
 
     }
