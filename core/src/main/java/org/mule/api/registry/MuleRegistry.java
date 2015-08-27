@@ -6,12 +6,10 @@
  */
 package org.mule.api.registry;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.transformer.DataType;
@@ -38,20 +36,20 @@ public interface MuleRegistry extends LifecycleRegistry
      *
      * @see Registry#registerObject(String, Object, Object)
      */
-    public static final int LIFECYCLE_BYPASS_FLAG = 0x01;
+    int LIFECYCLE_BYPASS_FLAG = 0x01;
 
     /**
      * Determines whether Inject processors should get executed on an object added to the registry
      * Inject processors are responsible for processing inject interfaces such as {@link org.mule.api.context.MuleContextAware}
      */
-    public static final int INJECT_PROCESSORS_BYPASS_FLAG = 0x02;
+    int INJECT_PROCESSORS_BYPASS_FLAG = 0x02;
 
     /**
      * Determines whether pre-init processors should get executed on an object added to the registry.
      * Pre init processors are basically object processors that do not inject members into objects.  These
      * processors happen after the inject processors
      */
-    public static final int PRE_INIT_PROCESSORS_BYPASS_FLAG = 0x04;
+    int PRE_INIT_PROCESSORS_BYPASS_FLAG = 0x04;
 
     // /////////////////////////////////////////////////////////////////////////
     // Lookup methods - these should NOT create a new object, only return existing ones
@@ -69,12 +67,6 @@ public interface MuleRegistry extends LifecycleRegistry
      */
     EndpointBuilder lookupEndpointBuilder(String name);
 
-    /**
-     * @deprecated use {@link MuleContext#getEndpointFactory()} instead
-     */
-    @Deprecated
-    EndpointFactory lookupEndpointFactory();
-
     Transformer lookupTransformer(String name);
 
     FlowConstruct lookupFlowConstruct(String name);
@@ -83,21 +75,9 @@ public interface MuleRegistry extends LifecycleRegistry
      * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given
      * input and return the given output type of object
      *
-     * @param input  The  desiered input type for the transformer
-     * @param output the desired output type for the transformer
-     * @return a list of matching transformers. If there were no matchers an empty list is returned.
-     * @deprecated use {@link #lookupTransformers(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead
-     */
-    @Deprecated
-    List<Transformer> lookupTransformers(Class<?> input, Class<?> output);
-
-    /**
-     * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given
-     * input and return the given output type of object
-     *
      * @param source The  desired input type for the transformer
      * @param result the desired output type for the transformer
-     * @return a list of matching transformers. If there were no matchers an empty list is returned.
+     * @return a list of matching transformers. If there were no matches an empty list is returned.
      * @since 3.0.0
      */
     List<Transformer> lookupTransformers(DataType<?> source, DataType<?> result);
@@ -105,19 +85,7 @@ public interface MuleRegistry extends LifecycleRegistry
     /**
      * Will find a transformer that is the closest match to the desired input and output.
      *
-     * @param input  The  desiered input type for the transformer
-     * @param output the desired output type for the transformer
-     * @return A transformer that exactly matches or the will accept the input and output parameters
-     * @throws TransformerException will be thrown if there is more than one match
-     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead
-     */
-    @Deprecated
-    Transformer lookupTransformer(Class<?> input, Class<?> output) throws TransformerException;
-
-    /**
-     * Will find a transformer that is the closest match to the desired input and output.
-     *
-     * @param source The  desiered input type for the transformer
+     * @param source The  desired input type for the transformer
      * @param result the desired output type for the transformer
      * @return A transformer that exactly matches or the will accept the input and output parameters
      * @throws TransformerException will be thrown if there is more than one match
@@ -129,45 +97,16 @@ public interface MuleRegistry extends LifecycleRegistry
 
     Agent lookupAgent(String agentName);
 
-    /**
-     * @deprecated Use lookupConnector() instead
-     */
-    @Deprecated
-    Collection<Connector> getConnectors();
-
-    /**
-     * @deprecated Use {@link org.mule.api.endpoint.EndpointFactory} for creation/lookup of individual endpoints instead
-     */
-    @Deprecated
-    Collection<ImmutableEndpoint> getEndpoints();
-
-    /**
-     * @deprecated Use lookupAgent() instead
-     */
-    @Deprecated
-    Collection<Agent> getAgents();
-
-    /**
-     * @deprecated Use lookupTransformer() instead
-     */
-    @Deprecated
-    Collection<Transformer> getTransformers();
-
     // /////////////////////////////////////////////////////////////////////////
     // Registration methods
     // /////////////////////////////////////////////////////////////////////////
 
     void registerConnector(Connector connector) throws MuleException;
 
-    void unregisterConnector(String connectorName) throws MuleException;
-
     //TODO MULE-2494
     void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException;
 
-    //TODO MULE-2494
-    void unregisterEndpoint(String endpointName) throws MuleException;
-
-    public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException;
+    void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException;
 
     void registerTransformer(Transformer transformer) throws MuleException;
 
@@ -175,12 +114,9 @@ public interface MuleRegistry extends LifecycleRegistry
 
     void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
 
-    void unregisterFlowConstruct(String flowConstructName) throws MuleException;
-
     void registerAgent(Agent agent) throws MuleException;
 
     void unregisterAgent(String agentName) throws MuleException;
-
 
     void registerScheduler(Scheduler scheduler) throws MuleException;
 
@@ -212,22 +148,6 @@ public interface MuleRegistry extends LifecycleRegistry
      * @throws org.mule.api.MuleException if the registry fails to process object processors for the object.
      */
     Object applyProcessors(Object object) throws MuleException;
-
-    /**
-     * Will execute any processors on an object without actually registering the object in the registry.  This is useful for prototype objects that are created per request and would
-     * clutter the registry with single use objects.  Not that this will only be applied to Mule registries.  Third party registries
-     * such as Guice support wiring, but you need to get a reference to the container/context to call the method.  This is so that
-     * wiring mechanisms don't trip over each other.
-     *
-     * @param object the object to process
-     * @param flags {@link org.mule.api.registry.MuleRegistry} flags which control which injectors will be applied
-     * @return the same object with any processors called
-     * @throws org.mule.api.MuleException if the registry fails to process object processors for the object.
-     * @since 3.0
-     * @deprecated as of 3.7.0. Use {@link #applyProcessors(Object)} instead.
-     */
-    @Deprecated
-    Object applyProcessors(Object object, int flags) throws MuleException;
 
     // /////////////////////////////////////////////////////////////////////////
     // Creation methods

@@ -123,7 +123,7 @@
         <test:assert expression="#[payload[0].getMessage().getPayload().equals('apple')]" />
         <test:assert expression="#[payload[1].getMessage().getPayload().equals('banana')]" />
         <test:assert expression="#[payload[1].getFlowVariable('flow').equals('var')]" />
-        <test:assert expression="#[payload[1].getSessionVariable('session').equals('sessionvar')]" />
+        <test:assert expression="#[payload[1].getSession().getProperty('session').equals('sessionvar')]" />
     </flow>
 
     <flow name="failingMergeStrategy">

@@ -42,22 +42,6 @@ public interface ExpressionManager
     void registerEnricher(ExpressionEnricher enricher);
 
     /**
-     * Checks whether an enricher is registered with the manager
-     * 
-     * @param name the name of the expression enricher
-     * @return true if the enricher is registered with the manager, false otherwise
-     */
-    boolean isEnricherRegistered(String name);
-
-    /**
-     * Removes the enricher with the given name
-     * 
-     * @param name the name of the enricher to remove
-     * @return the enricher that was removed. This will be null if the enricher was not registered
-     */
-    ExpressionEnricher unregisterEnricher(String name);
-
-    /**
      * Evaluates the given expression. The expression should be a single expression definition with or without
      * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
      * situations where one or more expressions need to be parsed within a single text, the
@@ -139,18 +123,6 @@ public interface ExpressionManager
      */
     TypedValue evaluateTyped(String expression, String evaluator, MuleMessage message, boolean failIfNull)
             throws ExpressionRuntimeException;
-
-    /**
-     * Evaluates the given expression resolving the result of the evaluation to a boolean. The expression
-     * should be a single expression definition with or without enclosing braces. i.e. "context:serviceName"
-     * and "#[context:serviceName]" are both valid.
-     * 
-     * @param expression a single expression i.e. header:foo=bar
-     * @param evaluator the evaluator to use when executing the expression
-     * @param message The current message being processed
-     */
-    boolean evaluateBoolean(String expression, String evaluator, MuleMessage message)
-        throws ExpressionRuntimeException;
 
     /**
      * Evaluates the given expression resolving the result of the evaluation to a boolean. The expression

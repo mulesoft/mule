@@ -19,6 +19,7 @@ import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
 import org.mule.exception.AbstractExceptionListener;
+import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
@@ -85,7 +86,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends org.mule.tck.j
         assertNotNull(responseTransformers);
         assertFalse(responseTransformers.isEmpty());
         final Object responseTransformer = responseTransformers.get(0);
-        assertTrue(responseTransformer instanceof TestCompressionTransformer);
+        assertTrue(responseTransformer instanceof InterceptingChainLifecycleWrapper);
+        assertTrue(((InterceptingChainLifecycleWrapper) responseTransformer).getMessageProcessors().get(0) instanceof TestCompressionTransformer);
     }
 
     @Test

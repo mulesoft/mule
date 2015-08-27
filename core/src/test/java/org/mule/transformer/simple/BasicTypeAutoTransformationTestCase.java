@@ -6,6 +6,9 @@
  */
 package org.mule.transformer.simple;
 
+import static org.junit.Assert.assertEquals;
+import static org.mule.api.transformer.DataType.STRING_DATA_TYPE;
+import static org.mule.transformer.types.DataTypeFactory.create;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -13,8 +16,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.math.BigDecimal;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTestCase
 {
@@ -45,12 +46,12 @@ public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTest
 
     private Transformer lookupFromStringTransformer(Class to) throws TransformerException
     {
-        return muleContext.getRegistry().lookupTransformer(String.class, to);
+        return muleContext.getRegistry().lookupTransformer(STRING_DATA_TYPE, create(to));
     }
 
     private Transformer lookupToStringTransformer(Class from) throws TransformerException
     {
-        return muleContext.getRegistry().lookupTransformer(from, String.class);
+        return muleContext.getRegistry().lookupTransformer(create(from), STRING_DATA_TYPE);
     }
 
 }
