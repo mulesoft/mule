@@ -182,12 +182,14 @@ public interface MuleRegistry extends LifecycleRegistry
 
     void registerConnector(Connector connector) throws MuleException;
 
+    @Deprecated
     void unregisterConnector(String connectorName) throws MuleException;
 
     //TODO MULE-2494
     void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException;
 
     //TODO MULE-2494
+    @Deprecated
     void unregisterEndpoint(String endpointName) throws MuleException;
 
     public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException;
@@ -204,6 +206,7 @@ public interface MuleRegistry extends LifecycleRegistry
 
     void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
 
+    @Deprecated
     void unregisterFlowConstruct(String flowConstructName) throws MuleException;
 
     @Deprecated

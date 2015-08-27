@@ -38,7 +38,9 @@ public interface MuleEventContext
      * 
      * @return the contents of the message as a byte array
      * @throws MuleException if the message cannot be converted into an array of bytes
+     * @deprecated Use {@code getMessage().getPayload(DataType.BYTE_ARRAY_DATA_TYPE)}
      */
+    @Deprecated
     byte[] getMessageAsBytes() throws MuleException;
 
     /**
@@ -130,7 +132,9 @@ public interface MuleEventContext
      * Mark the current transaction (if any) for rollback
      * 
      * @throws TransactionException if operation failed
+     * @deprecated
      */
+    @Deprecated
     void markTransactionForRollback() throws TransactionException;
 
     /**
@@ -264,7 +268,9 @@ public interface MuleEventContext
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
      * @see FutureMessageResult
+     * @deprecated
      */
+    @Deprecated
     FutureMessageResult sendEventAsync(MuleMessage message, EndpointURI endpoint, int timeout)
         throws MuleException;
 
@@ -286,7 +292,9 @@ public interface MuleEventContext
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
      * @see FutureMessageResult
+     * @deprecated
      */
+    @Deprecated
     FutureMessageResult sendEventAsync(MuleMessage message, String endpointName, int timeout)
         throws MuleException;
 
@@ -349,7 +357,9 @@ public interface MuleEventContext
      *            mule manager configuration
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
+     * @deprecated
      */
+    @Deprecated
     void dispatchEvent(MuleMessage message, String endpointName) throws MuleException;
 
     /**
@@ -361,7 +371,9 @@ public interface MuleEventContext
      * @param endpoint The endpoint name to disptch the event through.
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
+     * @deprecated
      */
+    @Deprecated
     void dispatchEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException;
 
     /**
@@ -372,7 +384,9 @@ public interface MuleEventContext
      * @param timeout time in milliseconds before the request times out
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
+     * @deprecated
      */
+    @Deprecated
     MuleMessage requestEvent(InboundEndpoint endpoint, long timeout) throws MuleException;
 
     /**
@@ -417,7 +431,9 @@ public interface MuleEventContext
      * @see org.mule.api.MuleContext
      * @see MuleEventContext
      * @see org.mule.api.lifecycle.Callable
+     * @deprecated
      */
+    @Deprecated
     boolean isStopFurtherProcessing();
 
     /**

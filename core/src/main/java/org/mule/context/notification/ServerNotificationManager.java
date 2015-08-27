@@ -124,6 +124,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener, subscription));
     }
 
+    @Deprecated
     public void addAllListenerSubscriptionPairs(Collection<?> pairs)
     {
         configuration.addAllListenerSubscriptionPairs(pairs);
@@ -147,6 +148,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.removeListener(listener);
     }
 
+    @Deprecated
     public void removeAllListeners(Collection<ServerNotificationListener> listeners)
     {
         configuration.removeAllListeners(listeners);
@@ -167,6 +169,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.disableType(type);
     }
 
+    @Deprecated
     public void setDisabledTypes(Collection<Class<? extends ServerNotificationListener>> types) throws ClassNotFoundException
     {
         configuration.disableAllTypes(types);
@@ -280,6 +283,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     /**
      * @return DIRECT reference to an event queue
      */
+    @Deprecated
     public Queue<ServerNotification> getEventQueue()
     {
         return eventQueue;
