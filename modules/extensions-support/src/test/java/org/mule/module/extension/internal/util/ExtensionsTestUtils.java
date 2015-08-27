@@ -138,21 +138,21 @@ public abstract class ExtensionsTestUtils
     public static File getMetaInfDirectory(Class clazz)
     {
         URL classUrl = clazz.getResource(clazz.getSimpleName() + ".class");
-        if (classUrl.toString().startsWith("jar"))
-        {
-            //we are dealing with a jar file, no need to modify test-classes resources
-            return null;
-        }
         String classPath = classUrl.getPath();
         return new File(String.format("%starget/test-classes/META-INF", classPath.substring(0, classPath.indexOf("target"))));
     }
 
     public static File createManifestFileIfNecessary(File targetDirectory) throws IOException
     {
+        return createManifestFileIfNecessary(targetDirectory, MuleManifest.getManifest());
+    }
+
+    public static File createManifestFileIfNecessary(File targetDirectory, Manifest sourceManifest) throws IOException
+    {
         File manifestFile = new File(targetDirectory.getPath(), "MANIFEST.MF");
         if (!manifestFile.exists())
         {
-            Manifest manifest = new Manifest(MuleManifest.getManifest());
+            Manifest manifest = new Manifest(sourceManifest);
             try (FileOutputStream fileOutputStream = new FileOutputStream(manifestFile))
             {
                 manifest.write(fileOutputStream);

@@ -6,52 +6,54 @@
  */
 package org.mule.module.extension.internal.introspection;
 
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.config.MuleManifest.getProductVersion;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createManifestFileIfNecessary;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getMetaInfDirectory;
-import org.mule.config.MuleManifest;
+import static org.mule.util.IOUtils.getResourceAsStream;
 import org.mule.extension.annotations.Extension;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.jar.Manifest;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class ManifestBasedVersionResolverTestCase extends AbstractMuleTestCase
 {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
+    private static final String TEST_MANIFEST_VERSION = "1.0.0-test";
     private Class<?> clazz = HeisenbergExtension.class;
     private VersionResolver versionResolver = new ManifestBasedVersionResolver(clazz);
 
     @Test
-    public void failsWithOutManifest()
+    public void worksWithoutManifest()
     {
-        thrown.expectMessage(is("Cannot resolve version for extension heisenberg: MANIFEST.MF could not be found."));
-        testResolution();
+        assertThat(testResolution(), is(getProductVersion()));
     }
 
     @Test
     public void worksWithManifest() throws Exception
     {
         File metaInfDirectory = getMetaInfDirectory(getClass());
-        File manifest = createManifestFileIfNecessary(metaInfDirectory);
+        InputStream testManifestInputStream = getResourceAsStream("test-manifest.mf", getClass());
+        File manifest = createManifestFileIfNecessary(metaInfDirectory, new Manifest(testManifestInputStream));
         try
         {
-            assertThat(testResolution(), is(MuleManifest.getProductVersion()));
+            assertThat(testResolution(), is(TEST_MANIFEST_VERSION));
         }
         finally
         {
             if (manifest.exists())
             {
-                FileUtils.deleteQuietly(manifest);
+                deleteQuietly(manifest);
             }
+            closeQuietly(testManifestInputStream);
         }
 
     }
