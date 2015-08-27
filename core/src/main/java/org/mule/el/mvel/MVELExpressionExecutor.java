@@ -8,6 +8,7 @@
 package org.mule.el.mvel;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.mvel2.MVEL;
@@ -36,6 +37,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 {
 
     private static Logger log = LoggerFactory.getLogger(MVELExpressionExecutor.class);
+    protected static final String DISABLE_MEL_EXPRESSION_CACHE = MuleProperties.SYSTEM_PROPERTY_PREFIX + "disableMelExpressionCache";
 
     protected static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
 
@@ -51,7 +53,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
         OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
 
         compiledExpressionsCache = CacheBuilder.newBuilder()
-            .maximumSize(COMPILED_EXPRESSION_MAX_CACHE_SIZE)
+            .maximumSize(getCompiledExpressionMaxCacheSize())
             .build(new CacheLoader<String, Serializable>()
             {
                 @Override
@@ -60,6 +62,19 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
                     return MVEL.compileExpression(key, new ParserContext(parserConfiguration));
                 }
             });
+    }
+
+    private int getCompiledExpressionMaxCacheSize()
+    {
+        final String propertyValue = System.getProperty(DISABLE_MEL_EXPRESSION_CACHE);
+        if (propertyValue != null)
+        {
+            return 0;
+        }
+        else
+        {
+            return COMPILED_EXPRESSION_MAX_CACHE_SIZE;
+        }
     }
 
     @Override

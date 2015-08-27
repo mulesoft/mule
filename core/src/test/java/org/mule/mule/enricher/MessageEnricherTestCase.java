@@ -6,11 +6,19 @@
  */
 package org.mule.mule.enricher;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.transformer.types.MimeTypes.JSON;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -18,9 +26,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.construct.Flow;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.transformer.simple.StringAppendTransformer;
@@ -387,6 +400,46 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void enrichesFlowVarWithDataTypeUsingExpressionEvaluator() throws Exception
     {
         doEnrichDataTypePropagationTest(new EnrichExpressionPair(FOO_FLOW_VAR_EXPRESSION));
+    }
+
+    @Test
+    public void enricherConservesSameEventInstance() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
+        SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
+        enricher.setEnrichmentMessageProcessor(sensingNullMessageProcessor);
+
+        MuleEvent in = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
+                                            MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
+        MuleEvent out = enricher.process(in);
+
+        assertThat(out, is(sameInstance(in)));
+        assertThat(sensingNullMessageProcessor.event, not(sameInstance(in)));
+    }
+
+    @Test
+    public void enricherConservesSameEventInstanceNonBlocking() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
+        SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
+        enricher.setEnrichmentMessageProcessor(sensingNullMessageProcessor);
+        ReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+
+        Flow flow = mock(Flow.class);
+        when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
+
+        MuleEvent in = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
+                                            MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
+                                            flow);
+        MuleEvent out = enricher.process(in);
+
+        assertThat(in.isAllowNonBlocking(), is(true));
+        assertThat(out, is(sameInstance(in)));
+        assertThat(sensingNullMessageProcessor.event, not(sameInstance(in)));
     }
 
     private void doEnrichDataTypePropagationTest(EnrichExpressionPair pair) throws Exception

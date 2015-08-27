@@ -51,7 +51,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
     public final MuleEvent execute() throws MessagingException
     {
         MuleEvent result = event;
-        while (hasNext())
+        while (hasNext() && isEventValid(event))
         {
             result = executeNext();
             if (!isEventValid(result))

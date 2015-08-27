@@ -101,9 +101,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
             @Override
             public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
             {
-                MuleEvent response = processResponse(new DefaultMuleEvent(event, originalReplyToHandler));
-                // Update RequestContext ThreadLocal for backwards compatibility
-                OptimizedRequestContext.unsafeSetEvent(response);
+                MuleEvent response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler));
                 if (!NonBlockingVoidMuleEvent.getInstance().equals(response))
                 {
                     originalReplyToHandler.processReplyTo(response, null, null);
@@ -118,6 +116,17 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
                 processFinally(exception.getEvent(), exception);
             }
         };
+    }
+
+    private MuleEvent recreateEventWithOriginalReplyToHandler(MuleEvent event, ReplyToHandler originalReplyToHandler)
+    {
+        if (event != null)
+        {
+            event = new DefaultMuleEvent(event, originalReplyToHandler);
+            // Update RequestContext ThreadLocal for backwards compatibility
+            OptimizedRequestContext.unsafeSetEvent(event);
+        }
+        return event;
     }
 
     private boolean isNonBlocking(MuleEvent event)

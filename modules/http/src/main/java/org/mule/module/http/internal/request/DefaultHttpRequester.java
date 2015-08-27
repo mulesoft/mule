@@ -221,7 +221,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
                                          notificationHelper.fireNotification(muleEvent, httpRequest.getUri(),
                                                                              muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
-                                         httpResponseToMuleEvent.convert(muleEvent, httpResponse);
+                                         httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
                                          resetMuleEventForNewThread(muleEvent);
 
 
@@ -287,7 +287,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e);
         }
 
-        httpResponseToMuleEvent.convert(muleEvent, response);
+        httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
 
         if (resendRequest(muleEvent, checkRetry, authentication))
         {

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig" host="127.0.0.1" port="${httpPort}" />
+    <http:request-config name="requestConfig" host="127.0.0.1" port="${httpPort}" />
+
+    <flow name="asyncService">
+        <http:listener config-ref="listenerConfig" path="/test" />
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.AsyncService"/>
+        <component>
+            <singleton-object class="org.mule.module.cxf.testmodels.AsyncService" />
+        </component>
+    </flow>
+
+    <flow name="jaxwsClient">
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.testmodels.AsyncService" operation="send"/>
+        <http:request config-ref="requestConfig" path="/test" method="POST" />
+    </flow>
+
+    <flow name="proxyClient">
+        <cxf:proxy-client />
+        <http:request config-ref="requestConfig" path="/test" method="POST" />
+    </flow>
+
+</mule>

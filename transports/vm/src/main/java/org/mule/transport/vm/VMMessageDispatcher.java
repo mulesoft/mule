@@ -50,7 +50,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         eventToDispatch.setMessage(eventToDispatch.getMessage().createInboundMessage());
         QueueSession session = getQueueSession();
         Queue queue = session.getQueue(endpointUri.getAddress());
-        if (!queue.offer(eventToDispatch, connector.getQueueTimeout()))
+        if (!queue.offer(eventToDispatch.getMessage(), connector.getQueueTimeout()))
         {
             // queue is full
             throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()),

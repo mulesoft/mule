@@ -9,6 +9,8 @@ package org.mule.module.http.internal.request;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.module.http.api.HttpHeaders.Names.SET_COOKIE;
+import static org.mule.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 import org.mule.DefaultMuleMessage;
@@ -32,13 +34,18 @@ import com.google.common.net.MediaType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maps an HTTP response into a Mule event. A new message is set in the event with the contents of the response.
@@ -48,6 +55,8 @@ import javax.activation.DataHandler;
  */
 public class HttpResponseToMuleEvent
 {
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponseToMuleEvent.class);
+
     private static final String MULTI_PART_PREFIX = "multipart/";
 
     private DefaultHttpRequester requester;
@@ -62,7 +71,7 @@ public class HttpResponseToMuleEvent
         this.parseResponse = parseResponse;
     }
 
-    public void convert(MuleEvent muleEvent, HttpResponse response) throws MessagingException
+    public void convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException
     {
         String responseContentType = response.getHeaderValue(CONTENT_TYPE.toLowerCase());
         DataType<?> dataType = muleEvent.getMessage().getDataType();
@@ -110,6 +119,10 @@ public class HttpResponseToMuleEvent
         muleEvent.setMessage(message);
         setResponsePayload(payload, muleEvent);
 
+        if (requester.getConfig().isEnableCookies())
+        {
+            processCookies(response, uri);
+        }
     }
 
 
@@ -185,4 +198,30 @@ public class HttpResponseToMuleEvent
     }
 
 
+    private void processCookies(HttpResponse response, String uri)
+    {
+        Collection<String> setCookieHeader = response.getHeaderValues(SET_COOKIE.toLowerCase());
+        Collection<String> setCookie2Header = response.getHeaderValues(SET_COOKIE2.toLowerCase());
+
+        Map<String, List<String>> cookieHeaders = new HashMap<>();
+
+        if (setCookieHeader != null)
+        {
+            cookieHeaders.put(SET_COOKIE, new ArrayList<>(setCookieHeader));
+        }
+
+        if (setCookie2Header != null)
+        {
+            cookieHeaders.put(SET_COOKIE2, new ArrayList<>(setCookie2Header));
+        }
+
+        try
+        {
+            requester.getConfig().getCookieManager().put(URI.create(uri), cookieHeaders);
+        }
+        catch (IOException e)
+        {
+            logger.warn("Error storing cookies for URI " + uri, e);
+        }
+    }
 }

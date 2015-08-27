@@ -7,13 +7,13 @@
 package org.mule.enricher;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
@@ -207,11 +207,27 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         }
 
         @Override
-        protected MuleEvent processRequest(MuleEvent event) throws MuleException
+        protected MuleEvent processBlocking(MuleEvent event) throws MuleException
         {
             this.eventToEnrich = event;
-            //TODO: change DefaultMuleEvent.copy to DefaultMuleEvent.copyPreservingSession
-            return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(event));
+            return super.processBlocking(copyEventForEnrichment(event));
+        }
+
+        @Override
+        protected MuleEvent processNonBlocking(MuleEvent event) throws MuleException
+        {
+            this.eventToEnrich = event;
+            MuleEvent result = processNext(copyEventForEnrichment(event));
+            if (!(result instanceof NonBlockingVoidMuleEvent))
+            {
+                processResponse(result);
+            }
+            return event;
+        }
+
+        private MuleEvent copyEventForEnrichment(MuleEvent event)
+        {
+            return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(new DefaultMuleEvent(event, createReplyToHandler(event))));
         }
 
         @Override

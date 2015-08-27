@@ -640,6 +640,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="enableCookies" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If true, cookies received in HTTP responses will be stored, and sent in subsequent HTTP requests.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
 
             </xsd:extension>
         </xsd:complexContent>
