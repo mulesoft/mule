@@ -47,6 +47,7 @@ public interface ExpressionManager
      * @param name the name of the expression enricher
      * @return true if the enricher is registered with the manager, false otherwise
      */
+    @Deprecated
     boolean isEnricherRegistered(String name);
 
     /**
@@ -55,6 +56,7 @@ public interface ExpressionManager
      * @param name the name of the enricher to remove
      * @return the enricher that was removed. This will be null if the enricher was not registered
      */
+    @Deprecated
     ExpressionEnricher unregisterEnricher(String name);
 
     /**

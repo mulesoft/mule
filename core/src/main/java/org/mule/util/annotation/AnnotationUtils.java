@@ -33,6 +33,7 @@ public class AnnotationUtils
         return false;
     }
 
+    @Deprecated
     public static List<AnnotationMetaData> getParamAnnotations(Method method)
     {
         return getParamAnnotationsWithMeta(method, null);
@@ -56,8 +57,7 @@ public class AnnotationUtils
         return annos;
     }
 
-
-
+    @Deprecated
     public static List<AnnotationMetaData> getClassAndMethodAnnotations(Class<?> c)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
@@ -71,6 +71,7 @@ public class AnnotationUtils
         return annotations;
     }
 
+    @Deprecated
     public static List<AnnotationMetaData> getAllMethodAnnotations(Class<?> c)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
@@ -104,6 +105,7 @@ public class AnnotationUtils
         return annotations;
     }
 
+    @Deprecated
     public static List<AnnotationMetaData> getMethodMetaAnnotations(Class<?> c, Class<? extends Annotation> metaAnn)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
@@ -122,6 +124,7 @@ public class AnnotationUtils
         return annotations;
     }
 
+    @Deprecated
     public static List<AnnotationMetaData> getAllFieldAnnotations(Class<?> c)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
@@ -137,6 +140,7 @@ public class AnnotationUtils
         return annotations;
     }
 
+    @Deprecated
     public static List<AnnotationMetaData> getFieldAnnotations(Class<?> c, Class<? extends Annotation> annotation)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
@@ -164,6 +168,7 @@ public class AnnotationUtils
         return getClassAnnotationInHierarchy(annotation, bottom);
     }
 
+    @Deprecated
     public static AnnotationMetaData getClassAnnotationInHierarchy(Class<? extends Annotation> annotation, Class<?> bottom)
     {
         AnnotationMetaData anno = getClassAnnotationForSuperClasses(annotation, bottom);
@@ -191,6 +196,7 @@ public class AnnotationUtils
         return getClassAnnotationInHierarchy(bottom);
     }
 
+    @Deprecated
     public static List<AnnotationMetaData> getClassAnnotationInHierarchy(Class<?> bottom)
     {
         List<AnnotationMetaData> annos = new ArrayList<AnnotationMetaData>();
@@ -247,6 +253,7 @@ public class AnnotationUtils
         return getFieldAnnotationsForHierarchy(bottom);
     }
 
+    @Deprecated
     public static Set<AnnotationMetaData> getFieldAnnotationsForHierarchy(Class<?> bottom)
     {
         Set<AnnotationMetaData> annos = new HashSet<AnnotationMetaData>();
@@ -255,6 +262,7 @@ public class AnnotationUtils
         return annos;
     }
 
+    @Deprecated
     public static void getFieldAnnotationsForInterfaces(Class<?> clazz, Set<AnnotationMetaData> annos)
     {
         for (int i = 0; i < clazz.getInterfaces().length; i++)
@@ -284,6 +292,7 @@ public class AnnotationUtils
         return getFieldAnnotationsForHierarchy(bottom, annotation);
     }
 
+    @Deprecated
     public static Set<AnnotationMetaData> getFieldAnnotationsForHierarchy(Class<?> bottom, Class<? extends Annotation> annotation)
     {
         Set<AnnotationMetaData> annos = new HashSet<AnnotationMetaData>();
@@ -292,6 +301,7 @@ public class AnnotationUtils
         return annos;
     }
 
+    @Deprecated
     public static void getFieldAnnotationsForInterfaces(Class<?> clazz, Set<AnnotationMetaData> annos, Class<? extends Annotation> annotation)
     {
         for (int i = 0; i < clazz.getInterfaces().length; i++)
@@ -313,6 +323,7 @@ public class AnnotationUtils
     }
 
 
+    @Deprecated
     public static boolean hasAnnotation(Class<? super Annotation> annotation, Class<?> clazz) throws IOException
     {
         for (Annotation anno : clazz.getDeclaredAnnotations())

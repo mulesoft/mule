@@ -322,6 +322,10 @@ public interface MuleEvent extends Serializable
 
     void clearFlowVariables();
 
+    /**
+     * @deprecated use {@code getSession()} to manipulate session state
+     */
+    @Deprecated
     <T> T getSessionVariable(String key);
 
     /**
@@ -329,14 +333,18 @@ public interface MuleEvent extends Serializable
      *
      * @param key the name or key of the variable. This must be non-null.
      * @return the property data type or null if the flow variable does not exist
+     * @deprecated use {@code getSession()} to manipulate session state
      */
+    @Deprecated
     DataType<?> getSessionVariableDataType(String key);
 
     /**
      * Sets a session variable value with a default data type
      *
      * @param key the name or key of the variable. This must be non-null.
+     * @deprecated use {@code getSession()} to manipulate session state
      */
+    @Deprecated
     void setSessionVariable(String key, Object value);
 
     /**
@@ -345,13 +353,27 @@ public interface MuleEvent extends Serializable
      * @param key the name or key of the variable. This must be non-null.
      * @param value value for the variable
      * @param dataType value's dataType. Not null.
+     * @deprecated use {@code getSession()} to manipulate session state
      */
+    @Deprecated
     void setSessionVariable(String key, Serializable value, DataType dataType);
 
+    /**
+     * @deprecated use {@code getSession()} to manipulate session state
+     */
+    @Deprecated
     void removeSessionVariable(String key);
 
+    /**
+     * @deprecated use {@code getSession()} to manipulate session state
+     */
+    @Deprecated
     Set<String> getSessionVariableNames();
 
+    /**
+     * @deprecated use {@code getSession()} to manipulate session state
+     */
+    @Deprecated
     void clearSessionVariables();
 
     /**
