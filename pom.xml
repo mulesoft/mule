@@ -140,6 +140,7 @@
         <licensePath>LICENSE_HEADER.txt</licensePath>
         <coberturaVersion>2.5</coberturaVersion>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
+        <groovyVersion>2.4.4</groovyVersion>
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
@@ -864,7 +865,7 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>1.8.6</version>
+                <version>2.4.4</version>
                 <exclusions>
                     <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
                     <exclusion>
