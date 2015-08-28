@@ -52,6 +52,7 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
+import org.glassfish.grizzly.http.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     private AttributeEvaluator reasonPhraseEvaluator;
     private MuleContext muleContext;
 
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
@@ -113,7 +115,14 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             final Collection<String> paramValues = resolvedHeaders.getAll(name);
             for (String value : paramValues)
             {
-                httpResponseHeaderBuilder.addHeader(name, value);
+                if (HttpHeaders.Names.TRANSFER_ENCODING.equals(name) && !supportsTransferEncoding(event))
+                {
+                    logger.debug("CLient HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
+                }
+                else
+                {
+                    httpResponseHeaderBuilder.addHeader(name, value);
+                }
             }
         }
 
@@ -134,7 +143,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
             }
             httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType());
-            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, (ByteArrayHttpEntity) httpEntity);
+            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), (ByteArrayHttpEntity) httpEntity);
         }
         else
         {
@@ -160,7 +169,10 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             {
                 if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
                 {
-                    setupChunkedEncoding(httpResponseHeaderBuilder);
+                    if (supportsTransferEncoding(event))
+                    {
+                        setupChunkedEncoding(httpResponseHeaderBuilder);
+                    }
                     httpEntity = new InputStreamHttpEntity((InputStream) payload);
                 }
                 else
@@ -175,7 +187,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 try
                 {
                     ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
-                    resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, byteArrayHttpEntity);
+                    resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), byteArrayHttpEntity);
                     httpEntity = byteArrayHttpEntity;
                 }
                 catch (Exception e)
@@ -208,11 +220,24 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         return httpResponseBuilder.build();
     }
 
-    private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding, String existingContentLength, ByteArrayHttpEntity byteArrayHttpEntity)
+    private boolean supportsTransferEncoding(MuleEvent event)
+    {
+        String httpVersion = event.getMessage().<String> getInboundProperty(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY);
+        return !(Protocol.HTTP_0_9.getProtocolString().equals(httpVersion) || Protocol.HTTP_1_0.getProtocolString().equals(httpVersion));
+    }
+
+    private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder,
+                                 String existingTransferEncoding,
+                                 String existingContentLength,
+                                 boolean supportsTranferEncoding,
+                                 ByteArrayHttpEntity byteArrayHttpEntity)
     {
         if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null && CHUNKED.equals(existingTransferEncoding)))
         {
-            setupChunkedEncoding(httpResponseHeaderBuilder);
+            if (supportsTranferEncoding)
+            {
+                setupChunkedEncoding(httpResponseHeaderBuilder);
+            }
         }
         else
         {
