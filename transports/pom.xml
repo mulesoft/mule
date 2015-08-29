@@ -20,7 +20,6 @@
         <module>jdbc</module>
         <module>jetty</module>
         <module>jms</module>
-        <module>multicast</module>
         <module>servlet</module>
         <module>sftp</module>
         <module>ssl</module>
