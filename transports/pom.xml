@@ -24,7 +24,6 @@
         <module>sftp</module>
         <module>ssl</module>
         <module>tcp</module>
-        <module>udp</module>
         <module>vm</module>
     </modules>
 
