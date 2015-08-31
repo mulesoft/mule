@@ -23,6 +23,7 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
+import org.glassfish.grizzly.http.HttpServerFilter;
 import org.glassfish.grizzly.memory.MemoryManager;
 
 /**
@@ -30,7 +31,7 @@ import org.glassfish.grizzly.memory.MemoryManager;
  * when the response body is an input stream.
  */
 public class ResponseStreamingCompletionHandler
-        extends BaseResponseCompletionHandler
+extends BaseResponseCompletionHandler
 {
 
     private final MemoryManager memoryManager;
@@ -40,6 +41,7 @@ public class ResponseStreamingCompletionHandler
     private final ResponseStatusCallback responseStatusCallback;
 
     private volatile boolean isDone;
+    private volatile boolean isAlreadyFinished;
 
     public ResponseStreamingCompletionHandler(final FilterChainContext ctx,
                                               final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
@@ -95,18 +97,33 @@ public class ResponseStreamingCompletionHandler
             if (!isDone)
             {
                 sendInputStreamChunk();
+                if (isDone)
+                {
+                    doComplete();
+                    isAlreadyFinished = true;
+                }
             }
             else
             {
-                close();
-                responseStatusCallback.responseSendSuccessfully();
-                resume();
+                if (!isAlreadyFinished)
+                {
+                    // For some reason, this was not being called for HTTP 1.0 streaming responses.
+                    doComplete();
+                }
             }
         }
         catch (IOException e)
         {
             failed(e);
         }
+    }
+
+    private void doComplete()
+    {
+        close();
+        responseStatusCallback.responseSendSuccessfully();
+        ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
+        resume();
     }
 
     /**
