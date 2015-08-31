@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request.grizzly;
 
+import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.CompletionHandler;
@@ -48,6 +49,7 @@ import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -148,6 +150,15 @@ public class GrizzlyHttpClient implements HttpClient
                 if (proxyConfig instanceof NtlmProxyConfig)
                 {
                     proxyServer.setNtlmDomain(((NtlmProxyConfig) proxyConfig).getNtlmDomain());
+                    try
+                    {
+                        proxyServer.setNtlmHost(getHostName());
+                    }
+                    catch (UnknownHostException e)
+                    {
+                        //do nothing, let the default behaviour be used
+                    }
+                    proxyServer.setScheme(NTLM);
                 }
             }
             else
@@ -369,8 +380,8 @@ public class GrizzlyHttpClient implements HttpClient
                     realmBuilder.setNtlmDomain(domain);
                 }
                 String workstation = authentication.getWorkstation();
-                String ntlmHost = workstation != null ? workstation : InetAddress.getLocalHost().getHostName();
-                realmBuilder.setNtlmHost(ntlmHost).setScheme(Realm.AuthScheme.NTLM);
+                String ntlmHost = workstation != null ? workstation : getHostName();
+                realmBuilder.setNtlmHost(ntlmHost).setScheme(NTLM);
             }
 
             builder.setRealm(realmBuilder.build());
@@ -411,6 +422,11 @@ public class GrizzlyHttpClient implements HttpClient
         builder.setRequestTimeout(responseTimeout);
 
         return builder.build();
+    }
+
+    private String getHostName() throws UnknownHostException
+    {
+        return InetAddress.getLocalHost().getHostName();
     }
 
     @Override
