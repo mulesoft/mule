@@ -195,7 +195,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
     /**
      * if {@link org.mule.api.lifecycle.Startable}, then
-     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * {@link BaseOAuth2Manager#defaultUnauthorizedConnector}
      * is started
      */
     @Override
@@ -209,7 +209,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
     /**
      * if {@link org.mule.api.lifecycle.Stoppable}, then
-     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * {@link BaseOAuth2Manager#defaultUnauthorizedConnector}
      * is stopped
      */
     @Override
@@ -223,7 +223,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
     /**
      * if {@link org.mule.api.lifecycle.Disposable}, then
-     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * {@link BaseOAuth2Manager#defaultUnauthorizedConnector}
      * is disposed
      */
     @Override
@@ -283,9 +283,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug(
-                String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]",
-                    accessTokenId, accessTokenPool.getNumActive(accessTokenId),
-                    accessTokenPool.getNumIdle(accessTokenId)));
+                    String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]",
+                                  accessTokenId, accessTokenPool.getNumActive(accessTokenId),
+                                  accessTokenPool.getNumIdle(accessTokenId)));
         }
 
         OAuth2Adapter object = accessTokenPool.borrowObject(accessTokenId);
@@ -293,9 +293,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug(
-                String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]",
-                    accessTokenId, accessTokenPool.getNumActive(accessTokenId),
-                    accessTokenPool.getNumIdle(accessTokenId)));
+                    String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]",
+                                  accessTokenId, accessTokenPool.getNumActive(accessTokenId),
+                                  accessTokenPool.getNumIdle(accessTokenId)));
         }
         return object;
     }
@@ -565,10 +565,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             return;
         }
 
-        if (getLogger().isDebugEnabled())
-        {
-            getLogger().debug("Retrieving access token...");
-        }
+        getLogger().debug("Retrieving access token...");
 
         String accessTokenUrl = adapter.getAccessTokenUrl() != null
                                                                    ? adapter.getAccessTokenUrl()
@@ -589,11 +586,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             getLogger().debug(
                 String.format("Access token retrieved successfully [accessToken = %s]",
                     adapter.getAccessToken()));
-        }
-
-        if (getLogger().isDebugEnabled())
-        {
-            getLogger().debug(
+            getLogger().debug(                           
                 String.format("Attempting to extract expiration time using [expirationPattern = %s]",
                     adapter.getExpirationTimePattern().pattern()));
         }
@@ -691,6 +684,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
                         try
                         {
                             this.refreshTokenManager.refreshToken(adapter, accessTokenId);
+                            accessTokenPoolFactory.passivateObject(accessTokenId, adapter);
                             adapter.postAuth();
                             tokenRefreshed = true;
                         }
@@ -711,6 +705,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             }
         }
     }
+
 
     protected Set<Class<? extends Exception>> refreshAccessTokenOn()
     {
@@ -741,8 +736,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     @Override
     public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate()
     {
-        return (ProcessTemplate<T, OAuth2Adapter>) new ManagedAccessTokenProcessTemplate<T>(this,
-            this.muleContext);
+        return new ManagedAccessTokenProcessTemplate<>(this, this.muleContext);
     }
 
     /**
