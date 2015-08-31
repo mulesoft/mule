@@ -7,8 +7,10 @@
 package org.mule.module.http.functional.listener;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.module.http.api.HttpHeaders.Values.KEEP_ALIVE;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.StringUtils;
@@ -22,11 +24,12 @@ import java.net.Socket;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
-import org.junit.Test;
 
-public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCase
+public abstract class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCase
 {
 
     private static final int HTTP_OK = 200;
@@ -39,6 +42,16 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
 
     @Rule
     public DynamicPort persistentPort = new DynamicPort("persistentPort");
+    @Rule
+    public DynamicPort persistentPortCloseHeader = new DynamicPort("persistentPortCloseHeader");
+    @Rule
+    public DynamicPort persistentPortCloseProperty = new DynamicPort("persistentPortCloseProperty");
+    @Rule
+    public DynamicPort persistentStreamingPort = new DynamicPort("persistentStreamingPort");
+    @Rule
+    public DynamicPort persistentStreamingTransformerPort = new DynamicPort("persistentStreamingTransformerPort");
+
+    protected abstract HttpVersion getHttpVersion();
 
     @Override
     protected String getConfigFile()
@@ -46,73 +59,53 @@ public class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCas
         return "http-listener-persistent-connections-config.xml";
     }
 
-    @Test
-    public void nonPersistentCheckHeader() throws Exception
+    protected void assertConnectionClosesAfterSend(DynamicPort port, HttpVersion httpVersion) throws IOException
     {
-        assertThat(performRequest(nonPersistentPort.getNumber()), is(HEADER_CONNECTION_CLOSE_VALUE));
-    }
-
-    @Test
-    public void persistentCheckHeader() throws Exception
-    {
-        assertThat(performRequest(persistentPort.getNumber()), is(nullValue()));
-    }
-
-    @Test
-    public void nonPersistentConnectionClosing() throws Exception
-    {
-        Socket socket = new Socket("localhost", nonPersistentPort.getNumber());
-        sendRequest(socket);
+        Socket socket = new Socket("localhost", port.getNumber());
+        sendRequest(socket, httpVersion);
         assertResponse(getResponse(socket), true);
 
-        sendRequest(socket);
+        sendRequest(socket, httpVersion);
         assertResponse(getResponse(socket), false);
 
         socket.close();
     }
 
-    @Test
-    public void persistentConnectionClosing() throws Exception
+    protected String performRequest(int port, HttpVersion httpVersion, boolean keepAlive) throws IOException
     {
-        Socket socket = new Socket("localhost", persistentPort.getNumber());
-        sendRequest(socket);
-        assertResponse(getResponse(socket), true);
-
-        sendRequest(socket);
-        assertResponse(getResponse(socket), true);
-
-        Thread.sleep(3000);
-
-        sendRequest(socket);
-        assertResponse(getResponse(socket), false);
-
-        socket.close();
-    }
-
-    private String performRequest(int port) throws IOException
-    {
-        String url = String.format("http://localhost:%s/", port);
-        HttpResponse response = Request.Get(url).connectTimeout(GET_TIMEOUT).execute().returnResponse();
-        assertThat(response.getStatusLine().getStatusCode(), is(HTTP_OK));
-        Header connectionHeader = response.getFirstHeader(HEADER_CONNECTION_NAME);
+        HttpResponse response = doPerformRequest(port, httpVersion, keepAlive);
+        Header connectionHeader = response.getFirstHeader(CONNECTION);
         return connectionHeader != null ? connectionHeader.getValue() : null;
     }
 
-    private void assertResponse(String response, boolean shouldBeValid)
+    private HttpResponse doPerformRequest(int port, HttpVersion httpVersion, boolean keepAlive) throws IOException, ClientProtocolException
+    {
+        String url = String.format("http://localhost:%s/", port);
+        Request request = Request.Get(url).version(httpVersion).connectTimeout(GET_TIMEOUT);
+        if (keepAlive)
+        {
+            request = request.addHeader(CONNECTION, KEEP_ALIVE);
+        }
+        HttpResponse response = request.execute().returnResponse();
+        assertThat(response.getStatusLine().getStatusCode(), is(HTTP_OK));
+        return response;
+    }
+
+    protected void assertResponse(String response, boolean shouldBeValid)
     {
         assertThat(StringUtils.isEmpty(response), is(!shouldBeValid));
     }
 
-    private void sendRequest(Socket socket) throws IOException
+    protected void sendRequest(Socket socket, HttpVersion httpVersion) throws IOException
     {
         PrintWriter writer = new PrintWriter(socket.getOutputStream());
-        writer.println("GET / HTTP/1.1");
+        writer.println("GET / " + httpVersion);
         writer.println("Host: www.example.com");
         writer.println("");
         writer.flush();
     }
 
-    private String getResponse(Socket socket)
+    protected String getResponse(Socket socket)
     {
         try
         {
