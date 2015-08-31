@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="ntlmProxy" host="localhost" port="9999" basePath="basePath">
+        <http:ntlm-proxy host="localhost" port="${httpPort}" username="Zaphod" password="Beeblebrox" ntlmDomain="Ursa-Minor" />
+    </http:request-config>
+    <flow name="ntlmFlow">
+        <http:request config-ref="ntlmProxy" path="requestPath" />
+    </flow>
+
+</mule>
