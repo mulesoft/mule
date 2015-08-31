@@ -10,7 +10,6 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.runtime.BaseObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -18,8 +17,7 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.GroupValueSetter;
 import org.mule.module.extension.internal.util.SingleValueSetter;
 import org.mule.module.extension.internal.util.ValueSetter;
-
-import com.google.common.collect.ImmutableList;
+import org.mule.util.collection.ImmutableListCollector;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -54,21 +52,17 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
 
     private List<ValueSetter> createSingleValueSetters(ConfigurationModel configurationModel, ResolverSet resolverSet)
     {
-        ImmutableList.Builder<ValueSetter> singleValueSetters = ImmutableList.builder();
         Class<?> prototypeClass = configurationModel.getInstantiator().getObjectType();
-        for (ParameterModel parameterModel : resolverSet.getResolvers().keySet())
-        {
 
-            Field field = getField(prototypeClass, parameterModel);
+        return resolverSet.getResolvers().keySet().stream()
+                .map(parameterModel -> {
+                    Field field = getField(prototypeClass, parameterModel);
 
-            // if no field, then it means this is a group attribute
-            if (field != null)
-            {
-                singleValueSetters.add(new SingleValueSetter(parameterModel, field));
-            }
-        }
-
-        return singleValueSetters.build();
+                    // if no field, then it means this is a group attribute
+                    return field != null ? new SingleValueSetter(parameterModel, field) : null;
+                })
+                .filter(field -> field != null)
+                .collect(new ImmutableListCollector<>());
     }
 
     @Override

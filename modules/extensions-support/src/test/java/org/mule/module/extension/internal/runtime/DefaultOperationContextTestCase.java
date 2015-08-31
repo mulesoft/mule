@@ -11,9 +11,11 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
@@ -34,12 +36,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultOperationContextTestCase extends AbstractMuleTestCase
 {
-
+    private static final String CONFIG_NAME = "config";
     private static final String PARAM_NAME = "param1";
     private static final String VALUE = "Do you want to build a snowman?";
 
     @Mock
     private ExtensionModel extensionModel;
+
+    @Mock
+    private ConfigurationModel configurationModel;
 
     @Mock
     private OperationModel operationModel;
@@ -91,18 +96,19 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     public void getImplicitConfiguration()
     {
         final Object configurationInstance = new Object();
-        when(extensionManager.getConfiguration(extensionModel, operationContext)).thenReturn(configurationInstance);
+        DeclaredConfiguration<Object> declaredConfiguration = new DeclaredConfiguration<>(CONFIG_NAME, configurationModel, configurationInstance);
+        when(extensionManager.getConfiguration(extensionModel, operationContext)).thenReturn(declaredConfiguration);
         assertThat(operationContext.getConfiguration(), is(sameInstance(configurationInstance)));
     }
 
     @Test
     public void getSpecificConfiguration()
     {
-        final String configurationInstanceName = "myConfig";
-        operationContext = new DefaultOperationContext(extensionModel, operationModel, configurationInstanceName, resolverSetResult, event, extensionManager);
+        operationContext = new DefaultOperationContext(extensionModel, operationModel, CONFIG_NAME, resolverSetResult, event, extensionManager);
 
         final Object configurationInstance = new Object();
-        when(extensionManager.getConfiguration(extensionModel, configurationInstanceName, operationContext)).thenReturn(configurationInstance);
+        DeclaredConfiguration<Object> declaredConfiguration = new DeclaredConfiguration<>(CONFIG_NAME, configurationModel, configurationInstance);
+        when(extensionManager.getConfiguration(extensionModel, CONFIG_NAME, operationContext)).thenReturn(declaredConfiguration);
         assertThat(operationContext.getConfiguration(), is(sameInstance(configurationInstance)));
     }
 

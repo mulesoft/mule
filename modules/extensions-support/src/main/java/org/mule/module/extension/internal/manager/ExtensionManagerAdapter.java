@@ -9,9 +9,11 @@ package org.mule.module.extension.internal.manager;
 import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 
 /**
  * An adapter interface which expands the contract of {@link ExtensionManager} with functionality
@@ -25,7 +27,7 @@ public interface ExtensionManagerAdapter extends ExtensionManager, Configuration
 
     /**
      * Returns a configuration instance obtained through a {@link ConfigurationProvider}
-     * previously registered using the {@link #registerConfigurationProvider(ExtensionModel, String, ConfigurationProvider)}
+     * previously registered using the {@link #registerConfigurationProvider(ExtensionModel, ConfigurationProvider)}
      * under the given {@code configurationProviderName}.
      * <p/>
      * After the {@link ConfigurationProvider} has been located, an instance is returned by
@@ -36,10 +38,12 @@ public interface ExtensionManagerAdapter extends ExtensionManager, Configuration
      * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
      * @param operationContext          a {@link OperationContext}
      * @param <C>                       the type of the configuration instance to be returned
-     * @return a configuration instance
+     * @return a {@link DeclaredConfiguration}
      */
-    <C> C getConfiguration(ExtensionModel extensionModel, String configurationProviderName, OperationContext operationContext);
+    <C> DeclaredConfiguration<C> getConfiguration(ExtensionModel extensionModel, String configurationProviderName, OperationContext operationContext);
 
-    <C> C getConfiguration(ExtensionModel extensionModel, OperationContext operationContext);
+    <C> DeclaredConfiguration<C> getConfiguration(ExtensionModel extensionModel, OperationContext operationContext);
+
+    DescribingContext createDescribingContext();
 
 }

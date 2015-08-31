@@ -19,8 +19,10 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
@@ -54,13 +56,16 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
     private MuleContext muleContext;
     private ObjectNameHelper objectNameHelper;
-    private ExtensionDiscoverer extensionDiscoverer = new DefaultExtensionDiscoverer(new DefaultExtensionFactory(serviceRegistry), serviceRegistry);
+    private ExtensionDiscoverer extensionDiscoverer = new DefaultExtensionDiscoverer(new DefaultExtensionFactory(serviceRegistry), serviceRegistry, this);
     private ImplicitConfigurationFactory implicitConfigurationFactory;
     private ConfigurationExpirationMonitor configurationExpirationMonitor;
+    private DescribingContextFactory describingContextFactory;
+
 
     @Override
     public void initialise() throws InitialisationException
     {
+        describingContextFactory = new DescribingContextFactory(serviceRegistry, muleContext.getExecutionClassLoader());
         objectNameHelper = new ObjectNameHelper(muleContext);
         implicitConfigurationFactory = new DefaultImplicitConfigurationFactory(extensionRegistry, muleContext);
     }
@@ -127,27 +132,27 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
      * {@inheritDoc}
      */
     @Override
-    public <C> void registerConfigurationProvider(ExtensionModel extensionModel, String providerName, ConfigurationProvider<C> configurationProvider)
+    public <C> void registerConfigurationProvider(ExtensionModel extensionModel, ConfigurationProvider<C> configurationProvider)
     {
         ExtensionStateTracker extensionStateTracker = extensionRegistry.getExtensionState(extensionModel);
-        extensionStateTracker.registerConfigurationProvider(providerName, configurationProvider);
+        extensionStateTracker.registerConfigurationProvider(configurationProvider.getName(), configurationProvider);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public <C> C getConfiguration(ExtensionModel extensionModel, String configurationProviderName, OperationContext operationContext)
+    public <C> DeclaredConfiguration<C> getConfiguration(ExtensionModel extensionModel, String configurationProviderName, OperationContext operationContext)
     {
         ConfigurationProvider<C> configurationProvider = getConfigurationProvider(extensionModel, configurationProviderName);
-        return configurationProvider.get(operationContext);
+        return new DeclaredConfiguration<>(configurationProviderName, configurationProvider.getModel(), configurationProvider.get(operationContext));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public <C> C getConfiguration(ExtensionModel extensionModel, OperationContext operationContext)
+    public <C> DeclaredConfiguration<C> getConfiguration(ExtensionModel extensionModel, OperationContext operationContext)
     {
         List<ConfigurationProvider<?>> providers = extensionRegistry.getExtensionState(extensionModel).getConfigurationProviders();
 
@@ -156,7 +161,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         if (matches == 1)
         {
             ConfigurationProvider<?> provider = providers.get(0);
-            return (C) provider.get(operationContext);
+            return new DeclaredConfiguration<>(provider.getName(), provider.getModel(), (C) provider.get(operationContext));
         }
         else if (matches > 1)
         {
@@ -165,19 +170,36 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         }
         else
         {
-            attemptToCreateImplicitConfiguration(extensionModel, operationContext);
-            return getConfiguration(extensionModel, operationContext);
+            if (attemptToCreateImplicitConfiguration(extensionModel, operationContext))
+            {
+                return getConfiguration(extensionModel, operationContext);
+            }
+
+            throw new IllegalStateException(String.format("No config-ref was specified for operation '%s' of extension '%s' and no implicit configuration could be inferred. Please define one.",
+                                                          operationContext.getOperationModel().getName(), extensionModel.getName()));
         }
     }
 
-    private void attemptToCreateImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext)
+    private boolean attemptToCreateImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext)
     {
-        ConfigurationHolder configurationHolder = implicitConfigurationFactory.createImplicitConfiguration(extensionModel, operationContext, this);
-        if (configurationHolder != null)
+        synchronized (extensionModel)
         {
-            Object configuration = configurationHolder.getConfiguration();
-            registerConfigurationProvider(extensionModel, configurationHolder.getName(), new StaticConfigurationProvider<>(configuration));
-            registerConfiguration(extensionModel, configurationHolder.getName(), configuration);
+            //check that another thread didn't beat us to create the instance
+            if (!extensionRegistry.getExtensionState(extensionModel).getConfigurationProviders().isEmpty())
+            {
+                return true;
+            }
+            DeclaredConfiguration<?> declaredConfiguration = implicitConfigurationFactory.createImplicitConfiguration(extensionModel, operationContext);
+            if (declaredConfiguration != null)
+            {
+                Object configuration = declaredConfiguration.getValue();
+                registerConfigurationProvider(extensionModel, new StaticConfigurationProvider<>(declaredConfiguration.getName(), declaredConfiguration.getModel(), configuration));
+                registerConfiguration(extensionModel, declaredConfiguration.getName(), configuration);
+
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -214,6 +236,12 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         putInRegistryAndApplyLifecycle(registrationName, configuration);
 
         return registrationName;
+    }
+
+    @Override
+    public DescribingContext createDescribingContext()
+    {
+        return describingContextFactory.newDescribingContext();
     }
 
     private void putInRegistryAndApplyLifecycle(String key, Object object)

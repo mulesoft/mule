@@ -25,10 +25,12 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.runtime.OperationExecutor;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -52,6 +54,9 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
 
     @Mock
     private ExtensionModel extensionModel;
+
+    @Mock
+    private ConfigurationModel configurationModel;
 
     @Mock
     private OperationModel operationModel;
@@ -86,7 +91,9 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     {
         when(operationModel.getExecutor()).thenReturn(operationExecutor);
         when(resolverSet.resolve(event)).thenReturn(parameters);
-        when(extensionManager.getConfiguration(same(extensionModel), same(configurationName), any(OperationContext.class))).thenReturn(configuration);
+        when(extensionManager.getConfiguration(same(extensionModel), same(configurationName), any(OperationContext.class))).thenReturn(
+                new DeclaredConfiguration<>(CONFIG_NAME, configurationModel, configuration));
+
         messageProcessor = createOperationMessageProcessor();
     }
 
@@ -151,7 +158,8 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
         messageProcessor = createOperationMessageProcessor();
 
         Object defaultConfigInstance = new Object();
-        when(extensionManager.getConfiguration(same(extensionModel), any(OperationContext.class))).thenReturn(defaultConfigInstance);
+        DeclaredConfiguration<Object> implicitConfiguration = new DeclaredConfiguration<>(CONFIG_NAME, configurationModel, defaultConfigInstance);
+        when(extensionManager.getConfiguration(same(extensionModel), any(OperationContext.class))).thenReturn(implicitConfiguration);
 
         ArgumentCaptor<OperationContext> operationContextCaptor = ArgumentCaptor.forClass(OperationContext.class);
         messageProcessor.process(event);

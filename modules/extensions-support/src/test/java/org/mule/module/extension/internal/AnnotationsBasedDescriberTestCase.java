@@ -19,6 +19,7 @@ import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.HeisenbergExtension.NAMESPACE;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_LOCATION;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createDescribingContext;
 import org.mule.config.MuleManifest;
 import org.mule.extension.annotations.Configurations;
 import org.mule.extension.annotations.Operations;
@@ -83,7 +84,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Test
     public void describeTestModule() throws Exception
     {
-        Descriptor descriptor = getDescriber().describe();
+        Descriptor descriptor = getDescriber().describe(createDescribingContext());
 
         Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
         assertExtensionProperties(declaration);
@@ -105,7 +106,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     public void heisenbergPointerPlusExternalConfig() throws Exception
     {
         setDescriber(describerFor(HeisengergPointerPlusExternalConfig.class));
-        Declaration declaration = getDescriber().describe().getRootDeclaration().getDeclaration();
+        Declaration declaration = getDescriber().describe(createDescribingContext()).getRootDeclaration().getDeclaration();
 
         assertExtensionProperties(declaration);
         assertThat(declaration.getConfigurations().size(), equalTo(2));
@@ -120,7 +121,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Test(expected = IllegalArgumentException.class)
     public void heisenbergWithOperationsConfig() throws Exception
     {
-        describerFor(HeisenbergWithOperations.class).describe();
+        describerFor(HeisenbergWithOperations.class).describe(createDescribingContext());
     }
 
     private void assertTestModuleConfiguration(Declaration declaration) throws Exception

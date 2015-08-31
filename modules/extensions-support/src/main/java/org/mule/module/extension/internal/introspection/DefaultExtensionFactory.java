@@ -11,8 +11,8 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
 import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.introspection.declaration.DescribingContext;
@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link ExtensionFactory} which uses a
@@ -103,14 +104,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     private List<ConfigurationModel> toConfigurations(List<ConfigurationDeclaration> declarations)
     {
         checkArgument(!declarations.isEmpty(), "A extension must have at least one configuration");
-
-        List<ConfigurationModel> configurationModels = new ArrayList<>(declarations.size());
-        for (ConfigurationDeclaration declaration : declarations)
-        {
-            configurationModels.add(toConfiguration(declaration));
-        }
-
-        return configurationModels;
+        return declarations.stream().map(this::toConfiguration).collect(Collectors.toList());
     }
 
     private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration)
@@ -129,23 +123,17 @@ public final class DefaultExtensionFactory implements ExtensionFactory
             return ImmutableList.of();
         }
 
-        List<OperationModel> operationModels = new ArrayList<>(declarations.size());
-        for (OperationDeclaration declaration : declarations)
-        {
-            operationModels.add(toOperation(declaration));
-        }
-
-        return operationModels;
+        return declarations.stream().map(this::toOperation).collect(Collectors.toList());
     }
 
     private OperationModel toOperation(OperationDeclaration declaration)
     {
         List<ParameterModel> parameterModels = toOperationParameters(declaration.getParameters());
         return new ImmutableOperationModel(declaration.getName(),
-                                      declaration.getDescription(),
-                                      declaration.getExecutorFactory(),
+                                           declaration.getDescription(),
+                                           declaration.getExecutorFactory(),
                                            parameterModels,
-                                      declaration.getCapabilities());
+                                           declaration.getCapabilities());
     }
 
     private List<ParameterModel> toConfigParameters(List<ParameterDeclaration> declarations)
@@ -169,13 +157,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
             return ImmutableList.of();
         }
 
-        List<ParameterModel> parameterModels = new ArrayList<>(declarations.size());
-        for (ParameterDeclaration declaration : declarations)
-        {
-            parameterModels.add(toParameter(declaration));
-        }
-
-        return parameterModels;
+        return declarations.stream().map(this::toParameter).collect(Collectors.toList());
     }
 
     private ParameterModel toParameter(ParameterDeclaration parameter)

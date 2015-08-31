@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationContext;
@@ -19,10 +20,14 @@ import org.mule.extension.runtime.OperationContext;
 public final class StaticConfigurationProvider<T> implements ConfigurationProvider<T>
 {
 
+    private final String name;
+    private final ConfigurationModel model;
     private final T configuration;
 
-    public StaticConfigurationProvider(T configuration)
+    public StaticConfigurationProvider(String name, ConfigurationModel model, T configuration)
     {
+        this.name = name;
+        this.model = model;
         this.configuration = configuration;
     }
 
@@ -39,5 +44,23 @@ public final class StaticConfigurationProvider<T> implements ConfigurationProvid
     public T get(OperationContext operationContext)
     {
         return configuration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ConfigurationModel getModel()
+    {
+        return model;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName()
+    {
+        return name;
     }
 }

@@ -38,13 +38,14 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
     {
         ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(configurationModel, resolverSet);
         ConfigurationProvider<T> configurationProvider = new DynamicConfigurationProvider<>(name,
-                                                                                                                    extensionModel,
-                                                                                                                    extensionManager,
-                                                                                                                    configurationObjectBuilder,
-                                                                                                                    resolverSet,
-                                                                                                                    dynamicConfigPolicy.getExpirationPolicy());
+                                                                                            extensionModel,
+                                                                                            configurationModel,
+                                                                                            extensionManager,
+                                                                                            configurationObjectBuilder,
+                                                                                            resolverSet,
+                                                                                            dynamicConfigPolicy.getExpirationPolicy());
 
-        register(extensionModel, name, configurationProvider, extensionManager);
+        register(extensionModel, configurationProvider, extensionManager);
 
         return configurationProvider;
     }
@@ -66,15 +67,15 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
 
 
         T configuration = (T) configurationObjectBuilder.build(getInitialiserEvent(muleContext));
-        configurationProvider = new StaticConfigurationProvider<>(configuration);
-        register(extensionModel, name, configurationProvider, extensionManager);
+        configurationProvider = new StaticConfigurationProvider<>(name, configurationModel, configuration);
+        register(extensionModel, configurationProvider, extensionManager);
         extensionManager.registerConfiguration(extensionModel, name, configuration);
 
         return configurationProvider;
     }
 
-    private <T> void register(ExtensionModel extensionModel, String name, ConfigurationProvider<T> configurationProvider, ExtensionManager extensionManager)
+    private <T> void register(ExtensionModel extensionModel, ConfigurationProvider<T> configurationProvider, ExtensionManager extensionManager)
     {
-        extensionManager.registerConfigurationProvider(extensionModel, name, configurationProvider);
+        extensionManager.registerConfigurationProvider(extensionModel, configurationProvider);
     }
 }

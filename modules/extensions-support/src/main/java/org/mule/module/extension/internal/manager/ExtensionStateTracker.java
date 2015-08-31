@@ -11,14 +11,13 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.util.collection.ImmutableListCollector;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Holds state regarding the use that the platform is doing of a
@@ -31,7 +30,7 @@ final class ExtensionStateTracker
 
     /**
      * Correlates instances of {@link ConfigurationProvider} by the key in which they were defined
-     * through the {@link ExtensionManager#registerConfigurationProvider(ExtensionModel, String, ConfigurationProvider)}
+     * through the {@link ExtensionManager#registerConfigurationProvider(ExtensionModel, ConfigurationProvider)}
      * method.
      */
     private final Map<String, ExpirableConfigurationProviderContainer> configurationProviders = new ConcurrentHashMap<>();
@@ -70,11 +69,10 @@ final class ExtensionStateTracker
      */
     List<ConfigurationProvider<?>> getConfigurationProviders()
     {
-        return ImmutableList.copyOf(
-                configurationProviders.values()
-                        .stream()
-                        .map(wrapper -> wrapper.getConfigurationProvider())
-                        .collect(Collectors.toList()));
+        return configurationProviders.values()
+                .stream()
+                .map(wrapper -> wrapper.getConfigurationProvider())
+                .collect(new ImmutableListCollector<>());
     }
 
     /**

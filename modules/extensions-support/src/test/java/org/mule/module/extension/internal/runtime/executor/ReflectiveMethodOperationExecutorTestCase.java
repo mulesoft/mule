@@ -18,11 +18,13 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
@@ -61,6 +63,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     private ExtensionModel extensionModel;
 
     @Mock
+    private ConfigurationModel configurationModel;
+
+    @Mock
     private OperationModel operationModel;
 
     @Mock
@@ -77,7 +82,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     {
         initHeisenberg();
         operationContext = spy(new DefaultOperationContext(extensionModel, operationModel, CONFIG_NAME, parameters, muleEvent, extensionManager));
-        when(extensionManager.getConfiguration(extensionModel, CONFIG_NAME, operationContext)).thenReturn(config);
+        when(extensionManager.getConfiguration(extensionModel, CONFIG_NAME, operationContext)).thenReturn(new DeclaredConfiguration<>(CONFIG_NAME, configurationModel, config));
     }
 
     @Test

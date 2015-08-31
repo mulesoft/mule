@@ -6,7 +6,8 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.introspection.declaration.Describer;
+import org.mule.extension.introspection.declaration.DescribingContext;
+import org.mule.extension.introspection.declaration.spi.Describer;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 
@@ -31,9 +32,12 @@ public abstract class DescriberSupport implements Describer
         delegate = new AnnotationsBasedDescriber(extensionType);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public final Descriptor describe()
+    public Descriptor describe(DescribingContext context)
     {
-        return delegate.describe();
+        return delegate.describe(context);
     }
 }

@@ -46,9 +46,9 @@ public final class SchemaDocumenterPostProcessor implements DescriberPostProcess
     @Override
     public void postProcess(DescribingContext context)
     {
-        ProcessingEnvironment processingEnv = context.getCheckedParameter(PROCESSING_ENVIRONMENT, ProcessingEnvironment.class);
-        TypeElement extensionElement = context.getCheckedParameter(EXTENSION_ELEMENT, TypeElement.class);
-        RoundEnvironment roundEnvironment = context.getCheckedParameter(ROUND_ENVIRONMENT, RoundEnvironment.class);
+        ProcessingEnvironment processingEnv = context.getParameter(PROCESSING_ENVIRONMENT, ProcessingEnvironment.class);
+        TypeElement extensionElement = context.getParameter(EXTENSION_ELEMENT, TypeElement.class);
+        RoundEnvironment roundEnvironment = context.getParameter(ROUND_ENVIRONMENT, RoundEnvironment.class);
 
         if (processingEnv == null || extensionElement == null)
         {

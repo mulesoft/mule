@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.manager;
 
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 
 /**
  * Provides implicit configurations instances which are compliant with a {@link ConfigurationModel}.
@@ -26,8 +26,8 @@ interface ImplicitConfigurationFactory
      *
      * @param extensionModel       an {@link ExtensionModel}
      * @param operationContext     an {@link OperationContext}
-     * @param registrationCallback a {@link ConfigurationRegistrationCallback}
-     * @return a {@link ConfigurationHolder} or {@code null} if it's not possible to create an implicit configuration
+     * @param <C>                  the type of the configuration instance to be returned
+     * @return a {@link DeclaredConfiguration} or {@code null} if it's not possible to create an implicit configuration
      */
-    ConfigurationHolder createImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext, ConfigurationRegistrationCallback registrationCallback);
+    <C> DeclaredConfiguration<C> createImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext);
 }
