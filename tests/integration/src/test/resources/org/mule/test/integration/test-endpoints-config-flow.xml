@@ -75,7 +75,7 @@
 
 
 
-            <outbound-endpoint address="udp://localhost:56731"
+            <outbound-endpoint address="tcp://localhost:56731"
                 exchange-pattern="one-way" />
             <outbound-endpoint address="test://test.queue2"
                 exchange-pattern="one-way" connector-ref="testConnector1" />
@@ -97,7 +97,7 @@
         <component class="org.mule.tck.testmodels.services.TestComponent" />
 
 
-        <outbound-endpoint address="udp://localhost:56731"
+        <outbound-endpoint address="tcp://localhost:56731"
             exchange-pattern="one-way" />
 
 
