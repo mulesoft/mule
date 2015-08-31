@@ -63,8 +63,8 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
         assertTrue(endpoint instanceof OutboundEndpoint);
 
         endpoint = (ImmutableEndpoint) allRouter.getRoutes().get(1);
-        assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
+        assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
+        assertEquals("tcp://localhost:56731", endpoint.getEndpointURI().getAddress());
         assertTrue(endpoint instanceof OutboundEndpoint);
 
         endpoint = (ImmutableEndpoint) allRouter.getRoutes().get(2);
@@ -103,8 +103,8 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
         assertNotNull(messageProcessors);
 
         ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);
-        assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
+        assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
+        assertEquals("tcp://localhost:56731", endpoint.getEndpointURI().getAddress());
         assertTrue(endpoint instanceof OutboundEndpoint);
     }
 
