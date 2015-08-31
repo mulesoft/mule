@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="basicConfig" host="localhost" port="${httpPort}">
+        <http:basic-authentication username="mule" password="man" preemptive="false" />
+    </http:request-config>
+
+    <flow name="executeRequest">
+        <http:request config-ref="basicConfig" path="/basic" method="GET">
+            <http:success-status-code-validator values="0..599" />
+        </http:request>
+    </flow>
+
+</mule>
