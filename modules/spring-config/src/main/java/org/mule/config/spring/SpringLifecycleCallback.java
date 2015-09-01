@@ -83,7 +83,7 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
         final DependencyNode node = new DependencyNode(object);
         parent.addChild(node);
 
-        for (Map.Entry<String, Object> dependency : getSpringRegistry().getDepencies(key).entrySet())
+        for (Map.Entry<String, Object> dependency : getSpringRegistry().getDependencies(key).entrySet())
         {
             addDependency(node, dependency.getKey(), dependency.getValue());
         }
