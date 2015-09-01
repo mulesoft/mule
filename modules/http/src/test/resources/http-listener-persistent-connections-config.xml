@@ -34,4 +34,17 @@
         <echo-component/>
     </flow>
 
+    <!-- MULE-8502 -->
+    <http:listener-config name="persistentConfigStreaming" host="localhost" port="${persistentStreamingPort}" usePersistentConnections="true" connectionIdleTimeout="1000" />
+    <flow name="persistentStreaming">
+        <http:listener path="/" config-ref="persistentConfigStreaming" responseStreamingMode="ALWAYS" />
+        <echo-component />
+    </flow>
+
+    <http:listener-config name="persistentConfigStreamingTransformer" host="localhost" port="${persistentStreamingTransformerPort}" usePersistentConnections="true" connectionIdleTimeout="1000" />
+    <flow name="persistentStreamingTransformer">
+        <http:listener path="/" config-ref="persistentConfigStreamingTransformer" responseStreamingMode="ALWAYS" />
+        <set-payload value="from_payload_transformer" />
+    </flow>
+
 </mule>

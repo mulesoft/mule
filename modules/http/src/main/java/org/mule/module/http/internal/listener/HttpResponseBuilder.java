@@ -7,6 +7,8 @@
 package org.mule.module.http.internal.listener;
 
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
@@ -21,7 +23,6 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpMessageBuilder;
@@ -31,6 +32,7 @@ import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
+import org.mule.module.http.internal.domain.HttpProtocol;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
@@ -69,6 +71,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     private AttributeEvaluator reasonPhraseEvaluator;
     private MuleContext muleContext;
 
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
@@ -113,7 +116,14 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             final Collection<String> paramValues = resolvedHeaders.getAll(name);
             for (String value : paramValues)
             {
-                httpResponseHeaderBuilder.addHeader(name, value);
+                if (TRANSFER_ENCODING.equals(name) && !supportsTransferEncoding(event))
+                {
+                    logger.debug("Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
+                }
+                else
+                {
+                    httpResponseHeaderBuilder.addHeader(name, value);
+                }
             }
         }
 
@@ -134,7 +144,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
             }
             httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType());
-            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, (ByteArrayHttpEntity) httpEntity);
+            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), (ByteArrayHttpEntity) httpEntity);
         }
         else
         {
@@ -160,7 +170,10 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             {
                 if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
                 {
-                    setupChunkedEncoding(httpResponseHeaderBuilder);
+                    if (supportsTransferEncoding(event))
+                    {
+                        setupChunkedEncoding(httpResponseHeaderBuilder);
+                    }
                     httpEntity = new InputStreamHttpEntity((InputStream) payload);
                 }
                 else
@@ -175,7 +188,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 try
                 {
                     ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
-                    resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, byteArrayHttpEntity);
+                    resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), byteArrayHttpEntity);
                     httpEntity = byteArrayHttpEntity;
                 }
                 catch (Exception e)
@@ -208,11 +221,24 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         return httpResponseBuilder.build();
     }
 
-    private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding, String existingContentLength, ByteArrayHttpEntity byteArrayHttpEntity)
+    private boolean supportsTransferEncoding(MuleEvent event)
+    {
+        String httpVersion = event.getMessage().<String> getInboundProperty(HTTP_VERSION_PROPERTY);
+        return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
+    }
+
+    private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder,
+                                 String existingTransferEncoding,
+                                 String existingContentLength,
+                                 boolean supportsTranferEncoding,
+                                 ByteArrayHttpEntity byteArrayHttpEntity)
     {
         if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null && CHUNKED.equals(existingTransferEncoding)))
         {
-            setupChunkedEncoding(httpResponseHeaderBuilder);
+            if (supportsTranferEncoding)
+            {
+                setupChunkedEncoding(httpResponseHeaderBuilder);
+            }
         }
         else
         {
@@ -252,7 +278,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             return statusCodeEvaluator.resolveIntegerValue(event);
         }
 
-        Object statusCodeOutboundProperty = event.getMessage().getOutboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
+        Object statusCodeOutboundProperty = event.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY);
         if (statusCodeOutboundProperty != null)
         {
             return NumberUtils.toInt(statusCodeOutboundProperty);

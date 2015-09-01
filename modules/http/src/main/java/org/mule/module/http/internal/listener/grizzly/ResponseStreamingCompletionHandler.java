@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
 import org.mule.api.DefaultMuleException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -95,18 +96,31 @@ public class ResponseStreamingCompletionHandler
             if (!isDone)
             {
                 sendInputStreamChunk();
+                // In HTTP 1.0 (no chunk supported) there is no more data sent to the client after the input stream is completed.
+                // As there is no more data to be sent (in HTTP 1.1 a last chunk with '0' is sent) the #completed method is not called
+                // So, we have to call it manually here
+                if (isDone && !httpResponsePacket.isChunked())
+                {
+                    doComplete();
+                }
             }
             else
             {
-                close();
-                responseStatusCallback.responseSendSuccessfully();
-                resume();
+                doComplete();
             }
         }
         catch (IOException e)
         {
             failed(e);
         }
+    }
+
+    private void doComplete()
+    {
+        close();
+        responseStatusCallback.responseSendSuccessfully();
+        ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
+        resume();
     }
 
     /**
