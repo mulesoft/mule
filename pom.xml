@@ -2231,6 +2231,12 @@
         </profile>
         <profile>
             <id>release</id>
+            <activation>
+                <property>
+                    <name>buildDistributions</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>false</skipDistributions>
