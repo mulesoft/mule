@@ -18,7 +18,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.common.MuleVersion;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationContext;
@@ -108,19 +107,19 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
      * {@inheritDoc}
      */
     @Override
-    public boolean registerExtension(ExtensionModel extensionModel)
+    public void registerExtension(ExtensionModel extensionModel)
     {
         LOGGER.info("Registering extension {} (version {})", extensionModel.getName(), extensionModel.getVersion());
         final String extensionName = extensionModel.getName();
 
         if (extensionRegistry.containsExtension(extensionName))
         {
-            return maybeUpdateExtension(extensionModel, extensionName);
+            throw new IllegalArgumentException(String.format("A extension of name '%s' (version %s) is already registered",
+                                                             extensionModel.getName(), extensionModel.getVersion()));
         }
         else
         {
-            doRegisterExtension(extensionModel, extensionName);
-            return true;
+            extensionRegistry.registerExtension(extensionName, extensionModel);
         }
     }
 
@@ -239,58 +238,6 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         }
 
         return configurationProvider;
-    }
-
-    private boolean maybeUpdateExtension(ExtensionModel extensionModel, String extensionName)
-    {
-        ExtensionModel actual = extensionRegistry.getExtension(extensionName);
-        MuleVersion newVersion;
-        try
-        {
-            newVersion = new MuleVersion(extensionModel.getVersion());
-        }
-        catch (IllegalArgumentException e)
-        {
-            LOGGER.warn(
-                    String.format("Found extensions %s with invalid version %s. Skipping registration",
-                                  extensionModel.getName(), extensionModel.getVersion()), e);
-
-            return false;
-        }
-
-        if (newVersion.newerThan(actual.getVersion()))
-        {
-            logExtensionHotUpdate(extensionModel, actual);
-            doRegisterExtension(extensionModel, extensionName);
-
-            return true;
-        }
-        else
-        {
-            LOGGER.info("Found extension {} but version {} was already registered. Keeping existing definition",
-                        extensionModel.getName(),
-                        extensionModel.getVersion());
-
-            return false;
-        }
-    }
-
-    private void doRegisterExtension(ExtensionModel extensionModel, String extensionName)
-    {
-        extensionRegistry.registerExtension(extensionName, extensionModel);
-    }
-
-    private void logExtensionHotUpdate(ExtensionModel extensionModel, ExtensionModel actual)
-    {
-        if (LOGGER.isInfoEnabled())
-        {
-            LOGGER.info(String.format(
-                    "Found extension %s which was already registered with version %s. New version %s " +
-                    "was found. Hot updating extension definition",
-                    extensionModel.getName(),
-                    actual.getVersion(),
-                    extensionModel.getVersion()));
-        }
     }
 
     private ConfigurationExpirationMonitor newConfigurationExpirationMonitor()
