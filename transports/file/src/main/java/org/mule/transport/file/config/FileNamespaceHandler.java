@@ -9,7 +9,7 @@ package org.mule.transport.file.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FileConnector;
@@ -34,8 +34,8 @@ public class FileNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-filename-parser", new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
         registerBeanDefinitionParser("expression-filename-parser", new ChildDefinitionParser("filenameParser", ExpressionFilenameParser.class));
 
-        registerBeanDefinitionParser("file-to-byte-array-transformer", new MessageProcessorDefinitionParser(FileToByteArray.class));
-        registerBeanDefinitionParser("file-to-string-transformer", new MessageProcessorDefinitionParser(FileToString.class));
+        registerBeanDefinitionParser("file-to-byte-array-transformer", new TransformerMessageProcessorDefinitionParser(FileToByteArray.class));
+        registerBeanDefinitionParser("file-to-string-transformer", new TransformerMessageProcessorDefinitionParser(FileToString.class));
         
         registerBeanDefinitionParser("filename-wildcard-filter", new FilterDefinitionParser(FilenameWildcardFilter.class));
         registerBeanDefinitionParser("filename-regex-filter", new FilterDefinitionParser(FilenameRegexFilter.class));

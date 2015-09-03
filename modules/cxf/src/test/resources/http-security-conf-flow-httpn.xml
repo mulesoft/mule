@@ -49,7 +49,7 @@
     
     <flow name="secure">
         <http:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST" />
-        <spring-sec:http-security-filter realm="mule-realm"/>
+        <http:basic-security-filter realm="mule-realm"/>
         <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
 
         <echo-component/>

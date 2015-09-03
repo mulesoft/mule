@@ -17,10 +17,11 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
+import org.mule.api.transformer.TransformerException;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,11 +115,11 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
      * Extend AbstractMessageAwareTransformer, even though it's deprecated, to ensure
      * that it keeps working for compatibility with older user-written transformers.
      */
-    @SuppressWarnings("deprecation")
-    public static class DummyTransformer extends AbstractMessageAwareTransformer
+    public static class DummyTransformer extends AbstractMessageTransformer
     {
+
         @Override
-        public Object transform(MuleMessage msg, String outputEncoding)
+        public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
         {
             assertEquals("param1", msg.getOutboundProperty("stringParam"));
             final Object o = msg.getOutboundProperty("objectParam");

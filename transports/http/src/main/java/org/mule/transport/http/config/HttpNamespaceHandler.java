@@ -20,6 +20,7 @@ import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.CacheControlHeader;
 import org.mule.transport.http.CookieWrapper;
@@ -66,11 +67,11 @@ public class HttpNamespaceHandler extends org.mule.module.http.internal.config.H
         registerDeprecatedBeanDefinitionParser("requiredParameter", new ChildMapEntryDefinitionParser("requiredParams"));
         registerDeprecatedBeanDefinitionParser("optionalParameter", new ChildMapEntryDefinitionParser("optionalParams"));
 
-        registerDeprecatedBeanDefinitionParser("http-response-to-object-transformer", new MessageProcessorDefinitionParser(HttpClientMethodResponseToObject.class));
-        registerDeprecatedBeanDefinitionParser("http-response-to-string-transformer", new MessageProcessorDefinitionParser(HttpResponseToString.class));
-        registerDeprecatedBeanDefinitionParser("object-to-http-request-transformer", new MessageProcessorDefinitionParser(ObjectToHttpClientMethodRequest.class));
-        registerDeprecatedBeanDefinitionParser("message-to-http-response-transformer", new MessageProcessorDefinitionParser(MuleMessageToHttpResponse.class));
-        registerDeprecatedBeanDefinitionParser("body-to-parameter-map-transformer", new MessageProcessorDefinitionParser(HttpRequestBodyToParamMap.class));
+        registerDeprecatedBeanDefinitionParser("http-response-to-object-transformer", new TransformerMessageProcessorDefinitionParser(HttpClientMethodResponseToObject.class));
+        registerDeprecatedBeanDefinitionParser("http-response-to-string-transformer", new TransformerMessageProcessorDefinitionParser(HttpResponseToString.class));
+        registerDeprecatedBeanDefinitionParser("object-to-http-request-transformer", new TransformerMessageProcessorDefinitionParser(ObjectToHttpClientMethodRequest.class));
+        registerDeprecatedBeanDefinitionParser("message-to-http-response-transformer", new TransformerMessageProcessorDefinitionParser(MuleMessageToHttpResponse.class));
+        registerDeprecatedBeanDefinitionParser("body-to-parameter-map-transformer", new TransformerMessageProcessorDefinitionParser(HttpRequestBodyToParamMap.class));
 
         registerDeprecatedBeanDefinitionParser("error-filter", new ParentDefinitionParser());
         registerDeprecatedBeanDefinitionParser("request-wildcard-filter", new FilterDefinitionParser(HttpRequestWildcardFilter.class));
