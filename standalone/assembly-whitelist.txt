@@ -125,7 +125,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-bpm-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-builders-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-client-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
