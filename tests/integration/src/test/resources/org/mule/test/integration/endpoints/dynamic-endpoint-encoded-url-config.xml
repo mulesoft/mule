@@ -16,7 +16,7 @@
 
     <flow name="assembledDynamicAddress">
         <vm:inbound-endpoint path="testAssembledDynamic" exchange-pattern="request-response"/>
-        <http:outbound-endpoint user="admin" password="admin%40123" path="#[message.inboundProperties['path']]?foo=bar" host="localhost"
+        <http:outbound-endpoint user="admin" password="admin@123" path="#[message.inboundProperties['path']]?foo=bar" host="localhost"
                                 port="${serverPort}" exchange-pattern="request-response"/>
     </flow>
 
@@ -28,7 +28,7 @@
 
     <flow name="assembledStaticAddress">
         <vm:inbound-endpoint path="testAssembledStatic" exchange-pattern="request-response"/>
-        <http:outbound-endpoint user="admin" password="admin%40123" path="test?foo=bar" host="localhost" port="${serverPort}"
+        <http:outbound-endpoint user="admin" password="admin@123" path="test?foo=bar" host="localhost" port="${serverPort}"
                                 exchange-pattern="request-response"/>
     </flow>
 </mule>

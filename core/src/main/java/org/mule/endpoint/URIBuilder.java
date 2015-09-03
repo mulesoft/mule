@@ -6,6 +6,10 @@
  */
 package org.mule.endpoint;
 
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.collections.TransformerUtils.nopTransformer;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
@@ -13,8 +17,8 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.util.ClassUtils;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +26,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.commons.collections.Transformer;
 
 /**
  * This has the following logic:
@@ -68,6 +74,22 @@ public class URIBuilder extends AbstractAnnotatedObject
     public static final String[] USERHOST_ATTRIBUTES = new String[]{USER, HOST};
     // this doesn't include address, since that is handled separately (and is exclusive with these)
     public static final String[] ALL_TRANSPORT_ATTRIBUTES = new String[]{USER, PASSWORD, HOST, PORT, PATH};
+
+    protected static final Transformer URL_ENCODER = new Transformer()
+    {
+        @Override
+        public Object transform(Object input)
+        {
+            try
+            {
+                return encode((String) input, UTF_8.name());
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                throw new AssertionError("UTF-8 is unknown");
+            }
+        }
+    };
 
     private String address;
     private String meta;
@@ -232,14 +254,19 @@ public class URIBuilder extends AbstractAnnotatedObject
      */
     protected String getConstructor()
     {
-        return URLDecoder.decode(getEncodedConstructor());
+        return getTransformedConstructor(nopTransformer(), nopTransformer());
     }
 
     protected String getEncodedConstructor()
     {
+        return getTransformedConstructor(nopTransformer(), URL_ENCODER);
+    }
+
+    protected String getTransformedConstructor(Transformer tokenProcessor, Transformer tokenEncoder)
+    {
         StringBuilder buffer = new StringBuilder();
         appendMeta(buffer);
-        OrderedQueryParameters uriQueries = appendAddress(buffer);
+        OrderedQueryParameters uriQueries = appendAddress(buffer, tokenProcessor, tokenEncoder);
         uriQueries.override(queryMap);
         buffer.append(uriQueries.toString());
         removeRootTrailingSlash(buffer);
@@ -255,25 +282,25 @@ public class URIBuilder extends AbstractAnnotatedObject
         }
     }
 
-    private OrderedQueryParameters appendAddress(StringBuilder buffer)
+    private OrderedQueryParameters appendAddress(StringBuilder buffer, Transformer tokenProcessor, Transformer tokenEncoder)
     {
         if (null != address)
         {
             int index = address.indexOf(QUERY);
             if (index > -1)
             {
-                buffer.append(address.substring(0, index));
-                return parseQueries(address.substring(index + 1));
+                buffer.append(tokenProcessor.transform(address.substring(0, index)));
+                return parseQueries((String) tokenProcessor.transform(address.substring(index + 1)));
             }
             else
             {
-                buffer.append(address);
+                buffer.append(tokenProcessor.transform(address));
                 return new OrderedQueryParameters();
             }
         }
         else
         {
-            constructAddress(buffer);
+            constructAddress(buffer, tokenProcessor, tokenEncoder);
             return new OrderedQueryParameters();
         }
     }
@@ -296,29 +323,29 @@ public class URIBuilder extends AbstractAnnotatedObject
         return map;
     }
 
-    private void constructAddress(StringBuilder buffer)
+    private void constructAddress(StringBuilder buffer, Transformer tokenProcessor, Transformer tokenEncoder)
     {
         buffer.append(protocol);
         buffer.append(DOTS_SLASHES);
         boolean atStart = true;
         if (null != user)
         {
-            buffer.append(user);
+            buffer.append(tokenEncoder.transform(tokenProcessor.transform(user)));
             if (null != password)
             {
                 buffer.append(":");
-                buffer.append(password);
+                buffer.append(tokenEncoder.transform(tokenProcessor.transform(password)));
             }
             buffer.append("@");
             atStart = false;
         }
         if (null != host)
         {
-            buffer.append(host);
+            buffer.append(tokenProcessor.transform(host));
             if (null != port)
             {
                 buffer.append(":");
-                buffer.append(port);
+                buffer.append(tokenProcessor.transform(port));
             }
             atStart = false;
         }
@@ -328,7 +355,7 @@ public class URIBuilder extends AbstractAnnotatedObject
             {
                 buffer.append("/");
             }
-            buffer.append(path);
+            buffer.append(tokenProcessor.transform(path));
         }
     }
 
@@ -400,7 +427,7 @@ public class URIBuilder extends AbstractAnnotatedObject
         if (null != protocol && null != address && !address.startsWith(protocol + DOTS_SLASHES))
         {
             throw new IllegalArgumentException("Address '" + address + "' for protocol '" + protocol +
-                    "' should start with " + protocol + DOTS_SLASHES);
+                                               "' should start with " + protocol + DOTS_SLASHES);
         }
     }
 
@@ -478,7 +505,7 @@ public class URIBuilder extends AbstractAnnotatedObject
                         names.add(name);
                         values.add(value);
                     }
-                 }
+                }
             }
         }
 
