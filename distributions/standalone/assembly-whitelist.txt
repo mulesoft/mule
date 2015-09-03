@@ -131,7 +131,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-devkit-support-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-drools-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}-tests.jar
@@ -230,9 +229,6 @@
 /mule-standalone-${productVersion}/lib/opt/cxf-tools-common-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-wstx-msv-validation-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/dom4j-1.6.1.jar
-/mule-standalone-${productVersion}/lib/opt/drools-api-5.0.1.jar
-/mule-standalone-${productVersion}/lib/opt/drools-compiler-5.0.1.jar
-/mule-standalone-${productVersion}/lib/opt/drools-core-5.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/ecj-4.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/el-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1.jar
@@ -325,7 +321,6 @@
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.9.jar
 /mule-standalone-${productVersion}/lib/opt/msg-simple-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/msv-core-2011.1.jar
-/mule-standalone-${productVersion}/lib/opt/mvel2-2.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-impl-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-jmx-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
