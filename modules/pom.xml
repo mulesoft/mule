@@ -28,7 +28,6 @@
         <module>http</module>
         <module>jaas</module>
         <module>jboss-transactions</module>
-        <module>jbpm</module>
         <module>json</module>
         <module>management</module>
         <module>oauth</module>
