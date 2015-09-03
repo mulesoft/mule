@@ -74,7 +74,7 @@ public class ConfigurationProviderTestCase extends AbstractConfigurationInstance
         when(resolverSet.getResolvers()).thenReturn(parameters);
         when(resolverSet.isDynamic()).thenReturn(false);
 
-        instanceProvider = new DefaultConfigurationProviderFactory()
+        provider = new DefaultConfigurationProviderFactory()
                 .createStaticConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet, muleContext, extensionManager);
     }
 

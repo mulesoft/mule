@@ -9,6 +9,7 @@ package org.mule.module.extension.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
 import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ExtensionModel;
@@ -46,7 +47,8 @@ public class HeisenbergDefaultConfigTestCase extends ExtensionsFunctionalTestCas
         assertThat(extensionModel.getName(), is(EXTENSION_NAME));
 
         ConfigurationProvider<Object> configurationProvider = mock(ConfigurationProvider.class);
-        extensionManager.registerConfigurationProvider(extensionModel, "secondConfig", configurationProvider);
+        when(configurationProvider.getName()).thenReturn("secondConfig");
+        extensionManager.registerConfigurationProvider(extensionModel, configurationProvider);
 
         expectedException.expectCause(IsInstanceOf.<IllegalStateException>instanceOf(IllegalStateException.class));
         runFlow("sayMyName");

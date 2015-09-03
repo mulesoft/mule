@@ -6,6 +6,8 @@
  */
 package org.mule.tck.util;
 
+import static org.mule.util.Preconditions.checkArgument;
+
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -49,15 +51,15 @@ public class TestTimeSupplier implements Supplier<Long>
      * Moves the current {@link #timeInMillis} by the given {@code time} which is expressed
      * in the given {@code unit}.
      * <p/>
-     * Note that {@code time} can be a negative number in which case
-     * you would be "going back in time"
      *
      * @param timeOffset the offset to be applied on {@link #timeInMillis}
      * @param unit       a {@link TimeUnit} which qualifies the {@code timeOffset}
      * @return the updated {@link #timeInMillis}
+     * @throws IllegalArgumentException if {@code timeOffset} is negative
      */
     public long move(long timeOffset, TimeUnit unit)
     {
+        checkArgument(timeOffset >= 0, "I told you not to go into the past McFly...");
         return this.timeInMillis += unit.toMillis(timeOffset);
     }
 }

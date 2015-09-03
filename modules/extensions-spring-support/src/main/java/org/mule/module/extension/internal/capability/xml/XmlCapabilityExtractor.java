@@ -11,7 +11,8 @@ import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.module.extension.CapabilityExtractor;
+import org.mule.module.extension.internal.spi.BaseCapabilityExtractor;
+import org.mule.module.extension.spi.CapabilityExtractor;
 
 /**
  * Implementation of {@link CapabilityExtractor}
@@ -20,15 +21,15 @@ import org.mule.module.extension.CapabilityExtractor;
  *
  * @since 3.7.0
  */
-public class XmlCapabilityExtractor implements CapabilityExtractor
+public final class XmlCapabilityExtractor extends BaseCapabilityExtractor
 {
 
     public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/extension/%s";
 
     @Override
-    public Object extractCapability(DeclarationDescriptor declarationDescriptor, Class<?> capableType)
+    public Object extractExtensionCapability(DeclarationDescriptor declarationDescriptor, Class<?> extensionType)
     {
-        Xml xml = capableType.getAnnotation(Xml.class);
+        Xml xml = extensionType.getAnnotation(Xml.class);
         return xml != null ? processCapability(xml, declarationDescriptor) : null;
     }
 
@@ -45,5 +46,4 @@ public class XmlCapabilityExtractor implements CapabilityExtractor
     {
         return String.format(DEFAULT_SCHEMA_LOCATION_MASK, declaration.getName());
     }
-
 }

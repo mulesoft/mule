@@ -10,14 +10,16 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createDescribingContext;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.declaration.Describer;
-import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.introspection.ExtensionModel;
+import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.introspection.declaration.spi.Describer;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -37,7 +39,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
 {
 
     @Mock
-    private ExtensionManager extensionManager;
+    private ExtensionManagerAdapter extensionManager;
 
     @Mock
     private ExtensionFactory extensionFactory;
@@ -59,14 +61,15 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     @Before
     public void setUp()
     {
-        discoverer = new DefaultExtensionDiscoverer(extensionFactory, serviceRegistry);
+        when(extensionManager.createDescribingContext()).thenAnswer(invocation -> createDescribingContext());
+        discoverer = new DefaultExtensionDiscoverer(extensionFactory, serviceRegistry, extensionManager);
     }
 
     @Test
     public void scan() throws Exception
     {
         when(serviceRegistry.lookupProviders(Describer.class, getClass().getClassLoader())).thenReturn(Arrays.asList(describer));
-        when(describer.describe()).thenReturn(descriptor);
+        when(describer.describe(any(DescribingContext.class))).thenReturn(descriptor);
         when(extensionFactory.createFrom(descriptor)).thenReturn(extensionModel);
 
         List<ExtensionModel> extensionModels = discoverer.discover(getClass().getClassLoader());
@@ -75,7 +78,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
         assertThat(extensionModels.get(0), is(sameInstance(extensionModel)));
 
         verify(serviceRegistry).lookupProviders(Describer.class, getClass().getClassLoader());
-        verify(describer).describe();
+        verify(describer).describe(any(DescribingContext.class));
         verify(extensionFactory).createFrom(descriptor);
     }
 
@@ -85,3 +88,4 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
         discoverer.discover(null);
     }
 }
+

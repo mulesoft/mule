@@ -7,11 +7,13 @@
 package org.mule.module.extension.internal.runtime;
 
 import org.mule.api.MuleEvent;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.event.OperationFailedSignal;
 import org.mule.extension.runtime.event.OperationSuccessfulSignal;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.util.StringUtils;
@@ -42,6 +44,7 @@ public class DefaultOperationContext implements OperationContextAdapter
     private final EventBus eventBus = new EventBus();
 
     private Object configuration;
+    private ConfigurationModel configurationModel;
 
     /**
      * Creates a new instance with the given state
@@ -73,17 +76,37 @@ public class DefaultOperationContext implements OperationContextAdapter
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <C> C getConfiguration()
     {
-        if (configuration == null)
-        {
-            configuration = StringUtils.isBlank(configurationProviderName)
-                                    ? extensionManager.getConfiguration(extensionModel, this)
-                                    : extensionManager.getConfiguration(extensionModel, configurationProviderName, this);
-        }
-
+        resolveConfig();
         return (C) configuration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ConfigurationModel getConfigurationModel()
+    {
+        resolveConfig();
+        return configurationModel;
+    }
+
+    private void resolveConfig()
+    {
+        if (configuration == null || configurationModel == null)
+        {
+            DeclaredConfiguration<Object> declaredConfiguration = StringUtils.isBlank(configurationProviderName)
+                                                                  ? extensionManager.getConfiguration(extensionModel, this)
+                                                                  : extensionManager.getConfiguration(extensionModel, configurationProviderName, this);
+
+            configuration = declaredConfiguration.getValue();
+            configurationModel = declaredConfiguration.getModel();
+        }
     }
 
     /**

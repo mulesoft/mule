@@ -25,9 +25,9 @@ import org.mule.extension.ExtensionManager;
 import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.extension.runtime.event.OperationSuccessfulSignal;
 import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.config.DynamicConfigurationProvider;
-import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
@@ -88,22 +88,23 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationI
         configurationObjectBuilder = new ConfigurationObjectBuilder(configurationModel, resolverSet);
         expirationPolicy = new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);
 
-        instanceProvider = new DynamicConfigurationProvider(CONFIG_NAME,
-                                                                    extensionModel,
+        provider = new DynamicConfigurationProvider(CONFIG_NAME,
+                                                            extensionModel,
+                                                            configurationModel,
                                                             configurationRegistrationCallback,
-                                                                    configurationObjectBuilder,
-                                                                    resolverSet,
-                                                                    expirationPolicy);
+                                                            configurationObjectBuilder,
+                                                            resolverSet,
+                                                            expirationPolicy);
     }
 
     @Test
     public void resolveCached() throws Exception
     {
         final int count = 10;
-        HeisenbergExtension config = (HeisenbergExtension) instanceProvider.get(operationContext);
+        HeisenbergExtension config = (HeisenbergExtension) provider.get(operationContext);
         for (int i = 1; i < count; i++)
         {
-            assertThat(instanceProvider.get(operationContext), is(sameInstance(config)));
+            assertThat(provider.get(operationContext), is(sameInstance(config)));
         }
 
         verify(resolverSet, times(count)).resolve(event);
@@ -112,7 +113,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationI
     @Test
     public void resolveDifferentInstances() throws Exception
     {
-        HeisenbergExtension instance1 = (HeisenbergExtension) instanceProvider.get(operationContext);
+        HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(operationContext);
         HeisenbergExtension instance2 = makeAlternateInstance();
 
         assertThat(instance2, is(not(sameInstance(instance1))));
@@ -133,10 +134,10 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationI
             return null;
         }).when(operationContext).onOperationSuccessful(any(Consumer.class));
 
-        HeisenbergExtension instance1 = (HeisenbergExtension) instanceProvider.get(operationContext);
+        HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(operationContext);
         HeisenbergExtension instance2 = makeAlternateInstance();
 
-        DynamicConfigurationProvider provider = (DynamicConfigurationProvider) instanceProvider;
+        DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
         timeSupplier.move(1, TimeUnit.MINUTES);
 
         Map<String, Object> expired = provider.getExpired();
@@ -155,23 +156,23 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationI
         ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
         when(resolverSet.resolve(event)).thenReturn(alternateResult);
 
-        return (HeisenbergExtension) instanceProvider.get(operationContext);
+        return (HeisenbergExtension) provider.get(operationContext);
     }
 
     @Test
     public void resolveDynamicConfigWithEquivalentEvent() throws Exception
     {
         assertSameInstancesResolved();
-        assertConfigInstanceRegistered(instanceProvider.get(operationContext));
+        assertConfigInstanceRegistered(provider.get(operationContext));
     }
 
     @Test
     public void resolveDynamicConfigWithDifferentEvent() throws Exception
     {
-        Object config1 = instanceProvider.get(operationContext);
+        Object config1 = provider.get(operationContext);
 
         when(resolverSet.resolve(event)).thenReturn(mock(ResolverSetResult.class));
-        Object config2 = instanceProvider.get(operationContext);
+        Object config2 = provider.get(operationContext);
 
         assertThat(config1, is(not(Matchers.sameInstance(config2))));
         assertConfigInstanceRegistered(config1);

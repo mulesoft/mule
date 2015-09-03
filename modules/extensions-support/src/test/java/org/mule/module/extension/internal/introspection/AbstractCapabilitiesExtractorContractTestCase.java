@@ -6,11 +6,14 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.reflections.ReflectionUtils.getMethods;
+import org.mule.extension.introspection.declaration.fluent.ConfigurationDescriptor;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.registry.SpiServiceRegistry;
+import org.mule.extension.introspection.declaration.fluent.OperationDescriptor;
+import org.mule.module.extension.spi.CapabilityExtractor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -25,34 +28,42 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractCapabilitiesExtractorContractTestCase extends AbstractMuleTestCase
 {
-    protected CapabilitiesResolver resolver;
+
+    protected CapabilityExtractor capabilityExtractor;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     protected DeclarationDescriptor declarationDescriptor;
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    protected ConfigurationDescriptor configurationDescriptor;
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    protected OperationDescriptor operationDescriptor;
+
     @Before
     public void before()
     {
-        resolver = new DefaultCapabilitiesResolver(new SpiServiceRegistry());
+        capabilityExtractor = createCapabilityExtractor();
+    }
+
+    protected abstract CapabilityExtractor createCapabilityExtractor();
+
+    @Test
+    public void extractExtensionCapability()
+    {
+        assertThat(capabilityExtractor.extractExtensionCapability(declarationDescriptor, getClass()), is(nullValue()));
     }
 
     @Test
-    public void noCapability()
+    public void extractConfigCapability()
     {
-        resolver.resolveCapabilities(declarationDescriptor, getClass());
-        verify(declarationDescriptor, never()).withCapability(anyObject());
+        assertThat(capabilityExtractor.extractConfigCapability(configurationDescriptor, getClass()), is(nullValue()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullClass()
+    @Test
+    public void extractOperationCapability()
     {
-        resolver.resolveCapabilities(declarationDescriptor, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullDeclaration()
-    {
-        resolver.resolveCapabilities(null, getClass());
+        assertThat(capabilityExtractor.extractOperationCapability(operationDescriptor, getMethods(getClass(), input -> true).iterator().next()), is(nullValue()));
     }
 
 }

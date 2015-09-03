@@ -27,6 +27,7 @@ import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationExecutor;
 import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
@@ -49,9 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -127,6 +126,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1OperationContext.getOperationModel()).thenReturn(extension1OperationModel);
 
         when(extension1ConfigurationProvider.get(same(extension1OperationContext))).thenReturn(configInstance);
+        when(extension1ConfigurationProvider.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
 
         when(extension1OperationModel.getExecutor()).thenReturn(executor);
 
@@ -214,19 +214,19 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     public void getConfigurationByName() throws Exception
     {
         discover();
-        extensionsManager.registerConfigurationProvider(extensionModel1, EXTENSION1_CONFIG_INSTANCE_NAME, extension1ConfigurationProvider);
-        Object configurationInstance = extensionsManager.getConfiguration(extensionModel1, EXTENSION1_CONFIG_INSTANCE_NAME, extension1OperationContext);
-        assertThat(configurationInstance, is(sameInstance(configInstance)));
+        extensionsManager.registerConfigurationProvider(extensionModel1, extension1ConfigurationProvider);
+        DeclaredConfiguration<Object> declaredConfiguration = extensionsManager.getConfiguration(extensionModel1, EXTENSION1_CONFIG_INSTANCE_NAME, extension1OperationContext);
+        assertThat(declaredConfiguration.getValue(), is(sameInstance(configInstance)));
     }
 
     @Test
     public void getConfigurationThroughDefaultConfig()
     {
         discover();
-        extensionsManager.registerConfigurationProvider(extensionModel1, EXTENSION1_CONFIG_INSTANCE_NAME, extension1ConfigurationProvider);
+        extensionsManager.registerConfigurationProvider(extensionModel1, extension1ConfigurationProvider);
 
-        Object configurationInstance = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
-        assertThat(configurationInstance, is(sameInstance(configInstance)));
+        DeclaredConfiguration<Object> declaredConfig = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
+        assertThat(declaredConfig.getValue(), is(sameInstance(configInstance)));
     }
 
     @Test
@@ -235,8 +235,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         discover();
         when(extension1ConfigurationModel.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
 
-        Object configurationInstance = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
-        assertThat(configurationInstance, is(sameInstance(configInstance)));
+        DeclaredConfiguration<Object> declaredConfig = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
+        assertThat(declaredConfig.getValue(), is(sameInstance(configInstance)));
     }
 
     @Test
@@ -251,30 +251,26 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         discover();
         when(extension1ConfigurationModel.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
 
-        when(extensionModel1.getConfigurations()).thenAnswer(new Answer<List<ConfigurationModel>>()
-        {
-            @Override
-            public List<ConfigurationModel> answer(InvocationOnMock invocation) throws Throwable
+        when(extensionModel1.getConfigurations()).thenAnswer(invocation -> {
+            new Thread()
             {
-                new Thread()
+                @Override
+                public void run()
                 {
-                    @Override
-                    public void run()
-                    {
-                        testLatch.release();
-                        extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
-                    }
-                }.start();
+                    testLatch.release();
+                    extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
+                }
+            }.start();
 
-                testLatch.await(timeout, timeUnit);
-                joinerLatch.countDown();
-                return Arrays.asList(extension1ConfigurationModel);
-            }
+            testLatch.await(timeout, timeUnit);
+            joinerLatch.countDown();
+            return Arrays.asList(extension1ConfigurationModel);
         });
 
-        Object configurationInstance = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
+        DeclaredConfiguration<Object> declaredConfiguration = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
+        joinerLatch.countDown();
         assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
-        assertThat(configurationInstance, is(sameInstance(configInstance)));
+        assertThat(declaredConfiguration.getValue(), is(sameInstance(configInstance)));
     }
 
     @Test(expected = IllegalStateException.class)

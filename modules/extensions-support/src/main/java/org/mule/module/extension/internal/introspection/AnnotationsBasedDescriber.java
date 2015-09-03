@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.module.extension.internal.DefaultDescribingContext.CAPABILITY_EXTRACTORS;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterName;
@@ -25,14 +26,16 @@ import org.mule.extension.annotations.Operations;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.declaration.Describer;
+import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.ConfigurationDescriptor;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
 import org.mule.extension.introspection.declaration.fluent.OperationDescriptor;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.introspection.declaration.fluent.WithParameters;
+import org.mule.extension.introspection.declaration.spi.Describer;
 import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
 import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
 import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
@@ -40,7 +43,7 @@ import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapa
 import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.registry.SpiServiceRegistry;
+import org.mule.module.extension.spi.CapabilityExtractor;
 import org.mule.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -50,6 +53,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Implementation of {@link Describer} which generates a {@link Descriptor} by
@@ -60,7 +64,6 @@ import java.util.Set;
 public final class AnnotationsBasedDescriber implements Describer
 {
 
-    private CapabilitiesResolver capabilitiesResolver = new DefaultCapabilitiesResolver(new SpiServiceRegistry());
     private final Class<?> extensionType;
     private final VersionResolver versionResolver;
 
@@ -76,27 +79,23 @@ public final class AnnotationsBasedDescriber implements Describer
         this.versionResolver = versionResolver;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public final Descriptor describe()
+    public final Descriptor describe(DescribingContext context)
     {
-        checkArgument(extensionType != null, String.format("describer %s does not specify an extension type", getClass().getName()));
-
         Extension extension = getExtension(extensionType);
-        DeclarationDescriptor declaration = newDeclarationDescriptor(extension);
-        declareConfigurations(declaration, extensionType);
-        declareOperations(declaration, extensionType);
-        describeCapabilities(declaration, extensionType);
+        DeclarationDescriptor declaration = context.getDeclarationDescriptor()
+                .named(extension.name())
+                .onVersion(getVersion(extension))
+                .describedAs(extension.description());
+
+        declareConfigurations(context, declaration, extensionType);
+        declareOperations(context, declaration, extensionType);
+        declareExtensionCapabilities(context, declaration, extensionType);
 
         return declaration;
-    }
-
-    private DeclarationDescriptor newDeclarationDescriptor(Extension extension)
-    {
-        return new DeclarationDescriptor(extension.name(), getVersion(extension)).describedAs(extension.description());
     }
 
     private String getVersion(Extension extension)
@@ -104,29 +103,29 @@ public final class AnnotationsBasedDescriber implements Describer
         return versionResolver.resolveVersion(extension);
     }
 
-    private void declareConfigurations(DeclarationDescriptor declaration, Class<?> extensionType)
+    private void declareConfigurations(DescribingContext context, DeclarationDescriptor declaration, Class<?> extensionType)
     {
         Configurations configurations = extensionType.getAnnotation(Configurations.class);
         if (configurations != null)
         {
             for (Class<?> declaringClass : configurations.value())
             {
-                declareConfiguration(declaration, declaringClass);
+                declareConfiguration(context, declaration, declaringClass);
             }
         }
         else
         {
-            declareConfiguration(declaration, extensionType);
+            declareConfiguration(context, declaration, extensionType);
         }
     }
 
-    private void declareConfiguration(DeclarationDescriptor declaration, Class<?> extensionType)
+    private void declareConfiguration(DescribingContext context, DeclarationDescriptor declaration, Class<?> configurationType)
     {
-        checkArgument(CollectionUtils.isEmpty(getOperationMethods(extensionType)), String.format("Class %s can't declare a configuration and operations at the same time", extensionType.getName()));
+        checkArgument(CollectionUtils.isEmpty(getOperationMethods(configurationType)), String.format("Class %s can't declare a configuration and operations at the same time", configurationType.getName()));
 
         ConfigurationDescriptor configuration;
 
-        Configuration configurationAnnotation = extensionType.getAnnotation(Configuration.class);
+        Configuration configurationAnnotation = configurationType.getAnnotation(Configuration.class);
         if (configurationAnnotation != null)
         {
             configuration = declaration.withConfig(configurationAnnotation.name()).describedAs(configurationAnnotation.description());
@@ -136,9 +135,10 @@ public final class AnnotationsBasedDescriber implements Describer
             configuration = declaration.withConfig(Extension.DEFAULT_CONFIG_NAME).describedAs(Extension.DEFAULT_CONFIG_DESCRIPTION);
         }
 
-        configuration.instantiatedWith(new TypeAwareConfigurationInstantiator(extensionType));
+        configuration.instantiatedWith(new TypeAwareConfigurationInstantiator(configurationType));
 
-        declareConfigurationParameters(extensionType, configuration);
+        declareConfigurationParameters(configurationType, configuration);
+        declareConfigCapabilities(context, configuration, configurationType);
     }
 
     private void declareConfigurationParameters(Class<?> extensionType, ConfigurationDescriptor configuration)
@@ -219,23 +219,21 @@ public final class AnnotationsBasedDescriber implements Describer
     }
 
 
-    private void declareOperations(DeclarationDescriptor declaration, Class<?> extensionType)
+    private void declareOperations(DescribingContext context, DeclarationDescriptor declaration, Class<?> extensionType)
     {
         Operations operations = extensionType.getAnnotation(Operations.class);
-        if (operations != null)
+        if (operations == null)
         {
-            for (Class<?> actingClass : operations.value())
-            {
-                declareOperation(declaration, actingClass);
-            }
+            throw new IllegalArgumentException(String.format("Extension of type %s does not declare operations", extensionType.getName()));
         }
-        else
+
+        for (Class<?> actingClass : operations.value())
         {
-            declareOperation(declaration, extensionType);
+            declareOperation(context, declaration, actingClass);
         }
     }
 
-    private <T> void declareOperation(DeclarationDescriptor declaration, Class<T> actingClass)
+    private <T> void declareOperation(DescribingContext context, DeclarationDescriptor declaration, Class<T> actingClass)
     {
         for (Method method : getOperationMethods(actingClass))
         {
@@ -243,8 +241,8 @@ public final class AnnotationsBasedDescriber implements Describer
                     .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method));
 
             declareOperationParameters(method, operation);
-
             calculateExtendedTypes(actingClass, method, operation);
+            declareOperationCapabilities(context, operation, method);
         }
     }
 
@@ -278,8 +276,8 @@ public final class AnnotationsBasedDescriber implements Describer
         for (org.mule.module.extension.internal.introspection.ParameterDescriptor parameterDescriptor : descriptors)
         {
             ParameterDescriptor parameter = parameterDescriptor.isRequired()
-                                           ? operation.with().requiredParameter(parameterDescriptor.getName())
-                                           : operation.with().optionalParameter(parameterDescriptor.getName()).defaultingTo(parameterDescriptor.getDefaultValue());
+                                            ? operation.with().requiredParameter(parameterDescriptor.getName())
+                                            : operation.with().optionalParameter(parameterDescriptor.getName()).defaultingTo(parameterDescriptor.getDefaultValue());
 
             parameter.describedAs(EMPTY).ofType(parameterDescriptor.getType());
 
@@ -306,8 +304,35 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void describeCapabilities(DeclarationDescriptor declaration, Class<?> extensionType)
+    private void declareExtensionCapabilities(DescribingContext context, DeclarationDescriptor declaration, Class<?> extensionType)
     {
-        capabilitiesResolver.resolveCapabilities(declaration, extensionType);
+        declareCapabilities(context, declaration, extractor -> extractor.extractExtensionCapability(declaration, extensionType));
+    }
+
+    private void declareConfigCapabilities(DescribingContext context, ConfigurationDescriptor descriptor, Class<?> configType)
+    {
+        declareCapabilities(context, descriptor, extractor -> extractor.extractConfigCapability(descriptor, configType));
+    }
+
+    private void declareOperationCapabilities(DescribingContext context, OperationDescriptor descriptor, Method method)
+    {
+        declareCapabilities(context, descriptor, extractor -> extractor.extractOperationCapability(descriptor, method));
+    }
+
+    private void declareCapabilities(DescribingContext context, HasCapabilities<?> declaration, Function<CapabilityExtractor, Object> extractFunction)
+    {
+        List<CapabilityExtractor> extractors = context.getParameter(CAPABILITY_EXTRACTORS, List.class);
+        if (CollectionUtils.isEmpty(extractors))
+        {
+            return;
+        }
+
+        extractors.forEach(extractor -> {
+            Object capability = extractFunction.apply(extractor);
+            if (capability != null)
+            {
+                declaration.withCapability(capability);
+            }
+        });
     }
 }

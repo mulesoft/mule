@@ -10,6 +10,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.asOpera
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.ConfigurationRegistrationCallback;
@@ -44,6 +45,7 @@ public final class DynamicConfigurationProvider<T> implements ConfigurationProvi
 
     private final String name;
     private final ExtensionModel extensionModel;
+    private final ConfigurationModel configurationModel;
     private final ConfigurationRegistrationCallback registrationCallback;
     private final ConfigurationObjectBuilder configurationObjectBuilder;
     private final ResolverSet resolverSet;
@@ -62,6 +64,7 @@ public final class DynamicConfigurationProvider<T> implements ConfigurationProvi
      */
     public DynamicConfigurationProvider(String name,
                                         ExtensionModel extensionModel,
+                                        ConfigurationModel configurationModel,
                                         ConfigurationRegistrationCallback registrationCallback,
                                         ConfigurationObjectBuilder configurationObjectBuilder,
                                         ResolverSet resolverSet,
@@ -69,6 +72,7 @@ public final class DynamicConfigurationProvider<T> implements ConfigurationProvi
     {
         this.name = name;
         this.extensionModel = extensionModel;
+        this.configurationModel = configurationModel;
         this.registrationCallback = registrationCallback;
         this.configurationObjectBuilder = configurationObjectBuilder;
         this.resolverSet = resolverSet;
@@ -176,5 +180,23 @@ public final class DynamicConfigurationProvider<T> implements ConfigurationProvi
     private void discountUsage(ExpirableDynamicConfiguration configuration)
     {
         configuration.discountUsage();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ConfigurationModel getModel()
+    {
+        return configurationModel;
     }
 }

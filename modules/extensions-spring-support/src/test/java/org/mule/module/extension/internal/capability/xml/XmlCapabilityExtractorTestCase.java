@@ -11,17 +11,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.module.extension.internal.introspection.AbstractCapabilitiesExtractorContractTestCase;
+import org.mule.module.extension.spi.CapabilityExtractor;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -36,22 +34,17 @@ public class XmlCapabilityExtractorTestCase extends AbstractCapabilitiesExtracto
     private static final String EXTENSION_NAME = "extension";
     private static final String EXTENSION_VERSION = "3.7";
 
-    private ArgumentCaptor<XmlCapability> captor;
-
-    @Before
-    public void before()
+    @Override
+    protected CapabilityExtractor createCapabilityExtractor()
     {
-        super.before();
-        captor = ArgumentCaptor.forClass(XmlCapability.class);
+        return new XmlCapabilityExtractor();
     }
 
-    @Test
-    public void capabilityAdded()
+    @Override
+    public void extractExtensionCapability()
     {
-        resolver.resolveCapabilities(declarationDescriptor, XmlSupport.class);
-        verify(declarationDescriptor).withCapability(captor.capture());
+        XmlCapability capability = (XmlCapability) capabilityExtractor.extractExtensionCapability(declarationDescriptor, XmlSupport.class);
 
-        XmlCapability capability = captor.getValue();
         assertThat(capability, is(notNullValue()));
         assertThat(capability.getSchemaVersion(), is(SCHEMA_VERSION));
         assertThat(capability.getNamespace(), is(NAMESPACE));
@@ -61,11 +54,9 @@ public class XmlCapabilityExtractorTestCase extends AbstractCapabilitiesExtracto
     @Test
     public void defaultCapabilityValues()
     {
-        declarationDescriptor = spy(new DeclarationDescriptor(EXTENSION_NAME, EXTENSION_VERSION));
-        resolver.resolveCapabilities(declarationDescriptor, DefaultXmlExtension.class);
-        verify(declarationDescriptor).withCapability(captor.capture());
+        declarationDescriptor = spy(new DeclarationDescriptor().named(EXTENSION_NAME).onVersion(EXTENSION_VERSION));
+        XmlCapability capability = (XmlCapability) capabilityExtractor.extractExtensionCapability(declarationDescriptor, DefaultXmlExtension.class);
 
-        XmlCapability capability = captor.getValue();
         assertThat(capability, is(notNullValue()));
         assertThat(capability.getSchemaVersion(), is(EXTENSION_VERSION));
         assertThat(capability.getNamespace(), is(NAMESPACE));

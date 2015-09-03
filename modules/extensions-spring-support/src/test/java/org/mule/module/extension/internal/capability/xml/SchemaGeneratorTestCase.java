@@ -9,9 +9,10 @@ package org.mule.module.extension.internal.capability.xml;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createDescribingContext;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.module.extension.HeisenbergExtension;
@@ -40,13 +41,12 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
         extensionFactory = new DefaultExtensionFactory(mock(ServiceRegistry.class));
     }
 
-
     @Test
     public void generate() throws Exception
     {
         String expectedSchema = IOUtils.getResourceAsString("heisenberg.xsd", getClass());
 
-        Descriptor descriptor = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe().getRootDeclaration();
+        Descriptor descriptor = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe(createDescribingContext()).getRootDeclaration();
         ExtensionModel extensionModel = extensionFactory.createFrom(descriptor);
 
         XmlCapability capability = extensionModel.getCapabilities(XmlCapability.class).iterator().next();

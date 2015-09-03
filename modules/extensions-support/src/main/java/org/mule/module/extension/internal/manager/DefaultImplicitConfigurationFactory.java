@@ -13,8 +13,8 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.config.DeclaredConfiguration;
 import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
@@ -41,7 +41,7 @@ final class DefaultImplicitConfigurationFactory implements ImplicitConfiguration
     }
 
     @Override
-    public ConfigurationHolder createImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext, ConfigurationRegistrationCallback registrationCallback)
+    public <C> DeclaredConfiguration<C> createImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext)
     {
         ConfigurationModel implicitConfigurationModel = getImplicitConfiguration(extensionModel);
 
@@ -52,25 +52,21 @@ final class DefaultImplicitConfigurationFactory implements ImplicitConfiguration
 
         synchronized (implicitConfigurationModel)
         {
-            //check that another thread didn't beat us to create the instance
-            if (!extensionRegistry.getExtensionState(extensionModel).getConfigurationProviders().isEmpty())
-            {
-                return null;
-            }
+
 
             final String instanceName = String.format("%s-%s", extensionModel.getName(), implicitConfigurationModel.getName());
             ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(implicitConfigurationModel, buildImplicitConfigurationResolverSet(implicitConfigurationModel));
 
-            Object configuration;
+            C configuration;
             try
             {
-                configuration = configurationObjectBuilder.build(asOperationContextAdapter(operationContext).getEvent());
+                configuration = (C) configurationObjectBuilder.build(asOperationContextAdapter(operationContext).getEvent());
             }
             catch (MuleException e)
             {
                 throw new MuleRuntimeException(e);
             }
-            return new ConfigurationHolder(instanceName, configuration);
+            return new DeclaredConfiguration<>(instanceName, implicitConfigurationModel, configuration);
         }
     }
 

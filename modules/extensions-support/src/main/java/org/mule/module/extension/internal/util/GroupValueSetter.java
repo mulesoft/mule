@@ -17,6 +17,7 @@ import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 
@@ -50,18 +51,16 @@ public final class GroupValueSetter implements ValueSetter
      */
     public static List<ValueSetter> settersFor(Capable capable)
     {
-        ImmutableList.Builder<ValueSetter> groupValueSetters = ImmutableList.builder();
         ParameterGroupCapability parameterGroupCapability = getSingleCapability(capable, ParameterGroupCapability.class);
 
         if (parameterGroupCapability != null)
         {
-            for (ParameterGroup group : parameterGroupCapability.getGroups())
-            {
-                groupValueSetters.add(new GroupValueSetter(group));
-            }
+            return parameterGroupCapability.getGroups().stream()
+                    .map(group -> new GroupValueSetter(group))
+                    .collect(new ImmutableListCollector<>());
         }
 
-        return groupValueSetters.build();
+        return ImmutableList.of();
     }
 
     private final org.mule.module.extension.internal.introspection.ParameterGroup group;

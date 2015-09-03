@@ -18,6 +18,8 @@ import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Test;
 import org.mockito.Mock;
 
 abstract class AbstractConfigurationInstanceProviderTestCase extends AbstractMuleTestCase
@@ -37,8 +39,19 @@ abstract class AbstractConfigurationInstanceProviderTestCase extends AbstractMul
     @Mock
     protected ConfigurationRegistrationCallback configurationRegistrationCallback;
 
-    protected ConfigurationProvider<Object> instanceProvider;
+    protected ConfigurationProvider<Object> provider;
 
+    @Test
+    public void getName()
+    {
+        assertThat(provider.getName(), is(CONFIG_NAME));
+    }
+
+    @Test
+    public void getConfigurationModel()
+    {
+        assertThat(provider.getModel(), is(CoreMatchers.sameInstance(configurationModel)));
+    }
 
     protected <T> void assertConfigInstanceRegistered(T configurationInstance)
     {
@@ -48,11 +61,11 @@ abstract class AbstractConfigurationInstanceProviderTestCase extends AbstractMul
     protected void assertSameInstancesResolved() throws Exception
     {
         final int count = 10;
-        Object config = instanceProvider.get(operationContext);
+        Object config = provider.get(operationContext);
 
         for (int i = 1; i < count; i++)
         {
-            assertThat(instanceProvider.get(operationContext), is(sameInstance(config)));
+            assertThat(provider.get(operationContext), is(sameInstance(config)));
         }
     }
 }

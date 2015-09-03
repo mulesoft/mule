@@ -6,14 +6,11 @@
  */
 package org.mule.module.extension.internal.util;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleContext;
@@ -23,12 +20,15 @@ import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
+import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationContext;
+import org.mule.module.extension.internal.manager.DescribingContextFactory;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.registry.SpiServiceRegistry;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,7 +37,6 @@ import java.net.URL;
 import java.util.jar.Manifest;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -102,18 +101,6 @@ public abstract class ExtensionsTestUtils
         });
     }
 
-    public static void assertRegisteredWithUniqueMadeKey(MuleContext muleContext, String key, Object object) throws Exception
-    {
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-        verify(muleContext.getRegistry()).registerObject(captor.capture(), same(object));
-        assertThat(captor.getValue(), containsString(key));
-    }
-
-    public static <C> C getConfigurationInstanceFromExtensionManager(String key, ExtensionModel extensionModel, MuleEvent muleEvent) throws Exception
-    {
-        return extractExtensionManager(muleEvent).getConfiguration(extensionModel, key, getOperationContext(muleEvent));
-    }
-
     public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent) throws Exception
     {
         ConfigurationProvider<C> configurationProvider = muleEvent.getMuleContext().getRegistry().get(key);
@@ -133,6 +120,11 @@ public abstract class ExtensionsTestUtils
                                            mock(ResolverSetResult.class),
                                            event,
                                            extractExtensionManager(event));
+    }
+
+    public static DescribingContext createDescribingContext()
+    {
+        return new DescribingContextFactory(new SpiServiceRegistry(), Thread.currentThread().getContextClassLoader()).newDescribingContext();
     }
 
     public static File getMetaInfDirectory(Class clazz)

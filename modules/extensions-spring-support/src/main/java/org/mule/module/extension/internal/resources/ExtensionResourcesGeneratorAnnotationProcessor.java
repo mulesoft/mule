@@ -10,14 +10,14 @@ import static org.mule.module.extension.internal.capability.xml.schema.Annotatio
 import org.mule.extension.annotations.Extension;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.declaration.Describer;
 import org.mule.extension.introspection.declaration.DescribingContext;
+import org.mule.extension.introspection.declaration.spi.Describer;
 import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.VersionResolver;
+import org.mule.module.extension.internal.manager.DescribingContextFactory;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.ExceptionUtils;
 
@@ -53,11 +53,13 @@ import javax.tools.Diagnostic;
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor
 {
+
     public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
     public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
     public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
 
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry());
+    private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
+    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry);
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)
@@ -66,11 +68,10 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(processingEnv, new SpiServiceRegistry());
         try
         {
-            for (TypeElement extensionElement : findExtensions(roundEnv))
-            {
+            findExtensions(roundEnv).forEach(extensionElement -> {
                 ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
                 generator.generateFor(extensionModel);
-            }
+            });
 
             generator.dumpAll();
 
@@ -89,17 +90,17 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
         Describer describer = new AnnotationsBasedDescriber(extensionClass, new FixedVersionResolver());
 
-        DescribingContext context = new DefaultDescribingContext(describer.describe().getRootDeclaration());
-        context.getCustomParameters().put(EXTENSION_ELEMENT, extensionElement);
-        context.getCustomParameters().put(PROCESSING_ENVIRONMENT, processingEnv);
-        context.getCustomParameters().put(ROUND_ENVIRONMENT, roundEnvironment);
+        DescribingContext context = new DescribingContextFactory(new SpiServiceRegistry(), extensionClass.getClassLoader()).newDescribingContext();
+        context.addParameter(EXTENSION_ELEMENT, extensionElement);
+        context.addParameter(PROCESSING_ENVIRONMENT, processingEnv);
+        context.addParameter(ROUND_ENVIRONMENT, roundEnvironment);
 
-        return extensionFactory.createFrom(context.getDeclarationDescriptor(), context);
+        return extensionFactory.createFrom(describer.describe(context), context);
     }
 
     private List<TypeElement> findExtensions(RoundEnvironment env)
     {
-        return ImmutableList.copyOf(getTypeElementsAnnotatedWith(org.mule.extension.annotations.Extension.class, env));
+        return ImmutableList.copyOf(getTypeElementsAnnotatedWith(Extension.class, env));
     }
 
     private void log(String message)
@@ -109,6 +110,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
 
     private class FixedVersionResolver implements VersionResolver
     {
+
         @Override
         public String resolveVersion(Extension extension)
         {

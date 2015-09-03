@@ -13,6 +13,8 @@ import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Default implementation of {@link DescribingContext}.
  * The fact that this class's attributes are immutable, doesn't mean that their inner state
@@ -22,6 +24,7 @@ import java.util.Map;
  */
 public final class DefaultDescribingContext implements DescribingContext
 {
+    public static final String CAPABILITY_EXTRACTORS = "CAPABILITY_EXTRACTORS";
 
     private final DeclarationDescriptor declarationDescriptor;
     private final Map<String, Object> customParameters = new HashMap<>();
@@ -44,28 +47,33 @@ public final class DefaultDescribingContext implements DescribingContext
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> getCustomParameters()
+    public void addParameter(String key, Object value)
     {
-        return customParameters;
+        checkArgument(!StringUtils.isBlank(key), "key cannot be blank");
+        checkArgument(value != null, "value cannot be null");
+
+        customParameters.put(key, value);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public <T> T getCheckedParameter(String key, Class<T> expectedType)
+    public <T> T getParameter(String key, Class<T> expectedType)
     {
-        Object parameter = getCustomParameters().get(key);
+        Object parameter = customParameters.get(key);
         if (parameter == null)
         {
             return null;
         }
 
-        checkArgument(expectedType.isInstance(parameter),
-                      String.format("Custom parameter '%s' was expected to be of class '%s' but got '%s' instead",
-                                    key,
-                                    expectedType.getName(),
-                                    parameter.getClass().getName()));
+        if (!expectedType.isInstance(parameter))
+        {
+            throw new IllegalArgumentException(String.format("Custom parameter '%s' was expected to be of class '%s' but got '%s' instead",
+                                                             key,
+                                                             expectedType.getName(),
+                                                             parameter.getClass().getName()));
+        }
 
         return (T) parameter;
     }

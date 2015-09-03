@@ -180,7 +180,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void badExtensionVersion()
     {
-        factory.createFrom(new DeclarationDescriptor("bad", "i'm new"));
+        factory.createFrom(new DeclarationDescriptor().named("bad").onVersion("i'm new"));
     }
 
     @Test
@@ -192,7 +192,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         final String beta = "beta";
         final String alpha = "alpha";
 
-        ExtensionModel extensionModel = factory.createFrom(new DeclarationDescriptor("test", "1.0")
+        ExtensionModel extensionModel = factory.createFrom(new DeclarationDescriptor().named("test").onVersion("1.0")
                                                          .withConfig(defaultConfiguration).describedAs(defaultConfiguration).instantiatedWith(mockInstantiator)
                                                          .withConfig(beta).describedAs(beta).instantiatedWith(mockInstantiator)
                                                          .withConfig(alpha).describedAs(alpha).instantiatedWith(mockInstantiator));
@@ -229,8 +229,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void nameWithSpaces()
     {
-
-        descriptor = new DeclarationDescriptor("i have spaces", "1.0").withConfig("default").getRootDeclaration();
+        descriptor = new DeclarationDescriptor().named("i have spaces").onVersion("1.0").withConfig("default").getRootDeclaration();
         factory.createFrom(descriptor);
     }
 
@@ -238,7 +237,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     public void configlessDescriptor()
     {
 
-        factory.createFrom(new DeclarationDescriptor("noConfigs", "1.0"));
+        factory.createFrom(new DeclarationDescriptor().named("noConfigs").onVersion("1.0"));
     }
 
     @Test
