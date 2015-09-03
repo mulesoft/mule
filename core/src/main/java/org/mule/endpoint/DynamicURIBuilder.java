@@ -15,7 +15,9 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,6 +30,22 @@ public class DynamicURIBuilder
     protected transient final Log logger = LogFactory.getLog(DynamicURIBuilder.class);
 
     private final URIBuilder templateUriBuilder;
+
+    private static final Transformer URL_ENCODER = new Transformer()
+    {
+        @Override
+        public Object transform(Object input)
+        {
+            try
+            {
+                return URLEncoder.encode((String) input, "UTF-8");
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                throw new AssertionError("UTF-8 is unknown");
+            }
+        }
+    };
 
     public DynamicURIBuilder(URIBuilder templateUriBuilder) throws MalformedEndpointException
     {
@@ -56,15 +74,24 @@ public class DynamicURIBuilder
         return resolvedUri;
     }
 
-    private String resolveAddress(MuleEvent event) throws URISyntaxException, UnsupportedEncodingException
+    private String resolveAddress(final MuleEvent event) throws URISyntaxException, UnsupportedEncodingException
     {
-        MuleContext muleContext = templateUriBuilder.getMuleContext();
-        String resolvedAddress = templateUriBuilder.getEncodedConstructor();
-
-        if (muleContext.getExpressionManager().isExpression(resolvedAddress))
+        final MuleContext muleContext = templateUriBuilder.getMuleContext();
+        String resolvedAddress = templateUriBuilder.getTransformedConstructor(new Transformer()
         {
-            resolvedAddress = muleContext.getExpressionManager().parse(resolvedAddress, event, true);
-        }
+            @Override
+            public Object transform(Object input)
+            {
+                String token = (String) input;
+
+                    if (muleContext.getExpressionManager().isExpression(token))
+                    {
+                        token = muleContext.getExpressionManager().parse(token, event, true, URL_ENCODER);
+                    }
+
+                    return token;
+            }
+        }, URL_ENCODER);
 
         return resolvedAddress;
     }

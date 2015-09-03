@@ -7,11 +7,14 @@
 package org.mule.endpoint;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +34,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
     }
 
     protected MuleContext unusedMuleContext = null;
-    
+
     @Test
     public void testAddressForProtocol()
     {
@@ -165,6 +168,36 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         uri.setAddress(address);
         String result = uri.getEncodedConstructor();
         assertEquals(address, result);
+    }
+
+    /**
+     * MULE-6279
+     * @throws UnsupportedEncodingException 
+     */
+    @Test
+    public void testSetAddressWithSpecialURIChars() throws UnsupportedEncodingException
+    {
+        URIBuilder uri = new URIBuilder();
+        uri.setAddress("smtp://user%40my-domain.com:" + URLEncoder.encode("! \"#$%&'()*+,-./:;<=>?@[\\]_`{|}~", "UTF-8") + "@smtp.my-domain.com:25");
+        String result = uri.getEncodedConstructor();
+        assertEquals("smtp://user%40my-domain.com:" + URLEncoder.encode("! \"#$%&'()*+,-./:;<=>?@[\\]_`{|}~", "UTF-8") + "@smtp.my-domain.com:25", result);
+    }
+
+    /**
+     * MULE-6139
+     * @throws UnsupportedEncodingException 
+     */
+    @Test
+    public void testConstructAddressWithSpecialURIChars() throws UnsupportedEncodingException
+    {
+        URIBuilder uri = new URIBuilder();
+        uri.setProtocol("smtp");
+        uri.setUser("user@my-domain.com");
+        uri.setPassword("! \"#$%&'()*+,-./:;<=>?@[\\]_`{|}~");
+        uri.setHost("smtp.my-domain.com");
+        uri.setPort("25");
+        String result = uri.getEncodedConstructor();
+        assertEquals("smtp://user%40my-domain.com:" + URLEncoder.encode("! \"#$%&'()*+,-./:;<=>?@[\\]_`{|}~", "UTF-8") + "@smtp.my-domain.com:25", result);
     }
 
     private URIBuilder createURIBuilder(String host, int port, String protocol, String path)

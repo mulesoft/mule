@@ -33,6 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.TransformerUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -515,8 +517,30 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     public String parse(String expression, final MuleEvent event, final boolean failIfNull)
         throws ExpressionRuntimeException
     {
+        return parse(expression, event, failIfNull, TransformerUtils.nopTransformer());
+    }
+
+    /**
+     * Evaluates expressions in a given string. This method will iterate through each expression, evaluate
+     * it and pass it through the given encoder. If a user needs to evaluate a single expression they can use
+     * {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
+     * 
+     * @param expression a single expression i.e. xpath://foo
+     * @param message the current message to process. The expression will evaluata on the message.
+     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
+     *            returns null.
+     * @param encoder how to post-process the result of the expression (i.e.: url encode it)
+     * @return the result of the evaluation. Expressions that return collection will return an empty
+     *         collection, not null.
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
+     *             and 'failIfNull is set to true.
+     */
+    @Override
+    public String parse(String expression, final MuleEvent event, final boolean failIfNull, Transformer encoder) throws ExpressionRuntimeException
+    {
         return parser.parse(new TemplateParser.TemplateCallback()
         {
+            @Override
             public Object match(String token)
             {
                 Object result = evaluate(token, event, failIfNull);

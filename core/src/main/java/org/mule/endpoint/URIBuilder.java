@@ -13,8 +13,9 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.util.ClassUtils;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.TransformerUtils;
 
 /**
  * This has the following logic:
@@ -232,14 +236,39 @@ public class URIBuilder extends AbstractAnnotatedObject
      */
     protected String getConstructor()
     {
-        return URLDecoder.decode(getEncodedConstructor());
+        return getTransformedConstructor(TransformerUtils.nopTransformer(), TransformerUtils.nopTransformer());
     }
 
     protected String getEncodedConstructor()
     {
         StringBuilder buffer = new StringBuilder();
         appendMeta(buffer);
-        OrderedQueryParameters uriQueries = appendAddress(buffer);
+        OrderedQueryParameters uriQueries = appendAddress(buffer, TransformerUtils.nopTransformer(), new Transformer()
+        {
+            @Override
+            public Object transform(Object input)
+            {
+                try
+                {
+                    return URLEncoder.encode((String) input, "UTF-8");
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    throw new AssertionError("UTF-8 is unknown");
+                }
+            }
+        });
+        uriQueries.override(queryMap);
+        buffer.append(uriQueries.toString());
+        removeRootTrailingSlash(buffer);
+        return buffer.toString();
+    }
+
+    protected String getTransformedConstructor(Transformer tokenProcessor, Transformer tokenEncoder)
+    {
+        StringBuilder buffer = new StringBuilder();
+        appendMeta(buffer);
+        OrderedQueryParameters uriQueries = appendAddress(buffer, tokenProcessor, tokenEncoder);
         uriQueries.override(queryMap);
         buffer.append(uriQueries.toString());
         removeRootTrailingSlash(buffer);
@@ -255,25 +284,25 @@ public class URIBuilder extends AbstractAnnotatedObject
         }
     }
 
-    private OrderedQueryParameters appendAddress(StringBuilder buffer)
+    private OrderedQueryParameters appendAddress(StringBuilder buffer, Transformer tokenProcessor, Transformer tokenEncoder)
     {
         if (null != address)
         {
             int index = address.indexOf(QUERY);
             if (index > -1)
             {
-                buffer.append(address.substring(0, index));
+                buffer.append(tokenProcessor.transform(address.substring(0, index)));
                 return parseQueries(address.substring(index + 1));
             }
             else
             {
-                buffer.append(address);
+                buffer.append(tokenProcessor.transform(address));
                 return new OrderedQueryParameters();
             }
         }
         else
         {
-            constructAddress(buffer);
+            constructAddress(buffer, tokenProcessor, tokenEncoder);
             return new OrderedQueryParameters();
         }
     }
@@ -296,29 +325,29 @@ public class URIBuilder extends AbstractAnnotatedObject
         return map;
     }
 
-    private void constructAddress(StringBuilder buffer)
+    private void constructAddress(StringBuilder buffer, Transformer tokenProcessor, Transformer tokenEncoder)
     {
         buffer.append(protocol);
         buffer.append(DOTS_SLASHES);
         boolean atStart = true;
         if (null != user)
         {
-            buffer.append(user);
+            buffer.append(tokenEncoder.transform(tokenProcessor.transform(user)));
             if (null != password)
             {
                 buffer.append(":");
-                buffer.append(password);
+                buffer.append(tokenEncoder.transform(tokenProcessor.transform(password)));
             }
             buffer.append("@");
             atStart = false;
         }
         if (null != host)
         {
-            buffer.append(host);
+            buffer.append(tokenProcessor.transform(host));
             if (null != port)
             {
                 buffer.append(":");
-                buffer.append(port);
+                buffer.append(tokenProcessor.transform(port));
             }
             atStart = false;
         }
@@ -328,7 +357,7 @@ public class URIBuilder extends AbstractAnnotatedObject
             {
                 buffer.append("/");
             }
-            buffer.append(path);
+            buffer.append(tokenProcessor.transform(path));
         }
     }
 
