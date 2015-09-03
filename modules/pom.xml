@@ -18,7 +18,6 @@
         <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
-        <module>bpm</module>
         <module>cxf</module>
         <module>db</module>
         <module>devkit-support</module>
