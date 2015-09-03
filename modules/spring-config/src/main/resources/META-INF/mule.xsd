@@ -4157,28 +4157,6 @@
     <xsd:complexType name="setPayloadTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
-                <xsd:attribute name="name" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the message processor so that other elements can reference it. Required if the message processor is defined at the global level.
-                            Deprecated. Provided only to maintain backwards compatibility at XML level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="returnClass" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Deprecated. Provided only to maintain backwards compatibility at XML level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="ignoreBadInput" type="substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Deprecated. Provided only to maintain backwards compatibility at XML level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attributeGroup ref="mimeTypeAttributes">
                     <xsd:annotation>
                         <xsd:documentation>

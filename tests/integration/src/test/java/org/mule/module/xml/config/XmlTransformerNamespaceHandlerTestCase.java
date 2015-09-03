@@ -166,7 +166,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     protected void assertAbstractTransformerOk(AbstractTransformer transformer, String name)
     {
         assertTrue(transformer.isIgnoreBadInput());
-        assertEquals(Object.class, transformer.getReturnClass());
+        assertEquals(Object.class, transformer.getReturnDataType().getType());
         assertEquals(name, transformer.getName());
         // AbstractXmlTransformer instances have an output encoding
         if (transformer instanceof AbstractXmlTransformer)

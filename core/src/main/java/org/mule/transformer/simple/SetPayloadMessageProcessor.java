@@ -46,7 +46,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         else
         {
             Object value = resolveValue(event);
-            DataType dataType = resolveDataType(event, value);
+            DataType dataType = resolveDataType(value);
 
             event.getMessage().setPayload(value, dataType);
         }
@@ -80,7 +80,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         }
     }
 
-    private DataType resolveDataType(MuleEvent event, Object value)
+    private DataType resolveDataType(Object value)
     {
         Class type = (value == null || value instanceof NullPayload) ? Object.class : value.getClass();
 
@@ -88,30 +88,6 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         simpleDataType.setEncoding(encoding);
 
         return simpleDataType;
-    }
-
-    /**
-     * Sets the name of the message processor
-     *
-     * @param name the name of the message processor
-     * @Deprecate this setter is provided for backwards compatibility to enable
-     * global message processor definition in the mule configuration
-     * as {@link SetPayloadTransformer}
-     */
-    @Deprecated
-    public void setName(String name)
-    {
-        // Do nothing
-    }
-
-    /**
-     * @Deprecate this setter is provided for backwards compatibility at mule
-     * configuration level with {@link SetPayloadTransformer}
-     */
-    @Deprecated
-    public void setIgnoreBadInput(boolean ignoreBadInput)
-    {
-        // Do nothing
     }
 
     public void setMimeType(String mimeType)
@@ -122,15 +98,6 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     public void setEncoding(String encoding)
     {
         this.encoding = encoding;
-    }
-
-    /**
-     * @Deprecate this setter is provided for backwards compatibility at mule
-     * configuration level with {@link SetPayloadTransformer}
-     */
-    public void setReturnClass(String className)
-    {
-        // Do nothing
     }
 
     public void setValue(String value)

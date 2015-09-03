@@ -49,11 +49,6 @@ public class MuleProperties
     public static final String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
     public static final String MULE_ENCODING_PROPERTY = PROPERTY_PREFIX + "ENCODING";
     public static final String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
-    /**
-     * @deprecated This property is no longer needed and will be removed in the next major release
-     */
-    @Deprecated
-    public static final String MULE_SESSION_ID_PROPERTY = PROPERTY_PREFIX + "SESSION_ID";
     public static final String MULE_SESSION_PROPERTY = PROPERTY_PREFIX + "SESSION";
     public static final String MULE_MESSAGE_ID_PROPERTY = PROPERTY_PREFIX + "MESSAGE_ID";
     public static final String MULE_CORRELATION_ID_PROPERTY = PROPERTY_PREFIX + "CORRELATION_ID";

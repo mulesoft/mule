@@ -94,6 +94,7 @@ import org.mule.config.spring.parsers.specific.StaticComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.TypedPropertyMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
@@ -286,8 +287,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerMuleBeanDefinitionParser("transformer", new ParentDefinitionParser()).addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor");
 
-        registerBeanDefinitionParser("custom-transformer", new MessageProcessorDefinitionParser());
-        registerBeanDefinitionParser("auto-transformer", new MessageProcessorDefinitionParser(AutoTransformer.class));
+        registerBeanDefinitionParser("custom-transformer", new TransformerMessageProcessorDefinitionParser());
+        registerBeanDefinitionParser("auto-transformer", new TransformerMessageProcessorDefinitionParser(AutoTransformer.class));
         registerBeanDefinitionParser("message-properties-transformer", new MessagePropertiesTransformerDefinitionParser());
         registerBeanDefinitionParser("set-property", new MessageProcessorDefinitionParser(AddPropertyTransformer.class));
         registerBeanDefinitionParser("remove-property", new MessageProcessorDefinitionParser(RemovePropertyTransformer.class));
@@ -305,40 +306,40 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("return-argument", new ChildDefinitionParser("argument", ExpressionArgument.class));
 
-        registerBeanDefinitionParser("bean-builder-transformer", new MessageProcessorDefinitionParser(BeanBuilderTransformer.class));
+        registerBeanDefinitionParser("bean-builder-transformer", new TransformerMessageProcessorDefinitionParser(BeanBuilderTransformer.class));
 
         final ChildDefinitionParser beanPropertyParser = new ChildDefinitionParser("argument", ExpressionArgument.class);
         beanPropertyParser.addAlias("property-name", "name");
         registerBeanDefinitionParser("bean-property", beanPropertyParser);
 
-        registerBeanDefinitionParser("base64-encoder-transformer", new MessageProcessorDefinitionParser(Base64Encoder.class));
-        registerBeanDefinitionParser("base64-decoder-transformer", new MessageProcessorDefinitionParser(Base64Decoder.class));
+        registerBeanDefinitionParser("base64-encoder-transformer", new TransformerMessageProcessorDefinitionParser(Base64Encoder.class));
+        registerBeanDefinitionParser("base64-decoder-transformer", new TransformerMessageProcessorDefinitionParser(Base64Decoder.class));
 
-        registerBeanDefinitionParser("xml-entity-encoder-transformer", new MessageProcessorDefinitionParser(XmlEntityEncoder.class));
-        registerBeanDefinitionParser("xml-entity-decoder-transformer", new MessageProcessorDefinitionParser(XmlEntityDecoder.class));
-        registerBeanDefinitionParser("gzip-compress-transformer", new MessageProcessorDefinitionParser(GZipCompressTransformer.class));
-        registerBeanDefinitionParser("gzip-uncompress-transformer", new MessageProcessorDefinitionParser(GZipUncompressTransformer.class));
-        registerBeanDefinitionParser("encrypt-transformer", new MessageProcessorDefinitionParser(EncryptionTransformer.class));
-        registerBeanDefinitionParser("decrypt-transformer", new MessageProcessorDefinitionParser(DecryptionTransformer.class));
-        registerBeanDefinitionParser("byte-array-to-hex-string-transformer", new MessageProcessorDefinitionParser(ByteArrayToHexString.class));
-        registerBeanDefinitionParser("hex-string-to-byte-array-transformer", new MessageProcessorDefinitionParser(HexStringToByteArray.class));
+        registerBeanDefinitionParser("xml-entity-encoder-transformer", new TransformerMessageProcessorDefinitionParser(XmlEntityEncoder.class));
+        registerBeanDefinitionParser("xml-entity-decoder-transformer", new TransformerMessageProcessorDefinitionParser(XmlEntityDecoder.class));
+        registerBeanDefinitionParser("gzip-compress-transformer", new TransformerMessageProcessorDefinitionParser(GZipCompressTransformer.class));
+        registerBeanDefinitionParser("gzip-uncompress-transformer", new TransformerMessageProcessorDefinitionParser(GZipUncompressTransformer.class));
+        registerBeanDefinitionParser("encrypt-transformer", new TransformerMessageProcessorDefinitionParser(EncryptionTransformer.class));
+        registerBeanDefinitionParser("decrypt-transformer", new TransformerMessageProcessorDefinitionParser(DecryptionTransformer.class));
+        registerBeanDefinitionParser("byte-array-to-hex-string-transformer", new TransformerMessageProcessorDefinitionParser(ByteArrayToHexString.class));
+        registerBeanDefinitionParser("hex-string-to-byte-array-transformer", new TransformerMessageProcessorDefinitionParser(HexStringToByteArray.class));
 
-        registerBeanDefinitionParser("byte-array-to-object-transformer", new MessageProcessorDefinitionParser(ByteArrayToObject.class));
-        registerBeanDefinitionParser("object-to-byte-array-transformer", new MessageProcessorDefinitionParser(ObjectToByteArray.class));
-        registerBeanDefinitionParser("object-to-string-transformer", new MessageProcessorDefinitionParser(ObjectToString.class));
-        registerBeanDefinitionParser("byte-array-to-serializable-transformer", new MessageProcessorDefinitionParser(ByteArrayToSerializable.class));
-        registerBeanDefinitionParser("serializable-to-byte-array-transformer", new MessageProcessorDefinitionParser(SerializableToByteArray.class));
-        registerBeanDefinitionParser("byte-array-to-string-transformer", new MessageProcessorDefinitionParser(ObjectToString.class));
-        registerBeanDefinitionParser("string-to-byte-array-transformer", new MessageProcessorDefinitionParser(ObjectToByteArray.class));
+        registerBeanDefinitionParser("byte-array-to-object-transformer", new TransformerMessageProcessorDefinitionParser(ByteArrayToObject.class));
+        registerBeanDefinitionParser("object-to-byte-array-transformer", new TransformerMessageProcessorDefinitionParser(ObjectToByteArray.class));
+        registerBeanDefinitionParser("object-to-string-transformer", new TransformerMessageProcessorDefinitionParser(ObjectToString.class));
+        registerBeanDefinitionParser("byte-array-to-serializable-transformer", new TransformerMessageProcessorDefinitionParser(ByteArrayToSerializable.class));
+        registerBeanDefinitionParser("serializable-to-byte-array-transformer", new TransformerMessageProcessorDefinitionParser(SerializableToByteArray.class));
+        registerBeanDefinitionParser("byte-array-to-string-transformer", new TransformerMessageProcessorDefinitionParser(ObjectToString.class));
+        registerBeanDefinitionParser("string-to-byte-array-transformer", new TransformerMessageProcessorDefinitionParser(ObjectToByteArray.class));
         registerBeanDefinitionParser("parse-template", new MessageProcessorDefinitionParser(ParseTemplateTransformer.class));
         registerBeanDefinitionParser("set-payload", new MessageProcessorDefinitionParser(SetPayloadMessageProcessor.class));
 
-        registerBeanDefinitionParser("append-string-transformer", new MessageProcessorDefinitionParser(StringAppendTransformer.class));
+        registerBeanDefinitionParser("append-string-transformer", new TransformerMessageProcessorDefinitionParser(StringAppendTransformer.class));
 
-        registerBeanDefinitionParser("map-to-bean-transformer", new MessageProcessorDefinitionParser(MapToBean.class));
-        registerBeanDefinitionParser("bean-to-map-transformer", new MessageProcessorDefinitionParser(BeanToMap.class));
+        registerBeanDefinitionParser("map-to-bean-transformer", new TransformerMessageProcessorDefinitionParser(MapToBean.class));
+        registerBeanDefinitionParser("bean-to-map-transformer", new TransformerMessageProcessorDefinitionParser(BeanToMap.class));
 
-        registerMuleBeanDefinitionParser("combine-collections-transformer", new MessageProcessorDefinitionParser(CombineCollectionsTransformer.class)).addIgnored("name");
+        registerMuleBeanDefinitionParser("combine-collections-transformer", new TransformerMessageProcessorDefinitionParser(CombineCollectionsTransformer.class)).addIgnored("name");
         
         //Transaction Managers
         registerBeanDefinitionParser("custom-transaction-manager", new TransactionManagerDefinitionParser());

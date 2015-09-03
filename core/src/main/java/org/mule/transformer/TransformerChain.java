@@ -73,7 +73,7 @@ public class TransformerChain extends AbstractMessageTransformer
                 result.setPayload(temp);
             }
         }
-        if (lastTransformer != null && lastTransformer.getReturnClass().equals(MuleMessage.class))
+        if (lastTransformer != null && lastTransformer.getReturnDataType().getType().equals(MuleMessage.class))
         {
             return result;
         }

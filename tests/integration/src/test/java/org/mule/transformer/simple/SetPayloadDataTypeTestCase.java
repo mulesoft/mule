@@ -32,12 +32,6 @@ public class SetPayloadDataTypeTestCase extends FunctionalTestCase
         doSetPayloadTest("vm://setPayloadLocal");
     }
 
-    @Test
-    public void setsPayloadGlobal() throws Exception
-    {
-        doSetPayloadTest("vm://setPayloadGlobal");
-    }
-
     private void doSetPayloadTest(String url) throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

@@ -78,8 +78,8 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertThat(get.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                                                 + "but there was no security context on the session. Authentication denied on endpoint" ));
+            assertThat(get.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.transport.http.filters.HttpBasicAuthenticationFilter " +
+                                                                 "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
@@ -103,8 +103,8 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(post);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertThat(post.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                                                  + "but there was no security context on the session. Authentication denied on endpoint" ));
+            assertThat(post.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.transport.http.filters.HttpBasicAuthenticationFilter " +
+                                                                  "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
