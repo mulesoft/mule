@@ -82,11 +82,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-jbpm</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-json</artifactId>
             <version>${project.version}</version>
         </dependency>

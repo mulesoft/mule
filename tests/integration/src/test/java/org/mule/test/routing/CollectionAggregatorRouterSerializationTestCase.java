@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.serialization.SerializationException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.EventGroup;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -21,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.hibernate.type.SerializationException;
 import org.junit.Test;
 
 public class CollectionAggregatorRouterSerializationTestCase extends FunctionalTestCase
