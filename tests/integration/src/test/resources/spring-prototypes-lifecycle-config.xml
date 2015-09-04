@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <custom-transformer name="AtoBConverter"
+                        class="org.mule.test.transformers.GraphTransformerResolutionTestCase$AtoBConverter"/>
+
+    <flow name="testFlow">
+        <vm:inbound-endpoint path="testIn" exchange-pattern="request-response"/>
+        
+        <auto-transformer returnClass="org.mule.test.transformers.GraphTransformerResolutionTestCase$B"/>
+    </flow>
+
+    <flow name="flowWithTransformerDependency">
+        <transformer ref="AtoBConverter" />
+    </flow>
+</mule>
