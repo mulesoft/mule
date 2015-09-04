@@ -16,6 +16,7 @@ import org.mule.config.i18n.CoreMessages;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -56,15 +57,24 @@ public class DynamicURIBuilder
         return resolvedUri;
     }
 
-    private String resolveAddress(MuleEvent event) throws URISyntaxException, UnsupportedEncodingException
+    private String resolveAddress(final MuleEvent event) throws URISyntaxException, UnsupportedEncodingException
     {
-        MuleContext muleContext = templateUriBuilder.getMuleContext();
-        String resolvedAddress = templateUriBuilder.getEncodedConstructor();
-
-        if (muleContext.getExpressionManager().isExpression(resolvedAddress))
+        final MuleContext muleContext = templateUriBuilder.getMuleContext();
+        String resolvedAddress = templateUriBuilder.getTransformedConstructor(new Transformer()
         {
-            resolvedAddress = muleContext.getExpressionManager().parse(resolvedAddress, event, true);
-        }
+            @Override
+            public Object transform(Object input)
+            {
+                String token = (String) input;
+
+                if (muleContext.getExpressionManager().isExpression(token))
+                {
+                    token = muleContext.getExpressionManager().parse(token, event, true);
+                }
+
+                return token;
+            }
+        }, URIBuilder.URL_ENCODER);
 
         return resolvedAddress;
     }

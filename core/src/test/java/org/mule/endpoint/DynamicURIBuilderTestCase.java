@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.MalformedEndpointException;
@@ -37,7 +38,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
     {
         String uriTemplate = "http://admin%40abc:admin%40123@localhost:8080/#[expression]";
 
-        createExpressionManager(uriTemplate);
+        createExpressionManager(uriTemplate, EXPECTED_ADDRESS);
 
         URIBuilder uriBuilder = new URIBuilder(uriTemplate, muleContext);
 
@@ -49,7 +50,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
     {
         String templatePort = "#[expression]";
 
-        createExpressionManager("http://admin%40abc:admin%40123@localhost:#[expression]/test?foo=bar");
+        createExpressionManager(ATTRIBUTE_EXPRESSION, "8080");
 
         URIBuilder uriBuilder = createDefaultUriBuilder(muleContext);
         uriBuilder.setPort(templatePort);
@@ -60,7 +61,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void resolvesDynamicHost() throws Exception
     {
-        createExpressionManager("http://admin%40abc:admin%40123@#[expression]:8080/test?foo=bar");
+        createExpressionManager(ATTRIBUTE_EXPRESSION, "localhost");
 
         URIBuilder uriBuilder = createDefaultUriBuilder(muleContext);
         uriBuilder.setHost(ATTRIBUTE_EXPRESSION);
@@ -71,7 +72,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void resolvesDynamicPath() throws Exception
     {
-        createExpressionManager("http://admin%40abc:admin%40123@localhost:8080/#[expression]");
+        createExpressionManager(ATTRIBUTE_EXPRESSION, "test?foo=bar");
 
         URIBuilder uriBuilder = createDefaultUriBuilder(muleContext);
         uriBuilder.setPath(ATTRIBUTE_EXPRESSION);
@@ -82,7 +83,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void resolvesDynamicPassword() throws Exception
     {
-        createExpressionManager("http://admin%40abc:#[expression]@localhost:8080/test?foo=bar");
+        createExpressionManager(ATTRIBUTE_EXPRESSION, "admin@123");
 
         URIBuilder uriBuilder = createDefaultUriBuilder(muleContext);
         uriBuilder.setPassword(ATTRIBUTE_EXPRESSION);
@@ -93,7 +94,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void resolvesDynamicUser() throws Exception
     {
-        createExpressionManager("http://#[expression]:admin%40123@localhost:8080/test?foo=bar");
+        createExpressionManager(ATTRIBUTE_EXPRESSION, "admin@abc");
 
         URIBuilder uriBuilder = createDefaultUriBuilder(muleContext);
         uriBuilder.setUser(ATTRIBUTE_EXPRESSION);
@@ -110,13 +111,13 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
         dynamicURIBuilder.build(event);
     }
 
-    private void createExpressionManager(String templateUri)
+    private void createExpressionManager(String expression, final String expressionValue)
     {
         ExpressionManager expressionManager = mock(ExpressionManager.class);
 
         when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-        when(expressionManager.isExpression(templateUri)).thenReturn(true);
-        when(expressionManager.parse(templateUri, event, true)).thenReturn(EXPECTED_ADDRESS);
+        when(expressionManager.isExpression(expression)).thenReturn(true);
+        when(expressionManager.parse(expression, event, true)).thenReturn(expressionValue);
     }
 
     private void doDynamicUriResolverTest(URIBuilder uriBuilder) throws URISyntaxException, UnsupportedEncodingException, MalformedEndpointException
@@ -131,8 +132,8 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
     {
         URIBuilder uriBuilder = new URIBuilder(muleContext);
 
-        uriBuilder.setUser("admin%40abc");
-        uriBuilder.setPassword("admin%40123");
+        uriBuilder.setUser("admin@abc");
+        uriBuilder.setPassword("admin@123");
         uriBuilder.setHost("localhost");
         uriBuilder.setPath("test?foo=bar");
         uriBuilder.setProtocol("http");
