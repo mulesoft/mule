@@ -13,11 +13,11 @@ import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.spi.Describer;
 import org.mule.extension.resources.ResourcesGenerator;
+import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.VersionResolver;
-import org.mule.module.extension.internal.manager.DescribingContextFactory;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.ExceptionUtils;
 
@@ -59,7 +59,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
     public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
 
     private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry);
+    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)
@@ -90,7 +90,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
         Describer describer = new AnnotationsBasedDescriber(extensionClass, new FixedVersionResolver());
 
-        DescribingContext context = new DescribingContextFactory(new SpiServiceRegistry(), extensionClass.getClassLoader()).newDescribingContext();
+        DescribingContext context = new DefaultDescribingContext();
         context.addParameter(EXTENSION_ELEMENT, extensionElement);
         context.addParameter(PROCESSING_ENVIRONMENT, processingEnv);
         context.addParameter(ROUND_ENVIRONMENT, roundEnvironment);

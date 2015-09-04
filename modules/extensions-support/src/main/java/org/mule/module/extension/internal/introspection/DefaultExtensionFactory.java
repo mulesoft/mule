@@ -21,7 +21,7 @@ import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.introspection.declaration.spi.DescriberPostProcessor;
+import org.mule.extension.introspection.declaration.spi.ModelEnricher;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 
 import com.google.common.collect.ImmutableList;
@@ -32,9 +32,11 @@ import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link ExtensionFactory} which uses a
- * {@link ServiceRegistry} to locate instances of {@link DescriberPostProcessor}.
- * The discovery of {@link DescriberPostProcessor}s will happen when the
- * {@link #DefaultExtensionFactory(ServiceRegistry)} constructor is invoked
+ * {@link ServiceRegistry} to locate instances of {@link ModelEnricher}.
+ * <p/>
+ * <p/>
+ * The discovery of {@link ModelEnricher} instances  will happen when the
+ * {@link #DefaultExtensionFactory(ServiceRegistry, ClassLoader)} constructor is invoked
  * and the list of discovered instances will be used during the whole duration of this instance
  *
  * @since 3.7.0
@@ -42,17 +44,18 @@ import java.util.stream.Collectors;
 public final class DefaultExtensionFactory implements ExtensionFactory
 {
 
-    private final List<DescriberPostProcessor> postProcessors;
+    private final List<ModelEnricher> modelEnrichers;
 
     /**
      * Creates a new instance and uses the given {@code serviceRegistry} to
-     * locate instances of {@link DescriberPostProcessor}
+     * locate instances of {@link ModelEnricher}
      *
-     * @param serviceRegistry a [@link ServiceRegistry
+     * @param serviceRegistry a {@link ServiceRegistry}
+     * @param classLoader     the {@link ClassLoader} on which the {@code serviceRegistry} will search into
      */
-    public DefaultExtensionFactory(ServiceRegistry serviceRegistry)
+    public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader)
     {
-        postProcessors = searchPostProcessors(serviceRegistry);
+        modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
     }
 
     /**
@@ -70,7 +73,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     @Override
     public ExtensionModel createFrom(Descriptor descriptor, DescribingContext describingContext)
     {
-        applyPostProcessors(describingContext);
+        enrichModel(describingContext);
         return toExtension(descriptor.getRootDeclaration().getDeclaration());
     }
 
@@ -78,11 +81,12 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     {
         validateMuleVersion(declaration);
         return new ImmutableExtensionModel(declaration.getName(),
-                                      declaration.getDescription(),
-                                      declaration.getVersion(),
-                                      sortConfigurations(toConfigurations(declaration.getConfigurations())),
-                                      alphaSortDescribedList(toOperations(declaration.getOperations())),
-                                      declaration.getCapabilities());
+                                           declaration.getDescription(),
+                                           declaration.getVersion(),
+                                           sortConfigurations(toConfigurations(declaration.getConfigurations())),
+                                           alphaSortDescribedList(toOperations(declaration.getOperations())),
+                                           declaration.getModelProperties(),
+                                           declaration.getCapabilities());
     }
 
     private List<ConfigurationModel> sortConfigurations(List<ConfigurationModel> configurationModels)
@@ -110,10 +114,11 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration)
     {
         return new ImmutableConfigurationModel(declaration.getName(),
-                                          declaration.getDescription(),
-                                          declaration.getConfigurationInstantiator(),
-                                          toConfigParameters(declaration.getParameters()),
-                                          declaration.getCapabilities());
+                                               declaration.getDescription(),
+                                               declaration.getConfigurationInstantiator(),
+                                               toConfigParameters(declaration.getParameters()),
+                                               declaration.getModelProperties(),
+                                               declaration.getCapabilities());
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations)
@@ -133,6 +138,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                            declaration.getDescription(),
                                            declaration.getExecutorFactory(),
                                            parameterModels,
+                                           declaration.getModelProperties(),
                                            declaration.getCapabilities());
     }
 
@@ -163,12 +169,13 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     private ParameterModel toParameter(ParameterDeclaration parameter)
     {
         return new ImmutableParameterModel(parameter.getName(),
-                                      parameter.getDescription(),
-                                      parameter.getType(),
-                                      parameter.isRequired(),
-                                      parameter.isDynamic(),
-                                      parameter.getDefaultValue(),
-                                      parameter.getCapabilities());
+                                           parameter.getDescription(),
+                                           parameter.getType(),
+                                           parameter.isRequired(),
+                                           parameter.isDynamic(),
+                                           parameter.getDefaultValue(),
+                                           parameter.getModelProperties(),
+                                           parameter.getCapabilities());
     }
 
     private void validateMuleVersion(Declaration declaration)
@@ -183,18 +190,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         }
     }
 
-    private void applyPostProcessors(DescribingContext describingContext)
+    private void enrichModel(DescribingContext describingContext)
     {
-        for (DescriberPostProcessor postProcessor : postProcessors)
-        {
-            postProcessor.postProcess(describingContext);
-        }
-    }
-
-    private List<DescriberPostProcessor> searchPostProcessors(ServiceRegistry serviceRegistry)
-    {
-        return ImmutableList.<DescriberPostProcessor>builder()
-                .addAll(serviceRegistry.lookupProviders(DescriberPostProcessor.class, getClass().getClassLoader()))
-                .build();
+        modelEnrichers.forEach(enricher -> enricher.enrich(describingContext));
     }
 }

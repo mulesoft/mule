@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.capability.xml.schema;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.capability.XmlCapability;
+import org.mule.extension.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
@@ -26,7 +26,7 @@ import org.dom4j.io.XMLWriter;
 
 /**
  * Generator class that takes a {@link ExtensionModel}
- * with a {@link org.mule.extension.introspection.capability.XmlCapability} and returns
+ * with a {@link XmlModelProperty} and returns
  * a XSD schema as a String
  *
  * @since 3.7.0
@@ -34,17 +34,17 @@ import org.dom4j.io.XMLWriter;
 public class SchemaGenerator
 {
 
-    private void validate(ExtensionModel extensionModel, XmlCapability xmlCapability)
+    private void validate(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
     {
         checkArgument(extensionModel != null, "extension cannot be null");
-        checkArgument(xmlCapability != null, "capability cannot be null");
-        checkState(!StringUtils.isBlank(xmlCapability.getNamespace()), "capability cannot provide a blank namespace");
+        checkArgument(xmlModelProperty != null, "capability cannot be null");
+        checkState(!StringUtils.isBlank(xmlModelProperty.getNamespace()), "capability cannot provide a blank namespace");
     }
 
-    public String generate(ExtensionModel extensionModel, XmlCapability xmlCapability)
+    public String generate(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
     {
-        validate(extensionModel, xmlCapability);
-        SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(xmlCapability.getSchemaLocation());
+        validate(extensionModel, xmlModelProperty);
+        SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(xmlModelProperty.getSchemaLocation());
 
         extensionModel.getConfigurations().forEach(schemaBuilder::registerConfigElement);
         extensionModel.getOperations().forEach(schemaBuilder::registerOperation);

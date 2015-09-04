@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
@@ -78,7 +79,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationI
         ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIG_NAME);
         when(configurationModel.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
         when(configurationModel.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-        when(configurationModel.getCapabilities(any(Class.class))).thenReturn(null);
+        when(configurationModel.getModelProperty(anyString())).thenReturn(null);
 
         when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
         when(muleContext.getExtensionManager()).thenReturn(extensionManager);

@@ -7,7 +7,6 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.module.extension.internal.DefaultDescribingContext.CAPABILITY_EXTRACTORS;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterName;
@@ -30,20 +29,19 @@ import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.ConfigurationDescriptor;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
-import org.mule.extension.introspection.declaration.fluent.HasCapabilities;
 import org.mule.extension.introspection.declaration.fluent.OperationDescriptor;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.introspection.declaration.spi.Describer;
-import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
-import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
-import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
-import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
-import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
+import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
+import org.mule.module.extension.internal.model.property.HiddenModelProperty;
+import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.module.extension.spi.CapabilityExtractor;
 import org.mule.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -53,7 +51,6 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Implementation of {@link Describer} which generates a {@link Descriptor} by
@@ -63,7 +60,6 @@ import java.util.function.Function;
  */
 public final class AnnotationsBasedDescriber implements Describer
 {
-
     private final Class<?> extensionType;
     private final VersionResolver versionResolver;
 
@@ -89,11 +85,13 @@ public final class AnnotationsBasedDescriber implements Describer
         DeclarationDescriptor declaration = context.getDeclarationDescriptor()
                 .named(extension.name())
                 .onVersion(getVersion(extension))
-                .describedAs(extension.description());
+                .describedAs(extension.description())
+                .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(extensionType));
 
-        declareConfigurations(context, declaration, extensionType);
-        declareOperations(context, declaration, extensionType);
-        declareExtensionCapabilities(context, declaration, extensionType);
+
+
+        declareConfigurations(declaration, extensionType);
+        declareOperations(declaration, extensionType);
 
         return declaration;
     }
@@ -103,23 +101,23 @@ public final class AnnotationsBasedDescriber implements Describer
         return versionResolver.resolveVersion(extension);
     }
 
-    private void declareConfigurations(DescribingContext context, DeclarationDescriptor declaration, Class<?> extensionType)
+    private void declareConfigurations(DeclarationDescriptor declaration, Class<?> extensionType)
     {
         Configurations configurations = extensionType.getAnnotation(Configurations.class);
         if (configurations != null)
         {
             for (Class<?> declaringClass : configurations.value())
             {
-                declareConfiguration(context, declaration, declaringClass);
+                declareConfiguration(declaration, declaringClass);
             }
         }
         else
         {
-            declareConfiguration(context, declaration, extensionType);
+            declareConfiguration(declaration, extensionType);
         }
     }
 
-    private void declareConfiguration(DescribingContext context, DeclarationDescriptor declaration, Class<?> configurationType)
+    private void declareConfiguration(DeclarationDescriptor declaration, Class<?> configurationType)
     {
         checkArgument(CollectionUtils.isEmpty(getOperationMethods(configurationType)), String.format("Class %s can't declare a configuration and operations at the same time", configurationType.getName()));
 
@@ -138,7 +136,6 @@ public final class AnnotationsBasedDescriber implements Describer
         configuration.instantiatedWith(new TypeAwareConfigurationInstantiator(configurationType));
 
         declareConfigurationParameters(configurationType, configuration);
-        declareConfigCapabilities(context, configuration, configurationType);
     }
 
     private void declareConfigurationParameters(Class<?> extensionType, ConfigurationDescriptor configuration)
@@ -147,7 +144,7 @@ public final class AnnotationsBasedDescriber implements Describer
         List<ParameterGroup> groups = declareConfigurationParametersGroups(extensionType, configuration);
         if (!CollectionUtils.isEmpty(groups))
         {
-            configuration.withCapability(new ParameterGroupCapability(groups));
+            configuration.withModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(groups));
         }
     }
 
@@ -174,7 +171,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), configuration);
                 if (!CollectionUtils.isEmpty(childGroups))
                 {
-                    group.addCapability(new ParameterGroupCapability(childGroups));
+                    group.addModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(childGroups));
                 }
             }
         }
@@ -210,7 +207,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 parameterDescriptor.whichIsStatic();
             }
 
-            parameterDescriptor.withCapability(new MemberNameCapability(field.getName()));
+            parameterDescriptor.withModelProperty(MemberNameModelProperty.KEY, new MemberNameModelProperty(field.getName()));
 
             parameters.add(parameterDescriptor);
         }
@@ -219,7 +216,7 @@ public final class AnnotationsBasedDescriber implements Describer
     }
 
 
-    private void declareOperations(DescribingContext context, DeclarationDescriptor declaration, Class<?> extensionType)
+    private void declareOperations(DeclarationDescriptor declaration, Class<?> extensionType)
     {
         Operations operations = extensionType.getAnnotation(Operations.class);
         if (operations == null)
@@ -229,11 +226,11 @@ public final class AnnotationsBasedDescriber implements Describer
 
         for (Class<?> actingClass : operations.value())
         {
-            declareOperation(context, declaration, actingClass);
+            declareOperation(declaration, actingClass);
         }
     }
 
-    private <T> void declareOperation(DescribingContext context, DeclarationDescriptor declaration, Class<T> actingClass)
+    private <T> void declareOperation(DeclarationDescriptor declaration, Class<T> actingClass)
     {
         for (Method method : getOperationMethods(actingClass))
         {
@@ -242,7 +239,6 @@ public final class AnnotationsBasedDescriber implements Describer
 
             declareOperationParameters(method, operation);
             calculateExtendedTypes(actingClass, method, operation);
-            declareOperationCapabilities(context, operation, method);
         }
     }
 
@@ -256,11 +252,11 @@ public final class AnnotationsBasedDescriber implements Describer
 
         if (extensionOf != null)
         {
-            operation.withCapability(new ExtendingOperationCapability(extensionOf.value()));
+            operation.withModelProperty(ExtendingOperationModelProperty.KEY, new ExtendingOperationModelProperty(extensionOf.value()));
         }
         else if (isExtensible())
         {
-            operation.withCapability(new ExtendingOperationCapability(extensionType));
+            operation.withModelProperty(ExtendingOperationModelProperty.KEY, new ExtendingOperationModelProperty(extensionType));
         }
     }
 
@@ -291,7 +287,7 @@ public final class AnnotationsBasedDescriber implements Describer
     {
         if (parameterDescriptor.isHidden())
         {
-            parameter.withCapability(new HiddenCapability());
+            parameter.withModelProperty(HiddenModelProperty.KEY, HiddenModelProperty.INSTANCE);
         }
     }
 
@@ -300,39 +296,7 @@ public final class AnnotationsBasedDescriber implements Describer
         Class<?> restriction = descriptor.getTypeRestriction();
         if (restriction != null)
         {
-            parameter.withCapability(new TypeRestrictionCapability<>(restriction));
+            parameter.withModelProperty(TypeRestrictionModelProperty.KEY, new TypeRestrictionModelProperty<>(restriction));
         }
-    }
-
-    private void declareExtensionCapabilities(DescribingContext context, DeclarationDescriptor declaration, Class<?> extensionType)
-    {
-        declareCapabilities(context, declaration, extractor -> extractor.extractExtensionCapability(declaration, extensionType));
-    }
-
-    private void declareConfigCapabilities(DescribingContext context, ConfigurationDescriptor descriptor, Class<?> configType)
-    {
-        declareCapabilities(context, descriptor, extractor -> extractor.extractConfigCapability(descriptor, configType));
-    }
-
-    private void declareOperationCapabilities(DescribingContext context, OperationDescriptor descriptor, Method method)
-    {
-        declareCapabilities(context, descriptor, extractor -> extractor.extractOperationCapability(descriptor, method));
-    }
-
-    private void declareCapabilities(DescribingContext context, HasCapabilities<?> declaration, Function<CapabilityExtractor, Object> extractFunction)
-    {
-        List<CapabilityExtractor> extractors = context.getParameter(CAPABILITY_EXTRACTORS, List.class);
-        if (CollectionUtils.isEmpty(extractors))
-        {
-            return;
-        }
-
-        extractors.forEach(extractor -> {
-            Object capability = extractFunction.apply(extractor);
-            if (capability != null)
-            {
-                declaration.withCapability(capability);
-            }
-        });
     }
 }

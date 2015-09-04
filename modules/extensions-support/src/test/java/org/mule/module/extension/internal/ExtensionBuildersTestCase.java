@@ -50,17 +50,17 @@ import static org.mule.extension.introspection.declaration.tck.TestWebServiceCon
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.exception.NoSuchConfigurationException;
 import org.mule.extension.exception.NoSuchOperationException;
-import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ConfigurationInstantiator;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.DataQualifier;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.spi.DescriberPostProcessor;
+import org.mule.extension.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -94,11 +94,11 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Before
     public void buildExtension() throws Exception
     {
-        Collection<DescriberPostProcessor> emptyList = Collections.emptyList();
-        when(serviceRegistry.lookupProviders(same(DescriberPostProcessor.class))).thenReturn(emptyList);
-        when(serviceRegistry.lookupProviders(same(DescriberPostProcessor.class), any(ClassLoader.class))).thenReturn(emptyList);
+        Collection<ModelEnricher> emptyList = Collections.emptyList();
+        when(serviceRegistry.lookupProviders(same(ModelEnricher.class))).thenReturn(emptyList);
+        when(serviceRegistry.lookupProviders(same(ModelEnricher.class), any(ClassLoader.class))).thenReturn(emptyList);
 
-        factory = new DefaultExtensionFactory(serviceRegistry);
+        factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
         descriptor = createDeclarationDescriptor();
         extensionModel = factory.createFrom(descriptor);
     }
@@ -243,23 +243,23 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test
     public void postProcessorsInvoked() throws Exception
     {
-        DescriberPostProcessor postProcessor1 = mock(DescriberPostProcessor.class);
-        DescriberPostProcessor postProcessor2 = mock(DescriberPostProcessor.class);
+        ModelEnricher modelEnricher1 = mock(ModelEnricher.class);
+        ModelEnricher modelEnricher2 = mock(ModelEnricher.class);
 
-        when(serviceRegistry.lookupProviders(same(DescriberPostProcessor.class), any(ClassLoader.class)))
-                .thenReturn(Arrays.asList(postProcessor1, postProcessor2));
+        when(serviceRegistry.lookupProviders(same(ModelEnricher.class), any(ClassLoader.class)))
+                .thenReturn(Arrays.asList(modelEnricher1, modelEnricher2));
 
-        factory = new DefaultExtensionFactory(serviceRegistry);
+        factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
         factory.createFrom(descriptor);
 
-        assertDescribingContext(postProcessor1);
-        assertDescribingContext(postProcessor2);
+        assertDescribingContext(modelEnricher1);
+        assertDescribingContext(modelEnricher2);
     }
 
-    private void assertDescribingContext(DescriberPostProcessor postProcessor)
+    private void assertDescribingContext(ModelEnricher modelEnricher)
     {
         ArgumentCaptor<DescribingContext> captor = ArgumentCaptor.forClass(DescribingContext.class);
-        verify(postProcessor).postProcess(captor.capture());
+        verify(modelEnricher).enrich(captor.capture());
 
         DescribingContext ctx = captor.getValue();
         assertThat(ctx, is(notNullValue()));

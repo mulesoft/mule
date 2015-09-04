@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.api.MuleContext;
@@ -64,7 +64,7 @@ public class ConfigurationProviderTestCase extends AbstractConfigurationInstance
 
         when(configurationModel.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
         when(configurationModel.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-        when(configurationModel.getCapabilities(any(Class.class))).thenReturn(null);
+        when(configurationModel.getModelProperty(anyString())).thenReturn(null);
 
         when(operationContext.getEvent()).thenReturn(event);
 

@@ -22,6 +22,7 @@ import org.mule.extension.introspection.declaration.spi.Describer;
 import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
 import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.manager.DefaultExtensionManager;
@@ -77,7 +78,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
 {
 
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry);
+    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
     private ExtensionManagerAdapter extensionManager;
     private File generatedResourcesDirectory;
 
@@ -191,7 +192,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
     {
         for (Describer describer : describers)
         {
-            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe(extensionManager.createDescribingContext())));
+            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe(new DefaultDescribingContext())));
         }
     }
 

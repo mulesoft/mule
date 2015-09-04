@@ -16,7 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -63,7 +63,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
         when(configurationModel.getParameterModels()).thenReturn(Arrays.asList(nameParameterModel, descriptionParameterModel));
         when(configurationModel.getInstantiator().newInstance()).thenReturn(configuration);
         when(configurationModel.getInstantiator().getObjectType()).thenAnswer(invocation -> TestConfig.class);
-        when(configurationModel.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
+        when(configurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
 
         resolverSet = new ResolverSet();
         resolverSet.add(nameParameterModel, getResolver(NAME_VALUE));

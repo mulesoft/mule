@@ -6,12 +6,11 @@
  */
 package org.mule.module.extension.internal.util;
 
-import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleException;
-import org.mule.extension.introspection.Capable;
-import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
+import org.mule.extension.introspection.EnrichableModel;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
@@ -42,20 +41,20 @@ public final class GroupValueSetter implements ValueSetter
 
     /**
      * Returns a {@link List} containing one {@link ValueSetter} instance per each
-     * {@link ParameterGroup} defined in the {@link ParameterGroupCapability} extracted
-     * from the given {@code capable}. If {@code capable} does not contain such capability
+     * {@link ParameterGroup} defined in the {@link ParameterGroupModelProperty} extracted
+     * from the given {@code model}. If {@code model} does not contain such model property
      * then an empty {@link List} is returned
      *
-     * @param capable a {@link Capable} instance presumed to have the {@link ParameterGroupCapability}
+     * @param model a {@link EnrichableModel} instance presumed to have the {@link ParameterGroupModelProperty}
      * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
      */
-    public static List<ValueSetter> settersFor(Capable capable)
+    public static List<ValueSetter> settersFor(EnrichableModel model)
     {
-        ParameterGroupCapability parameterGroupCapability = getSingleCapability(capable, ParameterGroupCapability.class);
+        ParameterGroupModelProperty parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.KEY);
 
-        if (parameterGroupCapability != null)
+        if (parameterGroupModelProperty != null)
         {
-            return parameterGroupCapability.getGroups().stream()
+            return parameterGroupModelProperty.getGroups().stream()
                     .map(group -> new GroupValueSetter(group))
                     .collect(new ImmutableListCollector<>());
         }

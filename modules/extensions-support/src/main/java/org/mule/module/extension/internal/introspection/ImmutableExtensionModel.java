@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @since 3.7.0
  */
-final class ImmutableExtensionModel extends AbstractCapableDescribed implements ExtensionModel
+final class ImmutableExtensionModel extends AbstractImmutableModel implements ExtensionModel
 {
 
     private final String version;
@@ -39,22 +39,24 @@ final class ImmutableExtensionModel extends AbstractCapableDescribed implements 
     /**
      * Creates a new instance with the given state
      *
-     * @param name           the extension's name. Cannot be blank
-     * @param description    the extension's description
-     * @param version        the extension's version
+     * @param name                the extension's name. Cannot be blank
+     * @param description         the extension's description
+     * @param version             the extension's version
      * @param configurationModels a {@link List} with the extension's {@link ConfigurationModel configurationModels}
      * @param operationModels     a {@link List} with the extension's {@link OperationModel operationModels}
-     * @param capabilities   a {@link Set} with the extension's capabilities
-     * @throws IllegalArgumentException if {@code configurations} or {@link ParameterModel} are null or contain instances with non unique names
+     * @param modelProperties     A {@link Map} of custom properties which extend this model
+     * @param capabilities        a {@link Set} with the extension's capabilities
+     * @throws IllegalArgumentException if {@code configurations} or {@link ParameterModel} are null or contain instances with non unique names, or if {@code name}  is blank
      */
     protected ImmutableExtensionModel(String name,
                                       String description,
                                       String version,
                                       List<ConfigurationModel> configurationModels,
                                       List<OperationModel> operationModels,
+                                      Map<String, Object> modelProperties,
                                       Set<Object> capabilities)
     {
-        super(name, description, capabilities);
+        super(name, description, modelProperties, capabilities);
 
         checkArgument(!name.contains(" "), "Extension name cannot contain spaces");
         validateRepeatedNames(configurationModels, operationModels);

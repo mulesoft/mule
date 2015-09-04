@@ -28,7 +28,6 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
-import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isDynamic;
@@ -45,9 +44,6 @@ import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
-import org.mule.module.extension.internal.capability.metadata.HiddenCapability;
-import org.mule.module.extension.internal.capability.metadata.TypeRestrictionCapability;
 import org.mule.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -75,6 +71,9 @@ import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelEl
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
+import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
+import org.mule.module.extension.internal.model.property.HiddenModelProperty;
+import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.ArrayUtils;
@@ -89,8 +88,6 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Builder class to generate a XSD schema that describes a
@@ -586,10 +583,10 @@ public class SchemaBuilder
     private QName getOperationSubstitutionGroup(OperationModel operationModel)
     {
         QName substitutionGroup = MULE_ABSTRACT_MESSAGE_PROCESSOR;
-        ExtendingOperationCapability extendingOperationCapability = getSingleCapability(operationModel, ExtendingOperationCapability.class);
-        if (extendingOperationCapability != null)
+        ExtendingOperationModelProperty extendingOperationModelProperty = operationModel.getModelProperty(ExtendingOperationModelProperty.class.getName());
+        if (extendingOperationModelProperty != null)
         {
-            substitutionGroup = getSubstitutionGroup(extendingOperationCapability.getType());
+            substitutionGroup = getSubstitutionGroup(extendingOperationModelProperty.getType());
         }
 
         return substitutionGroup;
@@ -708,7 +705,7 @@ public class SchemaBuilder
 
     private boolean isHidden(ParameterModel parameterModel)
     {
-        return !CollectionUtils.isEmpty(parameterModel.getCapabilities(HiddenCapability.class));
+        return parameterModel.getModelProperty(HiddenModelProperty.KEY) != null;
     }
 
     private boolean isOperation(DataType type)
@@ -741,7 +738,7 @@ public class SchemaBuilder
     private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs)
     {
         QName ref = MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
-        TypeRestrictionCapability restrictionCapability = getSingleCapability(parameterModel, TypeRestrictionCapability.class);
+        TypeRestrictionModelProperty restrictionCapability = parameterModel.getModelProperty(TypeRestrictionModelProperty.KEY);
         if (restrictionCapability != null)
         {
             ref = getSubstitutionGroup(restrictionCapability.getType());

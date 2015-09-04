@@ -9,11 +9,12 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.validateRepeatedNames;
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ConfigurationInstantiator;
+import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ParameterModel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,7 +22,7 @@ import java.util.Set;
  *
  * @since 3.7.0
  */
-final class ImmutableConfigurationModel extends AbstractCapableDescribed implements ConfigurationModel
+final class ImmutableConfigurationModel extends AbstractImmutableModel implements ConfigurationModel
 {
 
     private final List<ParameterModel> parameterModels;
@@ -30,19 +31,22 @@ final class ImmutableConfigurationModel extends AbstractCapableDescribed impleme
     /**
      * Creates a new instance with the given state
      *
-     * @param name         the configuration's name
-     * @param description  the configuration's description
-     * @param instantiator the {@link ConfigurationInstantiator}. Cannot be {@code null}
-     * @param parameterModels   a {@link List} with the configuration's {@link ParameterModel parameterModels}
-     * @param capabilities a {@link Set} with the configuration's capabilities
+     * @param name            the configuration's name
+     * @param description     the configuration's description
+     * @param instantiator    the {@link ConfigurationInstantiator}. Cannot be {@code null}
+     * @param parameterModels a {@link List} with the configuration's {@link ParameterModel parameterModels}
+     * @param modelProperties A {@link Map} of custom properties which extend this model
+     * @param capabilities    a {@link Set} with the configuration's capabilities
+     * @throws IllegalArgumentException if {@code name} is blank
      */
     protected ImmutableConfigurationModel(String name,
                                           String description,
                                           ConfigurationInstantiator instantiator,
                                           List<ParameterModel> parameterModels,
+                                          Map<String, Object> modelProperties,
                                           Set<Object> capabilities)
     {
-        super(name, description, capabilities);
+        super(name, description, modelProperties, capabilities);
         validateRepeatedNames(parameterModels);
         checkArgument(instantiator != null, "instantiator cannot be null");
 
