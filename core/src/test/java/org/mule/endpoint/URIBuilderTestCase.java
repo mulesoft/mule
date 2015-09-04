@@ -200,6 +200,17 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         assertEquals("smtp://user%40my-domain.com:" + URLEncoder.encode("! \"#$%&'()*+,-./:;<=>?@[\\]_`{|}~", "UTF-8") + "@smtp.my-domain.com:25", result);
     }
 
+    @Test
+    public void testConstructAddressWithSpecialURICharsInPath() throws UnsupportedEncodingException
+    {
+        URIBuilder uri = new URIBuilder();
+        uri.setProtocol("http");
+        uri.setHost("my-domain.com");
+        uri.setPath("folder%a/resource%b");
+        String result = uri.getEncodedConstructor();
+        assertEquals("http://my-domain.com/folder%a/resource%b", result);
+    }
+
     private URIBuilder createURIBuilder(String host, int port, String protocol, String path)
     {
         URIBuilder builder = new URIBuilder();

@@ -9,8 +9,6 @@ package org.mule.endpoint;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +22,6 @@ import org.mule.tck.size.SmallTest;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 
-import org.apache.commons.collections.Transformer;
 import org.junit.Test;
 
 @SmallTest
@@ -120,7 +117,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
 
         when(muleContext.getExpressionManager()).thenReturn(expressionManager);
         when(expressionManager.isExpression(expression)).thenReturn(true);
-        when(expressionManager.parse(eq(expression), eq(event), eq(true), any(Transformer.class))).thenReturn(expressionValue);
+        when(expressionManager.parse(expression, event, true)).thenReturn(expressionValue);
     }
 
     private void doDynamicUriResolverTest(URIBuilder uriBuilder) throws URISyntaxException, UnsupportedEncodingException, MalformedEndpointException

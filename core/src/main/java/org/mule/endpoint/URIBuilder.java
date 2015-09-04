@@ -73,6 +73,22 @@ public class URIBuilder extends AbstractAnnotatedObject
     // this doesn't include address, since that is handled separately (and is exclusive with these)
     public static final String[] ALL_TRANSPORT_ATTRIBUTES = new String[]{USER, PASSWORD, HOST, PORT, PATH};
 
+    protected static final Transformer URL_ENCODER = new Transformer()
+    {
+        @Override
+        public Object transform(Object input)
+        {
+            try
+            {
+                return URLEncoder.encode((String) input, "UTF-8");
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                throw new AssertionError("UTF-8 is unknown");
+            }
+        }
+    };
+
     private String address;
     private String meta;
     private String protocol;
@@ -243,21 +259,7 @@ public class URIBuilder extends AbstractAnnotatedObject
     {
         StringBuilder buffer = new StringBuilder();
         appendMeta(buffer);
-        OrderedQueryParameters uriQueries = appendAddress(buffer, TransformerUtils.nopTransformer(), new Transformer()
-        {
-            @Override
-            public Object transform(Object input)
-            {
-                try
-                {
-                    return URLEncoder.encode((String) input, "UTF-8");
-                }
-                catch (UnsupportedEncodingException e)
-                {
-                    throw new AssertionError("UTF-8 is unknown");
-                }
-            }
-        });
+        OrderedQueryParameters uriQueries = appendAddress(buffer, TransformerUtils.nopTransformer(), URL_ENCODER);
         uriQueries.override(queryMap);
         buffer.append(uriQueries.toString());
         removeRootTrailingSlash(buffer);
@@ -292,7 +294,7 @@ public class URIBuilder extends AbstractAnnotatedObject
             if (index > -1)
             {
                 buffer.append(tokenProcessor.transform(address.substring(0, index)));
-                return parseQueries(address.substring(index + 1));
+                return parseQueries((String) tokenProcessor.transform(address.substring(index + 1)));
             }
             else
             {
@@ -507,7 +509,7 @@ public class URIBuilder extends AbstractAnnotatedObject
                         names.add(name);
                         values.add(value);
                     }
-                 }
+                }
             }
         }
 

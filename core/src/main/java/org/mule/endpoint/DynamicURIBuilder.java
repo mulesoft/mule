@@ -15,7 +15,6 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
@@ -30,22 +29,6 @@ public class DynamicURIBuilder
     protected transient final Log logger = LogFactory.getLog(DynamicURIBuilder.class);
 
     private final URIBuilder templateUriBuilder;
-
-    private static final Transformer URL_ENCODER = new Transformer()
-    {
-        @Override
-        public Object transform(Object input)
-        {
-            try
-            {
-                return URLEncoder.encode((String) input, "UTF-8");
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new AssertionError("UTF-8 is unknown");
-            }
-        }
-    };
 
     public DynamicURIBuilder(URIBuilder templateUriBuilder) throws MalformedEndpointException
     {
@@ -84,14 +67,14 @@ public class DynamicURIBuilder
             {
                 String token = (String) input;
 
-                    if (muleContext.getExpressionManager().isExpression(token))
-                    {
-                        token = muleContext.getExpressionManager().parse(token, event, true, URL_ENCODER);
-                    }
+                if (muleContext.getExpressionManager().isExpression(token))
+                {
+                    token = muleContext.getExpressionManager().parse(token, event, true);
+                }
 
-                    return token;
+                return token;
             }
-        }, URL_ENCODER);
+        }, URIBuilder.URL_ENCODER);
 
         return resolvedAddress;
     }
