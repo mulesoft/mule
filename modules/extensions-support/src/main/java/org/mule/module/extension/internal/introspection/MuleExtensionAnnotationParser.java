@@ -15,9 +15,8 @@ import org.mule.api.MuleMessage;
 import org.mule.extension.annotations.Extension;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.RestrictedTo;
-import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.annotations.param.Payload;
+import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.declaration.fluent.CapableDeclaration;
@@ -165,14 +164,6 @@ public final class MuleExtensionAnnotationParser
         else
         {
             parameter.setRequired(true);
-        }
-
-        Payload payload = (Payload) annotations.get(Payload.class);
-        if (payload != null)
-        {
-            parameter.setRequired(false);
-            parameter.setDefaultValue("#[payload]");
-            parameter.setHidden(true);
         }
 
         RestrictedTo typeRestriction = (RestrictedTo) annotations.get(RestrictedTo.class);

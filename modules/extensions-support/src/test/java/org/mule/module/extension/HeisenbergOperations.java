@@ -14,9 +14,8 @@ import org.mule.extension.ExtensionManager;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.ParameterGroup;
 import org.mule.extension.annotations.RestrictedTo;
-import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.annotations.param.Payload;
+import org.mule.extension.annotations.param.UseConfig;
 
 import java.util.List;
 
@@ -50,7 +49,7 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public String kill(@Payload String victim, String goodbyeMessage) throws Exception
+    public String kill(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage) throws Exception
     {
         return killWithCustomMessage(victim, goodbyeMessage);
     }
