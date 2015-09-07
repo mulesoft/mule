@@ -732,6 +732,7 @@ public class SchemaBuilder
         TopLevelElement collectionElement = new TopLevelElement();
         collectionElement.setName(hyphenize(parameterModel.getName()));
         collectionElement.setMinOccurs(parameterModel.isRequired() ? BigInteger.ONE : BigInteger.ZERO);
+        collectionElement.setMaxOccurs(maxOccurs);
         collectionElement.setComplexType(collectionComplexType);
         collectionElement.setAnnotation(createDocAnnotation(EMPTY));
         all.getParticle().add(objectFactory.createElement(collectionElement));

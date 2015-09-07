@@ -210,6 +210,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="victim"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="goodbyeMessage"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
@@ -219,7 +220,7 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
-                    <xs:element minOccurs="1" name="kill-operations">
+                    <xs:element minOccurs="1" maxOccurs="unbounded" name="kill-operations">
                         <xs:complexType>
                             <xs:group xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="unbounded" ref="heisenberg-empire-group"></xs:group>
                         </xs:complexType>
@@ -239,7 +240,7 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
-                    <xs:element minOccurs="1" name="kill-operation">
+                    <xs:element minOccurs="1" maxOccurs="1" name="kill-operation">
                         <xs:complexType>
                             <xs:group xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg-empire-group"></xs:group>
                         </xs:complexType>
