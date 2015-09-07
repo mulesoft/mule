@@ -7,28 +7,23 @@
 package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.emptyIterable;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createDescribingContext;
 import org.mule.extension.annotations.Extensible;
 import org.mule.extension.annotations.ExtensionOf;
 import org.mule.extension.annotations.Operation;
 import org.mule.extension.annotations.Operations;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
-
-import java.util.Set;
+import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 
 import org.junit.Test;
 
 public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBasedDescriberTestCase
 {
+
     private static final String SAY_HELLO_OPERATION = "sayHello";
     private static final String SAY_BYE_OPERATION = "sayBye";
 
@@ -57,14 +52,11 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     private void assertOperationExtensionOf(String operationName, Class capabilityType)
     {
-        Declaration declaration = getDescriber().describe(createDescribingContext()).getRootDeclaration().getDeclaration();
+        Declaration declaration = getDescriber().describe(new DefaultDescribingContext()).getRootDeclaration().getDeclaration();
         OperationDeclaration operation = getOperation(declaration, operationName);
-        assertThat(operation.getCapabilities(), is(not(emptyIterable())));
 
-        Set<ExtendingOperationCapability> extendingOperationCapabilities = operation.getCapabilities(ExtendingOperationCapability.class);
-        assertThat(extendingOperationCapabilities, hasSize(1));
-        ExtendingOperationCapability<ExtensibleExtension> capability = extendingOperationCapabilities.iterator().next();
-        assertThat(capability.getType(), is(sameInstance(capabilityType)));
+        ExtendingOperationModelProperty<ExtensibleExtension> modelProperty = operation.getModelProperty(ExtendingOperationModelProperty.KEY);
+        assertThat(modelProperty.getType(), is(sameInstance(capabilityType)));
     }
 
     @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
@@ -93,6 +85,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
     @ExtensionOf(ExtensibleExtension.class)
     private static class ClassLevelExtensionOfOperation
     {
+
         @Operation
         public String sayHello()
         {
@@ -103,6 +96,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     private static class MethodLevelExtensionOfOperation
     {
+
         @ExtensionOf(ExtensibleExtension.class)
         @Operation
         public String sayBye()
@@ -113,6 +107,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     private static class ExtensibleExtensionOperation
     {
+
         @Operation
         public String sayHello()
         {

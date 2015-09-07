@@ -6,7 +6,6 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkState;
@@ -17,11 +16,10 @@ import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.RestrictedTo;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.declaration.fluent.CapableDeclaration;
-import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
-import org.mule.module.extension.internal.util.CapabilityUtils;
+import org.mule.extension.introspection.EnrichableModel;
+import org.mule.extension.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.ParamReader;
@@ -43,8 +41,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Utilities for reading annotations as a mean to
- * describe extensions
+ * Utilities for reading annotations as a mean to describe extensions
  *
  * @since 3.7.0
  */
@@ -67,16 +64,16 @@ public final class MuleExtensionAnnotationParser
         return StringUtils.isEmpty(alias) ? defaultName : alias;
     }
 
-    static String getMemberName(CapableDeclaration<?> capable, String defaultName)
+    public static String getMemberName(BaseDeclaration<?> declaration, String defaultName)
     {
-        MemberNameCapability memberNameCapability = CapabilityUtils.getSingleCapability(capable.getCapabilities(), MemberNameCapability.class);
-        return memberNameCapability != null ? memberNameCapability.getName() : defaultName;
+        MemberNameModelProperty memberNameModelProperty = declaration.getModelProperty(MemberNameModelProperty.KEY);
+        return memberNameModelProperty != null ? memberNameModelProperty.getName() : defaultName;
     }
 
-    public static String getMemberName(Capable capable, String defaultName)
+    public static String getMemberName(EnrichableModel enrichableModel, String defaultName)
     {
-        MemberNameCapability memberNameCapability = getSingleCapability(capable, MemberNameCapability.class);
-        return memberNameCapability != null ? memberNameCapability.getName() : defaultName;
+        MemberNameModelProperty memberNameModelProperty = enrichableModel.getModelProperty(MemberNameModelProperty.KEY);
+        return memberNameModelProperty != null ? memberNameModelProperty.getName() : defaultName;
     }
 
     static Extension getExtension(Class<?> extensionType)

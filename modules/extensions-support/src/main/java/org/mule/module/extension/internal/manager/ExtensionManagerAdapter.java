@@ -9,7 +9,6 @@ package org.mule.module.extension.internal.manager;
 import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.ConfigurationRegistrationCallback;
 import org.mule.extension.runtime.OperationContext;
@@ -43,7 +42,5 @@ public interface ExtensionManagerAdapter extends ExtensionManager, Configuration
     <C> DeclaredConfiguration<C> getConfiguration(ExtensionModel extensionModel, String configurationProviderName, OperationContext operationContext);
 
     <C> DeclaredConfiguration<C> getConfiguration(ExtensionModel extensionModel, OperationContext operationContext);
-
-    DescribingContext createDescribingContext();
 
 }

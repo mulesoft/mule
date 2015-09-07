@@ -7,7 +7,6 @@
 package org.mule.module.extension.internal.manager;
 
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.util.CollectionUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -39,7 +38,6 @@ final class ExtensionRegistry
     });
 
     private final Map<String, ExtensionModel> extensions = new ConcurrentHashMap<>();
-    private final Map<Class<?>, Set<ExtensionModel>> capabilityToExtension = new ConcurrentHashMap<>();
 
     ExtensionRegistry()
     {
@@ -74,42 +72,12 @@ final class ExtensionRegistry
     }
 
     /**
-     * Returns a registered {@link ExtensionModel} of the given {@code name}
-     *
-     * @param name the name of the extension that is being retrieved
-     * @return the registered {@link ExtensionModel} or {@code null} if nothing was registered with that {@code name}
-     */
-    ExtensionModel getExtension(String name)
-    {
-        return extensions.get(name);
-    }
-
-    /**
      * @param extensionModel a registered {@link ExtensionModel}
      * @return the {@link ExtensionStateTracker} object related to the given {@code extension}
      */
     ExtensionStateTracker getExtensionState(ExtensionModel extensionModel)
     {
         return extensionStates.getUnchecked(extensionModel);
-    }
-
-    /**
-     * @param capabilityType the {@link Class} of a capability
-     * @param <C>            the capability type
-     * @return an immutable view of all registered {@link ExtensionModel} which have the given {@code capabilityType}
-     */
-    <C> Set<ExtensionModel> getExtensionsCapableOf(Class<C> capabilityType)
-    {
-        Set<ExtensionModel> cachedCapables = capabilityToExtension.get(capabilityType);
-        if (CollectionUtils.isEmpty(cachedCapables))
-        {
-            ImmutableSet.Builder<ExtensionModel> capables = ImmutableSet.builder();
-            getExtensions().stream().filter(extension -> extension.isCapableOf(capabilityType)).forEach(capables::add);
-            cachedCapables = capables.build();
-            capabilityToExtension.put(capabilityType, cachedCapables);
-        }
-
-        return cachedCapables;
     }
 
     /**

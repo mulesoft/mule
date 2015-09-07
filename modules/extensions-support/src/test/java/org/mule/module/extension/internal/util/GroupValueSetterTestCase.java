@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.util;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -14,13 +15,12 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import org.mule.module.extension.ExtendedPersonalInfo;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.LifetimeInfo;
-import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import org.junit.Before;
@@ -53,7 +53,7 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase
 
         ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, "lifetimeInfo", LifetimeInfo.class));
         child.addParameter("dateOfBirth", getField(LifetimeInfo.class, "dateOfBirth", Date.class));
-        group.addCapability(new ParameterGroupCapability(Arrays.asList(child)));
+        group.addModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(asList(child)));
 
         when(result.get("myName")).thenReturn(NAME);
         when(result.get("age")).thenReturn(AGE);

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.metadata;
+package org.mule.module.extension.internal.model.property;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -16,26 +16,26 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class ExtendingOperationCapabilityTestCase extends AbstractMuleTestCase
+public class ExtendingOperationModelPropertyTestCase extends AbstractMuleTestCase
 {
 
     @Test
     public void extensible()
     {
-        ExtendingOperationCapability<TestExtensibleType> capability = new ExtendingOperationCapability(TestExtensibleType.class);
-        assertThat(capability.getType(), is(sameInstance(TestExtensibleType.class)));
+        ExtendingOperationModelProperty<TestExtensibleType> modelProperty = new ExtendingOperationModelProperty(TestExtensibleType.class);
+        assertThat(modelProperty.getType(), is(sameInstance(TestExtensibleType.class)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void notExtensible()
     {
-        new ExtendingOperationCapability(Object.class);
+        new ExtendingOperationModelProperty(Object.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullImplementation()
     {
-        new ExtendingOperationCapability(null);
+        new ExtendingOperationModelProperty(null);
     }
 
     @Extensible

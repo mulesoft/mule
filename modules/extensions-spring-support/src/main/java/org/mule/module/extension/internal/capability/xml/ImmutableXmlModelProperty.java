@@ -6,21 +6,21 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.introspection.capability.XmlCapability;
+import org.mule.extension.introspection.property.XmlModelProperty;
 
 /**
- * Immutable implementation of {@link org.mule.extension.introspection.capability.XmlCapability}
+ * Immutable implementation of {@link XmlModelProperty}
  *
- * @since 3.7.0
+ * @since 4.0
  */
-public final class ImmutableXmlCapability implements XmlCapability
+public final class ImmutableXmlModelProperty implements XmlModelProperty
 {
 
     private final String schemaVersion;
     private final String namespace;
     private final String schemaLocation;
 
-    public ImmutableXmlCapability(String schemaVersion, String namespace, String schemaLocation)
+    public ImmutableXmlModelProperty(String schemaVersion, String namespace, String schemaLocation)
     {
         this.schemaVersion = schemaVersion;
         this.namespace = namespace;

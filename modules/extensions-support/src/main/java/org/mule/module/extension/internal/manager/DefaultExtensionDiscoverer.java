@@ -12,6 +12,7 @@ import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.introspection.declaration.spi.Describer;
+import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.util.collection.ImmutableListCollector;
 
@@ -30,13 +31,11 @@ final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
 
     private final ExtensionFactory extensionFactory;
     private final ServiceRegistry serviceRegistry;
-    private final ExtensionManagerAdapter extensionManager;
 
-    public DefaultExtensionDiscoverer(ExtensionFactory extensionFactory, ServiceRegistry serviceRegistry, ExtensionManagerAdapter extensionManager)
+    public DefaultExtensionDiscoverer(ExtensionFactory extensionFactory, ServiceRegistry serviceRegistry)
     {
         this.extensionFactory = extensionFactory;
         this.serviceRegistry = serviceRegistry;
-        this.extensionManager = extensionManager;
     }
 
     /**
@@ -54,7 +53,7 @@ final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
         }
 
         return describers.stream().map(describer -> {
-            Descriptor descriptor = describer.describe(extensionManager.createDescribingContext());
+            Descriptor descriptor = describer.describe(new DefaultDescribingContext());
             return extensionFactory.createFrom(descriptor);
         }).collect(new ImmutableListCollector<>());
     }

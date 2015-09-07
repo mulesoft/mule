@@ -14,17 +14,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.capability.XmlCapability;
+import org.mule.extension.introspection.property.XmlModelProperty;
 import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.module.extension.internal.capability.xml.ImmutableXmlCapability;
+import org.mule.module.extension.internal.capability.xml.ImmutableXmlModelProperty;
 import org.mule.module.extension.internal.capability.xml.SpringBundleResourceContributor;
 import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
@@ -43,7 +40,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     private static final String EXTENSION_NAME = "extension";
     private static final String EXTENSION_VERSION = "version";
     private static final String SCHEMA_LOCATION = "mulesoft.com/extension";
-    private static final String UNSCAPED_LOCATION_PREFIX = "http://";
+    private static final String UNESCAPED_LOCATION_PREFIX = "http://";
     private static final String ESCAPED_LOCATION_PREFIX = "http\\://";
     private static final String SCHEMA_NAME = "mule-extension.xsd";
 
@@ -55,17 +52,15 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
 
     private ResourcesGenerator generator;
 
-    private XmlCapability xmlCapability;
+    private XmlModelProperty xmlModelProperty;
 
     private SpringBundleResourceContributor contributor;
 
     @Before
     public void before()
     {
-        xmlCapability = new ImmutableXmlCapability(EXTENSION_VERSION, "test", UNSCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
-        Set<XmlCapability> capabilities = new HashSet<>();
-        capabilities.add(xmlCapability);
-        when(extensionModel.getCapabilities(XmlCapability.class)).thenReturn(capabilities);
+        xmlModelProperty = new ImmutableXmlModelProperty(EXTENSION_VERSION, "test", UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
+        when(extensionModel.getModelProperty(XmlModelProperty.KEY)).thenReturn(xmlModelProperty);
 
         generator = new AnnotationProcessorResourceGenerator(mock(ProcessingEnvironment.class), serviceRegistry);
 

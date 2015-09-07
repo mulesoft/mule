@@ -7,27 +7,24 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.Capable;
+import org.mule.extension.introspection.EnrichableModel;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
-import org.mule.module.extension.internal.util.CapabilityUtils;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A metadata class that groups a set of parameters together.
  * It caches reflection objects necessary for handling those parameters
  * so that introspection is not executed every time, resulting in a performance gain.
  * <p/>
- * Because groups can be nested, this class also implements {@link Capable},
- * allowing for this group to have a {@link ParameterGroupCapability} which
+ * Because groups can be nested, this class also implements {@link EnrichableModel},
+ * allowing for this group to have a {@link ParameterGroupModelProperty} which
  * describes the nested group.
  * <p/>
  * To decouple this class from the representation model (which depending on the
@@ -36,7 +33,7 @@ import java.util.Set;
  *
  * @since 3.7.0
  */
-public class ParameterGroup implements Capable
+public class ParameterGroup implements EnrichableModel
 {
 
     /**
@@ -57,9 +54,9 @@ public class ParameterGroup implements Capable
     private final Map<String, Field> parameters = new HashMap<>();
 
     /**
-     * The capabilities set
+     * The model properties per the {@link EnrichableModel} interface
      */
-    private Set<Object> capabilities = new HashSet<>();
+    private Map<String, Object> modelProperties = new HashMap<>();
 
 
     public ParameterGroup(Class<?> type, Field field)
@@ -100,27 +97,17 @@ public class ParameterGroup implements Capable
         return ImmutableMap.copyOf(parameters);
     }
 
-    public void addCapability(Object capability)
-    {
-        checkArgument(capability != null, "cannot add a null capability");
-        capabilities.add(capability);
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public <T> Set<T> getCapabilities(Class<T> capabilityType)
+    public <T> T getModelProperty(String key)
     {
-        return CapabilityUtils.getCapabilities(capabilities, capabilityType);
+        return (T) modelProperties.get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isCapableOf(Class<?> capabilityType)
+    public void addModelProperty(String key, Object value)
     {
-        return CapabilityUtils.isCapableOf(capabilities, capabilityType);
+        modelProperties.put(key, value);
     }
 }

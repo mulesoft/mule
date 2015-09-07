@@ -20,15 +20,12 @@ import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.manager.DescribingContextFactory;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.registry.SpiServiceRegistry;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -120,11 +117,6 @@ public abstract class ExtensionsTestUtils
                                            mock(ResolverSetResult.class),
                                            event,
                                            extractExtensionManager(event));
-    }
-
-    public static DescribingContext createDescribingContext()
-    {
-        return new DescribingContextFactory(new SpiServiceRegistry(), Thread.currentThread().getContextClassLoader()).newDescribingContext();
     }
 
     public static File getMetaInfDirectory(Class clazz)

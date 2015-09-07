@@ -9,7 +9,6 @@ package org.mule.module.extension.internal.manager;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -23,10 +22,9 @@ import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.introspection.capability.XmlCapability;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationExecutor;
-import org.mule.module.extension.internal.capability.metadata.ParameterGroupCapability;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.config.DeclaredConfiguration;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
@@ -42,7 +40,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -159,36 +156,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void getExtensionsCapableOf()
-    {
-        when(extensionModel1.isCapableOf(XmlCapability.class)).thenReturn(true);
-        when(extensionModel2.isCapableOf(XmlCapability.class)).thenReturn(false);
-
-        discover();
-        Set<ExtensionModel> extensionModels = extensionsManager.getExtensionsCapableOf(XmlCapability.class);
-
-        assertThat(extensionModels, hasSize(1));
-        testEquals(extensionModel1, extensionModels.iterator().next());
-    }
-
-    @Test
-    public void noExtensionsCapableOf()
-    {
-        when(extensionModel1.isCapableOf(XmlCapability.class)).thenReturn(false);
-        when(extensionModel2.isCapableOf(XmlCapability.class)).thenReturn(false);
-
-        discover();
-        Set<ExtensionModel> extensionModels = extensionsManager.getExtensionsCapableOf(XmlCapability.class);
-        assertThat(extensionModels.isEmpty(), is(true));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void extensionsCapableOfNull()
-    {
-        extensionsManager.getExtensionsCapableOf(null);
-    }
-
-    @Test
     public void contextClassLoaderKept()
     {
         discover();
@@ -233,7 +200,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     public void getConfigurationThroughImplicitConfiguration()
     {
         discover();
-        when(extension1ConfigurationModel.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
+        when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
 
         DeclaredConfiguration<Object> declaredConfig = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
         assertThat(declaredConfig.getValue(), is(sameInstance(configInstance)));
@@ -249,7 +216,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
 
         discover();
-        when(extension1ConfigurationModel.getCapabilities(ParameterGroupCapability.class)).thenReturn(null);
+        when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
 
         when(extensionModel1.getConfigurations()).thenAnswer(invocation -> {
             new Thread()

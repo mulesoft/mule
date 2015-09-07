@@ -11,12 +11,10 @@ import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.config.spring.MuleArtifactContext;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.introspection.capability.XmlCapability;
+import org.mule.extension.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.util.ArrayUtils;
 
@@ -27,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -105,31 +102,18 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 
     private void registerOperations(ExtensionModel extensionModel) throws Exception
     {
-        for (OperationModel operationModel : extensionModel.getOperations())
-        {
-            registerBeanDefinitionParser(hyphenize(operationModel.getName()), new OperationBeanDefinitionParser(extensionModel, operationModel));
-        }
+        extensionModel.getOperations().forEach(operationModel -> registerBeanDefinitionParser(hyphenize(operationModel.getName()), new OperationBeanDefinitionParser(extensionModel, operationModel)));
     }
 
     private void registerConfigurations(ExtensionModel extensionModel) throws Exception
     {
-        for (ConfigurationModel configurationModel : extensionModel.getConfigurations())
-        {
-            registerBeanDefinitionParser(configurationModel.getName(), new ConfigurationBeanDefinitionParser(extensionModel, configurationModel));
-        }
+        extensionModel.getConfigurations().forEach(configurationModel -> registerBeanDefinitionParser(configurationModel.getName(), new ConfigurationBeanDefinitionParser(extensionModel, configurationModel)));
     }
 
     private void registerTopLevelParameters(ExtensionModel extensionModel)
     {
-        for (ConfigurationModel configurationModel : extensionModel.getConfigurations())
-        {
-            registerTopLevelParameter(extensionModel, configurationModel.getParameterModels());
-        }
-
-        for (OperationModel operationModel : extensionModel.getOperations())
-        {
-            registerTopLevelParameter(extensionModel, operationModel.getParameterModels());
-        }
+        extensionModel.getConfigurations().forEach(configurationModel -> registerTopLevelParameter(extensionModel, configurationModel.getParameterModels()));
+        extensionModel.getOperations().forEach(operationModel -> registerTopLevelParameter(extensionModel, operationModel.getParameterModels()));
     }
 
     private void registerTopLevelParameter(final ExtensionModel extensionModel, final DataType parameterType)
@@ -175,31 +159,21 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 
     private void registerTopLevelParameter(ExtensionModel extensionModel, Collection<ParameterModel> parameterModels)
     {
-        for (final ParameterModel parameterModel : parameterModels)
-        {
-            registerTopLevelParameter(extensionModel, parameterModel.getType());
-        }
+        parameterModels.forEach(parameterModel -> registerTopLevelParameter(extensionModel, parameterModel.getType()));
     }
 
 
     private ExtensionModel locateExtensionByNamespace(String namespace)
     {
-        Collection<ExtensionModel> capableExtensionModels = extensionManager.getExtensionsCapableOf(XmlCapability.class);
-        if (CollectionUtils.isEmpty(capableExtensionModels))
+        for (ExtensionModel extensionModel : extensionManager.getExtensions())
         {
-            throw new IllegalArgumentException(
-                    String.format("Could not find any extensions supporting XML capabilities. Can't process namespace %s", namespace));
-        }
-
-        for (ExtensionModel extensionModel : capableExtensionModels)
-        {
-            XmlCapability capability = extensionModel.getCapabilities(XmlCapability.class).iterator().next();
-            if (namespace.equals(capability.getSchemaLocation()))
+            XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.KEY);
+            if (namespace.equals(xmlProperty.getSchemaLocation()))
             {
                 return extensionModel;
             }
         }
 
-        throw new IllegalArgumentException(String.format("Could not find extension associated to namespace %s", namespace));
+        throw new IllegalArgumentException(String.format("Could not find any extension associated to namespace %s", namespace));
     }
 }

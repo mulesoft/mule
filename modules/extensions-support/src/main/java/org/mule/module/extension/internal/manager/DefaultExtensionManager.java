@@ -7,7 +7,6 @@
 package org.mule.module.extension.internal.manager;
 
 import static org.mule.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
-import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -19,7 +18,6 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.module.extension.internal.config.DeclaredConfiguration;
@@ -56,16 +54,19 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
     private MuleContext muleContext;
     private ObjectNameHelper objectNameHelper;
-    private ExtensionDiscoverer extensionDiscoverer = new DefaultExtensionDiscoverer(new DefaultExtensionFactory(serviceRegistry), serviceRegistry, this);
+    private ExtensionDiscoverer extensionDiscoverer;
     private ImplicitConfigurationFactory implicitConfigurationFactory;
     private ConfigurationExpirationMonitor configurationExpirationMonitor;
-    private DescribingContextFactory describingContextFactory;
 
 
     @Override
     public void initialise() throws InitialisationException
     {
-        describingContextFactory = new DescribingContextFactory(serviceRegistry, muleContext.getExecutionClassLoader());
+        if (extensionDiscoverer == null)
+        {
+            extensionDiscoverer = new DefaultExtensionDiscoverer(new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader()), serviceRegistry);
+        }
+
         objectNameHelper = new ObjectNameHelper(muleContext);
         implicitConfigurationFactory = new DefaultImplicitConfigurationFactory(extensionRegistry, muleContext);
     }
@@ -216,16 +217,6 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
      * {@inheritDoc}
      */
     @Override
-    public <C> Set<ExtensionModel> getExtensionsCapableOf(Class<C> capabilityType)
-    {
-        checkArgument(capabilityType != null, "capability type cannot be null");
-        return extensionRegistry.getExtensionsCapableOf(capabilityType);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public <C> String registerConfiguration(ExtensionModel extensionModel, String configurationProviderName, C configuration)
     {
         ExtensionStateTracker extensionStateTracker = extensionRegistry.getExtensionState(extensionModel);
@@ -236,12 +227,6 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         putInRegistryAndApplyLifecycle(registrationName, configuration);
 
         return registrationName;
-    }
-
-    @Override
-    public DescribingContext createDescribingContext()
-    {
-        return describingContextFactory.newDescribingContext();
     }
 
     private void putInRegistryAndApplyLifecycle(String key, Object object)

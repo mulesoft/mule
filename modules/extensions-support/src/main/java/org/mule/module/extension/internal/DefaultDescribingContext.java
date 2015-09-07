@@ -24,10 +24,14 @@ import org.apache.commons.lang.StringUtils;
  */
 public final class DefaultDescribingContext implements DescribingContext
 {
-    public static final String CAPABILITY_EXTRACTORS = "CAPABILITY_EXTRACTORS";
 
     private final DeclarationDescriptor declarationDescriptor;
     private final Map<String, Object> customParameters = new HashMap<>();
+
+    public DefaultDescribingContext()
+    {
+        this(new DeclarationDescriptor());
+    }
 
     public DefaultDescribingContext(DeclarationDescriptor declarationDescriptor)
     {

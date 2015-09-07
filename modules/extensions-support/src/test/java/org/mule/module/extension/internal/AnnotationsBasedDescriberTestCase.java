@@ -19,7 +19,6 @@ import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.HeisenbergExtension.NAMESPACE;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_LOCATION;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createDescribingContext;
 import org.mule.config.MuleManifest;
 import org.mule.extension.annotations.Configurations;
 import org.mule.extension.annotations.Operations;
@@ -37,6 +36,7 @@ import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.Ricin;
+import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.CollectionUtils;
 
@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.Predicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,7 +83,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Test
     public void describeTestModule() throws Exception
     {
-        Descriptor descriptor = getDescriber().describe(createDescribingContext());
+        Descriptor descriptor = getDescriber().describe(new DefaultDescribingContext());
 
         Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
         assertExtensionProperties(declaration);
@@ -92,7 +91,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertTestModuleConfiguration(declaration);
         assertTestModuleOperations(declaration);
 
-        assertCapabilities(declaration);
+        assertModelProperties(declaration);
     }
 
     @Test
@@ -106,7 +105,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     public void heisenbergPointerPlusExternalConfig() throws Exception
     {
         setDescriber(describerFor(HeisengergPointerPlusExternalConfig.class));
-        Declaration declaration = getDescriber().describe(createDescribingContext()).getRootDeclaration().getDeclaration();
+        Declaration declaration = getDescriber().describe(new DefaultDescribingContext()).getRootDeclaration().getDeclaration();
 
         assertExtensionProperties(declaration);
         assertThat(declaration.getConfigurations().size(), equalTo(2));
@@ -121,7 +120,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Test(expected = IllegalArgumentException.class)
     public void heisenbergWithOperationsConfig() throws Exception
     {
-        describerFor(HeisenbergWithOperations.class).describe(createDescribingContext());
+        describerFor(HeisenbergWithOperations.class).describe(new DefaultDescribingContext());
     }
 
     private void assertTestModuleConfiguration(Declaration declaration) throws Exception
@@ -248,19 +247,14 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)
     {
-        return (ParameterDeclaration) CollectionUtils.find(parameters, new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object object)
-            {
-                return name.equals(((ParameterDeclaration) object).getName());
-            }
-        });
+        return (ParameterDeclaration) CollectionUtils.find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
     }
 
-    protected void assertCapabilities(Declaration declaration)
+    protected void assertModelProperties(Declaration declaration)
     {
-        // template method for asserting custom capabilities in modules that define them
+        ImplementingTypeModelProperty implementingTypeModelProperty = declaration.getModelProperty(ImplementingTypeModelProperty.KEY);
+        assertThat(implementingTypeModelProperty, is(notNullValue()));
+        assertThat(HeisenbergExtension.class.isAssignableFrom(implementingTypeModelProperty.getType()), is(true));
     }
 
     @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)

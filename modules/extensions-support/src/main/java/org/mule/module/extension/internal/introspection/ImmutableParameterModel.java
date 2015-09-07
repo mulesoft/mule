@@ -10,6 +10,7 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.ParameterModel;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -19,7 +20,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @since 3.7.0
  */
-final class ImmutableParameterModel extends AbstractCapableDescribed implements ParameterModel
+final class ImmutableParameterModel extends AbstractImmutableModel implements ParameterModel
 {
 
     private final DataType type;
@@ -30,13 +31,14 @@ final class ImmutableParameterModel extends AbstractCapableDescribed implements 
     /**
      * Creates a new instance with the given state
      *
-     * @param name         the parameter's name. Cannot be blank and cannot be one of the values in {@link #RESERVED_NAMES}
-     * @param description  the parameter's description
-     * @param type         the parameter's {@link DataType}. Cannot be {@code null}
-     * @param required     whether this parameter is required or not
-     * @param dynamic      whether this parameter is dynamic or not
-     * @param defaultValue this parameter's default value
-     * @param capabilities this parameter's capabilities
+     * @param name            the parameter's name. Cannot be blank and cannot be one of the values in {@link #RESERVED_NAMES}
+     * @param description     the parameter's description
+     * @param type            the parameter's {@link DataType}. Cannot be {@code null}
+     * @param required        whether this parameter is required or not
+     * @param dynamic         whether this parameter is dynamic or not
+     * @param defaultValue    this parameter's default value
+     * @param modelProperties A {@link Map} of custom properties which extend this model
+     * @param capabilities    this parameter's capabilities
      * @throws IllegalArgumentException if {@code required} is {@code true} and {@code defaultValue} is not {@code null} at the same time
      */
     protected ImmutableParameterModel(String name,
@@ -45,9 +47,10 @@ final class ImmutableParameterModel extends AbstractCapableDescribed implements 
                                       boolean required,
                                       boolean dynamic,
                                       Object defaultValue,
+                                      Map<String, Object> modelProperties,
                                       Set<Object> capabilities)
     {
-        super(name, description, capabilities);
+        super(name, description, modelProperties, capabilities);
 
         if (RESERVED_NAMES.contains(name))
         {

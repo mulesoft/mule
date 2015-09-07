@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createDescribingContext;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.ExtensionModel;
@@ -61,8 +60,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     @Before
     public void setUp()
     {
-        when(extensionManager.createDescribingContext()).thenAnswer(invocation -> createDescribingContext());
-        discoverer = new DefaultExtensionDiscoverer(extensionFactory, serviceRegistry, extensionManager);
+        discoverer = new DefaultExtensionDiscoverer(extensionFactory, serviceRegistry);
     }
 
     @Test

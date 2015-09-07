@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.metadata;
+package org.mule.module.extension.internal.model.property;
 
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
@@ -14,26 +14,29 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
- * A metadata capability to specify that a certain group of {@link ParameterModel parameterModels}
+ * A custom model property that specifies that a certain group of {@link ParameterModel parameterModels}
  * are grouped. This grouping is transparent and is not reflected on the introspection
  * model because it's implementation specific.
  * <p/>
- * This capability provides the necessary metadata for the runtime to handle
- * those parameters accordingly.
+ * This property provides the necessary metadata for the runtime to handle those parameters accordingly.
  * <p/>
- * This capability gives access to a list of {@link ParameterGroup} instances through the
- * {@link #getGroups()} method.
+ * It gives access to a list of {@link ParameterGroup} instances through the {@link #getGroups()} method.
  * <p/>
  * This class is immutable
  *
- * @since 3.7.0
+ * @since 4.0
  */
-public final class ParameterGroupCapability
+public final class ParameterGroupModelProperty
 {
+
+    /**
+     * A unique key that identifies this property type
+     */
+    public static final String KEY = ParameterGroupModelProperty.class.getName();
 
     private final List<ParameterGroup> groups;
 
-    public ParameterGroupCapability(List<ParameterGroup> groups)
+    public ParameterGroupModelProperty(List<ParameterGroup> groups)
     {
         this.groups = ImmutableList.copyOf(groups);
     }
