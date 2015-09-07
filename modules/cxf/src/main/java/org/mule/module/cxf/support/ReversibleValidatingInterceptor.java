@@ -20,7 +20,8 @@ public class ReversibleValidatingInterceptor extends ReversibleStaxInterceptor
     {
         super(Phase.READ);
         addAfter(ProxySchemaValidationInInterceptor.class.getName());
-        addAfter(StartBodyInterceptor.class.getName());
+        //this interceptor will read the first element after the body, so we need to capture it
+        addBefore(StartBodyInterceptor.class.getName());
     }
 
 
