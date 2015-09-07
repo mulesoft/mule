@@ -20,7 +20,7 @@ public class ReversibleValidatingInterceptor extends ReversibleStaxInterceptor
     {
         super(Phase.READ);
         addAfter(ProxySchemaValidationInInterceptor.class.getName());
-        addAfter(StartBodyInterceptor.class.getName());
+        addBefore(StartBodyInterceptor.class.getName());
     }
 
 
