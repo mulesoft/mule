@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+        xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
+        xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
+    <flow name="envelopeValidationFlow">
+        <http:inbound-endpoint host="localhost" port="${port1}" path="services/envelopeValidation">
+            <cxf:proxy-service service="WebService2"
+                               wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
+                               validationEnabled="true" payload="envelope"/>
+        </http:inbound-endpoint>
+
+        <mule-xml:dom-to-xml-transformer/>
+    </flow>
+
+    <flow name="envelopeNoValidationFlow">
+        <http:inbound-endpoint host="localhost" port="${port1}" path="services/envelopeNoValidation">
+            <cxf:proxy-service service="WebService2"
+                               wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
+                               validationEnabled="false" payload="envelope"/>
+        </http:inbound-endpoint>
+
+        <mule-xml:dom-to-xml-transformer/>
+    </flow>
+
+    <flow name="bodyValidationFlow">
+        <http:inbound-endpoint host="localhost" port="${port1}" path="services/bodyValidation">
+            <cxf:proxy-service service="WebService2"
+                               wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
+                               validationEnabled="true" payload="body"/>
+        </http:inbound-endpoint>
+
+        <mule-xml:dom-to-xml-transformer/>
+    </flow>
+
+    <flow name="bodyNoValidationFlow">
+        <http:inbound-endpoint host="localhost" port="${port1}" path="services/bodyNoValidation">
+            <cxf:proxy-service service="WebService2"
+                               wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
+                               validationEnabled="false" payload="body"/>
+        </http:inbound-endpoint>
+
+        <mule-xml:dom-to-xml-transformer/>
+    </flow>
+</mule>
