@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.XMLEvent;
 
@@ -743,6 +744,10 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     {
         if (replay)
         {
+            if (current instanceof Characters)
+            {
+                return ((Characters) current).isWhiteSpace();
+            }
             return current.getEventType() == SPACE;
         }
         else
