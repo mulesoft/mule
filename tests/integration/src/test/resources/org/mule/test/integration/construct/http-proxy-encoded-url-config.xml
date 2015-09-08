@@ -17,7 +17,7 @@
 
     <pattern:http-proxy name="assembledDynamicAddress">
         <http:inbound-endpoint address="http://localhost:${port2}"/>
-        <http:outbound-endpoint user="admin" password="admin%40123" path="#[message.inboundProperties['path']]?foo=bar" host="localhost"
+        <http:outbound-endpoint user="admin" password="admin@123" path="#[message.inboundProperties['path']]?foo=bar" host="localhost"
                                 port="${serverPort}" exchange-pattern="request-response"/>
     </pattern:http-proxy>
 
@@ -29,7 +29,7 @@
 
     <pattern:http-proxy name="assembledStaticAddress">
         <http:inbound-endpoint address="http://localhost:${port4}"/>
-        <http:outbound-endpoint user="admin" password="admin%40123" path="test?foo=bar" host="localhost" port="${serverPort}"
+        <http:outbound-endpoint user="admin" password="admin@123" path="test?foo=bar" host="localhost" port="${serverPort}"
                                 exchange-pattern="request-response"/>
     </pattern:http-proxy>
 </mule>

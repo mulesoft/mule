@@ -6,12 +6,18 @@
  */
 package org.mule.endpoint;
 
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +27,7 @@ import org.junit.Test;
 public class URIBuilderTestCase extends AbstractMuleTestCase
 {
 
+    private static final String PWD_WITH_SPECIAL_CHARS = "! \"#$%&'()*+,-./:;<=>?@[\\]_`{|}~";
     private static final Map<String, String> queries;
 
     static
@@ -31,7 +38,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
     }
 
     protected MuleContext unusedMuleContext = null;
-    
+
     @Test
     public void testAddressForProtocol()
     {
@@ -165,6 +172,49 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         uri.setAddress(address);
         String result = uri.getEncodedConstructor();
         assertEquals(address, result);
+    }
+
+    /**
+     * MULE-6279
+     * @throws UnsupportedEncodingException 
+     */
+    @Test
+    public void testSetAddressWithSpecialURIChars() throws UnsupportedEncodingException
+    {
+        String address = String.format("smtp://user%%40my-domain.com:%s@smtp.my-domain.com:25", encode(PWD_WITH_SPECIAL_CHARS, UTF_8.name()));
+        URIBuilder uri = new URIBuilder();
+        uri.setAddress(address);
+        String result = uri.getEncodedConstructor();
+        assertThat(result, is(address));
+    }
+
+    /**
+     * MULE-6139
+     * @throws UnsupportedEncodingException 
+     */
+    @Test
+    public void testConstructAddressWithSpecialURIChars() throws UnsupportedEncodingException
+    {
+        String address = String.format("smtp://user%%40my-domain.com:%s@smtp.my-domain.com:25", encode(PWD_WITH_SPECIAL_CHARS, UTF_8.name()));
+        URIBuilder uri = new URIBuilder();
+        uri.setProtocol("smtp");
+        uri.setUser("user@my-domain.com");
+        uri.setPassword(PWD_WITH_SPECIAL_CHARS);
+        uri.setHost("smtp.my-domain.com");
+        uri.setPort("25");
+        String result = uri.getEncodedConstructor();
+        assertThat(result, is(address));
+    }
+
+    @Test
+    public void testConstructAddressWithSpecialURICharsInPath() throws UnsupportedEncodingException
+    {
+        URIBuilder uri = new URIBuilder();
+        uri.setProtocol("http");
+        uri.setHost("my-domain.com");
+        uri.setPath("folder%a/resource%b");
+        String result = uri.getEncodedConstructor();
+        assertThat(result, is("http://my-domain.com/folder%a/resource%b"));
     }
 
     private URIBuilder createURIBuilder(String host, int port, String protocol, String path)
