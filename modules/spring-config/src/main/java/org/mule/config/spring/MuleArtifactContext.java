@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostPr
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
@@ -246,12 +245,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
         beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(), optionalObjectsController));
 
-        if (getParent() != null)
-        {
-            //Copy over all processors
-            AbstractBeanFactory parentBeanFactory = (AbstractBeanFactory) getParent().getAutowireCapableBeanFactory();
-            beanFactory.copyConfigurationFrom(parentBeanFactory);
-        }
         return beanFactory;
     }
 
