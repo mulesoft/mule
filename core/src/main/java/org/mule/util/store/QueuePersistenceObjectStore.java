@@ -244,7 +244,19 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     {
         File outputFile = createStoreFile(key);
         ensureStoreDirectoryExists(outputFile);
-        serialize(value, outputFile);
+
+        try
+        {
+            serialize(value, outputFile);
+        }
+        catch (ObjectStoreException e)
+        {
+            if (e.getCause() instanceof SerializationException)
+            {
+                deleteStoreFile(outputFile);
+            }
+            throw e;
+        }
     }
 
     protected void ensureStoreDirectoryExists(File outputFile) throws ObjectStoreException
