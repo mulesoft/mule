@@ -6,14 +6,16 @@
  */
 package org.mule.util.store;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -26,6 +28,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.tck.NonSerializableObject;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
 import org.mule.util.UUID;
@@ -37,6 +40,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.lang.SerializationException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -189,6 +193,26 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         assertEquals("Hello", newMessage.getPayload());
     }
 
+    @Test
+    public void queueFilesAreRemovedWhenSerializationFails() throws ObjectStoreException
+    {
+        QueuePersistenceObjectStore<Serializable> store = getObjectStore();
+        String id = UUID.getUUID();
+        Serializable value = new SerializableWrapper(new NonSerializableObject());
+        File queueFile = createStoreFile(id);
+
+        try
+        {
+            store.store(new QueueKey(QUEUE_NAME, id), value);
+            fail();
+        }
+        catch (ObjectStoreException e)
+        {
+            assertThat(e.getCause(), instanceOf(SerializationException.class));
+            assertThat(queueFile.exists(), is(false));
+        }
+    }
+
     private File createAndPopulateStoreFile(String id, String payload) throws IOException
     {
         File storeFile = createStoreFile(id);
@@ -208,4 +232,16 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
             QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, QUEUE_NAME, id);
         return FileUtils.newFile(path);
     }
+
+
+    private static class SerializableWrapper implements Serializable
+    {
+        Object data;
+
+        SerializableWrapper(Object data)
+        {
+            this.data = data;
+        }
+    }
+
 }
