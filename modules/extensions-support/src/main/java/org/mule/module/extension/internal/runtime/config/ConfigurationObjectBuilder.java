@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @since 3.7.0
  */
-public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
+public final class ConfigurationObjectBuilder<T> extends BaseObjectBuilder<T>
 {
 
     private final ConfigurationModel configurationModel;
@@ -66,14 +66,14 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
     }
 
     @Override
-    public Object build(MuleEvent event) throws MuleException
+    public T build(MuleEvent event) throws MuleException
     {
         return build(resolverSet.resolve(event));
     }
 
-    public Object build(ResolverSetResult result) throws MuleException
+    public T build(ResolverSetResult result) throws MuleException
     {
-        Object configuration = instantiateObject();
+        T configuration = instantiateObject();
 
         setValues(configuration, result, groupValueSetters);
         setValues(configuration, result, singleValueSetters);
@@ -86,9 +86,9 @@ public final class ConfigurationObjectBuilder extends BaseObjectBuilder<Object>
      * {@inheritDoc}
      */
     @Override
-    protected Object instantiateObject()
+    protected T instantiateObject()
     {
-        return configurationModel.getInstantiator().newInstance();
+        return (T) configurationModel.getInstantiator().newInstance();
     }
 
     private void setValues(Object target, ResolverSetResult result, List<ValueSetter> setters) throws MuleException

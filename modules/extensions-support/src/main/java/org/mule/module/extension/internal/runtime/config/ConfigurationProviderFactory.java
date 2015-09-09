@@ -8,9 +8,7 @@ package org.mule.module.extension.internal.runtime.config;
 
 import org.mule.api.MuleContext;
 import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -26,10 +24,8 @@ public interface ConfigurationProviderFactory
      * Creates a new {@link ConfigurationProvider} which servers instances of a dynamic configuration
      *
      * @param name                the provider's name
-     * @param extensionModel      the {@link ExtensionModel} that owns the {@link ConfigurationModel} that describes the configurations instances to be returned
      * @param configurationModel  the {@link ConfigurationModel} that describes the configuration instances to be returned
      * @param resolverSet         a {@link ResolverSet} for the configuration's attributes
-     * @param extensionManager    the {@link ExtensionManagerAdapter}
      * @param dynamicConfigPolicy a {@link DynamicConfigPolicy} in case the configuration is dynamic
      * @param <T>                 the generic type for the configuration instances to be returned
      * @return a {@link ConfigurationProvider}
@@ -37,10 +33,8 @@ public interface ConfigurationProviderFactory
      */
     <T> ConfigurationProvider<T> createDynamicConfigurationProvider(
             String name,
-            ExtensionModel extensionModel,
             ConfigurationModel configurationModel,
             ResolverSet resolverSet,
-            ExtensionManagerAdapter extensionManager,
             DynamicConfigPolicy dynamicConfigPolicy) throws Exception;
 
 
@@ -48,20 +42,16 @@ public interface ConfigurationProviderFactory
      * Creates a new {@link ConfigurationProvider} which servers a static configuration instance
      *
      * @param name               the provider's name
-     * @param extensionModel     the {@link ExtensionModel} that owns the {@link ConfigurationModel} that describes the configurations instances to be returned
      * @param configurationModel the {@link ConfigurationModel} that describes the configuration instances to be returned
      * @param resolverSet        a {@link ResolverSet} for the configuration's attributes
      * @param muleContext        the {@link MuleContext} that will own the configuration instances
-     * @param extensionManager   the {@link ExtensionManagerAdapter}
      * @param <T>                the generic type for the configuration instances to be returned
      * @return a {@link ConfigurationProvider}
      * @throws Exception if anything goes wrong
      */
     <T> ConfigurationProvider<T> createStaticConfigurationProvider(
             String name,
-            ExtensionModel extensionModel,
             ConfigurationModel configurationModel,
             ResolverSet resolverSet,
-            MuleContext muleContext,
-            ExtensionManagerAdapter extensionManager) throws Exception;
+            MuleContext muleContext) throws Exception;
 }

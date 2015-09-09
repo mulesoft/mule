@@ -16,15 +16,9 @@ import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.config.MuleManifest;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.runtime.DefaultOperationContext;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.io.File;
@@ -34,8 +28,6 @@ import java.net.URL;
 import java.util.jar.Manifest;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public abstract class ExtensionsTestUtils
 {
@@ -76,47 +68,27 @@ public abstract class ExtensionsTestUtils
 
     public static void stubRegistryKeys(MuleContext muleContext, final String... keys)
     {
-        when(muleContext.getRegistry().get(anyString())).thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
+        when(muleContext.getRegistry().get(anyString())).thenAnswer(invocation -> {
+            String name = (String) invocation.getArguments()[0];
+            if (name != null)
             {
-                String name = (String) invocation.getArguments()[0];
-                if (name != null)
+                for (String key : keys)
                 {
-                    for (String key : keys)
+                    if (name.contains(key))
                     {
-                        if (name.contains(key))
-                        {
-                            return null;
-                        }
+                        return null;
                     }
                 }
-
-                return RETURNS_DEEP_STUBS.get().answer(invocation);
             }
+
+            return RETURNS_DEEP_STUBS.get().answer(invocation);
         });
     }
 
     public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent) throws Exception
     {
-        ConfigurationProvider<C> configurationProvider = muleEvent.getMuleContext().getRegistry().get(key);
-        return configurationProvider.get(getOperationContext(muleEvent));
-    }
-
-    private static ExtensionManagerAdapter extractExtensionManager(MuleEvent muleEvent)
-    {
-        return (ExtensionManagerAdapter) muleEvent.getMuleContext().getExtensionManager();
-    }
-
-    private static OperationContext getOperationContext(MuleEvent event) throws Exception
-    {
-        return new DefaultOperationContext(mock(ExtensionModel.class),
-                                           mock(OperationModel.class),
-                                           "",
-                                           mock(ResolverSetResult.class),
-                                           event,
-                                           extractExtensionManager(event));
+        ExtensionManager extensionManager = muleEvent.getMuleContext().getExtensionManager();
+        return (C) extensionManager.getConfiguration(key, muleEvent).getValue();
     }
 
     public static File getMetaInfDirectory(Class clazz)

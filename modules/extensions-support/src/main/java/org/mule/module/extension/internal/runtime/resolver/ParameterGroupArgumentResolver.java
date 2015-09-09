@@ -75,7 +75,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
             T group = type.newInstance();
             for (Field parameterField : parameterFields)
             {
-                Object value = operationContext.getParameterValue(getAlias(parameterField));
+                Object value = operationContext.getParameter(getAlias(parameterField));
                 if (value != null)
                 {
                     parameterField.set(group, value);

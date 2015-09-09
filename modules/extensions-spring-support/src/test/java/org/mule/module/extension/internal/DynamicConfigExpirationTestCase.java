@@ -38,14 +38,13 @@ public class DynamicConfigExpirationTestCase extends ExtensionsFunctionalTestCas
         final MuleEvent event = getTestEvent(myName);
         String returnedName = runFlow("dynamic", event).getMessage().getPayloadAsString();
 
-
-        HeisenbergExtension config = muleContext.getRegistry().lookupObject(HeisenbergExtension.class);
+        HeisenbergExtension config = (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", event).getValue();
 
         // validate we actually hit the correct dynamic config
         assertThat(returnedName, is(myName));
         assertThat(config.getPersonalInfo().getName(), is(myName));
 
-        PollingProber prober = new PollingProber(5000, 100);
+        PollingProber prober = new PollingProber(5000, 1000);
         prober.check(new JUnitProbe()
         {
             @Override
@@ -63,5 +62,8 @@ public class DynamicConfigExpirationTestCase extends ExtensionsFunctionalTestCas
                 return "config was not stopped or disposed";
             }
         });
+
+        assertThat(config.getInitialise(), is(1));
+        assertThat(config.getStart(), is(1));
     }
 }

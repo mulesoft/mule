@@ -8,30 +8,26 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.Capable;
 import org.mule.extension.introspection.Described;
 import org.mule.extension.introspection.EnrichableModel;
-import org.mule.module.extension.internal.util.CapabilityUtils;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * Base class for immutable implementations of the introspection model
  *
  * @since 4.0
  */
-public abstract class AbstractImmutableModel implements Described, Capable, EnrichableModel
+public abstract class AbstractImmutableModel implements Described, EnrichableModel
 {
 
     private final String name;
     private final String description;
-    private final Set<Object> capabilities;
     private final Map<String, Object> modelProperties;
 
     /**
@@ -40,17 +36,15 @@ public abstract class AbstractImmutableModel implements Described, Capable, Enri
      * @param name            the model's name
      * @param description     the model's description
      * @param modelProperties A {@link Map} of custom properties which extend this model
-     * @param capabilities    a {@link Set} with the model's capabilities
      * @throws IllegalArgumentException if {@code name} is blank
      */
-    protected AbstractImmutableModel(String name, String description, Map<String, Object> modelProperties, Set<Object> capabilities)
+    protected AbstractImmutableModel(String name, String description, Map<String, Object> modelProperties)
     {
         checkArgument(!StringUtils.isBlank(name), "Name attribute cannot be null or blank");
 
         this.name = name;
         this.description = description != null ? description : EMPTY;
         this.modelProperties = modelProperties != null ? ImmutableMap.copyOf(modelProperties) : ImmutableMap.of();
-        this.capabilities = capabilities != null ? ImmutableSet.copyOf(capabilities) : ImmutableSet.of();
     }
 
     /**
@@ -74,21 +68,6 @@ public abstract class AbstractImmutableModel implements Described, Capable, Enri
     /**
      * {@inheritDoc}
      */
-    @Override
-    public <T> Set<T> getCapabilities(Class<T> capabilityType)
-    {
-        return CapabilityUtils.getCapabilities(capabilities, capabilityType);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isCapableOf(Class<?> capabilityType)
-    {
-        return CapabilityUtils.isCapableOf(capabilities, capabilityType);
-    }
-
     @Override
     public <T> T getModelProperty(String key)
     {
@@ -124,5 +103,11 @@ public abstract class AbstractImmutableModel implements Described, Capable, Enri
     public int hashCode()
     {
         return name.hashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

@@ -70,7 +70,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -111,10 +110,6 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         assertThat(extensionModel.getVersion(), equalTo(VERSION));
         assertThat(extensionModel.getConfigurations(), hasSize(1));
 
-        Set<Object> capabilities = extensionModel.getCapabilities(Object.class);
-        assertThat(capabilities, is(notNullValue()));
-        assertThat(capabilities, hasSize(1));
-
         verify(serviceRegistry).lookupProviders(any(Class.class), any(ClassLoader.class));
     }
 
@@ -125,6 +120,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         assertThat(configurationModel, is(notNullValue()));
         assertThat(configurationModel.getName(), equalTo(CONFIG_NAME));
         assertThat(configurationModel.getDescription(), equalTo(CONFIG_DESCRIPTION));
+        assertThat(configurationModel.getExtensionModel(), is(sameInstance(extensionModel)));
 
         List<ParameterModel> parameterModels = configurationModel.getParameterModels();
         assertThat(parameterModels, hasSize(4));
@@ -154,20 +150,6 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void noSuchCapability()
-    {
-        Set<String> capabilities = extensionModel.getCapabilities(String.class);
-        assertThat(capabilities, is(notNullValue()));
-        assertThat(capabilities, hasSize(0));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullCapability()
-    {
-        factory.createFrom(createDeclarationDescriptor().withCapability(null));
-    }
-
-    @Test
     public void operations() throws Exception
     {
         List<OperationModel> operationModels = extensionModel.getOperations();
@@ -193,9 +175,9 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         final String alpha = "alpha";
 
         ExtensionModel extensionModel = factory.createFrom(new DeclarationDescriptor().named("test").onVersion("1.0")
-                                                         .withConfig(defaultConfiguration).describedAs(defaultConfiguration).instantiatedWith(mockInstantiator)
-                                                         .withConfig(beta).describedAs(beta).instantiatedWith(mockInstantiator)
-                                                         .withConfig(alpha).describedAs(alpha).instantiatedWith(mockInstantiator));
+                                                                   .withConfig(defaultConfiguration).describedAs(defaultConfiguration).instantiatedWith(mockInstantiator)
+                                                                   .withConfig(beta).describedAs(beta).instantiatedWith(mockInstantiator)
+                                                                   .withConfig(alpha).describedAs(alpha).instantiatedWith(mockInstantiator));
 
         List<ConfigurationModel> configurationModels = extensionModel.getConfigurations();
         assertThat(configurationModels, hasSize(3));
@@ -241,7 +223,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void postProcessorsInvoked() throws Exception
+    public void enrichersInvoked() throws Exception
     {
         ModelEnricher modelEnricher1 = mock(ModelEnricher.class);
         ModelEnricher modelEnricher2 = mock(ModelEnricher.class);
@@ -294,6 +276,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, true, false, of(Boolean.class), BOOLEAN, true);
         assertParameter(parameterModels.get(2), CALLBACK, CALLBACK_DESCRIPTION, false, true, of(OperationModel.class), DataQualifier.OPERATION, null);
     }
+
     private void assertArglessOperation(List<OperationModel> operationModels) throws NoSuchOperationException
     {
         OperationModel operationModel = operationModels.get(0);

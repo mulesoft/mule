@@ -18,6 +18,7 @@ import org.mule.api.registry.Registry;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.queue.QueueManager;
@@ -60,6 +61,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         stopOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Config.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));

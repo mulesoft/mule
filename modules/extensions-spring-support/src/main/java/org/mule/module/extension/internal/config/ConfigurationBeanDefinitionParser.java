@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConfigName;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
 import org.mule.api.registry.Registry;
@@ -47,9 +48,9 @@ final class ConfigurationBeanDefinitionParser extends BaseExtensionBeanDefinitio
     {
         parseConfigName(element, builder);
 
-        builder.addConstructorArgValue(extensionModel);
         builder.addConstructorArgValue(configurationModel);
         builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
         builder.addConstructorArgReference(OBJECT_MULE_CONTEXT);
+        builder.addConstructorArgReference(OBJECT_TIME_SUPPLIER);
     }
 }

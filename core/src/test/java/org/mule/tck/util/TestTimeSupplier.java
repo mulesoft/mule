@@ -7,12 +7,12 @@
 package org.mule.tck.util;
 
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.time.TimeSupplier;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 /**
- * A test {@link Supplier} for externalizing the system time. It is initialised at a given
+ * A test {@link TimeSupplier} for externalizing the system time. It is initialised at a given
  * initial {@link #timeInMillis} using the {@link #TestTimeSupplier(long)} constructor. The value can be
  * retrieved through the {@link #get()} method.
  * <p/>
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class TestTimeSupplier implements Supplier<Long>
+public class TestTimeSupplier extends TimeSupplier
 {
 
     private long timeInMillis;

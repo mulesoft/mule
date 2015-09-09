@@ -8,10 +8,6 @@ package org.mule.module.extension.internal.runtime;
 
 import org.mule.api.MuleEvent;
 import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.runtime.event.OperationFailedSignal;
-import org.mule.extension.runtime.event.OperationSuccessfulSignal;
-
-import java.util.function.Consumer;
 
 /**
  * Adapter interface which expands the contract of
@@ -30,21 +26,5 @@ public interface OperationContextAdapter extends OperationContext
      * an operation is to be executed
      */
     MuleEvent getEvent();
-
-    /**
-     * Sends a {@link OperationSuccessfulSignal} to all the handlers registered through the
-     * {@link #onOperationSuccessful(Consumer)} method
-     *
-     * @param result the operation's result
-     */
-    void notifySuccessfulOperation(Object result);
-
-    /**
-     * Sends a {@link OperationFailedSignal} to all the handlers registered through the
-     * {@link #onOperationFailed(Consumer)} method
-     *
-     * @param exception the {@link Exception} thrown by the operation
-     */
-    void notifyFailedOperation(Exception exception);
 
 }

@@ -16,8 +16,8 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ExtensionFactory;
+import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.declaration.spi.Describer;
 import org.mule.extension.resources.GeneratedResource;
 import org.mule.extension.resources.ResourcesGenerator;
@@ -26,7 +26,6 @@ import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.manager.DefaultExtensionManager;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.resources.AbstractResourcesGenerator;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.ArrayUtils;
@@ -79,7 +78,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
 
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
     private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
-    private ExtensionManagerAdapter extensionManager;
+    private ExtensionManager extensionManager;
     private File generatedResourcesDirectory;
 
 
@@ -188,7 +187,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         generateResourcesAndAddToClasspath(generator);
     }
 
-    private void loadExtensionsFromDescribers(ExtensionManagerAdapter extensionManager, Describer[] describers)
+    private void loadExtensionsFromDescribers(ExtensionManager extensionManager, Describer[] describers)
     {
         for (Describer describer : describers)
         {

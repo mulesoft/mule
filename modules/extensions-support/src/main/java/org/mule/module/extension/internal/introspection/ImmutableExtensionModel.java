@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -45,7 +44,6 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
      * @param configurationModels a {@link List} with the extension's {@link ConfigurationModel configurationModels}
      * @param operationModels     a {@link List} with the extension's {@link OperationModel operationModels}
      * @param modelProperties     A {@link Map} of custom properties which extend this model
-     * @param capabilities        a {@link Set} with the extension's capabilities
      * @throws IllegalArgumentException if {@code configurations} or {@link ParameterModel} are null or contain instances with non unique names, or if {@code name}  is blank
      */
     protected ImmutableExtensionModel(String name,
@@ -53,10 +51,9 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
                                       String version,
                                       List<ConfigurationModel> configurationModels,
                                       List<OperationModel> operationModels,
-                                      Map<String, Object> modelProperties,
-                                      Set<Object> capabilities)
+                                      Map<String, Object> modelProperties)
     {
-        super(name, description, modelProperties, capabilities);
+        super(name, description, modelProperties);
 
         checkArgument(!name.contains(" "), "Extension name cannot contain spaces");
         validateRepeatedNames(configurationModels, operationModels);

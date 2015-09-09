@@ -30,6 +30,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.extension.ExtensionManager;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
@@ -76,12 +77,12 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             super();
 
             Set<LifecycleObject> initOrderedObjects = new LinkedHashSet<>();
-            initOrderedObjects.add(new NotificationLifecycleObject(ExtensionManager.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionEvaluator.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionEnricher.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguage.class));
+            initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
@@ -90,6 +91,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             setOrderedLifecycleObjects(initOrderedObjects);
 
             setIgnoredObjectTypes(new Class[] {
+                    ExtensionManager.class,
                     SpringRegistry.class,
                     SpringRegistryBootstrap.class,
                     Component.class,

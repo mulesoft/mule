@@ -35,9 +35,20 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
 {
 
-    private static final String CONFIG_NAME = "configName";
     private static final String NAME_VALUE = "name";
     private static final String DESCRIPTION_VALUE = "description";
+
+    public static final ParameterModel nameParameterModel = getParameter("name", String.class);
+    public static final ParameterModel descriptionParameterModel = getParameter("description", String.class);
+
+    public static ResolverSet createResolverSet() throws Exception
+    {
+        ResolverSet resolverSet = new ResolverSet();
+        resolverSet.add(nameParameterModel, getResolver(NAME_VALUE));
+        resolverSet.add(descriptionParameterModel, getResolver(DESCRIPTION_VALUE));
+
+        return resolverSet;
+    }
 
     @Mock
     private ExtensionModel extensionModel;
@@ -50,10 +61,9 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
 
     private TestConfig configuration;
 
-    private ConfigurationObjectBuilder configurationObjectBuilder;
+    private ConfigurationObjectBuilder<TestConfig> configurationObjectBuilder;
     private ResolverSet resolverSet;
-    private ParameterModel nameParameterModel = getParameter("name", String.class);
-    private ParameterModel descriptionParameterModel = getParameter("description", String.class);
+
 
     @Before
     public void before() throws Exception
@@ -65,17 +75,15 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
         when(configurationModel.getInstantiator().getObjectType()).thenAnswer(invocation -> TestConfig.class);
         when(configurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
 
-        resolverSet = new ResolverSet();
-        resolverSet.add(nameParameterModel, getResolver(NAME_VALUE));
-        resolverSet.add(descriptionParameterModel, getResolver(DESCRIPTION_VALUE));
+        resolverSet = createResolverSet();
 
-        configurationObjectBuilder = new ConfigurationObjectBuilder(configurationModel, resolverSet);
+        configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
     }
 
     @Test
     public void build() throws Exception
     {
-        TestConfig testConfig = (TestConfig) configurationObjectBuilder.build(event);
+        TestConfig testConfig = configurationObjectBuilder.build(event);
         assertThat(testConfig.getName(), is(NAME_VALUE));
         assertThat(testConfig.getDescription(), is(DESCRIPTION_VALUE));
     }

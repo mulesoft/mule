@@ -6,37 +6,44 @@
  */
 package org.mule.module.extension.internal.manager;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.RegistrationException;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.OperationExecutor;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.module.extension.internal.config.DeclaredConfiguration;
+import org.mule.extension.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.concurrent.Latch;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -54,7 +61,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
 {
 
-    private ExtensionManagerAdapter extensionsManager;
+    private ExtensionManager extensionsManager;
 
     private static final String EXTENSION1_NAME = "extension1";
     private static final String EXTENSION1_CONFIG_NAME = "extension1Config";
@@ -88,8 +95,14 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     @Mock
     private ConfigurationProvider<Object> extension1ConfigurationProvider;
 
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private ConfigurationInstance<Object> extension1ConfigurationInstance = mock(ConfigurationInstance.class);
+
     @Mock
     private OperationExecutor executor;
+
+    @Mock
+    private MuleEvent event;
 
     private ClassLoader classLoader;
 
@@ -101,12 +114,13 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
         extensionsManager.setExtensionsDiscoverer(discoverer);
         extensionsManager.setMuleContext(muleContext);
+
         when(muleContext.getConfiguration().getExtension(ExtensionConfig.class)).thenReturn(null);
         extensionsManager.initialise();
         this.extensionsManager = extensionsManager;
 
         when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
-        when(extensionModel1.getConfigurations()).thenReturn(Arrays.asList(extension1ConfigurationModel));
+        when(extensionModel1.getConfigurations()).thenReturn(asList(extension1ConfigurationModel));
         when(extensionModel2.getName()).thenReturn(EXTENSION2_NAME);
 
         when(extensionModel1.getVersion()).thenReturn(EXTENSION1_VERSION);
@@ -115,14 +129,20 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1ConfigurationModel.getName()).thenReturn(EXTENSION1_CONFIG_NAME);
         when(extension1ConfigurationModel.getInstantiator().newInstance()).thenReturn(configInstance);
         when(extension1ConfigurationModel.getInstantiator().getObjectType()).thenReturn((Class) configInstance.getClass());
+        when(extension1ConfigurationModel.getExtensionModel()).thenReturn(extensionModel1);
+        when(extension1ConfigurationModel.getInterceptorFactories()).thenReturn(emptyList());
 
         when(extensionModel1.getConfiguration(EXTENSION1_CONFIG_NAME)).thenReturn(extension1ConfigurationModel);
         when(extensionModel1.getOperation(EXTENSION1_OPERATION_NAME)).thenReturn(extension1OperationModel);
         when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
 
-        when(extension1OperationContext.getOperationModel()).thenReturn(extension1OperationModel);
+        when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);
+        when(extension1ConfigurationInstance.getModel()).thenReturn(extension1ConfigurationModel);
+        when(extension1ConfigurationInstance.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
 
-        when(extension1ConfigurationProvider.get(same(extension1OperationContext))).thenReturn(configInstance);
+        when(extension1ConfigurationProvider.get(event)).thenReturn(extension1ConfigurationInstance);
+
+        when(extension1ConfigurationProvider.getModel()).thenReturn(extension1ConfigurationModel);
         when(extension1ConfigurationProvider.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
 
         when(extension1OperationModel.getExecutor()).thenReturn(executor);
@@ -137,7 +157,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
 
     private void setDiscoverableExtensions(ExtensionModel... extensionModels)
     {
-        when(discoverer.discover(same(classLoader))).thenReturn(Arrays.asList(extensionModels));
+        when(discoverer.discover(same(classLoader))).thenReturn(asList(extensionModels));
     }
 
     @Test
@@ -181,72 +201,65 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     public void getConfigurationByName() throws Exception
     {
         discover();
-        extensionsManager.registerConfigurationProvider(extensionModel1, extension1ConfigurationProvider);
-        DeclaredConfiguration<Object> declaredConfiguration = extensionsManager.getConfiguration(extensionModel1, EXTENSION1_CONFIG_INSTANCE_NAME, extension1OperationContext);
-        assertThat(declaredConfiguration.getValue(), is(sameInstance(configInstance)));
+        registerConfigurationProvider();
+
+        ConfigurationInstance<Object> configurationInstance = extensionsManager.getConfiguration(EXTENSION1_CONFIG_INSTANCE_NAME, event);
+        assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
     }
 
     @Test
-    public void getConfigurationThroughDefaultConfig()
+    public void getConfigurationThroughDefaultConfig() throws Exception
     {
         discover();
-        extensionsManager.registerConfigurationProvider(extensionModel1, extension1ConfigurationProvider);
+        registerConfigurationProvider();
 
-        DeclaredConfiguration<Object> declaredConfig = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
-        assertThat(declaredConfig.getValue(), is(sameInstance(configInstance)));
+        ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
+        assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
     }
 
     @Test
-    public void getConfigurationThroughImplicitConfiguration()
+    public void getConfigurationThroughImplicitConfiguration() throws Exception
     {
         discover();
         when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
-
-        DeclaredConfiguration<Object> declaredConfig = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
-        assertThat(declaredConfig.getValue(), is(sameInstance(configInstance)));
+        registerConfigurationProvider();
+        ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
+        assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
     }
 
     @Test
     public void getOperationExecutorThroughImplicitConfigurationConcurrently() throws Exception
     {
-        final long timeout = 5;
-        final TimeUnit timeUnit = TimeUnit.SECONDS;
         final int threadCount = 2;
-        final Latch testLatch = new Latch();
         final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
 
+        MuleRegistry registry = muleContext.getRegistry();
         discover();
         when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
+        when(registry.lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
 
-        when(extensionModel1.getConfigurations()).thenAnswer(invocation -> {
-            new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    testLatch.release();
-                    extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
-                }
-            }.start();
-
-            testLatch.await(timeout, timeUnit);
+        doAnswer(invocation -> {
+            when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(asList((ConfigurationProvider) invocation.getArguments()[1]));
+            new Thread(() -> extensionsManager.getConfiguration(extensionModel1, event)).start();
             joinerLatch.countDown();
-            return Arrays.asList(extension1ConfigurationModel);
-        });
 
-        DeclaredConfiguration<Object> declaredConfiguration = extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
+            return null;
+        }).when(registry).registerObject(anyString(), anyObject());
+
+        ConfigurationInstance<Object> configurationInstance = extensionsManager.getConfiguration(extensionModel1, event);
         joinerLatch.countDown();
         assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
-        assertThat(declaredConfiguration.getValue(), is(sameInstance(configInstance)));
+        assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
     }
 
     @Test(expected = IllegalStateException.class)
     public void getOperationExecutorWithNotImplicitConfig()
     {
+        when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
         makeExtension1ConfigurationNotImplicit();
         discover();
 
-        extensionsManager.getConfiguration(extensionModel1, extension1OperationContext);
+        extensionsManager.getConfiguration(extensionModel1, event);
     }
 
     private void makeExtension1ConfigurationNotImplicit()
@@ -254,7 +267,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         ParameterModel parameterModel1 = mock(ParameterModel.class);
         when(parameterModel1.isRequired()).thenReturn(true);
 
-        when(extension1ConfigurationModel.getParameterModels()).thenReturn(Arrays.asList(parameterModel1, parameterModel1));
+        when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameterModel1, parameterModel1));
         when(extension1ConfigurationModel.getInstantiator().newInstance()).thenReturn(configInstance);
     }
 
@@ -283,5 +296,13 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     {
         assertThat(obtained.getName(), equalTo(expected.getName()));
         assertThat(obtained.getVersion(), equalTo(expected.getVersion()));
+    }
+
+    private void registerConfigurationProvider() throws RegistrationException
+    {
+        extensionsManager.registerConfigurationProvider(extension1ConfigurationProvider);
+        verify(muleContext.getRegistry()).registerObject(extension1ConfigurationProvider.getName(), extension1ConfigurationProvider);
+        when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(asList(extension1ConfigurationProvider));
+        when(muleContext.getRegistry().get(extension1ConfigurationProvider.getName())).thenReturn(extension1ConfigurationProvider);
     }
 }

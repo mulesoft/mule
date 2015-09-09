@@ -16,12 +16,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.api.MuleEvent;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.Ricin;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import java.math.BigDecimal;
@@ -142,7 +142,7 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
 
     private HeisenbergExtension lookupHeisenberg(String key, MuleEvent event) throws Exception
     {
-        return ExtensionsTestUtils.getConfigurationFromRegistry(key, event);
+        return getConfigurationFromRegistry(key, event);
     }
 
     private MuleEvent getHeisenbergEvent() throws Exception

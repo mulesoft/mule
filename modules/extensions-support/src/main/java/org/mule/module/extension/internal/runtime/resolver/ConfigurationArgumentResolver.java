@@ -34,6 +34,6 @@ public final class ConfigurationArgumentResolver implements ArgumentResolver<Obj
     @Override
     public Object resolve(OperationContext operationContext)
     {
-        return operationContext.getConfiguration();
+        return operationContext.getConfiguration().getValue();
     }
 }

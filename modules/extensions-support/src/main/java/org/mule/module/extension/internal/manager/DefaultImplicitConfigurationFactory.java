@@ -6,16 +6,15 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.asOperationContextAdapter;
-import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.config.DeclaredConfiguration;
-import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
+import org.mule.extension.runtime.ConfigurationInstance;
+import org.mule.module.extension.internal.runtime.config.ConfigurationInstanceFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
@@ -31,17 +30,15 @@ import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 final class DefaultImplicitConfigurationFactory implements ImplicitConfigurationFactory
 {
 
-    private final MuleContext muleContext;
-    private final ExtensionRegistry extensionRegistry;
+    private final ExpressionManager expressionManager;
 
-    protected DefaultImplicitConfigurationFactory(ExtensionRegistry extensionRegistry, MuleContext muleContext)
+    protected DefaultImplicitConfigurationFactory(ExpressionManager expressionManager)
     {
-        this.extensionRegistry = extensionRegistry;
-        this.muleContext = muleContext;
+        this.expressionManager = expressionManager;
     }
 
     @Override
-    public <C> DeclaredConfiguration<C> createImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext)
+    public <C> ConfigurationInstance<C> createImplicitConfigurationInstance(ExtensionModel extensionModel, MuleEvent event)
     {
         ConfigurationModel implicitConfigurationModel = getImplicitConfiguration(extensionModel);
 
@@ -52,21 +49,16 @@ final class DefaultImplicitConfigurationFactory implements ImplicitConfiguration
 
         synchronized (implicitConfigurationModel)
         {
-
-
-            final String instanceName = String.format("%s-%s", extensionModel.getName(), implicitConfigurationModel.getName());
-            ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(implicitConfigurationModel, buildImplicitConfigurationResolverSet(implicitConfigurationModel));
-
-            C configuration;
+            final String providerName = String.format("%s-%s", extensionModel.getName(), implicitConfigurationModel.getName());
+            final ResolverSet resolverSet = buildImplicitConfigurationResolverSet(implicitConfigurationModel);
             try
             {
-                configuration = (C) configurationObjectBuilder.build(asOperationContextAdapter(operationContext).getEvent());
+                return new ConfigurationInstanceFactory<C>(implicitConfigurationModel, resolverSet).createConfiguration(providerName, event);
             }
             catch (MuleException e)
             {
                 throw new MuleRuntimeException(e);
             }
-            return new DeclaredConfiguration<>(instanceName, implicitConfigurationModel, configuration);
         }
     }
 
@@ -79,7 +71,7 @@ final class DefaultImplicitConfigurationFactory implements ImplicitConfiguration
             if (defaultValue != null)
             {
                 ValueResolver<Object> valueResolver;
-                if (defaultValue instanceof String && muleContext.getExpressionManager().isExpression((String) defaultValue))
+                if (defaultValue instanceof String && expressionManager.isExpression((String) defaultValue))
                 {
                     valueResolver = new TypeSafeExpressionValueResolver<>((String) defaultValue, parameterModel.getType());
                 }

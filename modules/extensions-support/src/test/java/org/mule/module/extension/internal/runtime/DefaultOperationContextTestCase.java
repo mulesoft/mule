@@ -6,22 +6,22 @@
  */
 package org.mule.module.extension.internal.runtime;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.module.extension.internal.config.DeclaredConfiguration;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.extension.runtime.ConfigurationInstance;
+import org.mule.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.ValueHolder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,71 +56,27 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     private MuleEvent event;
 
     @Mock
-    private ExtensionManagerAdapter extensionManager;
+    private ExtensionManager extensionManager;
 
+    private Object configurationInstance = new Object();
+    private ConfigurationInstance<Object> configuration;
     private DefaultOperationContext operationContext;
+
 
     @Before
     public void before()
     {
+        configuration = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, configurationInstance, emptyList());
         Map<ParameterModel, Object> parametersMap = new HashMap<>();
         parametersMap.put(ExtensionsTestUtils.getParameter(PARAM_NAME, String.class), VALUE);
         when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
-        operationContext = new DefaultOperationContext(extensionModel, operationModel, null, resolverSetResult, event, extensionManager);
-    }
-
-    @Test
-    public void onOperationSuccessful()
-    {
-        ValueHolder<Object> value = new ValueHolder<>();
-
-        operationContext.onOperationSuccessful(signal -> value.set(signal.getResult()));
-        operationContext.notifySuccessfulOperation(VALUE);
-        assertThat(value.get(), is(VALUE));
-    }
-
-    @Test
-    public void onOperationFailed()
-    {
-        ValueHolder<Exception> exceptionHolder = new ValueHolder<>();
-        final Exception exception = new Exception();
-
-        operationContext.onOperationFailed(signal -> exceptionHolder.set(signal.getException()));
-        operationContext.notifyFailedOperation(exception);
-
-        assertThat(exceptionHolder.get(), is(sameInstance(exception)));
-    }
-
-    @Test
-    public void getImplicitConfiguration()
-    {
-        final Object configurationInstance = new Object();
-        DeclaredConfiguration<Object> declaredConfiguration = new DeclaredConfiguration<>(CONFIG_NAME, configurationModel, configurationInstance);
-        when(extensionManager.getConfiguration(extensionModel, operationContext)).thenReturn(declaredConfiguration);
-        assertThat(operationContext.getConfiguration(), is(sameInstance(configurationInstance)));
-    }
-
-    @Test
-    public void getSpecificConfiguration()
-    {
-        operationContext = new DefaultOperationContext(extensionModel, operationModel, CONFIG_NAME, resolverSetResult, event, extensionManager);
-
-        final Object configurationInstance = new Object();
-        DeclaredConfiguration<Object> declaredConfiguration = new DeclaredConfiguration<>(CONFIG_NAME, configurationModel, configurationInstance);
-        when(extensionManager.getConfiguration(extensionModel, CONFIG_NAME, operationContext)).thenReturn(declaredConfiguration);
-        assertThat(operationContext.getConfiguration(), is(sameInstance(configurationInstance)));
-    }
-
-    @Test
-    public void getOperation()
-    {
-        assertThat(operationContext.getOperationModel(), is(operationModel));
+        operationContext = new DefaultOperationContext(configuration, resolverSetResult, event);
     }
 
     @Test
     public void getParameter()
     {
-        assertThat(operationContext.getParameterValue(PARAM_NAME), is(VALUE));
+        assertThat(operationContext.getParameter(PARAM_NAME), is(VALUE));
     }
 }

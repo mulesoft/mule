@@ -6,11 +6,13 @@
  */
 package org.mule.module.extension.internal.runtime.executor;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -18,16 +20,17 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
+import org.mule.extension.runtime.ConfigurationInstance;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
-import org.mule.module.extension.internal.config.DeclaredConfiguration;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -43,7 +46,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -69,9 +71,10 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     private OperationModel operationModel;
 
     @Mock
-    private ExtensionManagerAdapter extensionManager;
+    private ExtensionManager extensionManager;
 
     private ReflectiveMethodOperationExecutor executor;
+    private ConfigurationInstance<Object> configurationInstance;
     private OperationContextAdapter operationContext;
     private HeisenbergExtension config;
     private HeisenbergOperations operations;
@@ -81,8 +84,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     public void init()
     {
         initHeisenberg();
-        operationContext = spy(new DefaultOperationContext(extensionModel, operationModel, CONFIG_NAME, parameters, muleEvent, extensionManager));
-        when(extensionManager.getConfiguration(extensionModel, CONFIG_NAME, operationContext)).thenReturn(new DeclaredConfiguration<>(CONFIG_NAME, configurationModel, config));
+        configurationInstance = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, config, emptyList());
+        operationContext = new DefaultOperationContext(configurationInstance, parameters, muleEvent);
+        operationContext = spy(operationContext);
     }
 
     @Test
@@ -94,18 +98,11 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     }
 
     @Test
-    public void successfulOperationIsNotified() throws Exception
-    {
-        operationWithReturnValueAndWithoutParameters();
-        verify(operationContext).notifySuccessfulOperation(HEISENBERG);
-    }
-
-    @Test
-    public void failingOperationIsNotified() throws Exception
+    public void exceptionIsPropagated() throws Exception
     {
         final RuntimeException exception = new RuntimeException();
         operations = mock(HeisenbergOperations.class);
-        when(operations.sayMyName(Mockito.any(HeisenbergExtension.class))).thenThrow(exception);
+        when(operations.sayMyName(any(HeisenbergExtension.class))).thenThrow(exception);
 
         try
         {
@@ -114,7 +111,6 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         }
         catch (Exception e)
         {
-            verify(operationContext).notifyFailedOperation(exception);
             assertThat(e, is(sameInstance(exception)));
         }
     }

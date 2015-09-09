@@ -18,6 +18,7 @@ import org.mule.api.registry.Registry;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.queue.QueueManager;
@@ -51,19 +52,20 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, Component.class, OutboundRouter.class});
     }
 
-    public MuleContextStartPhase(Class<?>[] ignorredObjects)
+    public MuleContextStartPhase(Class<?>[] ignoredObjects)
     {
         super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 
-        Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
+        Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<>();
         startOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
+        startOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 
-        setIgnoredObjectTypes(ignorredObjects);
+        setIgnoredObjectTypes(ignoredObjects);
         setOrderedLifecycleObjects(startOrderedObjects);
         registerSupportedPhase(Initialisable.PHASE_NAME);
         //Start/Stop/Start 

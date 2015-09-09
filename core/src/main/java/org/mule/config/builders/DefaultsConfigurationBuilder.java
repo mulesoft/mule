@@ -23,6 +23,7 @@ import org.mule.execution.MuleMessageProcessingManager;
 import org.mule.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.security.MuleSecurityManager;
+import org.mule.time.TimeSupplier;
 import org.mule.util.DefaultStreamCloserService;
 import org.mule.util.lock.MuleLockFactory;
 import org.mule.util.lock.SingleServerLockProvider;
@@ -74,7 +75,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registerLocalObjectStoreManager(muleContext, registry);
 
         registry.registerObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME,
-            DefaultObjectStoreFactoryBean.createDefaultInMemoryQueueStore());
+                                DefaultObjectStoreFactoryBean.createDefaultInMemoryQueueStore());
         registry.registerObject(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME,
             DefaultObjectStoreFactoryBean.createDefaultPersistentQueueStore());
         registry.registerObject(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME,
@@ -98,12 +99,13 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         configureThreadingProfiles(registry);
 
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE,
-            new NoRetryPolicyTemplate());
+                                new NoRetryPolicyTemplate());
         registry.registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER,
             new DynamicDataTypeConversionResolver(muleContext));
 
         registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext));
         registry.registerObject(MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator());
+        registry.registerObject(MuleProperties.OBJECT_TIME_SUPPLIER, new TimeSupplier());
     }
 
     private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException
