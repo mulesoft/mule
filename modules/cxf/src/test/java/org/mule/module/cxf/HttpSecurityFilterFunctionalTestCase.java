@@ -10,8 +10,6 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
@@ -29,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class HttpSecurityFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTestCase
 {
     private static String soapRequest = 
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
@@ -61,8 +59,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractServiceAndFlow
             {ConfigVariant.FLOW, "http-security-filter-test-flow-httpn.xml"}
         });
     }      
- 
-    
+
+
     /**
      * By putting this test method that uses https first we can test MULE-4558
      * 

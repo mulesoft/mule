@@ -13,7 +13,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 
@@ -31,7 +30,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 
-public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
+public class HttpSecurityTestCase extends AbstractHttpSecurityTestCase
 {
 
     private static final String HTTP_SECURITY_CONF_FLOW_HTTPN_XML = "http-security-conf-flow-httpn.xml";
