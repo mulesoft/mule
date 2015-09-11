@@ -14,7 +14,6 @@ import static org.junit.Assume.assumeThat;
 import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConnector;
@@ -33,7 +32,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 
-public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
+public class HttpSecurityTestCase extends AbstractHttpSecurityTestCase
 {
 
     @Rule
