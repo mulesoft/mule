@@ -7,11 +7,14 @@
 
 package org.mule.work;
 
+import static org.mule.execution.MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.execution.MessageProcessorExecutionTemplate;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -31,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class ProcessingMuleEventWork extends AbstractMuleEventWork
 {
 
+    private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExceptionTransformerExecutionTemplate();
     private final CountDownLatch latch = new CountDownLatch(1);
     private final MessageProcessor messageProcessor;
     private MuleEvent resultEvent;
@@ -55,7 +59,7 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork
     {
         try
         {
-            this.resultEvent = this.messageProcessor.process(event);
+            this.resultEvent = messageProcessorExecutionTemplate.execute(messageProcessor, event);
         }
         catch (MuleException e)
         {

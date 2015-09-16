@@ -6,6 +6,8 @@
  */
 package org.mule.component;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.DefaultMuleEventContext;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
@@ -23,7 +25,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.registry.JSR250ValidatorProcessor;
 import org.mule.util.annotation.AnnotationMetaData;
@@ -199,6 +200,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
      * <b>NOTE:</b> It is up to component implementations to ensure their implementation of
      * <code>initialise()</code> is thread-safe.
      */
+    @Override
     public void initialise() throws InitialisationException
     {
         if (isInitialisable)
@@ -223,6 +225,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
      * implement the mule {@link Startable} interface. NOT: It is up to component
      * implementations to ensure their implementation of start() is thread-safe.
      */
+    @Override
     public void start() throws MuleException
     {
         if (isStartable)
@@ -249,6 +252,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
      * implement the mule {@link Stoppable} interface. NOT: It is up to component
      * implementations to ensure their implementation of stop() is thread-safe.
      */
+    @Override
     public void stop() throws MuleException
     {
         if (isStoppable)
@@ -275,6 +279,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
      * implement the mule {@link Disposable} interface. NOT: It is up to component
      * implementations to ensure their implementation of dispose() is thread-safe.
      */
+    @Override
     public void dispose()
     {
         try
@@ -309,6 +314,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     /**
      * @return true if the service has been started
      */
+    @Override
     public boolean isStarted()
     {
         return started;
@@ -317,11 +323,13 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     /**
      * @return whether the service managed by this lifecycle has been disposed
      */
+    @Override
     public boolean isDisposed()
     {
         return disposed;
     }
 
+    @Override
     public Object invoke(MuleEvent event) throws MuleException
     {
         // Invoke method
@@ -331,7 +339,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         {
             if (componentObject == null)
             {
-                throw new ComponentException(MessageFactory.createStaticMessage("componentObject is null"), RequestContext.getEvent(), component);
+                throw new ComponentException(createStaticMessage("componentObject is null"), RequestContext.getEvent(), component);
             }
             // Use the overriding entrypoint resolver if one is set
             if (component.getEntryPointResolverSet() != null)
@@ -345,7 +353,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
         catch (Exception e)
         {
-            throw new ComponentException(RequestContext.getEvent(), component, e);
+            throw new ComponentException(createStaticMessage("%s: %s", e.getClass().getName(), e.getMessage()), RequestContext.getEvent(), component, e);
         }
 
         return result;
