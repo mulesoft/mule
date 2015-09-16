@@ -6,13 +6,14 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.api.MuleContext;
-import org.mule.extension.ExtensionManager;
+import org.mule.api.MuleException;
+import org.mule.api.config.ConfigurationException;
 import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.extension.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -30,24 +31,14 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
     @Override
     public <T> ConfigurationProvider<T> createDynamicConfigurationProvider(
             String name,
-            ExtensionModel extensionModel,
             ConfigurationModel configurationModel,
             ResolverSet resolverSet,
-            ExtensionManagerAdapter extensionManager,
             DynamicConfigPolicy dynamicConfigPolicy) throws Exception
     {
-        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(configurationModel, resolverSet);
-        ConfigurationProvider<T> configurationProvider = new DynamicConfigurationProvider<>(name,
-                                                                                            extensionModel,
-                                                                                            configurationModel,
-                                                                                            extensionManager,
-                                                                                            configurationObjectBuilder,
-                                                                                            resolverSet,
-                                                                                            dynamicConfigPolicy.getExpirationPolicy());
-
-        register(extensionModel, configurationProvider, extensionManager);
-
-        return configurationProvider;
+        return new DynamicConfigurationProvider<>(name,
+                                                  configurationModel,
+                                                  resolverSet,
+                                                  dynamicConfigPolicy.getExpirationPolicy());
     }
 
     /**
@@ -56,26 +47,21 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
     @Override
     public <T> ConfigurationProvider<T> createStaticConfigurationProvider(
             String name,
-            ExtensionModel extensionModel,
             ConfigurationModel configurationModel,
             ResolverSet resolverSet,
-            MuleContext muleContext,
-            ExtensionManagerAdapter extensionManager) throws Exception
+            MuleContext muleContext) throws Exception
     {
-        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(configurationModel, resolverSet);
-        ConfigurationProvider<T> configurationProvider;
+        ConfigurationInstance<T> configuration;
+        try
+        {
+            configuration = new ConfigurationInstanceFactory<T>(configurationModel, resolverSet).createConfiguration(name, getInitialiserEvent(muleContext));
+        }
+        catch (MuleException e)
+        {
+            throw new ConfigurationException(createStaticMessage(String.format("Could not create configuration '%s' for the '%s'",
+                                                                               name, configurationModel.getExtensionModel().getName())), e);
+        }
 
-
-        T configuration = (T) configurationObjectBuilder.build(getInitialiserEvent(muleContext));
-        configurationProvider = new StaticConfigurationProvider<>(name, configurationModel, configuration);
-        register(extensionModel, configurationProvider, extensionManager);
-        extensionManager.registerConfiguration(extensionModel, name, configuration);
-
-        return configurationProvider;
-    }
-
-    private <T> void register(ExtensionModel extensionModel, ConfigurationProvider<T> configurationProvider, ExtensionManager extensionManager)
-    {
-        extensionManager.registerConfigurationProvider(extensionModel, configurationProvider);
+        return new StaticConfigurationProvider<>(name, configurationModel, configuration);
     }
 }

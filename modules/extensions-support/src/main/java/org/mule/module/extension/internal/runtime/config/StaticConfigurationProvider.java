@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.extension.runtime.OperationContext;
+import org.mule.extension.runtime.ConfigurationInstance;
 
 /**
  * {@link ConfigurationProvider} which provides always the same {@link #configuration}.
@@ -17,50 +17,27 @@ import org.mule.extension.runtime.OperationContext;
  * @param <T> the generic type of the instances provided
  * @since 3.7.0
  */
-public final class StaticConfigurationProvider<T> implements ConfigurationProvider<T>
+public final class StaticConfigurationProvider<T> extends LifecycleAwareConfigurationProvider<T>
 {
 
-    private final String name;
-    private final ConfigurationModel model;
-    private final T configuration;
+    private final ConfigurationInstance<T> configuration;
 
-    public StaticConfigurationProvider(String name, ConfigurationModel model, T configuration)
+    public StaticConfigurationProvider(String name, ConfigurationModel model, ConfigurationInstance<T> configuration)
     {
-        this.name = name;
-        this.model = model;
+        super(name, model);
         this.configuration = configuration;
+        registerConfiguration(configuration);
     }
 
     /**
      * Returns {@link #configuration}.
-     * <p/>
-     * The first time this method is invoked, the instance
-     * is registered on the {@code registrationCallback}
      *
-     * @param operationContext the {@link OperationContext context} of the {@link OperationModel} being executed
+     * @param muleEvent the current {@link MuleEvent}
      * @return {@link #configuration}
      */
     @Override
-    public T get(OperationContext operationContext)
+    public ConfigurationInstance<T> get(Object muleEvent)
     {
         return configuration;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConfigurationModel getModel()
-    {
-        return model;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return name;
     }
 }

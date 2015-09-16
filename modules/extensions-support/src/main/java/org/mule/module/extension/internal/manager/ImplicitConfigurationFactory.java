@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.manager;
 
+import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.config.DeclaredConfiguration;
+import org.mule.extension.runtime.ConfigurationInstance;
 
 /**
  * Provides implicit configurations instances which are compliant with a {@link ConfigurationModel}.
@@ -24,10 +24,10 @@ interface ImplicitConfigurationFactory
     /**
      * Creates an implicit configuration instance
      *
-     * @param extensionModel       an {@link ExtensionModel}
-     * @param operationContext     an {@link OperationContext}
-     * @param <C>                  the type of the configuration instance to be returned
-     * @return a {@link DeclaredConfiguration} or {@code null} if it's not possible to create an implicit configuration
+     * @param extensionModel the {@link ExtensionModel} from which a {@link ConfigurationModel} is to be selected
+     * @param muleEvent      the current {@link MuleEvent}
+     * @param <C>            the generic type of the returned {@link ConfigurationInstance}
+     * @return a {@link ConfigurationInstance} or {@code null} if it's not possible to create an implicit configuration
      */
-    <C> DeclaredConfiguration<C> createImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext);
+    <C> ConfigurationInstance<C> createImplicitConfigurationInstance(ExtensionModel extensionModel, MuleEvent muleEvent);
 }

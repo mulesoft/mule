@@ -17,6 +17,7 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.annotation.AnnotationMetaData;
@@ -50,13 +51,14 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase
         super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
         registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
 
-        Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
-        startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
-        setOrderedLifecycleObjects(startOrderedObjects);
+        Set<LifecycleObject> orderedObjects = new LinkedHashSet<>();
+        orderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
+        orderedObjects.add(new NotificationLifecycleObject(Config.class));
+        orderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        orderedObjects.add(new NotificationLifecycleObject(Agent.class));
+        orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
+        orderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
+        setOrderedLifecycleObjects(orderedObjects);
         setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, OutboundRouter.class});
     }
 

@@ -37,8 +37,8 @@ public class SchemaGenerator
     private void validate(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
     {
         checkArgument(extensionModel != null, "extension cannot be null");
-        checkArgument(xmlModelProperty != null, "capability cannot be null");
-        checkState(!StringUtils.isBlank(xmlModelProperty.getNamespace()), "capability cannot provide a blank namespace");
+        checkArgument(xmlModelProperty != null, "xml model property cannot be null");
+        checkState(!StringUtils.isBlank(xmlModelProperty.getNamespace()), "xml model property cannot provide a blank namespace");
     }
 
     public String generate(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)

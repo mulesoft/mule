@@ -44,7 +44,7 @@ import javax.tools.Diagnostic;
  * the XSD schema, spring bundles and extension registration files
  * necessary for mule to work with this extension.
  * <p/>
- * Depending on the capabilities declared by each extension, some of those resources
+ * Depending on the model properties declared by each extension, some of those resources
  * might or might not be generated
  *
  * @since 3.7.0

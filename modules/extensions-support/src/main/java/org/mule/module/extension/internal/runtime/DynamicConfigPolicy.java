@@ -6,8 +6,9 @@
  */
 package org.mule.module.extension.internal.runtime;
 
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.runtime.ExpirationPolicy;
-import org.mule.util.Preconditions;
+import org.mule.time.TimeSupplier;
 
 /**
  * A policy for how the platform should handle dynamic configuration instances
@@ -17,7 +18,17 @@ import org.mule.util.Preconditions;
 public final class DynamicConfigPolicy
 {
 
-    public static DynamicConfigPolicy DEFAULT = new DynamicConfigPolicy(ImmutableExpirationPolicy.DEFAULT);
+    /**
+     * Returns an instance with the default settings, using the given
+     * {@code timeSupplier}
+     *
+     * @param timeSupplier the {@link TimeSupplier} for the returned instance
+     * @return a {@link DynamicConfigPolicy} with the default settings
+     */
+    public static DynamicConfigPolicy getDefault(TimeSupplier timeSupplier)
+    {
+        return new DynamicConfigPolicy(ImmutableExpirationPolicy.getDefault(timeSupplier));
+    }
 
     private final ExpirationPolicy expirationPolicy;
 
@@ -29,7 +40,7 @@ public final class DynamicConfigPolicy
      */
     public DynamicConfigPolicy(ExpirationPolicy expirationPolicy)
     {
-        Preconditions.checkArgument(expirationPolicy != null, "expiration policy cannot be null");
+        checkArgument(expirationPolicy != null, "expiration policy cannot be null");
         this.expirationPolicy = expirationPolicy;
     }
 

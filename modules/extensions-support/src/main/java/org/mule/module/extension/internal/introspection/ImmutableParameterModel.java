@@ -11,9 +11,6 @@ import org.mule.extension.introspection.DataType;
 import org.mule.extension.introspection.ParameterModel;
 
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * Immutable implementation of {@link ParameterModel}
@@ -38,7 +35,6 @@ final class ImmutableParameterModel extends AbstractImmutableModel implements Pa
      * @param dynamic         whether this parameter is dynamic or not
      * @param defaultValue    this parameter's default value
      * @param modelProperties A {@link Map} of custom properties which extend this model
-     * @param capabilities    this parameter's capabilities
      * @throws IllegalArgumentException if {@code required} is {@code true} and {@code defaultValue} is not {@code null} at the same time
      */
     protected ImmutableParameterModel(String name,
@@ -47,10 +43,9 @@ final class ImmutableParameterModel extends AbstractImmutableModel implements Pa
                                       boolean required,
                                       boolean dynamic,
                                       Object defaultValue,
-                                      Map<String, Object> modelProperties,
-                                      Set<Object> capabilities)
+                                      Map<String, Object> modelProperties)
     {
-        super(name, description, modelProperties, capabilities);
+        super(name, description, modelProperties);
 
         if (RESERVED_NAMES.contains(name))
         {
@@ -105,11 +100,5 @@ final class ImmutableParameterModel extends AbstractImmutableModel implements Pa
     public Object getDefaultValue()
     {
         return defaultValue;
-    }
-
-    @Override
-    public String toString()
-    {
-        return ToStringBuilder.reflectionToString(this);
     }
 }

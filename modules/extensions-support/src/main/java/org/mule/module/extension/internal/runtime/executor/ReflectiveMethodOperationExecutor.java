@@ -20,7 +20,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.runtime.OperationExecutor;
-import org.mule.module.extension.internal.runtime.AbstractOperationExecutor;
 
 import java.lang.reflect.Method;
 
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class ReflectiveMethodOperationExecutor extends AbstractOperationExecutor implements MuleContextAware, Lifecycle
+public final class ReflectiveMethodOperationExecutor implements OperationExecutor, MuleContextAware, Lifecycle
 {
 
     private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate
@@ -75,7 +74,7 @@ public final class ReflectiveMethodOperationExecutor extends AbstractOperationEx
      * {@inheritDoc}
      */
     @Override
-    protected Object doExecute(OperationContext operationContext) throws Exception
+    public Object execute(OperationContext operationContext) throws Exception
     {
         Object result = invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext));
         return returnDelegate.asReturnValue(result, operationContext);

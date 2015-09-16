@@ -20,16 +20,17 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.OperationModel;
+import org.mule.extension.runtime.ConfigurationInstance;
 import org.mule.extension.runtime.OperationContext;
 import org.mule.extension.runtime.OperationExecutor;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.util.ExceptionUtils;
+import org.mule.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,9 @@ import org.slf4j.LoggerFactory;
  * A {@link #operationExecutor} is obtained by invoking {@link OperationModel#getExecutor()}. That instance
  * will be use to serve all invokations of {@link #process(MuleEvent)} on {@code this} instance but
  * will not be shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle}
- * events that {@code this} instace receives will be propagated to the {@link #operationExecutor}
+ * events that {@code this} instance receives will be propagated to the {@link #operationExecutor}.
+ * <p/>
+ * The {@link #operationExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
  *
  * @since 3.7.0
  */
@@ -57,7 +60,8 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private final String configurationProviderName;
     private final OperationModel operationModel;
     private final ResolverSet resolverSet;
-    private final ExtensionManagerAdapter extensionManager;
+    private final ExtensionManager extensionManager;
+    private final DefaultExecutionMediator executionMediator = new DefaultExecutionMediator();
 
     private MuleContext muleContext;
     private OperationExecutor operationExecutor;
@@ -66,7 +70,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
                                      OperationModel operationModel,
                                      String configurationProviderName,
                                      ResolverSet resolverSet,
-                                     ExtensionManagerAdapter extensionManager)
+                                     ExtensionManager extensionManager)
     {
         this.extensionModel = extensionModel;
         this.operationModel = operationModel;
@@ -78,8 +82,9 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        OperationContext operationContext = createOperationContext(event);
-        Object result = executeOperation(operationContext);
+        ConfigurationInstance<Object> configuration = getConfiguration(event);
+        OperationContext operationContext = createOperationContext(configuration, event);
+        Object result = executeOperation(operationContext, event);
 
         if (result instanceof MuleEvent)
         {
@@ -97,32 +102,38 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         return event;
     }
 
-    private Object executeOperation(OperationContext operationContext) throws MuleException
+    private Object executeOperation(OperationContext operationContext, MuleEvent event) throws MuleException
     {
         try
         {
-            return operationExecutor.execute(operationContext);
+            return executionMediator.execute(operationExecutor, operationContext);
         }
         catch (Exception e)
         {
-            throw handledException(operationContext, e);
+            throw handledException(e, event);
         }
     }
 
-    private MuleException handledException(OperationContext operationContext, Exception e)
+    private MuleException handledException(Exception e, MuleEvent event)
     {
         Throwable root = ExceptionUtils.getRootCause(e);
         if (root == null)
         {
             root = e;
         }
-        return new MessagingException(createStaticMessage(root.getMessage()), ((OperationContextAdapter) operationContext).getEvent(), root, this);
+        return new MessagingException(createStaticMessage(root.getMessage()), event, root, this);
     }
 
-    private OperationContext createOperationContext(MuleEvent event) throws MuleException
+    private ConfigurationInstance<Object> getConfiguration(MuleEvent event)
     {
-        ResolverSetResult parameters = resolverSet.resolve(event);
-        return new DefaultOperationContext(extensionModel, operationModel, configurationProviderName, parameters, event, extensionManager);
+        return StringUtils.isBlank(configurationProviderName) ? extensionManager.getConfiguration(extensionModel, event)
+                                                              : extensionManager.getConfiguration(configurationProviderName, event);
+    }
+
+
+    private OperationContext createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException
+    {
+        return new DefaultOperationContext(configuration, resolverSet.resolve(event), event);
     }
 
     @Override

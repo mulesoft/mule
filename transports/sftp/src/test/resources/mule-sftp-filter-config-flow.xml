@@ -28,8 +28,7 @@
         <sftp:inbound-endpoint name="inboundEndpoint"
             autoDelete="false" connector-ref="sftp"
             address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data">
-            <file:filename-wildcard-filter
-                pattern="*.xml" />
+            <file:filename-regex-filter pattern="(^SemDirector_Report-\d)(.*)(tab$)" caseSensitive="false"/>
         </sftp:inbound-endpoint>
 
         <sftp:outbound-endpoint connector-ref="sftp"

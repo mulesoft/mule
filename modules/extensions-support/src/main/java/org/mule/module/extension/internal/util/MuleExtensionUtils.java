@@ -8,7 +8,6 @@ package org.mule.module.extension.internal.util;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.util.Preconditions.checkArgument;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -19,8 +18,6 @@ import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.Described;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.util.ArrayUtils;
 
@@ -142,18 +139,6 @@ public class MuleExtensionUtils
 
         Collections.sort(list, new DescribedComparator());
         return list;
-    }
-
-    public static OperationContextAdapter asOperationContextAdapter(OperationContext operationContext)
-    {
-        checkArgument(operationContext != null, "operationContext cannot be null");
-        if (!(operationContext instanceof OperationContextAdapter))
-        {
-            throw new IllegalArgumentException(String.format("operationContext was expected to be an instance of %s but got %s instead",
-                                                             OperationContextAdapter.class.getName(), operationContext.getClass().getName()));
-        }
-
-        return (OperationContextAdapter) operationContext;
     }
 
     public static String getDefaultValue(Optional optional)

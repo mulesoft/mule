@@ -23,6 +23,7 @@ import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.spi.ModelEnricher;
 import org.mule.module.extension.internal.DefaultDescribingContext;
+import org.mule.util.ValueHolder;
 
 import com.google.common.collect.ImmutableList;
 
@@ -80,13 +81,16 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     private ExtensionModel toExtension(Declaration declaration)
     {
         validateMuleVersion(declaration);
-        return new ImmutableExtensionModel(declaration.getName(),
-                                           declaration.getDescription(),
-                                           declaration.getVersion(),
-                                           sortConfigurations(toConfigurations(declaration.getConfigurations())),
-                                           alphaSortDescribedList(toOperations(declaration.getOperations())),
-                                           declaration.getModelProperties(),
-                                           declaration.getCapabilities());
+        ValueHolder<ExtensionModel> extensionModelValueHolder = new ValueHolder<>();
+        ExtensionModel extensionModel = new ImmutableExtensionModel(declaration.getName(),
+                                                                    declaration.getDescription(),
+                                                                    declaration.getVersion(),
+                                                                    sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
+                                                                    alphaSortDescribedList(toOperations(declaration.getOperations())),
+                                                                    declaration.getModelProperties());
+
+        extensionModelValueHolder.set(extensionModel);
+        return extensionModel;
     }
 
     private List<ConfigurationModel> sortConfigurations(List<ConfigurationModel> configurationModels)
@@ -105,20 +109,23 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     }
 
 
-    private List<ConfigurationModel> toConfigurations(List<ConfigurationDeclaration> declarations)
+    private List<ConfigurationModel> toConfigurations(List<ConfigurationDeclaration> declarations, ValueHolder<ExtensionModel> extensionModelValueHolder)
     {
         checkArgument(!declarations.isEmpty(), "A extension must have at least one configuration");
-        return declarations.stream().map(this::toConfiguration).collect(Collectors.toList());
+        return declarations.stream()
+                .map(declaration -> toConfiguration(declaration, extensionModelValueHolder))
+                .collect(Collectors.toList());
     }
 
-    private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration)
+    private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration, ValueHolder<ExtensionModel> extensionModel)
     {
         return new ImmutableConfigurationModel(declaration.getName(),
                                                declaration.getDescription(),
+                                               extensionModel::get,
                                                declaration.getConfigurationInstantiator(),
                                                toConfigParameters(declaration.getParameters()),
                                                declaration.getModelProperties(),
-                                               declaration.getCapabilities());
+                                               declaration.getInterceptorFactories());
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations)
@@ -138,8 +145,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                            declaration.getDescription(),
                                            declaration.getExecutorFactory(),
                                            parameterModels,
-                                           declaration.getModelProperties(),
-                                           declaration.getCapabilities());
+                                           declaration.getModelProperties());
     }
 
     private List<ParameterModel> toConfigParameters(List<ParameterDeclaration> declarations)
@@ -174,8 +180,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                            parameter.isRequired(),
                                            parameter.isDynamic(),
                                            parameter.getDefaultValue(),
-                                           parameter.getModelProperties(),
-                                           parameter.getCapabilities());
+                                           parameter.getModelProperties());
     }
 
     private void validateMuleVersion(Declaration declaration)
@@ -186,7 +191,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         }
         catch (IllegalArgumentException e)
         {
-            throw new IllegalArgumentException(String.format("Invalid version %s for capability '%s'", declaration.getVersion(), declaration.getName()));
+            throw new IllegalArgumentException(String.format("Invalid version %s for extension '%s'", declaration.getVersion(), declaration.getName()));
         }
     }
 

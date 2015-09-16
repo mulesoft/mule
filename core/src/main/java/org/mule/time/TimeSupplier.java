@@ -10,19 +10,12 @@ import java.util.function.Supplier;
 
 /**
  * A {@link Supplier} which provides the current system time
- * in milliseconds. This is a singleton class, use {@link #INSTANCE}
- * to get an instance of it.
+ * in milliseconds.
  *
  * @since 4.0
  */
-public final class TimeSupplier implements Supplier<Long>
+public class TimeSupplier implements Supplier<Long>
 {
-
-    public static final TimeSupplier INSTANCE = new TimeSupplier();
-
-    private TimeSupplier()
-    {
-    }
 
     /**
      * Returns {@link System#currentTimeMillis()}

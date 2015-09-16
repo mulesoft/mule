@@ -9,10 +9,8 @@ package org.mule.module.extension.internal.config;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleContext;
 import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.extension.runtime.ExpirationPolicy;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.runtime.config.ConfigurationProviderFactory;
@@ -36,15 +34,15 @@ final class ConfigurationProviderFactoryBean implements FactoryBean<Configuratio
 
     private final ConfigurationProvider<Object> configurationProvider;
     private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
+    private final TimeSupplier timeSupplier;
 
     ConfigurationProviderFactoryBean(String name,
-                                     ExtensionModel extensionModel,
                                      ConfigurationModel configurationModel,
                                      ElementDescriptor element,
-                                     MuleContext muleContext)
+                                     MuleContext muleContext,
+                                     TimeSupplier timeSupplier)
     {
-        final ExtensionManagerAdapter extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
-
+        this.timeSupplier = timeSupplier;
         ResolverSet resolverSet = getResolverSet(element, configurationModel.getParameterModels());
         try
         {
@@ -52,22 +50,20 @@ final class ConfigurationProviderFactoryBean implements FactoryBean<Configuratio
             {
                 configurationProvider = configurationProviderFactory.createDynamicConfigurationProvider(
                         name,
-                        extensionModel,
                         configurationModel,
                         resolverSet,
-                        extensionManager,
                         getDynamicConfigPolicy(element));
             }
             else
             {
                 configurationProvider = configurationProviderFactory.createStaticConfigurationProvider(
                         name,
-                        extensionModel,
                         configurationModel,
                         resolverSet,
-                        muleContext,
-                        extensionManager);
+                        muleContext);
             }
+
+            muleContext.getInjector().inject(configurationProvider);
         }
         catch (Exception e)
         {
@@ -99,7 +95,8 @@ final class ConfigurationProviderFactoryBean implements FactoryBean<Configuratio
     private DynamicConfigPolicy getDynamicConfigPolicy(ElementDescriptor element)
     {
         ElementDescriptor policyElement = element.getChildByName("dynamic-config-policy");
-        return policyElement == null ? DynamicConfigPolicy.DEFAULT : new DynamicConfigPolicy(getExpirationPolicy(policyElement));
+        return policyElement == null ? DynamicConfigPolicy.getDefault(timeSupplier)
+                                     : new DynamicConfigPolicy(getExpirationPolicy(policyElement));
     }
 
     private ExpirationPolicy getExpirationPolicy(ElementDescriptor dynamicConfigPolicyElement)
@@ -107,14 +104,13 @@ final class ConfigurationProviderFactoryBean implements FactoryBean<Configuratio
         ElementDescriptor expirationPolicyElement = dynamicConfigPolicyElement.getChildByName("expiration-policy");
         if (expirationPolicyElement == null)
         {
-            return ImmutableExpirationPolicy.DEFAULT;
+            return ImmutableExpirationPolicy.getDefault(timeSupplier);
         }
 
-        //TODO: When MULE-8869 is implemented, the TimeSupplier should be injected
         return new ImmutableExpirationPolicy(
                 Long.valueOf(expirationPolicyElement.getAttribute("maxIdleTime")),
                 TimeUnit.valueOf(expirationPolicyElement.getAttribute("timeUnit")),
-                TimeSupplier.INSTANCE);
+                timeSupplier);
     }
 
 }

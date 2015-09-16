@@ -15,7 +15,6 @@ import org.mule.extension.runtime.OperationExecutor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Immutable concrete implementation of {@link OperationModel}
@@ -36,17 +35,15 @@ final class ImmutableOperationModel extends AbstractImmutableModel implements Op
      * @param executorFactory a {@link OperationExecutorFactory}. Cannot be {@code null}
      * @param parameterModels a {@link List} with the operation's {@link ParameterModel parameterModels}
      * @param modelProperties A {@link Map} of custom properties which extend this model
-     * @param capabilities    a {@link Set} with the operation's capabilities
      * @throws IllegalArgumentException if {@code name} is blank or {@code executorFactory} is {@code null}
      */
     ImmutableOperationModel(String name,
                             String description,
                             OperationExecutorFactory executorFactory,
                             List<ParameterModel> parameterModels,
-                            Map<String, Object> modelProperties,
-                            Set<Object> capabilities)
+                            Map<String, Object> modelProperties)
     {
-        super(name, description, modelProperties, capabilities);
+        super(name, description, modelProperties);
 
         checkArgument(executorFactory != null, String.format("Operation '%s' cannot have a null executor factory", name));
         this.executorFactory = executorFactory;

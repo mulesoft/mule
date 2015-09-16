@@ -4,24 +4,31 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.resolver;
+package org.mule.module.extension.internal.runtime.config;
 
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
+import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.size.SmallTest;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigurationProviderTestCase extends AbstractConfigurationInstanceProviderTestCase
+public class StaticConfigurationProviderTestCase extends AbstractConfigurationProviderTestCase<HeisenbergExtension>
 {
 
     private static final Class MODULE_CLASS = HeisenbergExtension.class;
@@ -41,9 +48,6 @@ public class ConfigurationProviderTestCase extends AbstractConfigurationInstance
     @Mock
     private ResolverSet resolverSet;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleContext muleContext;
-
     @Mock
     private MuleEvent event;
 
@@ -51,7 +55,7 @@ public class ConfigurationProviderTestCase extends AbstractConfigurationInstance
     private ResolverSetResult resolverSetResult;
 
     @Mock
-    private ExtensionManagerAdapter extensionManager;
+    private ExtensionManager extensionManager;
 
     @Mock
     private ExpirationPolicy expirationPolicy;
@@ -65,6 +69,8 @@ public class ConfigurationProviderTestCase extends AbstractConfigurationInstance
         when(configurationModel.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
         when(configurationModel.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
         when(configurationModel.getModelProperty(anyString())).thenReturn(null);
+        when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
+        when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
 
         when(operationContext.getEvent()).thenReturn(event);
 
@@ -74,8 +80,8 @@ public class ConfigurationProviderTestCase extends AbstractConfigurationInstance
         when(resolverSet.getResolvers()).thenReturn(parameters);
         when(resolverSet.isDynamic()).thenReturn(false);
 
-        provider = new DefaultConfigurationProviderFactory()
-                .createStaticConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet, muleContext, extensionManager);
+        provider = (LifecycleAwareConfigurationProvider) new DefaultConfigurationProviderFactory().createStaticConfigurationProvider(CONFIG_NAME, configurationModel, resolverSet, muleContext);
+        super.before();
     }
 
     @Test
@@ -84,4 +90,46 @@ public class ConfigurationProviderTestCase extends AbstractConfigurationInstance
         assertSameInstancesResolved();
     }
 
+    @Test
+    public void initialise() throws Exception
+    {
+        provider.initialise();
+        HeisenbergExtension config = provider.get(operationContext).getValue();
+        verify(muleContext.getInjector()).inject(config);
+        assertLifecycle(HeisenbergExtension::getInitialise);
+    }
+
+    @Test
+    public void start() throws Exception
+    {
+        provider.initialise();
+        provider.start();
+        assertLifecycle(HeisenbergExtension::getStart);
+    }
+
+    @Test
+    public void stop() throws Exception
+    {
+        provider.initialise();
+        provider.start();
+        provider.stop();
+        assertLifecycle(HeisenbergExtension::getStop);
+    }
+
+    @Test
+    public void dispose() throws Exception
+    {
+        provider.initialise();
+        provider.start();
+        provider.stop();
+        provider.dispose();
+        assertLifecycle(HeisenbergExtension::getDispose);
+    }
+
+
+    private void assertLifecycle(Function<HeisenbergExtension, Integer> testFunction)
+    {
+        HeisenbergExtension config = provider.get(operationContext).getValue();
+        assertThat(testFunction.apply(config), is(1));
+    }
 }

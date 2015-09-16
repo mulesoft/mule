@@ -12,8 +12,10 @@ import static org.mule.util.concurrent.ThreadNameHelper.getPrefix;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.extension.runtime.ConfigurationInstance;
 
-import java.util.Map;
+import com.google.common.collect.Multimap;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -88,7 +90,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
          * @param expirationHandler a {@link BiConsumer} which acts as a expiration handler
          * @return {@code this} instance
          */
-        public Builder onExpired(BiConsumer<String, Object> expirationHandler)
+        public Builder onExpired(BiConsumer<String, ConfigurationInstance<Object>> expirationHandler)
         {
             manager.expirationHandler = expirationHandler;
             return this;
@@ -115,7 +117,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
     private MuleContext muleContext;
     private long frequency;
     private TimeUnit timeUnit;
-    private BiConsumer<String, Object> expirationHandler;
+    private BiConsumer<String, ConfigurationInstance<Object>> expirationHandler;
 
     private ScheduledExecutorService executor;
 
@@ -146,7 +148,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
         LOGGER.debug("Running configuration expiration cycle");
         try
         {
-            Map<String, Object> expired = extensionRegistry.getExpiredConfigs();
+            Multimap<String, ConfigurationInstance<Object>> expired = extensionRegistry.getExpiredConfigs();
             if (LOGGER.isDebugEnabled())
             {
                 LOGGER.debug(expired.isEmpty()
@@ -154,7 +156,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
                              : "Found {} expired configurations", expired.size());
             }
 
-            expired.entrySet().stream().forEach(this::handleExpiration);
+            expired.entries().stream().forEach(entry -> handleExpiration(entry.getKey(), entry.getValue()));
         }
         catch (Exception e)
         {
@@ -163,24 +165,22 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
 
     }
 
-    private void handleExpiration(Map.Entry<String, Object> config)
+    private void handleExpiration(String key, ConfigurationInstance<Object> config)
     {
         if (stopChecking())
         {
             return;
         }
 
-        final String key = config.getKey();
-        LOGGER.debug("Expiring configuration of key {}", key);
         try
         {
-            expirationHandler.accept(key, config.getValue());
+            expirationHandler.accept(key, config);
             LOGGER.debug("Configuration of key {} was expired", key);
         }
         catch (Exception e)
         {
             LOGGER.error(String.format("Could not process expiration for dynamic config '%s' of type '%s'. Will try again on next cycle",
-                                       key, config.getValue().getClass().getName()), e);
+                                       key, config.getClass().getName()), e);
         }
     }
 

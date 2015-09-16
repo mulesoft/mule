@@ -50,13 +50,13 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
         assertOperationExtensionOf(SAY_BYE_OPERATION, ExtensibleExtension.class);
     }
 
-    private void assertOperationExtensionOf(String operationName, Class capabilityType)
+    private void assertOperationExtensionOf(String operationName, Class propertyType)
     {
         Declaration declaration = getDescriber().describe(new DefaultDescribingContext()).getRootDeclaration().getDeclaration();
         OperationDeclaration operation = getOperation(declaration, operationName);
 
         ExtendingOperationModelProperty<ExtensibleExtension> modelProperty = operation.getModelProperty(ExtendingOperationModelProperty.KEY);
-        assertThat(modelProperty.getType(), is(sameInstance(capabilityType)));
+        assertThat(modelProperty.getType(), is(sameInstance(propertyType)));
     }
 
     @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)

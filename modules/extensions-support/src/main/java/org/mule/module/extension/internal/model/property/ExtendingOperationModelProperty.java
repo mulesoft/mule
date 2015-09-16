@@ -15,7 +15,7 @@ import org.mule.extension.annotations.Extension;
  * the functionality of an {@link Extension} which is defined in a type
  * annotated with {@link Extensible}.
  * <p/>
- * The runtime consequences of this capabilities depend on the runtime.
+ * The runtime consequences of this property depend on the runtime.
  * This class constructor throws {@link IllegalArgumentException} if
  * {@link #type} is not annotated with {@link Extensible}
  *

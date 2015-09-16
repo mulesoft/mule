@@ -14,6 +14,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ExtensionFactory;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.introspection.declaration.DescribingContext;
@@ -38,7 +39,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
 {
 
     @Mock
-    private ExtensionManagerAdapter extensionManager;
+    private ExtensionManager extensionManager;
 
     @Mock
     private ExtensionFactory extensionFactory;

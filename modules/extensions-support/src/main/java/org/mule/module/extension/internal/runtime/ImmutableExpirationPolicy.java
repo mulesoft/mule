@@ -10,7 +10,6 @@ import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.time.TimeSupplier;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 /**
  * A immutable implementation of {@link ExpirationPolicy}
@@ -20,14 +19,22 @@ import java.util.function.Supplier;
 public final class ImmutableExpirationPolicy implements ExpirationPolicy
 {
 
-    //TODO: When MULE-8869 is implemented, the TimeSupplier should be injected
-    public static final ExpirationPolicy DEFAULT = new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, TimeSupplier.INSTANCE);
+    /**
+     * Returns an instance with the default settings
+     *
+     * @param timeSupplier the {@link TimeSupplier} for the returned instance to use
+     * @return a {@link ExpirationPolicy} with the default settings
+     */
+    public static ExpirationPolicy getDefault(TimeSupplier timeSupplier)
+    {
+        return new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);
+    }
 
     private final long maxIdleTime;
     private final TimeUnit timeUnit;
-    private final Supplier<Long> timeSupplier;
+    private final TimeSupplier timeSupplier;
 
-    public ImmutableExpirationPolicy(long maxIdleTime, TimeUnit timeUnit, Supplier<Long> timeSupplier)
+    public ImmutableExpirationPolicy(long maxIdleTime, TimeUnit timeUnit, TimeSupplier timeSupplier)
     {
         this.maxIdleTime = maxIdleTime;
         this.timeUnit = timeUnit;

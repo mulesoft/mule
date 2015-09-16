@@ -6,28 +6,30 @@
  */
 package org.mule.module.extension.internal.manager;
 
+import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ServiceRegistry;
+import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.config.DeclaredConfiguration;
+import org.mule.extension.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.module.extension.internal.runtime.config.StaticConfigurationProvider;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.time.Time;
-import org.mule.util.ObjectNameHelper;
 
 import com.google.common.collect.ImmutableList;
 
@@ -35,25 +37,30 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of {@link ExtensionManagerAdapter}. This implementation uses standard Java SPI
- * as a discovery mechanism
+ * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI
+ * as a discovery mechanism.
+ * <p/>
+ * Although it allows registering {@link ConfigurationProvider} instances through the
+ * {@link #registerConfigurationProvider(ConfigurationProvider)} method (and that's still the
+ * correct way of registering them), this implementation automatically acknowledges any
+ * {@link ConfigurationProvider} already present on the {@link MuleRegistry}
  *
  * @since 3.7.0
  */
-public final class DefaultExtensionManager implements ExtensionManagerAdapter, MuleContextAware, Initialisable, Startable, Stoppable
+public final class DefaultExtensionManager implements ExtensionManager, MuleContextAware, Initialisable, Startable, Stoppable
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
-    private final ExtensionRegistry extensionRegistry = new ExtensionRegistry();
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
 
     private MuleContext muleContext;
-    private ObjectNameHelper objectNameHelper;
+    private ExtensionRegistry extensionRegistry;
     private ExtensionDiscoverer extensionDiscoverer;
     private ImplicitConfigurationFactory implicitConfigurationFactory;
     private ConfigurationExpirationMonitor configurationExpirationMonitor;
@@ -62,13 +69,13 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     @Override
     public void initialise() throws InitialisationException
     {
+        extensionRegistry = new ExtensionRegistry(muleContext.getRegistry());
         if (extensionDiscoverer == null)
         {
             extensionDiscoverer = new DefaultExtensionDiscoverer(new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader()), serviceRegistry);
         }
 
-        objectNameHelper = new ObjectNameHelper(muleContext);
-        implicitConfigurationFactory = new DefaultImplicitConfigurationFactory(extensionRegistry, muleContext);
+        implicitConfigurationFactory = new DefaultImplicitConfigurationFactory(muleContext.getExpressionManager());
     }
 
     /**
@@ -120,8 +127,11 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
         if (extensionRegistry.containsExtension(extensionName))
         {
-            throw new IllegalArgumentException(String.format("A extension of name '%s' (version %s) is already registered",
-                                                             extensionModel.getName(), extensionModel.getVersion()));
+            if (LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug("A extension of name '{}' (version {}) is already registered. Skipping...",
+                             extensionModel.getName(), extensionModel.getVersion());
+            }
         }
         else
         {
@@ -133,69 +143,71 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
      * {@inheritDoc}
      */
     @Override
-    public <C> void registerConfigurationProvider(ExtensionModel extensionModel, ConfigurationProvider<C> configurationProvider)
+    public <C> void registerConfigurationProvider(ConfigurationProvider<C> configurationProvider)
     {
-        ExtensionStateTracker extensionStateTracker = extensionRegistry.getExtensionState(extensionModel);
-        extensionStateTracker.registerConfigurationProvider(configurationProvider.getName(), configurationProvider);
+        extensionRegistry.registerConfigurationProvider(configurationProvider);
     }
 
     /**
      * {@inheritDoc}
      */
+    //TODO: muleEvent should actually be of MuleEvent type when mule-api jar becomes available
     @Override
-    public <C> DeclaredConfiguration<C> getConfiguration(ExtensionModel extensionModel, String configurationProviderName, OperationContext operationContext)
+    public <C> ConfigurationInstance<C> getConfiguration(String configurationProviderName, Object muleEvent)
     {
-        ConfigurationProvider<C> configurationProvider = getConfigurationProvider(extensionModel, configurationProviderName);
-        return new DeclaredConfiguration<>(configurationProviderName, configurationProvider.getModel(), configurationProvider.get(operationContext));
+        checkArgument(!StringUtils.isBlank(configurationProviderName), "cannot get configuration from a blank provider name");
+        ConfigurationProvider<C> configurationProvider = extensionRegistry.getConfigurationProvider(configurationProviderName);
+        return configurationProvider.get(muleEvent);
     }
 
     /**
      * {@inheritDoc}
      */
+    //TODO: muleEvent should actually be of MuleEvent type when mule-api jar becomes available
     @Override
-    public <C> DeclaredConfiguration<C> getConfiguration(ExtensionModel extensionModel, OperationContext operationContext)
+    public <C> ConfigurationInstance<C> getConfiguration(ExtensionModel extensionModel, Object muleEvent)
     {
-        List<ConfigurationProvider<?>> providers = extensionRegistry.getExtensionState(extensionModel).getConfigurationProviders();
+
+        List<ConfigurationProvider> providers = extensionRegistry.getConfigurationProviders(extensionModel);
 
         int matches = providers.size();
 
         if (matches == 1)
         {
-            ConfigurationProvider<?> provider = providers.get(0);
-            return new DeclaredConfiguration<>(provider.getName(), provider.getModel(), (C) provider.get(operationContext));
+            return providers.get(0).get(muleEvent);
         }
         else if (matches > 1)
         {
-            throw new IllegalStateException(String.format("No config-ref was specified for operation '%s' of extension '%s', but %d are registered. Please specify which to use",
-                                                          operationContext.getOperationModel().getName(), extensionModel.getName(), matches));
+            throw new IllegalStateException(String.format("No config-ref was specified for operation of extension '%s', but %d are registered. Please specify which to use",
+                                                          extensionModel.getName(),
+                                                          matches));
         }
         else
         {
-            if (attemptToCreateImplicitConfiguration(extensionModel, operationContext))
+            if (attemptToCreateImplicitConfiguration(extensionModel, (MuleEvent) muleEvent))
             {
-                return getConfiguration(extensionModel, operationContext);
+                return getConfiguration(extensionModel, muleEvent);
             }
 
-            throw new IllegalStateException(String.format("No config-ref was specified for operation '%s' of extension '%s' and no implicit configuration could be inferred. Please define one.",
-                                                          operationContext.getOperationModel().getName(), extensionModel.getName()));
+            throw new IllegalStateException(String.format("No config-ref was specified for operation of extension '%s' and no implicit configuration could be inferred. Please define one.",
+                                                          extensionModel.getName()));
         }
     }
 
-    private boolean attemptToCreateImplicitConfiguration(ExtensionModel extensionModel, OperationContext operationContext)
+    private boolean attemptToCreateImplicitConfiguration(ExtensionModel extensionModel, MuleEvent muleEvent)
     {
         synchronized (extensionModel)
         {
             //check that another thread didn't beat us to create the instance
-            if (!extensionRegistry.getExtensionState(extensionModel).getConfigurationProviders().isEmpty())
+            if (!extensionRegistry.getConfigurationProviders(extensionModel).isEmpty())
             {
                 return true;
             }
-            DeclaredConfiguration<?> declaredConfiguration = implicitConfigurationFactory.createImplicitConfiguration(extensionModel, operationContext);
-            if (declaredConfiguration != null)
+            ConfigurationInstance<Object> configurationInstance = implicitConfigurationFactory.createImplicitConfigurationInstance(extensionModel, muleEvent);
+            if (configurationInstance != null)
             {
-                Object configuration = declaredConfiguration.getValue();
-                registerConfigurationProvider(extensionModel, new StaticConfigurationProvider<>(declaredConfiguration.getName(), declaredConfiguration.getModel(), configuration));
-                registerConfiguration(extensionModel, declaredConfiguration.getName(), configuration);
+                ConfigurationProvider<Object> configurationProvider = new StaticConfigurationProvider<>(configurationInstance.getName(), configurationInstance.getModel(), configurationInstance);
+                registerConfigurationProvider(configurationProvider);
 
                 return true;
             }
@@ -213,65 +225,25 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         return extensionRegistry.getExtensions();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <C> String registerConfiguration(ExtensionModel extensionModel, String configurationProviderName, C configuration)
-    {
-        ExtensionStateTracker extensionStateTracker = extensionRegistry.getExtensionState(extensionModel);
-        final String registrationName = objectNameHelper.getUniqueName(configurationProviderName);
-
-        extensionStateTracker.registerConfiguration(configurationProviderName, registrationName, configuration);
-
-        putInRegistryAndApplyLifecycle(registrationName, configuration);
-
-        return registrationName;
-    }
-
-    private void putInRegistryAndApplyLifecycle(String key, Object object)
-    {
-        try
-        {
-            muleContext.getRegistry().registerObject(key, object);
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
-
-    private <C> ConfigurationProvider<C> getConfigurationProvider(ExtensionModel extensionModel, String configurationProviderName)
-    {
-        ConfigurationProvider<C> configurationProvider = extensionRegistry.getExtensionState(extensionModel).getConfigurationProvider(configurationProviderName);
-
-        if (configurationProvider == null)
-        {
-            throw new IllegalArgumentException(String.format("There is no registered configurationProvider under name '%s'", configurationProviderName));
-        }
-
-        return configurationProvider;
-    }
-
     private ConfigurationExpirationMonitor newConfigurationExpirationMonitor()
     {
         Time freq = getConfigurationExpirationFrequency();
         return newBuilder(extensionRegistry, muleContext)
                 .runEvery(freq.getTime(), freq.getUnit())
-                .onExpired((key, object) -> unregisterConfiguration(key, object))
+                .onExpired((key, object) -> disposeConfiguration(key, object))
                 .build();
     }
 
-    private void unregisterConfiguration(String key, Object object)
+    private void disposeConfiguration(String key, ConfigurationInstance<Object> configuration)
     {
         try
         {
-            muleContext.getRegistry().unregisterObject(key);
+            stopIfNeeded(configuration);
+            disposeIfNeeded(configuration, LOGGER);
         }
-        catch (RegistrationException e)
+        catch (Exception e)
         {
-            LOGGER.error(String.format("Could not unregister expired dynamic config of key '%s' and type %s",
-                                       key, object.getClass().getName()), e);
+            LOGGER.error(String.format("Could not dispose expired dynamic config of key '%s' and type %s", key, configuration.getClass().getName()), e);
         }
     }
 

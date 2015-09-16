@@ -20,6 +20,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.extension.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.annotation.AnnotationMetaData;
@@ -58,11 +59,12 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
     {
         super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
 
-        Set<LifecycleObject> orderedObjects = new LinkedHashSet<LifecycleObject>();
+        Set<LifecycleObject> orderedObjects = new LinkedHashSet<>();
         // Stop in the opposite order to start
         orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         orderedObjects.add(new NotificationLifecycleObject(Agent.class));
         orderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        orderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         orderedObjects.add(new NotificationLifecycleObject(Config.class));
         orderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
         orderedObjects.add(new NotificationLifecycleObject(Object.class));
