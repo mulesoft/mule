@@ -10,14 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
+import static org.mockito.Mockito.spy;
+import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.introspection.ExtensionModel;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
@@ -30,13 +30,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleTestCase
+abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase
 {
 
     protected static final String CONFIG_NAME = "config";
-
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    protected MuleContext muleContext;
 
     @Mock
     protected ExtensionModel extensionModel;
@@ -56,18 +53,9 @@ abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleTest
     @Before
     public void before() throws Exception
     {
-        provider.setMuleContext(muleContext);
-        when(muleContext.getInjector().inject(anyObject())).thenAnswer(invocation -> {
-            Object target = invocation.getArguments()[0];
-            if (target instanceof LifecycleAwareConfigurationInstance)
-            {
-                ((LifecycleAwareConfigurationInstance) target).setMuleContext(muleContext);
-                ((LifecycleAwareConfigurationInstance) target).setTimeSupplier(timeSupplier);
-            }
-
-            return target;
-        });
-
+        muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
+        muleContext.getInjector().inject(provider);
+        ((DefaultMuleContext) muleContext).setInjector(spy(muleContext.getInjector()));
     }
 
     @Test

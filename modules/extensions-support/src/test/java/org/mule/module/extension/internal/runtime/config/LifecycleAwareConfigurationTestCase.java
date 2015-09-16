@@ -10,9 +10,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import org.mule.api.MuleContext;
+import org.mule.DefaultMuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Lifecycle;
@@ -20,7 +21,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.extension.introspection.ConfigurationModel;
 import org.mule.extension.runtime.Interceptor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
@@ -34,13 +35,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class LifecycleAwareConfigurationTestCase extends AbstractMuleTestCase
+public class LifecycleAwareConfigurationTestCase extends AbstractMuleContextTestCase
 {
 
     private static final String NAME = "name";
-
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleContext muleContext;
 
     @Mock
     private ConfigurationModel configurationModel;
@@ -58,11 +56,12 @@ public class LifecycleAwareConfigurationTestCase extends AbstractMuleTestCase
     private LifecycleAwareConfigurationInstance<Object> configuration;
 
     @Before
-    public void before()
+    public void before() throws Exception
     {
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_TIME_SUPPLIER, timeSupplier);
         configuration = new LifecycleAwareConfigurationInstance<>(NAME, configurationModel, value, Arrays.asList(interceptor1, interceptor2));
-        configuration.setMuleContext(muleContext);
-        configuration.setTimeSupplier(timeSupplier);
+        muleContext.getInjector().inject(configuration);
+        ((DefaultMuleContext) muleContext).setInjector(spy(muleContext.getInjector()));
     }
 
     @Test

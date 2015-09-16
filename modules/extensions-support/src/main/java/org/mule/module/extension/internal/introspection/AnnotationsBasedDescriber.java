@@ -34,9 +34,8 @@ import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.introspection.declaration.spi.Describer;
-import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
-import org.mule.module.extension.internal.model.property.HiddenModelProperty;
+import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
@@ -60,6 +59,7 @@ import java.util.Set;
  */
 public final class AnnotationsBasedDescriber implements Describer
 {
+
     private final Class<?> extensionType;
     private final VersionResolver versionResolver;
 
@@ -87,7 +87,6 @@ public final class AnnotationsBasedDescriber implements Describer
                 .onVersion(getVersion(extension))
                 .describedAs(extension.description())
                 .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(extensionType));
-
 
 
         declareConfigurations(declaration, extensionType);
@@ -133,7 +132,8 @@ public final class AnnotationsBasedDescriber implements Describer
             configuration = declaration.withConfig(Extension.DEFAULT_CONFIG_NAME).describedAs(Extension.DEFAULT_CONFIG_DESCRIPTION);
         }
 
-        configuration.instantiatedWith(new TypeAwareConfigurationInstantiator(configurationType));
+        configuration.instantiatedWith(new TypeAwareConfigurationInstantiator(configurationType))
+                .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(configurationType));
 
         declareConfigurationParameters(configurationType, configuration);
     }
@@ -276,19 +276,9 @@ public final class AnnotationsBasedDescriber implements Describer
                                             : operation.with().optionalParameter(parameterDescriptor.getName()).defaultingTo(parameterDescriptor.getDefaultValue());
 
             parameter.describedAs(EMPTY).ofType(parameterDescriptor.getType());
-
-            hideIfNecessary(parameterDescriptor, parameter);
             addTypeRestrictions(parameter, parameterDescriptor);
         }
 
-    }
-
-    private void hideIfNecessary(org.mule.module.extension.internal.introspection.ParameterDescriptor parameterDescriptor, ParameterDescriptor parameter)
-    {
-        if (parameterDescriptor.isHidden())
-        {
-            parameter.withModelProperty(HiddenModelProperty.KEY, HiddenModelProperty.INSTANCE);
-        }
     }
 
     private void addTypeRestrictions(ParameterDescriptor parameter, org.mule.module.extension.internal.introspection.ParameterDescriptor descriptor)

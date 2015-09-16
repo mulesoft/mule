@@ -22,7 +22,6 @@ final class ParameterDescriptor
     private DataType type;
     private boolean required;
     private Object defaultValue;
-    private boolean hidden = false;
     private Class<?> typeRestriction = null;
 
     String getName()
@@ -63,16 +62,6 @@ final class ParameterDescriptor
     void setDefaultValue(Object defaultValue)
     {
         this.defaultValue = defaultValue;
-    }
-
-    boolean isHidden()
-    {
-        return hidden;
-    }
-
-    void setHidden(boolean hidden)
-    {
-        this.hidden = hidden;
     }
 
     Class<?> getTypeRestriction()

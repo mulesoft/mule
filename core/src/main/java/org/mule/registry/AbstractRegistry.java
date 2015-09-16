@@ -28,7 +28,10 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractRegistry implements Registry
 {
-    /** the unique id for this Registry */
+
+    /**
+     * the unique id for this Registry
+     */
     private String id;
 
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
@@ -50,7 +53,7 @@ public abstract class AbstractRegistry implements Registry
     @Override
     public final synchronized void dispose()
     {
-        if(lifecycleManager.getState().isStarted())
+        if (lifecycleManager.getState().isStarted())
         {
             try
             {
@@ -139,7 +142,7 @@ public abstract class AbstractRegistry implements Registry
     public void fireLifecycle(String phase) throws LifecycleException
     {
         //Implicitly call stop if necessary when disposing
-        if(Disposable.PHASE_NAME.equals(phase) && lifecycleManager.getState().isStarted())
+        if (Disposable.PHASE_NAME.equals(phase) && lifecycleManager.getState().isStarted())
         {
             getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
         }

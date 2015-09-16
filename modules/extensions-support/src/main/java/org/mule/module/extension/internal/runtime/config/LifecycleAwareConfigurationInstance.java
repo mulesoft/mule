@@ -225,14 +225,4 @@ public final class LifecycleAwareConfigurationInstance<T> implements Configurati
             muleContext.getInjector().inject(interceptor);
         }
     }
-
-    void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
-
-    void setTimeSupplier(TimeSupplier timeSupplier)
-    {
-        this.timeSupplier = timeSupplier;
-    }
 }

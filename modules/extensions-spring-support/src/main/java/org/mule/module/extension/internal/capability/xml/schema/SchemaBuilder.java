@@ -72,7 +72,6 @@ import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSi
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
-import org.mule.module.extension.internal.model.property.HiddenModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
@@ -662,11 +661,6 @@ public class SchemaBuilder
 
         for (final ParameterModel parameterModel : operationModel.getParameterModels())
         {
-            if (isHidden(parameterModel))
-            {
-                continue;
-            }
-
             DataType parameterType = parameterModel.getType();
             DataQualifier parameterQualifier = parameterType.getQualifier();
 
@@ -701,11 +695,6 @@ public class SchemaBuilder
         }
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
-    }
-
-    private boolean isHidden(ParameterModel parameterModel)
-    {
-        return parameterModel.getModelProperty(HiddenModelProperty.KEY) != null;
     }
 
     private boolean isOperation(DataType type)

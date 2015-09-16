@@ -106,6 +106,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext));
         registry.registerObject(MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator());
         registry.registerObject(MuleProperties.OBJECT_TIME_SUPPLIER, new TimeSupplier());
+        registry.registerObject(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
     }
 
     private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException

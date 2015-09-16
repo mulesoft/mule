@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.api.MuleEvent;
-import org.mule.extension.ExtensionManager;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.module.extension.HeisenbergExtension;
@@ -21,7 +20,6 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.size.SmallTest;
 
 import com.google.common.collect.ImmutableList;
@@ -55,17 +53,11 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
     private ResolverSetResult resolverSetResult;
 
     @Mock
-    private ExtensionManager extensionManager;
-
-    @Mock
     private ExpirationPolicy expirationPolicy;
 
     @Before
     public void before() throws Exception
     {
-        when(muleContext.getExtensionManager()).thenReturn(extensionManager);
-        ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIG_NAME);
-
         when(configurationModel.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
         when(configurationModel.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
         when(configurationModel.getModelProperty(anyString())).thenReturn(null);

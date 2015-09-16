@@ -11,6 +11,7 @@ import static org.mule.module.extension.internal.introspection.MuleExtensionAnno
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.extension.annotations.ParameterGroup;
+import org.mule.extension.annotations.param.Connection;
 import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.introspection.OperationModel;
 import org.mule.extension.introspection.ParameterModel;
@@ -19,6 +20,7 @@ import org.mule.module.extension.internal.introspection.MuleExtensionAnnotationP
 import org.mule.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
+import org.mule.module.extension.internal.runtime.resolver.ConnectorArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.EventArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
@@ -35,6 +37,11 @@ import java.util.Map;
  */
 final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 {
+    private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
+    private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectorArgumentResolver();
+    private static final ArgumentResolver<MuleMessage> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
+    private static final ArgumentResolver<MuleEvent> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
+
 
     private final Method method;
     private ArgumentResolver<? extends Object>[] argumentResolvers;
@@ -72,15 +79,19 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 
             if (annotations.containsKey(UseConfig.class))
             {
-                argumentResolver = ConfigurationArgumentResolver.getInstance();
+                argumentResolver = CONFIGURATION_ARGUMENT_RESOLVER;
+            }
+            else if (annotations.containsKey(Connection.class))
+            {
+                argumentResolver = CONNECTOR_ARGUMENT_RESOLVER;
             }
             else if (MuleEvent.class.isAssignableFrom(parameterType))
             {
-                argumentResolver = EventArgumentResolver.getInstance();
+                argumentResolver = EVENT_ARGUMENT_RESOLVER;
             }
             else if (MuleMessage.class.isAssignableFrom(parameterType))
             {
-                argumentResolver = MessageArgumentResolver.getInstance();
+                argumentResolver = MESSAGE_ARGUMENT_RESOLVER;
             }
             else if (annotations.containsKey(ParameterGroup.class))
             {
