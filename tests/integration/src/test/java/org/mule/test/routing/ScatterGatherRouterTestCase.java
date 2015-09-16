@@ -7,13 +7,17 @@
 
 package org.mule.test.routing;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertSame;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -39,6 +43,8 @@ import org.junit.Test;
 public class ScatterGatherRouterTestCase extends FunctionalTestCase
 {
 
+    private static final String EXCEPTION_MESSAGE_TITLE_PREFIX = "Exception(s) were found for route(s): " + LINE_SEPARATOR;
+    private static final String EXCEPTION_NULL_PAYLOAD_SUFFIX = "Message payload is of type: NullPayload";
     private static Set<Thread> capturedThreads;
 
     @Override
@@ -77,28 +83,56 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
         {
             MuleEvent response = e.getEvent();
             ExceptionPayload ep = response.getMessage().getExceptionPayload();
-            assertNotNull(ep);
-            assertSame(e, ep.getException());
+            assertThat(ep, is(notNullValue()));
+            assertThat(e, sameInstance(ep.getException()));
 
             Map<Integer, Throwable> exceptions = e.getExceptions();
-            assertEquals(1, exceptions.size());
-            assertTrue(exceptions.get(2) instanceof ResponseTimeoutException);
+            assertThat(1, is(exceptions.size()));
+            assertThat(exceptions.get(2), instanceOf(ResponseTimeoutException.class));
         }
     }
 
     @Test
     public void routeWithException() throws Exception
     {
-        assertRouteException("routeWithException");
+        assertRouteException("routeWithException",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: Functional Test Service Exception. Component that caused exception is:",
+                             "}. " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
+    }
+
+    @Test
+    public void routeWithExceptionWithMessage() throws Exception
+    {
+        assertRouteException("routeWithExceptionWithMessage",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: I'm a message. Component that caused exception is:",
+                             "}. " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
+    }
+
+    @Test
+    public void routeWithNonMuleException() throws Exception
+    {
+        assertRouteException("routeWithNonMuleException",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: java.lang.NullPointerException: nonMule. Component that caused exception is:",
+                             "}. " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
+    }
+
+    @Test
+    public void routeWithMelException() throws Exception
+    {
+        assertRouteException("routeWithMelException",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: Execution of the expression \"invalidExpr\" failed. (org.mule.api.expression.ExpressionRuntimeException).",
+                             "). " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
     }
 
     @Test
     public void routeWithExceptionInSequentialProcessing() throws Exception
     {
-        assertRouteException("routeWithExceptionInSequentialProcessing");
+        assertRouteException("routeWithExceptionInSequentialProcessing",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: Functional Test Service Exception. Component that caused exception is:",
+                             "}. " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
     }
 
-    private void assertRouteException(String flow) throws Exception
+    private void assertRouteException(String flow, String exceptionMessageStart, String exceptionMessageEnd) throws Exception
     {
         try
         {
@@ -109,12 +143,15 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
         {
             MuleEvent response = e.getEvent();
             ExceptionPayload ep = response.getMessage().getExceptionPayload();
-            assertNotNull(ep);
-            assertSame(e, ep.getException());
+            assertThat(ep, is(notNullValue()));
+            assertThat(e, sameInstance(ep.getException()));
+            
+            assertThat(e.getMessage(), startsWith(exceptionMessageStart));
+            assertThat(e.getMessage(), endsWith(exceptionMessageEnd));
 
             Map<Integer, Throwable> exceptions = e.getExceptions();
-            assertEquals(1, exceptions.size());
-            assertTrue(exceptions.get(1) instanceof DispatchException);
+            assertThat(1, is(exceptions.size()));
+            assertThat(exceptions.get(1), instanceOf(DispatchException.class));
         }
     }
 
@@ -182,7 +219,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
         }
         catch (MessagingException e)
         {
-            assertEquals(UnsupportedOperationException.class, e.getCause().getClass());
+            assertThat(e.getCause(), instanceOf(UnsupportedOperationException.class));
         }
     }
 

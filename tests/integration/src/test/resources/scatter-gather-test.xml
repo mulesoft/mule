@@ -40,6 +40,30 @@
         </scatter-gather>
     </flow>
 
+    <flow name="routeWithExceptionWithMessage">
+        <scatter-gather timeout="1000">
+            <set-payload value="apple"/>
+            <test:component throwException="true" exceptionText="I'm a message"/>
+            <set-payload value="orange"/>
+        </scatter-gather>
+    </flow>
+
+    <flow name="routeWithNonMuleException">
+        <scatter-gather timeout="1000">
+            <set-payload value="apple"/>
+            <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException" exceptionText="nonMule"/>
+            <set-payload value="orange"/>
+        </scatter-gather>
+    </flow>
+
+    <flow name="routeWithMelException">
+        <scatter-gather timeout="1000">
+            <set-payload value="apple"/>
+            <set-payload value="#[invalidExpr]"/>
+            <set-payload value="orange"/>
+        </scatter-gather>
+    </flow>
+
     <flow name="routeWithExceptionInSequentialProcessing">
         <scatter-gather>
             <threading-profile doThreading="false" />
