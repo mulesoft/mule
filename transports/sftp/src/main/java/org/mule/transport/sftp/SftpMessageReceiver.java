@@ -223,6 +223,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             {
                 sftpStream.setErrorOccurred();
             }
+            throw e;
         }
         finally
         {
