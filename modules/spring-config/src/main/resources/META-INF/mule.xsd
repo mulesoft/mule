@@ -2436,8 +2436,8 @@
     <xsd:element name="flow" type="flowType">
         <xsd:annotation>
             <xsd:documentation>
-                A pipeline of message processors processed using a given processingStrategy when either a new message is received from a message source, or when a new message is 
-                recieved via a flow-ref or programativally.
+                A pipeline of message processors processed using a given processingStrategy.
+                Called when a new message is received from a message source, a flow-ref, or programmatically.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2487,7 +2487,7 @@
                     <xsd:enumeration value="queued-asynchronous">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Decouples the recieving of a new message from it's processing using a queue.
+                                Decouples the receiving of a new message from its processing using a queue.
                                 The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
                             </xsd:documentation>
                         </xsd:annotation>
@@ -2635,8 +2635,8 @@
     <xsd:element name="queued-asynchronous-processing-strategy" type="queuedAsynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                Decouples the recieving of a new message from it's processing using a queue. 
-                The queue is polled and a thread pool is used to process the pipeline of message processors asynchonously in a worker thread.
+                Decouples the receiving of a new message from it's processing using a queue.
+                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously in a worker thread.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2647,7 +2647,7 @@
                     <xsd:element ref="abstract-queue-store" minOccurs="0">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The queue store that stortes the queue's elements.  If not specified, this will be the default-in-memory-queue-store.
+                            The queue store that stores the queue's elements.  If not specified, this will be the default-in-memory-queue-store.
                         </xsd:documentation>
                     </xsd:annotation>
                     </xsd:element>
@@ -2722,7 +2722,8 @@
     <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Allows a 'flow' to be referenced such that the message processing will continue in the referenced flow before returning.  Message processing in the referenced 'flow' will occur within the context of the referenced flow and will therefore use it's exception strategy etc.
+                Allows a 'flow' to be referenced such that the message processing will continue in the referenced flow before returning.
+                Message processing in the referenced 'flow' will occur within the context of the referenced flow and will therefore use its exception strategy etc.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
