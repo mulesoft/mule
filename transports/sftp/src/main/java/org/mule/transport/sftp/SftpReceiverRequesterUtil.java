@@ -181,7 +181,16 @@ public class SftpReceiverRequesterUtil
         String archive = sftpUtil.getArchiveDir();
 
         // Retrieve the file stream
-        InputStream fileInputStream = client.retrieveFile(fileName);
+        InputStream fileInputStream;
+        try
+        {
+            fileInputStream = client.retrieveFile(fileName);
+        }
+        catch (IOException e)
+        {
+            connector.releaseClient(endpoint, client);
+            throw e;
+        }
 
         if (!"".equals(archive))
         {
