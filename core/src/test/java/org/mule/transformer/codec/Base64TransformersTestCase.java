@@ -6,12 +6,18 @@
  */
 package org.mule.transformer.codec;
 
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.Base64;
 
-import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public class Base64TransformersTestCase extends AbstractTransformerTestCase
 {
@@ -50,5 +56,21 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
         // our input is a String so we expect a String as output
         t.setReturnDataType(DataTypeFactory.STRING);
         return t;
+    }
+
+    @Test
+    public void decodeUnpaddedString() throws Exception
+    {
+        String encodeBytes = (String) getResultData();
+        assertThat(encodeBytes, endsWith("="));
+        while (encodeBytes.endsWith("="))
+        {
+            encodeBytes = encodeBytes.substring(0, encodeBytes.length() - 1);
+        }
+        assertThat(encodeBytes, not(endsWith("=")));
+
+        String resultString = (String) getRoundTripTransformer().transform(encodeBytes);
+
+        assertThat(resultString, is(TEST_DATA));
     }
 }
