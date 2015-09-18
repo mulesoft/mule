@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
-import org.mule.extension.annotations.Parameter;
+import org.mule.extension.annotation.api.Parameter;
 
 import java.util.List;
 

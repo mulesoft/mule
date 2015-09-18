@@ -11,15 +11,16 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefa
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.extension.annotations.Extension;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.RestrictedTo;
-import org.mule.extension.annotations.param.Connection;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.EnrichableModel;
-import org.mule.extension.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.RestrictedTo;
+import org.mule.extension.annotation.api.param.Connection;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
@@ -104,7 +105,7 @@ public final class MuleExtensionAnnotationParser
         {
             Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
 
-            if (annotations.containsKey(org.mule.extension.annotations.ParameterGroup.class))
+            if (annotations.containsKey(ParameterGroup.class))
             {
                 parseGroupParameters(parameterTypes[i], parameterDescriptors);
             }
@@ -125,7 +126,7 @@ public final class MuleExtensionAnnotationParser
     {
         for (Field field : IntrospectionUtils.getParameterFields(parameterType.getRawType()))
         {
-            if (field.getAnnotation(org.mule.extension.annotations.ParameterGroup.class) != null)
+            if (field.getAnnotation(org.mule.extension.annotation.api.ParameterGroup.class) != null)
             {
                 parseGroupParameters(getFieldDataType(field), parameterDescriptors);
             }

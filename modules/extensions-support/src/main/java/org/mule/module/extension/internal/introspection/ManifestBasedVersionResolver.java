@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.introspection;
 
 import org.mule.config.MuleManifest;
-import org.mule.extension.annotations.Extension;
+import org.mule.extension.annotation.api.Extension;
 
 import java.io.IOException;
 import java.io.InputStream;

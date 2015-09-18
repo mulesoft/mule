@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
-import org.mule.extension.introspection.ConfigurationInstantiator;
+import org.mule.extension.api.introspection.ConfigurationInstantiator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;

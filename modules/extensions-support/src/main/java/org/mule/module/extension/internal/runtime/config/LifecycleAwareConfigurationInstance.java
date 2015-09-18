@@ -15,11 +15,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.Interceptable;
-import org.mule.extension.runtime.ConfigurationStats;
-import org.mule.extension.runtime.ConfigurationInstance;
-import org.mule.extension.runtime.Interceptor;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.Interceptable;
+import org.mule.extension.api.runtime.ConfigurationStats;
+import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.Interceptor;
 import org.mule.time.TimeSupplier;
 
 import com.google.common.collect.ImmutableList;

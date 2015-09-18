@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.runtime.config;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.module.extension.internal.runtime.BaseObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;

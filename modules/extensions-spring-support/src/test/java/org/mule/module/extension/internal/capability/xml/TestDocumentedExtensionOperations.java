@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.ParameterGroup;
+import org.mule.extension.annotation.api.Operation;
+import org.mule.extension.annotation.api.ParameterGroup;
 
 public class TestDocumentedExtensionOperations
 {

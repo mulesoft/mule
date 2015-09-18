@@ -32,7 +32,7 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.util.StreamCloserService;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.extension.ExtensionManager;
+import org.mule.extension.api.ExtensionManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.util.lock.LockFactory;

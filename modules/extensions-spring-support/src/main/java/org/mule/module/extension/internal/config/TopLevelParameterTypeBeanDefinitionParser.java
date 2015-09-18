@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
-import org.mule.extension.introspection.DataType;
+import org.mule.extension.api.introspection.DataType;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;

@@ -18,7 +18,7 @@ import org.mule.api.registry.Registry;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
-import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.queue.QueueManager;
