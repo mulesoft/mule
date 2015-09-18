@@ -6,8 +6,8 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.param.Optional;
+import org.mule.api.extension.annotations.Parameter;
+import org.mule.api.extension.annotations.param.Optional;
 import org.mule.extension.validation.api.Validator;
 
 /**

@@ -24,7 +24,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_INT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_LONG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
-import org.mule.extension.introspection.DataType;
+import org.mule.api.extension.introspection.DataType;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.util.ValueHolder;
 

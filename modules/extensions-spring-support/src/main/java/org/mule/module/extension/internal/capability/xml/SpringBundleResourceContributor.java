@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.property.XmlModelProperty;
-import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.api.extension.introspection.ExtensionModel;
+import org.mule.api.extension.introspection.property.XmlModelProperty;
+import org.mule.api.extension.resources.ResourcesGenerator;
+import org.mule.api.extension.resources.spi.GenerableResourceContributor;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
 import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
@@ -17,7 +17,7 @@ import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
 import java.util.Properties;
 
 /**
- * Implementation of {@link org.mule.extension.resources.spi.GenerableResourceContributor}
+ * Implementation of {@link GenerableResourceContributor}
  * Spring bundles
  *
  * @since 3.7.0

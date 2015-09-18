@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime.executor;
 
-import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.runtime.OperationExecutor;
+import org.mule.api.extension.runtime.OperationContext;
+import org.mule.api.extension.runtime.OperationExecutor;
 
 /**
  * A delegate interface to decouple a {@link OperationExecutor}'s return value

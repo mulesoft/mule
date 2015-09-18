@@ -9,12 +9,12 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.validateRepeatedNames;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.exception.NoSuchConfigurationException;
-import org.mule.extension.exception.NoSuchOperationException;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.OperationModel;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.api.extension.exception.NoSuchConfigurationException;
+import org.mule.api.extension.exception.NoSuchOperationException;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.introspection.ExtensionModel;
+import org.mule.api.extension.introspection.OperationModel;
+import org.mule.api.extension.introspection.ParameterModel;
 
 import com.google.common.collect.ImmutableList;
 

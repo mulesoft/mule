@@ -11,8 +11,8 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.param.Optional;
+import org.mule.api.extension.annotations.Parameter;
+import org.mule.api.extension.annotations.param.Optional;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Constructor;

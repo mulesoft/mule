@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.extension.ExtensionManager;
+import org.mule.api.extension.ExtensionManager;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;

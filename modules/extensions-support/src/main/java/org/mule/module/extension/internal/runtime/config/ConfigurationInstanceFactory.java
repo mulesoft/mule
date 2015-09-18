@@ -8,10 +8,10 @@ package org.mule.module.extension.internal.runtime.config;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.runtime.ConfigurationInstance;
-import org.mule.extension.runtime.Interceptor;
-import org.mule.extension.runtime.InterceptorFactory;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.runtime.ConfigurationInstance;
+import org.mule.api.extension.runtime.Interceptor;
+import org.mule.api.extension.runtime.InterceptorFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.util.collection.ImmutableListCollector;

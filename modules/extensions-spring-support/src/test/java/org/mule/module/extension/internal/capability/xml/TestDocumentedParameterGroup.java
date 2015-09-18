@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.annotations.Parameter;
+import org.mule.api.extension.annotations.Parameter;
 
 public class TestDocumentedParameterGroup
 {

@@ -8,10 +8,10 @@ package org.mule.extension.validation.internal;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.api.extension.annotations.Operation;
+import org.mule.api.extension.annotations.ParameterGroup;
+import org.mule.api.extension.annotations.param.UseConfig;
+import org.mule.api.extension.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.validation.api.Validator;
 
 import com.google.common.cache.CacheBuilder;

@@ -6,9 +6,9 @@
  */
 package org.mule.module.extension.internal.util;
 
-import org.mule.extension.annotations.Alias;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.ExtensionModel;
+import org.mule.api.extension.annotations.Alias;
+import org.mule.api.extension.introspection.DataType;
+import org.mule.api.extension.introspection.ExtensionModel;
 
 import java.util.ArrayList;
 import java.util.List;

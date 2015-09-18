@@ -8,9 +8,9 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleContext;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.extension.runtime.ExpirationPolicy;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.runtime.ConfigurationProvider;
+import org.mule.api.extension.runtime.ExpirationPolicy;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.runtime.config.ConfigurationProviderFactory;

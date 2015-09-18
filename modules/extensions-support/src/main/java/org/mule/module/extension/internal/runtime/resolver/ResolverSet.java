@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.runtime.resolver;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.api.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 
 import com.google.common.collect.ImmutableMap;

@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.runtime.config;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.extension.runtime.ConfigurationInstance;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.runtime.ConfigurationProvider;
+import org.mule.api.extension.runtime.ConfigurationInstance;
 
 /**
  * {@link ConfigurationProvider} which provides always the same {@link #configuration}.

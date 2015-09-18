@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.EnrichableModel;
-import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
+import org.mule.api.extension.introspection.EnrichableModel;
+import org.mule.api.extension.introspection.ParameterModel;
+import org.mule.api.extension.introspection.declaration.fluent.Declaration;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 
 import com.google.common.collect.ImmutableMap;

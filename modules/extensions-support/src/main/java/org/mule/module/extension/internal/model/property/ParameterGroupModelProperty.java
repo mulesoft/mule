@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.model.property;
 
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.api.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 
 import com.google.common.collect.ImmutableList;

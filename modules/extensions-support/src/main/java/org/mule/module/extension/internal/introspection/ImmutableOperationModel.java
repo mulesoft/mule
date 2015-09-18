@@ -8,10 +8,10 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.OperationModel;
-import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.introspection.declaration.fluent.OperationExecutorFactory;
-import org.mule.extension.runtime.OperationExecutor;
+import org.mule.api.extension.introspection.OperationModel;
+import org.mule.api.extension.introspection.ParameterModel;
+import org.mule.api.extension.introspection.declaration.fluent.OperationExecutorFactory;
+import org.mule.api.extension.runtime.OperationExecutor;
 
 import java.util.List;
 import java.util.Map;

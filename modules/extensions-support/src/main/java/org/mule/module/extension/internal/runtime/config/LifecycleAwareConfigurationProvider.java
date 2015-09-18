@@ -18,9 +18,9 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.extension.runtime.ConfigurationInstance;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.runtime.ConfigurationProvider;
+import org.mule.api.extension.runtime.ConfigurationInstance;
 import org.mule.lifecycle.DefaultLifecycleManager;
 import org.mule.lifecycle.SimpleLifecycleManager;
 

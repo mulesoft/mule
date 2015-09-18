@@ -6,11 +6,11 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
-import org.mule.extension.annotations.Configurations;
-import org.mule.extension.annotations.Extension;
-import org.mule.extension.annotations.Operations;
-import org.mule.extension.annotations.capability.Xml;
-import org.mule.extension.annotations.connector.Connector;
+import org.mule.api.extension.annotations.Configurations;
+import org.mule.api.extension.annotations.Extension;
+import org.mule.api.extension.annotations.Operations;
+import org.mule.api.extension.annotations.capability.Xml;
+import org.mule.api.extension.annotations.connector.Connector;
 
 @Extension(name = "petstore", description = "PetStore Test connector")
 @Configurations(PetStoreConnectorConfig.class)

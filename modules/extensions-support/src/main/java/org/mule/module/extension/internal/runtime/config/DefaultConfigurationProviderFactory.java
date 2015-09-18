@@ -11,9 +11,9 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInit
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.extension.runtime.ConfigurationInstance;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.runtime.ConfigurationProvider;
+import org.mule.api.extension.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 

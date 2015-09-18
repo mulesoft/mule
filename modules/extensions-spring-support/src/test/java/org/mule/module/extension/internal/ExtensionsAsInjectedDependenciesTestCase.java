@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
-import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.api.extension.runtime.ConfigurationProvider;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;

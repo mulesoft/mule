@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.model.property;
 
 import org.mule.api.NamedObject;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.annotations.Parameter;
+import org.mule.api.extension.introspection.ConfigurationModel;
 
 /**
  * A custom model property to link a {@link NamedObject} to the actual member in which it was defined.

@@ -10,12 +10,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.transport.PropertyScope;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.annotations.RestrictedTo;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.annotations.param.UseConfig;
+import org.mule.api.extension.ExtensionManager;
+import org.mule.api.extension.annotations.Operation;
+import org.mule.api.extension.annotations.ParameterGroup;
+import org.mule.api.extension.annotations.RestrictedTo;
+import org.mule.api.extension.annotations.param.Optional;
+import org.mule.api.extension.annotations.param.UseConfig;
 
 import java.util.List;
 

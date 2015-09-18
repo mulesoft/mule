@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime;
 
-import org.mule.extension.runtime.Interceptor;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.runtime.OperationExecutor;
-import org.mule.extension.runtime.RetryRequest;
+import org.mule.api.extension.runtime.Interceptor;
+import org.mule.api.extension.runtime.OperationContext;
+import org.mule.api.extension.runtime.OperationExecutor;
+import org.mule.api.extension.runtime.RetryRequest;
 
 /**
  * Executes operations while coordinating the several moving parts that are

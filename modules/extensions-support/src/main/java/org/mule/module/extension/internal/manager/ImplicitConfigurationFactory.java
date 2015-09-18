@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.manager;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.runtime.ConfigurationInstance;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.introspection.ExtensionModel;
+import org.mule.api.extension.runtime.ConfigurationInstance;
 
 /**
  * Provides implicit configurations instances which are compliant with a {@link ConfigurationModel}.

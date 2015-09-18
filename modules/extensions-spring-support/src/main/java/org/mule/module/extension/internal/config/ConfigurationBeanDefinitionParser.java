@@ -11,8 +11,8 @@ import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConfigName;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
 import org.mule.api.registry.Registry;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.introspection.ExtensionModel;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;

@@ -8,10 +8,10 @@ package org.mule.module.extension.internal.manager;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
-import org.mule.extension.introspection.declaration.spi.Describer;
+import org.mule.api.extension.introspection.ExtensionFactory;
+import org.mule.api.extension.introspection.ExtensionModel;
+import org.mule.api.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.api.extension.introspection.declaration.spi.Describer;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.util.collection.ImmutableListCollector;

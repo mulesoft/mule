@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.api.extension.introspection.ParameterModel;
 import org.mule.module.extension.PersonalInfo;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;

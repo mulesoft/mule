@@ -122,7 +122,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
     public void after()
     {
         interceptor.after(operationContext, null);
-        verify(operationContext).setVariable(CONNECTION_PARAM, null);
+        verify(operationContext).removeVariable(CONNECTION_PARAM);
     }
 
     @Test
