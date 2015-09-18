@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.annotations.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.extension.annotation.api.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
@@ -20,16 +20,19 @@ import static org.mule.module.extension.HeisenbergExtension.NAMESPACE;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_LOCATION;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
 import org.mule.config.MuleManifest;
-import org.mule.extension.annotations.Configurations;
-import org.mule.extension.annotations.Operations;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.capability.Xml;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
-import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.annotation.api.Configuration;
+import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.Operation;
+import org.mule.extension.annotation.api.Configurations;
+import org.mule.extension.annotation.api.Operations;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.capability.Xml;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
@@ -257,7 +260,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(HeisenbergExtension.class.isAssignableFrom(implementingTypeModelProperty.getType()), is(true));
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
     @Configurations(HeisenbergExtension.class)
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
@@ -266,7 +269,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
     @Configurations({HeisenbergExtension.class, NamedHeisenbergAlternateConfig.class})
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
@@ -275,18 +278,18 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     }
 
-    @org.mule.extension.annotations.Configuration(name = EXTENDED_CONFIG_NAME, description = EXTENDED_CONFIG_DESCRIPTION)
+    @Configuration(name = EXTENDED_CONFIG_NAME, description = EXTENDED_CONFIG_DESCRIPTION)
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     public static class NamedHeisenbergAlternateConfig extends HeisenbergAlternateConfig
     {
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     public static class HeisenbergWithOperations extends HeisenbergExtension
     {
 
-        @org.mule.extension.annotations.Operation
+        @Operation
         public void invalid()
         {
         }

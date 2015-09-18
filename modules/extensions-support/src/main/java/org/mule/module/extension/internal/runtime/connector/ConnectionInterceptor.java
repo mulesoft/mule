@@ -16,9 +16,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.extension.connection.ConnectionHandler;
-import org.mule.extension.runtime.Interceptor;
-import org.mule.extension.runtime.OperationContext;
+import org.mule.extension.api.connection.ConnectionHandler;
+import org.mule.extension.api.runtime.Interceptor;
+import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 

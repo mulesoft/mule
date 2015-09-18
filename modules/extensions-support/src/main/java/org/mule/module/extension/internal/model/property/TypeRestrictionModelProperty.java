@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.model.property;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.EnrichableModel;
 
 /**
  * A custom model property to link an {@link EnrichableModel}

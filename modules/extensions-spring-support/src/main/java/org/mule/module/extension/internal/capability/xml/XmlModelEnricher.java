@@ -7,11 +7,11 @@
 package org.mule.module.extension.internal.capability.xml;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import org.mule.extension.annotations.capability.Xml;
-import org.mule.extension.introspection.declaration.DescribingContext;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.extension.introspection.property.XmlModelProperty;
+import org.mule.extension.annotation.api.capability.Xml;
+import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 

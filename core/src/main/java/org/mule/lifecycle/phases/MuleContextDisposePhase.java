@@ -21,7 +21,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.annotation.AnnotationMetaData;

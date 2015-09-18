@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.declaration.DescribingContext;
-import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;

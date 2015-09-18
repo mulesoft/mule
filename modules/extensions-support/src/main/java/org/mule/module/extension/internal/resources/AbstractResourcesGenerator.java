@@ -7,10 +7,10 @@
 package org.mule.module.extension.internal.resources;
 
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.resources.GeneratedResource;
-import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.resources.GeneratedResource;
+import org.mule.extension.api.resources.ResourcesGenerator;
+import org.mule.extension.api.resources.spi.GenerableResourceContributor;
 
 import com.google.common.collect.ImmutableList;
 

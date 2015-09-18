@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime;
 
-import org.mule.extension.runtime.Interceptor;
-import org.mule.extension.runtime.RetryRequest;
+import org.mule.extension.api.runtime.Interceptor;
+import org.mule.extension.api.runtime.RetryRequest;
 
 import java.util.HashSet;
 import java.util.Set;

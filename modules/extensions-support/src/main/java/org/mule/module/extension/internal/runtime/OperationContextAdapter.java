@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.runtime;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.runtime.Interceptor;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.runtime.OperationExecutor;
+import org.mule.extension.api.runtime.Interceptor;
+import org.mule.extension.api.runtime.OperationContext;
+import org.mule.extension.api.runtime.OperationExecutor;
 
 /**
  * Adapter interface which expands the contract of {@link OperationContext} which functionality that is

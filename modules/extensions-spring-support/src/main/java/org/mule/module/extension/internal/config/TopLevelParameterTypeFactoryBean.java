@@ -9,10 +9,10 @@ package org.mule.module.extension.internal.config;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.api.MuleContext;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.OperationModel;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.extension.introspection.declaration.spi.Describer;
+import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.module.extension.DescriberSupport;
 
 /**

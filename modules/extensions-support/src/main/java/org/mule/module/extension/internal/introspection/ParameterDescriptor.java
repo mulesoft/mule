@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import org.mule.extension.introspection.DataType;
+import org.mule.extension.api.introspection.DataType;
 
 /**
  * Intermediate representation of a parameter used to decouple

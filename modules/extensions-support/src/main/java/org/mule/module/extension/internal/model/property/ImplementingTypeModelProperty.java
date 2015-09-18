@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.model.property;
 
-import org.mule.extension.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.EnrichableModel;
 
 /**
  * An immutable model property which indicates that the owning {@link EnrichableModel}

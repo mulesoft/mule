@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import org.mule.extension.runtime.OperationContext;
+import org.mule.extension.api.runtime.OperationContext;
 
 /**
  * An implementation of {@link ArgumentResolver} which

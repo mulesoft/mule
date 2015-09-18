@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.runtime.config;
 
 import org.mule.api.MuleContext;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 

@@ -7,14 +7,14 @@
 package org.mule.module.extension.internal.runtime;
 
 import static java.lang.String.format;
-import org.mule.extension.introspection.Interceptable;
-import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.runtime.ConfigurationStats;
-import org.mule.extension.runtime.ConfigurationInstance;
-import org.mule.extension.runtime.Interceptor;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.runtime.OperationExecutor;
-import org.mule.extension.runtime.RetryRequest;
+import org.mule.extension.api.introspection.Interceptable;
+import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.extension.api.runtime.ConfigurationStats;
+import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.Interceptor;
+import org.mule.extension.api.runtime.OperationContext;
+import org.mule.extension.api.runtime.OperationExecutor;
+import org.mule.extension.api.runtime.RetryRequest;
 import org.mule.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.util.ValueHolder;
 

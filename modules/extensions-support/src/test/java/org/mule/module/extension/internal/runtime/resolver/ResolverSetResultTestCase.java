@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.HealthStatus;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

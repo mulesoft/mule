@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.param.UseConfig;
+import org.mule.extension.annotation.api.Operation;
+import org.mule.extension.annotation.api.param.UseConfig;
 
 import java.math.BigDecimal;
 

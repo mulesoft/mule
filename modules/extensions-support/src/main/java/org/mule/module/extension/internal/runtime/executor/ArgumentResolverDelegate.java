@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime.executor;
 
-import org.mule.extension.introspection.OperationModel;
-import org.mule.extension.runtime.OperationContext;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.runtime.OperationContext;
 
 /**
  * Extracts argument values from an {@link OperationContext}

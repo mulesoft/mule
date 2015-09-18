@@ -6,9 +6,9 @@
  */
 package org.mule.module.extension.internal.capability.xml.schema;
 
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.ParameterGroup;
+import org.mule.extension.annotation.api.Operation;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.util.ClassUtils;
 
 import com.google.common.collect.ImmutableMap;

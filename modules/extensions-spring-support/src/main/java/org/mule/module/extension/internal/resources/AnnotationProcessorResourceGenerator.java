@@ -10,8 +10,8 @@ package org.mule.module.extension.internal.resources;
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.resources.GeneratedResource;
-import org.mule.extension.resources.ResourcesGenerator;
+import org.mule.extension.api.resources.GeneratedResource;
+import org.mule.extension.api.resources.ResourcesGenerator;
 
 import java.io.IOException;
 import java.io.OutputStream;

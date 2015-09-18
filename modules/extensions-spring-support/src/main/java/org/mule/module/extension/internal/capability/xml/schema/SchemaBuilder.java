@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.capability.xml.schema;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.extension.introspection.DataQualifier.LIST;
-import static org.mule.extension.introspection.DataQualifier.OPERATION;
+import static org.mule.extension.api.introspection.DataQualifier.LIST;
+import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_DESCRIPTION_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
@@ -37,13 +37,13 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDyna
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.annotations.Extensible;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.DataQualifier;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.OperationModel;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.extension.annotation.api.Extensible;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.DataQualifier;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;

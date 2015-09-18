@@ -13,11 +13,11 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.Described;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.Described;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.util.ArrayUtils;
 

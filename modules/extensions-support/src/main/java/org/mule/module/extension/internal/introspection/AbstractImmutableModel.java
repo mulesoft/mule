@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.Described;
-import org.mule.extension.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.Described;
+import org.mule.extension.api.introspection.EnrichableModel;
 
 import com.google.common.collect.ImmutableMap;
 

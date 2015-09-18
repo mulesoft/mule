@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.runtime.OperationContext;
+import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 

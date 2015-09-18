@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.util;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import org.mule.extension.introspection.DataType;
+import org.mule.extension.api.introspection.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;

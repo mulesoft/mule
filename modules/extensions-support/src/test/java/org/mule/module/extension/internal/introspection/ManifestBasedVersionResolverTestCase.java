@@ -14,7 +14,7 @@ import static org.mule.config.MuleManifest.getProductVersion;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createManifestFileIfNecessary;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getMetaInfDirectory;
 import static org.mule.util.IOUtils.getResourceAsStream;
-import org.mule.extension.annotations.Extension;
+import org.mule.extension.annotation.api.Extension;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

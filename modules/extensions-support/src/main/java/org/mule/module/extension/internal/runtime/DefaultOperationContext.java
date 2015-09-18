@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.runtime;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.runtime.ConfigurationInstance;
+import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.util.HashMap;

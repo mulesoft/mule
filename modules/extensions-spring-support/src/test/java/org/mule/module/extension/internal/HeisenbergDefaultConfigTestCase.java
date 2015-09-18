@@ -10,10 +10,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.runtime.ConfigurationProvider;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import org.hamcrest.core.IsInstanceOf;

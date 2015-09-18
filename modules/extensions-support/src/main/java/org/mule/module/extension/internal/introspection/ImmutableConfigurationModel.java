@@ -9,11 +9,11 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.validateRepeatedNames;
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.ConfigurationInstantiator;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.runtime.InterceptorFactory;
+import org.mule.extension.api.introspection.ConfigurationInstantiator;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.runtime.InterceptorFactory;
 
 import com.google.common.collect.ImmutableList;
 
