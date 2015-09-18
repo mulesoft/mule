@@ -14,7 +14,7 @@ import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class HeisenbergDefaultConfigTestCase extends ExtensionsFunctionalTestCase
+public class HeisenbergDefaultConfigTestCase extends ExtensionFunctionalTestCase
 {
 
     @Rule

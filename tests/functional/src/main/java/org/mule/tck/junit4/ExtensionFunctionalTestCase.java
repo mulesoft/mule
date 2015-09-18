@@ -73,7 +73,7 @@ import org.apache.commons.io.FileUtils;
  *
  * @since 3.7.0
  */
-public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
+public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
 {
 
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();

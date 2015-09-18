@@ -13,14 +13,14 @@ import org.mule.api.MuleEvent;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.Test;
 
-public class ExtensionsAsInjectedDependenciesTestCase extends ExtensionsFunctionalTestCase
+public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String STATIC_HEISENBERG = "staticHeisenberg";
