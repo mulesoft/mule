@@ -14,13 +14,13 @@ import org.mule.api.MuleEvent;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 
 import java.util.List;
 
 import org.junit.Test;
 
-public abstract class PetStoreConnectionTestCase extends ExtensionsFunctionalTestCase
+public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTestCase
 {
 
     @Override

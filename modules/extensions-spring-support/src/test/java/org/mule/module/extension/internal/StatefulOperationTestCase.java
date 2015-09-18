@@ -12,13 +12,13 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 
 import java.math.BigDecimal;
 
 import org.junit.Test;
 
-public class StatefulOperationTestCase extends ExtensionsFunctionalTestCase
+public class StatefulOperationTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String TENANT_1 = "heisenberg";

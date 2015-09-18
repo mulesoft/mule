@@ -10,14 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DataType;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 
 import java.nio.charset.Charset;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class ContentTypeHandlingTestCase extends ExtensionsFunctionalTestCase
+public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String MIME_TYPE = "text/plain";

@@ -6,11 +6,13 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
-
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -21,6 +23,7 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.Optional;
 
@@ -133,6 +136,34 @@ public final class ConfigurationInstanceFactory<T>
                                                          configValue,
                                                          createInterceptors(configurationModel),
                                                          connectionProvider);
+    }
+
+    private void validateConnectionProvider(String name, Object configurationValue, Optional<ConnectionProvider> optionalConnectionProvider) throws MuleException
+    {
+        if (!optionalConnectionProvider.isPresent())
+        {
+            return;
+        }
+
+        ConnectionProvider provider = optionalConnectionProvider.get();
+
+        if (!configurationValue.getClass().isAssignableFrom(IntrospectionUtils.getConfigType(provider)))
+        {
+            throw invalidConnectionProviderException(name);
+        }
+
+        Class<?> connectionType = getOperationsConnectionType(configurationModel.getExtensionModel());
+        if (connectionType != null && !connectionType.isAssignableFrom(IntrospectionUtils.getConnectionType(provider)))
+        {
+            throw invalidConnectionProviderException(name);
+        }
+    }
+
+    private ConfigurationException invalidConnectionProviderException(String name)
+    {
+        return new ConfigurationException(createStaticMessage(
+                "Configuration '%s' specifies an incompatible connection provider. Make sure you use connection providers of the correct protocol",
+                name));
     }
 
     private T createConfigurationInstance(ResolverSetResult resolverSetResult) throws MuleException
