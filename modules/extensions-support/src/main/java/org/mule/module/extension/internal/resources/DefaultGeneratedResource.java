@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.resources;
 
-import org.mule.extension.resources.GeneratedResource;
+import org.mule.api.extension.resources.GeneratedResource;
 
 /**
  * Immutable implementation of a {@link GeneratedResource

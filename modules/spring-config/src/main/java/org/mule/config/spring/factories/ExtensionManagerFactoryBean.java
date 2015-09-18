@@ -7,7 +7,7 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
-import org.mule.extension.ExtensionManager;
+import org.mule.api.extension.ExtensionManager;
 
 import org.springframework.beans.factory.FactoryBean;
 

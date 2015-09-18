@@ -16,10 +16,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.resources.GeneratedResource;
-import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.api.extension.introspection.ExtensionModel;
+import org.mule.api.extension.resources.GeneratedResource;
+import org.mule.api.extension.resources.ResourcesGenerator;
+import org.mule.api.extension.resources.spi.GenerableResourceContributor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

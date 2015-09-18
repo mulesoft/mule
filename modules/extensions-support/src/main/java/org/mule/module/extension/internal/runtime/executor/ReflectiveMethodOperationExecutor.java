@@ -18,8 +18,8 @@ import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.runtime.OperationExecutor;
+import org.mule.api.extension.runtime.OperationContext;
+import org.mule.api.extension.runtime.OperationExecutor;
 
 import java.lang.reflect.Method;
 

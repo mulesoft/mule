@@ -12,11 +12,11 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.extension.introspection.ConfigurationModel;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.runtime.ConfigurationProvider;
-import org.mule.extension.runtime.ConfigurationInstance;
-import org.mule.extension.runtime.ExpirableConfigurationProvider;
+import org.mule.api.extension.introspection.ConfigurationModel;
+import org.mule.api.extension.introspection.ExtensionModel;
+import org.mule.api.extension.runtime.ConfigurationProvider;
+import org.mule.api.extension.runtime.ConfigurationInstance;
+import org.mule.api.extension.runtime.ExpirableConfigurationProvider;
 import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.cache.CacheBuilder;

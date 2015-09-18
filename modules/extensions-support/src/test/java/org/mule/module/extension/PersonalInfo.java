@@ -8,8 +8,8 @@ package org.mule.module.extension;
 
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.param.Optional;
+import org.mule.api.extension.annotations.Parameter;
+import org.mule.api.extension.annotations.param.Optional;
 
 public class PersonalInfo
 {

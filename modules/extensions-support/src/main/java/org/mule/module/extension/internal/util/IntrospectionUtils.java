@@ -17,12 +17,15 @@ import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 import org.mule.api.NestedProcessor;
-import org.mule.extension.annotations.param.Ignore;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.OperationModel;
-import org.mule.extension.introspection.ParameterModel;
-import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.api.extension.annotations.Operation;
+import org.mule.api.extension.annotations.Parameter;
+import org.mule.api.extension.annotations.ParameterGroup;
+import org.mule.api.extension.annotations.param.Ignore;
+import org.mule.api.extension.annotations.param.Optional;
+import org.mule.api.extension.introspection.DataType;
+import org.mule.api.extension.introspection.OperationModel;
+import org.mule.api.extension.introspection.ParameterModel;
+import org.mule.api.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -198,7 +201,7 @@ public class IntrospectionUtils
 
     public static boolean isDynamic(AccessibleObject object)
     {
-        org.mule.extension.annotations.Parameter parameter = object.getAnnotation(org.mule.extension.annotations.Parameter.class);
+        Parameter parameter = object.getAnnotation(Parameter.class);
         return parameter != null ? parameter.isDynamic() : true;
     }
 
@@ -210,17 +213,17 @@ public class IntrospectionUtils
 
     public static Collection<Field> getParameterFields(Class<?> extensionType)
     {
-        return getAllFields(extensionType, withAnnotation(org.mule.extension.annotations.Parameter.class));
+        return getAllFields(extensionType, withAnnotation(Parameter.class));
     }
 
     public static Collection<Field> getParameterGroupFields(Class<?> extensionType)
     {
-        return getAllFields(extensionType, withAnnotation(org.mule.extension.annotations.ParameterGroup.class));
+        return getAllFields(extensionType, withAnnotation(ParameterGroup.class));
     }
 
     public static Collection<Method> getOperationMethods(Class<?> declaringClass)
     {
-        return getAllMethods(declaringClass, withAnnotation(org.mule.extension.annotations.Operation.class), withModifier(Modifier.PUBLIC));
+        return getAllMethods(declaringClass, withAnnotation(Operation.class), withModifier(Modifier.PUBLIC));
     }
 
     public static Method getOperationMethod(Class<?> declaringClass, OperationModel operationModel)
@@ -241,7 +244,7 @@ public class IntrospectionUtils
         }
 
         Collection<Method> methods = getAllMethods(declaringClass,
-                                                   withAnnotation(org.mule.extension.annotations.Operation.class),
+                                                   withAnnotation(Operation.class),
                                                    withModifier(Modifier.PUBLIC),
                                                    withName(operationModel.getName()),
                                                    withParameters(parameterTypes));
@@ -254,7 +257,7 @@ public class IntrospectionUtils
 
     public static String getAlias(Field field)
     {
-        org.mule.extension.annotations.Parameter parameter = field.getAnnotation(org.mule.extension.annotations.Parameter.class);
+        Parameter parameter = field.getAnnotation(Parameter.class);
         String alias = parameter != null ? parameter.alias() : EMPTY;
         return StringUtils.isEmpty(alias) ? field.getName() : alias;
     }

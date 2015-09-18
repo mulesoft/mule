@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.annotations.Alias;
-import org.mule.extension.annotations.Parameter;
+import org.mule.api.extension.annotations.Alias;
+import org.mule.api.extension.annotations.Parameter;
 
 @Alias("door")
 public class KnockeableDoor

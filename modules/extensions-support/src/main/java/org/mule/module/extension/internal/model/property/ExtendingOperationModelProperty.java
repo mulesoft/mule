@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.model.property;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.annotations.Extensible;
-import org.mule.extension.annotations.Extension;
+import org.mule.api.extension.annotations.Extensible;
+import org.mule.api.extension.annotations.Extension;
 
 /**
  * A custom model property which marks that an operation is augmenting

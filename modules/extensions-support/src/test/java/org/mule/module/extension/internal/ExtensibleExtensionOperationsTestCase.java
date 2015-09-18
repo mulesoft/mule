@@ -11,12 +11,13 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
-import org.mule.extension.annotations.Extensible;
-import org.mule.extension.annotations.ExtensionOf;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.Operations;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.api.extension.annotations.Extension;
+import org.mule.api.extension.annotations.Extensible;
+import org.mule.api.extension.annotations.ExtensionOf;
+import org.mule.api.extension.annotations.Operation;
+import org.mule.api.extension.annotations.Operations;
+import org.mule.api.extension.introspection.declaration.fluent.Declaration;
+import org.mule.api.extension.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 
 import org.junit.Test;
@@ -59,7 +60,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
         assertThat(modelProperty.getType(), is(sameInstance(propertyType)));
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations(ExtensibleExtensionOperation.class)
     @Extensible
     public static class ExtensibleExtension
@@ -67,14 +68,14 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations({ClassLevelExtensionOfOperation.class, MethodLevelExtensionOfOperation.class})
     public static class ExtendingExtension
     {
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations({MethodLevelExtensionOfOperation.class, ExtensibleExtensionOperation.class})
     @Extensible
     public static class ExtensibleExtendingExtension

@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.api.extension.introspection.ParameterModel;
 
 import com.google.common.base.Objects;
 

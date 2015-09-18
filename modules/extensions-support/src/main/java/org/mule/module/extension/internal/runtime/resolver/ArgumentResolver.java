@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import org.mule.extension.runtime.OperationContext;
+import org.mule.api.extension.runtime.OperationContext;
 
 /**
  * A component for resolving the value of an operation's argument

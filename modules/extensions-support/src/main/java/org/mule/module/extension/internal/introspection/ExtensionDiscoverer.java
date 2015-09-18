@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.ExtensionModel;
+import org.mule.api.extension.ExtensionManager;
+import org.mule.api.extension.introspection.ExtensionModel;
 
 import java.util.List;
 

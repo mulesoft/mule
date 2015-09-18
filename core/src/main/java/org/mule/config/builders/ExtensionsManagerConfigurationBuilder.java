@@ -9,7 +9,7 @@ package org.mule.config.builders;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
-import org.mule.extension.ExtensionManager;
+import org.mule.api.extension.ExtensionManager;
 import org.mule.util.ClassUtils;
 
 /**

@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.annotations.ParameterGroup;
+import org.mule.api.extension.annotations.ParameterGroup;
 
 public class ExtendedPersonalInfo extends PersonalInfo
 {

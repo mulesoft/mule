@@ -7,10 +7,10 @@
 package org.mule.extension.validation.internal;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.annotations.param.Optional;
+import org.mule.api.extension.annotations.Operation;
+import org.mule.api.extension.annotations.ParameterGroup;
+import org.mule.api.extension.annotations.param.UseConfig;
+import org.mule.api.extension.annotations.param.Optional;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.validator.NumberType;
 import org.mule.extension.validation.internal.validator.NumberValidator;

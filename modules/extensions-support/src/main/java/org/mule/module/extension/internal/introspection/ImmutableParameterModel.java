@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.api.extension.introspection.DataType;
+import org.mule.api.extension.introspection.ParameterModel;
 
 import java.util.Map;
 

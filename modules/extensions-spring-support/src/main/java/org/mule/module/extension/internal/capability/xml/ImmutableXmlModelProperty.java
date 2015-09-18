@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.introspection.property.XmlModelProperty;
+import org.mule.api.extension.introspection.property.XmlModelProperty;
 
 /**
  * Immutable implementation of {@link XmlModelProperty}

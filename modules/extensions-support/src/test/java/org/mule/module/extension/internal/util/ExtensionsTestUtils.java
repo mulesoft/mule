@@ -16,9 +16,9 @@ import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.config.MuleManifest;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.ParameterModel;
+import org.mule.api.extension.ExtensionManager;
+import org.mule.api.extension.introspection.DataType;
+import org.mule.api.extension.introspection.ParameterModel;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.io.File;

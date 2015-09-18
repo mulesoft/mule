@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import org.mule.extension.introspection.DataQualifierVisitor;
+import org.mule.api.extension.introspection.DataQualifierVisitor;
 
 /**
  * Base implementation of {@link DataQualifierVisitor}

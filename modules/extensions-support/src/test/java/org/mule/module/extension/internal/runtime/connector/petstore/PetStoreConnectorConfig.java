@@ -6,9 +6,9 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
-import org.mule.extension.annotations.Configuration;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.connector.Connector;
+import org.mule.api.extension.annotations.Configuration;
+import org.mule.api.extension.annotations.Parameter;
+import org.mule.api.extension.annotations.connector.Connector;
 
 @Configuration(name = "config")
 @Connector(PetStoreClientConnectionHandler.class)

@@ -13,14 +13,14 @@ import static org.mule.module.extension.internal.capability.xml.schema.Annotatio
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.extension.annotations.Configuration;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.introspection.ExtensionModel;
-import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.api.extension.annotations.Configuration;
+import org.mule.api.extension.annotations.Parameter;
+import org.mule.api.extension.annotations.ParameterGroup;
+import org.mule.api.extension.introspection.ExtensionModel;
+import org.mule.api.extension.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.api.extension.introspection.declaration.fluent.Declaration;
+import org.mule.api.extension.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.api.extension.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.CollectionUtils;
 

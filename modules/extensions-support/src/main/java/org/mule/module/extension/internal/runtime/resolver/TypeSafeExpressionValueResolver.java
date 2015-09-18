@@ -15,7 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.extension.introspection.DataType;
+import org.mule.api.extension.introspection.DataType;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.ClassUtils;
