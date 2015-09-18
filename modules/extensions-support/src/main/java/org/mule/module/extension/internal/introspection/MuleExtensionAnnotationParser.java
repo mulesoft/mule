@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.extension.annotations.Extension;
 import org.mule.extension.annotations.Parameter;
 import org.mule.extension.annotations.RestrictedTo;
+import org.mule.extension.annotations.param.Connection;
 import org.mule.extension.annotations.param.Optional;
 import org.mule.extension.annotations.param.UseConfig;
 import org.mule.extension.introspection.DataType;
@@ -141,7 +142,7 @@ public final class MuleExtensionAnnotationParser
 
     private static ParameterDescriptor doParseParameter(String paramName, DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
     {
-        if (IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) || annotations.containsKey(UseConfig.class))
+        if (shouldAdvertise(parameterType, annotations))
         {
             return null;
         }
@@ -169,6 +170,13 @@ public final class MuleExtensionAnnotationParser
             parameter.setTypeRestriction(typeRestriction.value());
         }
         return parameter;
+    }
+
+    private static boolean shouldAdvertise(DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
+    {
+        return IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) ||
+               annotations.containsKey(UseConfig.class) ||
+               annotations.containsKey(Connection.class);
     }
 
     public static String[] getParamNames(Method method)

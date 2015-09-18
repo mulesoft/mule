@@ -7,7 +7,9 @@
 package org.mule.module.extension.internal.runtime;
 
 import static java.util.Collections.emptyList;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
@@ -36,6 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultOperationContextTestCase extends AbstractMuleTestCase
 {
+
     private static final String CONFIG_NAME = "config";
     private static final String PARAM_NAME = "param1";
     private static final String VALUE = "Do you want to build a snowman?";
@@ -78,5 +81,38 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     public void getParameter()
     {
         assertThat(operationContext.getParameter(PARAM_NAME), is(VALUE));
+    }
+
+    @Test
+    public void variables()
+    {
+        final String key = "foo";
+        final String value = "bar";
+
+        assertThat(operationContext.getVariable(key), is(nullValue()));
+        assertThat(operationContext.setVariable(key, value), is(nullValue()));
+        assertThat(operationContext.getVariable(key), is(value));
+        assertThat(operationContext.setVariable(key, EMPTY), is(value));
+        assertThat(operationContext.getVariable(key), is(EMPTY));
+        assertThat(operationContext.removeVariable(key), is(EMPTY));
+        assertThat(operationContext.getVariable(key), is(nullValue()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setNullKeyVariable()
+    {
+        operationContext.setVariable(null, "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setNullValueVariable()
+    {
+        operationContext.setVariable("key", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeNullValueVariable()
+    {
+        operationContext.removeVariable(null);
     }
 }

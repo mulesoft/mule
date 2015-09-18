@@ -187,9 +187,4 @@ public abstract class LifecycleAwareConfigurationProvider<T> implements Configur
     {
         startIfNeeded(config);
     }
-
-    void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
 }

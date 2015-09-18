@@ -61,9 +61,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         super(id, object);
         RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
 
-        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, new LifecycleCallback(){
-            public void onTransition(String phaseName, Object object) throws MuleException
-            { }});
+        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, (phaseName, target) -> { });
 
         for (Map.Entry<String, LifecyclePhase> entry : phases.entrySet())
         {

@@ -11,8 +11,8 @@ import org.mule.extension.annotations.capability.Xml;
 import org.mule.extension.introspection.declaration.DescribingContext;
 import org.mule.extension.introspection.declaration.fluent.Declaration;
 import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
-import org.mule.extension.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.introspection.property.XmlModelProperty;
+import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 /**
@@ -26,7 +26,7 @@ import org.mule.module.extension.internal.model.property.ImplementingTypeModelPr
  *
  * @since 4.0
  */
-public final class XmlModelEnricher implements ModelEnricher
+public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher
 {
 
     public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/extension/%s";
@@ -34,17 +34,11 @@ public final class XmlModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
-        Declaration declaration = descriptor.getDeclaration();
-        ImplementingTypeModelProperty backingType = declaration.getModelProperty(ImplementingTypeModelProperty.KEY);
-
-        if (backingType != null)
+        Xml xml = extractAnnotation(describingContext.getDeclarationDescriptor().getDeclaration(), Xml.class);
+        if (xml != null)
         {
-            Xml xml = backingType.getType().getAnnotation(Xml.class);
-            if (xml != null)
-            {
-                descriptor.withModelProperty(XmlModelProperty.KEY, createXmlModelProperty(xml, descriptor));
-            }
+            DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
+            descriptor.withModelProperty(XmlModelProperty.KEY, createXmlModelProperty(xml, descriptor));
         }
     }
 

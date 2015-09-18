@@ -18,14 +18,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleException;
-import org.mule.extension.ExtensionManager;
 import org.mule.extension.runtime.ConfigurationInstance;
 import org.mule.extension.runtime.ExpirationPolicy;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.collection.ImmutableListCollector;
 
@@ -54,22 +52,17 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     @Mock(answer = RETURNS_DEEP_STUBS)
     private ResolverSetResult resolverSetResult;
 
-    @Mock
-    private ExtensionManager extensionManager;
-
     private ExpirationPolicy expirationPolicy;
 
     @Before
     public void before() throws Exception
     {
-        ExtensionsTestUtils.stubRegistryKeys(muleContext, CONFIG_NAME);
         when(configurationModel.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
         when(configurationModel.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
         when(configurationModel.getModelProperty(anyString())).thenReturn(null);
         when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
 
         when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
-        when(muleContext.getExtensionManager()).thenReturn(extensionManager);
 
 
         expirationPolicy = new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);

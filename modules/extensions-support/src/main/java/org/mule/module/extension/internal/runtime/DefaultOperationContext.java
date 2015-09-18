@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime;
 
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
 import org.mule.extension.introspection.ParameterModel;
 import org.mule.extension.runtime.ConfigurationInstance;
@@ -26,6 +27,7 @@ public class DefaultOperationContext implements OperationContextAdapter
 
     private final ConfigurationInstance<?> configuration;
     private final Map<String, Object> parameters;
+    private final Map<String, Object> variables = new HashMap<>();
     private final MuleEvent event;
 
     /**
@@ -62,6 +64,36 @@ public class DefaultOperationContext implements OperationContextAdapter
         return parameters.get(parameterName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T getVariable(String key)
+    {
+        return (T) variables.get(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object setVariable(String key, Object value)
+    {
+        checkArgument(key != null, "null keys are not allowed");
+        checkArgument(value != null, "null values are not allowed");
+        return variables.put(key, value);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T removeVariable(String key)
+    {
+        checkArgument(key != null, "null keys are not allowed");
+        return (T) variables.remove(key);
+    }
 
     /**
      * {@inheritDoc}
