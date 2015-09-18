@@ -1504,6 +1504,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
                 if (transformer.isSourceDataTypeSupported(originalSourceType))
                 {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Using " + transformer + " to transform payload.");
+                    }
                     transformMessage(event, transformer);
                 }
                 else
@@ -1525,6 +1529,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
                         if (implicitTransformer != null)
                         {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Performing implicit transformation with: " + transformer);
+                            }
                             transformMessage(event, implicitTransformer);
                             transformMessage(event, transformer);
                         }
