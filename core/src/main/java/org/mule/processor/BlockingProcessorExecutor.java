@@ -6,11 +6,14 @@
  */
 package org.mule.processor;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.component.Component;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -81,10 +84,11 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
 
         if (copyOnVoidEvent && processorMayReturnVoidEvent(processor))
         {
-            MuleEvent copy = OptimizedRequestContext.criticalSetEvent(event);
+            MuleEvent copy = ((event instanceof ThreadSafeAccess) ? new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()), event) : event);
             MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
             if (isUseEventCopy(result))
             {
+                OptimizedRequestContext.unsafeSetEvent(copy);
                 result = copy;
             }
             return result;

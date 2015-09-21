@@ -8,6 +8,7 @@ package org.mule.processor.chain;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -137,13 +139,16 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     {
         ProcessorExecutor executor = createProcessorExecutor(processors);
 
+        assertThat(RequestContext.getEvent(), is(nullValue()));
         if (event.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE)
         {
             assertThat(executor.execute().getMessageAsString(), equalTo(RESULT));
+            assertThat(RequestContext.getEvent(), is(nullValue()));
         }
         else
         {
             assertThat(executor.execute(), equalTo(event));
+            assertThat(RequestContext.getEvent(), not(nullValue()));
         }
 
         assertThat(processor1.event, is(notNullValue()));
