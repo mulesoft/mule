@@ -16,4 +16,19 @@
         <http:request config-ref="requestConfig" method="POST" path="requestPath" />
     </flow>
 
+    <!-- MULE-8956 -->
+    <http:request-config name="blockingRequestConfig" host="localhost" port="${blockingHttpPort}" basePath="basePath" />
+    <http:listener-config name="blockingListenerConfig" host="localhost" port="${blockingHttpPort}" basePath="basePath"/>
+    <flow name="blockingRequestFlow">
+        <flow-ref name="blockingRequest"/>
+    </flow>
+    <flow name="remote">
+        <http:listener config-ref="blockingListenerConfig" path="/remote" allowedMethods="GET"/>
+        <set-payload value="#['&lt;root&gt;&lt;node&gt;value&lt;/node&gt;&lt;/root&gt;']"/>
+    </flow>
+    <flow name="blockingRequest">
+        <http:request config-ref="blockingRequestConfig" path="remote" method="GET"/>
+        <set-variable variableName="remotePayload" value="#[xpath3('/root/node/text()')]"/>
+        <set-payload value="#[remotePayload]"/>
+    </flow>
 </mule>

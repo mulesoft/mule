@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -161,7 +162,10 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
 
     private MuleEvent createEvent(HttpRequestContext requestContext) throws HttpRequestParsingException
     {
-        return HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, parseRequest, listenerPath);
+        MuleEvent muleEvent = HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, parseRequest, listenerPath);
+        // Update RequestContext ThreadLocal for backwards compatibility
+        OptimizedRequestContext.unsafeSetEvent(muleEvent);
+        return muleEvent;
     }
 
     @Override
