@@ -7,7 +7,7 @@
 package org.mule.construct;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.RequestContext;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
@@ -70,7 +70,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         ReplyToHandler replyToHandler = event.getReplyToHandler();
 
         final MuleEvent newEvent = new DefaultMuleEvent(event, this, null, null);
-        RequestContext.setEvent(newEvent);
+        OptimizedRequestContext.unsafeSetEvent(newEvent);
         try
         {
             ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, getExceptionListener());
@@ -107,7 +107,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         }
         finally
         {
-            RequestContext.setEvent(event);
+            OptimizedRequestContext.unsafeSetEvent(newEvent);
             event.getMessage().release();
         }
     }

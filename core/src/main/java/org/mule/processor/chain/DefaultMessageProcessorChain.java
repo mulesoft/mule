@@ -6,6 +6,8 @@
  */
 package org.mule.processor.chain;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
@@ -13,9 +15,9 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
@@ -88,7 +90,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 MessageProcessor processor = processors.get(i);
                 if (flowConstructIsNotAService && processorMayReturnNull(processor))
                 {
-                    copy = OptimizedRequestContext.criticalSetEvent(event);
+                    copy = ((event instanceof ThreadSafeAccess) ? new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()), event) : event);
                 }
 
                 event = messageProcessorExecutionTemplate.execute(processor, event);
@@ -97,6 +99,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 {
                     if (flowConstructIsNotAService)
                     {
+                        OptimizedRequestContext.unsafeSetEvent(copy);
                         event = copy;
                     }
                     else
