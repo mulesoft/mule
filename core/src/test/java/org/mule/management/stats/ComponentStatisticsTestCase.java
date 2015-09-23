@@ -6,9 +6,12 @@
  */
 package org.mule.management.stats;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 /**
@@ -39,11 +42,11 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     private void assertValues(ComponentStatistics stats,
             long numEvents, long totalTime, long avgTime, 
             long maxTime, long minTime) {
-        assertEquals("getExecutedEvents", numEvents, stats.getExecutedEvents());
-        assertEquals("getTotalExecutionTime", totalTime, stats.getTotalExecutionTime());
-        assertEquals("getAverageExecutionTime", avgTime, stats.getAverageExecutionTime());
-        assertEquals("getMaxExecutionTime", maxTime, stats.getMaxExecutionTime());
-        assertEquals("getMinExecutionTime", minTime, stats.getMinExecutionTime()); 
+        assertThat("getExecutedEvents", stats.getExecutedEvents(), equalTo(numEvents));
+        assertThat("getTotalExecutionTime", stats.getTotalExecutionTime(), equalTo(totalTime));
+        assertThat("getAverageExecutionTime", stats.getAverageExecutionTime(), equalTo(avgTime));
+        assertThat("getMaxExecutionTime", stats.getMaxExecutionTime(), equalTo(maxTime));
+        assertThat("getMinExecutionTime", stats.getMinExecutionTime(), equalTo(minTime)); 
     }
     
     @Test
@@ -51,7 +54,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
         ComponentStatistics stats = new ComponentStatistics();
         // num, total, avg, max, min
         assertValues(stats, 0L, 0L, 0L, 0L, 0L);
-        assertEquals(false, stats.isEnabled());
+        assertThat(stats.isEnabled(), equalTo(false));
     }
     
     @Test
