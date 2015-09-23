@@ -465,12 +465,19 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
+    @Override
     public EndpointBuilder createEndpointBuilder(String uri) throws TransportFactoryException
+    {
+         return createEndpointBuilder(uri, muleContext);
+    }
+
+    @Override
+    public EndpointBuilder createEndpointBuilder(String uri, MuleContext muleContext) throws TransportFactoryException
     {
         if (endpointBuilder == null)
         {
             logger.debug("Endpoint builder not set, Loading default builder: "
-                    + EndpointURIEndpointBuilder.class.getName());
+                         + EndpointURIEndpointBuilder.class.getName());
             return new EndpointURIEndpointBuilder(uri, muleContext);
         }
         else
@@ -479,7 +486,14 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
+    @Override
     public EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder) throws TransportFactoryException
+    {
+        return createEndpointBuilder(builder, muleContext);
+    }
+
+    @Override
+    public EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder, MuleContext muleContext) throws TransportFactoryException
     {
         EndpointBuilder wrappingBuilder;
         if (endpointBuilder == null)
