@@ -41,7 +41,7 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         // If this is a meta endpoint, then we can wrap it using the meta endpoint builder from the TransportServiceDescriptor
         String scheme = getEndpointBuilder().getEndpoint().getFullScheme();
         TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
-        EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this);
+        EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this, muleContext);
 
         OutboundEndpoint outboundEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
         if (outboundEndpoint instanceof AbstractEndpoint)
