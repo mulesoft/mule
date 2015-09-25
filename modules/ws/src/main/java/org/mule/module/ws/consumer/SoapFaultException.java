@@ -8,6 +8,7 @@ package org.mule.module.ws.consumer;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 
 import javax.xml.namespace.QName;
@@ -24,9 +25,9 @@ public class SoapFaultException extends MessagingException
     private final QName subCode;
     private final Element detail;
 
-    public SoapFaultException(MuleEvent event, QName faultCode, QName subCode, String message, Element detail)
+    public SoapFaultException(MuleEvent event, QName faultCode, QName subCode, String message, Element detail, MessageProcessor failingMessageProcessor)
     {
-        super(CoreMessages.createStaticMessage(message), event);
+        super(CoreMessages.createStaticMessage(message), event, failingMessageProcessor);
         this.faultCode = faultCode;
         this.subCode = subCode;
         this.detail = detail;

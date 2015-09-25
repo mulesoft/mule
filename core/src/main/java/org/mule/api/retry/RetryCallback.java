@@ -16,4 +16,9 @@ public interface RetryCallback
     public void doWork(RetryContext context) throws Exception;
 
     public String getWorkDescription();
+
+    /**
+     * @return the object for which the retry of the work is being done. Ideally, it should return a {@link org.mule.api.transport.Connector}.
+     */
+    public Object getWorkOwner();
 }

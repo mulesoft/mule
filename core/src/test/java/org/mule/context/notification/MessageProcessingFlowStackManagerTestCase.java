@@ -141,7 +141,7 @@ public class MessageProcessingFlowStackManagerTestCase extends AbstractMuleTestC
 
     protected String getContextInfo(MuleEvent event)
     {
-        return (String) manager.getContextInfo(event).get(FLOW_STACK_INFO_KEY);
+        return (String) manager.getContextInfo(event, null).get(FLOW_STACK_INFO_KEY);
     }
 
     @Test

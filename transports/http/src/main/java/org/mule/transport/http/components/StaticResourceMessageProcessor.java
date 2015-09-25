@@ -128,7 +128,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         }
         catch (IOException e)
         {
-            throw new ResourceNotFoundException(HttpMessages.fileNotFound(resourceBase + path),event);
+            throw new ResourceNotFoundException(HttpMessages.fileNotFound(resourceBase + path), event, this);
         }
         finally
         {

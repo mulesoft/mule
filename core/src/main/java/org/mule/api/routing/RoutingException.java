@@ -29,25 +29,25 @@ public class RoutingException extends MessagingException
 
     public RoutingException(MuleEvent event, MessageProcessor route)
     {
-        super(generateMessage(null, route), event);
+        super(generateMessage(null, route), event, route);
         this.route = route;
     }
 
     public RoutingException(MuleEvent event, MessageProcessor route, Throwable cause)
     {
-        super(generateMessage(null, route), event, cause);
+        super(generateMessage(null, route), event, cause, route);
         this.route = route;
     }
 
     public RoutingException(Message message, MuleEvent event, MessageProcessor route)
     {
-        super(generateMessage(message, route), event);
+        super(generateMessage(message, route), event, route);
         this.route = route;
     }
 
     public RoutingException(Message message, MuleEvent event, MessageProcessor route, Throwable cause)
     {
-        super(generateMessage(message, route), event, cause);
+        super(generateMessage(message, route), event, cause, route);
         this.route = route;
     }
 

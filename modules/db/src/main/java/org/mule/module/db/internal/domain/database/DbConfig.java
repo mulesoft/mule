@@ -7,6 +7,8 @@
 
 package org.mule.module.db.internal.domain.database;
 
+import org.mule.api.AnnotatedObject;
+import org.mule.api.NamedObject;
 import org.mule.common.Testable;
 import org.mule.common.metadata.ConnectorMetaDataEnabled;
 import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
@@ -16,13 +18,8 @@ import javax.sql.DataSource;
 /**
  * Database configuration used in the connector
  */
-public interface DbConfig extends Testable, ConnectorMetaDataEnabled
+public interface DbConfig extends NamedObject, AnnotatedObject, Testable, ConnectorMetaDataEnabled
 {
-
-    /**
-     * @return configuration name
-     */
-    String getName();
 
     /**
      * @return a non null {@link javax.sql.DataSource} to access the database

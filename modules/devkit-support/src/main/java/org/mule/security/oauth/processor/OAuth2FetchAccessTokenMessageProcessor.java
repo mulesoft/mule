@@ -93,7 +93,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         catch (Exception e)
         {
             throw new MessagingException(MessageFactory.createStaticMessage("Unable to fetch access token"),
-                event, e);
+                event, e, this);
         }
 
         return restoredEvent;
@@ -132,13 +132,13 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         }
         catch (ObjectDoesNotExistException e)
         {
-            throw new MessagingException(MessageFactory.createStaticMessage(String.format(
-                "Could not find authorization event %s in object store", eventId)), event, e);
+            throw new MessagingException(MessageFactory.createStaticMessage(String.format("Could not find authorization event %s in object store", eventId)),
+                event, e, this);
         }
         catch (ObjectStoreException e)
         {
-            throw new MessagingException(MessageFactory.createStaticMessage(String.format(
-                "Error retrieving authorization event %s from object store", eventId)), event, e);
+            throw new MessagingException(MessageFactory.createStaticMessage(String.format("Error retrieving authorization event %s from object store", eventId)),
+                event, e, this);
         }
 
         InboundPropertiesDelegate properties = getPropertiesDelegate(restoredEvent);
@@ -169,7 +169,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         catch (UnsupportedEncodingException e)
         {
             throw new MessagingException(
-                    MessageFactory.createStaticMessage("State query param had invalid encoding: " + state), event);
+                    MessageFactory.createStaticMessage("State query param had invalid encoding: " + state), event, this);
         }
     }
 

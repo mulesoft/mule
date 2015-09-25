@@ -8,6 +8,7 @@ package org.mule.api.security;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
@@ -29,9 +30,9 @@ public class NotPermittedException extends SecurityException
         super(message, RequestContext.getEvent());
     }
 
-    public NotPermittedException(Message message, Throwable cause)
+    public NotPermittedException(Message message, Throwable cause, MessageProcessor failingMessageProcessor)
     {
-        super(message, RequestContext.getEvent(), cause);
+        super(message, RequestContext.getEvent(), cause, failingMessageProcessor);
     }
 
     public NotPermittedException(Message message, MuleEvent event)
@@ -39,9 +40,9 @@ public class NotPermittedException extends SecurityException
         super(message, event);
     }
 
-    public NotPermittedException(Message message, MuleEvent event, Throwable cause)
+    public NotPermittedException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
     {
-        super(message, event, cause);
+        super(message, event, cause, failingMessageProcessor);
     }
 
     public NotPermittedException(MuleEvent event, SecurityContext context,SecurityFilter filter)
