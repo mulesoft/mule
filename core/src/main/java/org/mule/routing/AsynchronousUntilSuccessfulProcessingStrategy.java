@@ -6,13 +6,16 @@
  */
 package org.mule.routing;
 
+import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
@@ -21,9 +24,12 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.retry.RetryPolicyExhaustedException;
+import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.queue.objectstore.QueueKey;
 import org.mule.util.store.QueuePersistenceObjectStore;
@@ -51,6 +57,7 @@ import org.apache.commons.logging.LogFactory;
 public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy implements Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware
 {
 
+    private static final String UNTIL_SUCCESSFUL_MSG_PREFIX = "until-successful retries exhausted. Last exception message was: %s";
     private static final Random random = new Random();
     protected transient Log logger = LogFactory.getLog(getClass());
     private MessagingExceptionHandler messagingExceptionHandler;
@@ -117,9 +124,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                 }
                 catch (final Exception e)
                 {
-                    logger.error(
-                            MessageFactory.createStaticMessage("Failed to schedule for processing event stored with key: "
-                                                               + eventStoreKey), e);
+                    logger.error(MessageFactory.createStaticMessage("Failed to schedule for processing event stored with key: " + eventStoreKey), e);
                 }
             }
         }
@@ -146,14 +151,14 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                 }
                 catch (Exception e)
                 {
-                    incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(eventStoreKey);
+                    incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(eventStoreKey, e);
                 }
                 return null;
             }
         }, firstTime ? 0 : getUntilSuccessfulConfiguration().getMillisBetweenRetries(), TimeUnit.MILLISECONDS);
     }
 
-    private void incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(final Serializable eventStoreKey) throws Exception
+    private void incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(final Serializable eventStoreKey, Exception lastException) throws Exception
     {
         try
         {
@@ -174,7 +179,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
             }
             else
             {
-                abandonRetries(event, mutableEvent);
+                abandonRetries(event, mutableEvent, lastException);
             }
         }
         catch (final ObjectStoreException ose)
@@ -214,14 +219,12 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         return new QueueKey(QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, key);
     }
 
-    private void abandonRetries(final MuleEvent event, final MuleEvent mutableEvent)
+    private void abandonRetries(final MuleEvent event, final MuleEvent mutableEvent, final Exception lastException)
     {
         if (getUntilSuccessfulConfiguration().getDlqMP() == null)
         {
             logger.info("Retry attempts exhausted and no DLQ defined");
-            RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(
-                    CoreMessages.createStaticMessage("until-successful retries exhausted"), this);
-            messagingExceptionHandler.handleException(new MessagingException(event, retryPolicyExhaustedException), event);
+            messagingExceptionHandler.handleException(buildRetryPolicyExhaustedException(lastException), event);
             return;
         }
 
@@ -237,6 +240,35 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         catch (Exception e)
         {
             messagingExceptionHandler.handleException(new MessagingException(event, e), event);
+        }
+    }
+
+    protected RetryPolicyExhaustedException buildRetryPolicyExhaustedException(final Exception e)
+    {
+        MuleException muleException = ExceptionHelper.getRootMuleException(e);
+        
+        if (muleException == null)
+        {
+            return new RetryPolicyExhaustedException(CoreMessages.createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, e.getMessage()),
+                    e, this);
+        }
+        else
+        {
+            // the logger processes only the inner-most MuleException, which should be a MessagingException. In order to not lose information, we have to re-wrap its cause with this new exception.
+            if(muleException.getCause() != null)
+            {
+                RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages.createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
+                        muleException.getCause());
+                retryPolicyExhaustedException.getInfo().putAll(muleException.getInfo());
+                return retryPolicyExhaustedException;
+            }
+            else
+            {
+                RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages.createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
+                        muleException);
+                retryPolicyExhaustedException.getInfo().putAll(muleException.getInfo());
+                return retryPolicyExhaustedException;
+            }
         }
     }
 
