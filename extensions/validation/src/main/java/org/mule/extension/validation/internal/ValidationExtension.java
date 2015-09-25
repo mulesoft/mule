@@ -7,8 +7,11 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.NamedObject;
 import org.mule.api.config.Config;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -46,7 +49,7 @@ import java.util.Locale;
 @Operations({CommonValidationOperations.class, CustomValidatorOperation.class, ValidationStrategies.class, NumberValidationOperation.class})
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/validation", namespace = "validation", schemaVersion = "3.7")
 @Extensible(alias = "validator-message-processor")
-public class ValidationExtension implements Config, Initialisable, MuleContextAware
+public class ValidationExtension extends AbstractAnnotatedObject implements Config, NamedObject, Initialisable, MuleContextAware
 {
 
     public static final String DEFAULT_LOCALE = Locale.getDefault().getLanguage();
@@ -127,5 +130,11 @@ public class ValidationExtension implements Config, Initialisable, MuleContextAw
     public ExceptionFactory getExceptionFactory()
     {
         return exceptionFactory;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "Validation";
     }
 }

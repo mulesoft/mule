@@ -6,14 +6,13 @@
  */
 package org.mule.api.lifecycle;
 
-import org.mule.api.MuleException;
+import org.mule.api.LocatedMuleException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.util.ObjectUtils;
 
 /** <code>LifecycleException</code> TODO */
 
-public class LifecycleException extends MuleException
+public class LifecycleException extends LocatedMuleException
 {
 
     /** Serial version */
@@ -27,7 +26,7 @@ public class LifecycleException extends MuleException
      */
     public LifecycleException(Message message, Object component)
     {
-        super(message);
+        super(message, component);
         this.component = component;
     }
 
@@ -38,7 +37,7 @@ public class LifecycleException extends MuleException
      */
     public LifecycleException(Message message, Throwable cause, Object component)
     {
-        super(message, cause);
+        super(message, cause, component);
         this.component = component;
     }
 
@@ -48,9 +47,8 @@ public class LifecycleException extends MuleException
      */
     public LifecycleException(Throwable cause, Object component)
     {
-        super(CoreMessages.createStaticMessage(cause.getMessage()), cause);
+        super(CoreMessages.createStaticMessage(cause.getMessage()), cause, component);
         this.component = component;
-        addInfo("Object", ObjectUtils.toString(component, "null"));
     }
 
     public Object getComponent()

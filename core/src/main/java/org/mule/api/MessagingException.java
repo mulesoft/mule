@@ -7,7 +7,13 @@
 
 package org.mule.api;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import org.mule.VoidMuleEvent;
+import org.mule.api.construct.MessageProcessorPathResolver;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleManifest;
@@ -16,19 +22,15 @@ import org.mule.config.i18n.Message;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.NullPayload;
+import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 /**
  * <code>MessagingException</code> is a general message exception thrown when errors
  * specific to Message processing occur..
  */
 
-public class MessagingException extends MuleException
+public class MessagingException extends LocatedMuleException
 {
     /**
      * Serial version
@@ -57,7 +59,7 @@ public class MessagingException extends MuleException
     @Deprecated
     public MessagingException(Message message, MuleMessage muleMessage)
     {
-        super();
+        super(null);
         this.muleMessage = muleMessage;
         this.event = null;
         setMessage(generateMessage(message));
@@ -65,7 +67,7 @@ public class MessagingException extends MuleException
 
     public MessagingException(Message message, MuleEvent event)
     {
-        super();
+        super(null);
         this.event = event;
         extractMuleMessage(event);
         setMessage(generateMessage(message));
@@ -73,7 +75,7 @@ public class MessagingException extends MuleException
 
     public MessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
     {
-        super();
+        super(resolveProcessorPath(event, failingMessageProcessor));
         this.event = event;
         extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
@@ -86,7 +88,7 @@ public class MessagingException extends MuleException
     @Deprecated
     public MessagingException(Message message, MuleMessage muleMessage, Throwable cause)
     {
-        super(cause);
+        super(cause, null);
         this.muleMessage = muleMessage;
         this.event = null;
         setMessage(generateMessage(message));
@@ -94,7 +96,7 @@ public class MessagingException extends MuleException
 
     public MessagingException(Message message, MuleEvent event, Throwable cause)
     {
-        super(cause);
+        super(cause, null);
         this.event = event;
         extractMuleMessage(event);
         setMessage(generateMessage(message));
@@ -105,7 +107,7 @@ public class MessagingException extends MuleException
                               Throwable cause,
                               MessageProcessor failingMessageProcessor)
     {
-        super(cause);
+        super(cause, resolveProcessorPath(event, failingMessageProcessor));
         this.event = event;
         extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
@@ -114,7 +116,7 @@ public class MessagingException extends MuleException
 
     public MessagingException(MuleEvent event, Throwable cause)
     {
-        super(cause);
+        super(cause, null);
         this.event = event;
         extractMuleMessage(event);
         setMessage(generateMessage(getI18nMessage()));
@@ -122,11 +124,24 @@ public class MessagingException extends MuleException
 
     public MessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
     {
-        super(cause);
+        super(cause, resolveProcessorPath(event, failingMessageProcessor));
         this.event = event;
         extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
         setMessage(generateMessage(getI18nMessage()));
+    }
+
+    protected static String resolveProcessorPath(MuleEvent event, MessageProcessor failingMessageProcessor)
+    {
+        String docName = getDocName(failingMessageProcessor);
+        if (event != null && event.getFlowConstruct() != null && event.getFlowConstruct() instanceof MessageProcessorPathResolver)
+        {
+            return ((MessageProcessorPathResolver) event.getFlowConstruct()).getProcessorPath(failingMessageProcessor) + (docName != null ? " (" + docName + ")" : "");
+        }
+        else
+        {
+            return ObjectUtils.toString(failingMessageProcessor, "null") + (docName != null ? " (" + docName + ")" : "");
+        }
     }
 
     protected String generateMessage(Message message)
@@ -148,6 +163,19 @@ public class MessagingException extends MuleException
 
             buf.append(CoreMessages.messageIsOfType(payload.getClass()).getMessage());
             addInfo("Payload", StringUtils.abbreviate(payload.toString(), 1000));
+//            if (DefaultMuleConfiguration.verboseExceptions)
+//            {
+//                if (isConsumable(payload))
+//                {
+//                    buf.append(CoreMessages.messageIsOfType(payload.getClass()).getMessage());
+//                    addInfo("Payload", StringUtils.abbreviate(payload.toString(), 1000));
+//                }
+//                else
+//                {
+//                    buf.append(CoreMessages.messagePayloadIs(payload.toString()).getMessage());
+//                    addInfo("Payload", payload.toString());
+//                }
+//            }
         }
         else
         {
@@ -159,6 +187,11 @@ public class MessagingException extends MuleException
         return buf.toString();
     }
 
+//    private boolean isConsumable(Object payload)
+//    {
+//        return payload instanceof InputStream || payload instanceof Reader || payload instanceof Iterator || payload instanceof ResultSet;
+//    }
+//
     /**
      * @deprecated use {@link #getEvent().getMessage()} instead
      */

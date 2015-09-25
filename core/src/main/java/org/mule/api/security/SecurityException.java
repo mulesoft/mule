@@ -8,6 +8,7 @@ package org.mule.api.security;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
 /**
@@ -23,5 +24,10 @@ public abstract class SecurityException extends MessagingException
     protected SecurityException(Message message, MuleEvent event, Throwable cause)
     {
         super(message, event, cause);
+    }
+
+    protected SecurityException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
+    {
+        super(message, event, cause, failingMessageProcessor);
     }
 }

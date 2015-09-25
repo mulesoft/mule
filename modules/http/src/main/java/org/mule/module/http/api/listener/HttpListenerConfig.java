@@ -6,13 +6,15 @@
  */
 package org.mule.module.http.api.listener;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleException;
+import org.mule.api.NamedObject;
 import org.mule.api.config.Config;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.transport.ssl.api.TlsContextFactory;
 
-public interface HttpListenerConfig extends Config, Startable, Stoppable
+public interface HttpListenerConfig extends Config, NamedObject, AnnotatedObject, Startable, Stoppable
 {
 
     /**

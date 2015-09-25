@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
+import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
@@ -299,6 +300,12 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             public String getWorkDescription()
             {
                 return "Trying to reconnect to SFTP server " + endpoint.getEndpointURI();
+            }
+
+            @Override
+            public Connector getWorker()
+            {
+                return getEndpoint().getConnector();
             }
         }, getConnector().getMuleContext().getWorkManager());
     }

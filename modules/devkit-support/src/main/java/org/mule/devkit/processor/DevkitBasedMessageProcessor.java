@@ -21,6 +21,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
@@ -130,7 +131,14 @@ public abstract class DevkitBasedMessageProcessor extends ExpressionEvaluatorSup
 
     private void handleException(MuleEvent event, Throwable e) throws MuleException
     {
-        throw new MessagingException(CoreMessages.failedToInvoke(this.operationName), event, e);
+        if (this instanceof MessageProcessor)
+        {
+            throw new MessagingException(CoreMessages.failedToInvoke(this.operationName), event, e, (MessageProcessor) this);
+        }
+        else
+        {
+            throw new MessagingException(CoreMessages.failedToInvoke(this.operationName), event, e);
+        }
     }
 
     private MuleEvent handleNotAuthorized(OnNoTokenPolicyAware policyAware,

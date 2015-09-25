@@ -28,19 +28,19 @@ public class ComponentException extends MessagingException
 
     public ComponentException(Message message, MuleEvent muleMessage, Component component)
     {
-        super(generateMessage(message, component), muleMessage);
+        super(generateMessage(message, component), muleMessage, component);
         this.component = component;
     }
 
     public ComponentException(Message message, MuleEvent event, Component component, Throwable cause)
     {
-        super(generateMessage(message, component), event, cause);
+        super(generateMessage(message, component), event, cause, component);
         this.component = component;
     }
 
     public ComponentException(MuleEvent message, Component component, Throwable cause)
     {
-        super(generateMessage(null, component), message, cause);
+        super(generateMessage(null, component), message, cause, component);
         this.component = component;
     }
 

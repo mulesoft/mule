@@ -6,10 +6,6 @@
  */
 package org.mule.retry.async;
 
-import java.util.Map;
-
-import javax.resource.spi.work.WorkException;
-
 import org.mule.api.context.WorkManager;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
@@ -18,6 +14,10 @@ import org.mule.api.retry.RetryPolicy;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.util.concurrent.Latch;
+
+import java.util.Map;
+
+import javax.resource.spi.work.WorkException;
 
 /**
  * This class is a wrapper for a {@link RetryPolicyTemplate} and will execute any retry work within a separate thread.
@@ -51,7 +51,7 @@ public class AsynchronousRetryTemplate implements RetryPolicyTemplate
         }
         catch (WorkException e)
         {
-            throw new RetryPolicyExhaustedException(e, null);
+            throw new RetryPolicyExhaustedException(e, callback.getWorker());
         }
         return context;
     }

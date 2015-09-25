@@ -245,8 +245,9 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
                 throw (LifecycleException) t;
             }
 
+            // Need to get the cause of the MuleException so the LifecycleException wraps a non-mule esception
             throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o),
-                t, this);
+                    ExceptionHelper.getNonMuleException(t), o);
         }
     }
 

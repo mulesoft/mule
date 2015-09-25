@@ -15,8 +15,11 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.core.Is.isA;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import java.io.IOException;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
+import org.mule.module.oauth2.internal.TokenNotFoundException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.ApplicationContextBuilder;
@@ -55,7 +58,7 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
             public void run() throws Exception
             {
                 ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder().setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
-                expectedException.expectCause(isA(MessagingException.class));
+                expectedException.expectCause(isA(IOException.class));
                 applicationContextBuilder.build();
             }
         });
@@ -73,7 +76,7 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
             public void run() throws Exception
             {
                 ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder().setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
-                expectedException.expectCause(isA(DefaultMuleException.class));
+                expectedException.expectCause(isA(TokenNotFoundException.class));
                 applicationContextBuilder.build();
             }
         });

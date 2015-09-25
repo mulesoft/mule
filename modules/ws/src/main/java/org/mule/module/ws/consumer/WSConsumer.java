@@ -13,7 +13,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -194,7 +193,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                         event.getMessage().setPayload(soapFault.getDetail());
 
                         throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),
-                                                     soapFault.getMessage(), soapFault.getDetail());
+                                                     soapFault.getMessage(), soapFault.getDetail(), this);
                     }
                     else
                     {
@@ -455,7 +454,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 catch (Exception e)
                 {
                     throw new MessagingException(CoreMessages.createStaticMessage("Could not set inbound attachment %s",
-                                                                                  attachment.getId()), event, e);
+                                                                                  attachment.getId()), event, e, this);
                 }
             }
         }

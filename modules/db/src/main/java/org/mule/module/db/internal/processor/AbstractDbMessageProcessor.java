@@ -19,16 +19,15 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.OperationMetaDataEnabled;
+import org.mule.module.db.internal.domain.connection.DbConnection;
+import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-
-import org.mule.module.db.internal.metadata.QueryMetadataProvider;
-import org.mule.module.db.internal.metadata.NullMetadataProvider;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.metadata.NullMetadataProvider;
+import org.mule.module.db.internal.metadata.QueryMetadataProvider;
+import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 
 import java.sql.SQLException;
@@ -62,7 +61,14 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         try
         {
             connection = dbConfig.getConnectionFactory().createConnection(transactionalAction);
+        }
+        catch (SQLException e)
+        {
+            throw new DbConnectionException(e, dbConfig);
+        }
 
+        try
+        {
             Object result = executeQuery(connection, muleEvent);
 
             if (mustCloseConnection())
@@ -90,11 +96,11 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         }
         catch (SQLException e)
         {
-            throw new MessagingException(muleEvent, e);
+            throw new MessagingException(muleEvent, e, this);
         }
         finally
         {
-            if (connection != null && mustCloseConnection())
+            if (mustCloseConnection())
             {
                 dbConfig.getConnectionFactory().releaseConnection(connection);
             }

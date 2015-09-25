@@ -6,13 +6,6 @@
  */
 package org.mule.api;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -20,6 +13,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <code>MuleException</code> is the base exception type for the Mule server any
@@ -221,6 +220,13 @@ public abstract class MuleException extends Exception
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
         buf.append("Code                  : ").append("MULE_ERROR-").append(
             getExceptionCode() + getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
+        // Add info.Object
+        Map info = ExceptionHelper.getExceptionInfo(this);
+        if (info.containsKey(LocatedMuleException.INFO_LOCATION_KEY))
+        {
+            buf.append("Object:               :").append(info.get(LocatedMuleException.INFO_LOCATION_KEY)).append(SystemUtils.LINE_SEPARATOR);
+        }
+
         // print exception stack
         buf.append(StringUtils.repeat('-', 80)).append(SystemUtils.LINE_SEPARATOR);
         buf.append(CoreMessages.exceptionStackIs()).append(SystemUtils.LINE_SEPARATOR);
