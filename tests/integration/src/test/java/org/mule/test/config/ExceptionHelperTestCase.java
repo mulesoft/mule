@@ -6,11 +6,18 @@
  */
 package org.mule.test.config;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
+import java.util.Map;
+
+import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.registry.ResolverException;
@@ -20,38 +27,27 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.List;
-import java.util.Map;
-
-import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
-
 @SmallTest
 public class ExceptionHelperTestCase extends AbstractMuleTestCase
 {
-
     @Test
     public void testNestedExceptionRetreval() throws Exception
     {
         Exception testException = getException();
         Throwable t = ExceptionHelper.getRootException(testException);
         assertNotNull(t);
-        assertEquals("blah", t.getMessage());
-        assertNull(t.getCause());
+        assertThat(t.getMessage(), is("blah"));
+        assertThat(t.getCause(), nullValue());
 
         t = ExceptionHelper.getRootMuleException(testException);
-        assertNotNull(t);
-        assertEquals("bar", t.getMessage());
-        assertNotNull(t.getCause());
+        assertThat(t.getMessage(), is("bar"));
+        assertThat(t.getCause(), not(nullValue()));
 
         List<Throwable> l = ExceptionHelper.getExceptionsAsList(testException);
-        assertEquals(3, l.size());
+        assertThat(l.size(), is(3));
 
-        Map<?, ?> info = ExceptionHelper.getExceptionInfo(testException);
-        assertNotNull(info);
-        assertEquals(1, info.size());
-        assertNotNull(info.get("JavaDoc"));
+        Map<String, String> info = ExceptionHelper.getExceptionInfo(testException);
+        assertThat(info.size(), is(0));
     }
 
     @Test
@@ -62,7 +58,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         int depth = numberOfStackFrames + 1;
 
         Throwable summary = ExceptionHelper.summarise(exception, depth);
-        assertNotNull(summary);
+        assertThat(summary, not(nullValue()));
     }
 
     @Test
