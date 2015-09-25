@@ -131,17 +131,22 @@ public abstract class MuleException extends Exception
     protected void initialise()
     {
         setExceptionCode(ExceptionHelper.getErrorCode(getClass()));
-        String javadoc = ExceptionHelper.getJavaDocUrl(getClass());
-        String doc = ExceptionHelper.getDocUrl(getClass());
-        if (javadoc != null)
+        if(DefaultMuleConfiguration.docLinks)
         {
-            // info.put(ClassHelper.getClassName(getClass()) + " JavaDoc", javadoc);
-            info.put("JavaDoc", javadoc);
-        }
-        if (doc != null)
-        {
-            // info.put(ClassHelper.getClassName(getClass()) + " Other Doc", doc);
-            info.put("Other Doc", doc);
+            String javadoc = ExceptionHelper.getJavaDocUrl(getClass());
+            String doc = ExceptionHelper.getDocUrl(getClass());
+            if (javadoc != null)
+            {
+                // info.put(ClassHelper.getClassName(getClass()) + " JavaDoc", javadoc);
+                info.put("JavaDoc", javadoc);
+            }
+            if (doc != null)
+            {
+                // info.put(ClassHelper.getClassName(getClass()) + " Other Doc", doc);
+                info.put("Other Doc", doc);
+            }
+            
+            info.put("Code", "MULE_ERROR-" + getExceptionCode() + getMessageCode());
         }
     }
 
@@ -171,10 +176,6 @@ public abstract class MuleException extends Exception
         buf.append("Type                  : ")
             .append(getClass().getName())
             .append(SystemUtils.LINE_SEPARATOR);
-        buf.append("Code                  : ").append("MULE_ERROR-").append(
-            getExceptionCode() + getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
-        // buf.append("Msg Code :
-        // ").append(getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
 
         Map info = ExceptionHelper.getExceptionInfo(this);
         for( Map.Entry entry : (Set<Map.Entry>)info.entrySet() )
@@ -219,8 +220,6 @@ public abstract class MuleException extends Exception
         buf.append(SystemUtils.LINE_SEPARATOR).append(StringUtils.repeat('*', 80)).append(
             SystemUtils.LINE_SEPARATOR);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
-        buf.append("Code                  : ").append("MULE_ERROR-").append(
-            getExceptionCode() + getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
         // print exception stack
         buf.append(StringUtils.repeat('-', 80)).append(SystemUtils.LINE_SEPARATOR);
         buf.append(CoreMessages.exceptionStackIs()).append(SystemUtils.LINE_SEPARATOR);
