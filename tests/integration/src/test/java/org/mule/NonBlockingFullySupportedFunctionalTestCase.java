@@ -19,6 +19,8 @@ import org.junit.Test;
 public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestCase
 {
 
+    public static String FOO = "foo";
+
     @Override
     protected String getConfigFile()
     {
@@ -157,6 +159,14 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
         MuleEvent result = runFlowNonBlocking("enricherIssueNonBlocking");
         FlowAssert.verify("enricherIssueNonBlocking");
         assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    }
+
+    @Test
+    public void enricherFlowVar() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("enricherFlowVar");
+        FlowAssert.verify("enricherFlowVar");
+        assertThat((String) result.getFlowVariable(FOO), is(equalTo(TEST_MESSAGE)));
     }
 }
 

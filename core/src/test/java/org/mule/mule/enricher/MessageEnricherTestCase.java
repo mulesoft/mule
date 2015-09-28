@@ -6,6 +6,7 @@
  */
 package org.mule.mule.enricher;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -18,18 +19,20 @@ import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.construct.Flow;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
+import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
@@ -39,6 +42,7 @@ import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 import org.junit.Test;
@@ -419,26 +423,76 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void enricherConservesSameEventInstanceNonBlocking() throws Exception
+    public void enricherConservesSameEventInstanceNonBlockingTargetNonBlocking() throws Exception
+    {
+        SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
+        MessageEnricher enricher = createNonBlockingEnricher(sensingNullMessageProcessor);
+        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+        final MuleEvent in = createNonBlockingEvent(nullReplyToHandler);
+
+        MuleEvent out = processEnricherInChain(enricher, in);
+
+        nullReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+        assertThat(sensingNullMessageProcessor.event.getMessage(), not(sameInstance(in.getMessage())));
+
+        assertThat(out, is(instanceOf(NonBlockingVoidMuleEvent.class)));
+        assertThat(nullReplyToHandler.event.getMessage(), is(sameInstance(in.getMessage())));
+    }
+
+    @Test
+    public void enricherConservesSameEventInstanceNonBlockingTargetBlocking() throws Exception
+    {
+        SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor(){
+            @Override
+            public boolean isNonBlocking(MuleEvent event)
+            {
+                return false;
+            }
+        };
+        MessageEnricher enricher = createNonBlockingEnricher(sensingNullMessageProcessor);
+
+        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+        final MuleEvent in = createNonBlockingEvent(nullReplyToHandler);
+
+        MuleEvent out = processEnricherInChain(enricher, in);
+
+        assertThat(sensingNullMessageProcessor.event.getMessage(), not(sameInstance(in.getMessage())));
+        assertThat(out.getMessage(), is(sameInstance(in.getMessage())));
+    }
+
+    private MuleEvent createNonBlockingEvent(SensingNullReplyToHandler nullReplyToHandler)
+    {
+        Flow flow = mock(Flow.class);
+        when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
+
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
+                                                  MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
+                                                  flow);
+    }
+
+    private MessageEnricher createNonBlockingEnricher(SensingNullMessageProcessor sensingNullMessageProcessor)
     {
         MessageEnricher enricher = new MessageEnricher();
         enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
-        SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
         enricher.setEnrichmentMessageProcessor(sensingNullMessageProcessor);
-        ReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+        return enricher;
+    }
 
-        Flow flow = mock(Flow.class);
-        when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
-
-        MuleEvent in = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
-                                            MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
-                                            flow);
-        MuleEvent out = enricher.process(in);
-
-        assertThat(in.isAllowNonBlocking(), is(true));
-        assertThat(out, is(sameInstance(in)));
-        assertThat(sensingNullMessageProcessor.event, not(sameInstance(in)));
+    private MuleEvent processEnricherInChain(MessageEnricher enricher, final MuleEvent in) throws MuleException
+    {
+        return DefaultMessageProcessorChain.from(enricher, new MessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                // Ensure that message is writable after being processed by enricher with non-blocking target
+                ((ThreadSafeAccess) event).assertAccess(true);
+                assertThat(event.getMessage(), is(sameInstance(in.getMessage())));
+                return event;
+            }
+        }).process(in);
     }
 
     private void doEnrichDataTypePropagationTest(EnrichExpressionPair pair) throws Exception
