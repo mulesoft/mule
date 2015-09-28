@@ -6,11 +6,8 @@
  */
 package org.mule.processor;
 
-import org.mule.OptimizedRequestContext;
-import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
@@ -21,10 +18,7 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.MessageProcessors;
 import org.mule.execution.MessageProcessorExecutionTemplate;
-import org.mule.processor.chain.ProcessorExecutorFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -84,6 +78,7 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
         }
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (responseProcessor instanceof MuleContextAware)
@@ -100,6 +95,7 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
         }
     }
 
+    @Override
     public void start() throws MuleException
     {
         if (responseProcessor instanceof Startable)
@@ -108,6 +104,7 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         if (responseProcessor instanceof Stoppable)
@@ -116,6 +113,7 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
         }
     }
 
+    @Override
     public void dispose()
     {
         if (responseProcessor instanceof Disposable)
@@ -124,6 +122,7 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
         }
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
