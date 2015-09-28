@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
@@ -220,9 +221,9 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
             MuleEvent result = processNext(copyEventForEnrichment(event));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
-                processResponse(result);
+                result = processResponse(result);
             }
-            return event;
+            return result;
         }
 
         private MuleEvent copyEventForEnrichment(MuleEvent event)
@@ -233,6 +234,9 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         @Override
         protected MuleEvent processResponse(MuleEvent event) throws MuleException
         {
+            // Reset access control on current event instance for continued flow processing
+            ((ThreadSafeAccess) eventToEnrich).resetAccessControl();
+
             final ExpressionManager expressionManager = eventToEnrich.getMuleContext().getExpressionManager();
 
             if (event != null && !VoidMuleEvent.getInstance().equals(eventToEnrich))
