@@ -59,6 +59,7 @@ public class XaTransaction extends AbstractTransaction
 
         try
         {
+            txManager.setTransactionTimeout(getTimeoutInSeconds());
             txManager.begin();
             synchronized (this)
             {

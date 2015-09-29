@@ -10,6 +10,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -114,6 +116,21 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
         xaTransaction.begin();
         xaTransaction.enlistResource(mockXaResource);
         verify(mockXaResource).setTransactionTimeout(timeoutValueInSeconds);
+    }
+
+    @Test
+    public void setsTransactionTimeoutOnBegin() throws Exception
+    {
+        final int timeoutMillis = 5000;
+        final int timeoutSecs = timeoutMillis / 1000;
+
+        XaTransaction xaTransaction = new XaTransaction(mockMuleContext);
+        xaTransaction.setTimeout(timeoutMillis);
+        xaTransaction.begin();
+
+        final InOrder inOrder = inOrder(mockTransactionManager);
+        inOrder.verify(mockTransactionManager).setTransactionTimeout(timeoutSecs);
+        inOrder.verify(mockTransactionManager).begin();
     }
 
     private class BadHashCodeImplementation
