@@ -20,11 +20,15 @@ import javax.transaction.TransactionManager;
  */
 public class XaTransactionFactory implements ExternalTransactionAwareTransactionFactory
 {
+
+    private int timeout;
+
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
         try
         {
             XaTransaction xat = new XaTransaction(muleContext);
+            xat.setTimeout(timeout);
             xat.begin();
             return xat;
         }
@@ -64,5 +68,15 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
     public boolean isTransacted()
     {
         return true;
+    }
+
+    public int getTimeout()
+    {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout)
+    {
+        this.timeout = timeout;
     }
 }

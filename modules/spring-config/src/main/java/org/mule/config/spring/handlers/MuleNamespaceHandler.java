@@ -335,7 +335,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("inbound-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
-        registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
+        registerBeanDefinitionParser("xa-transaction", new XaTransactionDefinitionParser(XaTransactionFactory.class));
         registerBeanDefinitionParser("idempotent-redelivery-policy", new ChildDefinitionParser("redeliveryPolicy", IdempotentRedeliveryPolicy.class));
 
         // Message Processors
