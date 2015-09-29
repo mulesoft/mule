@@ -42,6 +42,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     public static final TimeUnit DEFAULT_JMS_POLL_TIMEUNIT = TimeUnit.MILLISECONDS;
 
     protected final JmsConnector connector;
+    private final long localTimeout;
     protected boolean reuseConsumer;
     protected boolean reuseSession;
     protected final ThreadContextLocal context = new ThreadContextLocal();
@@ -87,7 +88,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         // TODO AP: find appropriate value for polling frequency with the scheduler;
         // see setFrequency/setTimeUnit & VMMessageReceiver for more
         this.setTimeUnit(DEFAULT_JMS_POLL_TIMEUNIT);
-        this.setFrequency(MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency", DEFAULT_JMS_POLL_FREQUENCY));
+        this.setFrequency(DEFAULT_JMS_POLL_FREQUENCY);
 
         this.connector = (JmsConnector) connector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
@@ -127,6 +128,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         // If we're using topics we don't want to use multiple receivers as we'll get
         // the same message multiple times
         this.setUseMultipleTransactedReceivers(!topic);
+        this.localTimeout = resolveReceiveTimeout();
     }
 
     @Override
@@ -235,7 +237,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         Message message = null;
         try
         {
-            message = consumer.receive(timeout);
+            message = consumer.receive(localTimeout);
         }
         catch (Exception e)
         {
@@ -285,6 +287,25 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         routeMessage(messageToRoute);
         closeConsumerIfRequired(consumer);
         return null;
+    }
+
+    private long resolveReceiveTimeout()
+    {
+        long localTimeout = MapUtils.getLongValue(endpoint.getProperties(), "xaPollingTimeout", timeout);
+
+
+        if (localTimeout > timeout)
+        {
+            logger.warn(String.format("Transaction timeout ('%s') must be greater than the timeout used for polling messages ('%s'). Using transaction timeout", localTimeout, timeout));
+            localTimeout = timeout;
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(String.format("Consumer is receiving in '%s' ith timeout '%d'", this, localTimeout));
+        }
+
+        return localTimeout;
     }
 
     private void closeConsumerIfRequired(MessageConsumer consumer)
