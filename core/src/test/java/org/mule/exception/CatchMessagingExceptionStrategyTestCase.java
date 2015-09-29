@@ -10,14 +10,20 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.apache.commons.lang.RandomStringUtils;
+
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
@@ -88,9 +94,15 @@ public class CatchMessagingExceptionStrategyTestCase
         verify(mockStreamCloserService).closeStream(Matchers.<Object>any(Object.class));
     }
 
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    protected MuleContext muleContext;
+
     @Test
     public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception
     {
+        MuleMessage message = spy(new DefaultMuleMessage("", muleContext));
+        when(mockMuleEvent.getMessage()).thenReturn(message);
+
         catchMessagingExceptionStrategy.setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
         catchMessagingExceptionStrategy.initialise();
         catchMessagingExceptionStrategy.handleException(mockException,mockMuleEvent);
@@ -105,7 +117,8 @@ public class CatchMessagingExceptionStrategyTestCase
         catchMessagingExceptionStrategy.setMessageProcessors(asList(createChagingEventMessageProcessor(mock(MuleEvent.class,Answers.RETURNS_DEEP_STUBS.get())), createChagingEventMessageProcessor(lastEventCreated)));
         catchMessagingExceptionStrategy.initialise();
         MuleEvent exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
-        assertThat(exceptionHandlingResult, Is.is(lastEventCreated));
+        assertThat(exceptionHandlingResult.getId(), is(lastEventCreated.getId()));
+        assertThat(exceptionHandlingResult.getMessage().getUniqueId(), is(lastEventCreated.getMessage().getUniqueId()));
     }
 
     /**

@@ -56,14 +56,16 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
                             "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
                             "not recommended if unsupported message processors are being used.  ", processor.getClass());
                 event = new DefaultMuleEvent(event.getMessage(), event, true);
+                // Update RequestContext ThreadLocal for backwards compatibility
+                OptimizedRequestContext.unsafeSetEvent(event);
             }
 
             if (processor instanceof NonBlockingMessageProcessor)
             {
                 event = new DefaultMuleEvent(event, new NonBlockingProcessorExecutorReplyToHandler());
+                // Update RequestContext ThreadLocal for backwards compatibility
+                OptimizedRequestContext.unsafeSetEvent(event);
             }
-            // Update RequestContext ThreadLocal for backwards compatibility
-            OptimizedRequestContext.unsafeSetEvent(event);
         }
     }
 

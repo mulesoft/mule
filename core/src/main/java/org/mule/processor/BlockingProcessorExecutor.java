@@ -84,7 +84,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
 
         if (copyOnVoidEvent && processorMayReturnVoidEvent(processor))
         {
-            MuleEvent copy = ((event instanceof ThreadSafeAccess) ? new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()), event) : event);
+            MuleEvent copy = new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()), event);
             MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
             if (isUseEventCopy(result))
             {
