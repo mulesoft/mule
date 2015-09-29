@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.MessageExchangePattern;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -52,6 +54,10 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         when(event.isSynchronous()).thenReturn(false);
         when(event.isAllowNonBlocking()).thenReturn(true);
+    }
+    
+    protected Matcher<MuleEvent> requestResponseMatecher() {
+        return not(sameInstance(event));
     }
 
     @Test
@@ -76,7 +82,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         processors.add(processor1);
         processors.add(processor2);
         processors.add(processor3);
-        assertBlockingExecution(processors);
+        assertBlockingExecution(processors, not(sameInstance(event)));
     }
 
     @Test
@@ -86,7 +92,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         processors.add(new TestContainerMessageProcessor());
         processors.add(processor2);
         processors.add(processor3);
-        assertBlockingExecution(processors);
+        assertBlockingExecution(processors, not(sameInstance(event)));
     }
 
     @Test
