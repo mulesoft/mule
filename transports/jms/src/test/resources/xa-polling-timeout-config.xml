@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
@@ -16,8 +16,9 @@
     </jms:activemq-xa-connector>
 
     <flow name="main">
-        <jms:inbound-endpoint queue="testIn" connector-ref="jmsConnectorCustomPool" xaPollingTimeout="10000">
+        <jms:inbound-endpoint queue="testIn" connector-ref="jmsConnectorCustomPool">
             <xa-transaction action="ALWAYS_BEGIN"/>
+            <property key="xaPollingTimeout" value="10000"/>
         </jms:inbound-endpoint>
         
         <echo-component/>
