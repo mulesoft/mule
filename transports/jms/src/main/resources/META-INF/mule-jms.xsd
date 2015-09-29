@@ -524,15 +524,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="xaPollingTimeout" type="mule:substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The number of milliseconds that a transacted message receiver will wait for an incoming message inside an active XA transaction.
-                            When no polling timeout is configured, the transaction timeout will be used instead. This attribute is ignored when no XA transaction is configured.
-                            NOTE: this value must be considered when the transaction timeout is configured. This means that the transaction timeout must be large enough to cover the polling timeout and the message processing times.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
