@@ -3514,21 +3514,12 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="timeUnit" default="MILLISECONDS">
+                <xsd:attribute name="timeUnit" default="MILLISECONDS" type="timeUnitType">
                     <xsd:annotation>
                         <xsd:documentation>
                             The time unit for the frequency value
                         </xsd:documentation>
                     </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="MILLISECONDS"/>
-                            <xsd:enumeration value="SECONDS"/>
-                            <xsd:enumeration value="MINUTES"/>
-                            <xsd:enumeration value="DAYS"/>
-                            <xsd:enumeration value="HOURS"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
                 </xsd:attribute>
                 <xsd:attribute name="startDelay" type="substitutableLong" default="0">
                     <xsd:annotation>
@@ -8295,6 +8286,21 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:simpleType name="timeUnitType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Supported time units enumeration
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="MILLISECONDS"/>
+            <xsd:enumeration value="SECONDS"/>
+            <xsd:enumeration value="MINUTES"/>
+            <xsd:enumeration value="DAYS"/>
+            <xsd:enumeration value="HOURS"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <!--==============================================================-->
     <!--   JNDI support                                               -->
