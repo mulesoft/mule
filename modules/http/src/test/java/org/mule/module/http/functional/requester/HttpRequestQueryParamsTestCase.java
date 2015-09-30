@@ -78,4 +78,16 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
         assertThat(uri, equalTo("/testPath?testName1=testValue1&testName1=testValueNew&testName2=testValue2"));
     }
 
+    @Test
+    public void sendsQueryParamsNulls() throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("queryParamNulls");
+
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+
+        flow.process(event);
+
+        assertThat(uri, equalTo("/testPath?testName1&testName2"));
+    }
+
 }
