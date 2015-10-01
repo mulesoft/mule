@@ -185,6 +185,11 @@ public class GenericDbConfig implements DbConfig, Initialisable, Disposable
     {
         if (poolingProfile == null || useXaTransactions)
         {
+            if (dataSource instanceof Disposable)
+            {
+                ((Disposable) dataSource).dispose();
+            }
+
             return;
         }
 
