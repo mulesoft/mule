@@ -38,6 +38,7 @@ public class DataSourceFactory implements MuleContextAware, Disposable
 
     private final String name;
     private final Set<DataSource> pooledDataSources = new ConcurrentHashSet();
+    private final Set<Disposable> disposableDataSources = new ConcurrentHashSet();
     private MuleContext muleContext;
 
     public DataSourceFactory(String name)
@@ -80,7 +81,10 @@ public class DataSourceFactory implements MuleContextAware, Disposable
         {
             pooledDataSources.add(dataSource);
         }
-
+        else if (dataSource instanceof Disposable)
+        {
+            disposableDataSources.add((Disposable) dataSource);
+        }
 
         return dataSource;
     }
@@ -149,6 +153,19 @@ public class DataSourceFactory implements MuleContextAware, Disposable
                 logger.warn("Unable to properly release pooled data source", e);
             }
         }
+
+        for (Disposable disposableDataSource : disposableDataSources)
+        {
+            try
+            {
+                disposableDataSource.dispose();
+            }
+            catch (Exception e)
+            {
+                logger.warn("Unable to properly dispose data source", e);
+            }
+        }
+
     }
 
     public MuleContext getMuleContext()
