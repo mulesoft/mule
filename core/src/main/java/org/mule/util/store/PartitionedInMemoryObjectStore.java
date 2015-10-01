@@ -7,7 +7,6 @@
 package org.mule.util.store;
 
 import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
-
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
@@ -18,17 +17,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 
 public class PartitionedInMemoryObjectStore<T extends Serializable> extends AbstractPartitionedObjectStore<T>
     implements PartitionableExpirableObjectStore<T>
 {
     private ConcurrentMap<String, ConcurrentMap<Serializable, T>> partitions = new ConcurrentHashMap<String, ConcurrentMap<Serializable, T>>();
-    private ConcurrentMap<String, ConcurrentSkipListMap<Long, Serializable>> expiryInfoPartition = new ConcurrentHashMap<String, ConcurrentSkipListMap<Long, Serializable>>();
+    private ConcurrentMap<String, ConcurrentLinkedQueue<ExpiryEntry>> expiryInfoPartition = new ConcurrentHashMap<String, ConcurrentLinkedQueue<ExpiryEntry>>();
 
     @Override
     public boolean isPersistent()
@@ -57,7 +55,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
         {
             throw new ObjectAlreadyExistsException();
         }
-        getExpirtyInfoPartition(partitionName).put(Long.valueOf(System.nanoTime()), key);
+        getExpiryInfoPartition(partitionName).add(new ExpiryEntry(getCurrentNanoTime(), key));
     }
 
     @Override
@@ -80,21 +78,17 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
             throw new ObjectDoesNotExistException();
         }
 
-        // TODO possibly have a reverse map to make this more efficient
-        Iterator<Map.Entry<Long, Serializable>> localIterator = getExpirtyInfoPartition(partitionName).entrySet()
-            .iterator();
-        Map.Entry<Long, Serializable> localEntry;
-        Long timestamp = null;
-        while (localIterator.hasNext())
+        Iterator<ExpiryEntry> iterator = getExpiryInfoPartition(partitionName).iterator();
+        while (iterator.hasNext())
         {
-            localEntry = localIterator.next();
-            if (key.equals(localEntry.getValue()))
+            ExpiryEntry entry = iterator.next();
+            if (key.equals(entry.getKey()))
             {
-                timestamp = localEntry.getKey();
+                iterator.remove();
                 break;
             }
         }
-        getExpirtyInfoPartition(partitionName).remove(timestamp);
+
         return removedValue;
     }
 
@@ -125,13 +119,13 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
         return partition;
     }
 
-    private ConcurrentSkipListMap<Long, Serializable> getExpirtyInfoPartition(String partitionName)
+    private ConcurrentLinkedQueue<ExpiryEntry> getExpiryInfoPartition(String partitionName)
     {
-        ConcurrentSkipListMap<Long, Serializable> partition = expiryInfoPartition.get(partitionName);
+        ConcurrentLinkedQueue<ExpiryEntry> partition = expiryInfoPartition.get(partitionName);
         if (partition == null)
         {
-            partition = new ConcurrentSkipListMap<Long, Serializable>();
-            ConcurrentSkipListMap<Long, Serializable> previous = expiryInfoPartition.putIfAbsent(
+            partition = new ConcurrentLinkedQueue<ExpiryEntry>();
+            ConcurrentLinkedQueue<ExpiryEntry> previous = expiryInfoPartition.putIfAbsent(
                 partitionName, partition);
             if (previous != null)
             {
@@ -162,10 +156,10 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     @Override
     public void expire(int entryTTL, int maxEntries, String partitionName) throws ObjectStoreException
     {
-        final long now = System.nanoTime();
+        final long now = getCurrentNanoTime();
         int expiredEntries = 0;
-        Map.Entry<Long, Serializable> oldestEntry;
-        ConcurrentSkipListMap<Long, Serializable> store = getExpirtyInfoPartition(partitionName);
+        ExpiryEntry oldestEntry;
+        ConcurrentLinkedQueue<ExpiryEntry> store = getExpiryInfoPartition(partitionName);
         ConcurrentMap<Serializable, T> partition = getPartition(partitionName);
 
         trimToMaxSize(store, maxEntries, partition);
@@ -175,15 +169,12 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
             return;
         }
 
-        while ((oldestEntry = store.firstEntry()) != null)
+        while ((oldestEntry = store.peek()) != null)
         {
-            Long oldestKey = oldestEntry.getKey();
-            long oldestKeyValue = oldestKey.longValue();
-
-            if (TimeUnit.NANOSECONDS.toMillis(now - oldestKeyValue) >= entryTTL)
+            if (TimeUnit.NANOSECONDS.toMillis(now - oldestEntry.getTime()) >= entryTTL)
             {
-                partition.remove(oldestEntry.getValue());
-                store.remove(oldestKey);
+                oldestEntry = store.remove();
+                partition.remove(oldestEntry.getKey());
                 expiredEntries++;
             }
             else
@@ -198,7 +189,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
         }
     }
 
-    private void trimToMaxSize(ConcurrentSkipListMap<Long, Serializable> store,
+    private void trimToMaxSize(ConcurrentLinkedQueue<ExpiryEntry> store,
                                int maxEntries,
                                ConcurrentMap<Serializable, T> partition)
     {
@@ -213,8 +204,8 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
         {
             while (currentSize > maxEntries)
             {
-                Entry<Long, Serializable> toRemove = store.pollFirstEntry();
-                partition.remove(toRemove.getValue());
+                ExpiryEntry toRemove = store.remove();
+                partition.remove(toRemove.getKey());
                 currentSize--;
             }
 
@@ -228,17 +219,43 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     @Override
     public void disposePartition(String partitionName) throws ObjectStoreException
     {
-        removeAndClear(partitions, partitionName);
-        removeAndClear(expiryInfoPartition, partitionName);
-    }
-
-    private void removeAndClear(Map<String, ? extends Map> map, String key)
-    {
-        Map partition = map.remove(key);
-        if(partition!=null)
+        Map partition = partitions.remove(partitionName);
+        if (partition != null)
         {
             partition.clear();
         }
+
+        ConcurrentLinkedQueue<ExpiryEntry> entries = expiryInfoPartition.remove(partitionName);
+        if (entries != null)
+        {
+            entries.clear();
+        }
     }
 
+    protected long getCurrentNanoTime()
+    {
+        return System.nanoTime();
+    }
+
+    private static class ExpiryEntry
+    {
+        private final long time;
+        private final Serializable key;
+
+        public ExpiryEntry(long time, Serializable key)
+        {
+            this.time = time;
+            this.key = key;
+        }
+
+        public long getTime()
+        {
+            return time;
+        }
+
+        public Serializable getKey()
+        {
+            return key;
+        }
+    }
 }
