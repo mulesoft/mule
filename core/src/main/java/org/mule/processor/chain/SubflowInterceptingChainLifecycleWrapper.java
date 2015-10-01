@@ -18,12 +18,15 @@ import java.util.List;
 /**
  * Generates message processor identfiers specific for subflows.
  */
-public class SubflowInterceptingChainLifecycleWrapper extends InterceptingChainLifecycleWrapper
+public class SubflowInterceptingChainLifecycleWrapper extends InterceptingChainLifecycleWrapper implements SubFlowMessageProcessor
 {
+
+    private String subFlowName;
 
     public SubflowInterceptingChainLifecycleWrapper(MessageProcessorChain chain, List<MessageProcessor> processors, String name)
     {
         super(chain, processors, name);
+        this.subFlowName = name;
     }
 
     @Override
@@ -48,4 +51,9 @@ public class SubflowInterceptingChainLifecycleWrapper extends InterceptingChainL
         NotificationUtils.addMessageProcessorPathElements(filteredMessageProcessorList, subprocessors);
     }
 
+    @Override
+    public String getSubFlowName()
+    {
+        return subFlowName;
+    }
 }

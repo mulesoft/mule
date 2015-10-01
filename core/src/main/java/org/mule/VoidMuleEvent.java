@@ -12,6 +12,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.notification.FlowCallStack;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.Credentials;
@@ -336,6 +337,12 @@ public class VoidMuleEvent implements MuleEvent
 
     @Override
     public boolean isAllowNonBlocking()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FlowCallStack getFlowCallStack()
     {
         throw new UnsupportedOperationException();
     }

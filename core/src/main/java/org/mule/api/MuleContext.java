@@ -18,6 +18,7 @@ import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.api.execution.ExceptionContextProvider;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
@@ -39,6 +40,7 @@ import org.mule.util.lock.LockFactory;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -363,5 +365,11 @@ public interface MuleContext extends Lifecycle
      */
     boolean waitUntilStarted(int timeout) throws InterruptedException;
 
+    /**
+     * @return the providers for additional context information for exceptions.
+     * 
+     * @since 3.8.0
+     */
+    Collection<ExceptionContextProvider> getExceptionContextProviders();
 }
 
