@@ -195,7 +195,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
                     }
                     else
                     {
-                        throw new MessageRedeliveredException(messageId,counter.get(),maxRedeliveryCount,null,event);
+                        throw new MessageRedeliveredException(messageId, counter.get(), maxRedeliveryCount, null, event, this);
                     }
                 }
                 catch (MessageRedeliveredException ex)

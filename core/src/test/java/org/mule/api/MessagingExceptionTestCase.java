@@ -6,13 +6,20 @@
  */
 package org.mule.api;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.MessageProcessorPathResolver;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.SerializationTestUtils;
@@ -22,6 +29,8 @@ import org.mule.tck.size.SmallTest;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
+
+import javax.xml.namespace.QName;
 
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -168,6 +177,79 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
     }
     
     @Test
+    public void testWithFailingProcessorNoPathResolver()
+    {
+        MessageProcessor mockProcessor = mock(MessageProcessor.class);
+        when(mockEvent.getFlowConstruct()).thenReturn(null);
+        when(mockProcessor.toString()).thenReturn("Mock@1");
+        MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
+        assertThat(exception.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("Mock@1"));
+    }
+
+    @Test
+    public void testWithFailingProcessorPathResolver()
+    {
+        MessageProcessor mockProcessor = mock(MessageProcessor.class);
+        MessageProcessorPathResolver pathResolver = mock(MessageProcessorPathResolver.class, withSettings().extraInterfaces(FlowConstruct.class));
+        when(pathResolver.getProcessorPath(eq(mockProcessor))).thenReturn("/flow/processor");
+        when(mockEvent.getFlowConstruct()).thenReturn((FlowConstruct) pathResolver);
+        MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
+        assertThat(exception.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("/flow/processor"));
+    }
+
+    @Test
+    public void testWithFailingProcessorNotPathResolver()
+    {
+        MessageProcessor mockProcessor = mock(MessageProcessor.class);
+        FlowConstruct nonPathResolver = mock(FlowConstruct.class);
+        when(mockEvent.getFlowConstruct()).thenReturn(nonPathResolver);
+        when(mockProcessor.toString()).thenReturn("Mock@1");
+
+        MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
+        assertThat(exception.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("Mock@1"));
+    }
+
+    private static QName docNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
+
+    @Test
+    public void testWithAnnotatedFailingProcessorNoPathResolver()
+    {
+        MessageProcessor mockProcessor = mock(MessageProcessor.class, withSettings().extraInterfaces(AnnotatedObject.class));
+        when(((AnnotatedObject) mockProcessor).getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+        when(mockEvent.getFlowConstruct()).thenReturn(null);
+        when(mockProcessor.toString()).thenReturn("Mock@1");
+
+        MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
+        assertThat(exception.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("Mock@1 (Mock Component)"));
+    }
+
+    @Test
+    public void testWithAnnotatedFailingProcessorPathResolver()
+    {
+        MessageProcessor mockProcessor = mock(MessageProcessor.class, withSettings().extraInterfaces(AnnotatedObject.class));
+        when(((AnnotatedObject) mockProcessor).getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+        MessageProcessorPathResolver pathResolver = mock(MessageProcessorPathResolver.class, withSettings().extraInterfaces(FlowConstruct.class));
+        when(pathResolver.getProcessorPath(eq(mockProcessor))).thenReturn("/flow/processor");
+        when(mockEvent.getFlowConstruct()).thenReturn((FlowConstruct) pathResolver);
+
+        MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
+        assertThat(exception.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("/flow/processor (Mock Component)"));
+    }
+
+    @Test
+    public void testWithAnnotatedFailingProcessorNotPathResolver()
+    {
+        MessageProcessor mockProcessor = mock(MessageProcessor.class, withSettings().extraInterfaces(AnnotatedObject.class));
+        when(((AnnotatedObject) mockProcessor).getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+        FlowConstruct nonPathResolver = mock(FlowConstruct.class);
+        when(mockEvent.getFlowConstruct()).thenReturn(nonPathResolver);
+        when(mockProcessor.toString()).thenReturn("Mock@1");
+
+        MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
+        assertThat(exception.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("Mock@1 (Mock Component)"));
+    }
+
+    @Test
     public void testSerializableMessagingException() throws Exception
     {
         TestSerializableMessageProcessor processor = new TestSerializableMessageProcessor();
@@ -178,10 +260,10 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
 
         e = SerializationTestUtils.testException(e, muleContext);
 
-        assertTrue(e.getMessage().contains(message));
-        assertNotNull(e.getFailingMessageProcessor());
-        assertTrue(e.getFailingMessageProcessor() instanceof TestSerializableMessageProcessor);
-        assertEquals(value, ((TestSerializableMessageProcessor) e.getFailingMessageProcessor()).getValue());
+        assertThat(e.getMessage(), containsString(message));
+        assertThat(e.getFailingMessageProcessor(), not(nullValue()));
+        assertThat(e.getFailingMessageProcessor(), instanceOf(TestSerializableMessageProcessor.class));
+        assertThat(((TestSerializableMessageProcessor) e.getFailingMessageProcessor()).getValue(), is(value));
     }
 
     @Test
@@ -194,7 +276,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
 
         e = SerializationTestUtils.testException(e, muleContext);
 
-        assertTrue(e.getMessage().contains(message));
-        assertNull(e.getFailingMessageProcessor());
+        assertThat(e.getMessage(), containsString(message));
+        assertThat(e.getFailingMessageProcessor(), is(nullValue()));
     }
 }

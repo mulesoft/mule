@@ -158,7 +158,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             if(fault.getCause() instanceof MuleException)
             {
                 MuleException muleException = (MuleException) fault.getCause();
-                return alwaysReturnMessagingException ? new MessagingException(event, muleException) : muleException;
+                return alwaysReturnMessagingException ? new MessagingException(event, muleException, this) : muleException;
             }
             return new DispatchException(MessageFactory.createStaticMessage(fault.getMessage()), event, this, fault);
         }
@@ -209,7 +209,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
             if (ex != null && ex.getMessage().contains("Security"))
             {
-                throw new WebServiceSecurityException(event, e);
+                throw new WebServiceSecurityException(event, e, this);
             }
             else
             {

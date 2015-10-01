@@ -6,6 +6,7 @@
  */
 package org.mule.api.processor;
 
+import org.mule.api.MuleElement;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 
@@ -14,9 +15,11 @@ import org.mule.api.MuleException;
  * {@link MuleEvent} or pass it on to another MessageProcessor should return the
  * MuleEvent they receive.
  * 
+ * TODO: Actually, only processors built from xml elements should extend MuleElement. An intermediate interface should be included for this.
+ * 
  * @since 3.0
  */
-public interface MessageProcessor
+public interface MessageProcessor extends MuleElement
 {
     /**
      * Invokes the MessageProcessor.

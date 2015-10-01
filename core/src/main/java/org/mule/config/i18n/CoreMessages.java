@@ -111,6 +111,11 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 18, ClassUtils.getSimpleName(type));
     }
 
+    public static Message messagePayloadIs(String payloadValue)
+    {
+        return factory.createMessage(BUNDLE_PATH, 24, payloadValue);
+    }
+
     public static Message fatalErrorInShutdown()
     {
         return factory.createMessage(BUNDLE_PATH, 20);

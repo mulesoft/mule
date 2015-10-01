@@ -24,9 +24,11 @@ import org.mule.module.db.internal.domain.database.DbConfigFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.sql.DataSource;
+import javax.xml.namespace.QName;
 
 import org.junit.Test;
 
@@ -108,7 +110,7 @@ public class DynamicDbConfigResolverTestCase extends AbstractMuleTestCase
         when(dataSourceFactory.create(dataSourceConfig)).thenReturn(dataSource);
 
         DbConfigFactory dbConfigFactory = mock(DbConfigFactory.class);
-        when(dbConfigFactory.create(name, dataSource)).thenReturn(expectedDbConfig);
+        when(dbConfigFactory.create(name, new HashMap<QName, Object>(), dataSource)).thenReturn(expectedDbConfig);
         return new DynamicDbConfigResolver("test", dbConfigFactory, dataSourceFactory, dataSourceConfig);
     }
 

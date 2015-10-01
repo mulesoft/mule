@@ -190,6 +190,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 return getConnectionDescription();
             }
+
+            @Override
+            public Connector getWorker()
+            {
+                return jmsConnector;
+            }
         }, reconnectWorkManager);
     }
 

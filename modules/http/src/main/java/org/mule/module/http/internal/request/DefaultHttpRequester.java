@@ -284,7 +284,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         }
         catch (Exception e)
         {
-            throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e);
+            throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e, this);
         }
 
         httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());

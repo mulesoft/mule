@@ -8,6 +8,7 @@ package org.mule.transport.http.components;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
 /**
@@ -18,9 +19,9 @@ public class ResourceNotFoundException extends MessagingException
 
     private static final long serialVersionUID = -6693780652453067693L;
 
-    public ResourceNotFoundException(Message message, MuleEvent event)
+    public ResourceNotFoundException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
     {
-        super(message, event);
+        super(message, event, failingMessageProcessor);
     }
 
 }

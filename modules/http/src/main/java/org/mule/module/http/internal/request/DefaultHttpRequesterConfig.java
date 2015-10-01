@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -36,7 +37,7 @@ import org.mule.util.concurrent.ThreadNameHelper;
 import java.net.CookieManager;
 
 
-public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
+public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
 {
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;

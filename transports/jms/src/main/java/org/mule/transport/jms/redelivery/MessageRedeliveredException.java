@@ -12,6 +12,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.jms.i18n.JmsMessages;
 
+// TODO: This is thrown by a RedeliveryHandler and not a MessageProcessor. Is it ok for this to extend form MessagingException?
 public class MessageRedeliveredException extends org.mule.api.exception.MessageRedeliveredException
 {
     public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)

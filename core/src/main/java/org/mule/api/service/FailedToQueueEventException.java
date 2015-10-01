@@ -8,6 +8,7 @@ package org.mule.api.service;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
 /**
@@ -22,13 +23,13 @@ public class FailedToQueueEventException extends MessagingException
      */
     private static final long serialVersionUID = -8368283988424746098L;
 
-    public FailedToQueueEventException(Message message, MuleEvent event)
+    public FailedToQueueEventException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
     {
-        super(message, event);
+        super(message, event, failingMessageProcessor);
     }
 
-    public FailedToQueueEventException(Message message, MuleEvent event, Throwable cause)
+    public FailedToQueueEventException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
     {
-        super(message, event, cause);
+        super(message, event, cause, failingMessageProcessor);
     }
 }

@@ -7,7 +7,10 @@
 
 package org.mule.module.db.internal.domain.database;
 
+import org.mule.AbstractAnnotatedObject;
+import org.mule.api.NamedObject;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.module.db.internal.domain.connection.ConnectionCreationException;
 import org.mule.module.db.internal.domain.connection.ConnectionFactory;
 import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.module.db.internal.domain.connection.RetryConnectionFactory;
@@ -21,32 +24,63 @@ import org.mule.module.db.internal.domain.type.JdbcTypes;
 import org.mule.module.db.internal.domain.type.MetadataDbTypeManager;
 import org.mule.module.db.internal.domain.type.StaticDbTypeManager;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
+import javax.xml.namespace.QName;
 
 /**
  * Creates {@link DbConfig} for generic data bases
  */
 public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
 {
+    private class AnnotatedConnectionFactory extends AbstractAnnotatedObject implements ConnectionFactory, NamedObject
+    {
+
+        private String name;
+        private ConnectionFactory inner;
+
+        public AnnotatedConnectionFactory(String name, ConnectionFactory inner, Map<QName, Object> annotations)
+        {
+            this.name = name;
+            this.inner = inner;
+            setAnnotations(annotations);
+        }
+
+        @Override
+        public String getName()
+        {
+            return name;
+        }
+
+        @Override
+        public Connection create(DataSource dataSource) throws ConnectionCreationException
+        {
+            return inner.create(dataSource);
+        }
+
+    }
 
     private List<DbType> customDataTypes;
     private RetryPolicyTemplate retryPolicyTemplate;
 
     @Override
-    public DbConfig create(String name, DataSource dataSource)
+    public DbConfig create(String name, Map<QName, Object> annotations, DataSource dataSource)
     {
         ConnectionFactory connectionFactory;
+
+        SimpleConnectionFactory simpleConnectionFactory = new SimpleConnectionFactory();
         if (retryPolicyTemplate == null)
         {
-            connectionFactory = new SimpleConnectionFactory();
+            connectionFactory = simpleConnectionFactory;
         }
         else
         {
-            connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, new SimpleConnectionFactory());
+            connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, new AnnotatedConnectionFactory(name, simpleConnectionFactory, annotations));
         }
 
         DbTypeManager dbTypeManager = doCreateTypeManager();

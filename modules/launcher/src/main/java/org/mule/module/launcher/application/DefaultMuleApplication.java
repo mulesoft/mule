@@ -151,7 +151,15 @@ public class DefaultMuleApplication implements Application
             setStatusToFailed();
 
             // log it here so it ends up in app log, sys log will only log a message without stacktrace
-            logger.error(null, ExceptionUtils.getRootCause(e));
+            if (e instanceof MuleException)
+            {
+                logger.error(((MuleException) e).getDetailedMessage());
+            }
+            else
+            {
+                logger.error(null, ExceptionUtils.getRootCause(e));
+            }
+
             // TODO add app name to the exception field
             throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }

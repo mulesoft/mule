@@ -127,7 +127,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
                 {
                     throw new MessagingException(CoreMessages.createStaticMessage(String.format(
                         "Code generation error. Field %s should be present in class", parameter.getName())),
-                        event, e);
+                        event, e, this);
                 }
 
                 field.setAccessible(true);

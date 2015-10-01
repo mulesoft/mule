@@ -11,6 +11,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.api.transport.Connector;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.transport.ConnectException;
 import org.mule.util.concurrent.ThreadNameHelper;
@@ -119,6 +120,12 @@ class HttpRequestDispatcher implements Work
                             String hostName = ((InetSocketAddress) serverSocket.getLocalSocketAddress()).getHostName();
                             int port = ((InetSocketAddress) serverSocket.getLocalSocketAddress()).getPort();
                             return String.format("%s://%s:%d", httpConnector.getProtocol(), hostName, port);
+                        }
+
+                        @Override
+                        public Connector getWorker()
+                        {
+                            return httpConnector;
                         }
                     }, workManager);
                 }
