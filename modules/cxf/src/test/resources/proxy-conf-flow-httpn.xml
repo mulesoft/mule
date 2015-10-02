@@ -346,8 +346,6 @@
         </script:component>
     </flow>
 
-
-
     <flow name="proxyEnvelopeWithXSLTTransformation">
         <http:listener path="/services/envelope-xslt-proxy" config-ref="listenerConfig" allowedMethods="POST" />
         <cxf:proxy-service payload="envelope"/>
@@ -355,4 +353,10 @@
         <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
     </flow>
 
+    <flow name="proxyWithSoapJms">
+        <http:listener path="/proxyJms" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryJms.wsdl" port="EmployeeDirectoryPort"
+                           namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false" soapVersion="1.2"/>
+        <echo-component/>
+    </flow>
 </mule>
