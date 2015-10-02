@@ -29,6 +29,7 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.cxf.support.DelegatingOutputStream;
+import org.mule.module.cxf.transport.MuleUniversalDestination;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
@@ -342,6 +343,24 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         String soapAction = getSoapAction(event.getMessage());
         m.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
 
+        org.apache.cxf.transport.Destination d;
+
+        if (server != null)
+        {
+            d = server.getDestination();
+        }
+        else
+        {
+            String serviceUri = getUri(event);
+
+            DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+            DestinationFactory df = dfm.getDestinationFactoryForUri(serviceUri);
+
+            EndpointInfo ei = new EndpointInfo();
+            ei.setAddress(serviceUri);
+            d = df.getDestination(ei);
+        }
+
         // For MULE-6829
         if (shouldSoapActionHeader())
         {
@@ -358,7 +377,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             }
 
             String eventRequestUri = event.getMessageSourceURI().toString();
-            if (eventRequestUri.startsWith(JMS_TRANSPORT))
+            if (eventRequestUri.startsWith(JMS_TRANSPORT) || SoapJMSConstants.SOAP_JMS_NAMESPACE.equals(((MuleUniversalDestination) d).getEndpointInfo().getTransportId()))
             {
                 String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD);
                 if (contentType == null)
@@ -376,24 +395,6 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             }
 
             m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
-        }
-
-        org.apache.cxf.transport.Destination d;
-
-        if (server != null)
-        {
-            d = server.getDestination();
-        }
-        else
-        {
-            String serviceUri = getUri(event);
-
-            DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-            DestinationFactory df = dfm.getDestinationFactoryForUri(serviceUri);
-
-            EndpointInfo ei = new EndpointInfo();
-            ei.setAddress(serviceUri);
-            d = df.getDestination(ei);
         }
 
         // Set up a listener for the response
