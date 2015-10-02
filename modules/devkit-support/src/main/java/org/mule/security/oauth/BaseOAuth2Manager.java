@@ -60,6 +60,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     OAuth2Manager<OAuth2Adapter>, NameableObject
 {
 
+    public static final String ACCESS_TOKEN_URL = "_OAUTH_ACCESS_TOKEN_URL";
+    public static final String AUTHORIZATION_URL = "_OAUTH_AUTHORIZATION_URL";
+
     private OAuth2Adapter defaultUnauthorizedConnector;
     private String applicationName;
     private String scope;
@@ -248,12 +251,12 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      * {@inheritDoc}
      */
     @Override
-    public final OAuth2Adapter createAdapter(String verifier) throws Exception
+    public final OAuth2Adapter createAdapter(MuleEvent event, String verifier) throws Exception
     {
         OAuth2Adapter connector = this.instantiateAdapter();
         connector.setOauthVerifier(verifier);
-        connector.setAuthorizationUrl(getDefaultUnauthorizedConnector().getAuthorizationUrl());
-        connector.setAccessTokenUrl(getDefaultUnauthorizedConnector().getAccessTokenUrl());
+        connector.setAuthorizationUrl((String) event.getFlowVariable(AUTHORIZATION_URL));
+        connector.setAccessTokenUrl((String) event.getFlowVariable(ACCESS_TOKEN_URL));
         connector.setConsumerKey(this.getDefaultUnauthorizedConnector().getConsumerKey());
         connector.setConsumerSecret(this.getDefaultUnauthorizedConnector().getConsumerSecret());
 
