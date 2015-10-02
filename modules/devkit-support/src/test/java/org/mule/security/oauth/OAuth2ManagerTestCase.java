@@ -18,6 +18,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
@@ -100,6 +101,9 @@ public class OAuth2ManagerTestCase
     @Mock
     private RefreshTokenManager refreshTokenManager;
 
+    @Mock
+    private MuleEvent event;
+
     @Before
     public void setUp() throws Exception
     {
@@ -151,19 +155,21 @@ public class OAuth2ManagerTestCase
     public void createAdapter() throws Exception
     {
         final String verifier = "verifier";
+        final String authorizationUrl = "authorizationUrl";
+        final String accessTokenUrl = "accessTokenUrl";
 
-        when(adapter.getAuthorizationUrl()).thenReturn("authorizationUrl");
-        when(adapter.getAccessTokenUrl()).thenReturn("accessTokenUrl");
+        when(event.getFlowVariable(BaseOAuth2Manager.AUTHORIZATION_URL)).thenReturn(authorizationUrl);
+        when(event.getFlowVariable(BaseOAuth2Manager.ACCESS_TOKEN_URL)).thenReturn(accessTokenUrl);
         when(adapter.getConsumerKey()).thenReturn("consumerKey");
         when(adapter.getConsumerSecret()).thenReturn("consumerSecret");
 
-        OAuth2Adapter adapter = manager.createAdapter(verifier);
+        OAuth2Adapter adapter = manager.createAdapter(event, verifier);
 
         assertSame(adapter, adapter);
 
         verify(adapter).setOauthVerifier(eq(verifier));
-        verify(adapter).setAuthorizationUrl(eq(adapter.getAuthorizationUrl()));
-        verify(adapter).setAccessTokenUrl(eq(adapter.getAccessTokenUrl()));
+        verify(adapter).setAuthorizationUrl(authorizationUrl);
+        verify(adapter).setAccessTokenUrl(accessTokenUrl);
         verify(adapter).setConsumerKey(eq(adapter.getConsumerKey()));
         verify(adapter).setConsumerSecret(eq(adapter.getConsumerSecret()));
 
