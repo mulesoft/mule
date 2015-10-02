@@ -423,6 +423,15 @@
             </inbound>
         </service>
 
+        <service name="proxyWithSoapJms">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${port1}/proxyJms" exchange-pattern="request-response">
+                    <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryJms.wsdl" port="EmployeeDirectoryPort"
+                                       namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false" soapVersion="1.2"/>
+                </inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
 
     </model>
 

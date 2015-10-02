@@ -380,7 +380,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         String resString = result.getPayloadAsString();
         assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
-            String.valueOf(HttpConstants.SC_OK).equals(result.getOutboundProperty("http.status")));
+                    String.valueOf(HttpConstants.SC_OK).equals(result.getOutboundProperty("http.status")));
         assertTrue(resString.indexOf("Fault") != -1);
     }
 
@@ -390,7 +390,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
                                          + "/services/onewayWithSoapAction", prepareOneWayTestMessage(),
-            prepareOneWayWithSoapActionTestProperties());
+                                         prepareOneWayWithSoapActionTestProperties());
         assertEquals("", result.getPayloadAsString());
 
         AsyncServiceWithSoapAction component = (AsyncServiceWithSoapAction)getComponent("asyncServiceWithSoapAction");
@@ -403,7 +403,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
 
         client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction",
-            prepareOneWayTestMessage(), prepareOneWayWithSoapActionTestProperties());
+                        prepareOneWayTestMessage(), prepareOneWayWithSoapActionTestProperties());
 
         AsyncServiceWithSoapAction component = (AsyncServiceWithSoapAction)getComponent("asyncServiceWithSoapAction");
         assertTrue(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
@@ -415,7 +415,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber()
                                          + "/services/onewayWithSoapAction", prepareOneWayTestMessage(),
-            prepareOneWaySpoofingTestProperties());
+                                         prepareOneWaySpoofingTestProperties());
         assertNotNull(result);
 
         AsyncServiceWithSoapAction component = (AsyncServiceWithSoapAction)getComponent("asyncServiceWithSoapAction");
@@ -427,7 +427,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction",
-            prepareOneWayTestMessage(), prepareOneWaySpoofingTestProperties());
+                        prepareOneWayTestMessage(), prepareOneWaySpoofingTestProperties());
 
         AsyncServiceWithSoapAction component = (AsyncServiceWithSoapAction)getComponent("asyncServiceWithSoapAction");
         assertFalse(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
@@ -438,7 +438,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
-            prepareOneWayTestMessage(), prepareOneWayWithSoapActionTestProperties());
+                                         prepareOneWayTestMessage(), prepareOneWayWithSoapActionTestProperties());
         assertNotNull(result);
 
         AsyncService component = (AsyncService)getComponent("asyncService");
@@ -450,7 +450,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
-            prepareOneWayTestMessage(), prepareOneWayWithSoapActionTestProperties());
+                        prepareOneWayTestMessage(), prepareOneWayWithSoapActionTestProperties());
 
         AsyncService component = (AsyncService)getComponent("asyncService");
         assertFalse(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
@@ -461,7 +461,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
-            prepareOneWayTestMessage(), prepareOneWayTestProperties());
+                                         prepareOneWayTestMessage(), prepareOneWayTestProperties());
         assertNotNull(result);
 
         AsyncService component = (AsyncService)getComponent("asyncService");
@@ -473,7 +473,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
-            prepareOneWayTestMessage(), prepareOneWayTestProperties());
+                        prepareOneWayTestMessage(), prepareOneWayTestProperties());
 
         AsyncService component = (AsyncService)getComponent("asyncService");
         assertTrue(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
@@ -547,9 +547,30 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
                                + "</soap:Body>" + "</soap:Envelope>";
 
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyFault",
-            proxyFaultMsg, null);
+                                         proxyFaultMsg, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains("ERROR"));
+    }
+
+    @Test
+    public void testProxyJms() throws Exception
+    {
+        String payload = "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">"
+                         + "<soap:Body>"
+                         + "<emp:addEmployee xmlns:emp=\"http://employee.example.mule.org/\">"
+                         + "<emp:employee>"
+                         + "<emp:division>ESB</emp:division>"
+                         + "<emp:name>Pepe</emp:name>"
+                         + "</emp:employee>"
+                         + "</emp:addEmployee>"
+                         + "</soap:Body>"
+                         + "</soap:Envelope>";
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyJms",
+                                         payload, null);
+        assertNotNull(result);
+        assertTrue(payload.equals(result.getPayloadAsString()));
     }
 
     protected String prepareOneWayTestMessage()

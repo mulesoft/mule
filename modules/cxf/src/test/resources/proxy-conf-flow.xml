@@ -418,14 +418,20 @@
         </script:component>
     </flow>
 
-
-
     <flow name="proxyEnvelopeWithXSLTTransformation">
         <inbound-endpoint address="http://localhost:${port1}/services/envelope-xslt-proxy"
                           exchange-pattern="request-response">
             <cxf:proxy-service payload="envelope"/>
         </inbound-endpoint>
         <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
+    </flow>
+
+    <flow name="proxyWithSoapJms">
+        <inbound-endpoint address="http://localhost:${port1}/proxyJms" exchange-pattern="request-response">
+        <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryJms.wsdl" port="EmployeeDirectoryPort"
+                           namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false" soapVersion="1.2"/>
+        </inbound-endpoint>
+        <echo-component/>
     </flow>
 
 </mule>
