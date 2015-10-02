@@ -58,7 +58,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
         try
         {
-            OAuth2Adapter oauthAdapter = this.oauthManager.createAdapter(((String) event.getMessage()
+            OAuth2Adapter oauthAdapter = this.oauthManager.createAdapter(restoredEvent, ((String) event.getMessage()
                 .getInvocationProperty(OAuthProperties.VERIFIER)));
 
             if (oauthAdapter.getAccessTokenUrl() == null)

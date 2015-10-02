@@ -22,7 +22,7 @@ import java.util.Map;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 
 /**
- * Wrapper around {@link org.mule.api.annotations.oauth.OAuth2} annotated class that
+ * Wrapper around {@code org.mule.api.annotations.oauth.OAuth2} annotated class that
  * will infuse it with access token management capabilities.
  * <p/>
  * It can receive a {@link org.mule.config.PoolingProfile} which is a configuration
@@ -42,7 +42,7 @@ public interface OAuth2Manager<C extends OAuth2Adapter>
      * @return A newly created connector
      * @throws Exception If the access token cannot be retrieved
      */
-    C createAdapter(String verifier) throws Exception;
+    C createAdapter(MuleEvent event, String verifier) throws Exception;
 
     /**
      * Borrow an access token from the pool
