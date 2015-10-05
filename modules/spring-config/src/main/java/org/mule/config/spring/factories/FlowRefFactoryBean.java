@@ -147,7 +147,9 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
                     try
                     {
-                        return new FlowRefMessageProcessor()
+                        // Because this is created dynamically annotations cannot be injected by Spring and so
+                        // FlowRefMessageProcessor is not used here.
+                        return new NonBlockingMessageProcessor()
                         {
                             @Override
                             public MuleEvent process(MuleEvent event) throws MuleException
