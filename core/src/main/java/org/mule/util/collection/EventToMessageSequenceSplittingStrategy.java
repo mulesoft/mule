@@ -9,6 +9,7 @@ package org.mule.util.collection;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.util.Copiable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.MessageSequence;
 import org.mule.routing.outbound.ArrayMessageSequence;
@@ -23,7 +24,7 @@ import java.util.LinkedList;
 import org.w3c.dom.NodeList;
 
 public class EventToMessageSequenceSplittingStrategy
-    implements SplittingStrategy<MuleEvent, MessageSequence<?>>
+        implements SplittingStrategy<MuleEvent, MessageSequence<?>>
 {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -41,15 +42,15 @@ public class EventToMessageSequenceSplittingStrategy
         }
         if (payload instanceof Iterator<?>)
         {
-            return new IteratorMessageSequence<Object>(((Iterator<Object>) payload));
+            return new IteratorMessageSequence<>(((Iterator<Object>) payload));
         }
         if (payload instanceof Collection)
         {
-            return new CollectionMessageSequence(new LinkedList((Collection) payload));
+            return new CollectionMessageSequence(copyCollection((Collection) payload));
         }
         if (payload instanceof Iterable<?>)
         {
-            return new IteratorMessageSequence<Object>(((Iterable<Object>) payload).iterator());
+            return new IteratorMessageSequence<>(((Iterable<Object>) payload).iterator());
         }
         if (payload instanceof Object[])
         {
@@ -62,9 +63,17 @@ public class EventToMessageSequenceSplittingStrategy
         else
         {
             throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(payload.getClass(),
-                new Class[]{Iterable.class, Iterator.class, MessageSequence.class, Collection.class})
-                .getMessage());
+                                                                                   new Class[] {Iterable.class, Iterator.class, MessageSequence.class, Collection.class})
+                                                       .getMessage());
         }
-    };
+    }
+
+    private Collection copyCollection(Collection payload)
+    {
+        return payload instanceof Copiable
+               ? ((Copiable<Collection>) payload).copy()
+               : new LinkedList(payload);
+    }
+
 
 }
