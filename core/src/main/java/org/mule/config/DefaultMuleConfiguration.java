@@ -68,6 +68,14 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public static boolean verboseExceptions = false;
 
     /**
+     * When true, each event will keep a stack of the flows and components it traverses
+     * to be shown as part of an exception message if an exception occurs.
+     * Switching on DEBUG level logging with automatically set this flag to true.
+     */
+    public static boolean flowCallStacks = false;
+
+
+    /**
      * A comma-separated list of internal packages/classes which are removed from sanitized stacktraces.
      * Matching is done via string.startsWith().
      * @see #fullStackTraces
@@ -355,6 +363,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         else
         {
             verboseExceptions = logger.isDebugEnabled();
+        }
+
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "flowCallStacks");
+        if (p != null)
+        {
+            flowCallStacks = BooleanUtils.toBoolean(p);
+        }
+        else
+        {
+            flowCallStacks = logger.isDebugEnabled();
         }
 
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");

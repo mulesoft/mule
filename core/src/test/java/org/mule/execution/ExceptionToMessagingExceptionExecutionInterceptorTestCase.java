@@ -9,7 +9,13 @@ package org.mule.execution;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.junit.Before;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -37,6 +43,13 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     private MuleException mockMuleException;
     private ExceptionToMessagingExceptionExecutionInterceptor cut = new ExceptionToMessagingExceptionExecutionInterceptor();
 
+    @Before
+    public void before()
+    {
+        when(mockMuleEvent.getMuleContext()).thenReturn(mock(MuleContext.class));
+        when(mockResultMuleEvent.getMuleContext()).thenReturn(mock(MuleContext.class));
+    }
+    
     @Test
     public void testExecutionSuccessfully() throws MuleException
     {

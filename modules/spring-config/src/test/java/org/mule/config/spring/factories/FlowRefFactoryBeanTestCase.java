@@ -16,6 +16,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -27,8 +29,12 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.context.notification.MessageProcessingFlowStackManager;
+import org.mule.processor.chain.SubFlowMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,12 +46,13 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
 
     private static final String STATIC_REFERENCED_FLOW = "staticReferencedFlow";
     private static final String DYNAMIC_REFERENCED_FLOW = "dynamicReferencedFlow";
+    private static final String PARSED_DYNAMIC_REFERENCED_FLOW = "parsedDynamicReferencedFlow";
     private static final String DYNAMIC_NON_EXISTANT = "#['nonExistant']";
     private static final String NON_EXISTANT = "nonExistant";
 
     private MuleEvent result = mock(MuleEvent.class);
     private ProcessableFlowConstruct targetFlow = mock(ProcessableFlowConstruct.class);
-    private InitializableMessageProcessor targetSubFlow = mock(InitializableMessageProcessor.class);
+    private InitializableMessageProcessor targetSubFlow = mock(InitializableMessageProcessor.class, withSettings().extraInterfaces(SubFlowMessageProcessor.class));
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
     private MuleContext muleContext = mock(MuleContext.class);
     private ExpressionManager expressionManager = mock(ExpressionManager.class);
@@ -97,6 +104,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
     @Test
     public void testDynamicFlowRefSubFlow() throws Exception
     {
+        MessageProcessingFlowStackManager flowStackManager = mock(MessageProcessingFlowStackManager.class);
+        when(applicationContext.getBeansOfType(MessageProcessingFlowStackManager.class)).thenReturn(Collections.singletonMap("flowStackManager", flowStackManager));
+
         FlowRefFactoryBean flowRefFactoryBean = createDynamicFlowRefFactoryBean(targetSubFlow);
 
         // Inner MessageProcessor is used to resolve MP in runtime
@@ -104,6 +114,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
         assertNotSame(targetSubFlow, flowRefFactoryBean.getObject());
 
         verifyProcess(flowRefFactoryBean, targetSubFlow, 1);
+
+        verify(flowStackManager, times(2)).onFlowStart(any(MuleEvent.class), eq(PARSED_DYNAMIC_REFERENCED_FLOW));
+        verify(flowStackManager, times(2)).onFlowComplete(any(MuleEvent.class));
     }
 
     @Test
@@ -160,8 +173,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
     {
         when(expressionManager.isExpression(anyString())).thenReturn(true);
         when(expressionManager.parse(eq(DYNAMIC_REFERENCED_FLOW), any(MuleEvent.class))).thenReturn(
-                "parsedDynamicReferencedFlow");
-        when(applicationContext.getBean(eq("parsedDynamicReferencedFlow"))).thenReturn(target);
+                PARSED_DYNAMIC_REFERENCED_FLOW);
+        when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(target);
 
         return createFlowRefFactoryBean(DYNAMIC_REFERENCED_FLOW);
     }

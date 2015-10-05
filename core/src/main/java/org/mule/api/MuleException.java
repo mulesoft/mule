@@ -6,13 +6,6 @@
  */
 package org.mule.api;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -20,6 +13,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <code>MuleException</code> is the base exception type for the Mule server any
@@ -188,7 +187,8 @@ public abstract class MuleException extends Exception
                 buf.append(StringUtils.repeat(' ', pad));
             }
             buf.append(": ");
-            buf.append(entry.getValue()).append(SystemUtils.LINE_SEPARATOR);
+            buf.append((entry.getValue() == null ? "null" : entry.getValue().toString().replaceAll(SystemUtils.LINE_SEPARATOR, SystemUtils.LINE_SEPARATOR + StringUtils.repeat(' ', 24))))
+               .append(SystemUtils.LINE_SEPARATOR);
         }
 
         // print exception stack
