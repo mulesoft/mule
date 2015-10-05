@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request;
 
+import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
 import org.mule.DefaultMuleEvent;
@@ -20,6 +21,9 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
+import org.mule.api.debug.Debuggable;
+import org.mule.api.debug.FieldDebugInfo;
+import org.mule.api.debug.FieldDebugInfoFactory;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
@@ -28,6 +32,7 @@ import org.mule.construct.Flow;
 import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.context.notification.NotificationHelper;
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.api.requester.HttpSendBodyMode;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
@@ -39,15 +44,31 @@ import org.mule.util.AttributeEvaluator;
 import com.google.common.collect.Lists;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 
-public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware
+public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware, Debuggable
 {
 
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
     public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[payload]";
     public static final String DEFAULT_FOLLOW_REDIRECTS = "true";
+
+    static final String URI_DEBUG = "URI";
+    static final String METHOD_DEBUG = "Method";
+    static final String STREAMING_MODE_DEBUG = "Streaming Mode";
+    static final String SEND_BODY_DEBUG = "Send Body";
+    static final String FOLLOW_REDIRECTS_DEBUG = "Follow Redirects";
+    static final String PARSE_RESPONSE_DEBUG = "Parse Response";
+    static final String RESPONSE_TIMEOUT_DEBUG = "Response Timeout";
+    static final String USERNAME_DEBUG = "Username";
+    static final String NO_SECURITY_CONFIGURED = "No security configured";
+    static final String SECURITY_DEBUG = "Security";
+    static final String DOMAIN_DEBUG = "Domain";
+    static final String PASSWORD_DEBUG = "Password";
+    static final String WORKSTATION_DEBUG = "Workstation";
+    static final String AUTHENTICATION_TYPE_DEBUG = "Authentication Type";
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
@@ -558,5 +579,74 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+    @Override
+    public List<FieldDebugInfo> getDebugInfo(final MuleEvent event)
+    {
+        final List<FieldDebugInfo> fields = new ArrayList<>();
+        fields.add(createFieldDebugInfo(URI_DEBUG, String.class, new FieldDebugInfoFactory.FieldEvaluator()
+        {
+            @Override
+            public Object evaluate() throws Exception
+            {
+                return resolveURI(event);
+            }
+        }));
+        fields.add(createFieldDebugInfo(METHOD_DEBUG, String.class, method, event));
+        fields.add(createFieldDebugInfo(STREAMING_MODE_DEBUG, Boolean.class, requestStreamingMode, event));
+        fields.add(createFieldDebugInfo(SEND_BODY_DEBUG, HttpSendBodyMode.class, new FieldDebugInfoFactory.FieldEvaluator()
+        {
+            @Override
+            public Object evaluate() throws Exception
+            {
+                return HttpSendBodyMode.valueOf(sendBodyMode.resolveStringValue(event));
+            }
+        }));
+        fields.add(createFieldDebugInfo(FOLLOW_REDIRECTS_DEBUG, Boolean.class, followRedirects, event));
+        fields.add(createFieldDebugInfo(PARSE_RESPONSE_DEBUG, Boolean.class, parseResponse, event));
+        fields.add(createFieldDebugInfo(RESPONSE_TIMEOUT_DEBUG, Integer.class, new FieldDebugInfoFactory.FieldEvaluator()
+        {
+            @Override
+            public Object evaluate() throws Exception
+            {
+                return resolveResponseTimeout(event);
+            }
+        }));
+        fields.add(getSecurityFieldDebugInfo(event));
+
+        return fields;
+    }
+
+    private FieldDebugInfo getSecurityFieldDebugInfo(MuleEvent event)
+    {
+        FieldDebugInfo securityFieldDebugInfo;
+
+        try
+        {
+            HttpRequestAuthentication httpRequestAuthentication = resolveAuthentication(event);
+
+            if (httpRequestAuthentication != null)
+            {
+                final List<FieldDebugInfo> authenticationFields = new ArrayList<>();
+                authenticationFields.add(createFieldDebugInfo(USERNAME_DEBUG, String.class, httpRequestAuthentication.getUsername()));
+                authenticationFields.add(createFieldDebugInfo(DOMAIN_DEBUG, String.class, httpRequestAuthentication.getDomain()));
+                authenticationFields.add(createFieldDebugInfo(PASSWORD_DEBUG, String.class, httpRequestAuthentication.getPassword()));
+                authenticationFields.add(createFieldDebugInfo(WORKSTATION_DEBUG, String.class, httpRequestAuthentication.getWorkstation()));
+                authenticationFields.add(createFieldDebugInfo(AUTHENTICATION_TYPE_DEBUG, String.class, httpRequestAuthentication.getType().name()));
+
+                securityFieldDebugInfo = createFieldDebugInfo(SECURITY_DEBUG, HttpRequestAuthentication.class, authenticationFields);
+            }
+            else
+            {
+                securityFieldDebugInfo = createFieldDebugInfo(SECURITY_DEBUG, HttpRequestAuthentication.class, (Object) null);
+            }
+        }
+        catch (Exception e)
+        {
+            securityFieldDebugInfo = createFieldDebugInfo(SECURITY_DEBUG, HttpRequestAuthentication.class, e);
+        }
+
+        return securityFieldDebugInfo;
     }
 }
