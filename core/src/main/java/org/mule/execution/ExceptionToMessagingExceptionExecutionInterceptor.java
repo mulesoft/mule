@@ -13,23 +13,21 @@ import org.mule.api.processor.MessageProcessor;
 /**
  * Replace any exception thrown with a MessagingException
  */
-public class ExceptionToMessagingExceptionExecutionInterceptor implements MessageProcessorExecutionInterceptor
-{
+public class ExceptionToMessagingExceptionExecutionInterceptor implements MessageProcessorExecutionInterceptor {
 
     @Override
-    public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException
-    {
-        try
-        {
+    public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException {
+        try {
             return messageProcessor.process(event);
-        }
-        catch (MessagingException messagingException)
-        {
-            throw messagingException;
-        }
-        catch (Throwable ex)
-        {
-            throw new MessagingException(event,ex,messageProcessor);
+        } catch (MessagingException messagingException) {
+            if (messagingException.getFailingMessageProcessor() != null) {
+                throw messagingException;
+            } else {
+                throw new MessagingException(messagingException.getEvent(),
+                        messagingException.getCause(), messageProcessor);
+            }
+        } catch (Throwable ex) {
+            throw new MessagingException(event, ex, messageProcessor);
         }
     }
 }

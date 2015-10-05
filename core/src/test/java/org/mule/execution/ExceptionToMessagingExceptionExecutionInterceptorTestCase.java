@@ -9,6 +9,7 @@ package org.mule.execution;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -56,7 +57,9 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
         }
         catch (MessagingException e)
         {
-            assertThat(e, is(mockMessagingException));
+            assertThat(e.getCause(), is(mockMessagingException.getCause()));
+            assertThat(e.getEvent(), is(mockMessagingException.getEvent()));
+            assertNotNull(e.getFailingMessageProcessor());
         }
     }
     
@@ -72,6 +75,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
         catch (MessagingException e)
         {
             assertThat((MuleException) e.getCause(), is(mockMuleException));
+            assertNotNull(e.getFailingMessageProcessor());
         }
     }
     
@@ -88,6 +92,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
         catch (MessagingException e)
         {
             assertThat((RuntimeException) e.getCause(), is(runtimeException));
+            assertNotNull(e.getFailingMessageProcessor());
         }
     }
 
@@ -104,6 +109,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
         catch (MessagingException e)
         {
             assertThat((Error) e.getCause(), is(error));
+            assertNotNull(e.getFailingMessageProcessor());
         }
     }
 }
