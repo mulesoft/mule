@@ -24,10 +24,10 @@ public interface ExceptionReader
     Class<?> getExceptionType();
 
     /**
-     * Returns a map of the non-stanard information stored on the exception
+     * Returns a map of the non-standard information stored on the exception
      * 
      * @param t the exception to extract the information from
-     * @return a map of the non-stanard information stored on the exception
+     * @return a map of the non-standard information stored on the exception
      */
     Map<?, ?> getInfo(Throwable t);
 

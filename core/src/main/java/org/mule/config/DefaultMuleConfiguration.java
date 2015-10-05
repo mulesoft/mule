@@ -61,6 +61,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public static boolean fullStackTraces = false;
 
     /**
+     * When true, logged exceptions will contain links to the documentation page of the exception cause and a MULE_ERROR code.
+     */
+    public static boolean docLinks = false;
+
+    /**
      * When false (default), only a summary of the root exception
      * and trail is provided. If this flag is false, full exception information is reported.
      * Switching on DEBUG level logging with automatically set this flag to true.
@@ -348,6 +353,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (p != null)
         {
             fullStackTraces = false;
+        }
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "doc.links");
+        if (p != null)
+        {
+            docLinks = false;
         }
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "stacktrace.filter");
         if (p != null)
