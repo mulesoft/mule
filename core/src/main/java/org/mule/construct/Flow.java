@@ -8,7 +8,6 @@ package org.mule.construct;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
@@ -38,7 +37,6 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
@@ -122,7 +120,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
             }
         }, getExceptionListener());
 
-        final MuleEvent newEvent = createMuleEventForCurrentFlow(event, replyToDestination, replyToHandler);
+        final MuleEvent newEvent = createMuleEventForCurrentFlow(event, replyToDestination, nonBlockingReplyToHandler);
         try
         {
             ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, getExceptionListener());

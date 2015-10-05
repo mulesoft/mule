@@ -23,6 +23,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MessageProcessingFlowStackManager;
+import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.SubFlowMessageProcessor;
 
 import java.util.Collection;
@@ -42,7 +43,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     Disposable
 {
 
-    private abstract class FlowRefMessageProcessor implements MessageProcessor, AnnotatedObject
+    private abstract class FlowRefMessageProcessor implements NonBlockingMessageProcessor, AnnotatedObject
     {
         @Override
         public Object getAnnotation(QName name)
@@ -132,7 +133,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
                     // Need to initialize because message processor won't be managed by parent
                     String flowName = muleContext.getExpressionManager()
                                                  .parse(refName, event);
-                    MessageProcessor dynamicMessageProcessor = getReferencedFlow(flowName, event.getFlowConstruct());
+                    final MessageProcessor dynamicMessageProcessor = getReferencedFlow(flowName, event.getFlowConstruct());
 
                     Collection<MessageProcessingFlowStackManager> flowStackManagers = applicationContext.getBeansOfType(MessageProcessingFlowStackManager.class).values();
 
@@ -146,7 +147,14 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
                     try
                     {
-                        return dynamicMessageProcessor.process(event);
+                        return new FlowRefMessageProcessor()
+                        {
+                            @Override
+                            public MuleEvent process(MuleEvent event) throws MuleException
+                            {
+                                return dynamicMessageProcessor.process(event);
+                            }
+                        }.process(event);
                     }
                     finally
                     {
