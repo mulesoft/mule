@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.processor.NonBlockingMessageProcessor;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -101,9 +102,16 @@ public class FlowRefFactoryBean
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
                     // Need to initialize because message processor won't be managed by parent
-                    MessageProcessor dynamicMessageProcessor = getReferencedFlow(muleContext.getExpressionManager()
+                    final MessageProcessor dynamicMessageProcessor = getReferencedFlow(muleContext.getExpressionManager()
                         .parse(refName, event), event.getFlowConstruct());
-                    return dynamicMessageProcessor.process(event);
+                    return new NonBlockingMessageProcessor()
+                    {
+                        @Override
+                        public MuleEvent process(MuleEvent event) throws MuleException
+                        {
+                            return dynamicMessageProcessor.process(event);
+                        }
+                    }.process(event);
                 }
             };
             if (dynamicReference instanceof Initialisable)
@@ -167,7 +175,7 @@ public class FlowRefFactoryBean
         }
         if (referencedFlow instanceof FlowConstruct)
         {
-            return new MessageProcessor()
+            return new NonBlockingMessageProcessor()
             {
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
