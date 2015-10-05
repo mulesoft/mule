@@ -27,6 +27,7 @@
     <flow name="subFlow">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <flow-ref name="subFlowChild"/>
+        <test:assert count="1"/>
     </flow>
     <sub-flow name="subFlowChild">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
@@ -36,6 +37,7 @@
     <flow name="childFlow">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <flow-ref name="childFlowChild"/>
+        <test:assert count="1" expression="#[flow.name=='childFlow']"/>
     </flow>
     <flow name="childFlowChild">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
