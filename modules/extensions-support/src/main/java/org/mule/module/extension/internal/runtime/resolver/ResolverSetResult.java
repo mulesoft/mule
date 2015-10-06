@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 /**
  * This class represents the outcome of the evaluation of a {@link ResolverSet}.
@@ -107,16 +106,10 @@ public class ResolverSetResult
      * Returns the value associated with the given {@code parameter}
      *
      * @param parameterModel a {@link ParameterModel} which was registered with the builder
-     * @return the value associated to that {@code parameter}
-     * @throws NoSuchElementException if the {@code parameter} has not been registered through the builder
+     * @return the value associated to that {@code parameter} or {@code null} if no such association exists
      */
     public Object get(ParameterModel parameterModel)
     {
-        if (!evaluationResult.containsKey(parameterModel))
-        {
-            throw new NoSuchElementException("This result contains no information for the parameter: " + parameterModel.getName());
-        }
-
         return evaluationResult.get(parameterModel);
     }
 
@@ -124,16 +117,10 @@ public class ResolverSetResult
      * Returns the value associated with the {@link ParameterModel} of the given {@code parameterName}
      *
      * @param parameterName the name of the {@link ParameterModel} which value you seek
-     * @return the value associated to that {@code parameterName}
-     * @throws NoSuchElementException if the {@code parameterName} has not been registered through the builder
+     * @return the value associated to that {@code parameterName} or {@code null} if no such association exists
      */
     public Object get(String parameterName)
     {
-        if (!parameterToResult.containsKey(parameterName))
-        {
-            throw new NoSuchElementException("This result contains no information for the parameter: " + parameterName);
-        }
-
         return parameterToResult.get(parameterName);
     }
 

@@ -13,7 +13,7 @@ import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
- * Returns the value of the {@link ExtensionProperties#CONNECTION_PARAM} parameter,
+ * Returns the value of the {@link ExtensionProperties#CONNECTION_PARAM} variable,
  * which is expected to have been previously set on the supplied {@link OperationContext}.
  * <p/>
  * Notice that for this to work, the {@link OperationContext}

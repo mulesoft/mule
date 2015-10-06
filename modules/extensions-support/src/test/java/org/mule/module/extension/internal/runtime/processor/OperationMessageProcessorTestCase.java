@@ -37,11 +37,14 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.nio.charset.Charset;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -91,6 +94,8 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
+        configureMockEvent(event);
+
         when(operationModel.getExecutor()).thenReturn(operationExecutor);
         when(resolverSet.resolve(event)).thenReturn(parameters);
 
@@ -130,7 +135,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void operationReturnsMuleEvent() throws Exception
     {
-        MuleEvent responseEvent = mock(MuleEvent.class);
+        MuleEvent responseEvent = configureMockEvent(mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS));
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(responseEvent);
 
         assertThat(messageProcessor.process(event), is(sameInstance(responseEvent)));
@@ -212,5 +217,11 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
         messageProcessor.initialise();
 
         return messageProcessor;
+    }
+
+    private MuleEvent configureMockEvent(MuleEvent mockEvent)
+    {
+        when(mockEvent.getMessage().getEncoding()).thenReturn(Charset.defaultCharset().name());
+        return mockEvent;
     }
 }

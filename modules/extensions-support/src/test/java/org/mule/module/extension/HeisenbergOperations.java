@@ -10,13 +10,16 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.transport.PropertyScope;
-import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.annotation.api.ExposeContentType;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.RestrictedTo;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.runtime.ContentType;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,15 +34,19 @@ public class HeisenbergOperations
     private ExtensionManager extensionManager;
 
     @Operation
-    public String sayMyName(@UseConfig HeisenbergExtension config)
+    @ExposeContentType
+    public String sayMyName(@UseConfig HeisenbergExtension config, ContentType contentType)
     {
         return config.getPersonalInfo().getName();
     }
 
     @Operation
-    public void die(@UseConfig HeisenbergExtension config)
+    public void die(@UseConfig HeisenbergExtension config, ContentType contentType)
     {
         config.setEndingHealth(HealthStatus.DEAD);
+        contentType.setMimeType("dead/dead");
+        Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
+        contentType.setEncoding(lastSupportedEncoding);
     }
 
     @Operation

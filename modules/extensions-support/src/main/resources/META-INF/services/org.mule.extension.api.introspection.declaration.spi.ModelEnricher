@@ -1,1 +1,2 @@
 org.mule.module.extension.internal.runtime.connector.ConnectorModelEnricher
+org.mule.module.extension.internal.introspection.enricher.ContentTypeModelEnricher

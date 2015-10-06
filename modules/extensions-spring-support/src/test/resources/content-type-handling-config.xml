@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+
+    <context:property-placeholder location="heisenberg.properties" />
+
+    <heisenberg:config name="heisenberg"
+                       myName="walt"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       recipe="recipes"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER" />
+
+    <flow name="defaultContentType">
+        <heisenberg:say-my-name />
+    </flow>
+
+    <flow name="setsContentTypeOnXml">
+        <heisenberg:say-my-name encoding="ISO-8859-1" mimeType="text/plain" />
+    </flow>
+
+    <flow name="setsContentTypeProgrammatically">
+        <heisenberg:die />
+    </flow>
+
+</mule>

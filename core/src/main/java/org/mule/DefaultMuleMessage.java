@@ -9,6 +9,7 @@ package org.mule;
 import static org.mule.api.transport.PropertyScope.INBOUND;
 import static org.mule.api.transport.PropertyScope.INVOCATION;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
+import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.SystemUtils.LINE_SEPARATOR;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
@@ -27,6 +28,7 @@ import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.extension.api.runtime.ContentType;
 import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.TransformerUtils;
@@ -36,6 +38,7 @@ import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.ObjectUtils;
+import org.mule.util.Preconditions;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
@@ -1178,13 +1181,34 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /**
-     * @param mimeType
-     * @since 3.0
+     * {@inheritDoc}
      */
+    @Override
+    public String getMimeType()
+    {
+        assertAccess(READ);
+        return dataType != null ? dataType.getMimeType() : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setMimeType(String mimeType)
     {
         assertAccess(WRITE);
         dataType.setMimeType(mimeType);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setContentType(ContentType contentType)
+    {
+        checkArgument(contentType != null, "contentType cannot be null");
+        setEncoding(contentType.getEncoding().name());
+        setMimeType(contentType.getMimeType());
     }
 
     /**
