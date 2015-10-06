@@ -79,7 +79,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     private static final long serialVersionUID = 1541720810851984845L;
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
-    private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
 
     /**
      * The default UUID for the message. If the underlying transport has the notion of a
@@ -121,27 +120,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private transient AtomicBoolean mutable = null;
 
     private DataType<?> dataType;
-
-    static
-    {
-        addToConsumableClasses("javax.xml.stream.XMLStreamReader");
-        addToConsumableClasses("javax.xml.transform.stream.StreamSource");
-        consumableClasses.add(OutputHandler.class);
-        consumableClasses.add(InputStream.class);
-        consumableClasses.add(Reader.class);
-    }
-
-    private static void addToConsumableClasses(String className)
-    {
-        try
-        {
-            consumableClasses.add(ClassUtils.loadClass(className, DefaultMuleMessage.class));
-        }
-        catch (ClassNotFoundException e)
-        {
-            // ignore
-        }
-    }
 
     private static DataType<?> getMessageDataType(MuleMessage previous, Object payload)
     {
@@ -450,24 +428,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     protected boolean isPayloadConsumed(Class<?> inputCls)
     {
-        return InputStream.class.isAssignableFrom(inputCls) || isConsumedFromAdditional(inputCls);
-    }
-
-    private boolean isConsumedFromAdditional(Class<?> inputCls)
-    {
-        if (consumableClasses.isEmpty())
-        {
-            return false;
-        }
-
-        for (Class<?> c : consumableClasses)
-        {
-            if (c.isAssignableFrom(inputCls))
-            {
-                return true;
-            }
-        }
-        return false;
+        return InputStream.class.isAssignableFrom(inputCls) || ClassUtils.isConsumable(inputCls);
     }
 
     /**
@@ -1789,16 +1750,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         IllegalStateException exception = new IllegalStateException(message);
         logger.warn("Message access violation", exception);
         return exception;
-    }
-
-    /**
-     * Determines if the payload of this message is consumable i.e. it can't be read
-     * more than once. This is here temporarily without adding to MuleMessage
-     * interface until MULE-4256 is implemented.
-     */
-    public boolean isConsumable()
-    {
-        return isConsumedFromAdditional(this.getPayload().getClass());
     }
 
     public static class SerializedDataHandler implements Serializable

@@ -12,10 +12,14 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.api.MessagingException.PAYLOAD_INFO_KEY;
 
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.MessageProcessorPathResolver;
@@ -29,6 +33,7 @@ import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
@@ -36,11 +41,14 @@ import java.net.SocketException;
 import javax.xml.namespace.QName;
 
 import org.hamcrest.core.Is;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -50,6 +58,8 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
     private static final String message = "a message";
     private static final String value = "Hello world!";
     
+    private boolean originalVerboseExceptions;
+
     private LocationExecutionContextProvider locationProvider = new MessagingExceptionLocationProvider();
     
     @Mock
@@ -58,6 +68,8 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
     @Before
     public void before()
     {
+        originalVerboseExceptions = DefaultMuleConfiguration.verboseExceptions;
+
         MuleContext mockContext = mock(MuleContext.class);
         DefaultMuleConfiguration mockConfiguration = mock(DefaultMuleConfiguration.class);
         when(mockConfiguration.getId()).thenReturn("MessagingExceptionTestCase");
@@ -65,6 +77,12 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         when(mockEvent.getMuleContext()).thenReturn(mockContext);
     }
     
+    @After
+    public void after()
+    {
+        DefaultMuleConfiguration.verboseExceptions = originalVerboseExceptions;
+    }
+
     @Test
     public void getCauseExceptionWithoutCause()
     {
@@ -300,5 +318,90 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
 
         assertThat(e.getMessage(), containsString(message));
         assertThat(e.getFailingMessageProcessor(), is(nullValue()));
+    }
+    
+    @Test
+    public void payloadInfoNonConsumable() throws Exception
+    {
+        DefaultMuleConfiguration.verboseExceptions = true;
+
+        MuleEvent testEvent = mock(MuleEvent.class);
+        MuleMessage muleMessage = mock(MuleMessage.class);
+        Object payload = mock(Object.class);
+        // This has to be done this way since mockito doesn't allow to verify toString()
+        when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
+        when(muleMessage.getPayload()).thenReturn(payload);
+        when(muleMessage.getPayloadAsString()).thenReturn(value);
+        when(testEvent.getMessage()).thenReturn(muleMessage);
+        MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
+
+        assertThat((String) e.getInfo().get(PAYLOAD_INFO_KEY), is(value));
+    }
+
+    @Test
+    public void payloadInfoConsumable() throws Exception
+    {
+        DefaultMuleConfiguration.verboseExceptions = true;
+
+        MuleEvent testEvent = mock(MuleEvent.class);
+        MuleMessage muleMessage = mock(MuleMessage.class);
+        when(muleMessage.getPayload()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+        when(testEvent.getMessage()).thenReturn(muleMessage);
+        MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
+
+        assertThat((String) e.getInfo().get(PAYLOAD_INFO_KEY), containsString(ByteArrayInputStream.class.getName() + "@"));
+
+        verify(muleMessage, never()).getPayloadAsString();
+    }
+
+    @Test
+    public void payloadInfoException() throws Exception
+    {
+        DefaultMuleConfiguration.verboseExceptions = true;
+
+        MuleEvent testEvent = mock(MuleEvent.class);
+        MuleMessage muleMessage = mock(MuleMessage.class);
+        Object payload = mock(Object.class);
+        // This has to be done this way since mockito doesn't allow to verify toString()
+        when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
+        when(muleMessage.getPayload()).thenReturn(payload);
+        when(muleMessage.getPayloadAsString()).thenThrow(new Exception("exception thrown"));
+        when(testEvent.getMessage()).thenReturn(muleMessage);
+        MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
+
+        assertThat((String) e.getInfo().get(PAYLOAD_INFO_KEY), is(Exception.class.getName() + " while getting payload: exception thrown"));
+    }
+
+    @Test
+    public void payloadInfoNonVerbose() throws Exception
+    {
+        DefaultMuleConfiguration.verboseExceptions = false;
+
+        MuleEvent testEvent = mock(MuleEvent.class);
+        MuleMessage muleMessage = mock(MuleMessage.class);
+        when(testEvent.getMessage()).thenReturn(muleMessage);
+        MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
+
+        assertThat(e.getInfo().get(PAYLOAD_INFO_KEY), nullValue());
+
+        verify(muleMessage, never()).getPayload();
+        verify(muleMessage, never()).getPayloadAsString();
+    }
+
+    private static final class FailAnswer implements Answer<String>
+    {
+        private final String failMessage;
+
+        private FailAnswer(String failMessage)
+        {
+            this.failMessage = failMessage;
+        }
+
+        @Override
+        public String answer(InvocationOnMock invocation) throws Throwable
+        {
+            fail(failMessage);
+            return null;
+        }
     }
 }
