@@ -9,11 +9,9 @@ package org.mule.execution;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -21,10 +19,11 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -47,21 +46,22 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     public void before()
     {
         when(mockMuleEvent.getMuleContext()).thenReturn(mock(MuleContext.class));
-        when(mockResultMuleEvent.getMuleContext()).thenReturn(mock(MuleContext.class));
+        
+        when(mockMessagingException.getFailingMessageProcessor()).thenCallRealMethod();
     }
-    
+
     @Test
-    public void testExecutionSuccessfully() throws MuleException
+    public void executionSuccessfully() throws MuleException
     {
-        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
+        when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
         MuleEvent result = cut.execute(mockMessageProcessor, mockMuleEvent);
         assertThat(result, is(mockResultMuleEvent));
     }
     
     @Test
-    public void testMessageExceptionThrown() throws MuleException
+    public void messageExceptionThrown() throws MuleException
     {
-        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(mockMessagingException);
+        when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(mockMessagingException);
         try
         {
             cut.execute(mockMessageProcessor, mockMuleEvent);
@@ -74,9 +74,9 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     }
     
     @Test
-    public void testCheckedExceptionThrown() throws MuleException
+    public void checkedExceptionThrown() throws MuleException
     {
-        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(mockMuleException);
+        when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(mockMuleException);
         try
         {
             cut.execute(mockMessageProcessor, mockMuleEvent);
@@ -89,10 +89,10 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     }
     
     @Test
-    public void testRuntimeExceptionThrown() throws MuleException
+    public void runtimeExceptionThrown() throws MuleException
     {
         RuntimeException runtimeException = new RuntimeException();
-        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(runtimeException);
+        when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(runtimeException);
         try
         {
             cut.execute(mockMessageProcessor, mockMuleEvent);
@@ -105,10 +105,10 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     }
 
     @Test
-    public void testErrorThrown() throws MuleException
+    public void errorThrown() throws MuleException
     {
         Error error = new Error();
-        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(error);
+        when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(error);
         try
         {
             cut.execute(mockMessageProcessor, mockMuleEvent);

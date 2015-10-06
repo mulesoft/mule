@@ -167,6 +167,12 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                         {
                             return getConnectionDescription();
                         }
+
+                        @Override
+                        public Connector getWorkOwner()
+                        {
+                            return getEndpoint().getConnector();
+                        }
                     }, getWorkManager());
                 }
                 catch (Exception e)

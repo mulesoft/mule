@@ -19,19 +19,19 @@ public class TransformerMessagingException extends MessagingException
 
     public TransformerMessagingException(Message message, MuleEvent event, Transformer transformer)
     {
-        super(message, event);
+        super(message, event, transformer);
         this.transformer = transformer;
     }
 
     public TransformerMessagingException(Message message, MuleEvent event, Transformer transformer, Throwable cause)
     {
-        super(message, event, cause);
+        super(message, event, cause, transformer);
         this.transformer = transformer;
     }
 
     public TransformerMessagingException(MuleEvent event, Transformer transformer, Throwable cause)
     {
-        super(event, cause);
+        super(event, cause, transformer);
         this.transformer = transformer;
     }
 

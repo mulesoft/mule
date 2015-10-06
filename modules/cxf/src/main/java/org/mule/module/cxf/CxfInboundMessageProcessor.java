@@ -273,7 +273,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                             responseEvent.getMessage().setExceptionPayload(exceptionPayload);
                             returnMessage.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
                             responseEvent.setMessage(returnMessage);
-                            processExceptionReplyTo(new MessagingException(responseEvent, e), replyTo);
+                            processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
                         }
                     }
 

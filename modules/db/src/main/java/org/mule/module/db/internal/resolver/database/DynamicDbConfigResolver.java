@@ -8,6 +8,7 @@
 package org.mule.module.db.internal.resolver.database;
 
 import static org.mule.common.Result.Status.FAILURE;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleEvent;
 import org.mule.common.DefaultResult;
 import org.mule.common.DefaultTestResult;
@@ -35,7 +36,7 @@ import javax.sql.DataSource;
  * configured is resolved to the same static {@link DataSourceConfig}
  * </p>
  */
-public class DynamicDbConfigResolver implements DbConfigResolver
+public class DynamicDbConfigResolver extends AbstractAnnotatedObject implements DbConfigResolver
 {
 
     public static final String TEST_CONNECTION_ERROR = "Cannot test connection on a dynamic DB config";
@@ -73,7 +74,8 @@ public class DynamicDbConfigResolver implements DbConfigResolver
                     try
                     {
                         DataSource dynamicDataSource = dataSourceFactory.create(resolvedDataSourceConfig);
-                        dbConfig = dbConfigFactory.create(generateDbConfigName(), dynamicDataSource);
+                        dbConfig = dbConfigFactory.create(generateDbConfigName(), getAnnotations(), dynamicDataSource);
+                        dbConfig.setAnnotations(getAnnotations());
                         cache.put(resolvedDataSourceConfig, dbConfig);
                     }
                     catch (SQLException e)

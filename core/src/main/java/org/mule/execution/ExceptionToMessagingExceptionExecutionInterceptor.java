@@ -11,7 +11,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.execution.ExceptionContextProvider;
 import org.mule.api.processor.MessageProcessor;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -29,19 +28,26 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         }
         catch (MessagingException messagingException)
         {
-            throw putContext(messagingException, event);
+            if (messagingException.getFailingMessageProcessor() == null)
+            {
+                throw putContext(messagingException, messageProcessor, event);
+            }
+            else
+            {
+                throw putContext(messagingException, messagingException.getFailingMessageProcessor(), event);
+            }
         }
         catch (Throwable ex)
         {
-            throw putContext(new MessagingException(event, ex, messageProcessor), event);
+            throw putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event);
         }
     }
 
-    private MessagingException putContext(MessagingException messagingException, MuleEvent event)
+    private MessagingException putContext(MessagingException messagingException, MessageProcessor failingMessageProcessor, MuleEvent event)
     {
         for (ExceptionContextProvider exceptionContextProvider : event.getMuleContext().getExceptionContextProviders())
         {
-            for (Entry<String, Object> contextInfoEntry : exceptionContextProvider.getContextInfo(event).entrySet())
+            for (Entry<String, Object> contextInfoEntry : exceptionContextProvider.getContextInfo(event, failingMessageProcessor).entrySet())
             {
                 if (!messagingException.getInfo().containsKey(contextInfoEntry.getKey()))
                 {

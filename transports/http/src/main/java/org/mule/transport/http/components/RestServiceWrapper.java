@@ -213,7 +213,7 @@ public class RestServiceWrapper extends AbstractComponent
         if (isErrorPayload(result))
         {
             handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl),
-                event), result);
+                event, this), result);
         }
 
         return result;

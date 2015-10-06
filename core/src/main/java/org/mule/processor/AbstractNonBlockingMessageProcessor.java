@@ -6,13 +6,13 @@
  */
 package org.mule.processor;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
+import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.CompletionHandler;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.transport.ReplyToHandler;
@@ -22,7 +22,7 @@ import org.mule.construct.Flow;
  * Abstract implementation of {@link org.mule.processor.NonBlockingMessageProcessor} that determines if processing should
  * be performed blocking or non-blocking..
  */
-public abstract class AbstractNonBlockingMessageProcessor implements NonBlockingMessageProcessor, MessagingExceptionHandlerAware
+public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnotatedObject implements NonBlockingMessageProcessor, MessagingExceptionHandlerAware
 {
 
     private MessagingExceptionHandler messagingExceptionHandler;

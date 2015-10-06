@@ -6,27 +6,23 @@
  */
 package org.mule.context.notification;
 
-import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.execution.ExceptionContextProvider;
+import org.mule.api.execution.LocationExecutionContextProvider;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
 
 import java.util.Collections;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 /**
  * Manager for handling message processing stacks.
  */
-public class MessageProcessingFlowStackManager implements ExceptionContextProvider, MuleContextAware, Initialisable
+public class MessageProcessingFlowStackManager extends LocationExecutionContextProvider implements MuleContextAware, Initialisable
 {
-    private static final QName NAME_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
-
     public static final String FLOW_STACK_INFO_KEY = "FlowStack";
 
     private final FlowNotificationTextDebugger pipelineProcessorDebugger;
@@ -45,29 +41,9 @@ public class MessageProcessingFlowStackManager implements ExceptionContextProvid
     {
         if (DefaultMuleConfiguration.flowCallStacks)
         {
-            notification.getSource().getFlowCallStack().peek().addInvokedMessageProcessor(resolveProcessorName(notification));
+            notification.getSource().getFlowCallStack().peek().addInvokedMessageProcessor(
+                    resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getProcessorPath(), notification.getProcessor()));
         }
-    }
-
-    private String resolveProcessorName(MessageProcessorNotification notification)
-    {
-        if (notification.getProcessor() instanceof AnnotatedObject)
-        {
-            Object docName = ((AnnotatedObject) notification.getProcessor()).getAnnotation(NAME_ANNOTATION_KEY);
-            if (docName != null)
-            {
-                return String.format("%s @ %s (%s)", notification.getProcessorPath(), muleContext.getConfiguration().getId(), docName.toString());
-            }
-            else
-            {
-                return String.format("%s @ %s", notification.getProcessorPath(), muleContext.getConfiguration().getId());
-            }
-        }
-        else
-        {
-            return String.format("%s @ %s", notification.getProcessorPath(), muleContext.getConfiguration().getId());
-        }
-
     }
 
     @Override
@@ -111,7 +87,7 @@ public class MessageProcessingFlowStackManager implements ExceptionContextProvid
     }
 
     @Override
-    public Map<String, Object> getContextInfo(MuleEvent muleEvent)
+    public Map<String, Object> getContextInfo(MuleEvent muleEvent, MessageProcessor lastProcessed)
     {
         if (DefaultMuleConfiguration.flowCallStacks)
         {

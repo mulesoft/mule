@@ -6,7 +6,7 @@
  */
 package org.mule.transport;
 
-import org.mule.api.MuleException;
+import org.mule.api.LocatedMuleException;
 import org.mule.api.transport.Connectable;
 import org.mule.config.i18n.Message;
 
@@ -18,7 +18,7 @@ import java.io.Serializable;
 /** 
  * When this exception is thrown it will trigger a retry (reconnection) policy to go into effect if one is configured.
  */
-public class ConnectException extends MuleException
+public class ConnectException extends LocatedMuleException
 {
     /** Serial version */
     private static final long serialVersionUID = -7802483584780922653L;
@@ -28,21 +28,21 @@ public class ConnectException extends MuleException
     
     public ConnectException(Message message, Connectable failed)
     {
-        super(message);
+        super(message, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
         this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
     }
 
     public ConnectException(Message message, Throwable cause, Connectable failed)
     {
-        super(message, cause);
+        super(message, cause, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
         this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
     }
 
     public ConnectException(Throwable cause, Connectable failed)
     {
-        super(cause);
+        super(cause, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
         this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
     }

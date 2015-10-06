@@ -40,8 +40,7 @@ public class ExtractAuthorizationCodeMessageProcessor implements MessageProcesso
         }
         catch (Exception e)
         {
-            throw new MessagingException(
-                MessageFactory.createStaticMessage("Could not extract OAuth verifier"), event, e);
+            throw new MessagingException(MessageFactory.createStaticMessage("Could not extract OAuth verifier"), event, e, this);
         }
         return event;
     }
