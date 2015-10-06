@@ -35,6 +35,7 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDescript
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
+import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
@@ -235,6 +236,7 @@ public final class AnnotationsBasedDescriber implements Describer
         for (Method method : getOperationMethods(actingClass))
         {
             OperationDescriptor operation = declaration.withOperation(method.getName())
+                    .withModelProperty(ImplementingMethodModelProperty.KEY, new ImplementingMethodModelProperty(method))
                     .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method));
 
             declareOperationParameters(method, operation);

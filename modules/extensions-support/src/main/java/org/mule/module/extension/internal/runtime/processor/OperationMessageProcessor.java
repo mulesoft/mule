@@ -11,6 +11,7 @@ import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.extension.internal.ExtensionProperties.CONTENT_METADATA;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -20,15 +21,20 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transformer.DataType;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ContentType;
+import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
@@ -37,16 +43,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link MessageProcessor} capable of executing extension operations.
- * <p/>
+ * <p>
  * It obtains a configuration instance, evaluate all the operation parameters
  * and executes a {@link OperationModel} by using a {@link #operationExecutor}. This message processor is capable
  * of serving the execution of any {@link OperationModel} of any {@link ExtensionModel}.
- * <p/>
+ * <p>
  * A {@link #operationExecutor} is obtained by invoking {@link OperationModel#getExecutor()}. That instance
  * will be use to serve all invokations of {@link #process(MuleEvent)} on {@code this} instance but
  * will not be shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle}
  * events that {@code this} instance receives will be propagated to the {@link #operationExecutor}.
- * <p/>
+ * <p>
  * The {@link #operationExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
  *
  * @since 3.7.0
@@ -83,12 +89,17 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         ConfigurationInstance<Object> configuration = getConfiguration(event);
-        OperationContext operationContext = createOperationContext(configuration, event);
+        OperationContextAdapter operationContext = createOperationContext(configuration, event);
         Object result = executeOperation(operationContext, event);
 
+        return configureResponseEvent(operationContext, result, event);
+    }
+
+    private MuleEvent configureResponseEvent(OperationContextAdapter operationContext, Object result, MuleEvent event)
+    {
         if (result instanceof MuleEvent)
         {
-            return (MuleEvent) result;
+            event = (MuleEvent) result;
         }
         else if (result instanceof MuleMessage)
         {
@@ -97,6 +108,18 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         else
         {
             event.getMessage().setPayload(result);
+        }
+
+        ContentMetadata contentMetadata = operationContext.getVariable(CONTENT_METADATA);
+        if (contentMetadata != null)
+        {
+            final ContentType contentType = contentMetadata.getOutputContentType();
+            final MuleMessage message = event.getMessage();
+            final Object payload = message.getPayload();
+            final DataType<?> dataType = DataTypeFactory.createWithEncoding(payload.getClass(), contentType.getEncoding().name());
+            dataType.setMimeType(contentType.getMimeType());
+
+            message.setPayload(message.getPayload(), dataType);
         }
 
         return event;
@@ -131,9 +154,9 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     }
 
 
-    private OperationContext createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException
+    private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException
     {
-        return new DefaultOperationContext(configuration, resolverSet.resolve(event), event);
+        return new DefaultOperationContext(configuration, resolverSet.resolve(event), operationModel, event);
     }
 
     @Override

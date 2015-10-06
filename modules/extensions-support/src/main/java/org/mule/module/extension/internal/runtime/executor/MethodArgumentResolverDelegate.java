@@ -8,25 +8,32 @@ package org.mule.module.extension.internal.runtime.executor;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.toMap;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.extension.api.runtime.ContentType;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser;
 import org.mule.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ConnectorArgumentResolver;
+import org.mule.module.extension.internal.runtime.resolver.ContentMetadataArgumentResolver;
+import org.mule.module.extension.internal.runtime.resolver.ContentTypeArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.EventArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,11 +44,13 @@ import java.util.Map;
  */
 final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 {
+
     private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
     private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectorArgumentResolver();
     private static final ArgumentResolver<MuleMessage> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
     private static final ArgumentResolver<MuleEvent> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
-
+    private static final ArgumentResolver<ContentMetadata> CONTENT_METADATA_ARGUMENT_RESOLVER = new ContentMetadataArgumentResolver();
+    private static final ArgumentResolver<ContentType> CONTENT_TYPE_ARGUMENT_RESOLVER = new ContentTypeArgumentResolver();
 
     private final Method method;
     private ArgumentResolver<? extends Object>[] argumentResolvers;
@@ -68,7 +77,7 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 
         argumentResolvers = new ArgumentResolver[parameterTypes.length];
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        final String[] paramNames = MuleExtensionAnnotationParser.getParamNames(method);
+        final List<String> paramNames = MuleExtensionAnnotationParser.getParamNames(method);
 
         for (int i = 0; i < parameterTypes.length; i++)
         {
@@ -97,9 +106,25 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
             {
                 argumentResolver = new ParameterGroupArgumentResolver(parameterType);
             }
+            else if (ContentMetadata.class.isAssignableFrom(parameterType))
+            {
+                if (isVoid(method))
+                {
+                    throw new IllegalModelDefinitionException(String.format(
+                            "Operation method '%s' is void yet requires a '%s' argument which allows changing the content metadata." +
+                            " Mutating the content metadata requires an operation with a return type.",
+                            method.getName(), ContentMetadata.class.getName()));
+                }
+
+                argumentResolver = CONTENT_METADATA_ARGUMENT_RESOLVER;
+            }
+            else if (ContentType.class.isAssignableFrom(parameterType))
+            {
+                argumentResolver = CONTENT_TYPE_ARGUMENT_RESOLVER;
+            }
             else
             {
-                argumentResolver = new ByParameterNameArgumentResolver<>(paramNames[i]);
+                argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
             }
 
             argumentResolvers[i] = argumentResolver;

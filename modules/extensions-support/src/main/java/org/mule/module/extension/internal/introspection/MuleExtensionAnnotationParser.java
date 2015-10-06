@@ -12,8 +12,8 @@ import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.RestrictedTo;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
@@ -21,15 +21,16 @@ import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.extension.api.runtime.ContentType;
 import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
-import org.mule.util.ParamReader;
+import org.mule.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -53,6 +53,8 @@ public final class MuleExtensionAnnotationParser
     private static final Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
             .add(MuleEvent.class)
             .add(MuleMessage.class)
+            .add(ContentMetadata.class)
+            .add(ContentType.class)
             .build();
 
     static String getParameterName(Field field, Parameter parameterAnnotation)
@@ -89,9 +91,9 @@ public final class MuleExtensionAnnotationParser
 
     static List<ParameterDescriptor> parseParameters(Method method)
     {
-        String[] paramNames = getParamNames(method);
+        List<String> paramNames = getParamNames(method);
 
-        if (ArrayUtils.isEmpty(paramNames))
+        if (CollectionUtils.isEmpty(paramNames))
         {
             return ImmutableList.of();
         }
@@ -101,7 +103,8 @@ public final class MuleExtensionAnnotationParser
 
         List<ParameterDescriptor> parameterDescriptors = new LinkedList<>();
 
-        for (int i = 0; i < paramNames.length; i++)
+
+        for (int i = 0; i < paramNames.size(); i++)
         {
             Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
 
@@ -111,7 +114,7 @@ public final class MuleExtensionAnnotationParser
             }
             else
             {
-                ParameterDescriptor parameterDescriptor = doParseParameter(paramNames[i], parameterTypes[i], annotations);
+                ParameterDescriptor parameterDescriptor = doParseParameter(paramNames.get(i), parameterTypes[i], annotations);
                 if (parameterDescriptor != null)
                 {
                     parameterDescriptors.add(parameterDescriptor);
@@ -180,21 +183,15 @@ public final class MuleExtensionAnnotationParser
                annotations.containsKey(Connection.class);
     }
 
-    public static String[] getParamNames(Method method)
+    public static List<String> getParamNames(Method method)
     {
-        String[] paramNames;
-        try
+        ImmutableList.Builder<String> paramNames = ImmutableList.builder();
+        for (java.lang.reflect.Parameter parameter : method.getParameters())
         {
-            paramNames = new ParamReader(method.getDeclaringClass()).getParameterNames(method);
-        }
-        catch (IOException e)
-        {
-            throw new IllegalStateException(
-                    String.format("Could not read parameter names from method '%s' of class '%s'", method.getName(), method.getDeclaringClass().getName())
-                    , e);
+            paramNames.add(parameter.getName());
         }
 
-        return paramNames;
+        return paramNames.build();
     }
 
     public static Map<Class<? extends Annotation>, Annotation> toMap(Annotation[] annotations)

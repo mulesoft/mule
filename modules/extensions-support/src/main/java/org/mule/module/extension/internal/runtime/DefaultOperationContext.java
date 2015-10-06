@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.runtime;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
+import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -28,6 +29,7 @@ public class DefaultOperationContext implements OperationContextAdapter
     private final ConfigurationInstance<?> configuration;
     private final Map<String, Object> parameters;
     private final Map<String, Object> variables = new HashMap<>();
+    private final OperationModel operationModel;
     private final MuleEvent event;
 
     /**
@@ -37,10 +39,11 @@ public class DefaultOperationContext implements OperationContextAdapter
      * @param parameters    the parameters that the operation will use
      * @param event         the current {@link MuleEvent}
      */
-    public DefaultOperationContext(ConfigurationInstance<Object> configuration, ResolverSetResult parameters, MuleEvent event)
+    public DefaultOperationContext(ConfigurationInstance<Object> configuration, ResolverSetResult parameters, OperationModel operationModel, MuleEvent event)
     {
         this.configuration = configuration;
         this.event = event;
+        this.operationModel = operationModel;
 
         Map<ParameterModel, Object> parameterMap = parameters.asMap();
         this.parameters = new HashMap<>(parameterMap.size());
@@ -59,9 +62,30 @@ public class DefaultOperationContext implements OperationContextAdapter
      * {@inheritDoc}
      */
     @Override
-    public Object getParameter(String parameterName)
+    public <T> T getParameter(String parameterName)
     {
-        return parameters.get(parameterName);
+        return (T) parameters.get(parameterName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T getTypeSafeParameter(String parameterName, Class<? extends T> expectedType)
+    {
+        Object value = getParameter(parameterName);
+        if (value == null)
+        {
+            return null;
+        }
+
+        if (!expectedType.isInstance(value))
+        {
+            throw new IllegalArgumentException(String.format("'%s' was expected to be of type '%s' but type '%s' was found instead",
+                                                             parameterName, expectedType.getName(), value.getClass().getName()));
+        }
+
+        return (T) value;
     }
 
     /**
@@ -102,5 +126,14 @@ public class DefaultOperationContext implements OperationContextAdapter
     public MuleEvent getEvent()
     {
         return event;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OperationModel getOperationModel()
+    {
+        return operationModel;
     }
 }
