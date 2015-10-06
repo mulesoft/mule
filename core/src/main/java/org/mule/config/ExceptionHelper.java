@@ -298,11 +298,19 @@ public final class ExceptionHelper
         return null;
     }
 
+    /**
+     * @deprecated since 3.8.0
+     */
+    @Deprecated
     public static String getJavaDocUrl(Class<?> exception)
     {
         return getDocUrl("javadoc.", exception.getName());
     }
 
+    /**
+     * @deprecated since 3.8.0
+     */
+    @Deprecated
     public static String getDocUrl(Class<?> exception)
     {
         return getDocUrl("doc.", exception.getName());
