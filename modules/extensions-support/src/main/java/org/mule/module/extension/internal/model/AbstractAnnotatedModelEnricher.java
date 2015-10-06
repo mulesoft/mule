@@ -9,9 +9,11 @@ package org.mule.module.extension.internal.model;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
+import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 /**
  * Base class for implementations of {@link ModelEnricher} which provides utility methods
@@ -24,9 +26,12 @@ public abstract class AbstractAnnotatedModelEnricher implements ModelEnricher
 {
 
     /**
-     * Extracts an {@link Annotation} from class backing the {@code declaration}.
-     * <p/>
-     * This method works in conjunction with {@link #extractExtensionType(BaseDeclaration)}
+     * Extracts an {@link Annotation} from membar backing the {@code declaration}.
+     * <p>
+     * If the desired annotation is at a {@link Class} level, then this method works in conjunction
+     * with {@link #extractExtensionType(BaseDeclaration)}. If the annotation acts at a {@link Method}
+     * level, then the declaration is tested for the {@link ImplementingMethodModelProperty} property in
+     * order to query the corresponding {@link Method}
      *
      * @param declaration    a {@link BaseDeclaration} to be enriched
      * @param annotationType the type of the annotation you want
@@ -37,12 +42,24 @@ public abstract class AbstractAnnotatedModelEnricher implements ModelEnricher
     protected <A extends Annotation> A extractAnnotation(BaseDeclaration<? extends BaseDeclaration> declaration, Class<A> annotationType)
     {
         Class<?> extensionType = extractExtensionType(declaration);
-        return extensionType != null ? extensionType.getAnnotation(annotationType) : null;
+        if (extensionType != null)
+        {
+            return extensionType.getAnnotation(annotationType);
+        }
+
+        ImplementingMethodModelProperty methodProperty = declaration.getModelProperty(ImplementingMethodModelProperty.KEY);
+        if (methodProperty != null)
+        {
+            Method method = methodProperty.getMethod();
+            return method.getAnnotation(annotationType);
+        }
+
+        return null;
     }
 
     /**
      * Returns the annotated {@link Class} that was used to construct the {@code declaration}.
-     * <p/>
+     * <p>
      * The annotated type is determined by querying the {@code declaration} for the
      * {@link ImplementingTypeModelProperty} model property
      *

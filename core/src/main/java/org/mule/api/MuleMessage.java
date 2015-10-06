@@ -10,6 +10,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.extension.api.runtime.ContentType;
 
 import java.io.Serializable;
 import java.util.List;
@@ -408,6 +409,31 @@ public interface MuleMessage extends Serializable
      * @param encoding the encoding to use
      */
     void setEncoding(String encoding);
+
+    /**
+     * Returns the mimeType for this message.
+     * @return the message mime type
+     */
+    String getMimeType();
+
+    /**
+     * Sets the mimeType for this message
+     *
+     * @param mimeType the mimeType
+     * @since 4.0
+     */
+    void setMimeType(String mimeType);
+
+    /**
+     * Updates {@code this} instance so that methods like {@link #getEncoding()},
+     * {@link #getMimeType()} or any other relevant attribute are consistent
+     * with the given {@code contentType}
+     *
+     * @param contentType a {@link ContentType}
+     * @throws IllegalArgumentException is {@code contentType} is {@code null}
+     * @since 4.0
+     */
+    void setContentType(ContentType contentType);
 
     /**
      * Perform any clean up operations on the message resource.

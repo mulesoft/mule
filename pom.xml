@@ -1548,6 +1548,9 @@
                         <proc>none</proc>
                         <!-- Slightly faster builds, see https://jira.codehaus.org/browse/MCOMPILER-209 -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
+                        <compilerArgs>
+                            <arg>-parameters</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
                 <plugin>
