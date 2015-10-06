@@ -11,13 +11,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
-import java.util.List;
-import java.util.Map;
-
-import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.registry.ResolverException;
@@ -26,12 +21,25 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.SystemUtils;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
 
 @SmallTest
 public class ExceptionHelperTestCase extends AbstractMuleTestCase
 {
     @Test
-    public void testNestedExceptionRetreval() throws Exception
+    public void nestedExceptionRetreval() throws Exception
     {
         Exception testException = getException();
         Throwable t = ExceptionHelper.getRootException(testException);
@@ -51,7 +59,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testSummarizeWithDepthBeyondStackTraceLength()
+    public void summarizeWithDepthBeyondStackTraceLength()
     {
         Exception exception = getException();
         int numberOfStackFrames = exception.getStackTrace().length;
@@ -62,7 +70,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testGetNonMuleExceptionCause()
+    public void getNonMuleExceptionCause()
     {
         assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(), null)), IsNull.<Object>nullValue());
         assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(),
@@ -74,6 +82,112 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
                 new ConfigurationException(CoreMessages.failedToBuildMessage(),
                         new IllegalArgumentException(new NullPointerException())))), IsInstanceOf.instanceOf(IllegalArgumentException.class));
         assertThat(ExceptionHelper.getNonMuleException(new IllegalArgumentException()),IsInstanceOf.instanceOf(IllegalArgumentException.class));
+    }
+
+    @Test
+    public void filteredStackIncludingNonMuleCode()
+    {
+        int calls = 5;
+        try
+        {
+            generateStackEntries(calls, new Closure()
+            {
+                @Override
+                public void execute(Object input)
+                {
+                    CollectionUtils.forAllDo(Collections.singleton(null), new Closure()
+                    {
+                        @Override
+                        public void execute(Object input)
+                        {
+                            throw new RuntimeException(new DefaultMuleException(MessageFactory.createStaticMessage("foo")));
+                        }
+                    });
+                }
+            });
+            fail("Expected exception");
+        }
+        catch (Exception e)
+        {
+            assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
+                    "foo (org.mule.api.DefaultMuleException)",
+                    "  org.mule.test.config.ExceptionHelperTestCase$1$1:",
+                    "  (1 more...)", // CollectionUtils.forAllDo
+                    "  org.mule.test.config.ExceptionHelperTestCase$1:",
+                    "  org.mule.test.config.ExceptionHelperTestCase:",
+                    "  (" + (calls + 13) + " more...)")); // recursive
+        }
+    }
+
+    @Test
+    public void filteredStackAllMuleCode()
+    {
+        try
+        {
+            throw new RuntimeException(new DefaultMuleException(MessageFactory.createStaticMessage("foo")));
+        }
+        catch (Exception e)
+        {
+            assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
+                    "foo (org.mule.api.DefaultMuleException)",
+                    "  org.mule.test.config.ExceptionHelperTestCase:"));
+        }
+    }
+
+    private void generateStackEntries(int calls, Closure closure)
+    {
+        if (calls == 0)
+        {
+            closure.execute(null);
+        }
+        else
+        {
+            generateStackEntries(--calls, closure);
+        }
+    }
+
+    private static final class StringByLineMatcher extends TypeSafeMatcher<String>
+    {
+        private final String[] expectedEntries;
+        private int i = 0;
+
+        private StringByLineMatcher(String... expectedEntries)
+        {
+            this.expectedEntries = expectedEntries;
+        }
+
+        @Override
+        public void describeTo(Description description)
+        {
+            description.appendText(String.format("line %d matches \"%s\"", i, expectedEntries[i]));
+        }
+        
+        @Override
+        protected boolean matchesSafely(String item)
+        {
+            String[] stackEntries = item.split(SystemUtils.LINE_SEPARATOR);
+
+            if (stackEntries.length != expectedEntries.length)
+            {
+                return false;
+            }
+
+            for (String expectedEntry : expectedEntries)
+            {
+                if (!stackEntries[i].contains(expectedEntry))
+                {
+                    return false;
+                }
+                ++i;
+            }
+
+            return true;
+        }
+
+        public static StringByLineMatcher matchesLineByLine(String... expectedEntries)
+        {
+            return new StringByLineMatcher(expectedEntries);
+        }
     }
 
     private Exception getException()
