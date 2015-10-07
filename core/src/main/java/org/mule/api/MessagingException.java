@@ -7,16 +7,19 @@
 
 package org.mule.api;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.abbreviate;
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.VoidMuleEvent;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleManifest;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.NullPayload;
-import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -30,6 +33,8 @@ import java.io.Serializable;
 
 public class MessagingException extends MuleException
 {
+    public static final String PAYLOAD_INFO_KEY = "Payload";
+
     /**
      * Serial version
      */
@@ -140,20 +145,36 @@ public class MessagingException extends MuleException
 
         if (muleMessage != null)
         {
-            Object payload = muleMessage.getPayload();
-            if (payload == null)
+            if (DefaultMuleConfiguration.verboseExceptions)
             {
-                payload = NullPayload.getInstance();
-            }
+                Object payload = muleMessage.getPayload();
+                if (payload == null)
+                {
+                    payload = NullPayload.getInstance();
+                }
 
-            buf.append(CoreMessages.messageIsOfType(payload.getClass()).getMessage());
-            addInfo("Payload", StringUtils.abbreviate(payload.toString(), 1000));
+                if (isConsumable(muleMessage.getPayload().getClass()))
+                {
+                    addInfo(PAYLOAD_INFO_KEY, abbreviate(payload.toString(), 1000));
+                }
+                else
+                {
+                    try
+                    {
+                        addInfo(PAYLOAD_INFO_KEY, muleMessage.getPayloadAsString());
+                    }
+                    catch (Exception e)
+                    {
+                        addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
+                    }
+                }
+            }
         }
         else
         {
             buf.append("The current MuleMessage is null! Please report this to ").append(
                 MuleManifest.getDevListEmail());
-            addInfo("Payload", NullPayload.getInstance().toString());
+            addInfo(PAYLOAD_INFO_KEY, NullPayload.getInstance().toString());
         }
 
         return buf.toString();

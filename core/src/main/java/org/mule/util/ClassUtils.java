@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.transport.OutputHandler;
 import org.mule.routing.filters.WildcardFilter;
 
 import com.google.common.primitives.Primitives;
@@ -13,6 +15,7 @@ import com.google.common.primitives.Primitives;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -52,6 +55,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<Class<?>, Class<?>>();
     private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<String, Class<?>>(32);
+    private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
 
     static
     {
@@ -71,7 +75,26 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         {
             primitiveTypeNameMap.put(primitiveType.getName(), primitiveType);
         }
+
+        addToConsumableClasses("javax.xml.stream.XMLStreamReader");
+        addToConsumableClasses("javax.xml.transform.stream.StreamSource");
+        consumableClasses.add(OutputHandler.class);
+        consumableClasses.add(InputStream.class);
+        consumableClasses.add(Reader.class);
     }
+
+    private static void addToConsumableClasses(String className)
+    {
+        try
+        {
+            consumableClasses.add(ClassUtils.loadClass(className, DefaultMuleMessage.class));
+        }
+        catch (ClassNotFoundException e)
+        {
+            // ignore
+        }
+    }
+
 
     public static boolean isConcrete(Class<?> clazz)
     {
@@ -1138,4 +1161,24 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return Primitives.isWrapperType(type);
     }
 
+    /**
+     * Determines if the payload of this message is consumable i.e. it can't be read
+     * more than once.
+     */
+    public static boolean isConsumable(Class<?> payloadClass)
+    {
+        if (consumableClasses.isEmpty())
+        {
+            return false;
+        }
+        
+        for (Class<?> c : consumableClasses)
+        {
+            if (c.isAssignableFrom(payloadClass))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
