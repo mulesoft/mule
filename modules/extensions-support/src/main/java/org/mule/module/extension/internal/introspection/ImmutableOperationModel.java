@@ -11,6 +11,7 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
+import org.mule.extension.api.runtime.InterceptorFactory;
 import org.mule.extension.api.runtime.OperationExecutor;
 
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-final class ImmutableOperationModel extends AbstractImmutableModel implements OperationModel
+final class ImmutableOperationModel extends AbstractInterceptableModel implements OperationModel
 {
 
     private final List<ParameterModel> parameterModels;
@@ -30,20 +31,22 @@ final class ImmutableOperationModel extends AbstractImmutableModel implements Op
     /**
      * Creates a new instance with the given state
      *
-     * @param name            the operation's name. Cannot be blank
-     * @param description     the operation's descriptor
-     * @param executorFactory a {@link OperationExecutorFactory}. Cannot be {@code null}
-     * @param parameterModels a {@link List} with the operation's {@link ParameterModel parameterModels}
-     * @param modelProperties A {@link Map} of custom properties which extend this model
+     * @param name                 the operation's name. Cannot be blank
+     * @param description          the operation's descriptor
+     * @param executorFactory      a {@link OperationExecutorFactory}. Cannot be {@code null}
+     * @param parameterModels      a {@link List} with the operation's {@link ParameterModel parameterModels}
+     * @param modelProperties      A {@link Map} of custom properties which extend this model
+     * @param interceptorFactories A {@link List} with the {@link InterceptorFactory} instances that should be applied to instances built from this model
      * @throws IllegalArgumentException if {@code name} is blank or {@code executorFactory} is {@code null}
      */
     ImmutableOperationModel(String name,
                             String description,
                             OperationExecutorFactory executorFactory,
                             List<ParameterModel> parameterModels,
-                            Map<String, Object> modelProperties)
+                            Map<String, Object> modelProperties,
+                            List<InterceptorFactory> interceptorFactories)
     {
-        super(name, description, modelProperties);
+        super(name, description, modelProperties, interceptorFactories);
 
         checkArgument(executorFactory != null, String.format("Operation '%s' cannot have a null executor factory", name));
         this.executorFactory = executorFactory;

@@ -10,9 +10,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.spy;
 import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-import org.mule.DefaultMuleContext;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.spyInjector;
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -55,7 +54,7 @@ abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleCont
     {
         muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
         muleContext.getInjector().inject(provider);
-        ((DefaultMuleContext) muleContext).setInjector(spy(muleContext.getInjector()));
+        spyInjector(muleContext);
     }
 
     @Test

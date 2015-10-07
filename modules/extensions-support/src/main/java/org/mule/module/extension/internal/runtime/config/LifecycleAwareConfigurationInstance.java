@@ -11,18 +11,15 @@ import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.util.Preconditions.checkState;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.Interceptable;
-import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.Interceptor;
+import org.mule.module.extension.internal.introspection.AbstractInterceptable;
 import org.mule.time.TimeSupplier;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
@@ -41,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class LifecycleAwareConfigurationInstance<T> implements ConfigurationInstance<T>, Lifecycle, Interceptable
+public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterceptable implements ConfigurationInstance<T>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationInstance.class);
@@ -49,12 +46,9 @@ public final class LifecycleAwareConfigurationInstance<T> implements Configurati
     private final String name;
     private final ConfigurationModel model;
     private final T value;
-    private final List<Interceptor> interceptors;
+
 
     private ConfigurationStats configurationStats;
-
-    @Inject
-    private MuleContext muleContext;
 
     @Inject
     private TimeSupplier timeSupplier;
@@ -69,10 +63,10 @@ public final class LifecycleAwareConfigurationInstance<T> implements Configurati
      */
     public LifecycleAwareConfigurationInstance(String name, ConfigurationModel model, T value, List<Interceptor> interceptors)
     {
+        super(interceptors);
         this.name = name;
         this.model = model;
         this.value = value;
-        this.interceptors = interceptors != null ? ImmutableList.copyOf(interceptors) : ImmutableList.of();
     }
 
     /**
@@ -116,10 +110,7 @@ public final class LifecycleAwareConfigurationInstance<T> implements Configurati
     public void start() throws MuleException
     {
         startIfNeeded(value);
-        for (Interceptor interceptor : interceptors)
-        {
-            startIfNeeded(interceptor);
-        }
+        super.start();
     }
 
     /**
@@ -131,10 +122,7 @@ public final class LifecycleAwareConfigurationInstance<T> implements Configurati
     public void stop() throws MuleException
     {
         stopIfNeeded(value);
-        for (Interceptor interceptor : interceptors)
-        {
-            stopIfNeeded(interceptor);
-        }
+        super.stop();
     }
 
     /**
@@ -144,19 +132,13 @@ public final class LifecycleAwareConfigurationInstance<T> implements Configurati
     public void dispose()
     {
         disposeIfNeeded(value, LOGGER);
-        for (Interceptor interceptor : interceptors)
-        {
-            disposeIfNeeded(interceptor, LOGGER);
-        }
+        super.dispose();
     }
 
     private void doInitialise() throws InitialisationException
     {
         initialiseIfNeeded(value, muleContext);
-        for (Interceptor interceptor : interceptors)
-        {
-            initialiseIfNeeded(interceptor, muleContext);
-        }
+        super.initialise();
     }
 
     /**
@@ -198,15 +180,6 @@ public final class LifecycleAwareConfigurationInstance<T> implements Configurati
         return configurationStats;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Interceptor> getInterceptors()
-    {
-        return interceptors;
-    }
-
     private void initStats()
     {
         if (timeSupplier == null)
@@ -220,9 +193,6 @@ public final class LifecycleAwareConfigurationInstance<T> implements Configurati
     private void inject() throws MuleException
     {
         muleContext.getInjector().inject(value);
-        for (Interceptor interceptor : interceptors)
-        {
-            muleContext.getInjector().inject(interceptor);
-        }
+        injectInterceptors();
     }
 }

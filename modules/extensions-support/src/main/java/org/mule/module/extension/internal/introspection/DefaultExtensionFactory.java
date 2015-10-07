@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
@@ -20,9 +21,12 @@ import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDecl
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.extension.api.runtime.Interceptor;
 import org.mule.module.extension.internal.DefaultDescribingContext;
+import org.mule.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 import org.mule.util.ValueHolder;
 
 import com.google.common.collect.ImmutableList;
@@ -34,8 +38,8 @@ import java.util.stream.Collectors;
 /**
  * Default implementation of {@link ExtensionFactory} which uses a
  * {@link ServiceRegistry} to locate instances of {@link ModelEnricher}.
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * The discovery of {@link ModelEnricher} instances  will happen when the
  * {@link #DefaultExtensionFactory(ServiceRegistry, ClassLoader)} constructor is invoked
  * and the list of discovered instances will be used during the whole duration of this instance
@@ -141,11 +145,16 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     private OperationModel toOperation(OperationDeclaration declaration)
     {
         List<ParameterModel> parameterModels = toOperationParameters(declaration.getParameters());
+
+        List<Interceptor> interceptors = createInterceptors(declaration.getInterceptorFactories());
+        OperationExecutorFactory executorFactory = new OperationExecutorFactoryWrapper(declaration.getExecutorFactory(), interceptors);
+
         return new ImmutableOperationModel(declaration.getName(),
                                            declaration.getDescription(),
-                                           declaration.getExecutorFactory(),
+                                           executorFactory,
                                            parameterModels,
-                                           declaration.getModelProperties());
+                                           declaration.getModelProperties(),
+                                           declaration.getInterceptorFactories());
     }
 
     private List<ParameterModel> toConfigParameters(List<ParameterDeclaration> declarations)

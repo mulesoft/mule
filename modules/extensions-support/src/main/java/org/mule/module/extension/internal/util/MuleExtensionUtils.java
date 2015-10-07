@@ -17,11 +17,16 @@ import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.InterceptableModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.runtime.Interceptor;
+import org.mule.extension.api.runtime.InterceptorFactory;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.util.ArrayUtils;
+import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedHashMultiset;
@@ -139,6 +144,37 @@ public class MuleExtensionUtils
 
         Collections.sort(list, new DescribedComparator());
         return list;
+    }
+
+    /**
+     * Creates a new {@link List} of {@link Interceptor interceptors} using the
+     * factories returned by {@link InterceptableModel#getInterceptorFactories()}
+     *
+     * @param model the model on which {@link InterceptableModel#getInterceptorFactories()} is to be invoked
+     * @return an immutable {@link List} with instances of {@link Interceptor}
+     */
+    public static List<Interceptor> createInterceptors(InterceptableModel model)
+    {
+        return createInterceptors(model.getInterceptorFactories());
+    }
+
+    /**
+     * Creates a new {@link List} of {@link Interceptor interceptors} using the
+     * {@code interceptorFactories}
+     *
+     * @param interceptorFactories a {@link List} with instances of {@link InterceptorFactory}
+     * @return an immutable {@link List} with instances of {@link Interceptor}
+     */
+    public static List<Interceptor> createInterceptors(List<InterceptorFactory> interceptorFactories)
+    {
+        if (CollectionUtils.isEmpty(interceptorFactories))
+        {
+            return ImmutableList.of();
+        }
+
+        return interceptorFactories.stream()
+                .map(InterceptorFactory::createInterceptor)
+                .collect(new ImmutableListCollector<>());
     }
 
     public static String getDefaultValue(Optional optional)

@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.runtime.ConfigurationStats;
-import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
@@ -29,15 +28,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link ExecutionMediator}.
- * <p/>
+ * <p>
  * If the given {@code context} implements the {@link Interceptable}, then its defined
  * {@link Interceptor}s are properly executed as well.
- * <p/>
+ * <p>
  * It also inspects the {@link ConfigurationStats} obtained from the {@link ConfigurationDeclaration}
  * in the {@code context}. If the stats class implements the {@link MutableConfigurationStats} interface,
  * then {@link MutableConfigurationStats#addInflightOperation()} and {@link MutableConfigurationStats#discountInflightOperation()}
  * are guaranteed to be called, whatever the operation's outcome.
- * <p/>
+ * <p>
  * In case of operation failure, it will execute the {@link Interceptor#onError(OperationContext, RetryRequest, Exception)}
  * method of all the available interceptors, even if any of them request for a retry. When a retry request is granted,
  * the entire cycle of interception (before, onSuccess/onError, after) will be fired again, but no interceptor
@@ -62,7 +61,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator
      */
     public Object execute(OperationExecutor executor, OperationContext context) throws Exception
     {
-        final List<Interceptor> interceptors = collectInterceptors(context);
+        final List<Interceptor> interceptors = collectInterceptors(context.getConfiguration(), executor);
         final MutableConfigurationStats mutableStats = getMutableConfigurationStats(context);
         if (mutableStats != null)
         {
@@ -127,15 +126,19 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         return result;
     }
 
-    private List<Interceptor> collectInterceptors(OperationContext operationContext)
+    private List<Interceptor> collectInterceptors(Object... interceptableCandidates)
     {
-        ConfigurationInstance<?> configurationInstance = operationContext.getConfiguration();
-        if (configurationInstance instanceof Interceptable)
+        ImmutableList.Builder<Interceptor> interceptors = ImmutableList.builder();
+
+        for (Object interceptableCandidate : interceptableCandidates)
         {
-            return ((Interceptable) configurationInstance).getInterceptors();
+            if (interceptableCandidate instanceof Interceptable)
+            {
+                interceptors.addAll(((Interceptable) interceptableCandidate).getInterceptors());
+            }
         }
 
-        return ImmutableList.of();
+        return interceptors.build();
     }
 
     private void before(OperationContext operationContext, List<Interceptor> interceptors) throws Exception
@@ -149,7 +152,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator
     private void onSuccess(OperationContext operationContext, Object result, List<Interceptor> interceptors)
     {
         intercept(interceptors,
-                  (interceptor) -> interceptor.onSuccess(operationContext, result),
+                  interceptor -> interceptor.onSuccess(operationContext, result),
                   interceptor -> format("Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any)" +
                                         "will be executed and the operation's result will be returned", interceptor));
     }
@@ -172,8 +175,8 @@ public final class DefaultExecutionMediator implements ExecutionMediator
                           exceptionHolder.set(decoratedException);
                       }
                   },
-                  (interceptor) -> format("Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any)" +
-                                          "will be executed and the operation's exception will be returned", interceptor));
+                  interceptor -> format("Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any)" +
+                                        "will be executed and the operation's exception will be returned", interceptor));
 
         return exceptionHolder.get();
     }
@@ -181,9 +184,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator
     private void after(OperationContext operationContext, Object result, List<Interceptor> interceptors)
     {
         intercept(interceptors,
-                  (interceptor) -> interceptor.after(operationContext, result),
-                  (interceptor) -> format("Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any)" +
-                                          "will be executed and the operation's result be returned", interceptor));
+                  interceptor -> interceptor.after(operationContext, result),
+                  interceptor -> format("Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any)" +
+                                        "will be executed and the operation's result be returned", interceptor));
     }
 
     private void intercept(List<Interceptor> interceptors, Consumer<Interceptor> closure, Function<Interceptor, String> exceptionMessageFunction)
