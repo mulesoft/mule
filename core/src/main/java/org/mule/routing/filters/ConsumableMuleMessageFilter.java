@@ -6,6 +6,8 @@
  */
 package org.mule.routing.filters;
 
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
@@ -20,12 +22,13 @@ import org.mule.api.routing.filter.Filter;
 public class ConsumableMuleMessageFilter implements Filter
 {
 
+    @Override
     public boolean accept(MuleMessage message)
     {
 
         if (message instanceof DefaultMuleMessage)
         {
-            return !((DefaultMuleMessage) message).isConsumable();
+            return !isConsumable(message.getPayload().getClass());
         }
         else
         {

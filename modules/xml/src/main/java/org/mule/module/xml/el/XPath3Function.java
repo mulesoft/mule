@@ -6,9 +6,10 @@
  */
 package org.mule.module.xml.el;
 
+import static org.mule.util.ClassUtils.isConsumable;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
-import org.mule.DefaultMuleMessage;
+
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -139,7 +140,7 @@ public class XPath3Function implements ExpressionLanguageFunction
             Object result = xpathEvaluatorSupplier.get().evaluate(xpathExpression, node, returnType, event);
 
             MuleMessage message = event.getMessage();
-            if (input == message.getPayload() && ((DefaultMuleMessage) message).isConsumable())
+            if (input == message.getPayload() && isConsumable(message.getPayload().getClass()))
             {
                 ctx.setPayload(node);
             }
