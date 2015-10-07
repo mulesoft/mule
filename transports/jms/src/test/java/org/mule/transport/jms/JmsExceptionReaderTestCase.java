@@ -54,8 +54,7 @@ public class JmsExceptionReaderTestCase extends AbstractMuleTestCase
 
         Map info = ExceptionHelper.getExceptionInfo(testException);
         assertNotNull(info);
-        assertEquals(2, info.size());
-        assertNotNull(info.get("JavaDoc"));
+        assertEquals(1, info.size());
         assertEquals("1234", info.get("JMS Code"));
     }
 
