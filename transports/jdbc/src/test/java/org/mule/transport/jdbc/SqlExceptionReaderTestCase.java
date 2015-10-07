@@ -53,8 +53,7 @@ public class SqlExceptionReaderTestCase extends AbstractMuleTestCase
 
         Map info = ExceptionHelper.getExceptionInfo(testException);
         assertNotNull(info);
-        assertEquals(3, info.size());
-        assertNotNull(info.get("JavaDoc"));
+        assertEquals(2, info.size());
         assertEquals("1234", info.get("SQL Code"));
         assertEquals("bad SQL state", info.get("SQL State"));
     }
