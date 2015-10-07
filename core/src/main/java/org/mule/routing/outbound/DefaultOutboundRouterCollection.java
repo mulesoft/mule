@@ -6,6 +6,8 @@
  */
 package org.mule.routing.outbound;
 
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -77,7 +79,7 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
             if (iterator.hasNext()
                 && (isMatchAll() || ((outboundRouter instanceof TransformingMatchable) && ((TransformingMatchable) outboundRouter).isTransformBeforeMatch())))
             {
-                if (((DefaultMuleMessage) message).isConsumable())
+                if (isConsumable(message.getPayload().getClass()))
                 {
                     throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload()
                         .getClass()

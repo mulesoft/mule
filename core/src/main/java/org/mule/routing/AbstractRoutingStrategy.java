@@ -6,6 +6,8 @@
  */
 package org.mule.routing;
 
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -15,15 +17,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.management.stats.RouterStatistics;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.SystemUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -218,7 +217,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
      */
     public static void validateMessageIsNotConsumable(MuleEvent event, MuleMessage message) throws MessagingException
     {
-        if (((DefaultMuleMessage) message).isConsumable())
+        if (isConsumable(message.getPayload().getClass()))
         {
             throw new MessagingException(
                     CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()),
@@ -242,10 +241,9 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
      */
     protected static void assertNonConsumableMessage(MuleEvent event, MuleMessage message) throws MessagingException
     {
-        DefaultMuleMessage defaultMuleMessage = (DefaultMuleMessage) message;
-        if (defaultMuleMessage.isConsumable())
+        if (isConsumable(message.getPayload().getClass()))
         {
-            throw new MessagingException(CoreMessages.cannotCopyStreamPayload(defaultMuleMessage.getPayload().getClass().getName()), event);
+            throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()), event);
         }
     }
 }

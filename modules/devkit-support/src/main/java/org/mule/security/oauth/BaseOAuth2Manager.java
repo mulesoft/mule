@@ -7,6 +7,8 @@
 
 package org.mule.security.oauth;
 
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -483,8 +485,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
         if (message instanceof DefaultMuleMessage)
         {
-            DefaultMuleMessage dmm = (DefaultMuleMessage) message;
-            if (dmm.isConsumable())
+            if (isConsumable(message.getPayload().getClass()))
             {
                 try
                 {

@@ -7,6 +7,7 @@
 package org.mule;
 
 import static org.mule.util.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -21,7 +22,6 @@ import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
@@ -48,10 +48,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1750,6 +1748,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         IllegalStateException exception = new IllegalStateException(message);
         logger.warn("Message access violation", exception);
         return exception;
+    }
+
+    /**
+     * @deprecated since 3.8.0. Use {@link ClassUtils#isConsumable(Class)} instead.
+     * 
+     * Determines if the payload of this message is consumable i.e. it can't be read
+     * more than once.
+     */
+    @Deprecated
+    public boolean isConsumable()
+    {
+        return ClassUtils.isConsumable(getPayload().getClass());
     }
 
     public static class SerializedDataHandler implements Serializable

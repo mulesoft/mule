@@ -6,8 +6,9 @@
  */
 package org.mule.routing;
 
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.AbstractAnnotatedObject;
-import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -76,7 +77,7 @@ public class AbstractMatchingRouter extends AbstractAnnotatedObject implements M
 
             if (copyEvent)
             {
-                if (((DefaultMuleMessage) message).isConsumable())
+                if (isConsumable(message.getPayload().getClass()))
                 {
                     throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()), event, this);
                 }

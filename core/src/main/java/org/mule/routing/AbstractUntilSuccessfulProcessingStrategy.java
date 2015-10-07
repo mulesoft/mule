@@ -6,6 +6,8 @@
  */
 package org.mule.routing;
 
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -117,7 +119,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
             final MuleMessage message = event.getMessage();
             if (message instanceof DefaultMuleMessage)
             {
-                if (((DefaultMuleMessage) message).isConsumable())
+                if (isConsumable(message.getPayload().getClass()))
                 {
                     message.getPayloadAsBytes();
                 }
