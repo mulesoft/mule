@@ -6,21 +6,18 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.InterceptorFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.util.collection.ImmutableListCollector;
-
-import java.util.List;
 
 /**
  * Reusable and thread-safe factory that creates instances of {@link ConfigurationInstance}
- * <p/>
+ * <p>
  * The created instances will be of concrete type {@link LifecycleAwareConfigurationInstance}, which means
  * that all the {@link InterceptorFactory interceptor factories} obtained through
  * {@link ConfigurationModel#getInterceptorFactories()}  will be exercised per each
@@ -60,9 +57,9 @@ public final class ConfigurationInstanceFactory<T>
     public ConfigurationInstance<T> createConfiguration(String name, MuleEvent event) throws MuleException
     {
         return new LifecycleAwareConfigurationInstance<>(name,
-                                                 configurationModel,
-                                                 createConfigurationInstance(event),
-                                                 createInterceptors());
+                                                         configurationModel,
+                                                         createConfigurationInstance(event),
+                                                         createInterceptors(configurationModel));
 
     }
 
@@ -78,9 +75,9 @@ public final class ConfigurationInstanceFactory<T>
     public ConfigurationInstance<T> createConfiguration(String name, ResolverSetResult resolverSetResult) throws MuleException
     {
         return new LifecycleAwareConfigurationInstance<>(name,
-                                                 configurationModel,
-                                                 createConfigurationInstance(resolverSetResult),
-                                                 createInterceptors());
+                                                         configurationModel,
+                                                         createConfigurationInstance(resolverSetResult),
+                                                         createInterceptors(configurationModel));
 
     }
 
@@ -92,12 +89,5 @@ public final class ConfigurationInstanceFactory<T>
     private T createConfigurationInstance(MuleEvent event) throws MuleException
     {
         return configurationObjectBuilder.build(event);
-    }
-
-    private List<Interceptor> createInterceptors()
-    {
-        return configurationModel.getInterceptorFactories().stream()
-                .map(InterceptorFactory::createInterceptor)
-                .collect(new ImmutableListCollector<>());
     }
 }

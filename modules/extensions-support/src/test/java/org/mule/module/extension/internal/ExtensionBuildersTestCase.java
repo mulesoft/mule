@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
@@ -56,6 +57,7 @@ import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
@@ -218,7 +220,6 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void configlessDescriptor()
     {
-
         factory.createFrom(new DeclarationDescriptor().named("noConfigs").onVersion("1.0"));
     }
 
@@ -236,6 +237,15 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 
         assertDescribingContext(modelEnricher1);
         assertDescribingContext(modelEnricher2);
+    }
+
+    @Test
+    public void executorsAreInterceptable()
+    {
+        for (OperationModel operation : extensionModel.getOperations())
+        {
+            assertThat(operation.getExecutor(), is(instanceOf(Interceptable.class)));
+        }
     }
 
     private void assertDescribingContext(ModelEnricher modelEnricher)

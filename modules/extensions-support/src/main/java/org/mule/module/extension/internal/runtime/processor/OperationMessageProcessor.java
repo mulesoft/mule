@@ -140,6 +140,14 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     public void initialise() throws InitialisationException
     {
         operationExecutor = operationModel.getExecutor();
+        try
+        {
+            muleContext.getInjector().inject(operationExecutor);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(createStaticMessage("Could not inject dependencies into operation executor of type " + operationExecutor.getClass().getName()), e, this);
+        }
         initialiseIfNeeded(operationExecutor, muleContext);
     }
 

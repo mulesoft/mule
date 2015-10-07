@@ -11,8 +11,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import org.mule.DefaultMuleContext;
+import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.config.MuleManifest;
@@ -115,5 +118,13 @@ public abstract class ExtensionsTestUtils
             }
         }
         return manifestFile;
+    }
+
+    public static Injector spyInjector(MuleContext muleContext)
+    {
+        Injector spy = spy(muleContext.getInjector());
+        ((DefaultMuleContext) muleContext).setInjector(spy);
+
+        return spy;
     }
 }

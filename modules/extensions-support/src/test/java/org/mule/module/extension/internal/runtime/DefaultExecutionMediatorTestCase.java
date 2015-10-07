@@ -30,6 +30,9 @@ import org.mule.module.extension.internal.runtime.config.MutableConfigurationSta
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.junit.Before;
@@ -54,19 +57,26 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     @Mock
     private MutableConfigurationStats configurationStats;
 
-    @Mock
+    @Mock(extraInterfaces = Interceptable.class)
     private OperationExecutor operationExecutor;
 
     @Mock
-    private Interceptor interceptor1;
+    private Interceptor configurationInterceptor1;
 
     @Mock
-    private Interceptor interceptor2;
+    private Interceptor configurationInterceptor2;
+
+    @Mock
+    private Interceptor operationInterceptor1;
+
+    @Mock
+    private Interceptor operationInterceptor2;
 
     @Mock
     private Exception exception;
 
     private InOrder inOrder;
+    private List<Interceptor> orderedInterceptors;
 
     private ExecutionMediator mediator = new DefaultExecutionMediator();
     private final Object result = new Object();
@@ -78,7 +88,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
         when(operationExecutor.execute(operationContext)).thenReturn(result);
         when(operationContext.getConfiguration()).thenReturn(configurationInstance);
 
-        setInterceptors(interceptor1, interceptor2);
+        setInterceptors((Interceptable) configurationInstance, configurationInterceptor1, configurationInterceptor2);
+        setInterceptors((Interceptable) operationExecutor, operationInterceptor1, operationInterceptor2);
+        defineOrder(configurationInterceptor1, configurationInterceptor2, operationInterceptor1, operationInterceptor2);
     }
 
     @Test
@@ -119,7 +131,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     {
         stubException();
         final Exception decoratedException = mock(Exception.class);
-        when(interceptor2.onError(same(operationContext), any(RetryRequest.class), same(exception))).thenReturn(decoratedException);
+        when(configurationInterceptor2.onError(same(operationContext), any(RetryRequest.class), same(exception))).thenReturn(decoratedException);
 
         assertException(e -> {
             assertThat(e, is(sameInstance(decoratedException)));
@@ -172,7 +184,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     {
         stubException();
         Interceptor interceptor = mock(Interceptor.class);
-        setInterceptors(interceptor);
+        setInterceptors((Interceptable) configurationInstance, interceptor);
+        setInterceptors((Interceptable) operationExecutor);
+        defineOrder(interceptor);
+
         when(interceptor.onError(same(operationContext), any(RetryRequest.class), same(exception)))
                 .then(invocation -> {
                     RetryRequest retryRequest = (RetryRequest) invocation.getArguments()[1];
@@ -211,7 +226,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
 
     private void stubExceptionOnBeforeInterceptor() throws Exception
     {
-        doThrow(exception).when(interceptor2).before(operationContext);
+        doThrow(exception).when(operationInterceptor2).before(operationContext);
     }
 
     private void assertStatistics()
@@ -222,27 +237,32 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
 
     private void assertBefore() throws Exception
     {
-        inOrder.verify(interceptor1).before(operationContext);
-        inOrder.verify(interceptor2).before(operationContext);
+        verifyInOrder(interceptor -> {
+            try
+            {
+                interceptor.before(operationContext);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+
+        });
     }
 
     private void assertOnSuccess(VerificationMode verificationMode)
     {
-        inOrder.verify(interceptor1, verificationMode).onSuccess(operationContext, result);
-        inOrder.verify(interceptor2, verificationMode).onSuccess(operationContext, result);
+        verifyInOrder(interceptor -> interceptor.onSuccess(operationContext, result), verificationMode);
     }
 
     private void assertOnError(VerificationMode verificationMode)
     {
-        inOrder.verify(interceptor1, verificationMode).onError(same(operationContext), any(RetryRequest.class), same(exception));
-        inOrder.verify(interceptor2, verificationMode).onError(same(operationContext), any(RetryRequest.class), same(exception));
+        verifyInOrder(interceptor -> interceptor.onError(same(operationContext), any(RetryRequest.class), same(exception)), verificationMode);
     }
-
 
     private void assertAfter(Object expected)
     {
-        inOrder.verify(interceptor1).after(operationContext, expected);
-        inOrder.verify(interceptor2).after(operationContext, expected);
+        verifyInOrder(interceptor -> interceptor.after(operationContext, expected));
     }
 
     private void assertResult(Object result)
@@ -255,11 +275,27 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
         when(operationExecutor.execute(operationContext)).thenThrow(exception);
     }
 
-    private void setInterceptors(Interceptor... interceptors)
+    private void setInterceptors(Interceptable interceptable, Interceptor... interceptors)
     {
-        Interceptable interceptable = (Interceptable) configurationInstance;
         when(interceptable.getInterceptors()).thenReturn(asList(interceptors));
-        inOrder = inOrder(interceptors);
     }
 
+    private void defineOrder(Interceptor... interceptors)
+    {
+        inOrder = inOrder(interceptors);
+        orderedInterceptors = ImmutableList.copyOf(interceptors);
+    }
+
+    private void verifyInOrder(Consumer<Interceptor> consumer)
+    {
+        verifyInOrder(consumer, times(1));
+    }
+
+    private void verifyInOrder(Consumer<Interceptor> consumer, VerificationMode verificationMode)
+    {
+        for (Interceptor interceptor : orderedInterceptors)
+        {
+            consumer.accept(inOrder.verify(interceptor, verificationMode));
+        }
+    }
 }

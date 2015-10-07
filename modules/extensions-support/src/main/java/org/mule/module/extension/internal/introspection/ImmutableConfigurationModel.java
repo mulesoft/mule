@@ -15,8 +15,6 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.runtime.InterceptorFactory;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -26,12 +24,11 @@ import java.util.function.Supplier;
  *
  * @since 3.7.0
  */
-final class ImmutableConfigurationModel extends AbstractImmutableModel implements ConfigurationModel
+final class ImmutableConfigurationModel extends AbstractInterceptableModel implements ConfigurationModel
 {
 
     private final Supplier<ExtensionModel> extensionModelSupplier;
     private final List<ParameterModel> parameterModels;
-    private final List<InterceptorFactory> interceptorFactories;
     private final ConfigurationInstantiator instantiator;
 
     /**
@@ -53,13 +50,12 @@ final class ImmutableConfigurationModel extends AbstractImmutableModel implement
                                           Map<String, Object> modelProperties,
                                           List<InterceptorFactory> interceptorFactories)
     {
-        super(name, description, modelProperties);
+        super(name, description, modelProperties, interceptorFactories);
         validateRepeatedNames(parameterModels);
         checkArgument(instantiator != null, "instantiator cannot be null");
 
         this.extensionModelSupplier = extensionModelSupplier;
         this.parameterModels = immutableList(parameterModels);
-        this.interceptorFactories = interceptorFactories != null ? ImmutableList.copyOf(interceptorFactories) : ImmutableList.of();
         this.instantiator = instantiator;
     }
 
@@ -79,15 +75,6 @@ final class ImmutableConfigurationModel extends AbstractImmutableModel implement
     public ConfigurationInstantiator getInstantiator()
     {
         return instantiator;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<InterceptorFactory> getInterceptorFactories()
-    {
-        return interceptorFactories;
     }
 
     /**
