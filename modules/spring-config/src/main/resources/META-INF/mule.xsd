@@ -2054,7 +2054,7 @@
     <xsd:complexType name="abstractNotificationExceptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="exceptionStrategyType">
-                <xsd:attribute name="enableNotifications" type="xsd:boolean">
+                <xsd:attribute name="enableNotifications" type="xsd:boolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
                             Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.
@@ -2072,6 +2072,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="logException" use="optional" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

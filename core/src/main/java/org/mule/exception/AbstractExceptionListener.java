@@ -65,6 +65,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     protected WildcardFilter commitTxFilter;
 
     protected boolean enableNotifications = true;
+    protected boolean logException = true;
 
     protected String globalName;
 
@@ -313,14 +314,17 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      */
     protected void logException(Throwable t)
     {
-        MuleException muleException = ExceptionHelper.getRootMuleException(t);
-        if (muleException != null)
+        if (logException)
         {
-            logger.error(muleException.getDetailedMessage());
-        }
-        else
-        {
-            logger.error("Caught exception in Exception Strategy: " + t.getMessage(), t);
+            MuleException muleException = ExceptionHelper.getRootMuleException(t);
+            if (muleException != null)
+            {
+                logger.error(muleException.getDetailedMessage());
+            }
+            else
+            {
+                logger.error("Caught exception in Exception Strategy: " + t.getMessage(), t);
+            }
         }
     }
 
@@ -398,6 +402,19 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     public void setEnableNotifications(boolean enableNotifications)
     {
         this.enableNotifications = enableNotifications;
+    }
+
+    /**
+     * Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled.
+     */
+    public boolean isLogException()
+    {
+        return logException;
+    }
+
+    public void setLogException(boolean logException)
+    {
+        this.logException = logException;
     }
 
     public WildcardFilter getRollbackTxFilter()
