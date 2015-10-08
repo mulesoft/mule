@@ -26,7 +26,7 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
     }
 
     @Override
-    protected void logException(Throwable t)
+    protected void doLogException(Throwable t)
     {
         logger.debug("Ignoring", t);
     }

@@ -42,7 +42,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_START));
             FlowConstruct flowConstruct = event.getFlowConstruct();
             fireNotification(exception);
-            logException(exception);
+            logException(exception, event);
             processStatistics(event);
             event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
 
@@ -83,7 +83,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             try
             {
                 logger.error("Exception during exception strategy execution");
-                logException(e);
+                doLogException(e);
                 TransactionCoordination.getInstance().rollbackCurrentTransaction();
             }
             catch (Exception ex)
