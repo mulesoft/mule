@@ -26,6 +26,9 @@ import java.util.Set;
  */
 public abstract class MuleException extends Exception
 {
+    private static final String EXCEPTION_MESSAGE_DELIMITER = StringUtils.repeat('*', 80) + SystemUtils.LINE_SEPARATOR;
+    private static final String EXCEPTION_MESSAGE_SECTION_DELIMITER = StringUtils.repeat('-', 80) + SystemUtils.LINE_SEPARATOR;
+
     private final Map info = new HashMap();
     private int errorCode = -1;
     private String message = null;
@@ -153,8 +156,7 @@ public abstract class MuleException extends Exception
             return getMessage();
         }
         StringBuilder buf = new StringBuilder(1024);
-        buf.append(SystemUtils.LINE_SEPARATOR).append(StringUtils.repeat('*', 80)).append(
-            SystemUtils.LINE_SEPARATOR);
+        buf.append(SystemUtils.LINE_SEPARATOR).append(EXCEPTION_MESSAGE_DELIMITER);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
 
         Map info = ExceptionHelper.getExceptionInfo(this);
@@ -173,18 +175,14 @@ public abstract class MuleException extends Exception
         }
 
         // print exception stack
-        buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
-        buf.append(CoreMessages.exceptionStackIs()).append(SystemUtils.LINE_SEPARATOR);
-        buf.append(StringUtils.abbreviate(ExceptionHelper.getExceptionStack(this), 5000));
-
-        buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(EXCEPTION_MESSAGE_SECTION_DELIMITER);
         buf.append(CoreMessages.rootStackTrace()).append(SystemUtils.LINE_SEPARATOR);
         Throwable root = ExceptionHelper.getRootException(this);
         StringWriter w = new StringWriter();
         PrintWriter p = new PrintWriter(w);
         root.printStackTrace(p);
-        buf.append(StringUtils.abbreviate(w.toString(), 5000)).append(SystemUtils.LINE_SEPARATOR);
-        buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(w.toString()).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(EXCEPTION_MESSAGE_DELIMITER);
 
         return buf.toString();
     }
@@ -197,28 +195,18 @@ public abstract class MuleException extends Exception
             return getMessage();
         }
         StringBuilder buf = new StringBuilder(1024);
-        buf.append(SystemUtils.LINE_SEPARATOR).append(StringUtils.repeat('*', 80)).append(
-            SystemUtils.LINE_SEPARATOR);
+        buf.append(SystemUtils.LINE_SEPARATOR).append(EXCEPTION_MESSAGE_DELIMITER);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
+        buf.append("Element               : ").append(ExceptionHelper.getExceptionInfo(this).get(LocatedMuleException.INFO_LOCATION_KEY)).append(SystemUtils.LINE_SEPARATOR);
+        
         // print exception stack
-        buf.append(StringUtils.repeat('-', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(EXCEPTION_MESSAGE_SECTION_DELIMITER);
         buf.append(CoreMessages.exceptionStackIs()).append(SystemUtils.LINE_SEPARATOR);
-        buf.append(StringUtils.abbreviate(ExceptionHelper.getExceptionStack(this), 5000));
-
-        buf.append(StringUtils.repeat('-', 80)).append(SystemUtils.LINE_SEPARATOR);
-        buf.append(CoreMessages.rootStackTrace()).append(SystemUtils.LINE_SEPARATOR);
-        Throwable root = ExceptionHelper.getRootException(this);
-        Throwable rootSummary = ExceptionHelper.summarise(root, 3);
-        StringWriter w = new StringWriter();
-        PrintWriter p = new PrintWriter(w);
-        rootSummary.printStackTrace(p);
-        buf.append(StringUtils.abbreviate(w.toString(), 5000));
-        buf.append(
-            "    + "
-                            + root.getStackTrace().length
-                            + " more (set debug level logging or '-Dmule.verbose.exceptions=true' for everything)")
-            .append(SystemUtils.LINE_SEPARATOR);
-        buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(ExceptionHelper.getExceptionStack(this));
+        buf.append(SystemUtils.LINE_SEPARATOR)
+           .append("  (set debug level logging or '-Dmule.verbose.exceptions=true' for everything)")
+           .append(SystemUtils.LINE_SEPARATOR);
+        buf.append(EXCEPTION_MESSAGE_DELIMITER);
 
         return buf.toString();
     }

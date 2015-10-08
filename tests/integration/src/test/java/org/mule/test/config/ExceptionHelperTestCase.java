@@ -23,12 +23,16 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.SystemUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections.comparators.ComparableComparator;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
@@ -111,26 +115,78 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         {
             assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
                     "foo (org.mule.api.DefaultMuleException)",
-                    "  org.mule.test.config.ExceptionHelperTestCase$1$1:",
-                    "  (1 more...)", // CollectionUtils.forAllDo
-                    "  org.mule.test.config.ExceptionHelperTestCase$1:",
-                    "  org.mule.test.config.ExceptionHelperTestCase:",
+                    "  org.mule.test.config.ExceptionHelperTestCase$1$1.execute:",
+                    "  org.apache.commons.collections.CollectionUtils.forAllDo:",
+                    "  org.mule.test.config.ExceptionHelperTestCase$1.execute:",
+                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
                     "  (" + (calls + 13) + " more...)")); // recursive
         }
     }
 
     @Test
+    public void filteredStackIncludingMixedNonMuleCode()
+    {
+    	int calls = 5;
+    	try
+    	{
+    		generateStackEntries(calls, new Closure()
+    		{
+    			@Override
+    			public void execute(Object input)
+    			{
+    				Comparable exceptionComparable = new Comparable()
+    				{
+    					@Override
+    					public int compareTo(Object o) {
+    						throw new RuntimeException(new DefaultMuleException(MessageFactory.createStaticMessage("foo")));
+    					}
+    				};
+					Collections.sort(Arrays.asList(exceptionComparable, exceptionComparable), ComparableComparator.getInstance());
+    			}
+    		});
+    		fail("Expected exception");
+    	}
+    	catch (Exception e)
+    	{
+    		assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
+    				"foo (org.mule.api.DefaultMuleException)",
+    				"  org.mule.test.config.ExceptionHelperTestCase$2$1.compareTo:",
+    				"  org.apache.commons.collections.comparators.ComparableComparator.compare:",
+    				"  java.util", // Collections.sort
+    				"  java.util", // Collections.sort
+    				"  java.util", // Collections.sort
+    				"  java.util", // Collections.sort
+    				"  java.util", // Collections.sort
+    				"  org.mule.test.config.ExceptionHelperTestCase$2.execute:",
+    				"  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
+    				"  (" + (calls + 13) + " more...)")); // recursive
+    	}
+    }
+    
+    @Test
     public void filteredStackAllMuleCode()
     {
+    	int calls = 5;
         try
         {
-            throw new RuntimeException(new DefaultMuleException(MessageFactory.createStaticMessage("foo")));
+			generateStackEntries(calls, new Closure() 
+			{
+				@Override
+				public void execute(Object input)
+				{
+					throw new RuntimeException(new DefaultMuleException(MessageFactory.createStaticMessage("foo")));
+
+				}
+			});
         }
         catch (Exception e)
         {
             assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
                     "foo (org.mule.api.DefaultMuleException)",
-                    "  org.mule.test.config.ExceptionHelperTestCase:"));
+                    "  org.mule.test.config.ExceptionHelperTestCase$3.execute:",
+                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
+                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
+                    "  (" + (calls + 12) + " more...)")); // recursive
         }
     }
 
