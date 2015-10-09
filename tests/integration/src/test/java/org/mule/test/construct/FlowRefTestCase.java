@@ -16,6 +16,8 @@ import org.mule.api.client.MuleClient;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.util.List;
+
 import org.junit.Test;
 
 public class FlowRefTestCase extends FunctionalTestCase
@@ -50,11 +52,31 @@ public class FlowRefTestCase extends FunctionalTestCase
         assertEquals("0B", ((Flow) getFlowConstruct("flow2")).process(eventB).getMessageAsString());
     }
 
+    @Test
+    public void dynamicFlowRefWithChoice() throws Exception
+    {
+        MuleEvent eventC = getTestEvent("0");
+        eventC.setFlowVariable("letter", "C");
+
+        assertEquals("0A", ((Flow) getFlowConstruct("flow2")).process(eventC).getMessageAsString());
+    }
+
+    @Test
+    public void dynamicFlowRefWithScatterGather() throws Exception
+    {
+        MuleEvent eventSG = getTestEvent("0");
+        eventSG.setFlowVariable("letter", "SG");
+
+        List payload = (List) ((Flow) getFlowConstruct("flow2")).process(eventSG).getMessage().getPayload();
+        assertEquals("0A", payload.get(0));
+        assertEquals("0B", payload.get(1));
+    }
+
     @Test(expected=MessagingException.class)
     public void testFlowRefNotFound() throws Exception
     {
         MuleEvent eventC = getTestEvent("0");
-        eventC.setFlowVariable("letter", "C");
+        eventC.setFlowVariable("letter", "Z");
 
         assertEquals("0C", ((Flow) getFlowConstruct("flow2")).process(eventC).getMessageAsString());
 
