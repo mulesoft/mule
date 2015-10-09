@@ -135,7 +135,7 @@ public abstract class MuleException extends Exception
 
     public String getDetailedMessage()
     {
-        if (DefaultMuleConfiguration.verboseExceptions)
+        if (DefaultMuleConfiguration.isVerboseExceptions())
         {
             return getVerboseMessage();
         }

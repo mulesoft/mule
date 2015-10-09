@@ -39,7 +39,7 @@ public class MessageProcessingFlowStackManager extends LocationExecutionContextP
 
     public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification)
     {
-        if (DefaultMuleConfiguration.flowCallStacks)
+        if (DefaultMuleConfiguration.isFlowCallStacks())
         {
             notification.getSource().getFlowCallStack().peek().addInvokedMessageProcessor(
                     resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getProcessorPath(), notification.getProcessor()));
@@ -72,7 +72,7 @@ public class MessageProcessingFlowStackManager extends LocationExecutionContextP
 
     public void onFlowStart(MuleEvent muleEvent, String flowName)
     {
-        if (DefaultMuleConfiguration.flowCallStacks)
+        if (DefaultMuleConfiguration.isFlowCallStacks())
         {
             muleEvent.getFlowCallStack().push(new DefaultFlowStackElement(flowName));
         }
@@ -80,7 +80,7 @@ public class MessageProcessingFlowStackManager extends LocationExecutionContextP
 
     public void onFlowComplete(MuleEvent muleEvent)
     {
-        if (DefaultMuleConfiguration.flowCallStacks)
+        if (DefaultMuleConfiguration.isFlowCallStacks())
         {
             muleEvent.getFlowCallStack().pop();
         }
@@ -89,7 +89,7 @@ public class MessageProcessingFlowStackManager extends LocationExecutionContextP
     @Override
     public Map<String, Object> getContextInfo(MuleEvent muleEvent, MessageProcessor lastProcessed)
     {
-        if (DefaultMuleConfiguration.flowCallStacks)
+        if (DefaultMuleConfiguration.isFlowCallStacks())
         {
             return Collections.<String, Object> singletonMap(FLOW_STACK_INFO_KEY, muleEvent.getFlowCallStack().toString());
         }
