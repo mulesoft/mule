@@ -145,7 +145,7 @@ public class MessagingException extends MuleException
 
         if (muleMessage != null)
         {
-            if (DefaultMuleConfiguration.verboseExceptions)
+            if (DefaultMuleConfiguration.isVerboseExceptions())
             {
                 Object payload = muleMessage.getPayload();
                 if (payload == null)

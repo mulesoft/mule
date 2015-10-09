@@ -154,7 +154,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private boolean disableTimeouts = false;
 
-    protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
+    protected static transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
     private boolean containerMode;
@@ -360,19 +360,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             verboseExceptions = BooleanUtils.toBoolean(p);
         }
-        else
-        {
-            verboseExceptions = logger.isDebugEnabled();
-        }
 
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "flowCallStacks");
         if (p != null)
         {
             flowCallStacks = BooleanUtils.toBoolean(p);
-        }
-        else
-        {
-            flowCallStacks = logger.isDebugEnabled();
         }
 
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
@@ -386,6 +378,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             disableTimeouts = Boolean.valueOf(p);
         }
+    }
+    
+    public static boolean isVerboseExceptions()
+    {
+        return verboseExceptions || logger.isDebugEnabled();
+    }
+    
+    public static boolean isFlowCallStacks()
+    {
+        return flowCallStacks || logger.isDebugEnabled();
     }
 
     protected void validateEncoding() throws FatalException
