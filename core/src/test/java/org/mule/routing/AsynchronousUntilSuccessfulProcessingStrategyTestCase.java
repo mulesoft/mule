@@ -71,6 +71,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, Answers.RETURNS_DEEP_STUBS.get());
     private ScheduledThreadPoolExecutor mockScheduledPool = mock(ScheduledThreadPoolExecutor.class, Answers.RETURNS_DEEP_STUBS.get());
     private SimpleMemoryObjectStore<MuleEvent> objectStore = new SimpleMemoryObjectStore<MuleEvent>();
+    private MessageProcessor mockDLQ = mock(MessageProcessor.class);
     private FailCallback failRoute = new FailCallback()
     {
         @Override
@@ -104,6 +105,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         configureMockScheduledPoolToInvokeRunnableInNewThread();
         configureMockRouteToCountDownRouteLatch();
         configureExceptionStrategyToReleaseLatchWhenExecuted();
+        configureDLQToReleaseLatchWhenExecuted();
     }
 
     @Test(expected = InitialisationException.class)
@@ -151,6 +153,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                 return item instanceof RetryPolicyExhaustedException && EXPECTED_FAILURE_MSG.equals(((RetryPolicyExhaustedException) item).getCause().getMessage());
             }
         }), eq(mockEvent));
+        verify(mockDLQ, never()).process(any(MuleEvent.class));
     }
 
     @Test
@@ -177,6 +180,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                 return item instanceof RetryPolicyExhaustedException && ((RetryPolicyExhaustedException) item).getMessage().contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
             }
         }), eq(mockEvent));
+        verify(mockDLQ, never()).process(any(MuleEvent.class));
     }
 
     @Test
@@ -204,8 +208,129 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                        ((RetryPolicyExhaustedException) item).getMessage().contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
             }
         }), eq(mockEvent));
+        verify(mockDLQ, never()).process(any(MuleEvent.class));
     }
 
+    @Test
+    public void alwaysFailUsingFailureExpressionDLQ() throws Exception
+    {
+        when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(mockDLQ);
+        when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+        executeUntilSuccessfulFailingRoute(new FailCallback()
+        {
+            @Override
+            public void doFail()
+            {
+                throw new RuntimeException(EXPECTED_FAILURE_MSG);
+            }
+        });
+        waitUntilRouteIsExecuted();
+        waitUntilExceptionIsHandled();
+        
+        verify(mockEvent.getFlowConstruct().getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
+        verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                MuleEvent argEvent = (MuleEvent) argument;
+
+                verify(argEvent.getMessage(), times(1)).setExceptionPayload(argThat(new ArgumentMatcher<ExceptionPayload>()
+                {
+                    @Override
+                    public boolean matches(Object argument)
+                    {
+                        assertThat(((ExceptionPayload) argument).getException().getMessage(),
+                                containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
+                        return true;
+                    }
+                }));
+
+                return true;
+            }
+        }));
+    }
+    
+    @Test
+    public void alwaysFailMessageUsingFailureExpressionDLQ() throws Exception
+    {
+        when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(mockDLQ);
+        when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+        executeUntilSuccessfulFailingRoute(new FailCallback()
+        {
+            @Override
+            public void doFail() throws MessagingException
+            {
+                throw new MessagingException(CoreMessages.createStaticMessage(EXPECTED_FAILURE_MSG), mockEvent, mockRoute);
+            }
+        });
+        waitUntilRouteIsExecuted();
+        waitUntilExceptionIsHandled();
+        
+        verify(mockEvent.getFlowConstruct().getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
+        verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                MuleEvent argEvent = (MuleEvent) argument;
+
+                verify(argEvent.getMessage(), times(1)).setExceptionPayload(argThat(new ArgumentMatcher<ExceptionPayload>()
+                {
+                    @Override
+                    public boolean matches(Object argument)
+                    {
+                        assertThat(((ExceptionPayload) argument).getException().getMessage(),
+                                containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
+                        return true;
+                    }
+                }));
+
+                return true;
+            }
+        }));
+    }
+    
+    @Test
+    public void alwaysFailMessageWrapUsingFailureExpressionDLQ() throws Exception
+    {
+        when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(mockDLQ);
+        when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+        executeUntilSuccessfulFailingRoute(new FailCallback()
+        {
+            @Override
+            public void doFail() throws MessagingException
+            {
+                throw new MessagingException(mockEvent, new RuntimeException(EXPECTED_FAILURE_MSG));
+            }
+        });
+        waitUntilRouteIsExecuted();
+        waitUntilExceptionIsHandled();
+        
+        verify(mockEvent.getFlowConstruct().getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
+        verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                MuleEvent argEvent = (MuleEvent)argument;
+                
+                verify(argEvent.getMessage(), times(1)).setExceptionPayload(argThat(new ArgumentMatcher<ExceptionPayload>()
+                {
+                    @Override
+                    public boolean matches(Object argument)
+                    {
+                        assertThat(((ExceptionPayload) argument).getException().getMessage(),
+                                containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
+                        return true;
+                    }
+                }));
+
+                return true;
+            }
+        }));
+    }
+    
     @Test
     public void successfulExecution() throws Exception
     {
@@ -324,6 +449,19 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     private void configureExceptionStrategyToReleaseLatchWhenExecuted()
     {
         when(mockEvent.getFlowConstruct().getExceptionListener().handleException(any(Exception.class), any(MuleEvent.class))).thenAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                exceptionHandlingLatch.release();
+                return null;
+            }
+        });
+    }
+
+    private void configureDLQToReleaseLatchWhenExecuted() throws MuleException
+    {
+        when(mockDLQ.process(any(MuleEvent.class))).thenAnswer(new Answer()
         {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable

@@ -6,19 +6,27 @@
  */
 package org.mule.test.routing;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.tck.functional.InvocationCountMessageProcessor.getNumberOfInvocationsFor;
 
+import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.construct.Flow;
+import org.mule.retry.RetryPolicyExhaustedException;
+import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
@@ -30,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
@@ -94,6 +103,16 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     @Test
     public void testFullConfiguration() throws Exception
     {
+        final AtomicReference<ExceptionPayload> dlqExceptionPayload = new AtomicReference<>();
+        deadLetterQueueProcessor.setEventCallback(new EventCallback()
+        {
+            @Override
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                dlqExceptionPayload.set(context.getMessage().getExceptionPayload());
+            }
+        });
+
         final String payload = RandomStringUtils.randomAlphanumeric(20);
         final MuleMessage response = client.send("vm://input-2", payload, null);
         assertEquals("ACK", response.getPayloadAsString());
@@ -108,6 +127,15 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         receivedPayloads = ponderUntilMessageCountReceivedByDlqProcessor(1);
         assertEquals(1, receivedPayloads.size());
         assertEquals(payload, receivedPayloads.get(0));
+
+        assertThat(dlqExceptionPayload.get(), is(notNullValue()));
+        assertThat(dlqExceptionPayload.get().getException(), instanceOf(RetryPolicyExhaustedException.class));
+        assertThat(dlqExceptionPayload.get().getException().getMessage(),
+                containsString("until-successful retries exhausted. Last exception message was: Failure expression positive when processing event"));
+
+        assertThat(dlqExceptionPayload.get().getException().getCause(), instanceOf(MuleRuntimeException.class));
+        assertThat(dlqExceptionPayload.get().getException().getMessage(),
+                containsString("Failure expression positive when processing event"));
     }
 
     @Test
@@ -125,6 +153,16 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         }
 
         ponderUntilMessageCountReceivedByCustomMP(1);
+
+        ExceptionPayload dlqExceptionPayload = CustomMP.getProcessedMessages().get(0).getExceptionPayload();
+        assertThat(dlqExceptionPayload, is(notNullValue()));
+        assertThat(dlqExceptionPayload.getException(), instanceOf(RetryPolicyExhaustedException.class));
+        assertThat(dlqExceptionPayload.getException().getMessage(),
+                containsString("until-successful retries exhausted. Last exception message was: Failure expression positive when processing event"));
+
+        assertThat(dlqExceptionPayload.getException().getCause(), instanceOf(MuleRuntimeException.class));
+        assertThat(dlqExceptionPayload.getException().getMessage(),
+                containsString("Failure expression positive when processing event"));
     }
 
     @Test
@@ -269,22 +307,27 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
 
     static class CustomMP implements MessageProcessor
     {
-        private static int count;
+        private static List<MuleMessage> processedMessages = new ArrayList<>();
 
         public static void clearCount()
         {
-            count = 0;
+            processedMessages.clear();
         }
 
         public static int getCount()
         {
-            return count;
+            return processedMessages.size();
+        }
+
+        public static List<MuleMessage> getProcessedMessages()
+        {
+            return processedMessages;
         }
 
         @Override
         public MuleEvent process(final MuleEvent event) throws MuleException
         {
-            count++;
+            processedMessages.add(event.getMessage());
             return null;
         }
     }

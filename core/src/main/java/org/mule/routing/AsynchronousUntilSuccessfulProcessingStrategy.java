@@ -6,7 +6,6 @@
  */
 package org.mule.routing;
 
-import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
@@ -29,7 +28,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.retry.RetryPolicyExhaustedException;
-import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.queue.objectstore.QueueKey;
 import org.mule.util.store.QueuePersistenceObjectStore;
@@ -212,7 +210,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         // cluster to compete for the same
         // events over a shared object store
         // it also adds a random trailer to support events which have been
-        // splitted and thus have the same id. Random number was chosen over
+        // split and thus have the same id. Random number was chosen over
         // UUID for performance reasons
         String key = String.format("%s-%s-%s-%d", muleEvent.getFlowConstruct(), muleEvent.getMuleContext().getClusterId(), muleEvent.getId(), random.nextInt());
 
@@ -231,6 +229,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
         try
         {
+            mutableEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException)));
             getUntilSuccessfulConfiguration().getDlqMP().process(mutableEvent);
         }
         catch (MessagingException e)
