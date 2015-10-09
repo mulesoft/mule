@@ -33,7 +33,7 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionListener i
     {
         fireNotification(ex);
 
-        logException(ex);
+        doLogException(ex);
         
         if (isRollback(ex))
         {

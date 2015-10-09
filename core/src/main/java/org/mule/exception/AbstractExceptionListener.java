@@ -65,7 +65,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     protected WildcardFilter commitTxFilter;
 
     protected boolean enableNotifications = true;
-    protected boolean logException = true;
+    protected String logException;
 
     protected String globalName;
 
@@ -312,19 +312,24 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      *
      * @param t the exception thrown
      */
-    protected void logException(Throwable t)
+    protected void logException(Throwable t, MuleEvent event)
     {
-        if (logException)
+        if (this.muleContext.getExpressionManager().evaluateBoolean(logException, event, true, true))
         {
-            MuleException muleException = ExceptionHelper.getRootMuleException(t);
-            if (muleException != null)
-            {
-                logger.error(muleException.getDetailedMessage());
-            }
-            else
-            {
-                logger.error("Caught exception in Exception Strategy: " + t.getMessage(), t);
-            }
+            doLogException(t);
+        }
+    }
+
+    protected void doLogException(Throwable t)
+    {
+        MuleException muleException = ExceptionHelper.getRootMuleException(t);
+        if (muleException != null)
+        {
+            logger.error(muleException.getDetailedMessage());
+        }
+        else
+        {
+            logger.error("Caught exception in Exception Strategy: " + t.getMessage(), t);
         }
     }
 
@@ -407,12 +412,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     /**
      * Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled.
      */
-    public boolean isLogException()
+    public String isLogException()
     {
         return logException;
     }
 
-    public void setLogException(boolean logException)
+    public void setLogException(String logException)
     {
         this.logException = logException;
     }
@@ -459,7 +464,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         }
         catch (TransactionException e)
         {
-            logException(e);
+            doLogException(e);
         }
     }
 

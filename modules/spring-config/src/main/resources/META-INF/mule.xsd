@@ -2075,7 +2075,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="logException" use="optional" type="xsd:boolean" default="true">
+                <xsd:attribute name="logException" use="optional" type="expressionBoolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
                             Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.

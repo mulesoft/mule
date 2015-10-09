@@ -34,7 +34,7 @@ public class UnitTestExceptionStrategy extends DefaultMessagingExceptionStrategy
     }
 
     @Override
-    protected void logException(Throwable t)
+    protected void doLogException(Throwable t)
     {
         logger.debug("logException", t);
     }
