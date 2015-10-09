@@ -6,6 +6,20 @@
  */
 package org.mule.config;
 
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -20,18 +34,6 @@ import org.mule.util.MapUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.SystemUtils;
-
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can be
@@ -559,14 +561,13 @@ public final class ExceptionHelper
         ExceptionReader rootMuleReader = getExceptionReader(rootMule);
         buf.append(rootMuleReader.getMessage(rootMule))
            .append(" (")
-            .append(rootMule.getClass().getName())
-            .append(")")
-            .append(SystemUtils.LINE_SEPARATOR);
+           .append(rootMule.getClass().getName())
+           .append(")")
+           .append(SystemUtils.LINE_SEPARATOR);
 
         if (verbose)
         {
             int processedElements = 0;
-            int nonMuleElements = 0;
             int processedMuleElements = 1;
             for (StackTraceElement stackTraceElement : root.getStackTrace())
             {
@@ -579,25 +580,16 @@ public final class ExceptionHelper
                 if (stackTraceElement.getClassName().matches(MULE_PACKAGE_REGEXP))
                 {
                     ++processedMuleElements;
-                    if(nonMuleElements > 0)
-                    {
-                        buf.append("  (")
-                            .append(nonMuleElements)
-                            .append(" more...)")
-                            .append(SystemUtils.LINE_SEPARATOR);
-                    }
-                    
-                    buf.append("  ")
-                        .append(stackTraceElement.getClassName())
-                        .append(":")
-                        .append(stackTraceElement.getLineNumber())
-                        .append(SystemUtils.LINE_SEPARATOR);
-                    nonMuleElements = 0;
                 }
-                else
-                {
-                    ++nonMuleElements;
-                }
+                
+                buf.append("  ")
+                   .append(stackTraceElement.getClassName())
+                   .append(".")
+                   .append(stackTraceElement.getMethodName())
+                   .append(":")
+                   .append(stackTraceElement.getLineNumber())
+                   .append(")")
+                   .append(SystemUtils.LINE_SEPARATOR);
             }
             
             if (root.getStackTrace().length - processedElements > 0)
