@@ -131,6 +131,10 @@ public class FlowRefFactoryBean
                 {
                     ((FlowConstructAware) referencedFlow).setFlowConstruct(flowConstruct);
                 }
+                if (referencedFlow instanceof MuleContextAware)
+                {
+                    ((MuleContextAware) referencedFlow).setMuleContext(muleContext);
+                }
                 if (referencedFlow instanceof MessageProcessorChain)
                 {
                     for (MessageProcessor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors())
@@ -138,6 +142,10 @@ public class FlowRefFactoryBean
                         if (processor instanceof FlowConstructAware)
                         {
                             ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
+                        }
+                        if (processor instanceof MuleContextAware)
+                        {
+                            ((MuleContextAware) processor).setMuleContext(muleContext);
                         }
                     }
                 }
