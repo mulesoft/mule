@@ -140,7 +140,7 @@ public class MessagingException extends MuleException
 
         if (message != null)
         {
-            buf.append(message.getMessage()).append(". ");
+            buf.append(message.getMessage()).append(".");
         }
 
         if (muleMessage != null)
