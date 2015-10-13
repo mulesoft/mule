@@ -44,7 +44,6 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
 {
 
     private static final String EXCEPTION_MESSAGE_TITLE_PREFIX = "Exception(s) were found for route(s): " + LINE_SEPARATOR;
-    private static final String EXCEPTION_NULL_PAYLOAD_SUFFIX = "Message payload is of type: NullPayload";
     private static Set<Thread> capturedThreads;
 
     @Override
@@ -97,7 +96,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     {
         assertRouteException("routeWithException",
                              EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: Functional Test Service Exception. Component that caused exception is:",
-                             "}. " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
+                             "}.");
     }
 
     @Test
@@ -105,7 +104,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     {
         assertRouteException("routeWithExceptionWithMessage",
                              EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: I'm a message. Component that caused exception is:",
-                             "}. " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
+                             "}.");
     }
 
     @Test
@@ -113,7 +112,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     {
         assertRouteException("routeWithNonMuleException",
                              EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: java.lang.NullPointerException: nonMule. Component that caused exception is:",
-                             "}. " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
+                             "}.");
     }
 
     @Test
@@ -121,7 +120,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     {
         assertRouteException("routeWithMelException",
                              EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: Execution of the expression \"invalidExpr\" failed. (org.mule.api.expression.ExpressionRuntimeException).",
-                             "). " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
+                             ").");
     }
 
     @Test
@@ -129,7 +128,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     {
         assertRouteException("routeWithExceptionInSequentialProcessing",
                              EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: Functional Test Service Exception. Component that caused exception is:",
-                             "}. " + EXCEPTION_NULL_PAYLOAD_SUFFIX);
+                             "}.");
     }
 
     private void assertRouteException(String flow, String exceptionMessageStart, String exceptionMessageEnd) throws Exception

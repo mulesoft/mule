@@ -7,7 +7,6 @@
 package org.mule.test.construct;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -28,7 +27,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -112,7 +110,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                 .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously. Message payload is of type: BufferInputStream"));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously."));
     }
 
     @Test
@@ -122,7 +120,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                 .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously. Message payload is of type: BufferInputStream"));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously."));
     }
 
     @Test
