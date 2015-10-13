@@ -6,6 +6,8 @@
  */
 package org.mule.config.spring.factories;
 
+import static org.mule.util.NotificationUtils.buildPaths;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
@@ -21,10 +23,14 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MessageProcessingFlowStackManager;
 import org.mule.processor.NonBlockingMessageProcessor;
+import org.mule.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.processor.chain.SubFlowMessageProcessor;
+import org.mule.util.NotificationUtils.FlowMap;
 
 import java.util.Collection;
 import java.util.Map;
@@ -62,6 +68,42 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         {
             FlowRefFactoryBean.this.setAnnotations(annotations);
         }
+    }
+    
+    private abstract class FlowRefMessageProcessorContainer extends FlowRefMessageProcessor implements DynamicMessageProcessorContainer
+    {
+        private MessageProcessorPathElement pathElement;
+        private MessageProcessor dynamicMessageProcessor;
+
+        @Override
+        public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+            this.pathElement = pathElement;
+        }
+        
+        @Override
+        public FlowMap buildInnerPaths()
+        {
+            if (dynamicMessageProcessor instanceof MessageProcessorContainer)
+            {
+                ((MessageProcessorContainer) dynamicMessageProcessor).addMessageProcessorPathElements(getPathElement());
+                return buildPaths(getPathElement());
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public MessageProcessorPathElement getPathElement()
+        {
+            return pathElement;
+        }
+
+        protected void setResolvedMessageProcessor(MessageProcessor dynamicMessageProcessor)
+        {
+            this.dynamicMessageProcessor = dynamicMessageProcessor;
+        }
+
     }
 
     private static final String NULL_FLOW_CONTRUCT_NAME = "null";
@@ -125,7 +167,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         }
         else if (!referenceCache.containsKey(name))
         {
-            MessageProcessor dynamicReference = new FlowRefMessageProcessor()
+            MessageProcessor dynamicReference = new FlowRefMessageProcessorContainer()
             {
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
@@ -134,6 +176,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
                     String flowName = muleContext.getExpressionManager()
                                                  .parse(refName, event);
                     final MessageProcessor dynamicMessageProcessor = getReferencedFlow(flowName, event.getFlowConstruct());
+                    setResolvedMessageProcessor(dynamicMessageProcessor);
 
                     Collection<MessageProcessingFlowStackManager> flowStackManagers = applicationContext.getBeansOfType(MessageProcessingFlowStackManager.class).values();
 
@@ -160,6 +203,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
                     }
                     finally
                     {
+                        setResolvedMessageProcessor(null);
                         if (dynamicMessageProcessor instanceof SubFlowMessageProcessor)
                         {
                             for (MessageProcessingFlowStackManager messageProcessingFlowStackManager : flowStackManagers)
