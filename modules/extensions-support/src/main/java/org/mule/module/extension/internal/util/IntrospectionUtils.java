@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.util;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -23,6 +24,7 @@ import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.param.Ignore;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
@@ -199,10 +201,10 @@ public class IntrospectionUtils
         return !forceOptional && parameterModel.isRequired();
     }
 
-    public static boolean isDynamic(AccessibleObject object)
+    public static ExpressionSupport getExpressionSupport(AccessibleObject object)
     {
         Parameter parameter = object.getAnnotation(Parameter.class);
-        return parameter != null ? parameter.isDynamic() : true;
+        return parameter != null ? parameter.expressionSupport() : SUPPORTED;
     }
 
     public static boolean isVoid(Method method)

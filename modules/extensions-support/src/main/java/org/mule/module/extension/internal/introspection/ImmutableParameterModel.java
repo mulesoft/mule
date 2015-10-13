@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ParameterModel;
 
 import java.util.Map;
@@ -22,26 +23,26 @@ final class ImmutableParameterModel extends AbstractImmutableModel implements Pa
 
     private final DataType type;
     private final boolean required;
-    private final boolean dynamic;
+    private final ExpressionSupport expressionSupport;
     private final Object defaultValue;
 
     /**
      * Creates a new instance with the given state
      *
-     * @param name            the parameter's name. Cannot be blank and cannot be one of the values in {@link #RESERVED_NAMES}
-     * @param description     the parameter's description
-     * @param type            the parameter's {@link DataType}. Cannot be {@code null}
-     * @param required        whether this parameter is required or not
-     * @param dynamic         whether this parameter is dynamic or not
-     * @param defaultValue    this parameter's default value
-     * @param modelProperties A {@link Map} of custom properties which extend this model
+     * @param name              the parameter's name. Cannot be blank and cannot be one of the values in {@link #RESERVED_NAMES}
+     * @param description       the parameter's description
+     * @param type              the parameter's {@link DataType}. Cannot be {@code null}
+     * @param required          whether this parameter is required or not
+     * @param expressionSupport the {@link ExpressionSupport} that applies to {@code this} {@link ParameterModel}
+     * @param defaultValue      this parameter's default value
+     * @param modelProperties   A {@link Map} of custom properties which extend this model
      * @throws IllegalArgumentException if {@code required} is {@code true} and {@code defaultValue} is not {@code null} at the same time
      */
     protected ImmutableParameterModel(String name,
                                       String description,
                                       DataType type,
                                       boolean required,
-                                      boolean dynamic,
+                                      ExpressionSupport expressionSupport,
                                       Object defaultValue,
                                       Map<String, Object> modelProperties)
     {
@@ -62,7 +63,7 @@ final class ImmutableParameterModel extends AbstractImmutableModel implements Pa
 
         this.type = type;
         this.required = required;
-        this.dynamic = dynamic;
+        this.expressionSupport = expressionSupport;
         this.defaultValue = defaultValue;
     }
 
@@ -88,9 +89,9 @@ final class ImmutableParameterModel extends AbstractImmutableModel implements Pa
      * {@inheritDoc}
      */
     @Override
-    public boolean isDynamic()
+    public ExpressionSupport getExpressionSupport()
     {
-        return dynamic;
+        return expressionSupport;
     }
 
     /**

@@ -22,7 +22,9 @@
                        recipe="recipes"
                        initialHealth="CANCER"
                        finalHealth="DEAD"
-                       candidateDoors="candidateDoors">
+                       candidateDoors="candidateDoors"
+                       firstEndevour="Gray Matter Technologies"
+                       labAddress="#['Pollos Hermanos']">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
@@ -47,7 +49,9 @@
                        recipe="${recipe}"
                        initialHealth="${initialHealth}"
                        finalHealth="${finalHealth}"
-                       candidateDoors="${candidateDoors}">
+                       candidateDoors="${candidateDoors}"
+                       firstEndevour="Gray Matter Technologies"
+                       labAddress="#['Pollos Hermanos']">
         <heisenberg:enemies>
             <heisenberg:enemy value="${fring}"/>
             <heisenberg:enemy value="${hank}"/>
@@ -73,7 +77,9 @@
                        recipe="recipes"
                        ricinPacks="ricinPacks"
                        nextDoor="door"
-                       candidateDoors="candidateDoors">
+                       candidateDoors="candidateDoors"
+                       firstEndevour="Gray Matter Technologies"
+                       labAddress="#['Pollos Hermanos']">
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenberg"
@@ -86,7 +92,9 @@
                        dateOfDeath="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfDeath()]"
                        money="#[money]"
                        recipe="#[app.registry.recipes]"
-                       candidateDoors="#[app.registry.candidateDoors]">
+                       candidateDoors="#[app.registry.candidateDoors]"
+                       firstEndevour="Gray Matter Technologies"
+                       labAddress="#['Pollos Hermanos']">
         <heisenberg:enemies>
             <heisenberg:enemy value="#[gustavoFring]"/>
             <heisenberg:enemy value="#[hank]"/>
@@ -114,7 +122,9 @@
                        candidateDoors="#[app.registry.candidateDoors]"
                        enemies="#[app.registry.enemies]"
                        ricinPacks="#[app.registry.ricinPacks]"
-                       nextDoor="#[app.registry.door]">
+                       nextDoor="#[app.registry.door]"
+                       firstEndevour="Gray Matter Technologies"
+                       labAddress="#['Pollos Hermanos']">
     </heisenberg:config>
 
     <spring:beans>

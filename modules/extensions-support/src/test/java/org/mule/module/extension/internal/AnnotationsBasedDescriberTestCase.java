@@ -12,6 +12,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.annotation.api.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
+import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
@@ -28,6 +31,7 @@ import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
@@ -117,7 +121,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
         assertThat(configuration.getParameters(), hasSize(1));
-        assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, true, null);
+        assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, SUPPORTED, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -133,23 +137,24 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(13));
+        assertThat(parameters, hasSize(15));
 
-        assertParameter(parameters, "myName", "", DataType.of(String.class), false, true, HEISENBERG);
-        assertParameter(parameters, "age", "", DataType.of(Integer.class), false, true, AGE);
-        assertParameter(parameters, "enemies", "", DataType.of(List.class, String.class), true, true, null);
-        assertParameter(parameters, "money", "", DataType.of(BigDecimal.class), true, true, null);
-        assertParameter(parameters, "cancer", "", DataType.of(boolean.class), true, true, null);
-        assertParameter(parameters, "cancer", "", DataType.of(boolean.class), true, true, null);
-        assertParameter(parameters, "dateOfBirth", "", DataType.of(Date.class), true, true, null);
-        assertParameter(parameters, "dateOfDeath", "", DataType.of(Calendar.class), true, true, null);
-        assertParameter(parameters, "recipe", "", DataType.of(Map.class, String.class, Long.class), false, true, null);
-        assertParameter(parameters, "ricinPacks", "", DataType.of(Set.class, Ricin.class), false, true, null);
-        assertParameter(parameters, "nextDoor", "", DataType.of(KnockeableDoor.class), false, true, null);
-        assertParameter(parameters, "candidateDoors", "", DataType.of(Map.class, String.class, KnockeableDoor.class), false, true, null);
-        assertParameter(parameters, "initialHealth", "", DataType.of(HealthStatus.class), true, true, null);
-        assertParameter(parameters, "finalHealth", "", DataType.of(HealthStatus.class), true, true, null);
-
+        assertParameter(parameters, "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
+        assertParameter(parameters, "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
+        assertParameter(parameters, "enemies", "", DataType.of(List.class, String.class), true, SUPPORTED, null);
+        assertParameter(parameters, "money", "", DataType.of(BigDecimal.class), true, SUPPORTED, null);
+        assertParameter(parameters, "cancer", "", DataType.of(boolean.class), true, SUPPORTED, null);
+        assertParameter(parameters, "cancer", "", DataType.of(boolean.class), true, SUPPORTED, null);
+        assertParameter(parameters, "dateOfBirth", "", DataType.of(Date.class), true, SUPPORTED, null);
+        assertParameter(parameters, "dateOfDeath", "", DataType.of(Calendar.class), true, SUPPORTED, null);
+        assertParameter(parameters, "recipe", "", DataType.of(Map.class, String.class, Long.class), false, SUPPORTED, null);
+        assertParameter(parameters, "ricinPacks", "", DataType.of(Set.class, Ricin.class), false, SUPPORTED, null);
+        assertParameter(parameters, "nextDoor", "", DataType.of(KnockeableDoor.class), false, SUPPORTED, null);
+        assertParameter(parameters, "candidateDoors", "", DataType.of(Map.class, String.class, KnockeableDoor.class), false, SUPPORTED, null);
+        assertParameter(parameters, "initialHealth", "", DataType.of(HealthStatus.class), true, SUPPORTED, null);
+        assertParameter(parameters, "finalHealth", "", DataType.of(HealthStatus.class), true, SUPPORTED, null);
+        assertParameter(parameters, "labAddress", "", DataType.of(String.class), false, REQUIRED, null);
+        assertParameter(parameters, "firstEndevour", "", DataType.of(String.class), false, NOT_SUPPORTED, null);
     }
 
     private void assertExtensionProperties(Declaration declaration)
@@ -184,19 +189,19 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         operation = getOperation(declaration, GET_ENEMY_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
-        assertParameter(operation.getParameters(), "index", "", DataType.of(int.class), true, true, null);
+        assertParameter(operation.getParameters(), "index", "", DataType.of(int.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(2));
-        assertParameter(operation.getParameters(), "victim", "", DataType.of(String.class), false, true, "#[payload]");
-        assertParameter(operation.getParameters(), "goodbyeMessage", "", DataType.of(String.class), true, true, null);
+        assertParameter(operation.getParameters(), "victim", "", DataType.of(String.class), false, SUPPORTED, "#[payload]");
+        assertParameter(operation.getParameters(), "goodbyeMessage", "", DataType.of(String.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_CUSTOM_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(2));
-        assertParameter(operation.getParameters(), "victim", "", DataType.of(String.class), false, true, "#[payload]");
-        assertParameter(operation.getParameters(), "goodbyeMessage", "", DataType.of(String.class), true, true, null);
+        assertParameter(operation.getParameters(), "victim", "", DataType.of(String.class), false, SUPPORTED, "#[payload]");
+        assertParameter(operation.getParameters(), "goodbyeMessage", "", DataType.of(String.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, HIDE_METH_IN_EVENT_OPERATION);
         assertThat(operation, is(notNullValue()));
@@ -207,16 +212,16 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(operation.getParameters().isEmpty(), is(true));
 
         operation = getOperation(declaration, LAUNDER_MONEY);
-        assertParameter(operation.getParameters(), "amount", "", DataType.of(long.class), true, true, null);
+        assertParameter(operation.getParameters(), "amount", "", DataType.of(long.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, INJECTED_EXTENSION_MANAGER);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters().isEmpty(), is(true));
 
         operation = getOperation(declaration, ALIAS);
-        assertParameter(operation.getParameters(), "greeting", "", DataType.of(String.class), true, true, null);
-        assertParameter(operation.getParameters(), "myName", "", DataType.of(String.class), false, true, HEISENBERG);
-        assertParameter(operation.getParameters(), "age", "", DataType.of(Integer.class), false, true, AGE);
+        assertParameter(operation.getParameters(), "greeting", "", DataType.of(String.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
+        assertParameter(operation.getParameters(), "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
     }
 
     private void assertOperation(Declaration declaration,
@@ -234,7 +239,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
                                  String description,
                                  DataType dataType,
                                  boolean required,
-                                 boolean dynamic,
+                                 ExpressionSupport expressionSupport,
                                  Object defaultValue)
     {
         ParameterDeclaration param = findParameter(parameters, name);
@@ -244,7 +249,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(param.getDescription(), equalTo(description));
         assertThat(param.getType(), equalTo(dataType));
         assertThat(param.isRequired(), is(required));
-        assertThat(param.isDynamic(), is(dynamic));
+        assertThat(param.getExpressionSupport(), is(expressionSupport));
         assertThat(param.getDefaultValue(), equalTo(defaultValue));
     }
 

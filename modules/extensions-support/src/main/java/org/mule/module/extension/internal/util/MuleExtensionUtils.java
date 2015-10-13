@@ -8,6 +8,8 @@ package org.mule.module.extension.internal.util;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
+import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -16,6 +18,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.Described;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.InterceptableModel;
 import org.mule.extension.api.introspection.ParameterModel;
@@ -125,9 +128,27 @@ public class MuleExtensionUtils
         return false;
     }
 
+    /**
+     * Collects the {@link ParameterModel parameters} from {@code configurationModel} which
+     * supports or requires expressions
+     *
+     * @param configurationModel a {@link ConfigurationModel}
+     * @return a {@link List} of {@link ParameterModel}. Can be empty but will never be {@code null}
+     */
     public static List<ParameterModel> getDynamicParameters(ConfigurationModel configurationModel)
     {
-        return configurationModel.getParameterModels().stream().filter(parameter -> parameter.isDynamic()).collect(toList());
+        return configurationModel.getParameterModels().stream()
+                .filter(parameter -> acceptsExpressions(parameter.getExpressionSupport()))
+                .collect(toList());
+    }
+
+    /**
+     * @param support a {@link ExpressionSupport}
+     * @return Whether or not the given {@code support} is one which accepts or requires expressions
+     */
+    public static boolean acceptsExpressions(ExpressionSupport support)
+    {
+        return support == SUPPORTED || support == REQUIRED;
     }
 
     /**

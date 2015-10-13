@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.enricher;
 
+import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import org.mule.extension.annotation.api.ContentMetadataParameters;
@@ -64,7 +65,7 @@ public final class ContentMetadataModelEnricher extends AbstractAnnotatedModelEn
         ParameterDeclaration parameter = new ParameterDeclaration();
         parameter.setName(name);
         parameter.setRequired(false);
-        parameter.setDynamic(true);
+        parameter.setExpressionSupport(SUPPORTED);
         parameter.setType(DataType.of(String.class));
         parameter.setDescription(description);
 

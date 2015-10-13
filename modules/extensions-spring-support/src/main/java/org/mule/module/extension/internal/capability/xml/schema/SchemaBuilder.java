@@ -9,6 +9,8 @@ package org.mule.module.extension.internal.capability.xml.schema;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.api.introspection.DataQualifier.LIST;
 import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
+import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_DESCRIPTION_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
@@ -29,8 +31,8 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.isDynamic;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
@@ -41,6 +43,7 @@ import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
@@ -220,7 +223,7 @@ public class SchemaBuilder
 
     private Attribute createNameAttribute()
     {
-        return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, DataType.of(String.class), true, false);
+        return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, DataType.of(String.class), true, NOT_SUPPORTED);
     }
 
     public SchemaBuilder registerOperation(OperationModel operationModel)
@@ -301,7 +304,7 @@ public class SchemaBuilder
             final String name = getAlias(field);
             final DataType fieldType = getFieldDataType(field);
             final boolean required = isRequired(field);
-            final boolean dynamic = isDynamic(field);
+            final ExpressionSupport expressionSupport = getExpressionSupport(field);
 
             fieldType.getQualifier().accept(new AbstractDataQualifierVisitor()
             {
@@ -321,7 +324,7 @@ public class SchemaBuilder
                 @Override
                 protected void defaultOperation()
                 {
-                    Attribute attribute = createAttribute(name, fieldType, required, dynamic);
+                    Attribute attribute = createAttribute(name, fieldType, required, expressionSupport);
                     extension.getAttributeOrAttributeGroup().add(attribute);
                 }
             });
@@ -454,16 +457,16 @@ public class SchemaBuilder
 
     private Attribute createAttribute(ParameterModel parameterModel, boolean required)
     {
-        return createAttribute(parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), required, parameterModel.isDynamic());
+        return createAttribute(parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), required, parameterModel.getExpressionSupport());
     }
 
-    private Attribute createAttribute(String name, DataType type, boolean required, boolean dynamic)
+    private Attribute createAttribute(String name, DataType type, boolean required, ExpressionSupport expressionSupport)
     {
-        return createAttribute(name, EMPTY, type, required, dynamic);
+        return createAttribute(name, EMPTY, type, required, expressionSupport);
     }
 
 
-    private Attribute createAttribute(final String name, String description, final DataType type, boolean required, final boolean dynamic)
+    private Attribute createAttribute(final String name, String description, final DataType type, boolean required, final ExpressionSupport expressionSupport)
     {
         final Attribute attribute = new Attribute();
         attribute.setUse(required ? SchemaConstants.USE_REQUIRED : SchemaConstants.USE_OPTIONAL);
@@ -484,7 +487,7 @@ public class SchemaBuilder
             protected void defaultOperation()
             {
                 attribute.setName(name);
-                attribute.setType(SchemaTypeConversion.convertType(type, dynamic));
+                attribute.setType(SchemaTypeConversion.convertType(type, expressionSupport));
             }
         });
 
@@ -554,11 +557,11 @@ public class SchemaBuilder
         SimpleContent simpleContent = new SimpleContent();
         complexType.setSimpleContent(simpleContent);
         SimpleExtensionType simpleContentExtension = new SimpleExtensionType();
-        QName extensionBase = SchemaTypeConversion.convertType(type, false);
+        QName extensionBase = SchemaTypeConversion.convertType(type, NOT_SUPPORTED);
         simpleContentExtension.setBase(extensionBase);
         simpleContent.setExtension(simpleContentExtension);
 
-        Attribute valueAttribute = createAttribute(ATTRIBUTE_NAME_VALUE, type, true, true);
+        Attribute valueAttribute = createAttribute(ATTRIBUTE_NAME_VALUE, type, true, SUPPORTED);
         simpleContentExtension.getAttributeOrAttributeGroup().add(valueAttribute);
 
         return complexType;

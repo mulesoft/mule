@@ -25,7 +25,9 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_LONG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
+import org.mule.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.util.ValueHolder;
 
 import javax.xml.namespace.QName;
@@ -33,7 +35,8 @@ import javax.xml.namespace.QName;
 public final class SchemaTypeConversion
 {
 
-    public static QName convertType(final DataType type, final boolean dynamic) {
+    public static QName convertType(final DataType type, ExpressionSupport expressionSupport) {
+        final boolean dynamic = MuleExtensionUtils.acceptsExpressions(expressionSupport);
         final ValueHolder<QName> qName = new ValueHolder<>();
         type.getQualifier().accept(new AbstractDataQualifierVisitor()
         {
