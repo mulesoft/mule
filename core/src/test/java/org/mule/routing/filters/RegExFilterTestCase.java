@@ -6,28 +6,38 @@
  */
 package org.mule.routing.filters;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.regex.Pattern;
-
-import org.junit.Test;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-public class RegExFilterTestCase extends AbstractMuleTestCase
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.regex.Pattern;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class RegExFilterTestCase extends AbstractMuleContextTestCase
 {
+
     private static final String PATTERN = "(.*) brown fox";
+    private RegExFilter regExWithValue;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        regExWithValue = new RegExFilter("(\\w)* with the mules");
+        regExWithValue.setMuleContext(muleContext);
+    }
+
 
     @Test
     public void testRegexFilterNoPattern()
@@ -35,15 +45,15 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         // start with default
         RegExFilter filter = new RegExFilter();
         assertNull(filter.getPattern());
-        assertFalse(filter.accept("No tengo dinero"));
+        assertThat(filter.accept("No tengo dinero"), is(false));
 
         // activate a pattern
-        filter.setPattern("(.*) brown fox");
-        assertTrue(filter.accept("The quick brown fox"));
+        filter.setPattern(PATTERN);
+        assertThat(filter.accept("The quick brown fox"), is(true));
 
         // remove pattern again, i.e. block all
         filter.setPattern(null);
-        assertFalse(filter.accept("oh-oh"));
+        assertThat(filter.accept("oh-oh"), is(false));
     }
 
     @Test
@@ -89,12 +99,6 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
     {
         RegExFilter filter = new RegExFilter("The quick (.*)");
         assertNotNull(filter.getPattern());
-
-        MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
-        when(muleConfiguration.isCacheMessageAsBytes()).thenReturn(false);
-        MuleContext muleContext= mock(MuleContext.class);
-        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-
         MuleMessage message = new DefaultMuleMessage("The quick brown fox", muleContext);
         assertTrue(filter.accept(message));
     }
@@ -147,4 +151,64 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         filter2 = new RegExFilter(PATTERN, Pattern.DOTALL);
         assertEquals(filter1, filter2);
     }
+
+    @Test
+    public void equalsWithNullValues()
+    {
+        RegExFilter filter = new RegExFilter();
+        filter.setPattern("");
+        RegExFilter filter2 = new RegExFilter();
+        filter2.setPattern("");
+        assertThat(filter.equals(filter2), is(true));
+    }
+
+    @Test
+    public void notEqualsWithDifferentValues()
+    {
+        RegExFilter filter = new RegExFilter();
+        filter.setPattern("");
+        filter.setValue("value");
+        RegExFilter filter2 = new RegExFilter();
+        filter2.setPattern("");
+        filter2.setPattern("value2");
+        assertThat(filter.equals(filter2), is(false));
+    }
+
+    @Test
+    public void matchesValueFromMelPayload() throws InitialisationException
+    {
+        regExWithValue.setValue("#[payload]");
+        regExWithValue.initialise();
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage("run with the mules", muleContext);
+        assertThat(regExWithValue.accept(muleMessage), is(true));
+    }
+
+    @Test
+    public void notMatchesValueFromMelPayload() throws InitialisationException
+    {
+        regExWithValue.setValue("#[payload]");
+        regExWithValue.initialise();
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage("run with the zebras", muleContext);
+        assertThat(regExWithValue.accept(muleMessage), is(false));
+    }
+
+    @Test
+    public void matchesValueFromFlowVar() throws InitialisationException
+    {
+        regExWithValue.setValue("#[flowVars.value]");
+        regExWithValue.initialise();
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(null, muleContext);
+        muleMessage.setInvocationProperty("value", "code with the mules");
+        assertThat(regExWithValue.accept(muleMessage), is(true));
+    }
+
+    @Test
+    public void matchesPlainTextValue() throws InitialisationException
+    {
+        regExWithValue.setValue("run with the mules");
+        regExWithValue.initialise();
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(null, muleContext);
+        assertThat(regExWithValue.accept(muleMessage), is(true));
+    }
+
 }
