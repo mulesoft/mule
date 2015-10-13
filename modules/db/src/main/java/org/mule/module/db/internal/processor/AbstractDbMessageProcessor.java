@@ -7,12 +7,19 @@
 
 package org.mule.module.db.internal.processor;
 
+import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
+import static org.mule.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
+import static org.mule.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.debug.Debuggable;
+import org.mule.api.debug.FieldDebugInfo;
+import org.mule.api.debug.ObjectFieldDebugInfo;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.InterceptingMessageProcessor;
@@ -21,22 +28,25 @@ import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.OperationMetaDataEnabled;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.database.DbConfig;
+import org.mule.module.db.internal.domain.query.Query;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.query.QueryType;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.metadata.NullMetadataProvider;
 import org.mule.module.db.internal.metadata.QueryMetadataProvider;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.module.db.internal.resolver.database.UnresolvableDbConfigException;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Base class for database message processors.
  */
-public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMessageProcessor implements Initialisable, InterceptingMessageProcessor, OperationMetaDataEnabled
+public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMessageProcessor implements Initialisable, InterceptingMessageProcessor, OperationMetaDataEnabled, Debuggable
 {
 
     protected final DbConfigResolver dbConfigResolver;
@@ -183,5 +193,59 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         }
     }
 
+    @Override
+    public List<FieldDebugInfo> getDebugInfo(MuleEvent muleEvent)
+    {
+        List<FieldDebugInfo> debugInfo = new ArrayList<>();
+
+        DbConfig dbConfig;
+        try
+        {
+            dbConfig = dbConfigResolver.resolve(muleEvent);
+        }
+        catch (UnresolvableDbConfigException e)
+        {
+            debugInfo.add(createFieldDebugInfo(DbDebugInfoUtils.CONFIG_DEBUG_FIELD, DbConfig.class, e));
+            return debugInfo;
+        }
+
+        DbConnection connection;
+        try
+        {
+            connection = dbConfig.getConnectionFactory().createConnection(NOT_SUPPORTED);
+        }
+        catch (SQLException e)
+        {
+            debugInfo.add(createFieldDebugInfo(DbDebugInfoUtils.CONNECTION_DEBUG_FIELD, DbConnection.class, e));
+            return debugInfo;
+        }
+
+        try
+        {
+            debugInfo = getMessageProcessorDebugInfo(connection, muleEvent);
+
+            try
+            {
+                dbConfig.getConnectionFactory().releaseConnection(connection);
+            }
+            finally
+            {
+                connection = null;
+            }
+
+            return debugInfo;
+        }
+        finally
+        {
+            if (connection != null && mustCloseConnection())
+            {
+                dbConfig.getConnectionFactory().releaseConnection(connection);
+            }
+        }
+    }
+
+    protected abstract List<FieldDebugInfo> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent);
+
     protected abstract List<QueryType> getValidQueryTypes();
+
 }

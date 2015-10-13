@@ -11,13 +11,11 @@ import static org.mule.module.db.integration.TestRecordUtil.assertMessageContain
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.TestRecordUtil;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -57,9 +55,7 @@ public class InlineParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     {
         LocalMuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("type", 3);
-        MuleMessage response = client.send("vm://expressionParam", TEST_MESSAGE, props);
+        MuleMessage response = client.send("vm://expressionParam", TEST_MESSAGE, null);
 
         assertMessageContains(response, TestRecordUtil.getEarthRecord());
     }

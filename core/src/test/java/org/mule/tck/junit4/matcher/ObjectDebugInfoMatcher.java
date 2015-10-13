@@ -7,6 +7,9 @@
 
 package org.mule.tck.junit4.matcher;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import org.mule.api.debug.FieldDebugInfo;
 import org.mule.api.debug.ObjectFieldDebugInfo;
 
@@ -15,8 +18,6 @@ import java.util.List;
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
 
 public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
@@ -63,8 +64,14 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
         {
             for (FieldDebugInfo field : fields)
             {
-                MatcherAssert.assertThat(fieldDebugInfos, Matchers.hasItem(FieldDebugInfoMatcher.fieldLike(field.getName(), field.getType(), field.getValue())));
-
+                if (field instanceof ObjectFieldDebugInfo)
+                {
+                    assertThat(fieldDebugInfos, hasItem(objectLike(field.getName(), field.getType(), ((ObjectFieldDebugInfo) field).getValue())));
+                }
+                else
+                {
+                    assertThat(fieldDebugInfos, hasItem(fieldLike(field.getName(), field.getType(), field.getValue())));
+                }
             }
             return true;
         }
