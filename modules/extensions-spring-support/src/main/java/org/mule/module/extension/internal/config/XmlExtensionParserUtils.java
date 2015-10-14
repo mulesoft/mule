@@ -28,7 +28,6 @@ import org.mule.module.extension.internal.introspection.AbstractDataQualifierVis
 import org.mule.module.extension.internal.introspection.SimpleTypeDataQualifierVisitor;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
-import org.mule.module.extension.internal.runtime.resolver.CachingValueResolverWrapper;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
@@ -380,7 +379,7 @@ final class XmlExtensionParserUtils
                 @Override
                 protected void defaultOperation()
                 {
-                    resolverValueHolder.set(new CachingValueResolverWrapper(new RegistryLookupValueResolver(value.toString())));
+                    resolverValueHolder.set(new RegistryLookupValueResolver(value.toString()));
                 }
             };
 

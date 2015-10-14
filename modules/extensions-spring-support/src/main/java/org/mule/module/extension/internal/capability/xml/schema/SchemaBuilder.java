@@ -676,17 +676,32 @@ public class SchemaBuilder
             {
                 parameterQualifier.accept(new AbstractDataQualifierVisitor()
                 {
+                    private boolean forceOptional = false;
 
                     @Override
                     public void onList()
                     {
-                        generateCollectionElement(all, parameterModel, false);
+                        forceOptional = true;
+                        defaultOperation();
+                        generateCollectionElement(all, parameterModel, true);
+                    }
+
+                    @Override
+                    public void onPojo()
+                    {
+                        forceOptional = true;
+                        defaultOperation();
+                        registerComplexTypeChildElement(all,
+                                                        parameterModel.getName(),
+                                                        parameterModel.getDescription(),
+                                                        parameterModel.getType(),
+                                                        false);
                     }
 
                     @Override
                     protected void defaultOperation()
                     {
-                        complexContentExtension.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, parameterModel.isRequired()));
+                        complexContentExtension.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
                     }
                 });
             }

@@ -79,6 +79,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String LAUNDER_MONEY = "launder";
     private static final String INJECTED_EXTENSION_MANAGER = "getInjectedExtensionManager";
     private static final String ALIAS = "alias";
+    private static final String KNOCK = "knock";
+    private static final String KNOCK_MANY = "knockMany";
     private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
 
     @Before
@@ -168,7 +170,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(Declaration declaration) throws Exception
     {
-        assertThat(declaration.getOperations(), hasSize(12));
+        assertThat(declaration.getOperations(), hasSize(14));
         assertOperation(declaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(declaration, GET_ENEMY_OPERATION, "");
         assertOperation(declaration, KILL_OPERATION, "");
@@ -222,6 +224,12 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(operation.getParameters(), "greeting", "", DataType.of(String.class), true, SUPPORTED, null);
         assertParameter(operation.getParameters(), "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(operation.getParameters(), "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
+
+        operation = getOperation(declaration, KNOCK);
+        assertParameter(operation.getParameters(), "door", "", DataType.of(KnockeableDoor.class), true, SUPPORTED, null);
+
+        operation = getOperation(declaration, KNOCK_MANY);
+        assertParameter(operation.getParameters(), "doors", "", DataType.of(List.class, KnockeableDoor.class), true, SUPPORTED, null);
     }
 
     private void assertOperation(Declaration declaration,
