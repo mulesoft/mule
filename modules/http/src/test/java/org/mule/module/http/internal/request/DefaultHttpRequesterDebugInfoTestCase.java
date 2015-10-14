@@ -9,17 +9,20 @@ package org.mule.module.http.internal.request;
 
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.module.http.api.requester.HttpSendBodyMode.ALWAYS;
+import static org.mule.module.http.internal.HttpParamType.QUERY_PARAM;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.AUTHENTICATION_TYPE_DEBUG;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DOMAIN_DEBUG;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.FOLLOW_REDIRECTS_DEBUG;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.METHOD_DEBUG;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.PARSE_RESPONSE_DEBUG;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.PASSWORD_DEBUG;
+import static org.mule.module.http.internal.request.DefaultHttpRequester.QUERY_PARAMS_DEBUG;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.RESPONSE_TIMEOUT_DEBUG;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.SECURITY_DEBUG;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.SEND_BODY_DEBUG;
@@ -36,12 +39,15 @@ import org.mule.api.debug.FieldDebugInfo;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.construct.Flow;
 import org.mule.module.http.api.requester.HttpSendBodyMode;
+import org.mule.module.http.internal.HttpParam;
+import org.mule.module.http.internal.HttpSingleParam;
 import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -70,6 +76,12 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     private static final String HOST = "myHost";
     private static final String PORT = "7777";
     private static final String METHOD = "GET";
+    public static final String PARAM_NAME1 = "paramName1";
+    public static final String PARAM_NAME2 = "paramName2";
+    public static final String PARAM2_SECOND_VALUE_PROPERTY = PARAM_NAME2 + "_2";
+    public static final String PARAM2_FIRST_VALUE_PROPERTY = PARAM_NAME2 + "_1";
+    public static final String PARAM_VALUE1 = "foo";
+    public static final String PARAM_VALUE2 = "bar";
 
 
     private DefaultHttpRequester requester = new DefaultHttpRequester();
@@ -84,6 +96,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         config.setMuleContext(muleContext);
         requester.setConfig(config);
         requester.setPath("/");
+        requester.setRequestBuilder(createRequestBuilder());
 
         message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
@@ -95,7 +108,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         configureSecurityExpressions();
         addConfigSecurityProperties(message);
 
-        doDebugInfoTest(message, event, getSecurityFieldsDebugInfo());
+        doDebugInfoTest(message, event, getSecurityFieldsMatchers());
     }
 
     @Test
@@ -104,14 +117,14 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         doDebugInfoTest(message, event, null);
     }
 
-    private void doDebugInfoTest(DefaultMuleMessage message, DefaultMuleEvent event, List<FieldDebugInfo> securityFields) throws InitialisationException
+    private void doDebugInfoTest(DefaultMuleMessage message, DefaultMuleEvent event, List<Matcher<FieldDebugInfo>> securityFieldMatchers) throws InitialisationException
     {
         configureRequesterExpressions();
         addRequesterProperties(message);
 
         final List<FieldDebugInfo> debugInfo = requester.getDebugInfo(event);
 
-        assertThat(debugInfo.size(), equalTo(8));
+        assertThat(debugInfo.size(), equalTo(9));
         assertThat(debugInfo, hasItem(fieldLike(URI_DEBUG, String.class, String.format("http://%s:%s/", HOST, PORT))));
         assertThat(debugInfo, hasItem(fieldLike(METHOD_DEBUG, String.class, METHOD)));
         assertThat(debugInfo, hasItem(fieldLike(STREAMING_MODE_DEBUG, Boolean.class, TRUE)));
@@ -119,25 +132,29 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         assertThat(debugInfo, hasItem(fieldLike(FOLLOW_REDIRECTS_DEBUG, Boolean.class, TRUE)));
         assertThat(debugInfo, hasItem(fieldLike(PARSE_RESPONSE_DEBUG, Boolean.class, TRUE)));
         assertThat(debugInfo, hasItem(fieldLike(RESPONSE_TIMEOUT_DEBUG, Integer.class, RESPONSE_TIMEOUT)));
+        List<Matcher<FieldDebugInfo>> paramMatchers = new ArrayList<>();
+        paramMatchers.add(fieldLike(PARAM_NAME1, String.class, PARAM_VALUE1));
+        paramMatchers.add(fieldLike(PARAM_NAME2, List.class, contains(PARAM_VALUE1, PARAM_VALUE2)));
+        assertThat(debugInfo, hasItem(objectLike(QUERY_PARAMS_DEBUG, List.class, paramMatchers)));
 
-        if (securityFields == null)
+        if (securityFieldMatchers == null)
         {
-            assertThat(debugInfo, hasItem(fieldLike(SECURITY_DEBUG, HttpRequestAuthentication.class, null)));
+            assertThat(debugInfo, hasItem(fieldLike(SECURITY_DEBUG, HttpRequestAuthentication.class, isNull())));
         }
         else
         {
-            assertThat(debugInfo, hasItem(objectLike(SECURITY_DEBUG, HttpRequestAuthentication.class, securityFields)));
+            assertThat(debugInfo, hasItem(objectLike(SECURITY_DEBUG, HttpRequestAuthentication.class, securityFieldMatchers)));
         }
     }
 
-    private ArrayList<FieldDebugInfo> getSecurityFieldsDebugInfo()
+    private List<Matcher<FieldDebugInfo>> getSecurityFieldsMatchers()
     {
-        final ArrayList<FieldDebugInfo> securityFields = new ArrayList<>();
-        securityFields.add(createFieldDebugInfo(USERNAME_DEBUG, String.class, USERNAME));
-        securityFields.add(createFieldDebugInfo(DOMAIN_DEBUG, String.class, DOMAIN));
-        securityFields.add(createFieldDebugInfo(PASSWORD_DEBUG, String.class, PASSWORD));
-        securityFields.add(createFieldDebugInfo(WORKSTATION_DEBUG, String.class, WORKSTATION));
-        securityFields.add(createFieldDebugInfo(AUTHENTICATION_TYPE_DEBUG, String.class, "BASIC"));
+        final List<Matcher<FieldDebugInfo>> securityFields = new ArrayList<>();
+        securityFields.add(fieldLike(USERNAME_DEBUG, String.class, USERNAME));
+        securityFields.add(fieldLike(DOMAIN_DEBUG, String.class, DOMAIN));
+        securityFields.add(fieldLike(PASSWORD_DEBUG, String.class, PASSWORD));
+        securityFields.add(fieldLike(WORKSTATION_DEBUG, String.class, WORKSTATION));
+        securityFields.add(fieldLike(AUTHENTICATION_TYPE_DEBUG, String.class, "BASIC"));
 
         return securityFields;
     }
@@ -161,6 +178,9 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         message.setInvocationProperty(FOLLOW_REDIRECTS_PROPERTY, TRUE.toString());
         message.setInvocationProperty(PARSE_RESPONSE_PROPERTY, TRUE.toString());
         message.setInvocationProperty(RESPONSE_TIMEOUT_PROPERTY, RESPONSE_TIMEOUT);
+        message.setInvocationProperty(PARAM_NAME1, PARAM_VALUE1);
+        message.setInvocationProperty(PARAM2_FIRST_VALUE_PROPERTY, PARAM_VALUE1);
+        message.setInvocationProperty(PARAM2_SECOND_VALUE_PROPERTY, PARAM_VALUE2);
     }
 
     private void configureSecurityExpressions() throws InitialisationException
@@ -194,4 +214,26 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         requester.initialise();
     }
 
+    private HttpRequesterRequestBuilder createRequestBuilder()
+    {
+        final HttpRequesterRequestBuilder requestBuilder = new HttpRequesterRequestBuilder();
+
+        List<HttpParam> params = new ArrayList<>();
+        params.add(createHttpParam(PARAM_NAME1, getExpression(PARAM_NAME1)));
+        params.add(createHttpParam(PARAM_NAME2, getExpression(PARAM2_FIRST_VALUE_PROPERTY)));
+        params.add(createHttpParam(PARAM_NAME2, getExpression(PARAM2_SECOND_VALUE_PROPERTY)));
+        requestBuilder.setParams(params);
+
+        return requestBuilder;
+    }
+
+    private HttpSingleParam createHttpParam(String name, String value)
+    {
+        HttpSingleParam httpSingleParam = new HttpSingleParam(QUERY_PARAM);
+        httpSingleParam.setName(name);
+        httpSingleParam.setValue(value);
+        httpSingleParam.setMuleContext(muleContext);
+
+        return httpSingleParam;
+    }
 }

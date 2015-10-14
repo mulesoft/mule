@@ -15,7 +15,6 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.module.db.integration.model.Planet.EARTH;
 import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.internal.domain.query.QueryType.UPDATE;
@@ -26,6 +25,7 @@ import static org.mule.module.db.internal.processor.DbDebugInfoUtils.PARAM_SET_D
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERY_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
+import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 @SmallTest
@@ -99,24 +100,24 @@ public class PreparedBulkUpdateMessageProcessorDebugInfoTestCase extends Abstrac
         assertThat(debugInfo.size(), equalTo(2));
 
 
-        List<FieldDebugInfo> queryFields = new ArrayList<>();
-        queryFields.add(createFieldDebugInfo(SQL_TEXT_DEBUG_FIELD, String.class, QUERY_SQL));
-        queryFields.add(createFieldDebugInfo(TYPE_DEBUG_FIELD, String.class, UPDATE.toString()));
-        assertThat(debugInfo, hasItem(objectLike(QUERY_DEBUG_FIELD, Query.class, queryFields)));
-        assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, createExpectedParamSets())));
+        List<Matcher<FieldDebugInfo>> fieldMatchers = new ArrayList<>();
+        fieldMatchers.add(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, QUERY_SQL));
+        fieldMatchers.add(fieldLike(TYPE_DEBUG_FIELD, String.class, UPDATE.toString()));
+        assertThat(debugInfo, hasItem(objectLike(QUERY_DEBUG_FIELD, Query.class, fieldMatchers)));
+        assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, createExpectedParamSetMatchers())));
     }
 
-    private List<FieldDebugInfo> createExpectedParamSets()
+    private List<Matcher<FieldDebugInfo>> createExpectedParamSetMatchers()
     {
-        final List<FieldDebugInfo> paramSets = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo>> paramSets = new ArrayList<>();
 
-        final List<FieldDebugInfo> paramSet1 = new ArrayList<>();
-        paramSet1.add(createFieldDebugInfo(PARAM1, String.class, EARTH.getName()));
-        paramSets.add(createFieldDebugInfo(PARAM_SET1, List.class, paramSet1));
+        final List<Matcher<FieldDebugInfo>> paramSet1 = new ArrayList<>();
+        paramSet1.add(fieldLike(PARAM1, String.class, EARTH.getName()));
+        paramSets.add(objectLike(PARAM_SET1, List.class, paramSet1));
 
-        final List<FieldDebugInfo> paramSet2 = new ArrayList<>();
-        paramSet2.add(createFieldDebugInfo(PARAM1, String.class, MARS.getName()));
-        paramSets.add(createFieldDebugInfo(PARAM_SET2, List.class, paramSet2));
+        final List<Matcher<FieldDebugInfo>> paramSet2 = new ArrayList<>();
+        paramSet2.add(fieldLike(PARAM1, String.class, MARS.getName()));
+        paramSets.add(objectLike(PARAM_SET2, List.class, paramSet2));
         return paramSets;
     }
 }

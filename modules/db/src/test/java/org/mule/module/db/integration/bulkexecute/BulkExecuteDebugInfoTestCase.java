@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mule.module.db.internal.debug.DbDebugInfoTestUtils.createQueryFieldDebugInfoMatcher;
 import static org.mule.module.db.internal.domain.query.QueryType.UPDATE;
-import static org.mule.module.db.internal.processor.DbDebugInfoUtils.createQueryFieldDebugInfo;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 import org.mule.api.MuleEvent;
@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -76,10 +77,11 @@ public class BulkExecuteDebugInfoTestCase extends AbstractDbIntegrationTestCase
         assertThat(debugInfo, is(not(nullValue())));
         assertThat(debugInfo.size(), equalTo(1));
 
-        final List<FieldDebugInfo> queriesDebugInfo = new ArrayList<>();
-        queriesDebugInfo.add(createQueryFieldDebugInfo(QUERY1, QUERY_TEMPLATE1));
-        queriesDebugInfo.add(createQueryFieldDebugInfo(QUERY2, QUERY_TEMPLATE2));
+        final List<Matcher<FieldDebugInfo>> queryMatchers = new ArrayList<>();
+        queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
+        queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
 
-        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, queriesDebugInfo)));
+        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, queryMatchers)));
     }
+
 }

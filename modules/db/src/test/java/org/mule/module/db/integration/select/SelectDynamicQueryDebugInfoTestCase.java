@@ -8,6 +8,7 @@
 package org.mule.module.db.integration.select;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -17,7 +18,6 @@ import static org.mule.module.db.internal.processor.DbDebugInfoUtils.INPUT_PARAM
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
-import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 import org.mule.api.MuleEvent;
 import org.mule.api.debug.FieldDebugInfo;
 import org.mule.api.processor.MessageProcessor;
@@ -27,7 +27,6 @@ import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.internal.processor.AbstractSingleQueryDbMessageProcessor;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -69,6 +68,6 @@ public class SelectDynamicQueryDebugInfoTestCase extends AbstractDbIntegrationTe
         assertThat(debugInfo.size(), equalTo(3));
         assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, "select * from PLANET order by ID")));
         assertThat(debugInfo, hasItem(fieldLike(TYPE_DEBUG_FIELD, String.class, "SELECT")));
-        assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, Collections.<FieldDebugInfo>emptyList())));
+        assertThat(debugInfo, hasItem(fieldLike(INPUT_PARAMS_DEBUG_FIELD, List.class, empty())));
     }
 }

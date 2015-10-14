@@ -8,7 +8,9 @@
 package org.mule.tck.junit4.matcher;
 
 import static java.lang.String.format;
+import static org.hamcrest.Matchers.equalTo;
 import org.mule.api.debug.FieldDebugInfo;
+import org.mule.api.debug.SimpleFieldDebugInfo;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
@@ -20,31 +22,50 @@ public class FieldDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
 
     private final String name;
     private final Class type;
-    private final Object value;
+    private final Matcher matcher;
 
     public FieldDebugInfoMatcher(String name, Class type, Object value)
     {
         this.name = name;
         this.type = type;
-        this.value = value;
+        this.matcher = equalTo(value);
+    }
+
+    public FieldDebugInfoMatcher(String name, Class type, Matcher matcher)
+    {
+        this.name = name;
+        this.type = type;
+        this.matcher = matcher;
     }
 
     @Override
     public boolean matchesSafely(FieldDebugInfo item)
     {
-        boolean sameValue = value != null && value.equals(item.getValue()) || value == null && item.getValue() == null;
+        boolean sameValue = matcher.matches(item.getValue());
 
         return name.equals(item.getName()) && sameValue && type == item.getType();
     }
 
     public void describeTo(Description description)
     {
-        description.appendText(format("a field debug info with name: '%s' type: '%s' value: '%s'", name, type, value));
+        description.appendText(format("a %s with name: '%s' type: '%s' and value that is ", SimpleFieldDebugInfo.class.getSimpleName(), name, type));
+        matcher.describeTo(description);
     }
 
     @Factory
     public static Matcher<FieldDebugInfo> fieldLike(String name, Class type, Object value)
     {
         return new FieldDebugInfoMatcher(name, type, value);
+    }
+
+    @Factory
+    public static Matcher<FieldDebugInfo> fieldLike(String name, Class type, Matcher matcher)
+    {
+        if (matcher == null)
+        {
+            throw new IllegalArgumentException("Matcher cannot be null");
+        }
+
+        return new FieldDebugInfoMatcher(name, type, matcher);
     }
 }

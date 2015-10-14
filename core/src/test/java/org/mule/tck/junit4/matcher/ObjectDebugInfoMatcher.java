@@ -7,9 +7,9 @@
 
 package org.mule.tck.junit4.matcher;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import org.mule.api.debug.FieldDebugInfo;
 import org.mule.api.debug.ObjectFieldDebugInfo;
 
@@ -25,13 +25,13 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
 
     private final String name;
     private final Class type;
-    private final List<FieldDebugInfo> fields;
+    private final List<Matcher<FieldDebugInfo>> fieldMatchers;
 
-    public ObjectDebugInfoMatcher(String name, Class type, List<FieldDebugInfo> fields)
+    public ObjectDebugInfoMatcher(String name, Class type, List<Matcher<FieldDebugInfo>> fieldMatchers)
     {
         this.name = name;
         this.type = type;
-        this.fields = fields;
+        this.fieldMatchers = fieldMatchers;
     }
 
     @Override
@@ -55,23 +55,16 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
         final ObjectFieldDebugInfo objectFieldDebugInfo = (ObjectFieldDebugInfo) fieldDebugInfo;
         final List<FieldDebugInfo> fieldDebugInfos = objectFieldDebugInfo.getValue();
 
-        if (fields.size() != fieldDebugInfos.size())
+        if (fieldMatchers.size() != fieldDebugInfos.size())
         {
             return false;
         }
 
         try
         {
-            for (FieldDebugInfo field : fields)
+            for (Matcher<FieldDebugInfo> fieldMatcher : fieldMatchers)
             {
-                if (field instanceof ObjectFieldDebugInfo)
-                {
-                    assertThat(fieldDebugInfos, hasItem(objectLike(field.getName(), field.getType(), ((ObjectFieldDebugInfo) field).getValue())));
-                }
-                else
-                {
-                    assertThat(fieldDebugInfos, hasItem(fieldLike(field.getName(), field.getType(), field.getValue())));
-                }
+                assertThat(fieldDebugInfos, hasItem(fieldMatcher));
             }
             return true;
         }
@@ -86,12 +79,26 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
     @Override
     public void describeTo(Description description)
     {
-        description.appendText(String.format("an object debug info with name: '%s' type: '%s' fields: '%s'", name, type, fields));
+        description.appendText(format("an %s with name: '%s' type: '%s' and containing [ ", ObjectFieldDebugInfo.class.getSimpleName(), name, type));
+        boolean firstMatcher = true;
+        for (Matcher<FieldDebugInfo> fieldMatcher : fieldMatchers)
+        {
+            if (firstMatcher)
+            {
+                firstMatcher = false;
+            }
+            else
+            {
+                description.appendText(", ");
+            }
+            fieldMatcher.describeTo(description);
+        }
+        description.appendText("]");
     }
 
     @Factory
-    public static Matcher<FieldDebugInfo> objectLike(String name, Class type, List<FieldDebugInfo> fields)
+    public static Matcher<FieldDebugInfo> objectLike(String name, Class type, List<Matcher<FieldDebugInfo>> fieldMatchers)
     {
-        return new ObjectDebugInfoMatcher(name, type, fields);
+        return new ObjectDebugInfoMatcher(name, type, fieldMatchers);
     }
 }

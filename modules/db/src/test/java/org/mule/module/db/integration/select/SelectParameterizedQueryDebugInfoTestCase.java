@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.INPUT_PARAMS_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
@@ -32,6 +31,7 @@ import org.mule.module.db.internal.processor.DbDebugInfoUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -75,8 +75,8 @@ public class SelectParameterizedQueryDebugInfoTestCase extends AbstractDbIntegra
         assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, "SELECT * FROM PLANET WHERE POSITION = ? AND NAME = 'Earth'")));
         assertThat(debugInfo, hasItem(fieldLike(TYPE_DEBUG_FIELD, String.class, "SELECT")));
 
-        final List<FieldDebugInfo> paramFields = new ArrayList<>();
-        paramFields.add(createFieldDebugInfo(PARAM1, String.class, expectedPosition));
-        assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, paramFields)));
+        final List<Matcher<FieldDebugInfo>> paramMatchers = new ArrayList<>();
+        paramMatchers.add(fieldLike(PARAM1, String.class, expectedPosition));
+        assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, paramMatchers)));
     }
 }
