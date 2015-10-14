@@ -8,7 +8,9 @@ package org.mule.module.extension.internal.config;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.OperationModel;
@@ -39,7 +41,7 @@ final class TopLevelParameterTypeFactoryBean implements FactoryBean<Object>
     @Override
     public Object getObject() throws Exception
     {
-        return valueResolver.resolve(getInitialiserEvent(muleContext));
+        return valueResolver.resolve(getEvent());
     }
 
     @Override
@@ -51,6 +53,12 @@ final class TopLevelParameterTypeFactoryBean implements FactoryBean<Object>
     @Override
     public boolean isSingleton()
     {
-        return true;
+        return !valueResolver.isDynamic();
+    }
+
+    private MuleEvent getEvent()
+    {
+        MuleEvent event = RequestContext.getEvent();
+        return event != null ? event : getInitialiserEvent(muleContext);
     }
 }

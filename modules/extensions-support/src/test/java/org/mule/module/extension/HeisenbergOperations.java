@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension;
 
+import static java.util.stream.Collectors.toList;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
@@ -17,8 +18,8 @@ import org.mule.extension.annotation.api.RestrictedTo;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.extension.api.runtime.ContentType;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -116,5 +117,17 @@ public class HeisenbergOperations
     public void hideMethInMessage(MuleMessage message)
     {
         message.setProperty(SECRET_PACKAGE, METH, PropertyScope.INVOCATION);
+    }
+
+    @Operation
+    public String knock(KnockeableDoor door)
+    {
+        return door.knock();
+    }
+
+    @Operation
+    public List<String> knockMany(List<KnockeableDoor> doors)
+    {
+        return doors.stream().map(KnockeableDoor::knock).collect(toList());
     }
 }

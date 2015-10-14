@@ -11,13 +11,19 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HealthStatus.DEAD;
+import static org.mule.module.extension.KnockeableDoor.knock;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
@@ -143,6 +149,7 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
 
         assertThat(expected, is(event.getMessageAsString()));
     }
+
     @Test
     public void getInjectedDependency() throws Exception
     {
@@ -155,6 +162,72 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
     {
         String alias = runFlow("alias").getMessageAsString();
         assertThat(alias, is("Howdy!, my name is Walter White and I'm 52 years old"));
+    }
+
+    @Test
+    public void operationWithStaticInlinePojoParameter() throws Exception
+    {
+        String response = runFlow("knockStaticInlineDoor").getMessage().getPayloadAsString();
+        assertKnockedDoor(response, "Inline Skyler");
+    }
+
+    @Test
+    public void operationWithDynamicInlinePojoParameter() throws Exception
+    {
+        assertDynamicDoor("knockDynamicInlineDoor");
+    }
+
+    @Test
+    public void operationWithStaticTopLevelPojoParameter() throws Exception
+    {
+        String response = runFlow("knockStaticTopLevelDoor").getMessage().getPayloadAsString();
+        assertKnockedDoor(response, "Top Level Skyler");
+    }
+
+    @Test
+    public void operationWithDynamicTopLevelPojoParameter() throws Exception
+    {
+        assertDynamicDoor("knockDynamicTopLevelDoor");
+    }
+
+    @Test
+    public void operationWithInlineListParameter() throws Exception
+    {
+        MuleEvent event = getTestEvent("");
+        event.setFlowVariable("victim", "Saul");
+
+        List<String> response = (List<String>) runFlow("knockManyWithInlineList", event).getMessage().getPayload();
+        assertThat(response, Matchers.contains(knock("Inline Skyler"), knock("Saul")));
+    }
+
+    @Test
+    public void operationWithExpressionListParameter() throws Exception
+    {
+        List<KnockeableDoor> doors = Arrays.asList(new KnockeableDoor("Skyler"), new KnockeableDoor("Saul"));
+        MuleEvent event = getTestEvent("");
+        event.setFlowVariable("doors", doors);
+
+        List<String> response = (List<String>) runFlow("knockManyByExpression", event).getMessage().getPayload();
+        assertThat(response, Matchers.contains(knock("Skyler"), knock("Saul")));
+    }
+
+    private void assertDynamicDoor(String flowName) throws Exception
+    {
+        assertDynamicVictim(flowName, "Skyler");
+        assertDynamicVictim(flowName, "Saul");
+    }
+
+    private void assertDynamicVictim(String flowName, String victim) throws Exception
+    {
+        MuleEvent event = getTestEvent("");
+        event.setFlowVariable("victim", victim);
+
+        assertKnockedDoor(runFlow(flowName, event).getMessage().getPayloadAsString(), victim);
+    }
+
+    private void assertKnockedDoor(String actual, String expected)
+    {
+        assertThat(actual, is(knock(expected)));
     }
 
     private void assertKillPayload(MuleEvent event) throws MuleException

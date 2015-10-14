@@ -12,6 +12,12 @@ import org.mule.extension.annotation.api.Parameter;
 @Alias("door")
 public class KnockeableDoor
 {
+
+    public static String knock(String value)
+    {
+        return "Knocked on " + value;
+    }
+
     @Parameter
     private String victim;
 
@@ -20,6 +26,20 @@ public class KnockeableDoor
 
     @Parameter
     private KnockeableDoor previous;
+
+    public KnockeableDoor()
+    {
+    }
+
+    public KnockeableDoor(String victim)
+    {
+        this.victim = victim;
+    }
+
+    public String knock()
+    {
+        return knock(victim);
+    }
 
     public String getVictim()
     {
