@@ -250,6 +250,10 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         }
         else
         {
+            if (referencedFlow instanceof AnnotatedObject)
+            {
+                ((AnnotatedObject) referencedFlow).setAnnotations(getAnnotations());
+            }
             return referencedFlow;
         }
     }

@@ -7,12 +7,14 @@
 package org.mule.routing;
 
 import org.mule.VoidMuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.execution.LocationExecutionContextProvider;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -97,6 +99,15 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
     }
 
     @Override
+    protected MessagingException filterFailureException(MuleEvent event, Exception ex)
+    {
+        MessagingException messagingException = new MessagingException(event, ex, this);
+        String docName = LocationExecutionContextProvider.getDocName(filter);
+        messagingException.getInfo().put("Filter", docName != null ? String.format("%s (%s)", filter.toString(), docName) : filter.toString());
+        return messagingException;
+    }
+
+    @Override
     protected MuleException filterUnacceptedException(MuleEvent event)
     {
         return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter, this);
@@ -129,6 +140,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         }
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof FlowConstructAware)
@@ -137,6 +149,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         }
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Initialisable)
@@ -147,6 +160,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         LifecycleUtils.initialiseIfNeeded(filter);
     }
 
+    @Override
     public void start() throws MuleException
     {
         if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Startable)
@@ -155,6 +169,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Stoppable)
@@ -163,6 +178,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         }
     }
 
+    @Override
     public void dispose()
     {
         if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Disposable)

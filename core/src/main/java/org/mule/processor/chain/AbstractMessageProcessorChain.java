@@ -6,14 +6,13 @@
  */
 package org.mule.processor.chain;
 
-import org.mule.api.CompletionHandler;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
@@ -28,7 +27,6 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.endpoint.EndpointAware;
-import org.mule.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.util.NotificationUtils;
 import org.mule.util.StringUtils;
@@ -45,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  * this chain is nested in another chain the next MessageProcessor in the parent chain is not injected into
  * the first in the nested chain.
  */
-public abstract class AbstractMessageProcessorChain
+public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject
         implements NonBlockingMessageProcessor, MessageProcessorChain, Lifecycle, FlowConstructAware,
         MuleContextAware, EndpointAware, MessageProcessorContainer, MessagingExceptionHandlerAware
 {
@@ -78,6 +76,7 @@ public abstract class AbstractMessageProcessorChain
 
     protected abstract MuleEvent doProcess(MuleEvent event) throws MuleException;
 
+    @Override
     public void initialise() throws InitialisationException
     {
         for (MessageProcessor processor : processors)
@@ -90,6 +89,7 @@ public abstract class AbstractMessageProcessorChain
         }
     }
 
+    @Override
     public void start() throws MuleException
     {
         List<MessageProcessor> startedProcessors = new ArrayList<MessageProcessor>();
@@ -122,11 +122,13 @@ public abstract class AbstractMessageProcessorChain
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         stop(processors);
     }
 
+    @Override
     public void dispose()
     {
         for (MessageProcessor processor : processors)
@@ -139,6 +141,7 @@ public abstract class AbstractMessageProcessorChain
         processors.clear();
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         for (MessageProcessor processor : processors)
@@ -150,6 +153,7 @@ public abstract class AbstractMessageProcessorChain
         }
     }
 
+    @Override
     public String getName()
     {
         return name;
@@ -189,6 +193,7 @@ public abstract class AbstractMessageProcessorChain
         return string.toString();
     }
 
+    @Override
     public void setEndpoint(ImmutableEndpoint endpoint)
     {
         for (MessageProcessor processor : processors)
@@ -200,6 +205,7 @@ public abstract class AbstractMessageProcessorChain
         }
     }
 
+    @Override
     public List<MessageProcessor> getMessageProcessors()
     {
         return processors;

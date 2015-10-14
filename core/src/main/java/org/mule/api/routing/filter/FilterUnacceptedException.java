@@ -8,6 +8,7 @@ package org.mule.api.routing.filter;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.execution.LocationExecutionContextProvider;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
@@ -22,21 +23,14 @@ public class FilterUnacceptedException extends MessagingException
     {
         super(message, event, failingMessageProcessor);
         this.filter = filter;
-        addInfo("Filter", filter.toString());
+        addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
     }
 
     public FilterUnacceptedException(Message message, MuleEvent event, Filter filter, Throwable cause)
     {
         super(message, event, cause);
         this.filter = filter;
-        addInfo("Filter", filter.toString());
-    }
-
-    public FilterUnacceptedException(MuleEvent event, Filter filter, Throwable cause)
-    {
-        super(event, cause);
-        this.filter = filter;
-        addInfo("Filter", (filter == null ? "null" : filter.toString()));
+        addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
     }
 
     public FilterUnacceptedException(Message message, MuleEvent event, Throwable cause)
