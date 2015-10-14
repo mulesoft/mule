@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mule.module.db.internal.debug.DbDebugInfoTestUtils.createQueryFieldDebugInfoMatcher;
 import static org.mule.module.db.internal.domain.query.QueryType.UPDATE;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERY_DEBUG_FIELD;
@@ -25,12 +26,12 @@ import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.processor.AbstractDbMessageProcessor;
-import org.mule.module.db.internal.processor.DbDebugInfoUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 public class UpdateDynamicBulkDebugInfoTestCase extends UpdateBulkTestCase
@@ -68,14 +69,14 @@ public class UpdateDynamicBulkDebugInfoTestCase extends UpdateBulkTestCase
 
         assertThat(debugInfo, is(not(nullValue())));
         assertThat(debugInfo.size(), equalTo(1));
-        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueries())));
+        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueryMatchers())));
     }
 
-    private List<FieldDebugInfo> createExpectedQueries()
+    private List<Matcher<FieldDebugInfo>> createExpectedQueryMatchers()
     {
-        final List<FieldDebugInfo> queriesDebugInfo = new ArrayList<>();
-        queriesDebugInfo.add(DbDebugInfoUtils.createQueryFieldDebugInfo(QUERY1, new QueryTemplate("update PLANET set NAME='Mercury' where NAME='EARTH'", UPDATE, Collections.<QueryParam>emptyList())));
-        queriesDebugInfo.add(DbDebugInfoUtils.createQueryFieldDebugInfo(QUERY2, new QueryTemplate("update PLANET set NAME='Mercury' where NAME='MARS'", UPDATE, Collections.<QueryParam>emptyList())));
+        final List<Matcher<FieldDebugInfo>> queriesDebugInfo = new ArrayList<>();
+        queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY1, new QueryTemplate("update PLANET set NAME='Mercury' where NAME='EARTH'", UPDATE, Collections.<QueryParam>emptyList())));
+        queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY2, new QueryTemplate("update PLANET set NAME='Mercury' where NAME='MARS'", UPDATE, Collections.<QueryParam>emptyList())));
 
         return queriesDebugInfo;
     }

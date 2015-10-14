@@ -17,9 +17,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.module.db.internal.debug.DbDebugInfoTestUtils.createQueryFieldDebugInfoMatcher;
 import static org.mule.module.db.internal.domain.query.QueryType.UPDATE;
 import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
-import static org.mule.module.db.internal.processor.DbDebugInfoUtils.createQueryFieldDebugInfo;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 @SmallTest
@@ -86,7 +87,7 @@ public class DynamicBulkUpdateMessageProcessorTestCase extends AbstractMuleTestC
         assertThat(debugInfo, is(not(nullValue())));
         assertThat(debugInfo.size(), equalTo(1));
 
-        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueries())));
+        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueryMatchers())));
     }
 
     @Test
@@ -112,13 +113,13 @@ public class DynamicBulkUpdateMessageProcessorTestCase extends AbstractMuleTestC
         assertThat(debugInfo, hasItem(fieldLike(QUERIES_DEBUG_FIELD, List.class, queryResolutionException)));
     }
 
-    private List<FieldDebugInfo> createExpectedQueries()
+    private List<Matcher<FieldDebugInfo>> createExpectedQueryMatchers()
     {
-        final List<FieldDebugInfo> queriesDebugInfo = new ArrayList<>();
-        queriesDebugInfo.add(createQueryFieldDebugInfo(QUERY1, QUERY_TEMPLATE1));
-        queriesDebugInfo.add(createQueryFieldDebugInfo(QUERY2, QUERY_TEMPLATE2));
+        final List<Matcher<FieldDebugInfo>> queryMatchers = new ArrayList<>();
+        queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
+        queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
 
-        return queriesDebugInfo;
+        return queryMatchers;
     }
 
     private static List<String> getPlanetNames()

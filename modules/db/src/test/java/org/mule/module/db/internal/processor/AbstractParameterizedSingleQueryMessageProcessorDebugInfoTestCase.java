@@ -11,7 +11,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.when;
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.module.db.integration.model.Planet.EARTH;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.INPUT_PARAMS_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.PARAM_DEBUG_FIELD_PREFIX;
@@ -29,6 +28,7 @@ import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 public abstract class AbstractParameterizedSingleQueryMessageProcessorDebugInfoTestCase extends AbstractSingleQueryMessageProcessorDebugInfoTestCase
@@ -79,10 +79,10 @@ public abstract class AbstractParameterizedSingleQueryMessageProcessorDebugInfoT
         assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, getSqlText())));
         assertThat(debugInfo, hasItem(fieldLike(TYPE_DEBUG_FIELD, String.class, getQueryType().toString())));
 
-        final List<FieldDebugInfo> paramFields = new ArrayList<>();
-        paramFields.add(createFieldDebugInfo(paramName1, String.class, EARTH.getName()));
-        paramFields.add(createFieldDebugInfo(paramName2, String.class, EARTH.getPosition()));
-        assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, paramFields)));
+        final List<Matcher<FieldDebugInfo>> paramMatchers = new ArrayList<>();
+        paramMatchers.add(fieldLike(paramName1, String.class, EARTH.getName()));
+        paramMatchers.add(fieldLike(paramName2, String.class, EARTH.getPosition()));
+        assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, paramMatchers)));
     }
 
     protected Query createQueryWithNamedParameters()

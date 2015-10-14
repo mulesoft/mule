@@ -34,6 +34,7 @@ import org.mule.context.notification.NotificationHelper;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.HttpSendBodyMode;
 import org.mule.module.http.internal.HttpParser;
+import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
@@ -69,6 +70,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static final String PASSWORD_DEBUG = "Password";
     static final String WORKSTATION_DEBUG = "Workstation";
     static final String AUTHENTICATION_TYPE_DEBUG = "Authentication Type";
+    static final String QUERY_PARAMS_DEBUG = "Query Params";
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
@@ -613,9 +615,30 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                 return resolveResponseTimeout(event);
             }
         }));
+        fields.add(createFieldDebugInfo(QUERY_PARAMS_DEBUG, List.class, getQueryParamsDebugInfo(event)));
         fields.add(getSecurityFieldDebugInfo(event));
 
         return fields;
+    }
+
+    private List<FieldDebugInfo> getQueryParamsDebugInfo(MuleEvent event)
+    {
+        final ParameterMap queryParams = requestBuilder.getQueryParams(event);
+        List<FieldDebugInfo> params = new ArrayList<>();
+        for (String paramName : queryParams.keySet())
+        {
+            final List<String> values = queryParams.getAll(paramName);
+            if (values.size() == 1)
+            {
+                params.add(createFieldDebugInfo(paramName, String.class, values.get(0)));
+            }
+            else
+            {
+                params.add(createFieldDebugInfo(paramName, List.class, values));
+            }
+
+        }
+        return params;
     }
 
     private FieldDebugInfo getSecurityFieldDebugInfo(MuleEvent event)
