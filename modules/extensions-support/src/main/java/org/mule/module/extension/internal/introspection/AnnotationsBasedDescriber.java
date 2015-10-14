@@ -202,12 +202,7 @@ public final class AnnotationsBasedDescriber implements Describer
             }
 
             parameterDescriptor.ofType(dataType);
-
-            if (!parameter.isDynamic())
-            {
-                parameterDescriptor.whichIsStatic();
-            }
-
+            parameterDescriptor.withExpressionSupport(parameter.expressionSupport());
             parameterDescriptor.withModelProperty(MemberNameModelProperty.KEY, new MemberNameModelProperty(field.getName()));
 
             parameters.add(parameterDescriptor);

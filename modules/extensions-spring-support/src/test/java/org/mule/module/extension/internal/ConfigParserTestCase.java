@@ -65,6 +65,8 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
     private static final String SAUL = "Saul";
     private static final String WHITE_ADDRESS = "308 Negra Arroyo Lane";
     private static final String SHOPPING_MALL = "Shopping Mall";
+    private static final String LAB_ADDRESS = "Pollos Hermanos";
+    private static final String FIRST_ENDEVOUR = "Gray Matter Technologies";
     private static final int DEATH_YEAR = 2011;
     private static final HealthStatus INITIAL_HEALTH = HealthStatus.CANCER;
     private static final HealthStatus FINAL_HEALTH = HealthStatus.DEAD;
@@ -229,6 +231,8 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
         assertTrue(heisenberg.isCancer());
         assertThat(heisenberg.getInitialHealth(), is(INITIAL_HEALTH));
         assertThat(heisenberg.getEndingHealth(), is(FINAL_HEALTH));
+        assertThat(heisenberg.getFirstEndevour(), is(FIRST_ENDEVOUR));
+        assertThat(heisenberg.getLabAddress(), is(LAB_ADDRESS));
 
         Calendar dayOfBirth = Calendar.getInstance();
         dayOfBirth.setTime(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfBirth());

@@ -23,6 +23,9 @@ import static org.mule.extension.api.introspection.DataQualifier.BOOLEAN;
 import static org.mule.extension.api.introspection.DataQualifier.LIST;
 import static org.mule.extension.api.introspection.DataQualifier.STRING;
 import static org.mule.extension.api.introspection.DataType.of;
+import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
+import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.ADDRESS;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.ARG_LESS;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.BROADCAST;
@@ -49,12 +52,14 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER_DESCRIPTION;
 import org.mule.api.registry.ServiceRegistry;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.exception.NoSuchConfigurationException;
 import org.mule.extension.api.exception.NoSuchOperationException;
 import org.mule.extension.api.introspection.ConfigurationInstantiator;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.Interceptable;
@@ -87,6 +92,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 
     @Mock
     private ServiceRegistry serviceRegistry;
+
     private DeclarationDescriptor descriptor;
     private ExtensionModel extensionModel;
 
@@ -126,10 +132,10 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 
         List<ParameterModel> parameterModels = configurationModel.getParameterModels();
         assertThat(parameterModels, hasSize(4));
-        assertParameter(parameterModels.get(0), ADDRESS, SERVICE_ADDRESS, true, true, of(String.class), STRING, null);
-        assertParameter(parameterModels.get(1), PORT, SERVICE_PORT, true, true, of(String.class), STRING, null);
-        assertParameter(parameterModels.get(2), SERVICE, SERVICE_NAME, true, true, of(String.class), STRING, null);
-        assertParameter(parameterModels.get(3), WSDL_LOCATION, URI_TO_FIND_THE_WSDL, false, true, of(String.class), STRING, null);
+        assertParameter(parameterModels.get(0), ADDRESS, SERVICE_ADDRESS, SUPPORTED, true, of(String.class), STRING, null);
+        assertParameter(parameterModels.get(1), PORT, SERVICE_PORT, SUPPORTED, true, of(String.class), STRING, null);
+        assertParameter(parameterModels.get(2), SERVICE, SERVICE_NAME, SUPPORTED, true, of(String.class), STRING, null);
+        assertParameter(parameterModels.get(3), WSDL_LOCATION, URI_TO_FIND_THE_WSDL, NOT_SUPPORTED, true, of(String.class), STRING, null);
     }
 
     @Test
@@ -209,6 +215,23 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
                                    .with().requiredParameter("name").ofType(String.class));
     }
 
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void fixedParameterWithExpressionDefault()
+    {
+        factory.createFrom(descriptor.withOperation("invalidOperation").describedAs("")
+                                   .with().optionalParameter("fixed").ofType(String.class)
+                                   .withExpressionSupport(NOT_SUPPORTED)
+                                   .defaultingTo("#['hello']"));
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void expressionParameterWithFixedValue()
+    {
+        factory.createFrom(descriptor.withOperation("invalidOperation").describedAs("")
+                                   .with().optionalParameter("expression").ofType(String.class)
+                                   .withExpressionSupport(REQUIRED)
+                                   .defaultingTo("static"));
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void nameWithSpaces()
@@ -268,8 +291,8 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 
         List<ParameterModel> parameterModels = operationModel.getParameterModels();
         assertThat(parameterModels, hasSize(2));
-        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, true, true, of(String.class), STRING, null);
-        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, true, false, of(Boolean.class), BOOLEAN, true);
+        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, of(String.class), STRING, null);
+        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, of(Boolean.class), BOOLEAN, true);
     }
 
     private void assertBroadcastOperation(List<OperationModel> operationModels) throws NoSuchOperationException
@@ -282,9 +305,9 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 
         List<ParameterModel> parameterModels = operationModel.getParameterModels();
         assertThat(parameterModels, hasSize(3));
-        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, true, true, of(List.class, String.class), LIST, null);
-        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, true, false, of(Boolean.class), BOOLEAN, true);
-        assertParameter(parameterModels.get(2), CALLBACK, CALLBACK_DESCRIPTION, false, true, of(OperationModel.class), DataQualifier.OPERATION, null);
+        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, of(List.class, String.class), LIST, null);
+        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, of(Boolean.class), BOOLEAN, true);
+        assertParameter(parameterModels.get(2), CALLBACK, CALLBACK_DESCRIPTION, REQUIRED, true, of(OperationModel.class), DataQualifier.OPERATION, null);
     }
 
     private void assertArglessOperation(List<OperationModel> operationModels) throws NoSuchOperationException
@@ -303,7 +326,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     private void assertParameter(ParameterModel parameterModel,
                                  String name,
                                  String description,
-                                 boolean acceptsExpressions,
+                                 ExpressionSupport expressionSupport,
                                  boolean required,
                                  DataType type,
                                  DataQualifier qualifier,
@@ -312,7 +335,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         assertThat(parameterModel, is(notNullValue()));
         assertThat(parameterModel.getName(), equalTo(name));
         assertThat(parameterModel.getDescription(), equalTo(description));
-        assertThat(parameterModel.isDynamic(), is(acceptsExpressions));
+        assertThat(parameterModel.getExpressionSupport(), is(expressionSupport));
         assertThat(parameterModel.isRequired(), is(required));
         assertThat(parameterModel.getType(), equalTo(type));
         assertThat(parameterModel.getType().getQualifier(), is(qualifier));

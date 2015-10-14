@@ -22,8 +22,8 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
@@ -72,7 +72,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
         extensionRegistry = new ExtensionRegistry(muleContext.getRegistry());
         if (extensionDiscoverer == null)
         {
-            extensionDiscoverer = new DefaultExtensionDiscoverer(new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader()), serviceRegistry);
+            extensionDiscoverer = new DefaultExtensionDiscoverer(
+                    new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader()),
+                    serviceRegistry);
         }
 
         implicitConfigurationFactory = new DefaultImplicitConfigurationFactory(muleContext.getExpressionManager());

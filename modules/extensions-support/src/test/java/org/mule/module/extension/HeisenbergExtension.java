@@ -6,12 +6,13 @@
  */
 package org.mule.module.extension;
 
+import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operations;
@@ -19,6 +20,7 @@ import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.ExtensionManager;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -90,6 +92,14 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     @Parameter(alias = "finalHealth")
     private HealthStatus endingHealth;
+
+    @Parameter(expressionSupport = REQUIRED)
+    @Optional
+    private String labAddress;
+
+    @Parameter(expressionSupport = NOT_SUPPORTED)
+    @Optional
+    private String firstEndevour;
 
     @Override
     public void initialise() throws InitialisationException
@@ -203,6 +213,16 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     void setMoney(BigDecimal money)
     {
         this.money = money;
+    }
+
+    public String getLabAddress()
+    {
+        return labAddress;
+    }
+
+    public String getFirstEndevour()
+    {
+        return firstEndevour;
     }
 
     @Override

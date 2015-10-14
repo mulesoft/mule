@@ -6,11 +6,16 @@
  */
 package org.mule.module.extension.internal.introspection;
 
+import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -183,11 +188,24 @@ public final class DefaultExtensionFactory implements ExtensionFactory
 
     private ParameterModel toParameter(ParameterDeclaration parameter)
     {
+        Object defaultValue = parameter.getDefaultValue();
+        if (defaultValue instanceof String)
+        {
+            if (parameter.getExpressionSupport() == NOT_SUPPORTED && isExpression((String) defaultValue))
+            {
+                throw new IllegalModelDefinitionException(String.format("Parameter '%s' is marked as not supporting expressions yet it contains one as a default value. Please fix this", parameter.getName()));
+            }
+            else if (parameter.getExpressionSupport() == REQUIRED && !isExpression((String) defaultValue))
+            {
+                throw new IllegalModelDefinitionException(String.format("Parameter '%s' requires expressions yet it contains a constant as a default value. Please fix this", parameter.getName()));
+            }
+        }
+
         return new ImmutableParameterModel(parameter.getName(),
                                            parameter.getDescription(),
                                            parameter.getType(),
                                            parameter.isRequired(),
-                                           parameter.isDynamic(),
+                                           parameter.getExpressionSupport(),
                                            parameter.getDefaultValue(),
                                            parameter.getModelProperties());
     }
@@ -207,5 +225,11 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     private void enrichModel(DescribingContext describingContext)
     {
         modelEnrichers.forEach(enricher -> enricher.enrich(describingContext));
+    }
+
+    private boolean isExpression(String value)
+    {
+        return value.startsWith(DEFAULT_EXPRESSION_PREFIX) &&
+               value.endsWith(DEFAULT_EXPRESSION_POSTFIX);
     }
 }

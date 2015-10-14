@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
@@ -13,12 +14,14 @@ import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeN
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
 import org.mule.api.NestedProcessor;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.DataQualifierVisitor;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
@@ -208,8 +211,9 @@ final class XmlExtensionParserUtils
      * @param element         a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
      * @param parameterModels a {@link List} of {@link ParameterModel parameterModels}
      * @return a {@link ResolverSet}
+     * @throws ConfigurationException in case of invalid configuration
      */
-    static ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels)
+    static ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels) throws ConfigurationException
     {
         return getResolverSet(element, parameterModels, ImmutableMap.<String, List<MessageProcessor>>of());
     }
@@ -219,7 +223,7 @@ final class XmlExtensionParserUtils
      * for each {@link ParameterModel} in the {@code parameters} list, taking as source the given {@code element}
      * an a {@code nestedOperations} {@link Map} which has {@link ParameterModel} names as keys, and {@link List}s
      * of {@link MessageProcessor} as values.
-     * <p/>
+     * <p>
      * For each {@link ParameterModel} in the {@code parameters} list, if an entry exists in the {@code nestedOperations}
      * {@link Map}, a {@link ValueResolver} that generates {@link NestedProcessor} instances will be added to the
      * {@link ResolverSet}. Otherwise, a {@link ValueResolver} will be inferred from the given {@code element} just
@@ -230,8 +234,9 @@ final class XmlExtensionParserUtils
      * @param nestedOperations a {@link Map} which has {@link ParameterModel} names as keys, and {@link List}s
      *                         of {@link MessageProcessor} as values
      * @return a {@link ResolverSet}
+     * @throws ConfigurationException in case of invalid configuration
      */
-    static ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels, Map<String, List<MessageProcessor>> nestedOperations)
+    static ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels, Map<String, List<MessageProcessor>> nestedOperations) throws ConfigurationException
     {
         ResolverSet resolverSet = new ResolverSet();
 
@@ -245,7 +250,24 @@ final class XmlExtensionParserUtils
             else
             {
                 ValueResolver<?> resolver = parseParameter(element, parameterModel);
-                resolverSet.add(parameterModel, resolver != null ? resolver : new StaticValueResolver(null));
+                if (resolver == null)
+                {
+                    resolver = new StaticValueResolver(null);
+                }
+
+                if (resolver.isDynamic() && parameterModel.getExpressionSupport() == ExpressionSupport.NOT_SUPPORTED)
+                {
+                    throw new ConfigurationException(createStaticMessage(String.format(
+                            "An expression value was given for parameter '%s' but it doesn't support expressions", parameterModel.getName())));
+                }
+
+                if (!resolver.isDynamic() && parameterModel.getExpressionSupport() == ExpressionSupport.REQUIRED && parameterModel.isRequired())
+                {
+                    throw new ConfigurationException(createStaticMessage(String.format(
+                            "A fixed value was given for parameter '%s' but it only supports expressions", parameterModel.getName())));
+                }
+
+                resolverSet.add(parameterModel, resolver);
             }
         }
 

@@ -58,7 +58,9 @@
                     <xs:attribute type="mule:expressionMap" use="required" name="dateOfDeath"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="firstEndevour"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.HealthStatusEnumType" use="required" name="initialHealth"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="myName"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="nextDoor"></xs:attribute>
