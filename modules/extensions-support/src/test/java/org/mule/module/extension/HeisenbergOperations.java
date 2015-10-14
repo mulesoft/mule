@@ -10,13 +10,17 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.transport.PropertyScope;
-import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.annotation.api.ContentMetadataParameters;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.RestrictedTo;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.runtime.ContentType;
+import org.mule.extension.api.runtime.ContentMetadata;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -25,13 +29,15 @@ public class HeisenbergOperations
 {
 
     private static final String SECRET_PACKAGE = "secretPackage";
+    private static final String CONTENT_TYPE = "contentType";
     private static final String METH = "meth";
 
     @Inject
     private ExtensionManager extensionManager;
 
     @Operation
-    public String sayMyName(@UseConfig HeisenbergExtension config)
+    @ContentMetadataParameters
+    public String sayMyName(@UseConfig HeisenbergExtension config, ContentMetadata contentMetadata)
     {
         return config.getPersonalInfo().getName();
     }
@@ -43,8 +49,14 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public String getEnemy(@UseConfig HeisenbergExtension config, int index)
+    public String getEnemy(@UseConfig HeisenbergExtension config, int index, ContentMetadata contentMetadata)
     {
+        if (contentMetadata.isOutputModifiable())
+        {
+            Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
+            contentMetadata.setOutputContentType(new ContentType(lastSupportedEncoding, "dead/dead"));
+        }
+
         return config.getEnemies().get(index);
     }
 
@@ -88,9 +100,10 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public void hideMethInEvent(MuleEvent event)
+    public void hideMethInEvent(MuleEvent event, ContentType contentType)
     {
         event.setFlowVariable(SECRET_PACKAGE, METH);
+        event.setFlowVariable(CONTENT_TYPE, contentType);
     }
 
     @Operation

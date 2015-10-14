@@ -20,12 +20,15 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
+import org.mule.api.transformer.DataType;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.extension.api.runtime.ContentType;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
@@ -35,6 +38,7 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -54,6 +58,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
 {
 
     private static final String CONFIG_NAME = "config";
+    private static final DataType DATA_TYPE = DataTypeFactory.create(String.class);
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleEvent muleEvent;
@@ -81,18 +86,19 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
 
 
     @Before
-    public void init()
+    public void init() throws Exception
     {
         initHeisenberg();
         configurationInstance = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, config, emptyList());
-        operationContext = new DefaultOperationContext(configurationInstance, parameters, muleEvent);
+        when(muleEvent.getMessage().getDataType()).thenReturn(DATA_TYPE);
+        operationContext = new DefaultOperationContext(configurationInstance, parameters, operationModel, muleEvent);
         operationContext = spy(operationContext);
     }
 
     @Test
     public void operationWithReturnValueAndWithoutParameters() throws Exception
     {
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {HeisenbergExtension.class});
+        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {HeisenbergExtension.class, ContentMetadata.class});
         executor = new ReflectiveMethodOperationExecutor(method, operations, ValueReturnDelegate.INSTANCE);
         assertResult(executor.execute(operationContext), HEISENBERG);
     }
@@ -102,7 +108,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     {
         final RuntimeException exception = new RuntimeException();
         operations = mock(HeisenbergOperations.class);
-        when(operations.sayMyName(any(HeisenbergExtension.class))).thenThrow(exception);
+        when(operations.sayMyName(any(HeisenbergExtension.class), any(ContentMetadata.class))).thenThrow(exception);
 
         try
         {
@@ -133,7 +139,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         when(parameters.asMap()).thenReturn(parametersMap);
         init();
 
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {HeisenbergExtension.class, int.class});
+        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {HeisenbergExtension.class, int.class, ContentMetadata.class});
         executor = new ReflectiveMethodOperationExecutor(method, operations, ValueReturnDelegate.INSTANCE);
 
         assertResult(executor.execute(operationContext), "Hank");
@@ -142,7 +148,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     @Test
     public void voidWithArguments() throws Exception
     {
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "hideMethInEvent", new Class<?>[] {MuleEvent.class});
+        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "hideMethInEvent", new Class<?>[] {MuleEvent.class, ContentType.class});
         executor = new ReflectiveMethodOperationExecutor(method, operations, VoidReturnDelegate.INSTANCE);
         assertSameInstance(executor.execute(operationContext), muleEvent);
         verify(muleEvent).setFlowVariable("secretPackage", "meth");

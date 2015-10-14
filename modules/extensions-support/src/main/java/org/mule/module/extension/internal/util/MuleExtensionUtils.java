@@ -19,8 +19,10 @@ import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.InterceptableModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.InterceptorFactory;
+import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.util.ArrayUtils;
 import org.mule.util.collection.ImmutableListCollector;
@@ -33,6 +35,7 @@ import com.google.common.collect.LinkedHashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -191,6 +194,24 @@ public class MuleExtensionUtils
     public static MuleEvent getInitialiserEvent(MuleContext muleContext)
     {
         return new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
+    }
+
+    /**
+     * Returns the {@link Method} that was used to declare the given
+     * {@code operationDeclaration}.
+     *
+     * @param operationDeclaration a {@link OperationDeclaration}
+     * @return A {@link Method} or {@code null} if the {@code operationDeclaration} was defined by other means
+     */
+    public static Method getImplementingMethod(OperationDeclaration operationDeclaration)
+    {
+        ImplementingMethodModelProperty methodProperty = operationDeclaration.getModelProperty(ImplementingMethodModelProperty.KEY);
+        if (methodProperty != null)
+        {
+            return methodProperty.getMethod();
+        }
+
+        return null;
     }
 
     private static Set<String> collectRepeatedNames(Collection<? extends Described> describedCollection)

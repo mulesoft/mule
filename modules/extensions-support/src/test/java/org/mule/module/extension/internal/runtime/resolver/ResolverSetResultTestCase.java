@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
@@ -15,8 +16,6 @@ import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.HealthStatus;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.NoSuchElementException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -81,17 +80,23 @@ public class ResolverSetResultTestCase extends AbstractMuleTestCase
         getBuilder().add(null, "blah");
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void invalidParameter()
     {
-        result.get(getParameter("invalid", String.class));
+        assertThat(result.get(getParameter("invalid", String.class)), is(nullValue()));
+    }
+
+    @Test
+    public void invalidParameterName()
+    {
+        assertThat(result.get("invalid"), is(nullValue()));
     }
 
     private void assertResult(ResolverSetResult result)
     {
-        assertThat((String) result.get(nameParameterModel), is(NAME));
-        assertThat((Integer) result.get(ageParameterModel), is(AGE));
-        assertThat((HealthStatus) result.get(healthParameterModel), is(HEALTH));
+        assertThat(result.get(nameParameterModel), is(NAME));
+        assertThat(result.get(ageParameterModel), is(AGE));
+        assertThat(result.get(healthParameterModel), is(HEALTH));
     }
 
     private ResolverSetResult buildResult()

@@ -74,13 +74,25 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
         parametersMap.put(ExtensionsTestUtils.getParameter(PARAM_NAME, String.class), VALUE);
         when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
-        operationContext = new DefaultOperationContext(configuration, resolverSetResult, event);
+        operationContext = new DefaultOperationContext(configuration, resolverSetResult, operationModel, event);
     }
 
     @Test
     public void getParameter()
     {
         assertThat(operationContext.getParameter(PARAM_NAME), is(VALUE));
+    }
+
+    @Test
+    public void getTypeSafeParameter()
+    {
+        assertThat(operationContext.getTypeSafeParameter(PARAM_NAME, String.class), is(VALUE));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getTypeSafeParameterFails()
+    {
+        operationContext.getTypeSafeParameter(PARAM_NAME, Integer.class);
     }
 
     @Test
