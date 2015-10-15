@@ -22,7 +22,10 @@ import java.io.Serializable;
  */
 public class SerializableToByteArray extends AbstractTransformer implements DiscoverableTransformer
 {
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+    /**
+     * Give core transformers a slightly higher priority
+     */
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
     public SerializableToByteArray()
     {
