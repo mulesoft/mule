@@ -349,8 +349,8 @@
 /mule-standalone-${productVersion}/lib/opt/jruby-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.51.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
-/mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.4.jar
-/mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.5.jar
+/mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.5.jar
+/mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.6.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
@@ -358,7 +358,7 @@
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.2.jar
-/mule-standalone-${productVersion}/lib/opt/libphonenumber-6.0.jar
+/mule-standalone-${productVersion}/lib/opt/libphonenumber-6.2.jar
 /mule-standalone-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
