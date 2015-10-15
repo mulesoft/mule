@@ -52,11 +52,34 @@ public final class MuleContainerBootstrapUtils
     }
 
     /**
+     * @return null if running embedded
+     */
+    public static File getMuleBase()
+    {
+        File muleBase = null;
+        String muleBaseVar = System.getProperty("mule.base");
+
+        if (muleBaseVar != null && !muleBaseVar.trim().equals("") && !muleBaseVar.equals("%MULE_BASE%"))
+        {
+            try {
+                muleBase = new File(muleBaseVar).getCanonicalFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (muleBase == null) {
+            muleBase = getMuleHome();
+        }
+        return muleBase;
+    }
+
+    /**
      * @return null if running embedded, otherwise the apps dir as a File ref
      */
     public static File getMuleAppsDir()
     {
-        return isStandalone() ? new File(getMuleHome(), MULE_APPS_FILENAME) : null;
+        return isStandalone() ? new File(getMuleBase(), MULE_APPS_FILENAME) : null;
     }
 
     /**
@@ -82,7 +105,7 @@ public final class MuleContainerBootstrapUtils
      */
     public static File getMuleLibDir()
     {
-        return isStandalone() ? new File(getMuleHome(), MULE_LIB_FILENAME) : null;
+        return isStandalone() ? new File(getMuleBase(), MULE_LIB_FILENAME) : null;
     }
 
     /**
@@ -90,7 +113,7 @@ public final class MuleContainerBootstrapUtils
      */
     public static File getMuleTmpDir()
     {
-        return isStandalone() ? new File(getMuleHome(), MULE_TMP_FILENAME) : null;
+        return isStandalone() ? new File(getMuleBase(), MULE_TMP_FILENAME) : null;
     }
 
     public static File getMuleLocalJarFile()
@@ -100,7 +123,7 @@ public final class MuleContainerBootstrapUtils
 
     public static File getMuleDomainsDir()
     {
-        return isStandalone() ? new File(getMuleHome(), MULE_DOMAIN_FOLDER) : null;
+        return isStandalone() ? new File(getMuleBase(), MULE_DOMAIN_FOLDER) : null;
     }
 
     /**
@@ -108,7 +131,7 @@ public final class MuleContainerBootstrapUtils
      */
     public static File getMuleConfDir()
     {
-        return isStandalone() ? new File(getMuleHome(), MULE_CONF_FILENAME) : null;
+        return isStandalone() ? new File(getMuleBase(), MULE_CONF_FILENAME) : null;
     }
 
     public static class ProxyInfo

@@ -100,7 +100,7 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
 
     protected void validateAndGetDomainFolders() throws Exception
     {
-        File oldDomainDir = new File(MuleContainerBootstrapUtils.getMuleHome(), OLD_DOMAIN_LIBRARY_FOLDER + File.separator + domain);
+        File oldDomainDir = new File(MuleContainerBootstrapUtils.getMuleBase(), OLD_DOMAIN_LIBRARY_FOLDER + File.separator + domain);
         if (oldDomainDir.exists())
         {
             if (!oldDomainDir.canRead())

@@ -29,8 +29,8 @@ public final class JarUtils
 {
     private static final String MULE_MODULE_FILENAME = "lib" + File.separator + "module";
     private static final String MULE_LIB_FILENAME = "lib" + File.separator + "mule";
-    private static final String MULE_HOME = System.getProperty("mule.home");
-    
+    private static final String MULE_HOME = ServerUtils.getMuleHome();
+
     public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
 
     private static final Log logger = LogFactory.getLog(JarUtils.class);

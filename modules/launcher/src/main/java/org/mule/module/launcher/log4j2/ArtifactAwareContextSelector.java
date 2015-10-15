@@ -204,7 +204,7 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable
 
         if (appLogConfig == null)
         {
-            File defaultConfigFile = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
+            File defaultConfigFile = new File(MuleContainerBootstrapUtils.getMuleBase(), "conf");
             defaultConfigFile = new File(defaultConfigFile, "log4j2.xml");
 
             try

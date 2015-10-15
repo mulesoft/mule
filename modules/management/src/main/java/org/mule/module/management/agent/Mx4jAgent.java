@@ -6,6 +6,8 @@
  */
 package org.mule.module.management.agent;
 
+import static org.mule.util.ServerUtils.getMuleHome;
+
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -17,10 +19,7 @@ import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
+import org.mule.util.*;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -77,7 +76,7 @@ public class Mx4jAgent extends AbstractAgent
     private String authenticationMethod = "basic";
 
     // TODO AH check how an embedded scenario can be handled (no mule home) 
-    private String xslFilePath = System.getProperty("mule.home") + "/lib/mule/mule-module-management-" +
+    private String xslFilePath = getMuleHome() + "/lib/mule/mule-module-management-" +
             MuleManifest.getProductVersion() + ".jar";
 
     private String pathInJar = DEFAULT_PATH_IN_JAR;
