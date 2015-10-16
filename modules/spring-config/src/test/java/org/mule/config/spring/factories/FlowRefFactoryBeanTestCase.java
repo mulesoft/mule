@@ -31,13 +31,11 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.context.notification.MessageProcessingFlowStackManager;
 import org.mule.processor.chain.SubFlowMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -109,9 +107,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
     @Test
     public void dynamicFlowRefSubFlow() throws Exception
     {
-        MessageProcessingFlowStackManager flowStackManager = mock(MessageProcessingFlowStackManager.class);
-        when(applicationContext.getBeansOfType(MessageProcessingFlowStackManager.class)).thenReturn(Collections.singletonMap("flowStackManager", flowStackManager));
-
         FlowRefFactoryBean flowRefFactoryBean = createDynamicFlowRefFactoryBean(targetSubFlow);
 
         // Inner MessageProcessor is used to resolve MP in runtime
@@ -119,9 +114,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
         assertNotSame(targetSubFlow, flowRefFactoryBean.getObject());
 
         verifyProcess(flowRefFactoryBean, targetSubFlow, 1);
-
-        verify(flowStackManager, times(2)).onFlowStart(any(MuleEvent.class), eq(PARSED_DYNAMIC_REFERENCED_FLOW));
-        verify(flowStackManager, times(2)).onFlowComplete(any(MuleEvent.class));
     }
 
     @Test

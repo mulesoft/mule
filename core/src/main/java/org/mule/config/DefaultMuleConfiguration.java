@@ -68,11 +68,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public static boolean verboseExceptions = false;
 
     /**
-     * When true, each event will keep a stack of the flows and components it traverses
+     * When true, each event will keep trace information of the flows and components it traverses
      * to be shown as part of an exception message if an exception occurs.
      * Switching on DEBUG level logging with automatically set this flag to true.
      */
-    public static boolean flowCallStacks = false;
+    public static boolean flowTrace = false;
 
 
     /**
@@ -245,6 +245,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -361,10 +362,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             verboseExceptions = BooleanUtils.toBoolean(p);
         }
 
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "flowCallStacks");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "flowTrace");
         if (p != null)
         {
-            flowCallStacks = BooleanUtils.toBoolean(p);
+            flowTrace = BooleanUtils.toBoolean(p);
         }
 
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
@@ -385,9 +386,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return verboseExceptions || logger.isDebugEnabled();
     }
     
-    public static boolean isFlowCallStacks()
+    /**
+     * @return {@code true} if the log is set to debug or if the system property {@code mule.flowTrace} is set to
+     *         {@code true}. {@code false} otherwise.
+     */
+    public static boolean isFlowTrace()
     {
-        return flowCallStacks || logger.isDebugEnabled();
+        return flowTrace || logger.isDebugEnabled();
     }
 
     protected void validateEncoding() throws FatalException
@@ -427,6 +432,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public int getDefaultResponseTimeout()
     {
         return responseTimeout;
@@ -440,11 +446,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public String getWorkingDirectory()
     {
         return workingDirectory;
     }
 
+    @Override
     public String getMuleHomeDirectory()
     {
         return System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
@@ -467,6 +475,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public int getDefaultTransactionTimeout()
     {
         return defaultTransactionTimeout;
@@ -480,16 +489,19 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isValidateExpressions()
     {
         return validateExpressions;
     }
 
+    @Override
     public boolean isClientMode()
     {
         return clientMode;
     }
 
+    @Override
     public String getDefaultEncoding()
     {
         return encoding;
@@ -503,6 +515,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public String getId()
     {
         return id;
@@ -525,6 +538,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.clusterId = clusterId;
     }
 
+    @Override
     public String getDomainId()
     {
         return domainId;
@@ -538,6 +552,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public String getSystemModelType()
     {
         return systemModelType;
@@ -559,11 +574,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public String getSystemName()
     {
         return domainId + "." + clusterId + "." + id;
     }
 
+    @Override
     public boolean isAutoWrapMessageAwareTransform()
     {
         return autoWrapMessageAwareTransform;
@@ -577,6 +594,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isCacheMessageAsBytes()
     {
         return cacheMessageAsBytes;
@@ -590,6 +608,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isCacheMessageOriginalPayload()
     {
         return cacheMessageOriginalPayload;
@@ -603,6 +622,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isEnableStreaming()
     {
         return enableStreaming;
@@ -642,6 +662,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public int getDefaultQueueTimeout()
     {
         return defaultQueueTimeout;
@@ -655,6 +676,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public int getShutdownTimeout()
     {
         return shutdownTimeout;
@@ -668,6 +690,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isContainerMode()
     {
         return this.containerMode;
@@ -684,6 +707,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isStandalone()
     {
         // this is our best guess
@@ -710,6 +734,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return this.extendedProperties.get(name);
     }
 
+    @Override
     public String getDefaultExceptionStrategyName()
     {
         return defaultExceptionStrategyName;
@@ -745,6 +770,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.defaultExceptionStrategyName = defaultExceptionStrategyName;
     }
     
+    @Override
     public boolean isEnricherPropagatesSessionVariableChanges()
     {
         return enricherPropagatesSessionVariableChanges;
@@ -794,6 +820,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.extensions = extensions;
     }
 
+    @Override
     public <T> T getExtension(final Class<T> extensionType)
     {
         return (T) CollectionUtils.find(extensions, new Predicate()

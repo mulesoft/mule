@@ -19,6 +19,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.notification.FlowTraceManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.el.ExpressionLanguage;
@@ -76,7 +77,6 @@ import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -185,6 +185,8 @@ public class DefaultMuleContext implements MuleContext
 
     private ObjectSerializer objectSerializer;
     private DataTypeConversionResolver dataTypeConversionResolver;
+
+    private volatile FlowTraceManager flowTraceManager;
 
     private volatile Collection<ExceptionContextProvider> exceptionContextProviders;
 
@@ -1079,6 +1081,30 @@ public class DefaultMuleContext implements MuleContext
     public void setObjectSerializer(ObjectSerializer objectSerializer)
     {
         this.objectSerializer = objectSerializer;
+    }
+
+    @Override
+    public FlowTraceManager getFlowTraceManager()
+    {
+        if (flowTraceManager == null)
+        {
+            synchronized (this)
+            {
+                if (flowTraceManager == null)
+                {
+                    try
+                    {
+                        flowTraceManager = getRegistry().lookupObject(FlowTraceManager.class);
+                    }
+                    catch (RegistrationException e)
+                    {
+                        // Should not occur
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
+        }
+        return flowTraceManager;
     }
 
     @Override

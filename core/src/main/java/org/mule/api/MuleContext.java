@@ -11,6 +11,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.notification.FlowTraceManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.el.ExpressionLanguage;
@@ -364,6 +365,13 @@ public interface MuleContext extends Lifecycle
      * @throws InterruptedException if the current thread is interrupted while waiting
      */
     boolean waitUntilStarted(int timeout) throws InterruptedException;
+
+    /**
+     * @return the callbacks for notifying when a flow call from another flow is started or completed.
+     * 
+     * @since 3.8.0
+     */
+    FlowTraceManager getFlowTraceManager();
 
     /**
      * @return the providers for additional context information for exceptions.
