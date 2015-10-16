@@ -22,20 +22,20 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
 
     /* This class was added to address MULE-6417 */
     
-    private String env_statIntervalTime;
+    private String originalStatIntervalTime;
     
     @Before
     public void setUp() {
         // ComponentStatistics reads statIntervalTime from the environment.
         // We will want to control it.
-        env_statIntervalTime = System.getProperty("statIntervalTime");
+        originalStatIntervalTime = System.getProperty("statIntervalTime");
         System.clearProperty("statIntervalTime");
     }
     
     @After
     public void tearDown() {
-        if (env_statIntervalTime != null) {
-            System.setProperty("statIntervalTime", env_statIntervalTime);
+        if (originalStatIntervalTime != null) {
+            System.setProperty("statIntervalTime", originalStatIntervalTime);
         }
     }
     
@@ -50,7 +50,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
     
     @Test
-    public void testDefaults() {
+    public void verifyStatDefaults() {
         ComponentStatistics stats = new ComponentStatistics();
         // num, total, avg, max, min
         assertValues(stats, 0L, 0L, 0L, 0L, 0L);
@@ -58,7 +58,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
     
     @Test
-    public void testSingleEvent() {
+    public void processSingleEvent() {
         ComponentStatistics stats = new ComponentStatistics();
         stats.addExecutionTime(100L);
         // num, total, avg, max, min
@@ -66,7 +66,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
     
     @Test
-    public void testSingleBranchEvent() {
+    public void processSingleBranchEvent() {
         ComponentStatistics stats = new ComponentStatistics();
         stats.addExecutionBranchTime(true /*first*/, 25L, 25L);
         // num, total, avg, max, min
@@ -78,7 +78,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
     
     @Test
-    public void testClear() {
+    public void clearStats() {
         ComponentStatistics stats = new ComponentStatistics();
         stats.addExecutionTime(100L);
         stats.clear();
@@ -97,7 +97,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
      * allow for a solution, so for now this quirk must be accepted.
      */
     @Test
-    public void testClearDuringBranch() {
+    public void clearDuringBranch() {
         ComponentStatistics stats = new ComponentStatistics();
         stats.addExecutionBranchTime(true /*first*/, 25L, 25L);
         stats.clear();
@@ -107,7 +107,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
     
     @Test
-    public void testMaxMinAverage() {
+    public void verifyMaxMinAverage() {
         ComponentStatistics stats = new ComponentStatistics();
         stats.addExecutionTime(2L);
         stats.addExecutionTime(3L);
@@ -116,7 +116,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
     
     @Test
-    public void testBranchMaxMinAverage() {
+    public void verifyBranchMaxMinAverage() {
         ComponentStatistics stats = new ComponentStatistics();
         stats.addExecutionBranchTime(true /*first*/, 2L, 2L);
         stats.addCompleteExecutionTime(2L);
@@ -127,7 +127,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
 
     @Test
-    public void testMultiBranchMaxMinAverage() {
+    public void verifyMultiBranchMaxMinAverage() {
         ComponentStatistics stats = new ComponentStatistics();
         stats.addExecutionBranchTime(true /*first*/, 1L, 1L);
         stats.addExecutionBranchTime(false /*false*/, 1L, 2L);
@@ -139,7 +139,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
     
     @Test
-    public void testStatIntervalReset() {
+    public void verifyShortStatIntervalReset() {
         // configure to reset continuously
         // this functionality is flawed in many ways, but we'll test the basics anyways
         System.setProperty("statIntervalTime", "-1");
@@ -161,7 +161,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase {
     }
 
     @Test
-    public void testStatIntervalNoReset() {
+    public void verifyLongStatIntervalNoReset() {
         // configure to reset far into the future
         System.setProperty("statIntervalTime", "9999");
         ComponentStatistics stats = new ComponentStatistics();
