@@ -8,39 +8,45 @@ package org.mule.context.notification;
 
 import org.mule.api.context.notification.FlowStackElement;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-public class DefaultFlowStackElement implements FlowStackElement, Serializable
+public class DefaultFlowStackElement implements FlowStackElement
 {
-    private static final long serialVersionUID = -2950239332824176742L;
+    private static final long serialVersionUID = -851491195125245390L;
 
     private String flowName;
-    private List<String> processorPaths;
+    private String currentProcessorPath;
 
     public DefaultFlowStackElement(String flowName)
     {
         this.flowName = flowName;
-        this.processorPaths = new ArrayList<>();
+    }
+
+    public void addInvokedMessageProcessor(String processorPath)
+    {
+        this.currentProcessorPath = processorPath;
     }
 
     @Override
-    public void addInvokedMessageProcessor(String processorPath)
+    public String currentMessageProcessor()
     {
-        this.processorPaths.add(processorPath);
+        return currentProcessorPath;
+    }
+
+    @Override
+    public String getFlowName()
+    {
+        return flowName;
     }
 
     @Override
     public String toString()
     {
-        if (processorPaths.isEmpty())
+        if (currentProcessorPath == null)
         {
             return String.format("%s", flowName);
         }
         else
         {
-            return String.format("%s(%s)", flowName, processorPaths.get(processorPaths.size() - 1));
+            return String.format("%s(%s)", flowName, currentProcessorPath);
         }
     }
 
@@ -48,7 +54,7 @@ public class DefaultFlowStackElement implements FlowStackElement, Serializable
     public DefaultFlowStackElement clone()
     {
         DefaultFlowStackElement defaultFlowStackElement = new DefaultFlowStackElement(flowName);
-        defaultFlowStackElement.processorPaths.addAll(this.processorPaths);
+        defaultFlowStackElement.currentProcessorPath = currentProcessorPath;
         return defaultFlowStackElement;
     }
 }

@@ -13,17 +13,17 @@ import java.io.Serializable;
  * 
  * @since 3.8.0
  */
-public interface FlowStackElement extends Serializable, Cloneable
+public interface FlowStackElement extends Serializable
 {
 
     /**
-     * Deep-copies this instance.
+     * @return the path of the currently executing processor in the current flow.
      */
-    FlowStackElement clone();
+    String currentMessageProcessor();
 
     /**
-     * Marks the passed processorRepresentation as being executed as part of this flow.
+     * @return the name of the flow which execution is represented by this element.
      */
-    void addInvokedMessageProcessor(String processorRepresentation);
+    String getFlowName();
 
 }

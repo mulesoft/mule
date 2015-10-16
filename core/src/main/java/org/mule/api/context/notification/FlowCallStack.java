@@ -7,7 +7,7 @@
 package org.mule.api.context.notification;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Keeps context information about the executing flows and its callers
@@ -20,12 +20,19 @@ import java.util.Collection;
 public interface FlowCallStack extends Serializable
 {
 
-    void push(FlowStackElement flowStackElement);
-
-    FlowStackElement pop();
-
+    /**
+     * @return the top-most element of this stack
+     */
     FlowStackElement peek();
 
-    Collection<FlowStackElement> getElementsCopy();
+    /**
+     * @return the elements of this stack as a list, ordered from top to bottom.
+     */
+    List<FlowStackElement> getElements();
+
+    /**
+     * @return the paths of the processors that were executed as part of this flow.
+     */
+    List<String> getExecutedProcessors();
 
 }
