@@ -7,7 +7,6 @@
 
 package org.mule.api;
 
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.execution.LocationExecutionContextProvider;
 import org.mule.config.i18n.Message;
 import org.mule.util.ObjectUtils;
@@ -19,6 +18,7 @@ import org.mule.util.ObjectUtils;
 public class LocatedMuleException extends MuleException
 {
     public static final String INFO_LOCATION_KEY = "Element";
+    public static final String INFO_SOURCE_XML_KEY = "Element XML";
 
     /**
      * Serial version
