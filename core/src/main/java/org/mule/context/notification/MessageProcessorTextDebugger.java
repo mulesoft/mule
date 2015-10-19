@@ -29,6 +29,10 @@ public class MessageProcessorTextDebugger implements MessageProcessorNotificatio
         {
             messageProcessingStackManager.onMessageProcessorNotificationPreInvoke(notification);
         }
+        if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE)
+        {
+            messageProcessingStackManager.onMessageProcessorNotificationPostInvoke(notification);
+        }
     }
 
 }
