@@ -20,6 +20,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageRouter;
 import org.mule.api.routing.AggregationContext;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
@@ -352,7 +353,14 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         routeChains = new ArrayList<MessageProcessor>(routes.size());
         for (MessageProcessor route : routes)
         {
-            routeChains.add(new DefaultMessageProcessorChainBuilder().chain(route).build());
+            if (route instanceof MessageProcessorChain)
+            {
+                routeChains.add(route);
+            }
+            else
+            {
+                routeChains.add(new DefaultMessageProcessorChainBuilder().chain(route).build());
+            }
         }
     }
 
@@ -365,7 +373,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     @Override
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
-        return routes;
+        return routeChains;
     }
 
     public void setAggregationStrategy(AggregationStrategy aggregationStrategy)

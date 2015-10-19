@@ -125,6 +125,17 @@
         </choice>
     </flow>
 
+    <flow name="scatterGather">
+        <vm:inbound-endpoint path="in-scatterGather" exchange-pattern="request-response"/>
+        <scatter-gather>
+            <logger message="check1"/>
+            <processor-chain>
+                <logger message="check2"/>
+                <logger message="check3"/>
+            </processor-chain>
+        </scatter-gather>
+    </flow>
+
     <flow name="all">
         <vm:inbound-endpoint path="in-all" exchange-pattern="request-response"/>
         <all>

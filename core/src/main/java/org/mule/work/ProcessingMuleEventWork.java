@@ -7,7 +7,7 @@
 
 package org.mule.work;
 
-import static org.mule.execution.MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate;
+import static org.mule.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class ProcessingMuleEventWork extends AbstractMuleEventWork
 {
 
-    private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExceptionTransformerExecutionTemplate();
+    private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
     private final CountDownLatch latch = new CountDownLatch(1);
     private final MessageProcessor messageProcessor;
     private MuleEvent resultEvent;
