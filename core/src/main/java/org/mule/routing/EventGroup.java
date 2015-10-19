@@ -258,7 +258,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         {
             //Using both event ID and CorrelationSequence since in certain instances
             //when an event is split up, the same event IDs are used.
-            Serializable key=event.getId()+event.getMessage().getCorrelationSequence();
+            Serializable key= getEventKey(event);
             event.getMessage().setInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter);
             lastStoredEventKey = key;
             events.store(key, event);
@@ -279,6 +279,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         }
     }
 
+    private String getEventKey(MuleEvent event)
+    {
+        return event.getId() + event.getMessage().getCorrelationSequence();
+    }
 
     /**
      * Remove the given event from the group.
@@ -454,6 +458,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     private MuleEvent retrieveLastStoredEvent() throws ObjectStoreException
     {
+        if (lastStoredEventKey == null)
+        {
+            lastStoredEventKey = findLastStoredEventKey();
+        }
+
         return events.retrieve(lastStoredEventKey);
     }
 
@@ -498,6 +507,32 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
         String storeKey = storePrefix + ".eventGroup." + groupId;
         this.events = getObjectStoreManager().getObjectStore(storeKey, true);
+    }
+
+    /**
+     * Finds the last stored event key on the event group.
+     * <p/>
+     * Event group uses {@code lastStoredEventKey} internally to differentiate the last event
+     * added to the group. When the event group is stored in an {@link org.mule.api.store.ObjectStore}
+     * that serializes/deserializes the instances, the eventGroup state is not keep updated.
+     * When an instance is deserialized, the events field is restored, but no the lastStoredEventKey
+     * field.
+     * As {@link #lastStoredEventKey} is used only under some scenarios and the cost of finding the last
+     * event key is high, is better to use lazy initialization for that field.
+     *
+     * @return the key of that last event added to the group. Null if no events added yet.
+     * @throws ObjectStoreException
+     */
+    private String findLastStoredEventKey() throws ObjectStoreException
+    {
+        final MuleEvent[] muleEvents = toArray(true);
+
+        if (muleEvents.length > 0)
+        {
+            return getEventKey(muleEvents[muleEvents.length - 1]);
+        }
+
+        return null;
     }
 
     public boolean isInitialised()
