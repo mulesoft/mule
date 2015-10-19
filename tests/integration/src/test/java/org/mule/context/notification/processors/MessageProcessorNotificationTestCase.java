@@ -42,6 +42,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         assertNotNull(client.send("vm://in-processorChain", "test", null));
         assertNotNull(client.send("vm://customProcessor", "test", null));
         assertNotNull(client.send("vm://in-choice", "test", null));
+        assertNotNull(client.send("vm://in-scatterGather", "test", null));
 
         assertNotNull(client.send("vm://in-foreach", "test", null));
         assertNotNull(client.send("vm://in-enricher", "test", null));
@@ -89,7 +90,14 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(prePost())    //otherwise-logger
                 .serial(post())
 
-
+                // scatter-gather
+                .serial(pre()) // scatter-gather
+                .serial(prePost()) // route 0 logger
+                .serial(pre()) // route 1 chain
+                .serial(prePost()) // route 1 first logger
+                .serial(prePost()) // route 1 second logger
+                .serial(post()) // route 1 chain
+                .serial(post()) // scatter-gather
 
                 //foreach
                 .serial(pre()) //foreach
