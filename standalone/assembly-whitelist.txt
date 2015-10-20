@@ -180,7 +180,7 @@
 /mule-standalone-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.27.jar
+/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.31.jar
 /mule-standalone-${productVersion}/lib/opt/bcmail-jdk16-1.46.jar
 /mule-standalone-${productVersion}/lib/opt/bcpg-jdk16-1.46.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk16-1.46.jar
@@ -295,13 +295,13 @@
 /mule-standalone-${productVersion}/lib/opt/jruby-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.51.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
-/mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.4.jar
-/mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.5.jar
+/mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.5.jar
+/mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.6.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.2.jar
-/mule-standalone-${productVersion}/lib/opt/libphonenumber-6.0.jar
+/mule-standalone-${productVersion}/lib/opt/libphonenumber-6.2.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.9.jar
