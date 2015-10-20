@@ -28,6 +28,7 @@ import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.api.execution.ExceptionContextProvider;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -77,6 +78,7 @@ import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -185,6 +187,8 @@ public class DefaultMuleContext implements MuleContext
 
     private ObjectSerializer objectSerializer;
     private DataTypeConversionResolver dataTypeConversionResolver;
+
+    private volatile Collection<ExceptionContextProvider> exceptionContextProviders;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -1079,5 +1083,21 @@ public class DefaultMuleContext implements MuleContext
     public void setObjectSerializer(ObjectSerializer objectSerializer)
     {
         this.objectSerializer = objectSerializer;
+    }
+
+    @Override
+    public Collection<ExceptionContextProvider> getExceptionContextProviders()
+    {
+        if (exceptionContextProviders == null)
+        {
+            synchronized (this)
+            {
+                if (exceptionContextProviders == null)
+                {
+                    exceptionContextProviders = this.muleRegistryHelper.lookupByType(ExceptionContextProvider.class).values();
+                }
+            }
+        }
+        return exceptionContextProviders;
     }
 }

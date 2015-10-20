@@ -7,7 +7,10 @@
 
 package org.mule.module.db.internal.domain.database;
 
+import java.util.Map;
+
 import javax.sql.DataSource;
+import javax.xml.namespace.QName;
 
 /**
  * Creates {@link DbConfig} instances
@@ -19,8 +22,9 @@ public interface DbConfigFactory
      * Creates a {@link DbConfig} to access a given {@link DataSource}
      *
      * @param name name of the config
+     * @param annotations 
      * @param dataSource dataSource to access from the created DbConfig
      * @return a non null DbConfig
      */
-    DbConfig create(String name, DataSource dataSource);
+    DbConfig create(String name, Map<QName, Object> annotations, DataSource dataSource);
 }

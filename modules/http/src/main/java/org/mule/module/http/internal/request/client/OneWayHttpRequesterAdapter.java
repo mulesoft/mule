@@ -50,7 +50,7 @@ public class OneWayHttpRequesterAdapter implements MessageProcessor
             }
             catch (IOException e)
             {
-                throw new MessagingException(event, e);
+                throw new MessagingException(event, e, this);
             }
         }
     }

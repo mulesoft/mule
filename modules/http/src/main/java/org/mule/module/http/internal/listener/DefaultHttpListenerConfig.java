@@ -9,6 +9,7 @@ package org.mule.module.http.internal.listener;
 import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -41,7 +42,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisable, MuleContextAware
+public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implements HttpListenerConfig, Initialisable, MuleContextAware
 {
 
     public static final int DEFAULT_MAX_THREADS = 128;

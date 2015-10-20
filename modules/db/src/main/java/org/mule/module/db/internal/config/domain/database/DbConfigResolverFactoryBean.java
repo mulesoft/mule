@@ -7,10 +7,12 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.config.spring.factories.AnnotatedObjectFactoryBean;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.module.db.internal.domain.database.ConfigurableDbConfigFactory;
 import org.mule.module.db.internal.domain.database.DataSourceConfig;
@@ -28,12 +30,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.config.AbstractFactoryBean;
-
 /**
  * Creates {@link DbConfigResolver} instances
  */
-public class DbConfigResolverFactoryBean extends AbstractFactoryBean<DbConfigResolver> implements MuleContextAware, Disposable
+public class DbConfigResolverFactoryBean extends AnnotatedObjectFactoryBean<DbConfigResolver> implements AnnotatedObject, MuleContextAware, Disposable
 {
 
     private MuleContext muleContext;
@@ -63,7 +63,7 @@ public class DbConfigResolverFactoryBean extends AbstractFactoryBean<DbConfigRes
     }
 
     @Override
-    protected DbConfigResolver createInstance() throws Exception
+    protected DbConfigResolver doCreateInstance() throws Exception
     {
         validate();
 
@@ -91,7 +91,8 @@ public class DbConfigResolverFactoryBean extends AbstractFactoryBean<DbConfigRes
                 instanceDataSource = dataSourceFactory.decorateDataSource(dataSource, dataSourceConfig.getPoolingProfile(), muleContext);
             }
 
-            DbConfig dbConfig = dbConfigFactory.create(name, instanceDataSource);
+            DbConfig dbConfig = dbConfigFactory.create(name, getAnnotations(), instanceDataSource);
+            dbConfig.setAnnotations(getAnnotations());
 
             return new StaticDbConfigResolver(dbConfig);
         }

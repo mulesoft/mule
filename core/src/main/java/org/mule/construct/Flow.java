@@ -119,7 +119,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
             }
         }, getExceptionListener());
 
-        final MuleEvent newEvent = createMuleEventForCurrentFlow(event, replyToDestination, replyToHandler);
+        final MuleEvent newEvent = createMuleEventForCurrentFlow(event, replyToDestination, nonBlockingReplyToHandler);
         try
         {
             ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, getExceptionListener());

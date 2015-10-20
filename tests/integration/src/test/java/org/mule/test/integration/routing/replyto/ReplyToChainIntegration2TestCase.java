@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.listener.ExceptionListener;
 
 import org.junit.Test;
 
@@ -28,9 +29,13 @@ public class ReplyToChainIntegration2TestCase extends FunctionalTestCase
     {
         String message = "test";
 
+        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
+
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
         assertEquals("Received: " + message, result.getPayload());
+
+        exceptionListener.waitUntilAllNotificationsAreReceived();
     }
 }

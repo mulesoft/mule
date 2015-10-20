@@ -37,6 +37,11 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder
             List<String> uriParamValues = uriParamMap.getAll(uriParamName);
             String uriParamValue = uriParamValues.get(uriParamValues.size() - 1);
 
+            if (uriParamValue == null)
+            {
+                throw new NullPointerException(String.format("Expression {%s} evaluated to null.", uriParamName));
+            }
+
             path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);
         }
         return path;

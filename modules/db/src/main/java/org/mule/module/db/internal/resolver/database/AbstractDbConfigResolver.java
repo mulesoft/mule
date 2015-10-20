@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.resolver.database;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.common.Result;
 import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
@@ -18,7 +19,7 @@ import java.util.List;
 /**
  * Provides a base implementation for resolver's metadata related functionality
  */
-public abstract class AbstractDbConfigResolver implements DbConfigResolver
+public abstract class AbstractDbConfigResolver extends AbstractAnnotatedObject implements DbConfigResolver
 {
 
     @Override

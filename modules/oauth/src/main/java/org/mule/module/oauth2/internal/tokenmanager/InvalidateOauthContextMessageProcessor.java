@@ -34,7 +34,7 @@ public class InvalidateOauthContextMessageProcessor implements MessageProcessor,
         final String resourceOwnerId = resourceOwnerIdEvaluator.resolveStringValue(event);
         if (resourceOwnerId == null)
         {
-            throw new MessagingException(CoreMessages.createStaticMessage("Resource owner id cannot be null"), event);
+            throw new MessagingException(CoreMessages.createStaticMessage("Resource owner id cannot be null"), event, this);
         }
         config.getConfigOAuthContext().clearContextForResourceOwner(resourceOwnerId);
         return event;

@@ -7,6 +7,8 @@
 
 package org.mule.security.oauth;
 
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -59,6 +61,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     implements MuleContextAware, Initialisable, Capabilities, Startable, Stoppable, Disposable,
     OAuth2Manager<OAuth2Adapter>, NameableObject
 {
+
+    public static final String ACCESS_TOKEN_URL = "_OAUTH_ACCESS_TOKEN_URL";
+    public static final String AUTHORIZATION_URL = "_OAUTH_AUTHORIZATION_URL";
 
     private OAuth2Adapter defaultUnauthorizedConnector;
     private String applicationName;
@@ -195,7 +200,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
     /**
      * if {@link org.mule.api.lifecycle.Startable}, then
-     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * {@link BaseOAuth2Manager#defaultUnauthorizedConnector}
      * is started
      */
     @Override
@@ -209,7 +214,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
     /**
      * if {@link org.mule.api.lifecycle.Stoppable}, then
-     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * {@link BaseOAuth2Manager#defaultUnauthorizedConnector}
      * is stopped
      */
     @Override
@@ -223,7 +228,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
     /**
      * if {@link org.mule.api.lifecycle.Disposable}, then
-     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * {@link BaseOAuth2Manager#defaultUnauthorizedConnector}
      * is disposed
      */
     @Override
@@ -248,12 +253,12 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      * {@inheritDoc}
      */
     @Override
-    public final OAuth2Adapter createAdapter(String verifier) throws Exception
+    public final OAuth2Adapter createAdapter(MuleEvent event, String verifier) throws Exception
     {
         OAuth2Adapter connector = this.instantiateAdapter();
         connector.setOauthVerifier(verifier);
-        connector.setAuthorizationUrl(getDefaultUnauthorizedConnector().getAuthorizationUrl());
-        connector.setAccessTokenUrl(getDefaultUnauthorizedConnector().getAccessTokenUrl());
+        connector.setAuthorizationUrl((String) event.getFlowVariable(AUTHORIZATION_URL));
+        connector.setAccessTokenUrl((String) event.getFlowVariable(ACCESS_TOKEN_URL));
         connector.setConsumerKey(this.getDefaultUnauthorizedConnector().getConsumerKey());
         connector.setConsumerSecret(this.getDefaultUnauthorizedConnector().getConsumerSecret());
 
@@ -283,9 +288,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug(
-                String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]",
-                    accessTokenId, accessTokenPool.getNumActive(accessTokenId),
-                    accessTokenPool.getNumIdle(accessTokenId)));
+                    String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]",
+                                  accessTokenId, accessTokenPool.getNumActive(accessTokenId),
+                                  accessTokenPool.getNumIdle(accessTokenId)));
         }
 
         OAuth2Adapter object = accessTokenPool.borrowObject(accessTokenId);
@@ -293,9 +298,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug(
-                String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]",
-                    accessTokenId, accessTokenPool.getNumActive(accessTokenId),
-                    accessTokenPool.getNumIdle(accessTokenId)));
+                    String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]",
+                                  accessTokenId, accessTokenPool.getNumActive(accessTokenId),
+                                  accessTokenPool.getNumIdle(accessTokenId)));
         }
         return object;
     }
@@ -480,8 +485,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
         if (message instanceof DefaultMuleMessage)
         {
-            DefaultMuleMessage dmm = (DefaultMuleMessage) message;
-            if (dmm.isConsumable())
+            if (isConsumable(message.getPayload().getClass()))
             {
                 try
                 {
@@ -565,10 +569,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             return;
         }
 
-        if (getLogger().isDebugEnabled())
-        {
-            getLogger().debug("Retrieving access token...");
-        }
+        getLogger().debug("Retrieving access token...");
 
         String accessTokenUrl = adapter.getAccessTokenUrl() != null
                                                                    ? adapter.getAccessTokenUrl()
@@ -589,11 +590,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             getLogger().debug(
                 String.format("Access token retrieved successfully [accessToken = %s]",
                     adapter.getAccessToken()));
-        }
-
-        if (getLogger().isDebugEnabled())
-        {
-            getLogger().debug(
+            getLogger().debug(                           
                 String.format("Attempting to extract expiration time using [expirationPattern = %s]",
                     adapter.getExpirationTimePattern().pattern()));
         }
@@ -691,6 +688,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
                         try
                         {
                             this.refreshTokenManager.refreshToken(adapter, accessTokenId);
+                            accessTokenPoolFactory.passivateObject(accessTokenId, adapter);
                             adapter.postAuth();
                             tokenRefreshed = true;
                         }
@@ -711,6 +709,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             }
         }
     }
+
 
     protected Set<Class<? extends Exception>> refreshAccessTokenOn()
     {
@@ -741,8 +740,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     @Override
     public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate()
     {
-        return (ProcessTemplate<T, OAuth2Adapter>) new ManagedAccessTokenProcessTemplate<T>(this,
-            this.muleContext);
+        return new ManagedAccessTokenProcessTemplate<>(this, this.muleContext);
     }
 
     /**

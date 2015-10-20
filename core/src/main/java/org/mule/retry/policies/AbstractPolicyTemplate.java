@@ -98,7 +98,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
             else
             {
                 context.setFailed(cause);
-                throw new RetryPolicyExhaustedException(cause, callback.getWorkDescription());
+                throw new RetryPolicyExhaustedException(cause, callback.getWorkOwner());
             }
         }
         finally

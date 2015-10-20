@@ -25,21 +25,39 @@ public abstract class AbstractScopedVarAssignmentDataTypePropagatorTestCase exte
     }
 
     @Test
-    public void propagatesFlowVarDataTypeUsingMapSyntax() throws Exception
+    public void propagatesVarDataTypeUsingMapSyntax() throws Exception
     {
         doAssignmentDataTypePropagationTest(scope, createAssignmentExpression("['" + PROPERTY_NAME + "']"));
     }
 
     @Test
-    public void propagatesFlowVarDataTypeUsingDotSyntax() throws Exception
+    public void propagatesVarDataTypeUsingDotSyntax() throws Exception
     {
         doAssignmentDataTypePropagationTest(scope, createAssignmentExpression("." + PROPERTY_NAME + ""));
     }
 
     @Test
-    public void propagatesFlowVarDataTypeUsingEscapedDotSyntax() throws Exception
+    public void propagatesVarDataTypeUsingEscapedDotSyntax() throws Exception
     {
         doAssignmentDataTypePropagationTest(scope, createAssignmentExpression(".'" + PROPERTY_NAME + "'"));
+    }
+
+    @Test
+    public void doesNotChangesVarDataTypeUsingRecursiveMapSyntax() throws Exception
+    {
+        doInnerAssignmentDataTypePropagationTest(scope, createAssignmentExpression("['" + PROPERTY_NAME + "']['" + INNER_PROPERTY_NAME + "']"));
+    }
+
+    @Test
+    public void doesNotChangesVarDataTypeUsingRecursiveDotSyntax() throws Exception
+    {
+        doInnerAssignmentDataTypePropagationTest(scope, createAssignmentExpression("." + PROPERTY_NAME + "." + INNER_PROPERTY_NAME));
+    }
+
+    @Test
+    public void doesNotChangesVarDataTypeUsingRecursiveEscapedDotSyntax() throws Exception
+    {
+        doInnerAssignmentDataTypePropagationTest(scope, createAssignmentExpression(".'" + PROPERTY_NAME + "'.'" + INNER_PROPERTY_NAME + "'"));
     }
 
     private String createAssignmentExpression(String accessorExpression)

@@ -706,6 +706,15 @@ public final class Base64
             } // end else:
         } // each input character
 
+        if (b4Posn > 0)
+        {
+            for (i = 0; i < 4 - b4Posn; i++)
+            {
+                b4[b4Posn++] = EQUALS_SIGN;
+            }
+            outBuffPosn += decode4to3(b4, 0, outBuff, outBuffPosn);
+        }
+
         byte[] out = new byte[outBuffPosn];
         System.arraycopy(outBuff, 0, out, 0, outBuffPosn);
         return out;

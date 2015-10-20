@@ -52,7 +52,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
             // Work with the root exception, not anything that wraps it
             //Throwable t = ExceptionHelper.getRootException(ex);
 
-            logException(ex);
+            logException(ex, event);
             doHandleException(ex, event);
 
             ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);

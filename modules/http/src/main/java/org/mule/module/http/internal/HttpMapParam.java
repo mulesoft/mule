@@ -49,14 +49,19 @@ public class HttpMapParam extends HttpParam
                 final Iterator iterator = iterable.iterator();
                 while (iterator.hasNext())
                 {
-                    parameterMap.put(paramName, iterator.next().toString());
+                    parameterMap.put(paramName, toStringIfPossible(iterator.next()));
                 }
             }
             else
             {
-                parameterMap.put(paramName, paramValue.toString());
+                parameterMap.put(paramName, toStringIfPossible(paramValue));
             }
 
         }
+    }
+
+    private String toStringIfPossible(Object paramValue)
+    {
+        return paramValue != null ? paramValue.toString() : null;
     }
 }

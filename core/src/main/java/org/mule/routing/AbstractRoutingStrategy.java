@@ -6,6 +6,8 @@
  */
 package org.mule.routing;
 
+import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -215,7 +217,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
      */
     public static void validateMessageIsNotConsumable(MuleEvent event, MuleMessage message) throws MessagingException
     {
-        if (((DefaultMuleMessage) message).isConsumable())
+        if (isConsumable(message.getPayload().getClass()))
         {
             throw new MessagingException(
                     CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()),
@@ -239,10 +241,9 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
      */
     protected static void assertNonConsumableMessage(MuleEvent event, MuleMessage message) throws MessagingException
     {
-        DefaultMuleMessage defaultMuleMessage = (DefaultMuleMessage) message;
-        if (defaultMuleMessage.isConsumable())
+        if (isConsumable(message.getPayload().getClass()))
         {
-            throw new MessagingException(CoreMessages.cannotCopyStreamPayload(defaultMuleMessage.getPayload().getClass().getName()), event);
+            throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()), event);
         }
     }
 }

@@ -6,22 +6,13 @@
  */
 package org.mule.tck.functional;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.processor.NonBlockingMessageProcessor;
-import org.mule.util.ObjectUtils;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -48,6 +39,7 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
                 @Override
                 public void run()
                 {
+                    ((ThreadSafeAccess)event).resetAccessControl();
                     try
                     {
                         event.getReplyToHandler().processReplyTo(event, null, null);

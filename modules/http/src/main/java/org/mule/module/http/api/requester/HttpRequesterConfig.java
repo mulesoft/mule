@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.api.requester;
 
+import org.mule.api.AnnotatedObject;
+import org.mule.api.NamedObject;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.http.api.HttpAuthentication;
@@ -24,7 +26,7 @@ import org.mule.transport.ssl.api.TlsContextFactory;
  * If a new HttpRequesterConfig needs to be created programmatically then use
  * {@link org.mule.module.http.api.requester.HttpRequesterConfigBuilder}
  */
-public interface HttpRequesterConfig extends Startable, Stoppable
+public interface HttpRequesterConfig extends NamedObject, AnnotatedObject, Startable, Stoppable
 {
 
     /**

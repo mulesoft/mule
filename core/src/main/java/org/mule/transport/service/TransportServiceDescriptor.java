@@ -7,6 +7,7 @@
 package org.mule.transport.service;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
@@ -69,9 +70,31 @@ public interface TransportServiceDescriptor extends ServiceDescriptor, MuleConte
 
     EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
 
+    @Deprecated
     EndpointBuilder createEndpointBuilder(String uri) throws TransportFactoryException;
 
+    /**
+     * Creates a {@link EndpointBuilder}
+     *
+     * @param uri  address for the created endpoints
+     * @param muleContext context of the application owning endpoint builder
+     * @return a non null endpoint builder for the given address
+     * @throws TransportFactoryException
+     */
+    EndpointBuilder createEndpointBuilder(String uri, MuleContext muleContext) throws TransportFactoryException;
+
+    @Deprecated
     EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder) throws TransportFactoryException;
+
+    /**
+     * Creates a {@link EndpointBuilder} wrapping an existing builder
+     *
+     * @param builder  instance to be wrapped
+     * @param muleContext context of the application owning endpoint builder
+     * @return a non null endpoint builder for the given builder
+     * @throws TransportFactoryException
+     */
+    EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder, MuleContext muleContext) throws TransportFactoryException;
 
     void setExceptionMappings(Properties props);
 

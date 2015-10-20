@@ -7,8 +7,11 @@
 package org.mule.context.notification;
 
 import static org.junit.Assert.assertNull;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.tck.listener.ExceptionListener;
 
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
 {
@@ -22,8 +25,12 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
     @Override
     public void doTest() throws Exception
     {
+        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://in-1", "hello world", null);
+        MuleMessage result = client.send("vm://in-1", new DefaultMuleMessage("hello world", muleContext));
+        // processing is async, give time for the exception notificator to run
+        exceptionListener.waitUntilAllNotificationsAreReceived();
+
         assertNull(result);
     }
 

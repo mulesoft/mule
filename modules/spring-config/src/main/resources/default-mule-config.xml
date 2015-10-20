@@ -34,6 +34,10 @@
 
         <spring:bean name="_muleConnectorMessageProcessorLocator" class="org.mule.connector.MuleConnectorOperationLocator"/>
 
+        <spring:bean name="_muleExceptionLocationProvider" class="org.mule.exception.MessagingExceptionLocationProvider"/>
+
+        <spring:bean name="_muleMessageProcessingFlowStackManager" class="org.mule.context.notification.MessageProcessingFlowStackManager"/>
+
     </spring:beans>
 
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that

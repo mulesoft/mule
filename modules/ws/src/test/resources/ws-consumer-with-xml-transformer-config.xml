@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="${useTransportForUris}"/>
+    </configuration>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfig"/>
+
+    <flow name="client">
+        <mulexml:dom-to-xml-transformer/>
+        <mulexml:xml-to-dom-transformer/>
+        <ws:consumer operation="echo"/>
+    </flow>
+
+    <flow name="server">
+        <inbound-endpoint address="http://localhost:${port}/services/Test" exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
+        </inbound-endpoint>
+        <component class="org.mule.module.ws.consumer.TestService"/>
+    </flow>
+
+</mule>

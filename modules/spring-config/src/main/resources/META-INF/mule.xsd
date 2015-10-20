@@ -1790,7 +1790,7 @@
     <xsd:complexType name="abstractNotificationExceptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="exceptionStrategyType">
-                <xsd:attribute name="enableNotifications" type="xsd:boolean">
+                <xsd:attribute name="enableNotifications" type="xsd:boolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
                             Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.
@@ -1808,6 +1808,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="logException" use="optional" type="expressionBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2080,8 +2087,8 @@
     <xsd:element name="flow" type="flowType">
         <xsd:annotation>
             <xsd:documentation>
-                A pipeline of message processors processed using a given processingStrategy when either a new message is received from a message source, or when a new message is 
-                recieved via a flow-ref or programativally.
+                A pipeline of message processors processed using a given processingStrategy.
+                Called when a new message is received from a message source, a flow-ref, or programmatically.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2131,7 +2138,7 @@
                     <xsd:enumeration value="queued-asynchronous">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Decouples the recieving of a new message from it's processing using a queue.
+                                Decouples the receiving of a new message from its processing using a queue.
                                 The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
                             </xsd:documentation>
                         </xsd:annotation>
@@ -2282,8 +2289,8 @@
     <xsd:element name="queued-asynchronous-processing-strategy" type="queuedAsynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                Decouples the recieving of a new message from it's processing using a queue. 
-                The queue is polled and a thread pool is used to process the pipeline of message processors asynchonously in a worker thread.
+                Decouples the receiving of a new message from it's processing using a queue.
+                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously in a worker thread.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2294,7 +2301,7 @@
                     <xsd:element ref="abstract-queue-store" minOccurs="0">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The queue store that stortes the queue's elements.  If not specified, this will be the default-in-memory-queue-store.
+                            The queue store that stores the queue's elements.  If not specified, this will be the default-in-memory-queue-store.
                         </xsd:documentation>
                     </xsd:annotation>
                     </xsd:element>
@@ -2369,7 +2376,8 @@
     <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Allows a 'flow' to be referenced such that the message processing will continue in the referenced flow before returning.  Message processing in the referenced 'flow' will occur within the context of the referenced flow and will therefore use it's exception strategy etc.
+                Allows a 'flow' to be referenced such that the message processing will continue in the referenced flow before returning.
+                Message processing in the referenced 'flow' will occur within the context of the referenced flow and will therefore use its exception strategy etc.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -3396,6 +3404,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The property name and optionally a value to use when matching. If the expression is just a property name, the filter will check that the property exists. Users can also use '=' and '!=' to determine a specific value for a property.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="value" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Value to validate.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

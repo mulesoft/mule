@@ -10,6 +10,7 @@ import static org.mule.api.transport.PropertyScope.INBOUND;
 import static org.mule.api.transport.PropertyScope.INVOCATION;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import static org.mule.util.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -24,7 +25,6 @@ import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.ds.ByteArrayDataSource;
@@ -50,10 +50,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -81,7 +79,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     private static final long serialVersionUID = 1541720810851984845L;
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
-    private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
 
     /**
      * The default UUID for the message. If the underlying transport has the notion of a
@@ -123,27 +120,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private transient AtomicBoolean mutable = null;
 
     private DataType<?> dataType;
-
-    static
-    {
-        addToConsumableClasses("javax.xml.stream.XMLStreamReader");
-        addToConsumableClasses("javax.xml.transform.stream.StreamSource");
-        consumableClasses.add(OutputHandler.class);
-        consumableClasses.add(InputStream.class);
-        consumableClasses.add(Reader.class);
-    }
-
-    private static void addToConsumableClasses(String className)
-    {
-        try
-        {
-            consumableClasses.add(ClassUtils.loadClass(className, DefaultMuleMessage.class));
-        }
-        catch (ClassNotFoundException e)
-        {
-            // ignore
-        }
-    }
 
     private static DataType<?> getMessageDataType(MuleMessage previous, Object payload)
     {
@@ -453,24 +429,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     protected boolean isPayloadConsumed(Class<?> inputCls)
     {
-        return InputStream.class.isAssignableFrom(inputCls) || isConsumedFromAdditional(inputCls);
-    }
-
-    private boolean isConsumedFromAdditional(Class<?> inputCls)
-    {
-        if (consumableClasses.isEmpty())
-        {
-            return false;
-        }
-
-        for (Class<?> c : consumableClasses)
-        {
-            if (c.isAssignableFrom(inputCls))
-            {
-                return true;
-            }
-        }
-        return false;
+        return InputStream.class.isAssignableFrom(inputCls) || ClassUtils.isConsumable(inputCls);
     }
 
     /**
@@ -1331,6 +1290,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
                 if (transformer.isSourceDataTypeSupported(originalSourceType))
                 {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Using " + transformer + " to transform payload.");
+                    }
                     transformMessage(event, transformer);
                 }
                 else
@@ -1352,6 +1315,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
                         if (implicitTransformer != null)
                         {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Performing implicit transformation with: " + transformer);
+                            }
                             transformMessage(event, implicitTransformer);
                             transformMessage(event, transformer);
                         }
@@ -1611,13 +1578,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /**
+     * @deprecated since 3.8.0. Use {@link ClassUtils#isConsumable(Class)} instead.
+     * 
      * Determines if the payload of this message is consumable i.e. it can't be read
-     * more than once. This is here temporarily without adding to MuleMessage
-     * interface until MULE-4256 is implemented.
+     * more than once.
      */
+    @Deprecated
     public boolean isConsumable()
     {
-        return isConsumedFromAdditional(this.getPayload().getClass());
+        return ClassUtils.isConsumable(getPayload().getClass());
     }
 
     public static class SerializedDataHandler implements Serializable

@@ -62,6 +62,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     protected WildcardFilter commitTxFilter;
 
     protected boolean enableNotifications = true;
+    protected String logException = "true";
 
     protected String globalName;
 
@@ -256,7 +257,15 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      *
      * @param t the exception thrown
      */
-    protected void logException(Throwable t)
+    protected void logException(Throwable t, MuleEvent event)
+    {
+        if (this.muleContext.getExpressionManager().evaluateBoolean(logException, event, true, true))
+        {
+            doLogException(t);
+        }
+    }
+
+    protected void doLogException(Throwable t)
     {
         MuleException muleException = ExceptionHelper.getRootMuleException(t);
         if (muleException != null)
@@ -343,6 +352,19 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     public void setEnableNotifications(boolean enableNotifications)
     {
         this.enableNotifications = enableNotifications;
+    }
+
+    /**
+     * Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled.
+     */
+    public String isLogException()
+    {
+        return logException;
+    }
+
+    public void setLogException(String logException)
+    {
+        this.logException = logException;
     }
 
     public WildcardFilter getRollbackTxFilter()

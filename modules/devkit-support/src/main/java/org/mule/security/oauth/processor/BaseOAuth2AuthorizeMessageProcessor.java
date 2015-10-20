@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.common.security.oauth.AuthorizationParameter;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.security.oauth.BaseOAuth2Manager;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
@@ -48,8 +49,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
             }
         }
 
-        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor(
-            (OAuth2Manager<OAuth2Adapter>) module, accessTokenId);
+        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor(module, accessTokenId);
 
         this.startCallback(module, fetchAccessTokenMessageProcessor);
 
@@ -78,7 +78,9 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         String transformedAuthorizationUrl = this.toString(event, this.getAuthorizationUrl());
         String transformedAccessTokenUrl = this.toString(event, this.getAccessTokenUrl());
 
-        moduleObject.getDefaultUnauthorizedConnector().setAccessTokenUrl(transformedAccessTokenUrl);
+        event.setFlowVariable(BaseOAuth2Manager.AUTHORIZATION_URL, transformedAuthorizationUrl);
+        event.setFlowVariable(BaseOAuth2Manager.ACCESS_TOKEN_URL, transformedAccessTokenUrl);
+
         String location = moduleObject.buildAuthorizeUrl(this.getExtraParameters(event, moduleObject),
             transformedAuthorizationUrl, this.getOauthCallback().getUrl());
 
@@ -127,7 +129,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
                 {
                     throw new MessagingException(CoreMessages.createStaticMessage(String.format(
                         "Code generation error. Field %s should be present in class", parameter.getName())),
-                        event, e);
+                        event, e, this);
                 }
 
                 field.setAccessible(true);

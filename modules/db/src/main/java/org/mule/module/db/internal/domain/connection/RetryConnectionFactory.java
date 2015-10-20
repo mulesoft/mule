@@ -52,6 +52,12 @@ public class RetryConnectionFactory extends AbstractConnectionFactory
                 {
                     return "Connection factory";
                 }
+
+                @Override
+                public Object getWorkOwner()
+                {
+                    return delegate;
+                }
             }, null);
         }
         catch (Exception e)

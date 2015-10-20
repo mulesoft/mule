@@ -34,4 +34,11 @@
         </http:request>
     </flow>
 
+    <flow name="queryParamNulls">
+        <http:request config-ref="config" path="testPath" >
+            <http:request-builder>
+                <http:query-params expression="#[{'testName1':null, 'testName2': [null]}]" />
+            </http:request-builder>
+        </http:request>
+    </flow>
 </mule>

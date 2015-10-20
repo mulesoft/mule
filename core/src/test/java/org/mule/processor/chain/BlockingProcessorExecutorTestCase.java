@@ -8,8 +8,10 @@ package org.mule.processor.chain;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
@@ -17,6 +19,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -35,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,6 +79,8 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
         processors.add(processor2);
         processors.add(processor3);
 
+        OptimizedRequestContext.unsafeSetEvent(event);
+        
         when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
@@ -95,7 +102,11 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     public void executeRequestResponse() throws MuleException
     {
         setupRequestResponseEvent();
-        assertBlockingExecution(processors);
+        assertBlockingExecution(processors, requestResponseMatecher());
+    }
+    
+    protected Matcher<MuleEvent> requestResponseMatecher() {
+        return sameInstance(event);
     }
 
     @Test
@@ -117,7 +128,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     public void executeOneWay() throws MuleException
     {
         setupOneWayEvent();
-        assertBlockingExecution(processors);
+        assertBlockingExecution(processors, sameInstance(event));
     }
 
     private void setupOneWayEvent()
@@ -133,17 +144,20 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
         when(event.isSynchronous()).thenReturn(true);
     }
 
-    protected void assertBlockingExecution(List<MessageProcessor> processors) throws MuleException
+    protected void assertBlockingExecution(List<MessageProcessor> processors, Matcher<MuleEvent> requestResponseMatcher) throws MuleException
     {
         ProcessorExecutor executor = createProcessorExecutor(processors);
 
         if (event.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE)
         {
             assertThat(executor.execute().getMessageAsString(), equalTo(RESULT));
+            assertThat(RequestContext.getEvent(), requestResponseMatcher);
         }
         else
         {
-            assertThat(executor.execute(), equalTo(event));
+            assertThat(executor.execute().getId(), equalTo(event.getId()));
+            assertThat(executor.execute().getMessage(), equalTo(event.getMessage()));
+            assertThat(RequestContext.getEvent(), not(sameInstance(event)));
         }
 
         assertThat(processor1.event, is(notNullValue()));

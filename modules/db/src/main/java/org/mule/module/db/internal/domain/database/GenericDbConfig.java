@@ -10,6 +10,7 @@ package org.mule.module.db.internal.domain.database;
 import static org.mule.common.Result.Status.FAILURE;
 import static org.mule.common.Result.Status.SUCCESS;
 import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
+import org.mule.AbstractAnnotatedObject;
 import org.mule.common.DefaultResult;
 import org.mule.common.DefaultTestResult;
 import org.mule.common.Result;
@@ -30,7 +31,7 @@ import javax.sql.DataSource;
  * Defines a database configuration that is not customized for any particular
  * database vendor
  */
-public class GenericDbConfig implements DbConfig
+public class GenericDbConfig extends AbstractAnnotatedObject implements DbConfig
 {
 
     private final DataSource dataSource;

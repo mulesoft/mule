@@ -66,25 +66,29 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
                 if (variableAccessor.getProperty().equals(propertyName))
                 {
                     final AccessorNode nextNode = variableAccessor.getNextNode();
-                    String propertyName = null;
-                    if (nextNode instanceof MapAccessorNest)
-                    {
-                        final MapAccessorNest mapAccesorNest = (MapAccessorNest) nextNode;
-                        if (mapAccesorNest.getProperty().isLiteralOnly())
-                        {
-                            propertyName = (String) ((ExecutableLiteral) mapAccesorNest.getProperty()).getLiteral();
-                        }
-                    }
-                    else if (nextNode instanceof MapAccessor)
-                    {
-                        propertyName = (String) ((MapAccessor) nextNode).getProperty();
-                    }
 
-                    if (propertyName != null && message.getPropertyNames(scope).contains(propertyName))
+                    if (nextNode.getNextNode() == null)
                     {
-                        propertyName = getUnescapedPropertyName(propertyName);
-                        message.setProperty(propertyName, typedValue.getValue(), scope, typedValue.getDataType());
-                        return true;
+                        String propertyName = null;
+                        if (nextNode instanceof MapAccessorNest)
+                        {
+                            final MapAccessorNest mapAccesorNest = (MapAccessorNest) nextNode;
+                            if (mapAccesorNest.getProperty().isLiteralOnly())
+                            {
+                                propertyName = (String) ((ExecutableLiteral) mapAccesorNest.getProperty()).getLiteral();
+                            }
+                        }
+                        else if (nextNode instanceof MapAccessor)
+                        {
+                            propertyName = (String) ((MapAccessor) nextNode).getProperty();
+                        }
+
+                        if (propertyName != null && message.getPropertyNames(scope).contains(propertyName))
+                        {
+                            propertyName = getUnescapedPropertyName(propertyName);
+                            message.setProperty(propertyName, typedValue.getValue(), scope, typedValue.getDataType());
+                            return true;
+                        }
                     }
                 }
             }

@@ -9,7 +9,7 @@ package org.mule.util.collection;
 public interface SplittingStrategy<Input, Output>
 {
     
-    public Output split(Input input);
+    Output split(Input input);
 }
 
 

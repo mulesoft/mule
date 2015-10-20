@@ -16,9 +16,10 @@
     <flow name="expressionParam">
         <inbound-endpoint address="vm://expressionParam" exchange-pattern="request-response"/>
 
+        <set-variable variableName="position" value="3"/>
+
         <db:select config-ref="dbConfig">
-            <db:parameterized-query>SELECT * FROM PLANET WHERE POSITION = #[message.inboundProperties['type']] AND NAME =
-                'Earth'
+            <db:parameterized-query>SELECT * FROM PLANET WHERE POSITION = #[position] AND NAME = 'Earth'
             </db:parameterized-query>
         </db:select>
     </flow>

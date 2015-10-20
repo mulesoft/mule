@@ -7,7 +7,6 @@
 package org.mule.test.construct;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -24,11 +23,12 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
+import java.util.List;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -55,7 +55,7 @@ public class FlowRefTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testTwoFlowRefsToSubFlow() throws Exception
+    public void twoFlowRefsToSubFlow() throws Exception
     {
         MuleClient client = muleContext.getClient();
 
@@ -67,7 +67,7 @@ public class FlowRefTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testDynamicFlowRef() throws Exception
+    public void dynamicFlowRef() throws Exception
     {
         MuleEvent eventA = getTestEvent("0");
         eventA.setFlowVariable("letter", "A");
@@ -78,11 +78,31 @@ public class FlowRefTestCase extends FunctionalTestCase
         assertEquals("0B", ((Flow) getFlowConstruct("flow2")).process(eventB).getMessageAsString());
     }
 
-    @Test(expected=MessagingException.class)
-    public void testFlowRefNotFound() throws Exception
+    @Test
+    public void dynamicFlowRefWithChoice() throws Exception
     {
         MuleEvent eventC = getTestEvent("0");
         eventC.setFlowVariable("letter", "C");
+
+        assertEquals("0A", ((Flow) getFlowConstruct("flow2")).process(eventC).getMessageAsString());
+    }
+
+    @Test
+    public void dynamicFlowRefWithScatterGather() throws Exception
+    {
+        MuleEvent eventSG = getTestEvent("0");
+        eventSG.setFlowVariable("letter", "SG");
+
+        List payload = (List) ((Flow) getFlowConstruct("flow2")).process(eventSG).getMessage().getPayload();
+        assertEquals("0A", payload.get(0));
+        assertEquals("0B", payload.get(1));
+    }
+
+    @Test(expected=MessagingException.class)
+    public void flowRefNotFound() throws Exception
+    {
+        MuleEvent eventC = getTestEvent("0");
+        eventC.setFlowVariable("letter", "Z");
 
         assertEquals("0C", ((Flow) getFlowConstruct("flow2")).process(eventC).getMessageAsString());
     }
@@ -112,7 +132,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                 .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously. Message payload is of type: BufferInputStream"));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously."));
     }
 
     @Test
@@ -122,7 +142,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                 .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously. Message payload is of type: BufferInputStream"));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously."));
     }
 
     @Test

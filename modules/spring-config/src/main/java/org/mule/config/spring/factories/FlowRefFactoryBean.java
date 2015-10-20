@@ -6,6 +6,8 @@
  */
 package org.mule.config.spring.factories;
 
+import org.mule.AbstractAnnotatedObject;
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -20,19 +22,47 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.MessageProcessingFlowStackManager;
+import org.mule.processor.NonBlockingMessageProcessor;
+import org.mule.processor.chain.SubFlowMessageProcessor;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import javax.xml.namespace.QName;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public class FlowRefFactoryBean
+public class FlowRefFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<MessageProcessor>, ApplicationContextAware, MuleContextAware, Initialisable,
     Disposable
 {
+
+    private abstract class FlowRefMessageProcessor implements NonBlockingMessageProcessor, AnnotatedObject
+    {
+        @Override
+        public Object getAnnotation(QName name)
+        {
+            return FlowRefFactoryBean.this.getAnnotation(name);
+        }
+
+        @Override
+        public Map<QName, Object> getAnnotations()
+        {
+            return FlowRefFactoryBean.this.getAnnotations();
+        }
+
+        @Override
+        public void setAnnotations(Map<QName, Object> annotations)
+        {
+            FlowRefFactoryBean.this.setAnnotations(annotations);
+        }
+    }
 
     private static final String NULL_FLOW_CONTRUCT_NAME = "null";
     private static final String MULE_PREFIX = "_mule-";
@@ -95,15 +125,49 @@ public class FlowRefFactoryBean
         }
         else if (!referenceCache.containsKey(name))
         {
-            MessageProcessor dynamicReference = new MessageProcessor()
+            MessageProcessor dynamicReference = new FlowRefMessageProcessor()
             {
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
                     // Need to initialize because message processor won't be managed by parent
-                    MessageProcessor dynamicMessageProcessor = getReferencedFlow(muleContext.getExpressionManager()
-                        .parse(refName, event), event.getFlowConstruct());
-                    return dynamicMessageProcessor.process(event);
+                    String flowName = muleContext.getExpressionManager()
+                                                 .parse(refName, event);
+                    final MessageProcessor dynamicMessageProcessor = getReferencedFlow(flowName, event.getFlowConstruct());
+
+                    Collection<MessageProcessingFlowStackManager> flowStackManagers = applicationContext.getBeansOfType(MessageProcessingFlowStackManager.class).values();
+
+                    if (dynamicMessageProcessor instanceof SubFlowMessageProcessor)
+                    {
+                        for (MessageProcessingFlowStackManager messageProcessingFlowStackManager : flowStackManagers)
+                        {
+                            messageProcessingFlowStackManager.onFlowStart(event, flowName);
+                        }
+                    }
+
+                    try
+                    {
+                        // Because this is created dynamically annotations cannot be injected by Spring and so
+                        // FlowRefMessageProcessor is not used here.
+                        return new NonBlockingMessageProcessor()
+                        {
+                            @Override
+                            public MuleEvent process(MuleEvent event) throws MuleException
+                            {
+                                return dynamicMessageProcessor.process(event);
+                            }
+                        }.process(event);
+                    }
+                    finally
+                    {
+                        if (dynamicMessageProcessor instanceof SubFlowMessageProcessor)
+                        {
+                            for (MessageProcessingFlowStackManager messageProcessingFlowStackManager : flowStackManagers)
+                            {
+                                messageProcessingFlowStackManager.onFlowComplete(event);
+                            }
+                        }
+                    }
                 }
             };
             if (dynamicReference instanceof Initialisable)
@@ -131,6 +195,10 @@ public class FlowRefFactoryBean
                 {
                     ((FlowConstructAware) referencedFlow).setFlowConstruct(flowConstruct);
                 }
+                if (referencedFlow instanceof MuleContextAware)
+                {
+                    ((MuleContextAware) referencedFlow).setMuleContext(muleContext);
+                }
                 if (referencedFlow instanceof MessageProcessorChain)
                 {
                     for (MessageProcessor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors())
@@ -138,6 +206,10 @@ public class FlowRefFactoryBean
                         if (processor instanceof FlowConstructAware)
                         {
                             ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
+                        }
+                        if (processor instanceof MuleContextAware)
+                        {
+                            ((MuleContextAware) processor).setMuleContext(muleContext);
                         }
                     }
                 }
@@ -167,7 +239,7 @@ public class FlowRefFactoryBean
         }
         if (referencedFlow instanceof FlowConstruct)
         {
-            return new MessageProcessor()
+            return new FlowRefMessageProcessor()
             {
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException

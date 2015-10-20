@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.notification.FlowCallStack;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
@@ -302,5 +303,11 @@ public class OutboundRoutingTestEvent implements MuleEvent
     public boolean isAllowNonBlocking()
     {
         return false;
+    }
+
+    @Override
+    public FlowCallStack getFlowCallStack()
+    {
+        return null;
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      ">
+
+    <flow name="default-payload-value">
+        <regex-filter pattern="(\w)* with the mules"/>
+    </flow>
+
+    <flow name="matches-configuring-value">
+        <regex-filter pattern="(\w)* with the mules" value="#[payload.goodValue]"/>
+    </flow>
+
+    <flow name="not-matches-configuring-value">
+        <regex-filter pattern="(\w)* with the mules" value="#[payload.wrongValue]"/>
+    </flow>
+
+    <flow name="not-matches-configuring-non-string-value">
+        <regex-filter pattern="(\w)* with the mules" value="#[payload]"/>
+    </flow>
+
+    <flow name="matches-configuring-plain-text-value">
+        <regex-filter pattern="(\w)* with the mules" value="code with the mules"/>
+    </flow>
+
+
+</mule>

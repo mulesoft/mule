@@ -8,6 +8,7 @@ package org.mule.api;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.notification.FlowCallStack;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -281,4 +282,15 @@ public interface MuleEvent extends Serializable
      * @return true if non-blocking execution and IO is allowed. False otherwise.
      */
     boolean isAllowNonBlocking();
+
+    /**
+     * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can determine where this event came from.
+     * 
+     * This will only be enabled it the log is set to debug or if the system property {@code mule.flowCallStacks} is set to {@code true}. If not enabled, the stack will always be empty.
+     * 
+     * @return the flow stack associated to this event.
+     * 
+     * @since 3.8.0
+     */
+    FlowCallStack getFlowCallStack();
 }

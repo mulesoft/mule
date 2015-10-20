@@ -68,6 +68,14 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public static boolean verboseExceptions = false;
 
     /**
+     * When true, each event will keep a stack of the flows and components it traverses
+     * to be shown as part of an exception message if an exception occurs.
+     * Switching on DEBUG level logging with automatically set this flag to true.
+     */
+    public static boolean flowCallStacks = false;
+
+
+    /**
      * A comma-separated list of internal packages/classes which are removed from sanitized stacktraces.
      * Matching is done via string.startsWith().
      * @see #fullStackTraces
@@ -146,7 +154,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private boolean disableTimeouts = false;
 
-    protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
+    protected static transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
     private boolean containerMode;
@@ -352,9 +360,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             verboseExceptions = BooleanUtils.toBoolean(p);
         }
-        else
+
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "flowCallStacks");
+        if (p != null)
         {
-            verboseExceptions = logger.isDebugEnabled();
+            flowCallStacks = BooleanUtils.toBoolean(p);
         }
 
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
@@ -368,6 +378,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             disableTimeouts = Boolean.valueOf(p);
         }
+    }
+    
+    public static boolean isVerboseExceptions()
+    {
+        return verboseExceptions || logger.isDebugEnabled();
+    }
+    
+    public static boolean isFlowCallStacks()
+    {
+        return flowCallStacks || logger.isDebugEnabled();
     }
 
     protected void validateEncoding() throws FatalException

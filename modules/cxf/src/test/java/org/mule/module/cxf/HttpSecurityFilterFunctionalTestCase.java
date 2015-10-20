@@ -26,7 +26,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
+public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTestCase
 {
     
     @Rule

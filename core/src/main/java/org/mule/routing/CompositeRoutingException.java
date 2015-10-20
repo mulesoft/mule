@@ -7,14 +7,19 @@
 
 package org.mule.routing;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.processor.MessageRouter;
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * This is a {@link MessagingException} used to aggregate exceptions thrown by
@@ -25,6 +30,8 @@ import java.util.Map;
  */
 public class CompositeRoutingException extends MessagingException
 {
+
+    private static final String MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
     private static final long serialVersionUID = -4421728527040579607L;
 
@@ -50,6 +57,12 @@ public class CompositeRoutingException extends MessagingException
         this(buildExceptionMessage(exceptions), event, exceptions);
     }
 
+    @Override
+    protected String generateMessage(Message message)
+    {
+        return message.getMessage();
+    }
+
     /**
      * Returns the {@link Exception} for the given route index
      * 
@@ -72,20 +85,41 @@ public class CompositeRoutingException extends MessagingException
         return this.exceptions;
     }
 
+    @Override
+    public String getDetailedMessage()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append(MESSAGE_TITLE).append(LINE_SEPARATOR);
+
+        for (Entry<Integer, Throwable> entry : getExceptions().entrySet())
+        {
+            String routeSubtitle = String.format("Route %d:", entry.getKey());
+            MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue());
+            if (muleException != null)
+            {
+                builder.append(routeSubtitle).append(muleException.getDetailedMessage());
+            }
+            else
+            {
+                builder.append(routeSubtitle).append("Caught exception in Exception Strategy: " + entry.getValue().getMessage());
+            }
+        }
+        return builder.toString();
+    }
+
     private static Message buildExceptionMessage(Map<Integer, Throwable> exceptions)
     {
         StringBuilder builder = new StringBuilder();
         for (Integer route : exceptions.keySet())
         {
-            if (builder.length() > 0)
-            {
-                builder.append(", ");
-            }
-
-            builder.append(route);
+            Throwable routeException = exceptions.get(route);
+            builder.append(LINE_SEPARATOR + "\t")
+                   .append(route)
+                   .append(": ")
+                   .append(routeException.getCause() != null ? routeException.getCause().getMessage() : routeException.getMessage());
         }
 
-        builder.insert(0, "Exception was found for route(s): ");
+        builder.insert(0, MESSAGE_TITLE);
         return MessageFactory.createStaticMessage(builder.toString());
     }
 

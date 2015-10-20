@@ -40,7 +40,7 @@ public class OAuth1FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         catch (Exception e)
         {
             throw new MessagingException(MessageFactory.createStaticMessage("Unable to fetch access token"),
-                event, e);
+                event, e, this);
         }
         return event;
     }

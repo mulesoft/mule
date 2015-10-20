@@ -8,6 +8,7 @@ package org.mule.transport.http.components;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
 public class RestServiceException extends MessagingException
@@ -17,13 +18,13 @@ public class RestServiceException extends MessagingException
      */
     private static final long serialVersionUID = -1026055907767407434L;
 
-    public RestServiceException(Message message, MuleEvent event)
+    public RestServiceException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
     {
-        super(message, event);
+        super(message, event, failingMessageProcessor);
     }
 
-    public RestServiceException(Message message, MuleEvent event, Throwable cause)
+    public RestServiceException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
     {
-        super(message, event, cause);
+        super(message, event, cause, failingMessageProcessor);
     }
 }

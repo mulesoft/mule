@@ -12,12 +12,15 @@
  */
 package com.ning.http.client.providers.grizzly;
 
+import com.ning.http.client.ProxyServer;
 import com.ning.http.client.providers.grizzly.events.GracefulCloseEvent;
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.Request;
 import com.ning.http.client.uri.Uri;
 import com.ning.http.client.ws.WebSocket;
 import com.ning.http.util.AsyncHttpProviderUtils;
+import com.ning.http.util.ProxyUtils;
+
 import java.io.IOException;
 import org.glassfish.grizzly.CloseListener;
 import org.glassfish.grizzly.CloseType;
@@ -47,6 +50,7 @@ public final class HttpTransactionContext {
     final int maxRedirectCount;
     final boolean redirectsAllowed;
     final GrizzlyAsyncHttpProvider provider;
+    final ProxyServer proxyServer;
 
     private final Request ahcRequest;
     Uri requestUri;
@@ -142,6 +146,8 @@ public final class HttpTransactionContext {
         this.connection = connection;
         this.future = future;
         this.ahcRequest = ahcRequest;
+        this.proxyServer = ProxyUtils.getProxyServer(
+                provider.getClientConfig(), ahcRequest);
         redirectsAllowed = provider.getClientConfig().isFollowRedirect();
         maxRedirectCount = provider.getClientConfig().getMaxRedirects();
         this.requestUri = ahcRequest.getUri();
@@ -158,6 +164,11 @@ public final class HttpTransactionContext {
     Request getAhcRequest() {
         return ahcRequest;
     }
+
+    ProxyServer getProxyServer() {
+        return proxyServer;
+    }
+
     // ----------------------------------------------------- Private Methods
 
     HttpTransactionContext cloneAndStartTransactionFor(

@@ -7,7 +7,12 @@
 
 package org.mule.module.db.internal.processor;
 
+import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
+import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERY_DEBUG_FIELD;
+import static org.mule.module.db.internal.processor.DbDebugInfoUtils.createQueryFieldDebugInfo;
 import org.mule.api.MuleEvent;
+import org.mule.api.debug.FieldDebugInfo;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.executor.BulkExecutor;
 import org.mule.module.db.internal.domain.executor.BulkQueryExecutorFactory;
@@ -17,6 +22,7 @@ import org.mule.module.db.internal.domain.query.QueryType;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.module.db.internal.resolver.query.BulkQueryResolver;
+import org.mule.module.db.internal.resolver.query.QueryResolutionException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -61,7 +67,6 @@ public class BulkExecuteMessageProcessor extends AbstractDbMessageProcessor
     @Override
     protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException
     {
-
         MuleEvent eventToUse = resolveSource(muleEvent);
 
         BulkQuery bulkQuery = bulkQueryResolver.resolve(eventToUse);
@@ -76,5 +81,48 @@ public class BulkExecuteMessageProcessor extends AbstractDbMessageProcessor
     protected List<QueryType> getValidQueryTypes()
     {
         return validQueryTypes;
+    }
+
+    @Override
+    protected List<FieldDebugInfo> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent)
+    {
+        MuleEvent eventToUse = resolveSource(muleEvent);
+        final List<FieldDebugInfo> fields = new ArrayList<>();
+
+        BulkQuery bulkQuery;
+        try
+        {
+            bulkQuery = bulkQueryResolver.resolve(eventToUse);
+        }
+        catch (QueryResolutionException e)
+        {
+            fields.add(createFieldDebugInfo(QUERIES_DEBUG_FIELD, List.class, e));
+            return fields;
+        }
+
+        try
+        {
+            validateQueryTemplates(bulkQuery.getQueryTemplates());
+        }
+        catch (IllegalArgumentException e)
+        {
+            fields.add(createFieldDebugInfo(QUERIES_DEBUG_FIELD, List.class, e));
+            return fields;
+        }
+
+        final List<FieldDebugInfo> queries = new ArrayList<>();
+
+        int queryIndex = 1;
+        for (QueryTemplate queryTemplate : bulkQuery.getQueryTemplates())
+        {
+
+            final FieldDebugInfo fieldDebugInfo = createQueryFieldDebugInfo(QUERY_DEBUG_FIELD + queryIndex++, queryTemplate);
+
+            queries.add(fieldDebugInfo);
+        }
+
+        fields.add(createFieldDebugInfo(QUERIES_DEBUG_FIELD, List.class, queries));
+
+        return fields;
     }
 }

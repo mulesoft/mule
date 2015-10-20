@@ -8,6 +8,7 @@ package org.mule.api.routing.filter;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
 
@@ -17,9 +18,9 @@ public class FilterUnacceptedException extends MessagingException
     
     private transient Filter filter;
 
-    public FilterUnacceptedException(Message message, MuleEvent event, Filter filter)
+    public FilterUnacceptedException(Message message, MuleEvent event, Filter filter, MessageProcessor failingMessageProcessor)
     {
-        super(message, event);
+        super(message, event, failingMessageProcessor);
         this.filter = filter;
         addInfo("Filter", filter.toString());
     }
@@ -43,9 +44,9 @@ public class FilterUnacceptedException extends MessagingException
         super(message, event, cause);
     }
 
-    public FilterUnacceptedException(Message message, MuleEvent event)
+    public FilterUnacceptedException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
     {
-        super(message, event);
+        super(message, event, failingMessageProcessor);
     }
 
     public Filter getFilter()

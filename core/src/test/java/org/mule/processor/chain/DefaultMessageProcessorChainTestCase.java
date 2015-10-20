@@ -8,6 +8,7 @@
 package org.mule.processor.chain;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -822,7 +823,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
         MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
         MuleEvent response = chain.process(event);
-        assertSame(event, response);
+        assertThat(event.getId(), is(response.getId()));
+        assertThat(event.getMessage(), is(response.getMessage()));
 
         assertEquals(1, threads);
     }

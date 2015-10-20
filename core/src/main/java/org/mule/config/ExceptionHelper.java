@@ -6,6 +6,20 @@
  */
 package org.mule.config;
 
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -19,19 +33,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.SpiUtils;
-
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.util.SystemUtils;
 
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can be
@@ -44,6 +46,8 @@ import org.apache.commons.logging.LogFactory;
 
 public final class ExceptionHelper
 {
+    private static final String MULE_PACKAGE_REGEXP = "(?:org|com)\\.mule(?:soft)?\\.(?!mvel2)(?!el).*";
+
     /**
      * This is the property to set the error code to no the message it is the
      * property name the Transport provider uses set the set the error code on the
@@ -69,7 +73,7 @@ public final class ExceptionHelper
     private static Map<String,Properties> errorMappings = new HashMap<String,Properties>();
     private static Map<String,Boolean> disposeListenerRegistered = new HashMap<String,Boolean>();
 
-    private static int exceptionThreshold = 0;
+    private static final int EXCEPTION_THRESHOLD = 3;
     private static boolean verbose = true;
 
     private static boolean initialised = false;
@@ -298,11 +302,19 @@ public final class ExceptionHelper
         return null;
     }
 
+    /**
+     * @deprecated since 3.8.0
+     */
+    @Deprecated
     public static String getJavaDocUrl(Class<?> exception)
     {
         return getDocUrl("javadoc.", exception.getName());
     }
 
+    /**
+     * @deprecated since 3.8.0
+     */
+    @Deprecated
     public static String getDocUrl(Class<?> exception)
     {
         return getDocUrl("doc.", exception.getName());
@@ -541,34 +553,54 @@ public final class ExceptionHelper
 
     public static String getExceptionStack(Throwable t)
     {
-        StringBuilder buf = new StringBuilder();
-        // get exception stack
-        List<Throwable> exceptions = getExceptionsAsList(t);
+        Throwable root = getRootException(t);
+        MuleException rootMule = getRootMuleException(t);
 
-        int i = 1;
-        for (Iterator<Throwable> iterator = exceptions.iterator(); iterator.hasNext(); i++)
+        StringBuilder buf = new StringBuilder();
+
+        ExceptionReader rootMuleReader = getExceptionReader(rootMule);
+        buf.append(rootMuleReader.getMessage(rootMule))
+           .append(" (")
+           .append(rootMule.getClass().getName())
+           .append(")")
+           .append(SystemUtils.LINE_SEPARATOR);
+
+        if (verbose)
         {
-            if (i > exceptionThreshold && exceptionThreshold > 0)
+            int processedElements = 0;
+            int processedMuleElements = 1;
+            for (StackTraceElement stackTraceElement : root.getStackTrace())
             {
-                buf.append("(").append(exceptions.size() - i + 1).append(" more...)");
-                break;
-            }
-            Throwable throwable = iterator.next();
-            ExceptionReader er = getExceptionReader(throwable);
-            buf.append(i).append(". ").append(er.getMessage(throwable)).append(" (");
-            buf.append(throwable.getClass().getName()).append(")\n");
-            if (verbose && throwable.getStackTrace().length > 0)
-            {
-                StackTraceElement e = throwable.getStackTrace()[0];
+                if (processedMuleElements > EXCEPTION_THRESHOLD)
+                {
+                    break;
+                }
+                
+                ++processedElements;
+                if (stackTraceElement.getClassName().matches(MULE_PACKAGE_REGEXP))
+                {
+                    ++processedMuleElements;
+                }
+                
                 buf.append("  ")
-                        .append(e.getClassName())
-                        .append(":")
-                        .append(e.getLineNumber())
-                        .append(" (")
-                        .append(getJavaDocUrl(throwable.getClass()))
-                        .append(")\n");
+                   .append(stackTraceElement.getClassName())
+                   .append(".")
+                   .append(stackTraceElement.getMethodName())
+                   .append(":")
+                   .append(stackTraceElement.getLineNumber())
+                   .append(")")
+                   .append(SystemUtils.LINE_SEPARATOR);
+            }
+            
+            if (root.getStackTrace().length - processedElements > 0)
+            {
+                buf.append("  (")
+                   .append(root.getStackTrace().length - processedElements)
+                   .append(" more...)")
+                   .append(SystemUtils.LINE_SEPARATOR);
             }
         }
+        
         return buf.toString();
     }
 

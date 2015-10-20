@@ -31,11 +31,33 @@ public class DefaultExceptionStrategyTestCase extends FunctionalTestCase
 
     public static class CustomExceptionStrategy implements MessagingExceptionHandler
     {
+        private boolean enableNotifications = true;
+        private String logException = "true";
 
         @Override
         public MuleEvent handleException(Exception exception, MuleEvent event)
         {
             return null;
+        }
+
+        public boolean isEnableNotifications()
+        {
+            return enableNotifications;
+        }
+
+        public void setEnableNotifications(boolean enableNotifications)
+        {
+            this.enableNotifications = enableNotifications;
+        }
+
+        public String getLogException()
+        {
+            return logException;
+        }
+
+        public void setLogException(String logException)
+        {
+            this.logException = logException;
         }
     }
 

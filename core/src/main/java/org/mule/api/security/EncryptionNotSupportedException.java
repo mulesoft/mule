@@ -7,6 +7,7 @@
 package org.mule.api.security;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
 /**
@@ -26,8 +27,8 @@ public class EncryptionNotSupportedException extends SecurityException
         super(message, event);
     }
 
-    public EncryptionNotSupportedException(Message message, MuleEvent event, Throwable cause)
+    public EncryptionNotSupportedException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
     {
-        super(message, event, cause);
+        super(message, event, cause, failingMessageProcessor);
     }
 }
