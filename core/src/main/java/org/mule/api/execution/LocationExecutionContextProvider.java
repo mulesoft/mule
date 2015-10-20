@@ -30,17 +30,10 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
      */
     public static String resolveProcessorRepresentation(String appId, String processorPath, Object element)
     {
-        if (element instanceof AnnotatedObject)
+        String docName = getDocName(element);
+        if (docName != null)
         {
-            Object docName = ((AnnotatedObject) element).getAnnotation(NAME_ANNOTATION_KEY);
-            if (docName != null)
-            {
-                return String.format("%s @ %s (%s)", processorPath, appId, docName.toString());
-            }
-            else
-            {
-                return String.format("%s @ %s", processorPath, appId);
-            }
+            return String.format("%s @ %s (%s)", processorPath, appId, docName);
         }
         else
         {
@@ -48,5 +41,17 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
         }
     }
 
+    public static String getDocName(Object element)
+    {
+        if (element instanceof AnnotatedObject)
+        {
+            Object docName = ((AnnotatedObject) element).getAnnotation(NAME_ANNOTATION_KEY);
+            return docName != null ? docName.toString() : null;
+        }
+        else
+        {
+            return null;
+        }
+    }
 
 }

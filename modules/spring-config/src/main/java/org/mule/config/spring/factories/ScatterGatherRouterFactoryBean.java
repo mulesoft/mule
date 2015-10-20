@@ -7,6 +7,7 @@
 
 package org.mule.config.spring.factories;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.AggregationStrategy;
@@ -16,7 +17,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class ScatterGatherRouterFactoryBean implements FactoryBean<ScatterGatherRouter>
+public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject implements FactoryBean<ScatterGatherRouter>
 {
 
     private long timeout = 0;
@@ -45,6 +46,7 @@ public class ScatterGatherRouterFactoryBean implements FactoryBean<ScatterGather
             sg.setThreadingProfile(this.threadingProfile);
         }
 
+        sg.setAnnotations(getAnnotations());
         return sg;
     }
 
