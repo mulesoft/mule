@@ -259,8 +259,8 @@
 /mule-standalone-${productVersion}/lib/opt/ecj-4.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/el-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1.jar
-/mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1.jar
-/mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.jar
+/mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-2.0.0.jar
+/mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-stax-api_1.0_spec-1.0.1.jar
