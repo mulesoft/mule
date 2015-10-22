@@ -6,14 +6,15 @@
  */
 package org.mule.transport.quartz.jobs;
 
+import static java.lang.Boolean.TRUE;
+import static org.mule.api.config.MuleProperties.MULE_CONTEXT_PROPERTY;
+import static org.mule.transport.quartz.QuartzConnector.PROPERTY_JOB_DYNAMIC;
+
 import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.transport.quartz.QuartzConnector;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 
 /**
@@ -21,14 +22,11 @@ import org.quartz.SchedulerException;
  */
 public abstract class AbstractJob implements Job
 {
-    protected MuleContext muleContext;
-
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
-        muleContext = getMuleContext(jobExecutionContext);
-        if (muleContext.isPrimaryPollingInstance() ||
-            jobExecutionContext.getJobDetail().getJobDataMap().get(QuartzConnector.PROPERTY_JOB_DYNAMIC) == Boolean.TRUE)
+        if (getMuleContext(jobExecutionContext).isPrimaryPollingInstance() ||
+            TRUE.equals(jobExecutionContext.getJobDetail().getJobDataMap().get(PROPERTY_JOB_DYNAMIC)))
         {
             doExecute(jobExecutionContext);
         }
@@ -43,8 +41,7 @@ public abstract class AbstractJob implements Job
     {
         try
         {
-            SchedulerContext schedulerContext = jobExecutionContext.getScheduler().getContext();
-            return (MuleContext) schedulerContext.get(MuleProperties.MULE_CONTEXT_PROPERTY);
+            return (MuleContext) jobExecutionContext.getScheduler().getContext().get(MULE_CONTEXT_PROPERTY);
         }
         catch (SchedulerException e)
         {
