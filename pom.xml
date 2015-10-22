@@ -189,8 +189,11 @@
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
-        <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
+        <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
+        <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
+        <geronimoSpecsEjbVersion>1.1</geronimoSpecsEjbVersion>
+        <geronimoSpecsJaxRpcVersion>2.1</geronimoSpecsJaxRpcVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <grizzlyVersion>2.3.21</grizzlyVersion>
         <guavaVersion>18.0</guavaVersion>
@@ -707,17 +710,17 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-ejb_2.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsEjbVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsJ2eeVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_1.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsJmsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
