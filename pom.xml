@@ -189,10 +189,14 @@
         <derbyVersion>10.9.1.0</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
-        <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
+        <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
+		<geronimoSpecsJ2eeManagementVersion>1.1</geronimoSpecsJ2eeManagementVersion>
+        <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
         <geronimoSpecsAnnotationVersion>1.0.1</geronimoSpecsAnnotationVersion>
         <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
+        <geronimoSpecsEjbVersion>1.1</geronimoSpecsEjbVersion>
+        <geronimoSpecsJaxRpcVersion>2.1</geronimoSpecsJaxRpcVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <guavaVersion>16.0.1</guavaVersion>
@@ -452,7 +456,6 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-servlet_3.0_spec</artifactId>
-                <!-- servlet api jar is versioned differently -->
                 <version>${geronimoSpecsServletApiVersion}</version>
             </dependency>
             <dependency>
@@ -662,22 +665,22 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-ejb_2.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsEjbVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsJ2eeVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsJ2eeManagementVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_1.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsJmsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
