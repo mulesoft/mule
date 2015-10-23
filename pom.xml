@@ -165,7 +165,8 @@
         <asyncHttpClientVersion>1.9.31</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
-        <bouncycastleVersion>1.46</bouncycastleVersion>
+        <bouncycastleVersion>1.50</bouncycastleVersion>
+        <bouncycastleTspVersion>1.46</bouncycastleTspVersion>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.2</commonsBeanUtilsVersion>
@@ -1139,23 +1140,23 @@
             <!-- BouncyCastle deps -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpg-jdk16</artifactId>
+                <artifactId>bcpg-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-ext-jdk16</artifactId>
+                <artifactId>bcprov-ext-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk16</artifactId>
+                <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bctsp-jdk16</artifactId>
-                <version>${bouncycastleVersion}</version>
+                <artifactId>bctsp-jdk15on</artifactId>
+                <version>${bouncycastleTspVersion}</version>
             </dependency>
 
             <dependency>

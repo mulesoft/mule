@@ -15,8 +15,8 @@
     <description>A Mule implementation of PGP security using cryptix libraries.</description>
 
     <properties>
-        <bouncycastle.jdk>jdk16</bouncycastle.jdk>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <bouncycastle.jdk>jdk15on</bouncycastle.jdk>
     </properties>
 
     <dependencies>
