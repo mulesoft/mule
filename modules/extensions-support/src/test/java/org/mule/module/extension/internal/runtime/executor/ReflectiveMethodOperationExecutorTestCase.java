@@ -45,6 +45,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -89,7 +90,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     public void init() throws Exception
     {
         initHeisenberg();
-        configurationInstance = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, config, emptyList());
+        configurationInstance = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, config, emptyList(), Optional.empty());
         when(muleEvent.getMessage().getDataType()).thenReturn(DATA_TYPE);
         operationContext = new DefaultOperationContext(configurationInstance, parameters, operationModel, muleEvent);
         operationContext = spy(operationContext);

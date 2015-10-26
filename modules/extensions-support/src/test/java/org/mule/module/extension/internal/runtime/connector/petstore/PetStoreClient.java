@@ -24,7 +24,7 @@ public class PetStoreClient
         this.password = password;
     }
 
-    public List<String> getPets(String ownerName, PetStoreConfig config)
+    public List<String> getPets(String ownerName, PetStoreConnector config)
     {
         checkArgument(ownerName.equals(username), "config doesn't match");
         return config.getPets();

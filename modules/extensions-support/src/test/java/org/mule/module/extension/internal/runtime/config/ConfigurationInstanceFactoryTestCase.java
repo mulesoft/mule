@@ -17,17 +17,29 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
+import org.mule.api.config.ConfigurationException;
+import org.mule.extension.api.connection.ConnectionException;
+import org.mule.extension.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.Interceptable;
+import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.Interceptor;
+import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase;
 import org.mule.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase.TestConfig;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Kiwi;
+
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,10 +58,16 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
     private ConfigurationModel configurationModel;
 
     @Mock
+    private OperationModel operationModel;
+
+    @Mock
     private Interceptor interceptor1;
 
     @Mock
     private Interceptor interceptor2;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private MuleEvent event;
 
     private ResolverSet resolverSet;
     private ConfigurationInstanceFactory<TestConfig> factory;
@@ -57,9 +75,12 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        when(configurationModel.getInstantiator().newInstance()).thenReturn(new TestConfig());
+        when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(new TestConfig());
         when(configurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
+        when(configurationModel.getModelProperty(ConnectionTypeModelProperty.KEY)).thenReturn(null);
         when(configurationModel.getInterceptorFactories()).thenReturn(asList(() -> interceptor1, () -> interceptor2));
+        when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(asList(operationModel));
+        when(operationModel.getModelProperty(ConnectionTypeModelProperty.KEY)).thenReturn(new ConnectionTypeModelProperty(Banana.class));
 
         resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
         factory = new ConfigurationInstanceFactory<>(configurationModel, resolverSet);
@@ -68,8 +89,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void createFromEvent() throws Exception
     {
-        MuleEvent event = mock(MuleEvent.class);
-        ConfigurationInstance<TestConfig> configurationInstance = factory.createConfiguration(CONFIG_NAME, event);
+        ConfigurationInstance<TestConfig> configurationInstance = factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(null));
 
         assertConfiguration(configurationInstance);
     }
@@ -78,9 +98,24 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
     public void createFromResolverSetResult() throws Exception
     {
         ResolverSetResult result = ResolverSetResult.newBuilder().build();
-        ConfigurationInstance<TestConfig> configurationInstance = factory.createConfiguration(CONFIG_NAME, result);
+        ConfigurationInstance<TestConfig> configurationInstance = factory.createConfiguration(CONFIG_NAME, result, Optional.empty());
 
         assertConfiguration(configurationInstance);
+        assertThat(configurationInstance.getConnectionProvider().isPresent(), is(false));
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void invalidConfigConnectionProvider() throws Exception
+    {
+        when(configurationModel.getExtensionModel().getConnectionProviders()).thenReturn(asList(mock(ConnectionProviderModel.class)));
+        factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(new InvalidConfigTestConnectionProvider()));
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void invalidConnectionTypeProvider() throws Exception
+    {
+        when(configurationModel.getExtensionModel().getConnectionProviders()).thenReturn(asList(mock(ConnectionProviderModel.class)));
+        factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(new InvalidConnectionTypeProvider()));
     }
 
     private void assertConfiguration(ConfigurationInstance<TestConfig> configurationInstance)
@@ -92,5 +127,37 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
 
         assertThat(configurationInstance, is(instanceOf(Interceptable.class)));
         assertThat(((Interceptable) configurationInstance).getInterceptors(), containsInAnyOrder(interceptor1, interceptor2));
+    }
+
+    public static class InvalidConfigTestConnectionProvider implements ConnectionProvider<Apple, Banana>
+    {
+
+        @Override
+        public Banana connect(Apple apple) throws ConnectionException
+        {
+            return new Banana();
+        }
+
+        @Override
+        public void disconnect(Banana banana)
+        {
+
+        }
+    }
+
+    public static class InvalidConnectionTypeProvider implements ConnectionProvider<TestConfig, Kiwi>
+    {
+
+        @Override
+        public Kiwi connect(TestConfig testConfig) throws ConnectionException
+        {
+            return new Kiwi();
+        }
+
+        @Override
+        public void disconnect(Kiwi kiwi)
+        {
+
+        }
     }
 }

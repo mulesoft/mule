@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HealthStatus.DEAD;
+import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.module.extension.KnockeableDoor.knock;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -209,6 +210,12 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
 
         List<String> response = (List<String>) runFlow("knockManyByExpression", event).getMessage().getPayload();
         assertThat(response, Matchers.contains(knock("Skyler"), knock("Saul")));
+    }
+
+    @Test
+    public void operationWhichRequiresConnection() throws Exception
+    {
+        assertThat(runFlow("callSaul").getMessage().getPayloadAsString(), is("You called " + SAUL_OFFICE_NUMBER));
     }
 
     private void assertDynamicDoor(String flowName) throws Exception

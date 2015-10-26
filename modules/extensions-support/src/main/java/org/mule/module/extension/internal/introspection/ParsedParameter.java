@@ -8,6 +8,10 @@ package org.mule.module.extension.internal.introspection;
 
 import org.mule.extension.api.introspection.DataType;
 
+import java.lang.annotation.Annotation;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Intermediate representation of a parameter used to decouple
  * an interchangeable introspection mechanism from the extension's API
@@ -15,7 +19,7 @@ import org.mule.extension.api.introspection.DataType;
  *
  * @since 3.7.0
  */
-final class ParameterDescriptor
+final class ParsedParameter
 {
 
     private String name;
@@ -23,6 +27,13 @@ final class ParameterDescriptor
     private boolean required;
     private Object defaultValue;
     private Class<?> typeRestriction = null;
+    private boolean advertised = true;
+    private Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
+
+    ParsedParameter(Map<Class<? extends Annotation>, Annotation> annotations)
+    {
+        this.annotations = annotations;
+    }
 
     String getName()
     {
@@ -72,5 +83,20 @@ final class ParameterDescriptor
     void setTypeRestriction(Class<?> typeRestriction)
     {
         this.typeRestriction = typeRestriction;
+    }
+
+    public boolean isAdvertised()
+    {
+        return advertised;
+    }
+
+    public void setAdvertised(boolean advertised)
+    {
+        this.advertised = advertised;
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationType)
+    {
+        return (T) annotations.get(annotationType);
     }
 }

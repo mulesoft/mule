@@ -27,6 +27,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -69,7 +70,7 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
-        configuration = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, configurationInstance, emptyList());
+        configuration = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, configurationInstance, emptyList(), Optional.empty());
         Map<ParameterModel, Object> parametersMap = new HashMap<>();
         parametersMap.put(ExtensionsTestUtils.getParameter(PARAM_NAME, String.class), VALUE);
         when(resolverSetResult.asMap()).thenReturn(parametersMap);

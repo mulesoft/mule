@@ -1,0 +1,59 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.module.extension.internal.introspection;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.extension.api.introspection.ConnectionProviderFactory;
+import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
+import org.junit.Test;
+
+@SmallTest
+public class DefaultConnectionProviderFactoryTestCase extends AbstractMuleTestCase
+{
+
+    private ConnectionProviderFactory factory = new DefaultConnectionProviderFactory<>(PetStoreConnectionProvider.class);
+
+    @Test
+    public void getObjectType()
+    {
+        assertThat(factory.getObjectType(), equalTo(PetStoreConnectionProvider.class));
+    }
+
+    @Test
+    public void newInstance() throws Exception
+    {
+        assertThat(factory.newInstance(), is(instanceOf(PetStoreConnectionProvider.class)));
+    }
+
+    @Test
+    public void returnsDifferentInstances() throws Exception
+    {
+        assertThat(factory.newInstance(), is(not(sameInstance(factory.newInstance()))));
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void notProviderClass()
+    {
+        new DefaultConnectionProviderFactory<>(Object.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void notInstantiable()
+    {
+        new DefaultConnectionProviderFactory<>(ConnectionProvider.class);
+    }
+}

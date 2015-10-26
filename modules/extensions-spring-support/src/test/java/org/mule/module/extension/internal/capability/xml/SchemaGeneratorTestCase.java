@@ -63,6 +63,6 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
         System.out.println(schema);
 
         XMLUnit.setIgnoreWhitespace(true);
-        assertThat(XMLUnit.compareXML(expectedSchema, schema).similar(), is(true));
+        assertThat(XMLUnit.compareXML(expectedSchema, schema).identical(), is(true));
     }
 }

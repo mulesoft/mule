@@ -10,16 +10,16 @@ import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.api.introspection.ConfigurationInstantiator;
+import org.mule.extension.api.introspection.ConfigurationFactory;
 
 /**
- * Implementation of {@link ConfigurationInstantiator} which creates instances
+ * Implementation of {@link ConfigurationFactory} which creates instances
  * based on a given {@link Class} which is assumed to have a default and public
  * constructor.
  *
  * @since 3.7.0
  */
-final class TypeAwareConfigurationInstantiator implements ConfigurationInstantiator
+final class TypeAwareConfigurationFactory implements ConfigurationFactory
 {
 
     private final Class<?> configurationType;
@@ -31,7 +31,7 @@ final class TypeAwareConfigurationInstantiator implements ConfigurationInstantia
      * @param configurationType the type to be instantiated. Must be not {@code null}, and have a public default constructor
      * @throws IllegalArgumentException if the type is {@code null} or doesn't have a default public constructor
      */
-    TypeAwareConfigurationInstantiator(Class<?> configurationType)
+    TypeAwareConfigurationFactory(Class<?> configurationType)
     {
         checkArgument(configurationType != null, "configuration type cannot be null");
         checkInstantiable(configurationType);

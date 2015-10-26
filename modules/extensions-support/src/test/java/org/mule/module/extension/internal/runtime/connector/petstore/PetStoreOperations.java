@@ -16,7 +16,7 @@ public class PetStoreOperations
 {
 
     @Operation
-    public List<String> getPets(@Connection PetStoreClient client, @UseConfig PetStoreConfig config, String ownerName)
+    public List<String> getPets(@Connection PetStoreClient client, @UseConfig PetStoreConnector config, String ownerName)
     {
         return client.getPets(ownerName, config);
     }

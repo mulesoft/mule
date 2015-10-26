@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.config;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
+import org.mule.extension.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExpirationPolicy;
@@ -17,6 +18,7 @@ import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.runtime.config.ConfigurationProviderFactory;
 import org.mule.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.time.TimeSupplier;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +34,6 @@ import org.springframework.beans.factory.FactoryBean;
  */
 final class ConfigurationProviderFactoryBean implements FactoryBean<ConfigurationProvider<Object>>
 {
-
     private final ConfigurationProvider<Object> configurationProvider;
     private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
     private final TimeSupplier timeSupplier;
@@ -41,18 +42,20 @@ final class ConfigurationProviderFactoryBean implements FactoryBean<Configuratio
                                      ConfigurationModel configurationModel,
                                      ElementDescriptor element,
                                      MuleContext muleContext,
-                                     TimeSupplier timeSupplier) throws ConfigurationException
+                                     TimeSupplier timeSupplier,
+                                     ValueResolver<ConnectionProvider> connectionProviderResolver) throws ConfigurationException
     {
         this.timeSupplier = timeSupplier;
         ResolverSet resolverSet = getResolverSet(element, configurationModel.getParameterModels());
         try
         {
-            if (resolverSet.isDynamic())
+            if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic())
             {
                 configurationProvider = configurationProviderFactory.createDynamicConfigurationProvider(
                         name,
                         configurationModel,
                         resolverSet,
+                        connectionProviderResolver,
                         getDynamicConfigPolicy(element));
             }
             else
@@ -61,6 +64,7 @@ final class ConfigurationProviderFactoryBean implements FactoryBean<Configuratio
                         name,
                         configurationModel,
                         resolverSet,
+                        connectionProviderResolver,
                         muleContext);
             }
 
@@ -113,5 +117,4 @@ final class ConfigurationProviderFactoryBean implements FactoryBean<Configuratio
                 TimeUnit.valueOf(expirationPolicyElement.getAttribute("timeUnit")),
                 timeSupplier);
     }
-
 }

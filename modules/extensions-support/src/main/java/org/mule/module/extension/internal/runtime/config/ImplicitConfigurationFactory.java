@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.manager;
+package org.mule.module.extension.internal.runtime.config;
 
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.introspection.ConfigurationModel;
@@ -18,7 +18,7 @@ import org.mule.extension.api.runtime.ConfigurationInstance;
  *
  * @since 3.8.0
  */
-interface ImplicitConfigurationFactory
+public interface ImplicitConfigurationFactory
 {
 
     /**
