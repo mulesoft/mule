@@ -17,15 +17,18 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
+import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import org.mule.DefaultMessageCollection;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.AggregationContext;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.routing.AggregationStrategy;
 import org.mule.routing.CompositeRoutingException;
 import org.mule.tck.functional.FlowAssert;
@@ -38,6 +41,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class ScatterGatherRouterTestCase extends FunctionalTestCase
@@ -271,6 +275,17 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     {
         runFlow("setsVariablesAfterRouting");
         FlowAssert.verify("setsVariablesAfterRouting");
+    }
+
+    @Test
+    public void returnsCorrectDataType() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_PAYLOAD);
+        event.getMessage().setProperty(CONTENT_TYPE_PROPERTY, "application/json", PropertyScope.INBOUND);
+        MuleMessage response = runFlow("dataType", event).getMessage();
+        assertThat(response, is(Matchers.instanceOf(DefaultMessageCollection.class)));
+        assertThat(((DefaultMessageCollection) response).size(), is(3));
+        assertThat(((DefaultMessageCollection) response).getMessage(0).getDataType().getMimeType(), is("text/plain"));
     }
 
     public static class TestAggregationStrategy implements AggregationStrategy
