@@ -6,6 +6,8 @@
  */
 package org.mule.construct;
 
+import static org.mule.util.NotificationUtils.buildPaths;
+
 import org.mule.api.GlobalNameableObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -45,12 +47,11 @@ import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.util.NotificationUtils;
+import org.mule.util.NotificationUtils.PathResolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s
@@ -65,7 +66,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected MessageProcessor pipeline;
 
     protected List<MessageProcessor> messageProcessors = Collections.emptyList();
-    private Map<MessageProcessor, String> flowMap = new LinkedHashMap<MessageProcessor, String>();
+    private PathResolver flowMap;
 
     protected ProcessingStrategy processingStrategy;
     private boolean canProcessMessage = false;
@@ -239,6 +240,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         injectExceptionHandler(pipeline);
         initialiseIfInitialisable(messageSource);
         initialiseIfInitialisable(pipeline);
+
+        createFlowMap();
     }
 
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
@@ -351,21 +354,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         startIfStartable(pipeline);
         canProcessMessage = true;
         startIfStartable(messageSource);
-        createFlowMap();
     }
 
     private void createFlowMap()
     {
-        if (!flowMap.isEmpty())
-        {
-            logger.warn("flow map already populated");
-            return;
-        }
-
         DefaultMessageProcessorPathElement pipeLinePathElement = new DefaultMessageProcessorPathElement(null, getName());
         addMessageProcessorPathElements(pipeLinePathElement);
-        flowMap = NotificationUtils.buildPaths(pipeLinePathElement);
-
+        flowMap = buildPaths(pipeLinePathElement);
     }
 
     @Override
@@ -421,7 +416,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     public String getProcessorPath(MessageProcessor processor)
     {
-        return flowMap.get(processor);
+        return flowMap.resolvePath(processor);
     }
 
 
