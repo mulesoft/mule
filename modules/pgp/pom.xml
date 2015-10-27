@@ -14,10 +14,6 @@
     <name>PGP Security</name>
     <description>A Mule implementation of PGP security using cryptix libraries.</description>
 
-    <properties>
-        <bouncycastle.jdk>jdk15on</bouncycastle.jdk>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -35,19 +31,19 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpg-${bouncycastle.jdk}</artifactId>
+            <artifactId>bcpg-jdk15on</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-${bouncycastle.jdk}</artifactId>
+            <artifactId>bcprov-ext-jdk15on</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-${bouncycastle.jdk}</artifactId>
+            <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bctsp-${bouncycastle.jdk}</artifactId>
+            <artifactId>bcpkix-jdk15on</artifactId>
         </dependency>
 
         <!-- Unit tests -->
