@@ -33,6 +33,7 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
 
     public static final int MESSAGE_RECEIVED = MESSAGE_EVENT_ACTION_START_RANGE + 1;
     public static final int MESSAGE_RESPONSE = MESSAGE_EVENT_ACTION_START_RANGE + 5;
+    public static final int MESSAGE_ERROR_RESPONSE = MESSAGE_EVENT_ACTION_START_RANGE + 6;
 
     public static final int MESSAGE_REQUEST_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 4;
     public static final int MESSAGE_REQUEST_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 3;
@@ -41,6 +42,7 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
     {
         registerAction("receive", MESSAGE_RECEIVED);
         registerAction("response", MESSAGE_RESPONSE);
+        registerAction("error response", MESSAGE_ERROR_RESPONSE);
 
         registerAction("begin request", MESSAGE_REQUEST_BEGIN);
         registerAction("end request", MESSAGE_REQUEST_END);

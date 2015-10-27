@@ -9,15 +9,26 @@ package org.mule.message.processing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.context.notification.NotificationHelper;
+import org.mule.context.notification.ServerNotificationManager;
 import org.mule.execution.AsyncResponseFlowProcessingPhase;
 import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.MessageProcessContext;
@@ -50,7 +61,15 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
 {
 
     private static final int LATCH_TIMEOUT = 50;
-    private AsyncResponseFlowProcessingPhase phase = new AsyncResponseFlowProcessingPhase();
+    private AsyncResponseFlowProcessingPhase phase = new AsyncResponseFlowProcessingPhase()
+    {
+        // We cannot mock this method since its protected
+        @Override
+        protected NotificationHelper getNotificationHelper(ServerNotificationManager serverNotificationManager)
+        {
+            return notificationHelper;
+        };
+    };
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private AsyncResponseFlowProcessingPhaseTemplate mockTemplate;
@@ -66,7 +85,14 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     private MuleException mockException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private DefaultMuleEvent mockMuleEvent;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private NotificationHelper notificationHelper;
 
+    @Before
+    public void before()
+    {
+        phase.setMuleContext(mock(MuleContext.class));
+    }
 
     @Before
     public void configureExpectedBehaviour() throws Exception
@@ -300,6 +326,56 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         when(mockMuleEvent.newThreadCopy()).thenReturn(mockMuleEvent);
         RequestContext.setEvent(mockMuleEvent);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
+    }
+
+
+    @Test
+    public void responseNotificationFired() throws Exception
+    {
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
+                callback.responseSentWithFailure(mockException, mockMuleEvent);
+                return null;
+            }
+        }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+        verify(notificationHelper).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
+        verify(notificationHelper, never()).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
+    }
+
+    @Test
+    public void responseNotificationFiredNonBlocking() throws Exception
+    {
+        final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
+                callback.responseSentWithFailure(mockException, mockMuleEvent);
+                return null;
+            }
+        }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
+        when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenAnswer(new Answer<MuleEvent>()
+        {
+            @Override
+            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
+            {
+                return sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]);
+            }
+        });
+
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
+        sensingMessageProcessor.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
+        verify(notificationHelper).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
+        verify(notificationHelper, never()).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
     }
 
     private void verifyOnlySuccessfulWasCalled()

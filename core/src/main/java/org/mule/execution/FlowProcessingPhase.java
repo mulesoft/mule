@@ -6,6 +6,9 @@
  */
 package org.mule.execution;
 
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -26,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * To participate of this phase, {@link MessageProcessTemplate} must implement {@link FlowProcessingPhaseTemplate}
  */
-public class FlowProcessingPhase implements MessageProcessPhase<FlowProcessingPhaseTemplate>, Comparable<MessageProcessPhase>
+public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowProcessingPhaseTemplate>
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -142,6 +145,7 @@ public class FlowProcessingPhase implements MessageProcessPhase<FlowProcessingPh
     {
         if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate)
         {
+            fireNotification(null, MESSAGE_ERROR_RESPONSE);
             ((RequestResponseFlowProcessingPhaseTemplate) flowProcessingPhaseTemplate).sendFailureResponseToClient(messagingException);
         }
     }
@@ -150,6 +154,7 @@ public class FlowProcessingPhase implements MessageProcessPhase<FlowProcessingPh
     {
         if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate)
         {
+            fireNotification(muleEvent, MESSAGE_RESPONSE);
             ((RequestResponseFlowProcessingPhaseTemplate) flowProcessingPhaseTemplate).sendResponseToClient(muleEvent);
         }
     }
