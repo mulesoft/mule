@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <notifications>
+        <notification event="CONNECTOR-MESSAGE"/>
+    </notifications>
+
+    <spring:bean name="notificationLogger" class="org.mule.context.notification.ConnectorMessageNotificationLogger"/>
+
+    <notifications>
+        <notification-listener ref="notificationLogger"/>
+    </notifications>
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
+    <flow name="testFlow">
+        <http:listener config-ref="listenerConfig"  path="/path"/>
+        <test:component throwException="true"/>
+    </flow>
+
+</mule>

@@ -67,6 +67,19 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
                 return compareValue;
             }
         });
+
+        for (MessageProcessPhase messageProcessPhase : messageProcessPhaseList)
+        {
+            if (messageProcessPhase instanceof MuleContextAware)
+            {
+                ((MuleContextAware) messageProcessPhase).setMuleContext(muleContext);
+            }
+            if (messageProcessPhase instanceof Initialisable)
+            {
+                ((Initialisable) messageProcessPhase).initialise();
+            }
+        }
+
         phaseExecutionEngine = new PhaseExecutionEngine(messageProcessPhaseList, muleContext.getExceptionListener(), endProcessPhase);
     }
 }
