@@ -206,11 +206,10 @@
 /mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.31.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-api-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-impl-1.2.5.jar
-/mule-standalone-${productVersion}/lib/opt/bcmail-jdk15on-1.46.jar
 /mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.50.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.50.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.50.jar
-/mule-standalone-${productVersion}/lib/opt/bctsp-jdk15on-1.46.jar
+/mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.50.jar
 /mule-standalone-${productVersion}/lib/opt/btf-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/bytelist-1.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
