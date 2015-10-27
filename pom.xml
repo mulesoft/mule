@@ -166,7 +166,6 @@
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.50</bouncycastleVersion>
-        <bouncycastleTspVersion>1.46</bouncycastleTspVersion>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.2</commonsBeanUtilsVersion>
@@ -464,7 +463,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-servlet_3.0_spec</artifactId>
-                 <!--servlet api jar is versioned differently-->
+                <!--servlet api jar is versioned differently-->
                 <version>${geronimoSpecsServletApiVersion}</version>
             </dependency>
             <dependency>
@@ -504,11 +503,11 @@
                 <artifactId>cometd-client</artifactId>
                 <version>${cometdVersion}</version>
                 <exclusions>
-                   <exclusion>
-                       <groupId>org.mortbay.jetty</groupId>
-                       <artifactId>servlet-api</artifactId>
-                   </exclusion>
-               </exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.yourkit</groupId>
@@ -1155,8 +1154,8 @@
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bctsp-jdk15on</artifactId>
-                <version>${bouncycastleTspVersion}</version>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bouncycastleVersion}</version>
             </dependency>
 
             <dependency>
@@ -1352,7 +1351,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>${guavaVersion}</version>        
+                <version>${guavaVersion}</version>
             </dependency>
 
             <dependency>
@@ -2049,7 +2048,7 @@
 
     <profiles>
 
-         <profile>
+        <profile>
             <id>ci-server</id>
             <distributionManagement>
                 <site>
@@ -2131,7 +2130,7 @@
                         </configuration>
                     </plugin>
                 </plugins>
-             </build>
+            </build>
             <properties>
                 <skipFunctionalTests>false</skipFunctionalTests>
                 <skipIntegrationTests>true</skipIntegrationTests>
