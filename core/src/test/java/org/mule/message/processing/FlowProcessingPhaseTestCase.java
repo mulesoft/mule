@@ -9,15 +9,25 @@ package org.mule.message.processing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
 
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.context.notification.NotificationHelper;
+import org.mule.context.notification.ServerNotificationManager;
 import org.mule.execution.FlowProcessingPhase;
 import org.mule.execution.FlowProcessingPhaseTemplate;
 import org.mule.execution.MessageProcessContext;
@@ -29,6 +39,7 @@ import org.mule.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -43,7 +54,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
 {
 
-    private FlowProcessingPhase phase = new FlowProcessingPhase();
+    private FlowProcessingPhase phase = new FlowProcessingPhase()
+    {
+        // We cannot mock this method since its protected
+        @Override
+        protected NotificationHelper getNotificationHelper(ServerNotificationManager serverNotificationManager)
+        {
+            return notificationHelper;
+        };
+    };
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private FlowProcessingPhaseTemplate mockTemplate;
@@ -59,7 +78,14 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
     private MessagingException mockMessagingException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleException mockException;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private NotificationHelper notificationHelper;
 
+    @Before
+    public void before()
+    {
+        phase.setMuleContext(mock(MuleContext.class));
+    }
 
     @Test
     public void supportedTemplates()
@@ -160,6 +186,31 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
         verify(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
         verify(mockRequestResponseTemplate).afterFailureProcessingFlow(mockMessagingException);
+    }
+
+    @Test
+    public void responseNotificationFired() throws MuleException
+    {
+        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
+        when(mockRequestResponseTemplate.afterRouteEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+        when(mockMessagingException.handled()).thenReturn(true);
+        phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
+        verify(notificationHelper).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
+        verify(notificationHelper, never()).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
+    }
+
+    @Test
+    public void errorResponseNotificationFired() throws Exception
+    {
+        MuleEvent event = mock(MuleEvent.class);
+        when(event.getMuleContext()).thenReturn(mock(MuleContext.class));
+        RequestContext.setEvent(event);
+        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
+        when(mockRequestResponseTemplate.afterRouteEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+        when(mockMessagingException.handled()).thenReturn(false);
+        phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
+        verify(notificationHelper, never()).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
+        verify(notificationHelper).fireNotification(eq(event), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
     }
 
     private void verifyOnlySuccessfulWasCalled()
