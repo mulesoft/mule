@@ -456,10 +456,6 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-servlet_3.0_spec</artifactId>
-<<<<<<< HEAD
-=======
-                <!--servlet api jar is versioned differently-->
->>>>>>> 34dd9bd... MULE-9020: Upgrade BouncyCastle dependencies to 1.50
                 <version>${geronimoSpecsServletApiVersion}</version>
             </dependency>
             <dependency>
