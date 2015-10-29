@@ -6,12 +6,13 @@
  */
 package org.mule.execution;
 
+import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -20,12 +21,7 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transport.ExceptionHandlingReplyToHandlerDecorator;
 import org.mule.api.transport.ReplyToHandler;
-import org.mule.context.notification.ConnectorMessageNotification;
-import org.mule.context.notification.NotificationHelper;
-import org.mule.context.notification.ServerNotificationManager;
 import org.mule.transaction.MuleTransactionConfig;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,12 +31,10 @@ import org.apache.commons.logging.LogFactory;
  *
  * To participate of this phase, {@link org.mule.execution.MessageProcessTemplate} must implement {@link org.mule.execution.FlowProcessingPhaseTemplate}
  */
-public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<AsyncResponseFlowProcessingPhaseTemplate>, Comparable<MessageProcessPhase>
+public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessingPhase<AsyncResponseFlowProcessingPhaseTemplate>
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
-
-    private ConcurrentHashMap<ServerNotificationManager, NotificationHelper> notificationHelpers = new ConcurrentHashMap<>();
 
     @Override
     public boolean supportsTemplate(MessageProcessTemplate messageProcessTemplate)
@@ -85,6 +79,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
             }
             catch (final MessagingException e)
             {
+                fireNotification(null, MESSAGE_ERROR_RESPONSE);
                 template.sendFailureResponseToClient(e, createSendFailureResponseCompletationCallback(phaseResultNotifier));
             }
         }
@@ -92,45 +87,6 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
         {
             phaseResultNotifier.phaseFailure(e);
         }
-    }
-
-    private void fireNotification(MuleEvent event, int action)
-    {
-        try
-        {
-            if (event == null)
-            {
-                //Null result only happens when there's a filter in the chain.
-                //Unfortunately a filter causes the whole chain to return null
-                //and there's no other way to retrieve the last event but using the RequestContext.
-                //see https://www.mulesoft.org/jira/browse/MULE-8670
-                event = RequestContext.getEvent();
-                if (event == null)
-                {
-                    return;
-                }
-            }
-            getNotificationHelper(event.getMuleContext().getNotificationManager()).fireNotification(
-                    event,
-                    event.getMessageSourceURI().toString(),
-                    event.getFlowConstruct(),
-                    action);
-        }
-        catch (Exception e)
-        {
-            logger.warn("Could not fire notification. Action: " + action, e);
-        }
-    }
-
-    private NotificationHelper getNotificationHelper(ServerNotificationManager serverNotificationManager)
-    {
-        NotificationHelper notificationHelper = notificationHelpers.get(serverNotificationManager);
-        if (notificationHelper==null)
-        {
-            notificationHelper = new NotificationHelper(serverNotificationManager, ConnectorMessageNotification.class, false);
-            notificationHelpers.putIfAbsent(serverNotificationManager, notificationHelper);
-        }
-        return notificationHelper;
     }
 
     private ResponseCompletionCallback createSendFailureResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier)
@@ -236,6 +192,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
         {
             try
             {
+                fireNotification(null, MESSAGE_ERROR_RESPONSE);
                 template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback(phaseResultNotifier));
             }
             catch (MuleException e)
