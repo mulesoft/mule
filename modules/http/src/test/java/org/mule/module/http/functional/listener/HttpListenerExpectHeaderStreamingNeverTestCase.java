@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
@@ -15,6 +17,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.io.BufferedReader;
@@ -24,14 +27,20 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-public class HttpListenerExpectHeaderTestCase extends FunctionalTestCase
+@RunWith(Parameterized.class)
+public class HttpListenerExpectHeaderStreamingNeverTestCase extends FunctionalTestCase
 {
+
     private static final String HTTP_11 = "HTTP/1.1";
     private static final String LISTEN_HOST = "localhost";
     private static final String CONTINUE_RESPONSE = "HTTP/1.1 100 Continue\r\n\r\n";
@@ -40,14 +49,28 @@ public class HttpListenerExpectHeaderTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
 
+    @Rule
+    public SystemProperty persistentConnections;
+
     private Socket socket;
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {{TRUE.toString()},{FALSE.toString()}});
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "http-listener-expect-header-config.xml";
+        return "http-listener-expect-header-streaming-never-config.xml";
+    }
+
+    public HttpListenerExpectHeaderStreamingNeverTestCase(String persistentConnections)
+    {
+        this.persistentConnections = new SystemProperty("persistentConnections", persistentConnections);
     }
 
     @Before
@@ -70,9 +93,14 @@ public class HttpListenerExpectHeaderTestCase extends FunctionalTestCase
     @Test
     public void http11WithoutExpectHeader() throws Exception
     {
-        sendHeaders(outputStream, HTTP_11, null);
-        sendBody(outputStream);
-        readAndAssertResponse(inputStream);
+        sendAndReceiveWithoutExpectContinue();
+
+        // If persistent connection are being used ensure first request/response completed cleanly and second request
+        // can be made.
+        if (isPersistentConnections())
+        {
+            sendAndReceiveWithoutExpectContinue();
+        }
     }
 
     @Test
@@ -82,6 +110,13 @@ public class HttpListenerExpectHeaderTestCase extends FunctionalTestCase
         readAndAssertContinueResponse(inputStream);
         sendBody(outputStream);
         readAndAssertResponse(inputStream);
+
+        // If persistent connection are being used ensure first request/response completed cleanly and second request
+        // can be made.
+        if (isPersistentConnections())
+        {
+            sendAndReceiveWithoutExpectContinue();
+        }
     }
 
     @Test
@@ -89,6 +124,18 @@ public class HttpListenerExpectHeaderTestCase extends FunctionalTestCase
     {
         sendHeaders(outputStream, HTTP_11, "invalidExpect");
         assertFromStream(inputStream, EXPECTATION_FAILED_RESPONSE);
+    }
+
+    private void sendAndReceiveWithoutExpectContinue() throws IOException
+    {
+        sendHeaders(outputStream, HTTP_11, null);
+        sendBody(outputStream);
+        readAndAssertResponse(inputStream);
+    }
+
+    private boolean isPersistentConnections() throws IOException
+    {
+        return Boolean.parseBoolean(persistentConnections.getValue());
     }
 
     /**
@@ -134,9 +181,9 @@ public class HttpListenerExpectHeaderTestCase extends FunctionalTestCase
             // Do nothing, consume headers until blank line.
         }
 
-        char[] body = new char[TEST_MESSAGE.length()];
+        char[] body = new char[getExpectedResponseBody().length()];
         IOUtils.read(reader, body);
-        assertThat(new String(body), equalTo(TEST_MESSAGE));
+        assertThat(new String(body), equalTo(getExpectedResponseBody()));
     }
 
     private void assertFromStream(InputStream inputStream, String expectedInput) throws IOException
@@ -144,6 +191,11 @@ public class HttpListenerExpectHeaderTestCase extends FunctionalTestCase
         byte[] actualInput = new byte[expectedInput.length()];
         IOUtils.read(inputStream, actualInput);
         assertThat(new String(actualInput), equalTo(expectedInput));
+    }
+
+    protected String getExpectedResponseBody()
+    {
+        return TEST_MESSAGE;
     }
 
 }
