@@ -41,6 +41,13 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
         {
             httpResponsePacket.setChunked(true);
         }
+        else
+        {
+            // Workaround GRIZZLY-1811 by explicity setting chunking 'false' so that chunking isn't incorrectly used for
+            // sending a response with content-length when 'Expect: Continue' is used.
+            httpResponsePacket.setChunked(false);
+        }
+
         if (CLOSE.equalsIgnoreCase(httpResponsePacket.getHeader(CONNECTION)))
         {
             httpResponsePacket.getProcessingState().setKeepAlive(false);
