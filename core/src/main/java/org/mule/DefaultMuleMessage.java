@@ -6,8 +6,8 @@
  */
 package org.mule;
 
+import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.util.SystemUtils.LINE_SEPARATOR;
-
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -525,7 +525,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             dataType.setEncoding((String) value);
         }
-        else if (MuleProperties.CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
+        else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
         {
             try
             {
@@ -1296,6 +1296,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(WRITE);
         dataType.setMimeType(mimeType);
+        removeContentTypeIfNecessary();
     }
 
     /**
@@ -1407,6 +1408,25 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         this.dataType = dataType.cloneDataType();
 
         cache = null;
+
+        removeContentTypeIfNecessary();
+    }
+
+    private void removeContentTypeIfNecessary()
+    {
+        for(String key : properties.getPropertyNames(PropertyScope.INBOUND))
+        {
+            if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key) && !matchesMimeType(key))
+            {
+                removeProperty(CONTENT_TYPE_PROPERTY, PropertyScope.INBOUND);
+            }
+        }
+    }
+
+    private boolean matchesMimeType(String key)
+    {
+        String mimeType = dataType.getMimeType();
+        return ((String) getProperty(key, PropertyScope.INBOUND)).contains(mimeType) || DataType.ANY_MIME_TYPE.equals(mimeType);
     }
 
     /**
