@@ -7,8 +7,7 @@
 
 package org.mule.mvel;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -32,6 +31,6 @@ public class MvelCompiledExpressionCachingTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://fooInput", TEST_MESSAGE, null);
 
-        assertThat(response.getPayloadAsString(), equalTo("SUCCESS"));
+        assertEquals("SUCCESS", response.getPayloadAsString());
     }
 }
