@@ -1066,6 +1066,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 255, transformer);
     }
 
+    @Deprecated
     public static Message transformHasMultipleMatches(Class<?> input,
                                                       Class<?> output,
                                                       Transformer transformer1,
@@ -1073,7 +1074,14 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 256, input, output, transformer1.getName() + "("
                                                                       + transformer1.getClass() + ")",
-            transformer2.getName() + "(" + transformer2.getClass() + ")");
+                                     transformer2.getName() + "(" + transformer2.getClass() + ")");
+    }
+
+    public static Message transformHasMultipleMatches(Class<?> input,
+                                                      Class<?> output,
+                                                      List<? extends Transformer> transformers)
+    {
+        return factory.createMessage(BUNDLE_PATH, 351, input, output, StringMessageUtils.toString(transformers));
     }
 
     public static Message configurationBuilderSuccess(ConfigurationBuilder configurationBuilder,
