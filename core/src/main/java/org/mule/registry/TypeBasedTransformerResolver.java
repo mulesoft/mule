@@ -153,7 +153,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Comparing transformers for best match: input = " + input + " output = " + output + " Possible transformers = " + trans);
+                logger.debug("Comparing transformers for best match: source = " + input + " target = " + output + " Possible transformers = " + trans);
             }
 
             List<TransformerWeighting> weightings = calculateTransformerWeightings(trans, input, output);
