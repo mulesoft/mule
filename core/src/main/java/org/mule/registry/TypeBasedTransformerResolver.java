@@ -27,6 +27,7 @@ import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.types.SimpleDataType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,7 +154,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Comparing transformers for best match: input = " + input + " output = " + output + " Possible transformers = " + trans);
+                logger.debug("Comparing transformers for best match: source = " + input + " target = " + output + " Possible transformers = " + trans);
             }
 
             List<TransformerWeighting> weightings = calculateTransformerWeightings(trans, input, output);
@@ -164,11 +165,10 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
             {
                 //We may have two transformers that are exactly the same, in which case we can use either i.e. use the current
                 TransformerWeighting current = weightings.get(index);
-
                 if (!maxWeighting.getTransformer().getClass().equals(current.getTransformer().getClass()))
                 {
-                    throw new ResolverException(CoreMessages.transformHasMultipleMatches(input, output,
-                                                                                         current.getTransformer(), maxWeighting.getTransformer()));
+                    List<Transformer> transformers = Arrays.asList(current.getTransformer(), maxWeighting.getTransformer());
+                    throw new ResolverException(CoreMessages.transformHasMultipleMatches(input, output, transformers));
                 }
             }
 
