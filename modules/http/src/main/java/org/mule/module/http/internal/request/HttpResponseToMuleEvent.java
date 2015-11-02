@@ -15,7 +15,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -99,14 +98,9 @@ public class HttpResponseToMuleEvent
         }
 
 
-        MuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
+        DefaultMuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
                                                      null, inboundAttachments, muleContext, muleEvent.getMessage().getDataType());
-
-        if (encoding != null)
-        {
-            message.setEncoding(encoding);
-        }
-
+        message.setMimeType(responseContentType);
         muleEvent.setMessage(message);
         setResponsePayload(payload, muleEvent);
 

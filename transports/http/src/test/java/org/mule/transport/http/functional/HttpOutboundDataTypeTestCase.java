@@ -42,7 +42,7 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        muleMessage.setOutboundProperty("Content-Type", MimeTypes.TEXT + "; charset=" + StandardCharsets.UTF_16.name());
+        muleMessage.setMimeType(MimeTypes.TEXT + "; charset=" + StandardCharsets.UTF_16.name());
 
         client.dispatch("vm://testInput", muleMessage);
 
