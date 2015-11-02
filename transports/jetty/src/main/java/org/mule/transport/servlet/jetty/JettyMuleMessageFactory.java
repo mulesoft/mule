@@ -36,4 +36,11 @@ public class JettyMuleMessageFactory extends ServletMuleMessageFactory
         message.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod(), PropertyScope.INBOUND);
     }
 
+    @Override
+    protected String getMimeType(Object transportMessage)
+    {
+        HttpServletRequest request = (HttpServletRequest) transportMessage;
+
+        return request.getContentType();
+    }
 }

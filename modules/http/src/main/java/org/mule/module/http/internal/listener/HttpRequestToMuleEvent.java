@@ -72,6 +72,8 @@ public class HttpRequestToMuleEvent
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
         Object payload = NullPayload.getInstance();
+        final String contentTypeValue = request.getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
+
         if (parseRequest)
         {
             final HttpEntity entity = request.getEntity();
@@ -83,7 +85,6 @@ public class HttpRequestToMuleEvent
                 }
                 else
                 {
-                    final String contentTypeValue = request.getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
                     if (contentTypeValue != null)
                     {
                         final MediaType mediaType = MediaType.parse(contentTypeValue);
@@ -122,6 +123,8 @@ public class HttpRequestToMuleEvent
         }
 
         final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
+        defaultMuleMessage.setMimeType(contentTypeValue);
+
         return new DefaultMuleEvent(
                 defaultMuleMessage,
                 resolveUri(requestContext),
