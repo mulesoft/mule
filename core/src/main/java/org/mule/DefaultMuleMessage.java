@@ -63,8 +63,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -547,40 +545,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             {
                 properties.setProperty(key, value, scope, dataType);
             }
-
-            updateDataTypeWithProperty(key, value);
         }
         else
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug("setProperty(key, value) invoked with null key. Ignoring this entry");
-            }
-        }
-    }
-
-    private void updateDataTypeWithProperty(String key, Object value)
-    {
-        // updates dataType when encoding is updated using a property instead of using #setEncoding
-        if (MuleProperties.MULE_ENCODING_PROPERTY.equals(key))
-        {
-            dataType.setEncoding((String) value);
-        }
-        else if (MuleProperties.CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
-        {
-            try
-            {
-                MimeType mimeType = new MimeType((String) value);
-                dataType.setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
-                String encoding = mimeType.getParameter("charset");
-                if (!StringUtils.isEmpty(encoding))
-                {
-                    dataType.setEncoding(encoding);
-                }
-            }
-            catch (MimeTypeParseException e)
-            {
-                throw new IllegalArgumentException("Invalid Content-Type property value", e);
             }
         }
     }
@@ -647,8 +617,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                         new Throwable());
                 properties.removeProperty(key);
             }
-
-            updateDataTypeWithProperty(key, value);
         }
         else
         {
