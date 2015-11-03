@@ -20,6 +20,10 @@ import org.mule.module.launcher.artifact.Artifact;
  */
 public interface Domain extends Artifact
 {
+    /**
+     * Domain configuration file name
+     */
+    String DOMAIN_CONFIG_FILE_LOCATION = "mule-domain-config.xml";
 
     /**
      * @return true if this domain has shared mule components, false if it doesn't
