@@ -62,9 +62,13 @@ public class DefaultDomainFactory implements DomainFactory
         return MuleContainerBootstrapUtils.getMuleDomainsDir();
     }
 
-    public void dispose(Domain domain)
+    public void dispose(DomainWrapper domain)
     {
         domains.remove(domain.getArtifactName());
     }
 
+    public void start(DomainWrapper domainWrapper)
+    {
+        domains.put(domainWrapper.getArtifactName(), domainWrapper);
+    }
 }
