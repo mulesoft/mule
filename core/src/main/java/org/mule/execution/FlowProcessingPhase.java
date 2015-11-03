@@ -145,7 +145,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
     {
         if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate)
         {
-            fireNotification(null, MESSAGE_ERROR_RESPONSE);
+            fireNotification(messagingException.getEvent(), MESSAGE_ERROR_RESPONSE);
             ((RequestResponseFlowProcessingPhaseTemplate) flowProcessingPhaseTemplate).sendFailureResponseToClient(messagingException);
         }
     }
