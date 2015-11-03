@@ -28,6 +28,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Initialisable;
@@ -54,10 +56,13 @@ import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -113,6 +118,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor waitDomainDescriptor = new ArtifactDescriptor("wait-domain", "/wait-domain.zip", "/wait-domain", "wait-domain.zip", "mule-domain-config.xml");
 
     private static final ArtifactDescriptor sharedHttpDomainDescriptor = new ArtifactDescriptor("shared-http-domain", "/shared-http-domain.zip", "/shared-http-domain", "shared-http-domain.zip", "mule-domain-config.xml");
+    private static final ArtifactDescriptor sharedHttpDomainBundleDescriptor = new ArtifactDescriptor("shared-http-domain", "/shared-http-domain-bundle.zip", "/shared-http-domain", "shared-http-domain.zip", "mule-domain-config.xml");
     private static final ArtifactDescriptor sharedHttpAppADescriptor = new ArtifactDescriptor("shared-http-app-a", "/shared-http-app-a.zip", "/shared-http-app-a", "shared-http-app-a.zip", "mule-config.xml");
     private static final ArtifactDescriptor sharedHttpAppBDescriptor = new ArtifactDescriptor("shared-http-app-b", "/shared-http-app-b.zip", "/shared-http-app-b", "shared-http-app-b.zip", "mule-config.xml");
 
@@ -155,11 +161,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected void doTearDown() throws Exception
     {
         // comment out the deletion to analyze results after test is done
-        FileUtils.deleteTree(muleHome);
         if (deploymentService != null)
         {
             deploymentService.stop();
         }
+        FileUtils.deleteTree(muleHome);
         super.doTearDown();
 
         // this is a complex classloader setup and we can't reproduce standalone Mule 100%,
@@ -707,6 +713,33 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained(incompleteAppDescriptor.id);
+    }
+
+    @Test
+    public void redeployModifiedDomainAndRedeployFailedApps() throws Exception
+    {
+        addExplodedDomainFromResource(sharedHttpDomainBundleDescriptor.zipPath, sharedHttpDomainBundleDescriptor.id);
+
+        //change shared http config name to use a wrong name
+        File domainConfigFile = new File(domainsDir + sharedHttpDomainBundleDescriptor.path, DOMAIN_CONFIG_FILE_LOCATION);
+        String correctDomainConfigContent = IOUtils.toString(new FileInputStream(domainConfigFile));
+        String wrongDomainFileContext = correctDomainConfigContent.replace("http-listener-config", "http-listener-config-wrong");
+        FileUtils.copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainDescriptor.id);
+        assertDeploymentFailure(applicationDeploymentListener, sharedHttpAppADescriptor.id);
+        assertDeploymentFailure(applicationDeploymentListener, sharedHttpAppBDescriptor.id);
+
+        reset(applicationDeploymentListener);
+        reset(domainDeploymentListener);
+
+        FileUtils.copyInputStreamToFile(new ByteArrayInputStream(correctDomainConfigContent.getBytes()), domainConfigFile);
+
+        assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainDescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, sharedHttpAppADescriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, sharedHttpAppBDescriptor.id);
     }
 
     @Test
@@ -2821,7 +2854,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void addExplodedDomainFromResource(String resource, String domainName) throws IOException, URISyntaxException
     {
-        addExplodedArtifactFromResource(resource, domainName, "mule-domain-config.xml", domainsDir);
+        addExplodedArtifactFromResource(resource, domainName, DOMAIN_CONFIG_FILE_LOCATION, domainsDir);
     }
 
     private void addExplodedAppFromResource(String resource, String appName) throws IOException, URISyntaxException
