@@ -1141,7 +1141,12 @@
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcmail-jdk15on</artifactId>
+                <version>${bouncycastleVersion}</version>
+            </dependency>
+			
             <dependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>jasper-el</artifactId>
