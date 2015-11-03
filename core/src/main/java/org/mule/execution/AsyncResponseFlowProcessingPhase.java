@@ -79,7 +79,7 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
             }
             catch (final MessagingException e)
             {
-                fireNotification(null, MESSAGE_ERROR_RESPONSE);
+                fireNotification(e.getEvent(), MESSAGE_ERROR_RESPONSE);
                 template.sendFailureResponseToClient(e, createSendFailureResponseCompletationCallback(phaseResultNotifier));
             }
         }
@@ -192,7 +192,7 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
         {
             try
             {
-                fireNotification(null, MESSAGE_ERROR_RESPONSE);
+                fireNotification(exception.getEvent(), MESSAGE_ERROR_RESPONSE);
                 template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback(phaseResultNotifier));
             }
             catch (MuleException e)
