@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
 
-import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -202,15 +201,12 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
     @Test
     public void errorResponseNotificationFired() throws Exception
     {
-        MuleEvent event = mock(MuleEvent.class);
-        when(event.getMuleContext()).thenReturn(mock(MuleContext.class));
-        RequestContext.setEvent(event);
         when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
         when(mockRequestResponseTemplate.afterRouteEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
         when(mockMessagingException.handled()).thenReturn(false);
         phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
         verify(notificationHelper, never()).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
-        verify(notificationHelper).fireNotification(eq(event), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
+        verify(notificationHelper).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
     }
 
     private void verifyOnlySuccessfulWasCalled()
