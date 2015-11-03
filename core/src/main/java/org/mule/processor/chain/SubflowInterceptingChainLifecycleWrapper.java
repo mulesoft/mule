@@ -6,6 +6,9 @@
  */
 package org.mule.processor.chain;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.context.notification.FlowTraceManager;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
@@ -49,6 +52,22 @@ public class SubflowInterceptingChainLifecycleWrapper extends InterceptingChainL
             }
         }
         NotificationUtils.addMessageProcessorPathElements(filteredMessageProcessorList, subprocessors);
+    }
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        FlowTraceManager flowTraceManager = event.getMuleContext().getFlowTraceManager();
+        flowTraceManager.onFlowStart(event, getSubFlowName());
+
+        try
+        {
+            return super.process(event);
+        }
+        finally
+        {
+            flowTraceManager.onFlowComplete(event);
+        }
     }
 
     @Override

@@ -13,17 +13,45 @@ import java.io.Serializable;
  * 
  * @since 3.8.0
  */
-public interface FlowStackElement extends Serializable, Cloneable
+public class FlowStackElement implements Serializable
 {
+    private static final long serialVersionUID = -851491195125245390L;
+
+    private String flowName;
+    private String processorPath;
+
+    public FlowStackElement(String flowName, String processorPath)
+    {
+        this.flowName = flowName;
+        this.processorPath = processorPath;
+    }
 
     /**
-     * Deep-copies this instance.
+     * @return the path of the currently executing processor in the flow represented by this element.
      */
-    FlowStackElement clone();
+    public String getProcessorPath()
+    {
+        return processorPath;
+    }
 
     /**
-     * Marks the passed processorRepresentation as being executed as part of this flow.
+     * @return the name of the flow which execution is represented by this element.
      */
-    void addInvokedMessageProcessor(String processorRepresentation);
+    public String getFlowName()
+    {
+        return flowName;
+    }
 
+    @Override
+    public String toString()
+    {
+        if (processorPath == null)
+        {
+            return String.format("%s", flowName);
+        }
+        else
+        {
+            return String.format("%s(%s)", flowName, processorPath);
+        }
+    }
 }

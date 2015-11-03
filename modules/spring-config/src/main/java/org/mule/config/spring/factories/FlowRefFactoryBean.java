@@ -26,13 +26,10 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.MessageProcessingFlowStackManager;
 import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.DynamicMessageProcessorContainer;
-import org.mule.processor.chain.SubFlowMessageProcessor;
 import org.mule.util.NotificationUtils.FlowMap;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -178,40 +175,16 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
                     final MessageProcessor dynamicMessageProcessor = getReferencedFlow(flowName, event.getFlowConstruct());
                     setResolvedMessageProcessor(dynamicMessageProcessor);
 
-                    Collection<MessageProcessingFlowStackManager> flowStackManagers = applicationContext.getBeansOfType(MessageProcessingFlowStackManager.class).values();
-
-                    if (dynamicMessageProcessor instanceof SubFlowMessageProcessor)
+                    // Because this is created dynamically annotations cannot be injected by Spring and so
+                    // FlowRefMessageProcessor is not used here.
+                    return new NonBlockingMessageProcessor()
                     {
-                        for (MessageProcessingFlowStackManager messageProcessingFlowStackManager : flowStackManagers)
+                        @Override
+                        public MuleEvent process(MuleEvent event) throws MuleException
                         {
-                            messageProcessingFlowStackManager.onFlowStart(event, flowName);
+                            return dynamicMessageProcessor.process(event);
                         }
-                    }
-
-                    try
-                    {
-                        // Because this is created dynamically annotations cannot be injected by Spring and so
-                        // FlowRefMessageProcessor is not used here.
-                        return new NonBlockingMessageProcessor()
-                        {
-                            @Override
-                            public MuleEvent process(MuleEvent event) throws MuleException
-                            {
-                                return dynamicMessageProcessor.process(event);
-                            }
-                        }.process(event);
-                    }
-                    finally
-                    {
-                        setResolvedMessageProcessor(null);
-                        if (dynamicMessageProcessor instanceof SubFlowMessageProcessor)
-                        {
-                            for (MessageProcessingFlowStackManager messageProcessingFlowStackManager : flowStackManagers)
-                            {
-                                messageProcessingFlowStackManager.onFlowComplete(event);
-                            }
-                        }
-                    }
+                    }.process(event);
                 }
             };
             if (dynamicReference instanceof Initialisable)

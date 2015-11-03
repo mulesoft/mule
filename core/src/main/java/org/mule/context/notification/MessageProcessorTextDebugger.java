@@ -14,11 +14,11 @@ import org.mule.api.context.notification.MessageProcessorNotificationListener;
 public class MessageProcessorTextDebugger implements MessageProcessorNotificationListener<MessageProcessorNotification>
 {
 
-    private final MessageProcessingFlowStackManager messageProcessingStackManager;
+    private final MessageProcessingFlowTraceManager messageProcessingFlowTraceManager;
 
-    public MessageProcessorTextDebugger(MessageProcessingFlowStackManager messageProcessingStackManager)
+    public MessageProcessorTextDebugger(MessageProcessingFlowTraceManager messageProcessingFlowTraceManager)
     {
-        this.messageProcessingStackManager = messageProcessingStackManager;
+        this.messageProcessingFlowTraceManager = messageProcessingFlowTraceManager;
     }
 
 
@@ -27,7 +27,7 @@ public class MessageProcessorTextDebugger implements MessageProcessorNotificatio
     {
         if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)
         {
-            messageProcessingStackManager.onMessageProcessorNotificationPreInvoke(notification);
+            messageProcessingFlowTraceManager.onMessageProcessorNotificationPreInvoke(notification);
         }
     }
 
