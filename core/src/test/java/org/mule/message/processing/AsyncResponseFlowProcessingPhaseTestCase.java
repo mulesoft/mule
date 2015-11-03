@@ -378,6 +378,48 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         verify(notificationHelper, never()).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
     }
 
+    @Test
+    public void errorResponseNotificationFired() throws Exception
+    {
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
+                callback.responseSentWithFailure(mockException, mockMuleEvent);
+                return null;
+            }
+        }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+        verify(notificationHelper, never()).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
+        verify(notificationHelper).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
+    }
+
+    @Test
+    public void errorResponseNotificationFiredNonBlocking() throws Exception
+    {
+        final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
+                callback.responseSentWithFailure(mockException, mockMuleEvent);
+                return null;
+            }
+        }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
+        when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
+        when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+        phase.runPhase(mockTemplate, mockContext, mockNotifier);
+
+        sensingMessageProcessor.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
+        verify(notificationHelper, never()).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
+        verify(notificationHelper).fireNotification(any(MuleEvent.class), isNull(String.class), any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
+    }
+
     private void verifyOnlySuccessfulWasCalled()
     {
         verify(mockNotifier, Mockito.never()).phaseFailure(any(Exception.class));
