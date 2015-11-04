@@ -688,7 +688,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         //change shared http config name to use a wrong name
         File domainConfigFile = new File(domainsDir + sharedHttpDomainBundleDescriptor.path, DOMAIN_CONFIG_FILE_LOCATION);
         String correctDomainConfigContent = IOUtils.toString(new FileInputStream(domainConfigFile));
-        String wrongDomainFileContext = correctDomainConfigContent.replace("http-listener-config", "http-listener-config-wrong");
+        String wrongDomainFileContext = correctDomainConfigContent.replace("http-config", "http-config-wrong");
         FileUtils.copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
 
         deploymentService.start();
@@ -705,6 +705,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainDescriptor.id);
         assertDeploymentSuccess(applicationDeploymentListener, sharedHttpAppADescriptor.id);
         assertDeploymentSuccess(applicationDeploymentListener, sharedHttpAppBDescriptor.id);
+    }
+
+    @Override
+    public int getTestTimeoutSecs()
+    {
+        return 99999999;
     }
 
     @Test
