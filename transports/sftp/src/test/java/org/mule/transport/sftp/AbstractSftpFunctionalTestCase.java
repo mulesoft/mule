@@ -13,7 +13,6 @@ import org.mule.tck.util.sftp.SftpServer;
 import java.io.IOException;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class AbstractSftpFunctionalTestCase extends FunctionalTestCase
@@ -47,9 +46,14 @@ public abstract class AbstractSftpFunctionalTestCase extends FunctionalTestCase
     @After
     public void tearDown() throws Exception
     {
-        cleanUpTestFolder();
+        // In case there was a failure in @Before and the client is not set, avoid throwing an NPE that would hide the
+        // first exception.
+        if (sftpClient != null)
+        {
+            cleanUpTestFolder();
 
-        sftpClient.disconnect();
+            sftpClient.disconnect();
+        }
 
         if (sftpServer != null)
         {
