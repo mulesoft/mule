@@ -9,7 +9,6 @@ package org.mule.context.notification;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -44,6 +43,9 @@ import org.junit.Test;
 @SmallTest
 public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestCase
 {
+    private static QName docNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
+    private static QName sourceFileNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName");
+    private static QName sourceFileLineAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine");
 
     private static final String NESTED_FLOW_NAME = "nestedFlow";
     private static final String ROOT_FLOW_NAME = "rootFlow";
@@ -151,9 +153,11 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
         assertThat(getContextInfo(event), is("at " + flowName));
 
         AnnotatedObject annotatedMessageProcessor = (AnnotatedObject) mock(MessageProcessor.class, withSettings().extraInterfaces(AnnotatedObject.class));
-        when(annotatedMessageProcessor.getAnnotation(any(QName.class))).thenReturn("annotatedName");
+        when(annotatedMessageProcessor.getAnnotation(docNameAttrName)).thenReturn("annotatedName");
+        when(annotatedMessageProcessor.getAnnotation(sourceFileNameAttrName)).thenReturn("muleApp.xml");
+        when(annotatedMessageProcessor.getAnnotation(sourceFileLineAttrName)).thenReturn(10);
         manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, (MessageProcessor) annotatedMessageProcessor, "/comp"));
-        assertThat(getContextInfo(event), is("at " + flowName + "(/comp @ " + APP_ID + " (annotatedName))"));
+        assertThat(getContextInfo(event), is("at " + flowName + "(/comp @ " + APP_ID + ":muleApp.xml:10 (annotatedName))"));
 
         manager.onPipelineNotificationComplete(pipelineNotification);
         assertThat(getContextInfo(event), is(""));

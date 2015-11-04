@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <string-to-byte-array-transformer name="StringtoByteArray" doc:name="stb-transformer">
+        <annotations>
+            <doc:description>Convert a String to a Byte Array</doc:description>
+        </annotations>
+    </string-to-byte-array-transformer>
+
+    <endpoint name="in" address="vm://in" exchange-pattern="request-response" doc:name="inbound vm endpoint">
+        <annotations>
+            <doc:description>Accepts inbound messages</doc:description>
+        </annotations>
+    </endpoint>
+
+    <endpoint name="out" address="vm://out" exchange-pattern="request-response" doc:name="outbound vm endpoint">
+        <annotations>
+            <doc:description>Accepts outbound messages</doc:description>
+        </annotations>
+    </endpoint>
+
+</mule>

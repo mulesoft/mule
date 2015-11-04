@@ -11,6 +11,7 @@ import static org.mule.util.Preconditions.checkArgument;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.api.MuleContext;
 import org.mule.config.ConfigResource;
 import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
@@ -180,6 +181,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         return springResources;
     }
 
+    @Override
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
         BeanDefinitionReader beanDefinitionReader = createBeanDefinitionReader(beanFactory);
@@ -198,9 +200,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory)
     {
         XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
-        //hook in our custom hierarchical reader
+        // annotate parsed elements with metadata
+        beanDefinitionReader.setDocumentLoader(new MuleDocumentLoader());
+        // hook in our custom hierarchical reader
         beanDefinitionReader.setDocumentReaderClass(getBeanDefinitionDocumentReaderClass());
-        //add error reporting
+        // add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
         registerAnnotationConfigProcessors(beanDefinitionReader.getRegistry(), null);
 

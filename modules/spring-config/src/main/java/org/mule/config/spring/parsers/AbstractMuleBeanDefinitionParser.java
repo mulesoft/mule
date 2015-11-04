@@ -6,6 +6,9 @@
  */
 package org.mule.config.spring.parsers;
 
+import static org.mule.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
+import static org.mule.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Disposable;
@@ -27,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -37,13 +42,14 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.io.Resource;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
  * This parser extends the Spring provided {@link AbstractBeanDefinitionParser} to provide additional features for
- * consistently customising bean representations for Mule bean definition parsers.  Most custom bean definition parsers
+ * consistently customizing bean representations for Mule bean definition parsers.  Most custom bean definition parsers
  * in Mule will use this base class. The following enhancements are made -
  *
  * <ol>
@@ -122,24 +128,28 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE);
     }
 
+    @Override
     public MuleDefinitionParserConfiguration addReference(String propertyName)
     {
         beanPropertyConfiguration.addReference(propertyName);
         return this;
     }
 
+    @Override
     public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
     {
         beanPropertyConfiguration.addMapping(propertyName, mappings);
         return this;
     }
 
+    @Override
     public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
     {
         beanPropertyConfiguration.addMapping(propertyName, mappings);
         return this;
     }
 
+    @Override
     public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
     {
         beanPropertyConfiguration.addMapping(propertyName, mappings);
@@ -151,6 +161,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName The bean property name
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
+    @Override
     public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
     {
         beanPropertyConfiguration.addAlias(alias, propertyName);
@@ -161,6 +172,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is a collection
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
+    @Override
     public MuleDefinitionParserConfiguration addCollection(String propertyName)
     {
         beanPropertyConfiguration.addCollection(propertyName);
@@ -171,18 +183,21 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is to be ignored
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
+    @Override
     public MuleDefinitionParserConfiguration addIgnored(String propertyName)
     {
         beanPropertyConfiguration.addIgnored(propertyName);
         return this;
     }
 
+    @Override
     public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
     {
         beanPropertyConfiguration.removeIgnored(propertyName);
         return this;
     }
 
+    @Override
     public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
     {
         beanPropertyConfiguration.setIgnoredDefault(ignoreAll);
@@ -401,6 +416,17 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
             Attr attribute = (Attr) attributes.item(x);
             processProperty(attribute, assembler);
         }
+
+        Map<QName, Object> annotations = (Map<QName, Object>) builder.getBeanDefinition().getPropertyValues().get("annotations");
+        if (annotations != null)
+        {
+            Resource readerResource = context.getReaderContext().getResource();
+
+            XmlMetadataAnnotations elementMetadata = (XmlMetadataAnnotations) element.getUserData(METADATA_ANNOTATIONS_KEY);
+            addMetadataAnnotationsFromXml(annotations, readerResource.getFilename() != null ? readerResource.getFilename() : readerResource.getDescription(),
+                    elementMetadata.getLineNumber(), elementMetadata.getElementString());
+        }
+
         postProcess(getParserContext(), assembler, element);
     }
 
@@ -468,17 +494,20 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         return element.getParentNode().getLocalName().equals(ROOT_ELEMENT) || element.getParentNode().getLocalName().equals(DOMAIN_ROOT_ELEMENT);
     }
 
+    @Override
     public AbstractBeanDefinition muleParse(Element element, ParserContext context)
     {
         return parseInternal(element, context);
     }
 
+    @Override
     public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
     {
         preProcessors.addFirst(preProcessor);
         return this;
     }
 
+    @Override
     public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
     {
         postProcessors.add(postProcessor);
@@ -495,11 +524,13 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         this.beanAssemblerFactory = beanAssemblerFactory;
     }
 
+    @Override
     public String getBeanName(Element element)
     {
         return AutoIdUtils.getUniqueName(element, "mule-bean");
     }
 
+    @Override
     public MuleDefinitionParserConfiguration addBeanFlag(String flag)
     {
         beanAttributes.add(flag);

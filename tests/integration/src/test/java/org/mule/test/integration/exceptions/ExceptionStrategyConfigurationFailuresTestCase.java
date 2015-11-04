@@ -6,12 +6,6 @@
  */
 package org.mule.test.integration.exceptions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.Test;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
@@ -24,10 +18,54 @@ import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.concurrent.Latch;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+@RunWith(Parameterized.class)
 public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase
 {
+
+    @Rule
+    public SystemProperty useXalan;
+
+    /**
+     * Verify that regardless of the XML library used, validation errors are handled correctly.
+     * @return
+     */
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                                             {false},
+                                             {true}
+        });
+    }
+
+    public ExceptionStrategyConfigurationFailuresTestCase(boolean isUseXalan)
+    {
+        if (isUseXalan)
+        {
+            useXalan = new ForceXalanTransformerFactory();
+        }
+        else
+        {
+            useXalan = null;
+        }
+    }
 
     @Test(expected = ConfigurationException.class)
     public void testNamedFlowExceptionStrategyFails() throws Exception
