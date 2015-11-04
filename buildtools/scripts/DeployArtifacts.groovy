@@ -64,6 +64,8 @@ private OptionAccessor parseOptions(arguments)
 def deployJars()
 {
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule', version, 'pom')
+    deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule-extensions', version, 'pom')
+    deployToRemote(ceRepoUrl, ceRepoId, 'org.mule.modules', 'mule-module-validation', version, 'jar')
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule-core', version, 'jar')
     [
             'modules',
@@ -204,4 +206,3 @@ class Artifact
         return clone;
     }
 }
-
