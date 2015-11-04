@@ -52,7 +52,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
 import org.junit.Rule;
 
 /**
@@ -1301,8 +1300,8 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
     protected void stopSftpServerAndClient() throws Exception
     {
-        sftpServer.stop();
         sftpClient.disconnect();
+        sftpServer.stop();
     }
 
 }
