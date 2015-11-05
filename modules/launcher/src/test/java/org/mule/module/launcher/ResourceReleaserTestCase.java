@@ -6,14 +6,24 @@
  */
 package org.mule.module.launcher;
 
-import static org.hamcrest.core.Is.is;
+import static java.sql.DriverManager.deregisterDriver;
+import static java.sql.DriverManager.getDrivers;
+import static java.sql.DriverManager.registerDriver;
+import static java.util.Collections.list;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+
 import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
+import org.mule.module.launcher.artifact.DefaultResourceReleaser;
 import org.mule.module.launcher.artifact.ResourceReleaser;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Method;
+import java.sql.Driver;
 
 import org.junit.Test;
 
@@ -50,6 +60,36 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase
         assertThat(resourceReleaserInstanceClassLoader, is((ClassLoader) classLoader));
     }
 
+    @Test
+    public void notDeregisterJdbcDriversDifferentClassLoaders() throws Exception
+    {
+        Driver jdbcDriver = mock(Driver.class);
+        TestMuleApplicationClassLoader classLoader = new TestMuleApplicationClassLoader(new TestMuleSharedDomainClassLoader());
+        try
+        {
+            registerDriver(jdbcDriver);
+
+            assertThat(list(getDrivers()), hasItem(jdbcDriver));
+            classLoader.dispose();
+            assertThat(list(getDrivers()), hasItem(jdbcDriver));
+        }
+        finally
+        {
+            deregisterDriver(jdbcDriver);
+            classLoader.close();
+        }
+    }
+
+    @Test
+    public void deregisterJdbcDriversSameClassLoaders() throws Exception
+    {
+        Driver jdbcDriver = mock(Driver.class);
+        registerDriver(jdbcDriver);
+
+        assertThat(list(getDrivers()), hasItem(jdbcDriver));
+        new DefaultResourceReleaser().release();
+        assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
+    }
 
     private static interface KeepResourceReleaserInstance
     {
