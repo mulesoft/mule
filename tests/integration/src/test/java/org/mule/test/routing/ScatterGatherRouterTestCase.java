@@ -284,7 +284,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     public void returnsCorrectDataType() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
-        message.setMimeType("application/json");
+        message.setOutboundProperty("Content-Type", "application/json");
 
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
         MuleMessage response = runFlow("dataType", event).getMessage();

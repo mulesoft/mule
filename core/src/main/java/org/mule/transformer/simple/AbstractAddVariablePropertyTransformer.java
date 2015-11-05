@@ -6,16 +6,13 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.MimeTypes;
 import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
@@ -67,36 +64,19 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             }
             else
             {
-                if (!MimeTypes.ANY.equals(mimeType) || !StringUtils.isEmpty(encoding))
+                if (!StringUtils.isEmpty(mimeType) || !StringUtils.isEmpty(encoding))
                 {
-                    DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), mimeType);
+                    DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType());
                     dataType.setEncoding(getEncoding());
                     message.setProperty(key, typedValue.getValue(), getScope(), dataType);
                 }
                 else
                 {
                     message.setProperty(key, typedValue.getValue(), getScope(), typedValue.getDataType());
-
-                    updateMessageDataTypeFromProperty(message, key, typedValue.getValue());
                 }
             }
         }
         return message;
-    }
-
-    private void updateMessageDataTypeFromProperty(MuleMessage message, String key, Object value)
-    {
-        if (value instanceof String)
-        {
-            if (key.equalsIgnoreCase(MuleProperties.CONTENT_TYPE_PROPERTY) && message instanceof DefaultMuleMessage)
-            {
-                ((DefaultMuleMessage) message).setMimeType((String) value);
-            }
-            if (key.equalsIgnoreCase(MuleProperties.MULE_ENCODING_PROPERTY))
-            {
-                message.setEncoding((String) value);
-            }
-        }
     }
 
     @Override
