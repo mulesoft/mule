@@ -165,8 +165,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         httpHeaders.put(HttpConnector.HTTP_HEADERS, new HashMap<String, Object>(headers));
 
         String encoding = getEncoding(headers);
-        String contentType = getContentType(headers);
-
+        
         queryParameters.put(HttpConnector.HTTP_QUERY_PARAMS, processQueryParams(uri, encoding));
 
         //Make any URI params available ans inbound message headers
@@ -192,12 +191,6 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         // The encoding is stored as message property. To avoid overriding it from the message
         // properties, it must be initialized last
         initEncoding(message, encoding);
-        initMimeType(message, contentType);
-    }
-
-    private void initMimeType(DefaultMuleMessage message, String mimeType)
-    {
-        message.setMimeType(mimeType);
     }
 
     protected Map<String, Object> processIncomingHeaders(Map<String, Object> headers) throws Exception

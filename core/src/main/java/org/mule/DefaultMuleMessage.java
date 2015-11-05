@@ -7,6 +7,7 @@
 package org.mule;
 
 import static org.mule.util.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -63,6 +64,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -151,7 +154,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             DataType<?> dataType = DataTypeFactory.create(payload.getClass(), previous.getDataType().getMimeType());
             dataType.setEncoding(previous.getDataType().getEncoding());
-            
+
             return dataType;
         }
     }
@@ -233,7 +236,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
-        
+
         DataType newDataType  = dataType.cloneDataType();
 
         if (message instanceof MuleMessage)
@@ -276,10 +279,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         else
         {
             copyMessageProperties(muleMessage);
-        }        
+        }
     }
 
-    
     protected void copyMessageProperties(MuleMessage muleMessage)
     {
         for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND, PropertyScope.OUTBOUND})
@@ -291,7 +293,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     Object value = muleMessage.getProperty(name, scope);
                     if (value != null)
                     {
-                        setProperty(name, value, scope);
+                        setPropertyInternal(name, value, scope, DataTypeFactory.createFromObject(value));
                     }
                 }
             }
@@ -530,6 +532,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType)
     {
+        setPropertyInternal(key, value, scope, dataType);
+
+        updateDataTypeWithProperty(key, value);
+    }
+
+    private void setPropertyInternal(String key, Object value, PropertyScope scope, DataType<?> dataType)
+    {
         assertAccess(WRITE);
         if (key != null)
         {
@@ -551,6 +560,32 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             if (logger.isDebugEnabled())
             {
                 logger.debug("setProperty(key, value) invoked with null key. Ignoring this entry");
+            }
+        }
+    }
+
+    private void updateDataTypeWithProperty(String key, Object value)
+    {
+        // updates dataType when encoding is updated using a property instead of using #setEncoding
+        if (MuleProperties.MULE_ENCODING_PROPERTY.equals(key))
+        {
+            dataType.setEncoding((String) value);
+        }
+        else if (MuleProperties.CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
+        {
+            try
+            {
+                MimeType mimeType = new MimeType((String) value);
+                dataType.setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
+                String encoding = mimeType.getParameter("charset");
+                if (!StringUtils.isEmpty(encoding))
+                {
+                    dataType.setEncoding(encoding);
+                }
+            }
+            catch (MimeTypeParseException e)
+            {
+                throw new IllegalArgumentException("Invalid Content-Type property value", e);
             }
         }
     }
@@ -617,6 +652,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                         new Throwable());
                 properties.removeProperty(key);
             }
+
+            updateDataTypeWithProperty(key, value);
         }
         else
         {
