@@ -150,7 +150,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-validation-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-007.jar
+/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-008.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-email-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-file-${productVersion}.jar
@@ -181,11 +181,10 @@
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.31.jar
-/mule-standalone-${productVersion}/lib/opt/bcmail-jdk16-1.46.jar
-/mule-standalone-${productVersion}/lib/opt/bcpg-jdk16-1.46.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk16-1.46.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-jdk16-1.46.jar
-/mule-standalone-${productVersion}/lib/opt/bctsp-jdk16-1.46.jar
+/mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.50.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.50.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.50.jar
+/mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.50.jar
 /mule-standalone-${productVersion}/lib/opt/btf-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/bytelist-1.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
@@ -228,8 +227,8 @@
 /mule-standalone-${productVersion}/lib/opt/dom4j-1.6.1.jar
 /mule-standalone-${productVersion}/lib/opt/ecj-4.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/el-api-6.0.44.jar
-/mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1.jar
-/mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.jar
+/mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-2.0.0.jar
+/mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar

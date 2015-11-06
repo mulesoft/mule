@@ -21,6 +21,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.FlowCallStack;
+import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -351,6 +352,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 
         @Override
         public FlowCallStack getFlowCallStack()
+        {
+            return null;
+        }
+
+        @Override
+        public ProcessorsTrace getProcessorsTrace()
         {
             return null;
         }

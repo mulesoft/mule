@@ -28,6 +28,8 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase
 {
 
     private static QName docNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
+    private static QName sourceFileNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName");
+    private static QName sourceFileLineAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine");
 
     @Test
     public void namedComponent()
@@ -43,10 +45,12 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase
     {
         AnnotatedObject annotated = mock(AnnotatedObject.class);
         when(annotated.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+        when(annotated.getAnnotation(eq(sourceFileNameAttrName))).thenReturn("muleApp.xml");
+        when(annotated.getAnnotation(eq(sourceFileLineAttrName))).thenReturn(10);
         when(annotated.toString()).thenReturn("Mock@1");
 
         LocatedMuleException lme = new LocatedMuleException(annotated);
-        assertThat(lme.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("Mock@1 @ app (Mock Component)"));
+        assertThat(lme.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("Mock@1 @ app:muleApp.xml:10 (Mock Component)"));
     }
 
     @Test
@@ -55,10 +59,12 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase
         AnnotatedObject namedAnnotated = mock(AnnotatedObject.class, withSettings().extraInterfaces(NamedObject.class));
         when(((NamedObject) namedAnnotated).getName()).thenReturn("mockComponent");
         when(namedAnnotated.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+        when(namedAnnotated.getAnnotation(eq(sourceFileNameAttrName))).thenReturn("muleConfig.xml");
+        when(namedAnnotated.getAnnotation(eq(sourceFileLineAttrName))).thenReturn(6);
         when(namedAnnotated.toString()).thenReturn("Mock@1");
 
         LocatedMuleException lme = new LocatedMuleException(namedAnnotated);
-        assertThat(lme.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("/mockComponent @ app (Mock Component)"));
+        assertThat(lme.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("/mockComponent @ app:muleConfig.xml:6 (Mock Component)"));
     }
 
     @Test

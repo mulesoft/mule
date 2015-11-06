@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <custom-transformer name="AtoBConverter"
                         class="org.mule.test.transformers.GraphTransformerResolutionTestCase$AtoBConverter"/>
@@ -18,5 +20,24 @@
 
     <flow name="flowWithTransformerDependency">
         <transformer ref="AtoBConverter" />
+    </flow>
+
+
+    <!-- This caused a StackOverflowException during app init before MULE-8913 -->
+    <flow name="testExceptionHandlerWithTransformerInEndpointFlow">
+        <vm:inbound-endpoint path="testExceptionHandlerWithTransformerInEndpoint" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+        <exception-strategy ref="exceptionHandler" />
+    </flow>
+    
+    <catch-exception-strategy name="exceptionHandler">
+        <vm:outbound-endpoint path="handleException" exchange-pattern="request-response">
+            <transformer ref="AtoBConverter" />
+        </vm:outbound-endpoint>     
+    </catch-exception-strategy>
+
+    <flow name="handleExceptionFlow">
+        <vm:inbound-endpoint path="handleException" exchange-pattern="request-response"/>
+        <echo-component/>
     </flow>
 </mule>

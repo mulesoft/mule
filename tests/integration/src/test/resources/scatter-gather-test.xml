@@ -295,6 +295,14 @@
         <flow-ref name="assertFlowVars" />
     </flow>
 
+    <flow name="dataType">
+        <scatter-gather>
+            <set-payload value="apple" mimeType="text/plain"/>
+            <set-payload value="banana"/>
+            <set-payload value="orange"/>
+        </scatter-gather>
+    </flow>
+
     <sub-flow name="assertFlowVars">
         <test:assert expression="#[flowVars.foo.equals('bar')]" />
     </sub-flow>

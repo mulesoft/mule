@@ -131,7 +131,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             DataType<?> dataType = DataTypeFactory.create(payload.getClass(), previous.getDataType().getMimeType());
             dataType.setEncoding(previous.getDataType().getEncoding());
-            
+
             return dataType;
         }
     }
@@ -213,7 +213,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
-        
+
         DataType newDataType  = dataType.cloneDataType();
 
         if (message instanceof MuleMessage)
@@ -256,10 +256,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         else
         {
             copyMessageProperties(muleMessage);
-        }        
+        }
     }
 
-    
     protected void copyMessageProperties(MuleMessage muleMessage)
     {
         for (PropertyScope scope : new PropertyScope[]{INBOUND, PropertyScope.OUTBOUND})
@@ -271,7 +270,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     Object value = muleMessage.getProperty(name, scope);
                     if (value != null)
                     {
-                        setProperty(name, value, scope);
+                        setPropertyInternal(name, value, scope, DataTypeFactory.createFromObject(value));
                     }
                 }
             }
@@ -488,6 +487,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType)
     {
+        setPropertyInternal(key, value, scope, dataType);
+
+        updateDataTypeWithProperty(key, value);
+    }
+
+    private void setPropertyInternal(String key, Object value, PropertyScope scope, DataType<?> dataType)
+    {
         assertAccess(WRITE);
         if (key != null)
         {
@@ -503,8 +509,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             {
                 properties.setProperty(key, value, scope, dataType);
             }
-
-            updateDataTypeWithProperty(key, value);
         }
         else
         {

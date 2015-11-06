@@ -9,79 +9,90 @@ package org.mule.context.notification;
 import org.mule.api.context.notification.FlowCallStack;
 import org.mule.api.context.notification.FlowStackElement;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Stack;
 
 /**
- * Keeps context information about the executing flows and its callers
- * in order to provide augmented troubleshooting information for an application developer.
+ * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting
+ * information for an application developer.
  */
-public class DefaultFlowCallStack implements FlowCallStack, Serializable
+public class DefaultFlowCallStack implements FlowCallStack
 {
-    private static final long serialVersionUID = -4540003678773678613L;
+    private static final long serialVersionUID = -8683711977929802819L;
 
     private Stack<FlowStackElement> innerStack = new Stack<>();
 
-    public DefaultFlowCallStack()
-    {
-    }
-
-    public DefaultFlowCallStack(FlowCallStack flowCallStack)
-    {
-        if(flowCallStack != null)
-        {
-            Collection<FlowStackElement> elementsCopy = flowCallStack.getElementsCopy();
-            for (FlowStackElement flowStackElement : elementsCopy)
-            {
-                innerStack.push(flowStackElement.clone());
-            }
-        }
-    }
-
-    @Override
+    /**
+     * Adds an element to the top of this stack
+     * 
+     * @param flowStackElement the element to add
+     */
     public void push(FlowStackElement flowStackElement)
     {
         innerStack.push(flowStackElement);
     }
 
-    @Override
+    /**
+     * Adds a message processor path to the list of processors that were invoked as part of the processing of this
+     * stack's event.
+     * 
+     * @param processorPath the path to mark as invoked.
+     * @throws EmptyStackException if this stack is empty.
+     */
+    public void setCurrentProcessorPath(String processorPath)
+    {
+        FlowStackElement topElement = innerStack.pop();
+        innerStack.push(new FlowStackElement(topElement.getFlowName(), processorPath));
+    }
+
+    /**
+     * Removes the top-most element from this stack.
+     * 
+     * @return the top-most element of this stack.
+     * @throws EmptyStackException if this stack is empty.
+     */
     public FlowStackElement pop()
     {
         return innerStack.pop();
     }
 
     @Override
-    public FlowStackElement peek()
+    public List<FlowStackElement> getElements()
     {
-        return innerStack.peek();
-    }
-
-    @Override
-    public Collection<FlowStackElement> getElementsCopy()
-    {
-        List<FlowStackElement> ret = new ArrayList<>();
-        for (FlowStackElement flowStackElement : innerStack)
-        {
-            ret.add(flowStackElement.clone());
-        }
-        return ret;
-    }
-
-    @Override
-    public synchronized String toString()
-    {
-        StringBuilder ret = new StringBuilder();
+        List<FlowStackElement> elementsCloned = new ArrayList<>();
         for (int i = innerStack.size() - 1; i >= 0; --i)
         {
-            ret.append("at ").append(innerStack.get(i).toString());
+            elementsCloned.add(innerStack.get(i));
+        }
+        return elementsCloned;
+    }
+
+    @Override
+    public DefaultFlowCallStack clone()
+    {
+        DefaultFlowCallStack cloned = new DefaultFlowCallStack();
+        for (int i = 0; i < innerStack.size(); ++i)
+        {
+            cloned.innerStack.push(innerStack.get(i));
+        }
+
+        return cloned;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder stackString = new StringBuilder();
+        for (int i = innerStack.size() - 1; i >= 0; --i)
+        {
+            stackString.append("at ").append(innerStack.get(i).toString());
             if (i != 0)
             {
-                ret.append(System.lineSeparator());
+                stackString.append(System.lineSeparator());
             }
         }
-        return ret.toString();
+        return stackString.toString();
     }
 }

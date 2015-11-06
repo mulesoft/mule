@@ -9,10 +9,12 @@ package org.mule.api;
 import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.FlowCallStack;
+import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.ReplyToHandler;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
@@ -284,13 +286,28 @@ public interface MuleEvent extends Serializable
     boolean isAllowNonBlocking();
 
     /**
-     * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can determine where this event came from.
-     * 
-     * This will only be enabled it the log is set to debug or if the system property {@code mule.flowCallStacks} is set to {@code true}. If not enabled, the stack will always be empty.
+     * Events have a stack of executed flows (same as a call stack), so that at any given instant an application
+     * developer can determine where this event came from.
+     * <p/>
+     * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false},
+     * the stack will always be empty.
      * 
      * @return the flow stack associated to this event.
      * 
      * @since 3.8.0
      */
     FlowCallStack getFlowCallStack();
+
+    /**
+     * Events have a list of message processor paths it went trough so that the execution path of an event can be
+     * reconstructed after it has executed.
+     * <p/>
+     * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false},
+     * the list will always be empty.
+     * 
+     * @return the message processors trace associated to this event.
+     * 
+     * @since 3.8.0
+     */
+    ProcessorsTrace getProcessorsTrace();
 }

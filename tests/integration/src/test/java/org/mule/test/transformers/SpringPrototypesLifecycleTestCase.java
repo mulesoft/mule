@@ -36,4 +36,14 @@ public class SpringPrototypesLifecycleTestCase extends FunctionalTestCase
 
         assertThat(response.getPayload(), is(instanceOf(B.class)));
     }
+
+    @Test
+    public void exceptionHandlerWithTransformerInEndpoint() throws Exception
+    {
+        final LocalMuleClient client = muleContext.getClient();
+
+        final MuleMessage response = client.send("vm://testExceptionHandlerWithTransformerInEndpoint", new A(TEST_MESSAGE), null);
+
+        assertThat(response.getPayload(), is(instanceOf(B.class)));
+    }
 }

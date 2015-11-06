@@ -34,6 +34,7 @@ import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
+    @Override
     public void init()
     {
         //Deprecated
@@ -76,8 +77,8 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xslt-text", new XsltTextDefinitionParser("xslt", String.class));
 
         //XQuery
-        registerBeanDefinitionParser("xquery-transformer", new TransformerMessageProcessorDefinitionParser(XQueryTransformer.class));
-        registerBeanDefinitionParser("xquery-text", new TextDefinitionParser("xquery", true));
+        registerBeanDefinitionParser("xquery-transformer", new MessageProcessorDefinitionParser(XQueryTransformer.class));
+        registerBeanDefinitionParser("xquery-text", new TextDefinitionParser("xquery"));
 
         //Used by XQuery and XSLT
         registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));

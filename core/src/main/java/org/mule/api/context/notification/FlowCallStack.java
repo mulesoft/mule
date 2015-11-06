@@ -6,26 +6,28 @@
  */
 package org.mule.api.context.notification;
 
+import org.mule.config.DefaultMuleConfiguration;
+
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 
 /**
- * Keeps context information about the executing flows and its callers
- * in order to provide augmented troubleshooting information for an application developer.
- * 
- * This will only be enabled it the log is set to debug or if the system property {@code mule.flowCallStacks} is set to {@code true}. If not enabled, the stack will always be empty.
+ * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting
+ * information for an application developer.
  * 
  * @since 3.8.0
  */
-public interface FlowCallStack extends Serializable
+public interface FlowCallStack extends Serializable, Cloneable
 {
 
-    void push(FlowStackElement flowStackElement);
+    /**
+     * @return the current elements of this stack as a list, ordered from top to bottom, if
+     *         {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. Empty list otherwise.
+     */
+    List<FlowStackElement> getElements();
 
-    FlowStackElement pop();
-
-    FlowStackElement peek();
-
-    Collection<FlowStackElement> getElementsCopy();
-
+    /**
+     * @return a deep copy of this object.
+     */
+    FlowCallStack clone();
 }

@@ -12,22 +12,16 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class XSLTWikiDocsTestCase extends FunctionalTestCase
 {
-
-    @Rule
-    public SystemProperty useXalan = new ForceXalanTransformerFactory();
 
     @Override
     protected String getConfigFile()

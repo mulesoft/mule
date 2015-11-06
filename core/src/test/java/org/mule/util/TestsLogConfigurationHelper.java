@@ -91,7 +91,7 @@ public class TestsLogConfigurationHelper
             logConfigFile = FileUtils.findFileByName(folder, "log4j2.xml", true);
         }
 
-        String logConfigPath = logConfigFile != null && logConfigFile.isFile() ? logConfigFile.getAbsolutePath() : NULL_CONFIG_FILE;
+        String logConfigPath = logConfigFile != null && logConfigFile.isFile() ? logConfigFile.toURI().toString() : NULL_CONFIG_FILE;
         LOGGING_CONFIG_CACHE.set(logConfigPath);
         return logConfigPath;
     }

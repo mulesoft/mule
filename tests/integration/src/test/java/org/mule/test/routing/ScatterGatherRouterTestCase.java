@@ -17,15 +17,21 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
+import static org.mockito.Mockito.mock;
+import org.mule.DefaultMessageCollection;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.AggregationContext;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.transport.DispatchException;
+import org.mule.construct.Flow;
 import org.mule.routing.AggregationStrategy;
 import org.mule.routing.CompositeRoutingException;
 import org.mule.tck.functional.FlowAssert;
@@ -38,6 +44,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class ScatterGatherRouterTestCase extends FunctionalTestCase
@@ -271,6 +278,22 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     {
         runFlow("setsVariablesAfterRouting");
         FlowAssert.verify("setsVariablesAfterRouting");
+    }
+
+    @Test
+    public void returnsCorrectDataType() throws Exception
+    {
+        DefaultMuleMessage message = new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
+        message.setOutboundProperty("Content-Type", "application/json");
+
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
+        MuleMessage response = runFlow("dataType", event).getMessage();
+
+        assertThat(response, is(Matchers.instanceOf(DefaultMessageCollection.class)));
+        assertThat(((DefaultMessageCollection) response).size(), is(3));
+        assertThat(((DefaultMessageCollection) response).getMessage(0).getDataType().getMimeType(), is("text/plain"));
+        assertThat(((DefaultMessageCollection) response).getMessage(1).getDataType().getMimeType(), is("*/*"));
+        assertThat(((DefaultMessageCollection) response).getMessage(2).getDataType().getMimeType(), is("*/*"));
     }
 
     public static class TestAggregationStrategy implements AggregationStrategy

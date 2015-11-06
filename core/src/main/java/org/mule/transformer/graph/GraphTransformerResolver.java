@@ -58,7 +58,7 @@ public class GraphTransformerResolver implements TransformerResolver
 
         if (converters.size() > 1)
         {
-            throw new ResolverException(CoreMessages.transformHasMultipleMatches(source.getType(), result.getType(), converters.get(0), converters.get(1)));
+            throw new ResolverException(CoreMessages.transformHasMultipleMatches(source.getType(), result.getType(), converters));
         }
 
         Transformer converter = (converters.size() == 0) ? null : converters.get(0);

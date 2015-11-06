@@ -163,7 +163,7 @@
         <asyncHttpClientVersion>1.9.31</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
-        <bouncycastleVersion>1.46</bouncycastleVersion>
+        <bouncycastleVersion>1.50</bouncycastleVersion>
         <c3p0Version>0.9.5</c3p0Version>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
@@ -188,8 +188,11 @@
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
-        <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
+        <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
+        <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
+        <geronimoSpecsEjbVersion>1.1</geronimoSpecsEjbVersion>
+        <geronimoSpecsJaxRpcVersion>2.1</geronimoSpecsJaxRpcVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <grizzlyVersion>2.3.21</grizzlyVersion>
         <guavaVersion>18.0</guavaVersion>
@@ -223,7 +226,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
-        <muleMvelVersion>2.1.9-MULE-007</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-008</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>2.7.3</ognlVersion>
@@ -465,7 +468,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-servlet_3.0_spec</artifactId>
-                 <!--servlet api jar is versioned differently-->
+                <!--servlet api jar is versioned differently-->
                 <version>${geronimoSpecsServletApiVersion}</version>
             </dependency>
             <dependency>
@@ -505,11 +508,11 @@
                 <artifactId>cometd-client</artifactId>
                 <version>${cometdVersion}</version>
                 <exclusions>
-                   <exclusion>
-                       <groupId>org.mortbay.jetty</groupId>
-                       <artifactId>servlet-api</artifactId>
-                   </exclusion>
-               </exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.yourkit</groupId>
@@ -712,12 +715,12 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsJ2eeVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_1.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsJmsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -1127,22 +1130,22 @@
             <!-- BouncyCastle deps -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpg-jdk16</artifactId>
+                <artifactId>bcpg-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-ext-jdk16</artifactId>
+                <artifactId>bcprov-ext-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk16</artifactId>
+                <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bctsp-jdk16</artifactId>
+                <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
 
@@ -1320,7 +1323,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>${guavaVersion}</version>        
+                <version>${guavaVersion}</version>
             </dependency>
 
             <dependency>
@@ -1976,7 +1979,7 @@
 
     <profiles>
 
-         <profile>
+        <profile>
             <id>ci-server</id>
             <distributionManagement>
                 <site>
@@ -2058,7 +2061,7 @@
                         </configuration>
                     </plugin>
                 </plugins>
-             </build>
+            </build>
             <properties>
                 <skipFunctionalTests>false</skipFunctionalTests>
                 <skipIntegrationTests>true</skipIntegrationTests>

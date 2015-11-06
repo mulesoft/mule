@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.NonBlockingSupported;
@@ -34,9 +35,19 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
      */
     protected MessageProcessor unacceptedMessageProcessor;
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (accept(event))
+        boolean accepted;
+        try
+        {
+            accepted = accept(event);
+        }
+        catch (Exception ex)
+        {
+            throw filterFailureException(event, ex);
+        }
+        if (accepted)
         {
             return processNext(event);
         }
@@ -62,6 +73,11 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
         {
             return null;
         }
+    }
+
+    protected MessagingException filterFailureException(MuleEvent event, Exception ex)
+    {
+        return new MessagingException(event, ex, this);
     }
 
     protected MuleException filterUnacceptedException(MuleEvent event)

@@ -17,6 +17,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.context.notification.FlowCallStack;
+import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
@@ -26,6 +27,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.DefaultFlowCallStack;
+import org.mule.context.notification.DefaultProcessorsTrace;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.security.MuleCredentials;
@@ -99,6 +101,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     private CopyOnWriteCaseInsensitiveMap<String, TypedValue> flowVariables = new CopyOnWriteCaseInsensitiveMap<>();
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
+    private ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
 
     // Constructors
 
@@ -434,7 +437,9 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.transacted = rewriteEvent.isTransacted();
         this.notificationsEnabled = rewriteEvent.isNotificationsEnabled();
         this.synchronous = synchronous;
-        this.flowCallStack = new DefaultFlowCallStack(rewriteEvent.getFlowCallStack());
+        this.flowCallStack = rewriteEvent.getFlowCallStack() == null ? new DefaultFlowCallStack() : rewriteEvent.getFlowCallStack().clone();
+        // We want parallel paths of the same flows (i.e.: async events) to contribute to this list and be available at the end, so we copy only the reference.
+        this.processorsTrace = rewriteEvent.getProcessorsTrace();
     }
 
     // Constructor with everything just in case
@@ -1113,5 +1118,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public FlowCallStack getFlowCallStack()
     {
         return flowCallStack;
+    }
+
+    @Override
+    public ProcessorsTrace getProcessorsTrace()
+    {
+        return processorsTrace;
     }
 }

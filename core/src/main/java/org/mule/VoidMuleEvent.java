@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.FlowCallStack;
+import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.Credentials;
@@ -270,6 +271,12 @@ public class VoidMuleEvent implements MuleEvent
 
     @Override
     public FlowCallStack getFlowCallStack()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProcessorsTrace getProcessorsTrace()
     {
         throw new UnsupportedOperationException();
     }

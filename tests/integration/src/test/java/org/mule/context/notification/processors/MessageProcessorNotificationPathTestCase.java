@@ -6,18 +6,20 @@
  */
 package org.mule.context.notification.processors;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.junit.Assert.assertThat;
+import static org.mule.util.NotificationUtils.buildPaths;
+
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.processor.DefaultMessageProcessorPathElement;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.NotificationUtils;
+import org.mule.util.NotificationUtils.FlowMap;
 
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -131,9 +133,10 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         FlowConstruct flow = getFlowConstruct(unescape(flowName));
         DefaultMessageProcessorPathElement flowElement = new DefaultMessageProcessorPathElement(null, flowName);
         ((Pipeline) flow).addMessageProcessorPathElements(flowElement);
-        Map<MessageProcessor, String> messageProcessorPaths = NotificationUtils.buildPaths(flowElement);
-        String[] flowPaths = messageProcessorPaths.values().toArray(new String[]{});
-        Assert.assertArrayEquals(expectedPaths, flowPaths);
+        FlowMap messageProcessorPaths = buildPaths(flowElement);
+
+        assertThat(messageProcessorPaths.getAllPaths(), hasSize(nodes.length));
+        assertThat(messageProcessorPaths.getAllPaths(), hasItems(expectedPaths));
     }
 
     private String[] generatePaths(String flowName, String[] nodes)

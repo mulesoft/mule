@@ -279,6 +279,11 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
+    private String getContentType(Map<String, Object> headers)
+    {
+        return (String) headers.get(HttpConstants.HEADER_CONTENT_TYPE);
+    }
+
     private String getEncoding(Map<String, Object> headers)
     {
         String encoding = DEFAULT_ENCODING;

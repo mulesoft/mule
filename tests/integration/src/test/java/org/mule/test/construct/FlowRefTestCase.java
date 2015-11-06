@@ -15,20 +15,24 @@ import static org.junit.Assert.assertThat;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -47,11 +51,16 @@ public class FlowRefTestCase extends FunctionalTestCase
     private static String TO_SYNC_FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingToSyncFlow2SensingProcessor";
     private static String ERROR_MESSAGE = "ERROR";
 
-
     @Override
     protected String getConfigFile()
     {
         return "org/mule/test/construct/flow-ref.xml";
+    }
+
+    @Before
+    public void before()
+    {
+        ProcessorPathAssertingProcessor.traversedProcessorPaths.clear();
     }
 
     @Test
@@ -76,6 +85,63 @@ public class FlowRefTestCase extends FunctionalTestCase
 
         assertEquals("0A", ((Flow) getFlowConstruct("flow2")).process(eventA).getMessageAsString());
         assertEquals("0B", ((Flow) getFlowConstruct("flow2")).process(eventB).getMessageAsString());
+    }
+
+    public static class ProcessorPathAssertingProcessor implements MessageProcessor
+    {
+
+        private static List<String> traversedProcessorPaths = new ArrayList<>();
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            traversedProcessorPaths.add(((Flow) muleContext.getRegistry().lookupFlowConstruct(event.getFlowConstruct().getName())).getProcessorPath(this));
+            return event;
+        }
+    }
+
+    @Test
+    public void dynamicFlowRefProcessorPath() throws Exception
+    {
+        MuleEvent eventJ = getTestEvent("0");
+        eventJ.setFlowVariable("letter", "J");
+
+        ((Flow) getFlowConstruct("flow2")).process(eventJ);
+
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(1));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
+    }
+
+    @Test
+    public void dynamicFlowRefProcessorPathSameSubflowFromSingleFlow() throws Exception
+    {
+        MuleEvent eventJ = getTestEvent("0");
+        eventJ.setFlowVariable("letter", "J");
+
+        ((Flow) getFlowConstruct("flow3")).process(eventJ);
+
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(2));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow3/processors/0/sub-flow-J/subprocessors/0"));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(1), is("/flow3/processors/1/sub-flow-J/subprocessors/0"));
+    }
+
+    @Test
+    public void dynamicFlowRefProcessorPathSameSubflowFromDifferentFlow() throws Exception
+    {
+        MuleEvent eventJ1 = getTestEvent("0");
+        eventJ1.setFlowVariable("letter", "J");
+
+        ((Flow) getFlowConstruct("flow2")).process(eventJ1);
+
+        MuleEvent eventJ2 = getTestEvent("0");
+        eventJ2.setFlowVariable("letter", "J");
+
+        ((Flow) getFlowConstruct("flow3")).process(eventJ2);
+
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(3));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(1), is("/flow3/processors/0/sub-flow-J/subprocessors/0"));
+        assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(2), is("/flow3/processors/1/sub-flow-J/subprocessors/0"));
     }
 
     @Test

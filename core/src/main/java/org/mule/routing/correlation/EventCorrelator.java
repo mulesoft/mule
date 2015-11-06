@@ -327,8 +327,14 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     protected void removeEventGroup(EventGroup group) throws ObjectStoreException
     {
         final Object groupId = group.getGroupId();
-        eventGroups.remove((Serializable) groupId);
-        addProcessedGroup(groupId);
+        synchronized (groupsLock)
+        {
+            if (!isGroupAlreadyProcessed(groupId))
+            {
+                eventGroups.remove((Serializable) groupId);
+                addProcessedGroup(groupId);
+            }
+        }
     }
 
     protected void addProcessedGroup(Object id) throws ObjectStoreException
@@ -536,7 +542,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 for (Serializable o : eventGroups.allKeys())
                 {
                     EventGroup group = getEventGroup(o);
-                    if (group.getCreated() + getTimeout() < System.currentTimeMillis())
+                    // group may have been removed by another thread right after eventGroups.allKeys()
+                    if (group != null && group.getCreated() + getTimeout() < System.currentTimeMillis())
                     {
                         expired.add(group);
                     }
@@ -546,32 +553,28 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             {
                 logger.warn("expiry failed dues to ObjectStoreException " + e);
             }
-            if (expired.size() > 0)
+            for (final EventGroup group : expired)
             {
-                for (Object anExpired : expired)
+                ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
+                try
                 {
-                    final EventGroup group = (EventGroup) anExpired;
-                    ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
-                    try
+                    executionTemplate.execute(new ExecutionCallback<MuleEvent>()
                     {
-                        executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+                        @Override
+                        public MuleEvent process() throws Exception
                         {
-                            @Override
-                            public MuleEvent process() throws Exception
-                            {
-                                handleGroupExpiry(group);
-                                return null;
-                            }
-                        });
-                    }
-                    catch (MessagingException e)
-                    {
-                        //Already handled by TransactionTemplate
-                    }
-                    catch (Exception e)
-                    {
-                        muleContext.getExceptionListener().handleException(e);
-                    }
+                            handleGroupExpiry(group);
+                            return null;
+                        }
+                    });
+                }
+                catch (MessagingException e)
+                {
+                    // Already handled by TransactionTemplate
+                }
+                catch (Exception e)
+                {
+                    muleContext.getExceptionListener().handleException(e);
                 }
             }
         }
@@ -586,6 +589,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         }
     }
 
+    @Override
     public void dispose()
     {
         disposeIfDisposable(expiredAndDispatchedGroups);
