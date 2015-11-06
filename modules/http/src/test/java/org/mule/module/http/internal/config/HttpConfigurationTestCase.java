@@ -32,15 +32,15 @@ public class HttpConfigurationTestCase extends AbstractMuleTestCase
     @Test
     public void defaultIsUseNewModule()
     {
-        when(mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class)).thenReturn(null);
+        when((Object) (mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class))).thenReturn(null);
         assertThat(HttpConfiguration.useTransportForUris(mockMuleContext), is(false));
     }
 
     @Test
     public void noSystemPropertyAndNoConfig() throws Exception
     {
-       when(mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class)).thenReturn(null);
-       assertThat(HttpConfiguration.useTransportForUris(mockMuleContext), is(false));
+        when((Object) (mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class))).thenReturn(null);
+        assertThat(HttpConfiguration.useTransportForUris(mockMuleContext), is(false));
     }
 
 
@@ -53,7 +53,7 @@ public class HttpConfigurationTestCase extends AbstractMuleTestCase
                @Override
                public void run() throws Exception
                {
-                   when(mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class)).thenReturn(null);
+                   when((Object) (mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class))).thenReturn(null);
                    assertThat(HttpConfiguration.useTransportForUris(mockMuleContext), is(true));
                }
            });
@@ -69,7 +69,7 @@ public class HttpConfigurationTestCase extends AbstractMuleTestCase
                    @Override
                    public void run() throws Exception
                    {
-                       when(mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class)).thenReturn(httpConfiguration);
+                       when((Object) (mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class))).thenReturn(httpConfiguration);
                        httpConfiguration.setUseTransportForUris(false);
                        assertThat(HttpConfiguration.useTransportForUris(mockMuleContext), is(false));
                    }
@@ -86,7 +86,7 @@ public class HttpConfigurationTestCase extends AbstractMuleTestCase
                                    @Override
                                    public void run() throws Exception
                                    {
-                                       when(mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class)).thenReturn(httpConfiguration);
+                                       when((Object) (mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class))).thenReturn(httpConfiguration);
                                        httpConfiguration.setUseTransportForUris(false);
                                        assertThat(HttpConfiguration.useTransportForUris(mockMuleContext), is(false));
                                    }
@@ -103,7 +103,7 @@ public class HttpConfigurationTestCase extends AbstractMuleTestCase
                                    @Override
                                    public void run() throws Exception
                                    {
-                                       when(mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class)).thenReturn(httpConfiguration);
+                                       when((Object) (mockMuleContext.getConfiguration().getExtension(HttpConfiguration.class))).thenReturn(httpConfiguration);
                                        httpConfiguration.setUseTransportForUris(true);
                                        assertThat(HttpConfiguration.useTransportForUris(mockMuleContext), is(true));
                                    }

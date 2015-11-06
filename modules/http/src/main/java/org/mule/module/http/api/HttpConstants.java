@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.api;
 
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
+
 /**
  * General purpose HTTP constants
  */
@@ -62,7 +64,7 @@ public abstract class HttpConstants
     public static final class ResponseProperties
     {
         public static final String HTTP_STATUS_PROPERTY = RequestProperties.HTTP_STATUS_PROPERTY;
-        public static final String HTTP_REASON_PROPERTY = RequestProperties.HTTP_PREFIX + "reason";
+        public static final String HTTP_REASON_PROPERTY = HTTP_PREFIX + "reason";
     }
 
     public static final String ALL_INTERFACES_IP = "0.0.0.0";

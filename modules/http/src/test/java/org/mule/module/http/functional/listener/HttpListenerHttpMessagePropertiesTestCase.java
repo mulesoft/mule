@@ -8,10 +8,12 @@ package org.mule.module.http.functional.listener;
 
 import static org.apache.http.client.fluent.Request.Post;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
@@ -215,12 +217,14 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.<String>getInboundProperty(HTTP_REMOTE_ADDRESS), startsWith("/127.0.0.1:"));
+        assertThat(message.<String> getInboundProperty(HttpHeaders.Names.X_FORWARDED_FOR), nullValue());
 
         Post(url)
-                .addHeader(HttpHeaders.Names.X_FORWARDED_FOR, "/192.1.2.3:1234")
+                 .addHeader(HttpHeaders.Names.X_FORWARDED_FOR, "clientIp, proxy1Ip")
                 .connectTimeout(RECEIVE_TIMEOUT).execute();
         final MuleMessage forwardedMessage = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
-        assertThat(forwardedMessage.<String>getInboundProperty(HTTP_REMOTE_ADDRESS), is("/192.1.2.3:1234"));
+        assertThat(forwardedMessage.<String> getInboundProperty(HTTP_REMOTE_ADDRESS), startsWith("/127.0.0.1:"));
+        assertThat(forwardedMessage.<String> getInboundProperty(HttpHeaders.Names.X_FORWARDED_FOR), is("clientIp, proxy1Ip"));
     }
 
     @Test

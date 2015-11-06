@@ -8,6 +8,7 @@ package org.mule.module.http.internal.listener;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -55,7 +56,7 @@ public class HttpListenerConnectionManagerTestCase extends AbstractMuleTestCase
         final MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
         connectionManager.setMuleContext(mockMuleContext);
         WorkManagerSource mockWorkManagerSource = mock(WorkManagerSource.class);
-        when(mockMuleContext.getRegistry().lookupObject(TcpServerSocketProperties.class)).thenReturn(mock(TcpServerSocketProperties.class));
+        when((Object) (mockMuleContext.getRegistry().lookupObject(TcpServerSocketProperties.class))).thenReturn(mock(TcpServerSocketProperties.class));
 
         connectionManager.initialise();
         connectionManager.createServer(new ServerAddress(firstIp, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);

@@ -6,27 +6,27 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
+import static org.mule.module.http.internal.HttpParser.decodeUrlEncodedBody;
+import static org.mule.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.endpoint.URIBuilder;
 import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
 
 import com.google.common.net.MediaType;
 
@@ -60,15 +60,14 @@ public class HttpRequestToMuleEvent
             }
         }
 
-        new HttpMessagePropertiesResolver()
-                .setMethod(request.getMethod())
-                .setProtocol(request.getProtocol().asString())
-                .setUri(request.getUri())
-                .setListenerPath(listenerPath)
-                .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
-                .setScheme(requestContext.getScheme())
-                .setClientCertificate(requestContext.getClientConnection().getClientCertificate())
-                .addPropertiesTo(inboundProperties);
+        new HttpMessagePropertiesResolver().setMethod(request.getMethod())
+                                           .setProtocol(request.getProtocol().asString())
+                                           .setUri(request.getUri())
+                                           .setListenerPath(listenerPath)
+                                           .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
+                                           .setScheme(requestContext.getScheme())
+                                           .setClientCertificate(requestContext.getClientConnection().getClientCertificate())
+                                           .addPropertiesTo(inboundProperties);
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
         Object payload = NullPayload.getInstance();
@@ -79,7 +78,7 @@ public class HttpRequestToMuleEvent
             {
                 if (entity instanceof MultipartHttpEntity)
                 {
-                    inboundAttachments.putAll(HttpPartDataSource.createDataHandlerFrom(((MultipartHttpEntity) entity).getParts()));
+                    inboundAttachments.putAll(createDataHandlerFrom(((MultipartHttpEntity) entity).getParts()));
                 }
                 else
                 {
@@ -88,12 +87,12 @@ public class HttpRequestToMuleEvent
                     {
                         final MediaType mediaType = MediaType.parse(contentTypeValue);
                         String encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
-                        outboundProperties.put(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
+                        outboundProperties.put(MULE_ENCODING_PROPERTY, encoding);
                         if ((mediaType.type() + "/" + mediaType.subtype()).equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
                         {
                             try
                             {
-                                payload = HttpParser.decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), encoding);
+                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), encoding);
                             }
                             catch (IllegalArgumentException e)
                             {
@@ -125,7 +124,7 @@ public class HttpRequestToMuleEvent
         return new DefaultMuleEvent(
                 defaultMuleMessage,
                 resolveUri(requestContext),
-                MessageExchangePattern.REQUEST_RESPONSE,
+                REQUEST_RESPONSE,
                 flowConstruct,
                 new DefaultMuleSession());
     }
@@ -141,8 +140,6 @@ public class HttpRequestToMuleEvent
 
     private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)
     {
-        return StringUtils.defaultIfEmpty(
-                requestContext.getRequest().getHeaderValue(HttpHeaders.Names.X_FORWARDED_FOR),
-                requestContext.getClientConnection().getRemoteHostAddress().toString());
+        return requestContext.getClientConnection().getRemoteHostAddress().toString();
     }
 }
