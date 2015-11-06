@@ -10,10 +10,10 @@ import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 import static java.sql.DriverManager.registerDriver;
 import static java.util.Collections.list;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
@@ -69,9 +69,9 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase
         {
             registerDriver(jdbcDriver);
 
-            assertThat(list(getDrivers()), hasItem(jdbcDriver));
+            assertTrue(list(getDrivers()).contains(jdbcDriver));
             classLoader.dispose();
-            assertThat(list(getDrivers()), hasItem(jdbcDriver));
+            assertTrue(list(getDrivers()).contains(jdbcDriver));
         }
         finally
         {
@@ -86,9 +86,9 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase
         Driver jdbcDriver = mock(Driver.class);
         registerDriver(jdbcDriver);
 
-        assertThat(list(getDrivers()), hasItem(jdbcDriver));
+        assertTrue(list(getDrivers()).contains(jdbcDriver));
         new DefaultResourceReleaser().release();
-        assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
+        assertFalse(list(getDrivers()).contains(jdbcDriver));
     }
 
     private static interface KeepResourceReleaserInstance
