@@ -4,26 +4,16 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:sec="http://www.springframework.org/schema/security"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:https="http://www.mulesoft.org/schema/mule/https"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:spring-sec="http://www.mulesoft.org/schema/mule/spring-security"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd">
-
-    <!-- //TODO(pablo.kraan): workaround for MULE-8827: remove this HTTPS connector once the test is properly fixed-->
-    <https:connector name="httpConnector">
-        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
-        <https:tls-server path="trustStore" storePassword="mulepassword"/>
-    </https:connector>
 
     <http:listener-config name="httpsConfig" protocol="HTTPS" host="localhost" port="${port2}">
         <tls:context>
