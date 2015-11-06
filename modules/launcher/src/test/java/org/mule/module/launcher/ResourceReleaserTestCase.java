@@ -76,7 +76,6 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase
         finally
         {
             deregisterDriver(jdbcDriver);
-            classLoader.close();
         }
     }
 
