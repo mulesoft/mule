@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
@@ -19,6 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.MessageProcessingManager;
+import org.mule.module.http.api.HttpConstants.HttpStatus;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
@@ -43,8 +46,6 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultHttpListener.class);
 
-    private static final int INTERNAL_SERVER_ERROR_STATUS_CODE = 500;
-    private static final int BAD_REQUEST_STATUS_CODE = 400;
     public static final String SERVER_PROBLEM = "Server encountered a problem";
 
     private String path;
@@ -132,12 +133,12 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                 catch (HttpRequestParsingException | IllegalArgumentException e)
                 {
                     logger.warn("Exception occurred parsing request:", e);
-                    sendErrorResponse(BAD_REQUEST_STATUS_CODE, e.getMessage(), responseCallback);
+                    sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
                 }
                 catch (RuntimeException e)
                 {
                     logger.warn("Exception occurred processing request:", e);
-                    sendErrorResponse(INTERNAL_SERVER_ERROR_STATUS_CODE, SERVER_PROBLEM, responseCallback);
+                    sendErrorResponse(INTERNAL_SERVER_ERROR, SERVER_PROBLEM, responseCallback);
                 }
                 finally
                 {
@@ -145,17 +146,18 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                 }
             }
 
-            private void sendErrorResponse(final int statusCode, String message, HttpResponseReadyCallback responseCallback)
+            private void sendErrorResponse(final HttpStatus status, String message, HttpResponseReadyCallback responseCallback)
             {
                 responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
-                                                       .setStatusCode(statusCode)
+                                                       .setStatusCode(status.getStatusCode())
+                                                       .setReasonPhrase(status.getReasonPhrase())
                                                        .setEntity(new ByteArrayHttpEntity(message.getBytes()))
                                                        .build(), new ResponseStatusCallback()
                 {
                     @Override
                     public void responseSendFailure(Throwable exception)
                     {
-                        logger.warn("Error while sending {} response {}", statusCode, exception.getMessage());
+                        logger.warn("Error while sending {} response {}", status.getStatusCode(), exception.getMessage());
                         if (logger.isDebugEnabled())
                         {
                             logger.debug("Exception thrown", exception);

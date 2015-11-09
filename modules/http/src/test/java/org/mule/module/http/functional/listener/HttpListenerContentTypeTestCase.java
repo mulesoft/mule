@@ -77,6 +77,7 @@ public class HttpListenerContentTypeTestCase extends FunctionalTestCase
 
         assertThat(IOUtils.toString(response.getEntity().getContent()), containsString(expectedMessage));
         assertThat(statusLine.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
+        assertThat(statusLine.getReasonPhrase(), is(BAD_REQUEST.getReasonPhrase()));
     }
 
     private String getUrl()
