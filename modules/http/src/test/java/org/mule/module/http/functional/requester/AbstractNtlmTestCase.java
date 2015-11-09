@@ -26,7 +26,7 @@ import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
+public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
 {
     private static final String TYPE_1_MESSAGE = "NTLM TlRMTVNTUAABAAAAAYIIogAAAAAoAAAAAAAAACgAAAAFASgKAAAADw==";
     private static final String TYPE_2_MESSAGE_CHALLENGE = "TlRMTVNTUAACAAAAAAAAACgAAAABggAAU3J2Tm9uY2UAAAAAAAAAAA==";

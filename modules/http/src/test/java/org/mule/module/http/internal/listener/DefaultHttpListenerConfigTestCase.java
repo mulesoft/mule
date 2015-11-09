@@ -43,7 +43,7 @@ public class DefaultHttpListenerConfigTestCase extends AbstractMuleTestCase
     @Before
     public void setUp() throws RegistrationException
     {
-        when(mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)).thenReturn(mockHttpListenerConnectionManager);
+        when((Object) (mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class))).thenReturn(mockHttpListenerConnectionManager);
         when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
         listenerConfig = createBaseListener();
     }

@@ -13,6 +13,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.construct.Flow;
@@ -122,9 +123,9 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void useExistentListenerConfig() throws Exception
     {
-        when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(mockMessageProcessingManager);
+        when((Object) (mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class))).thenReturn(mockMessageProcessingManager);
         when(mockMuleContext.getRegistry().lookupObjects(HttpListenerConfig.class)).thenReturn(Arrays.<HttpListenerConfig>asList(mockListenerConfig));
-        when(mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)).thenReturn(mockListenerConnectionManager);
+        when((Object) (mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class))).thenReturn(mockListenerConnectionManager);
         when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
         when(mockListenerConfig.getPort()).thenReturn(PORT);
         when(mockListenerConfig.getHost()).thenReturn(HOST);
@@ -168,7 +169,7 @@ public class HttpListenerBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void useConfiguredListenerConfig() throws Exception
     {
-        when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(mockMessageProcessingManager);
+        when((Object) (mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class))).thenReturn(mockMessageProcessingManager);
 
         final HttpListener httpListener = new HttpListenerBuilder(mockMuleContext)
                 .setFlow(mockFlow)
