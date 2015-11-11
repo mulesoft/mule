@@ -313,6 +313,7 @@
 /mule-standalone-${productVersion}/lib/opt/jersey-guava-2.11.jar
 /mule-standalone-${productVersion}/lib/opt/jersey-media-json-jackson1-2.11.jar
 /mule-standalone-${productVersion}/lib/opt/jersey-media-json-jettison-2.11.jar
+/mule-standalone-${productVersion}/lib/opt/jersey-media-multipart-2.11.jar
 /mule-standalone-${productVersion}/lib/opt/jersey-server-2.11.jar
 /mule-standalone-${productVersion}/lib/opt/jettison-1.3.3.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-annotations-9.0.7.v20131107.jar
@@ -363,6 +364,7 @@
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.9.jar
+/mule-standalone-${productVersion}/lib/opt/mimepull-1.9.3.jar
 /mule-standalone-${productVersion}/lib/opt/msg-simple-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/msv-core-2011.1.jar
 /mule-standalone-${productVersion}/lib/opt/mvel2-2.0.10.jar
