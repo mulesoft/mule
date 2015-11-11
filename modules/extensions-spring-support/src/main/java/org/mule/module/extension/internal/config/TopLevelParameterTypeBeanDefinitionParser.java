@@ -11,6 +11,7 @@ import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.
 import org.mule.extension.api.introspection.DataType;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
@@ -35,7 +36,7 @@ final class TopLevelParameterTypeBeanDefinitionParser extends BaseExtensionBeanD
     }
 
     @Override
-    protected void doParse(BeanDefinitionBuilder builder, Element element)
+    protected void doParse(BeanDefinitionBuilder builder, Element element, ParserContext parserContext)
     {
         builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
         builder.addConstructorArgValue(dataType);

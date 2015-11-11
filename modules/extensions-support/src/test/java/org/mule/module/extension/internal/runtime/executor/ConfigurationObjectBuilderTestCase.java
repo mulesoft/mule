@@ -71,8 +71,8 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
         configuration = new TestConfig();
 
         when(configurationModel.getParameterModels()).thenReturn(Arrays.asList(nameParameterModel, descriptionParameterModel));
-        when(configurationModel.getInstantiator().newInstance()).thenReturn(configuration);
-        when(configurationModel.getInstantiator().getObjectType()).thenAnswer(invocation -> TestConfig.class);
+        when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(configuration);
+        when(configurationModel.getConfigurationFactory().getObjectType()).thenAnswer(invocation -> TestConfig.class);
         when(configurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
 
         resolverSet = createResolverSet();

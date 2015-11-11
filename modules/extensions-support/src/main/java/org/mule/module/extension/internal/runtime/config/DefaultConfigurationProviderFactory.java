@@ -11,11 +11,13 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInit
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
+import org.mule.extension.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 /**
  * Default implementation of {@link ConfigurationProviderFactory}
@@ -33,11 +35,13 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
             String name,
             ConfigurationModel configurationModel,
             ResolverSet resolverSet,
+            ValueResolver<ConnectionProvider> connectionProviderResolver,
             DynamicConfigPolicy dynamicConfigPolicy) throws Exception
     {
         return new DynamicConfigurationProvider<>(name,
                                                   configurationModel,
                                                   resolverSet,
+                                                  connectionProviderResolver,
                                                   dynamicConfigPolicy.getExpirationPolicy());
     }
 
@@ -49,12 +53,13 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
             String name,
             ConfigurationModel configurationModel,
             ResolverSet resolverSet,
+            ValueResolver<ConnectionProvider> connectionProviderResolver,
             MuleContext muleContext) throws Exception
     {
         ConfigurationInstance<T> configuration;
         try
         {
-            configuration = new ConfigurationInstanceFactory<T>(configurationModel, resolverSet).createConfiguration(name, getInitialiserEvent(muleContext));
+            configuration = new ConfigurationInstanceFactory<T>(configurationModel, resolverSet).createConfiguration(name, getInitialiserEvent(muleContext), connectionProviderResolver);
         }
         catch (MuleException e)
         {

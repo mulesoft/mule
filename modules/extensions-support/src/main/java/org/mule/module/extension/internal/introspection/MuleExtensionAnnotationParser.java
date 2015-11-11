@@ -89,7 +89,7 @@ public final class MuleExtensionAnnotationParser
         return extension;
     }
 
-    static List<ParameterDescriptor> parseParameters(Method method)
+    static List<ParsedParameter> parseParameters(Method method)
     {
         List<String> paramNames = getParamNames(method);
 
@@ -101,7 +101,7 @@ public final class MuleExtensionAnnotationParser
         DataType[] parameterTypes = IntrospectionUtils.getMethodArgumentTypes(method);
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
-        List<ParameterDescriptor> parameterDescriptors = new LinkedList<>();
+        List<ParsedParameter> parsedParameters = new LinkedList<>();
 
 
         for (int i = 0; i < paramNames.size(); i++)
@@ -110,50 +110,42 @@ public final class MuleExtensionAnnotationParser
 
             if (annotations.containsKey(ParameterGroup.class))
             {
-                parseGroupParameters(parameterTypes[i], parameterDescriptors);
+                parseGroupParameters(parameterTypes[i], parsedParameters);
             }
             else
             {
-                ParameterDescriptor parameterDescriptor = doParseParameter(paramNames.get(i), parameterTypes[i], annotations);
-                if (parameterDescriptor != null)
-                {
-                    parameterDescriptors.add(parameterDescriptor);
-                }
+                ParsedParameter parsedParameter = doParseParameter(paramNames.get(i), parameterTypes[i], annotations);
+                parsedParameters.add(parsedParameter);
             }
         }
 
-        return parameterDescriptors;
+        return parsedParameters;
     }
 
-    private static void parseGroupParameters(DataType parameterType, List<ParameterDescriptor> parameterDescriptors)
+    private static void parseGroupParameters(DataType parameterType, List<ParsedParameter> parsedParameters)
     {
         for (Field field : IntrospectionUtils.getParameterFields(parameterType.getRawType()))
         {
             if (field.getAnnotation(org.mule.extension.annotation.api.ParameterGroup.class) != null)
             {
-                parseGroupParameters(getFieldDataType(field), parameterDescriptors);
+                parseGroupParameters(getFieldDataType(field), parsedParameters);
             }
             else
             {
-                ParameterDescriptor parameterDescriptor = doParseParameter(field.getName(), getFieldDataType(field), toMap(field.getAnnotations()));
-                if (parameterDescriptor != null)
+                ParsedParameter parsedParameter = doParseParameter(field.getName(), getFieldDataType(field), toMap(field.getAnnotations()));
+                if (parsedParameter != null)
                 {
-                    parameterDescriptors.add(parameterDescriptor);
+                    parsedParameters.add(parsedParameter);
                 }
             }
         }
     }
 
-    private static ParameterDescriptor doParseParameter(String paramName, DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
+    private static ParsedParameter doParseParameter(String paramName, DataType dataType, Map<Class<? extends Annotation>, Annotation> annotations)
     {
-        if (shouldAdvertise(parameterType, annotations))
-        {
-            return null;
-        }
+        ParsedParameter parameter = new ParsedParameter(annotations);
+        parameter.setAdvertised(shouldAdvertise(dataType, annotations));
 
-        DataType dataType = parameterType;
-
-        ParameterDescriptor parameter = new ParameterDescriptor();
         parameter.setName(getParameterName(paramName, (Parameter) annotations.get(Parameter.class)));
         parameter.setType(dataType);
 
@@ -178,9 +170,9 @@ public final class MuleExtensionAnnotationParser
 
     private static boolean shouldAdvertise(DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
     {
-        return IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) ||
+        return !(IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) ||
                annotations.containsKey(UseConfig.class) ||
-               annotations.containsKey(Connection.class);
+               annotations.containsKey(Connection.class));
     }
 
     public static List<String> getParamNames(Method method)

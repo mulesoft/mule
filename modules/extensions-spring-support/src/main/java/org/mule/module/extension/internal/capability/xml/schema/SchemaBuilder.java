@@ -19,7 +19,9 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
@@ -30,17 +32,21 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
+import static org.mule.module.extension.internal.introspection.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
@@ -76,13 +82,13 @@ import org.mule.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.ArrayUtils;
 import org.mule.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -97,7 +103,7 @@ import javax.xml.namespace.QName;
  *
  * @since 3.7.0
  */
-public class SchemaBuilder
+public final class SchemaBuilder
 {
 
     private static final String UNBOUNDED = "unbounded";
@@ -165,18 +171,98 @@ public class SchemaBuilder
         return this;
     }
 
+    public SchemaBuilder registerConnectionProviderElement(ConnectionProviderModel providerModel)
+    {
+        Element providerElement = new TopLevelElement();
+        providerElement.setName(providerModel.getName());
+        providerElement.setSubstitutionGroup(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
+
+        LocalComplexType complexType = new LocalComplexType();
+        providerElement.setComplexType(complexType);
+
+        ExtensionType providerType = new ExtensionType();
+        providerType.setBase(MULE_EXTENSION_CONNECTION_PROVIDER_TYPE);
+
+        ComplexContent complexContent = new ComplexContent();
+        complexContent.setExtension(providerType);
+        complexType.setComplexContent(complexContent);
+
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
+
+        final ExplicitGroup choice = new ExplicitGroup();
+        choice.setMinOccurs(BigInteger.ZERO);
+        choice.setMaxOccurs(UNBOUNDED);
+
+        registerParameters(providerType, choice, providerModel.getParameterModels());
+        return this;
+    }
+
     public SchemaBuilder registerConfigElement(final ConfigurationModel configurationModel)
     {
-        final ExtensionType config = registerExtension(configurationModel.getName());
+        ExtensionType config = registerExtension(configurationModel.getName());
         config.getAttributeOrAttributeGroup().add(createNameAttribute());
+
 
         final ExplicitGroup choice = new ExplicitGroup();
         choice.setMinOccurs(new BigInteger("0"));
         choice.setMaxOccurs(UNBOUNDED);
 
+        addConnectionProviderElement(choice, configurationModel);
         addDynamicConfigPolicyElement(choice, configurationModel);
+        registerParameters(config, choice, configurationModel.getParameterModels());
+        config.setAnnotation(createDocAnnotation(configurationModel.getDescription()));
 
-        for (final ParameterModel parameterModel : configurationModel.getParameterModels())
+        return this;
+    }
+
+    private Attribute createNameAttribute()
+    {
+        return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, DataType.of(String.class), true, NOT_SUPPORTED);
+    }
+
+    public SchemaBuilder registerOperation(OperationModel operationModel)
+    {
+        String typeName = StringUtils.capitalize(operationModel.getName()) + SchemaConstants.TYPE_SUFFIX;
+        registerProcessorElement(operationModel, typeName);
+        registerOperationType(typeName, operationModel);
+
+        return this;
+    }
+
+    private void addConnectionProviderElement(ExplicitGroup all, ConfigurationModel configurationModel)
+    {
+        ExtensionModel extensionModel = configurationModel.getExtensionModel();
+        if (!getConnectedOperations(extensionModel).isEmpty())
+        {
+            TopLevelElement objectElement = new TopLevelElement();
+
+            objectElement.setMinOccurs(getFirstImplicit(extensionModel.getConnectionProviders()) != null
+                                       ? BigInteger.ZERO
+                                       : BigInteger.ONE);
+
+            objectElement.setMaxOccurs("1");
+            objectElement.setRef(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
+
+            all.getParticle().add(objectFactory.createElement(objectElement));
+        }
+    }
+
+    private void addDynamicConfigPolicyElement(ExplicitGroup all, ConfigurationModel configurationModel)
+    {
+        if (!getDynamicParameters(configurationModel).isEmpty())
+        {
+            TopLevelElement objectElement = new TopLevelElement();
+            objectElement.setMinOccurs(BigInteger.ZERO);
+            objectElement.setMaxOccurs("1");
+            objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT);
+
+            all.getParticle().add(objectFactory.createElement(objectElement));
+        }
+    }
+
+    private void registerParameters(ExtensionType type, ExplicitGroup choice, Collection<ParameterModel> parameterModels)
+    {
+        for (final ParameterModel parameterModel : parameterModels)
         {
             parameterModel.getType().getQualifier().accept(new AbstractDataQualifierVisitor()
             {
@@ -206,45 +292,14 @@ public class SchemaBuilder
                 @Override
                 protected void defaultOperation()
                 {
-                    config.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
+                    type.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
                 }
             });
         }
 
-        config.setAnnotation(createDocAnnotation(configurationModel.getDescription()));
-
         if (!choice.getParticle().isEmpty())
         {
-            config.setChoice(choice);
-        }
-
-        return this;
-    }
-
-    private Attribute createNameAttribute()
-    {
-        return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, DataType.of(String.class), true, NOT_SUPPORTED);
-    }
-
-    public SchemaBuilder registerOperation(OperationModel operationModel)
-    {
-        String typeName = StringUtils.capitalize(operationModel.getName()) + SchemaConstants.TYPE_SUFFIX;
-        registerProcessorElement(operationModel, typeName);
-        registerOperationType(typeName, operationModel);
-
-        return this;
-    }
-
-    private void addDynamicConfigPolicyElement(ExplicitGroup all, ConfigurationModel configurationModel)
-    {
-        if (!getDynamicParameters(configurationModel).isEmpty())
-        {
-            TopLevelElement objectElement = new TopLevelElement();
-            objectElement.setMinOccurs(BigInteger.ZERO);
-            objectElement.setMaxOccurs("1");
-            objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_TYPE);
-
-            all.getParticle().add(objectFactory.createElement(objectElement));
+            type.setChoice(choice);
         }
     }
 
@@ -294,7 +349,7 @@ public class SchemaBuilder
         final ExplicitGroup all = new ExplicitGroup();
         extension.setSequence(all);
 
-        for (Field field : IntrospectionUtils.getParameterFields(type.getRawType()))
+        for (Field field : getParameterFields(type.getRawType()))
         {
             if (isIgnored(field))
             {

@@ -143,4 +143,8 @@
         <heisenberg:knock-many doors="#[doors]" />
     </flow>
 
+    <flow name="callSaul">
+        <heisenberg:call-saul />
+    </flow>
+
 </mule>

@@ -24,6 +24,7 @@ import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.collection.ImmutableListCollector;
 
@@ -57,10 +58,11 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     @Before
     public void before() throws Exception
     {
-        when(configurationModel.getInstantiator().getObjectType()).thenReturn(MODULE_CLASS);
-        when(configurationModel.getInstantiator().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
+        when(configurationModel.getConfigurationFactory().getObjectType()).thenReturn(MODULE_CLASS);
+        when(configurationModel.getConfigurationFactory().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
         when(configurationModel.getModelProperty(anyString())).thenReturn(null);
         when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
+        when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(ImmutableList.of());
 
         when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
 
@@ -70,6 +72,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
         provider = new DynamicConfigurationProvider(CONFIG_NAME,
                                                     configurationModel,
                                                     resolverSet,
+                                                    new StaticValueResolver<>(null),
                                                     expirationPolicy);
 
         super.before();

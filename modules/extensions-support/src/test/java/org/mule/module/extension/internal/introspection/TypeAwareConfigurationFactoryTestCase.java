@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
-import org.mule.extension.api.introspection.ConfigurationInstantiator;
+import org.mule.extension.api.introspection.ConfigurationFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -17,15 +17,15 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.junit.Test;
 
 @SmallTest
-public class TypeAwareConfigurationInstantiatorTestCase extends AbstractMuleTestCase
+public class TypeAwareConfigurationFactoryTestCase extends AbstractMuleTestCase
 {
 
-    private ConfigurationInstantiator instantiator;
+    private ConfigurationFactory instantiator;
 
     @Test
     public void instantiate()
     {
-        instantiator = new TypeAwareConfigurationInstantiator(Apple.class);
+        instantiator = new TypeAwareConfigurationFactory(Apple.class);
         Object object = instantiator.newInstance();
         assertThat(object, instanceOf(Apple.class));
     }
@@ -33,24 +33,24 @@ public class TypeAwareConfigurationInstantiatorTestCase extends AbstractMuleTest
     @Test(expected = IllegalArgumentException.class)
     public void noDefaultConstructor()
     {
-        instantiator = new TypeAwareConfigurationInstantiator(TypeAwareConfigurationInstantiator.class);
+        instantiator = new TypeAwareConfigurationFactory(TypeAwareConfigurationFactory.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullType()
     {
-        instantiator = new TypeAwareConfigurationInstantiator(null);
+        instantiator = new TypeAwareConfigurationFactory(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void interfaceType()
     {
-        instantiator = new TypeAwareConfigurationInstantiator(MuleMessage.class);
+        instantiator = new TypeAwareConfigurationFactory(MuleMessage.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void abstractClass()
     {
-        instantiator = new TypeAwareConfigurationInstantiator(AbstractMuleTestCase.class);
+        instantiator = new TypeAwareConfigurationFactory(AbstractMuleTestCase.class);
     }
 }

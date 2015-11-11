@@ -6,23 +6,25 @@
  */
 package org.mule.module.extension.internal.introspection;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
-import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
@@ -31,23 +33,31 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarat
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.module.extension.internal.DefaultDescribingContext;
+import org.mule.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
+import org.mule.module.extension.internal.introspection.validation.ModelValidator;
+import org.mule.module.extension.internal.introspection.validation.NameClashModelValidator;
 import org.mule.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
+import org.mule.util.CollectionUtils;
 import org.mule.util.ValueHolder;
+import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Default implementation of {@link ExtensionFactory} which uses a
- * {@link ServiceRegistry} to locate instances of {@link ModelEnricher}.
+ * Default implementation of {@link ExtensionFactory}.
  * <p>
+ * It transforms {@link Descriptor} instances into fully fledged instances of
+ * {@link ImmutableExtensionModel}. Because the {@link Descriptor} is a raw, unvalidated
+ * object model, this instance uses a fixed list of {@link ModelValidator} to assure
+ * that the produced model is legal.
  * <p>
- * The discovery of {@link ModelEnricher} instances  will happen when the
- * {@link #DefaultExtensionFactory(ServiceRegistry, ClassLoader)} constructor is invoked
- * and the list of discovered instances will be used during the whole duration of this instance
+ * It uses a {@link ServiceRegistry} to locate instances of {@link ModelEnricher}.
+ * The discovery happens when the {@link #DefaultExtensionFactory(ServiceRegistry, ClassLoader)}
+ * constructor is invoked and the list of discovered instances will be used during
+ * the whole duration of this instance.
  *
  * @since 3.7.0
  */
@@ -55,6 +65,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
 {
 
     private final List<ModelEnricher> modelEnrichers;
+    private final List<ModelValidator> modelValidators;
 
     /**
      * Creates a new instance and uses the given {@code serviceRegistry} to
@@ -66,6 +77,10 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader)
     {
         modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
+        modelValidators = ImmutableList.<ModelValidator>builder()
+                .add(new NameClashModelValidator())
+                .add(new ConnectionProviderModelValidator())
+                .build();
     }
 
     /**
@@ -84,7 +99,10 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     public ExtensionModel createFrom(Descriptor descriptor, DescribingContext describingContext)
     {
         enrichModel(describingContext);
-        return toExtension(descriptor.getRootDeclaration().getDeclaration());
+        ExtensionModel extensionModel = toExtension(descriptor.getRootDeclaration().getDeclaration());
+        modelValidators.forEach(v -> v.validate(extensionModel));
+
+        return extensionModel;
     }
 
     private ExtensionModel toExtension(Declaration declaration)
@@ -96,6 +114,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                                     declaration.getVersion(),
                                                                     sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
                                                                     alphaSortDescribedList(toOperations(declaration.getOperations())),
+                                                                    toConnectionProviders(declaration.getConnectionProviders()),
                                                                     declaration.getModelProperties());
 
         extensionModelValueHolder.set(extensionModel);
@@ -104,6 +123,11 @@ public final class DefaultExtensionFactory implements ExtensionFactory
 
     private List<ConfigurationModel> sortConfigurations(List<ConfigurationModel> configurationModels)
     {
+        if (CollectionUtils.isEmpty(configurationModels))
+        {
+            return configurationModels;
+        }
+
         List<ConfigurationModel> sorted = new ArrayList<>(configurationModels.size());
 
         // first one is kept as default while the rest are alpha sorted
@@ -120,10 +144,9 @@ public final class DefaultExtensionFactory implements ExtensionFactory
 
     private List<ConfigurationModel> toConfigurations(List<ConfigurationDeclaration> declarations, ValueHolder<ExtensionModel> extensionModelValueHolder)
     {
-        checkArgument(!declarations.isEmpty(), "A extension must have at least one configuration");
         return declarations.stream()
                 .map(declaration -> toConfiguration(declaration, extensionModelValueHolder))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration, ValueHolder<ExtensionModel> extensionModel)
@@ -131,20 +154,15 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         return new ImmutableConfigurationModel(declaration.getName(),
                                                declaration.getDescription(),
                                                extensionModel::get,
-                                               declaration.getConfigurationInstantiator(),
-                                               toConfigParameters(declaration.getParameters()),
+                                               declaration.getConfigurationFactory(),
+                                               toParameters(declaration.getParameters()),
                                                declaration.getModelProperties(),
                                                declaration.getInterceptorFactories());
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations)
     {
-        if (declarations.isEmpty())
-        {
-            return ImmutableList.of();
-        }
-
-        return declarations.stream().map(this::toOperation).collect(Collectors.toList());
+        return declarations.stream().map(this::toOperation).collect(toList());
     }
 
     private OperationModel toOperation(OperationDeclaration declaration)
@@ -162,13 +180,21 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                            declaration.getInterceptorFactories());
     }
 
-    private List<ParameterModel> toConfigParameters(List<ParameterDeclaration> declarations)
+    private List<ConnectionProviderModel> toConnectionProviders(List<ConnectionProviderDeclaration> declarations)
     {
+        return declarations.stream().map(this::toConnectionProvider).collect(new ImmutableListCollector<>());
+    }
 
-        List<ParameterModel> parameterModels = toParameters(declarations);
-        alphaSortDescribedList(parameterModels);
-
-        return parameterModels;
+    private ConnectionProviderModel toConnectionProvider(ConnectionProviderDeclaration declaration)
+    {
+        return new ImmutableConnectionProviderModel(
+                declaration.getName(),
+                declaration.getDescription(),
+                declaration.getConfigurationType(),
+                declaration.getConnectionType(),
+                declaration.getFactory(),
+                toParameters(declaration.getParameters()),
+                declaration.getModelProperties());
     }
 
     private List<ParameterModel> toOperationParameters(List<ParameterDeclaration> declarations)
@@ -183,7 +209,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
             return ImmutableList.of();
         }
 
-        return declarations.stream().map(this::toParameter).collect(Collectors.toList());
+        return declarations.stream().map(this::toParameter).collect(toList());
     }
 
     private ParameterModel toParameter(ParameterDeclaration parameter)

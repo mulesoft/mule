@@ -15,6 +15,7 @@ import org.mule.extension.annotation.api.ContentMetadataParameters;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.RestrictedTo;
+import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.ExtensionManager;
@@ -129,5 +130,11 @@ public class HeisenbergOperations
     public List<String> knockMany(List<KnockeableDoor> doors)
     {
         return doors.stream().map(KnockeableDoor::knock).collect(toList());
+    }
+
+    @Operation
+    public String callSaul(@Connection HeisenbergConnection connection)
+    {
+        return connection.callSaul();
     }
 }

@@ -35,7 +35,7 @@ public class StaticValueResolver<T> implements ValueResolver<T>
     }
 
     /**
-     * @return {@value false}
+     * @return {@code false}
      */
     @Override
     public boolean isDynamic()

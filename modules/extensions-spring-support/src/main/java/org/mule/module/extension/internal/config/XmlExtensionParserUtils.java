@@ -13,6 +13,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
+import static org.springframework.util.xml.DomUtils.getChildElements;
 import org.mule.api.NestedProcessor;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.processor.MessageProcessor;
@@ -52,6 +53,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -60,7 +62,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
@@ -86,12 +87,26 @@ final class XmlExtensionParserUtils
      *
      * @param element an {@link Element} being parsed
      * @param builder a {@link BeanDefinitionBuilder}
+     * @return the parsed name
      */
-    static void parseConfigName(Element element, BeanDefinitionBuilder builder)
+    static String parseConfigName(Element element, BeanDefinitionBuilder builder)
     {
-        String name = AutoIdUtils.getUniqueName(element, "mule-bean");
+        return parseName(element, "config", builder);
+    }
+
+    //TODO: Discuss EE-4683
+    static void parseConnectionProviderName(Element element, BeanDefinitionBuilder builder)
+    {
+        parseName(element, "connection-provider", builder);
+    }
+
+    static String parseName(Element element, String type, BeanDefinitionBuilder builder)
+    {
+        String name = AutoIdUtils.getUniqueName(element, type);
         element.setAttribute("name", name);
         builder.addConstructorArgValue(name);
+
+        return name;
     }
 
     /**
@@ -558,11 +573,9 @@ final class XmlExtensionParserUtils
 
     private static void parseElementDescriptorChilds(Element element, BeanDefinitionBuilder builder)
     {
-        ManagedList<BeanDefinition> managedChilds = new ManagedList<>();
-        for (Element child : DomUtils.getChildElements(element))
-        {
-            managedChilds.add(toElementDescriptorBeanDefinition(child));
-        }
+        ManagedList<BeanDefinition> managedChilds = getChildElements(element).stream()
+                .map(XmlExtensionParserUtils::toElementDescriptorBeanDefinition)
+                .collect(Collectors.toCollection(() -> new ManagedList<>()));
 
         builder.addConstructorArgValue(managedChilds);
     }

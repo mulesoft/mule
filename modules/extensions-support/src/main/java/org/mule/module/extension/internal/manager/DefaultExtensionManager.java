@@ -27,6 +27,8 @@ import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
+import org.mule.module.extension.internal.runtime.config.DefaultImplicitConfigurationFactory;
+import org.mule.module.extension.internal.runtime.config.ImplicitConfigurationFactory;
 import org.mule.module.extension.internal.runtime.config.StaticConfigurationProvider;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.time.Time;
@@ -58,13 +60,12 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
+    private final ImplicitConfigurationFactory implicitConfigurationFactory = new DefaultImplicitConfigurationFactory();
 
     private MuleContext muleContext;
     private ExtensionRegistry extensionRegistry;
     private ExtensionDiscoverer extensionDiscoverer;
-    private ImplicitConfigurationFactory implicitConfigurationFactory;
     private ConfigurationExpirationMonitor configurationExpirationMonitor;
-
 
     @Override
     public void initialise() throws InitialisationException
@@ -76,8 +77,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                     new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader()),
                     serviceRegistry);
         }
-
-        implicitConfigurationFactory = new DefaultImplicitConfigurationFactory(muleContext.getExpressionManager());
     }
 
     /**

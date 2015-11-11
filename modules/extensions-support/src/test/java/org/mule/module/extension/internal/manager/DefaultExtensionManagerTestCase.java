@@ -101,7 +101,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     @Mock
     private OperationExecutor executor;
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleEvent event;
 
     private ClassLoader classLoader;
@@ -120,20 +120,20 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         this.extensionsManager = extensionsManager;
 
         when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
-        when(extensionModel1.getConfigurations()).thenReturn(asList(extension1ConfigurationModel));
+        when(extensionModel1.getConfigurationModels()).thenReturn(asList(extension1ConfigurationModel));
         when(extensionModel2.getName()).thenReturn(EXTENSION2_NAME);
 
         when(extensionModel1.getVersion()).thenReturn(EXTENSION1_VERSION);
         when(extensionModel2.getVersion()).thenReturn(EXTENSION2_VERSION);
 
         when(extension1ConfigurationModel.getName()).thenReturn(EXTENSION1_CONFIG_NAME);
-        when(extension1ConfigurationModel.getInstantiator().newInstance()).thenReturn(configInstance);
-        when(extension1ConfigurationModel.getInstantiator().getObjectType()).thenReturn((Class) configInstance.getClass());
+        when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
+        when(extension1ConfigurationModel.getConfigurationFactory().getObjectType()).thenReturn((Class) configInstance.getClass());
         when(extension1ConfigurationModel.getExtensionModel()).thenReturn(extensionModel1);
         when(extension1ConfigurationModel.getInterceptorFactories()).thenReturn(emptyList());
 
-        when(extensionModel1.getConfiguration(EXTENSION1_CONFIG_NAME)).thenReturn(extension1ConfigurationModel);
-        when(extensionModel1.getOperation(EXTENSION1_OPERATION_NAME)).thenReturn(extension1OperationModel);
+        when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(extension1ConfigurationModel);
+        when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(extension1OperationModel);
         when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
 
         when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);
@@ -268,7 +268,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(parameterModel1.isRequired()).thenReturn(true);
 
         when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameterModel1, parameterModel1));
-        when(extension1ConfigurationModel.getInstantiator().newInstance()).thenReturn(configInstance);
+        when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
     }
 
     private List<ExtensionModel> getTestExtensions()

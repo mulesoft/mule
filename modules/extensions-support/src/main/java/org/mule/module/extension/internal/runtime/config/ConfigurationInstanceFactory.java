@@ -6,14 +6,27 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.ConfigurationException;
+import org.mule.extension.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.InterceptorFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Reusable and thread-safe factory that creates instances of {@link ConfigurationInstance}
@@ -29,8 +42,12 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 public final class ConfigurationInstanceFactory<T>
 {
 
+    private static final ValueResolver<ConnectionProvider> NULL_CONNECTION_PROVIDER = new StaticValueResolver<>(null);
+
     private final ConfigurationModel configurationModel;
     private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
+    private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory = new DefaultImplicitConnectionProviderFactory();
+    private final boolean requiresConnection;
 
     /**
      * Creates a new instance which provides instances derived from the given {@code configurationModel}
@@ -43,11 +60,18 @@ public final class ConfigurationInstanceFactory<T>
     {
         this.configurationModel = configurationModel;
         configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
+        requiresConnection = !getConnectedOperations(configurationModel.getExtensionModel()).isEmpty();
     }
 
     /**
      * Creates a new instance using the given {@code event} to obtain the configuration's parameter
-     * values
+     * values.
+     * <p>
+     * This method tries to automatically infer a {@link ConnectionProvider}. The first step is to
+     * determine if the {@link ExtensionModel} which owns the {@link #configurationModel} has any
+     * {@link OperationModel} which requires a connection. If the answer is no, then it just provides
+     * a {@code null} connection provider. Otherwise, it uses a {@link ImplicitConnectionProviderFactory}
+     * to construct an implicit {@link ConnectionProvider}.
      *
      * @param name  the name of the configuration to return
      * @param event the current {@link MuleEvent}
@@ -56,11 +80,44 @@ public final class ConfigurationInstanceFactory<T>
      */
     public ConfigurationInstance<T> createConfiguration(String name, MuleEvent event) throws MuleException
     {
+        ValueResolver<ConnectionProvider> providerResolver;
+        if (requiresConnection)
+        {
+            providerResolver = new StaticValueResolver<>(implicitConnectionProviderFactory.createImplicitConnectionProvider(name, configurationModel.getExtensionModel(), event));
+        }
+        else
+        {
+            providerResolver = NULL_CONNECTION_PROVIDER;
+        }
+
+        return createConfiguration(name, event, providerResolver);
+    }
+
+    /**
+     * Creates a new instance using the given {@code event} to obtain the configuration's parameter
+     * values.
+     * <p>
+     * This method overload allows specifying a {@link ValueResolver} to provide the {@link ConnectionProvider}
+     * that the configuration will use to obtain connections. If the connection does not need such a concept
+     * you can provide a {@code null}
+     *
+     * @param name                       the name of the configuration to return
+     * @param event                      the current {@link MuleEvent}
+     * @param connectionProviderResolver a {@link ValueResolver} to provide the {@link ConnectionProvider} or {@code null}
+     * @return a {@link ConfigurationInstance}
+     * @throws MuleException if an error is encountered
+     */
+    public ConfigurationInstance<T> createConfiguration(String name, MuleEvent event, ValueResolver<ConnectionProvider> connectionProviderResolver) throws MuleException
+    {
+        Optional<ConnectionProvider> connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(event));
+        T configValue = createConfigurationInstance(event);
+        validateConnectionProvider(name, configValue, connectionProvider);
+
         return new LifecycleAwareConfigurationInstance<>(name,
                                                          configurationModel,
-                                                         createConfigurationInstance(event),
-                                                         createInterceptors(configurationModel));
-
+                                                         configValue,
+                                                         createInterceptors(configurationModel),
+                                                         connectionProvider);
     }
 
     /**
@@ -72,13 +129,45 @@ public final class ConfigurationInstanceFactory<T>
      * @return a {@link ConfigurationInstance}
      * @throws MuleException if an error is encountered
      */
-    public ConfigurationInstance<T> createConfiguration(String name, ResolverSetResult resolverSetResult) throws MuleException
+    public ConfigurationInstance<T> createConfiguration(String name, ResolverSetResult resolverSetResult, Optional<ConnectionProvider> connectionProvider) throws MuleException
     {
+        T configValue = createConfigurationInstance(resolverSetResult);
+        validateConnectionProvider(name, configValue, connectionProvider);
+
         return new LifecycleAwareConfigurationInstance<>(name,
                                                          configurationModel,
-                                                         createConfigurationInstance(resolverSetResult),
-                                                         createInterceptors(configurationModel));
+                                                         configValue,
+                                                         createInterceptors(configurationModel),
+                                                         connectionProvider);
+    }
 
+    private void validateConnectionProvider(String name, Object configurationValue, Optional<ConnectionProvider> optionalConnectionProvider) throws MuleException
+    {
+        if (!optionalConnectionProvider.isPresent())
+        {
+            return;
+        }
+
+        Class<? extends ConnectionProvider> providerClass = optionalConnectionProvider.get().getClass();
+        List<Class<?>> providerGenerics = getInterfaceGenerics(providerClass, ConnectionProvider.class);
+
+        if (!configurationValue.getClass().isAssignableFrom(providerGenerics.get(0)))
+        {
+            throw invalidConnectionProviderException(name);
+        }
+
+        Class<?> connectionType = getOperationsConnectionType(configurationModel.getExtensionModel());
+        if (connectionType != null && !providerGenerics.get(1).isAssignableFrom(connectionType))
+        {
+            throw invalidConnectionProviderException(name);
+        }
+    }
+
+    private ConfigurationException invalidConnectionProviderException(String name)
+    {
+        return new ConfigurationException(createStaticMessage(
+                "Configuration '%s' specifies an incompatible connection provider. Make sure you use connection providers of the correct protocol",
+                name));
     }
 
     private T createConfigurationInstance(ResolverSetResult resolverSetResult) throws MuleException

@@ -6,18 +6,26 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
-import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operations;
+import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.capability.Xml;
-import org.mule.extension.annotation.api.connector.Connector;
+import org.mule.extension.annotation.api.connector.Providers;
+
+import java.util.List;
 
 @Extension(name = "petstore", description = "PetStore Test connector")
-@Configurations(PetStoreConnectorConfig.class)
 @Operations(PetStoreOperations.class)
-@Connector(PetStoreClientConnectionHandler.class)
+@Providers(PetStoreConnectionProvider.class)
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore", schemaVersion = "4.0")
 public class PetStoreConnector
 {
 
+    @Parameter
+    private List<String> pets;
+
+    public List<String> getPets()
+    {
+        return pets;
+    }
 }
