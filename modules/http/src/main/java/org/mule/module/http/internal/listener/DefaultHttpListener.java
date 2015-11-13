@@ -22,6 +22,7 @@ import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpParser;
+import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.RequestHandler;
@@ -43,6 +44,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
 
     private static final int INTERNAL_SERVER_ERROR_STATUS_CODE = 500;
     private static final int BAD_REQUEST_STATUS_CODE = 400;
+    public static final String SERVER_PROBLEM = "Server encountered a problem";
 
     private String path;
     private String allowedMethods;
@@ -125,20 +127,23 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                     final HttpMessageProcessContext messageProcessContext = new HttpMessageProcessContext(DefaultHttpListener.this, flowConstruct, config.getWorkManager(), muleContext.getExecutionClassLoader());
                     messageProcessingManager.processMessage(httpMessageProcessorTemplate, messageProcessContext);
                 }
-                catch (HttpRequestParsingException e)
+                catch (HttpRequestParsingException | IllegalArgumentException e)
                 {
-                    sendErrorResponse(BAD_REQUEST_STATUS_CODE, responseCallback);
+                    logger.warn("Exception occurred parsing request:", e);
+                    sendErrorResponse(BAD_REQUEST_STATUS_CODE, e.getMessage(), responseCallback);
                 }
                 catch (RuntimeException e)
                 {
-                    sendErrorResponse(INTERNAL_SERVER_ERROR_STATUS_CODE, responseCallback);
+                    logger.warn("Exception occurred processing request:", e);
+                    sendErrorResponse(INTERNAL_SERVER_ERROR_STATUS_CODE, SERVER_PROBLEM, responseCallback);
                 }
             }
 
-            private void sendErrorResponse(final int statusCode, HttpResponseReadyCallback responseCallback)
+            private void sendErrorResponse(final int statusCode, String message, HttpResponseReadyCallback responseCallback)
             {
                 responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
                                                        .setStatusCode(statusCode)
+                                                       .setEntity(new ByteArrayHttpEntity(message.getBytes()))
                                                        .build(), new ResponseStatusCallback()
                 {
                     @Override
