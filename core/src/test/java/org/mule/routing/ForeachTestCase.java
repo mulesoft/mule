@@ -6,8 +6,13 @@
  */
 package org.mule.routing;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -15,6 +20,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -22,8 +28,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ForeachTestCase extends AbstractMuleContextTestCase
 {
@@ -47,6 +53,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     {
         List<MessageProcessor> lmp = new ArrayList<MessageProcessor>();
         lmp.add(new MessageProcessor() {
+            @Override
             public MuleEvent process(MuleEvent event) {
                 String payload = event.getMessage().getPayload().toString();
                 event.getMessage().setPayload(payload + ":foo");
@@ -70,17 +77,17 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     private Foreach createForeach(List<MessageProcessor> mps)
             throws MuleException
     {
-        Foreach f = new Foreach();
-        f.setMessageProcessors(mps);
-        f.setMuleContext(muleContext);
-        f.initialise();
-        return f;
+        Foreach foreachMp = new Foreach();
+        foreachMp.setMessageProcessors(mps);
+        foreachMp.setMuleContext(muleContext);
+        foreachMp.initialise();
+        return foreachMp;
     }
 
     @Test
-    public void testArrayListPayload() throws Exception
+    public void arrayListPayload() throws Exception
     {
-        ArrayList<String> arrayList = new ArrayList<String>();
+        List<String> arrayList = new ArrayList<String>();
         arrayList.add("bar");
         arrayList.add("zip");
         simpleForeach.process(getTestEvent(arrayList));
@@ -89,7 +96,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testArrayPayload() throws Exception
+    public void arrayPayload() throws Exception
     {        
         String[] array = new String[2];
         array[0] = "bar";
@@ -100,7 +107,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testMuleMessageCollectionPayload() throws Exception
+    public void muleMessageCollectionPayload() throws Exception
     {
         MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
         MuleMessage msg = new DefaultMuleMessage("bar", muleContext);
@@ -113,7 +120,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testIterablePayload() throws Exception
+    public void iterablePayload() throws Exception
     {
         Iterable<String> iterable = new DummySimpleIterableClass();
         simpleForeach.process(getTestEvent(iterable));
@@ -122,7 +129,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testIteratorPayload() throws Exception
+    public void iteratorPayload() throws Exception
     {
         Iterable<String> iterable = new DummySimpleIterableClass();
         simpleForeach.process(getTestEvent(iterable.iterator()));
@@ -131,12 +138,12 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
     
     @Test
-    public void testNestedArrayListPayload() throws Exception
+    public void nestedArrayListPayload() throws Exception
     {
-        ArrayList<ArrayList<String>> payload = new ArrayList<ArrayList<String>>();
-        ArrayList<String> elem1 = new ArrayList<String>();
-        ArrayList<String> elem2 = new ArrayList<String>();
-        ArrayList<String> elem3 = new ArrayList<String>();
+        List<List<String>> payload = new ArrayList<>();
+        List<String> elem1 = new ArrayList<String>();
+        List<String> elem2 = new ArrayList<String>();
+        List<String> elem3 = new ArrayList<String>();
         elem1.add("a1");
         elem1.add("a2");
         elem1.add("a3");
@@ -152,7 +159,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testNestedArrayPayload() throws Exception
+    public void nestedArrayPayload() throws Exception
     {
         String[][] payload = new String[3][2];
         payload[0][0] = "a1";
@@ -167,7 +174,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testNestedMuleMessageCollectionPayload() throws Exception
+    public void nestedMuleMessageCollectionPayload() throws Exception
     {
         MuleMessageCollection parentCollection = new DefaultMessageCollection(muleContext);
         MuleMessageCollection childCollection1 = new DefaultMessageCollection(muleContext);
@@ -195,7 +202,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testNestedIterablePayload() throws Exception
+    public void nestedIterablePayload() throws Exception
     {
         Iterable iterable = new DummyNestedIterableClass();
 
@@ -204,7 +211,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testNestedIteratorPayload() throws Exception
+    public void nestedIteratorPayload() throws Exception
     {
         Iterable iterable = new DummyNestedIterableClass();
 
@@ -212,6 +219,42 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
         assertNestedProcessedMessages();
     }
     
+    @Test
+    public void addProcessorPathElementsBeforeInit() throws MuleException
+    {
+        Foreach foreachMp = new Foreach();
+        foreachMp.setMuleContext(muleContext);
+        List<MessageProcessor> processors = getSimpleMessageProcessors();
+        foreachMp.setMessageProcessors(processors);
+
+        MessageProcessorPathElement mpPathElement = mock(MessageProcessorPathElement.class);
+        foreachMp.addMessageProcessorPathElements(mpPathElement);
+
+        assertAddedPathElements(processors, mpPathElement);
+    }
+
+    @Test
+    public void addProcessorPathElementsAfterInit() throws MuleException
+    {
+        Foreach foreachMp = new Foreach();
+        foreachMp.setMuleContext(muleContext);
+        List<MessageProcessor> processors = getSimpleMessageProcessors();
+        foreachMp.setMessageProcessors(processors);
+        foreachMp.initialise();
+
+        MessageProcessorPathElement mpPathElement = mock(MessageProcessorPathElement.class);
+        foreachMp.addMessageProcessorPathElements(mpPathElement);
+
+        assertAddedPathElements(processors, mpPathElement);
+    }
+
+    protected void assertAddedPathElements(List<MessageProcessor> processors, MessageProcessorPathElement mpPathElement)
+    {
+        verify(mpPathElement, times(processors.size())).addChild(any(MessageProcessor.class));
+        verify(mpPathElement).addChild(processors.get(0));
+        verify(mpPathElement).addChild(processors.get(1));
+    }
+
     private void assertSimpleProcessedMessages()
     {
         assertEquals(ERR_NUMBER_MESSAGES, 2, processedEvents.size());
@@ -243,7 +286,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
 
     public class DummySimpleIterableClass implements Iterable<String>
     {
-        public ArrayList<String> strings = new ArrayList<String>();
+        public List<String> strings = new ArrayList<String>();
         public DummySimpleIterableClass()
         {
             strings.add("bar");
@@ -258,7 +301,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
 
     private class DummyNestedIterableClass implements Iterable<DummySimpleIterableClass>
     {
-        private ArrayList<DummySimpleIterableClass> iterables = new ArrayList<DummySimpleIterableClass>();
+        private List<DummySimpleIterableClass> iterables = new ArrayList<DummySimpleIterableClass>();
         public DummyNestedIterableClass()
         {
             DummySimpleIterableClass dsi1 = new DummySimpleIterableClass();
