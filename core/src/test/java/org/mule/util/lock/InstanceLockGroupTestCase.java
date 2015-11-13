@@ -18,13 +18,11 @@ import org.mule.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mockito;
@@ -42,28 +40,24 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
     private LockProvider mockLockProvider;
 
     @Test
-    @Ignore("MULE-6926: Flaky Test")
     public void testLockUnlock() throws Exception
     {
         testHighConcurrency(false);
     }
 
     @Test
-    @Ignore("MULE-6926: Flaky Test")
     public void testTryLockUnlock() throws Exception
     {
         testHighConcurrency(true);
     }
     
     @Test
-    @Ignore("MULE-6926: Flaky Test")
     public void testWhenUnlockThenDestroy() throws Exception
     {
         lockUnlockThenDestroy(1);
     }
 
     @Test
-    @Ignore("MULE-6926: Flaky Test")
     public void testWhenSeveralLockOneUnlockThenDestroy() throws Exception
     {
         lockUnlockThenDestroy(5);
@@ -85,7 +79,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
 
     private void testHighConcurrency(boolean useTryLock) throws InterruptedException, ObjectStoreException
     {
-        List<Thread> threads = new ArrayList<Thread>(THREAD_COUNT);
+        List<Thread> threads = new ArrayList<Thread>(THREAD_COUNT * 2);
         for (int i = 0; i < THREAD_COUNT; i++)
         {
             IncrementKeyValueThread incrementKeyValueThread = new IncrementKeyValueThread(sharedKeyA,useTryLock);
@@ -166,7 +160,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
 
     public static class InMemoryObjectStore implements ObjectStore<Integer>
     {
-        private Map<Serializable,Integer> store = new HashMap<Serializable,Integer>();
+        private Map<Serializable, Integer> store = new ConcurrentHashMap<Serializable, Integer>();
 
         @Override
         public boolean contains(Serializable key) throws ObjectStoreException
