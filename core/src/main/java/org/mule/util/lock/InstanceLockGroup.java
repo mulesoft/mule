@@ -28,6 +28,7 @@ public class InstanceLockGroup implements LockGroup
         this.locks = new HashMap<String,LockEntry>();
     }
 
+    @Override
     public void lock(String lockId)
     {
         LockEntry lockEntry;
@@ -48,6 +49,7 @@ public class InstanceLockGroup implements LockGroup
         lockEntry.getLock().lock();
     }
 
+    @Override
     public void unlock(String key)
     {
         synchronized (lockAccessMonitor)
@@ -66,6 +68,7 @@ public class InstanceLockGroup implements LockGroup
         }
     }
 
+    @Override
     public boolean tryLock(String lockId, long timeout, TimeUnit timeUnit) throws InterruptedException
     {
         LockEntry lockEntry;
