@@ -174,7 +174,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         splitter.setCounterVariableName(counterVariableName);
         splitter.setMuleContext(muleContext);
 
-        ownedMessageProcessors = new ArrayList<>(messageProcessors.size() + 2);
+        ownedMessageProcessors = new ArrayList<MessageProcessor>(messageProcessors.size() + 2);
         ownedMessageProcessors.add(splitter);
         ownedMessageProcessors.addAll(messageProcessors);
         ownedMessageProcessors.add(new MessageFilter(new Filter()

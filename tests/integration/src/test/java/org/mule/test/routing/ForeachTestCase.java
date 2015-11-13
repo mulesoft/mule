@@ -392,7 +392,7 @@ public class ForeachTestCase extends FunctionalTestCase
 
     private List<List<String>> createNestedPayload()
     {
-        final List<List<String>> payload = new ArrayList<>();
+        final List<List<String>> payload = new ArrayList<List<String>>();
         final List<String> elem1 = new ArrayList<String>();
         final List<String> elem2 = new ArrayList<String>();
         final List<String> elem3 = new ArrayList<String>();

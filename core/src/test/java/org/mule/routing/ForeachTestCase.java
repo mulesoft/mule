@@ -140,7 +140,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     @Test
     public void nestedArrayListPayload() throws Exception
     {
-        List<List<String>> payload = new ArrayList<>();
+        List<List<String>> payload = new ArrayList<List<String>>();
         List<String> elem1 = new ArrayList<String>();
         List<String> elem2 = new ArrayList<String>();
         List<String> elem3 = new ArrayList<String>();
