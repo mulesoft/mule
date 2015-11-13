@@ -71,6 +71,9 @@ public class HttpRequestToMuleEvent
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
         Object payload = NullPayload.getInstance();
+        //We need to reject the request if the Content-Type is invalid, just like newer versions
+        final String contentTypeValue = request.getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
+        final MediaType mediaType = contentTypeValue != null ? MediaType.parse(contentTypeValue) : null;
         if (parseRequest)
         {
             final HttpEntity entity = request.getEntity();
@@ -82,10 +85,8 @@ public class HttpRequestToMuleEvent
                 }
                 else
                 {
-                    final String contentTypeValue = request.getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
                     if (contentTypeValue != null)
                     {
-                        final MediaType mediaType = MediaType.parse(contentTypeValue);
                         String encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
                         outboundProperties.put(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
                         if ((mediaType.type() + "/" + mediaType.subtype()).equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
