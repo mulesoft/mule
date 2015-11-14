@@ -2263,6 +2263,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
     }
 
+    @Test
+    public void checkDeploymentServiceStatus() throws Exception
+    {
+        assertFalse("Deployment Service has not been started yet!", deploymentService.isStarted());
+
+        deploymentService.start();
+        assertTrue("Deployment Service should be started at this moment", deploymentService.isStarted());
+
+        deploymentService.stop();
+        assertFalse("Deployment Service should be stopped at this moment", deploymentService.isStarted());
+    }
+
     private void doRedeployAppByChangingConfigFileWithGoodOne(String applicationPath) throws Exception
     {
         changeConfigFile(applicationPath, EMPTY_APP_CONFIG_XML);
