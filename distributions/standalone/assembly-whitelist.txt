@@ -154,7 +154,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-email-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-file-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-ftp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-jdbc-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-jetty-${productVersion}.jar
@@ -309,7 +308,6 @@
 /mule-standalone-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/neethi-3.0.3.jar
-/mule-standalone-${productVersion}/lib/opt/oro-2.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar

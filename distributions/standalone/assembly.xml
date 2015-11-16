@@ -122,7 +122,6 @@
                 <!-- Transports -->
                 <include>org.mule.transports:mule-transport-email</include>
                 <include>org.mule.transports:mule-transport-file</include>
-                <include>org.mule.transports:mule-transport-ftp</include>
                 <include>org.mule.transports:mule-transport-http</include>
                 <include>org.mule.transports:mule-transport-jdbc</include>
                 <include>org.mule.transports:mule-transport-jetty</include>
@@ -186,7 +185,6 @@
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-email</exclude>
                 <exclude>org.mule.transports:mule-transport-file</exclude>
-                <exclude>org.mule.transports:mule-transport-ftp</exclude>
                 <exclude>org.mule.transports:mule-transport-http</exclude>
                 <exclude>org.mule.transports:mule-transport-jdbc</exclude>
                 <exclude>org.mule.transports:mule-transport-jetty</exclude>

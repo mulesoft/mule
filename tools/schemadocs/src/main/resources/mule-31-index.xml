@@ -7,7 +7,6 @@
     <transport dist="ce" artifactName="email">pop3</transport>
     <transport dist="ce" artifactName="email">pop3s</transport>
     <transport dist="ce">file</transport>
-    <transport dist="ce">ftp</transport>
     <transport dist="ce">http</transport>
     <transport dist="ce" artifactName="http">https</transport>
     <transport dist="ce">jdbc</transport>
@@ -27,7 +26,6 @@
     <transport dist="ee">jdbc</transport>
     <transport dist="ee">wmq</transport>
     <!--<transport dist="ee">msmq</transport>-->
-    <transport dist="ee">ftp</transport>
     <!--todo test make this work with Mule Forge transports-->
     <transport dist="mf">jcr</transport>
 </index>
