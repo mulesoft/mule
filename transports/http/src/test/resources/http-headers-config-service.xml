@@ -19,13 +19,6 @@
     <http:endpoint name="clientEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
     <http:endpoint name="serverEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
 
-    <http:endpoint name="clientEndpoint2" host="localhost" port="${port2}" contentType="application/xml"
-        exchange-pattern="one-way">
-        <property key="Content-Disposition" value="attachment; filename=foo.zip"/>
-        <property key="X-Test" value="foo"/>
-    </http:endpoint>
-    <http:endpoint name="serverEndpoint2" host="localhost" port="${port2}" exchange-pattern="request-response"/>
-
     <model name="Test">
         <service name="ProductDataSourceRepository">
             <inbound>
@@ -36,18 +29,8 @@
                     </properties>
                 </http:inbound-endpoint>
             </inbound>
+            <component class="org.mule.transport.http.functional.HttpHeadersTestCase$TestPayloadComponent"/>
         </service>
 
-        <service name="TestService2">
-            <inbound>
-                <http:inbound-endpoint ref="serverEndpoint2"/>
-            </inbound>
-            <test:component logMessageDetails="true"/>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" connector-ref="vm" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
     </model>
 </mule>

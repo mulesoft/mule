@@ -6,6 +6,7 @@
  */
 package org.mule.transport.servlet;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
@@ -284,7 +285,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
                 }
                 else
                 {
-                    realValue = values.get(0);
+                    realValue = values.size() == 1 ? values.get(0) : EMPTY;
                 }
             }
             headers.put(realKey, realValue);
