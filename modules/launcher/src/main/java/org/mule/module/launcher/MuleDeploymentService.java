@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
 import org.mule.module.launcher.application.Application;
@@ -79,9 +80,12 @@ public class MuleDeploymentService implements DeploymentService
         ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<Application>();
         ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<Domain>();
 
-        this.applicationDeployer = new DefaultArchiveDeployer(applicationMuleDeployer, applicationFactory, applications, deploymentLock);
+        this.applicationDeployer = new DefaultArchiveDeployer<Application>(applicationMuleDeployer, applicationFactory, applications, deploymentLock, NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
         this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-        this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock), applicationDeployer, applicationMuleDeployer, this);
+        this.domainDeployer = new DomainArchiveDeployer(
+                new DefaultArchiveDeployer<Domain>(domainMuleDeployer, domainFactory, domains, deploymentLock,
+                        new DomainDeploymentTemplate(applicationDeployer, this)),
+                applicationDeployer, applicationMuleDeployer, this);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         this.deploymentDirectoryWatcher = new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
     }
@@ -129,10 +133,11 @@ public class MuleDeploymentService implements DeploymentService
         return deploymentDirectoryWatcher.findArtifact(appName, applications);
     }
 
+    @Override
     public Collection<Application> findDomainApplications(final String domain)
     {
         Preconditions.checkArgument(domain != null, "Domain name cannot be null");
-        return (Collection<Application>) CollectionUtils.select(applications, new Predicate()
+        return CollectionUtils.select(applications, new Predicate()
         {
             @Override
             public boolean evaluate(Object object)
