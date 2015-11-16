@@ -44,8 +44,6 @@ public class UnsupportedConnectorsMuleArtifactTestCase
         checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\" validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
         //FTP
         checkUnsupportedConnector("<ftp:connector name=\"ftpConnector\" streaming=\"true\" xmlns:ftp=\"http://www.mulesoft.org/schema/mule/ftp\"/>");
-        //SFTP
-        checkUnsupportedConnector("<sftp:connector name=\"sftp-default\" xmlns:sftp=\"http://www.mulesoft.org/schema/mule/sftp\"/>");
         //File Input
         checkUnsupportedConnector("<file:connector name=\"output\" outputAppend=\"false\" outputPattern=\"#[function:datestamp]-#[header:inbound:originalFilename]\" xmlns:file=\"http://www.mulesoft.org/schema/mule/file\"/>\n");
         //File Output

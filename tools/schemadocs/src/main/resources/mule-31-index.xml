@@ -8,7 +8,6 @@
     <transport dist="ce" artifactName="email">pop3s</transport>
     <transport dist="ce">file</transport>
     <transport dist="ce">ftp</transport>
-    <transport dist="ce">sftp</transport>
     <transport dist="ce">http</transport>
     <transport dist="ce" artifactName="http">https</transport>
     <transport dist="ce">jdbc</transport>
