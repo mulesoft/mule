@@ -7,15 +7,17 @@
 package org.mule.module.extension.internal.resources;
 
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.introspection.declaration.Describer;
-import org.mule.extension.introspection.declaration.DescribingContext;
-import org.mule.extension.resources.ResourcesGenerator;
+import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.api.introspection.ExtensionFactory;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.extension.api.resources.ResourcesGenerator;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.module.extension.internal.introspection.VersionResolver;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.ExceptionUtils;
 
@@ -34,7 +36,7 @@ import javax.tools.Diagnostic;
 
 /**
  * Annotation processor that picks up all the extensions annotated with
- * {@link Extension} and use a
+ * {@link ExtensionModel} and use a
  * {@link ResourcesGenerator} to generated
  * the required resources.
  * <p/>
@@ -42,20 +44,22 @@ import javax.tools.Diagnostic;
  * the XSD schema, spring bundles and extension registration files
  * necessary for mule to work with this extension.
  * <p/>
- * Depending on the capabilities declared by each extension, some of those resources
+ * Depending on the model properties declared by each extension, some of those resources
  * might or might not be generated
  *
  * @since 3.7.0
  */
-@SupportedAnnotationTypes(value = {"org.mule.extension.annotations.Extension"})
+@SupportedAnnotationTypes(value = {"org.mule.extension.annotation.api.Extension"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor
 {
+
     public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
     public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
     public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
 
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry());
+    private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
+    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)
@@ -64,11 +68,10 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(processingEnv, new SpiServiceRegistry());
         try
         {
-            for (TypeElement extensionElement : findExtensions(roundEnv))
-            {
-                Extension extension = parseExtension(extensionElement, roundEnv);
-                generator.generateFor(extension);
-            }
+            findExtensions(roundEnv).forEach(extensionElement -> {
+                ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
+                generator.generateFor(extensionModel);
+            });
 
             generator.dumpAll();
 
@@ -82,26 +85,41 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         }
     }
 
-    private Extension parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment)
+    private ExtensionModel parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment)
     {
         Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
-        Describer describer = new AnnotationsBasedDescriber(extensionClass);
+        Describer describer = new AnnotationsBasedDescriber(extensionClass, new FixedVersionResolver());
 
-        DescribingContext context = new DefaultDescribingContext(describer.describe().getRootDeclaration());
-        context.getCustomParameters().put(EXTENSION_ELEMENT, extensionElement);
-        context.getCustomParameters().put(PROCESSING_ENVIRONMENT, processingEnv);
-        context.getCustomParameters().put(ROUND_ENVIRONMENT, roundEnvironment);
+        DescribingContext context = new DefaultDescribingContext();
+        context.addParameter(EXTENSION_ELEMENT, extensionElement);
+        context.addParameter(PROCESSING_ENVIRONMENT, processingEnv);
+        context.addParameter(ROUND_ENVIRONMENT, roundEnvironment);
 
-        return extensionFactory.createFrom(context.getDeclarationDescriptor(), context);
+        return extensionFactory.createFrom(describer.describe(context), context);
     }
 
     private List<TypeElement> findExtensions(RoundEnvironment env)
     {
-        return ImmutableList.copyOf(getTypeElementsAnnotatedWith(org.mule.extension.annotations.Extension.class, env));
+        return ImmutableList.copyOf(getTypeElementsAnnotatedWith(Extension.class, env));
     }
 
     private void log(String message)
     {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, message);
+    }
+
+    private class FixedVersionResolver implements VersionResolver
+    {
+
+        @Override
+        public String resolveVersion(Extension extension)
+        {
+            String extensionVersion = processingEnv.getOptions().get("extension.version");
+            if (extensionVersion == null)
+            {
+                throw new RuntimeException(String.format("Cannot resolve version for extension %s: option extension.version is missing.", extension.name()));
+            }
+            return extensionVersion;
+        }
     }
 }

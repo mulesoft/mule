@@ -47,7 +47,7 @@ public class InboundMessageLossTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "reliability/inbound-message-loss.xml";
+        return "reliability/inbound-message-loss-flow.xml";
     }
 
     @Override

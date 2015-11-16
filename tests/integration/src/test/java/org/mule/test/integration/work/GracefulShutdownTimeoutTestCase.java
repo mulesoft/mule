@@ -6,37 +6,26 @@
  */
 package org.mule.test.integration.work;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEventContext;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.service.Service;
 import org.mule.construct.Flow;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertTrue;
-
-public class GracefulShutdownTimeoutTestCase extends AbstractServiceAndFlowTestCase
+public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/work/graceful-shutdown-timeout-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/work/graceful-shutdown-timeout-flow.xml"}});
-    }
 
-    public GracefulShutdownTimeoutTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/work/graceful-shutdown-timeout-flow.xml";
     }
 
     @Override
@@ -59,8 +48,8 @@ public class GracefulShutdownTimeoutTestCase extends AbstractServiceAndFlowTestC
     {
         final Latch latch = new Latch();
 
-        FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("TestService");
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(service);
+        FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("TestService");
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(flowConstruct);
         testComponent.setEventCallback(new EventCallback()
         {
             @Override
@@ -72,19 +61,9 @@ public class GracefulShutdownTimeoutTestCase extends AbstractServiceAndFlowTestC
             }
         });
 
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            ((Flow) service).process(getTestEvent("test"));
-            Thread.sleep(200);
-            ((Flow) service).dispose();
-            assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
-        }
-        else
-        {
-            ((Service) service).dispatchEvent(getTestEvent("test"));
-            Thread.sleep(200);
-            ((Service) service).dispose();
-            assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
-        }
+        ((Flow) flowConstruct).process(getTestEvent("test"));
+        Thread.sleep(200);
+        ((Flow) flowConstruct).dispose();
+        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
     }
 }

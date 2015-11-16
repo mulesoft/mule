@@ -55,7 +55,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         PooledJavaComponent component = new PooledJavaComponent(getDefaultObjectFactory(), createDefaultPoolingProfile());
         assertNull(component.lifecycleAdapterPool);
         
-        component.setFlowConstruct(getTestService());
+        component.setFlowConstruct(getTestFlow());
         component.setMuleContext(muleContext);
         component.initialise();
         assertNull(component.lifecycleAdapterPool);
@@ -278,7 +278,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
     {
         PooledJavaComponent component = new PooledJavaComponent(objectFactory, poolingProfile);
         component.setMuleContext(muleContext);
-        component.setFlowConstruct(getTestService());
+        component.setFlowConstruct(getTestFlow());
         component.initialise();
         component.start();
         return component;

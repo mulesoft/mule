@@ -20,17 +20,13 @@ import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionListenerTestCase extends FunctionalTestCase
 {
 
     private static final int TIMEOUT_MILLIS = 5000;
@@ -40,18 +36,10 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
     private ServerNotification exceptionStrategyStartNotification;
     private ServerNotification exceptionStrategyEndNotification;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-listener-config-service.xml"},
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-listener-config-flow.xml"}
-        });
-    }
-
-    public ExceptionListenerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exception-listener-config-flow.xml";
     }
 
     @Override

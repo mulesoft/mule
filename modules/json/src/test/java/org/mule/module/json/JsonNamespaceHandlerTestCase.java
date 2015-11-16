@@ -57,7 +57,7 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
         {
             return;
         }
-          
+
         IsJsonFilter filter = (IsJsonFilter) muleContext.getRegistry().lookupObject("jsonFilter");
         assertNotNull(filter);
         assertTrue(filter.isValidateParsing());
@@ -65,13 +65,13 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
         ObjectToJson serializer = (ObjectToJson) muleContext.getRegistry().lookupObject("fruitCollectionToJson");
         serializer.initialise();
         assertNotNull(serializer);
-        assertEquals(String.class, serializer.getReturnClass());
+        assertEquals(String.class, serializer.getReturnDataType().getType());
         assertEquals(FruitCollection.class, serializer.getSourceClass());
         assertEquals(3, serializer.getSerializationMixins().size());
 
         JsonToObject deserializer = (JsonToObject) muleContext.getRegistry().lookupObject("jsonToFruitCollection");
         assertNotNull(deserializer);
-        assertEquals(FruitCollection.class, deserializer.getReturnClass());
+        assertEquals(FruitCollection.class, deserializer.getReturnDataType().getType());
         assertEquals(1, deserializer.getDeserializationMixins().size());
 
        //Test roundTrip

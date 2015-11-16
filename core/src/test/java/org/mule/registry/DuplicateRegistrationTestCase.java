@@ -6,6 +6,9 @@
  */
 package org.mule.registry;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.StringUtils;
@@ -14,28 +17,24 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class DuplicateRegistrationTestCase extends AbstractMuleContextTestCase
 {
     @Test
     public void testComponentAlreadyDefinedThrowsException() throws Exception
     {
-        Collection components = muleContext.getRegistry().lookupServices();
+        Collection components = muleContext.getRegistry().lookupFlowConstructs();
         assertEquals(0, components.size());
         
         final String componentName = "TEST_COMPONENT_1";
-        getTestService(componentName, Object.class);
+        getTestFlow(componentName, Object.class);
 
-        components = muleContext.getRegistry().lookupServices();
+        components = muleContext.getRegistry().lookupFlowConstructs();
         assertEquals(1, components.size());
         
         // register it again with the same name
         try
         {
-            getTestService(componentName, Object.class);
+            getTestFlow(componentName, Object.class);
             fail("Trying to register a service with the same name must have thrown an exception.");
         }
         catch (RegistrationException e)
@@ -45,7 +44,7 @@ public class DuplicateRegistrationTestCase extends AbstractMuleContextTestCase
                        StringUtils.contains(e.getMessage(), componentName));
         }
 
-        components = muleContext.getRegistry().lookupServices();
+        components = muleContext.getRegistry().lookupFlowConstructs();
         assertEquals(1, components.size());
     }
 }

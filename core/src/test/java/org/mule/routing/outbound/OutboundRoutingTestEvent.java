@@ -27,7 +27,6 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.UUID;
 
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.HashSet;
@@ -113,12 +112,6 @@ public class OutboundRoutingTestEvent implements MuleEvent
     }
 
     @Override
-    public Object transformMessage() throws TransformerException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
         return transformMessage(DataTypeFactory.create(outputType));
@@ -131,18 +124,11 @@ public class OutboundRoutingTestEvent implements MuleEvent
     }
 
     @Override
-    @Deprecated
-    public byte[] transformMessageToBytes() throws TransformerException
-    {
-        return transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
-    }
-
-    @Override
     public String transformMessageToString() throws TransformerException
     {
         try
         {
-            return new String(transformMessageToBytes(), getEncoding());
+            return new String(transformMessage(DataType.BYTE_ARRAY_DATA_TYPE), getEncoding());
         }
         catch (UnsupportedEncodingException e)
         {
@@ -154,18 +140,6 @@ public class OutboundRoutingTestEvent implements MuleEvent
     public String getId()
     {
         return id;
-    }
-
-    @Override
-    public Object getProperty(String name)
-    {
-        return null;
-    }
-
-    @Override
-    public Object getProperty(String name, Object defaultValue)
-    {
-        return defaultValue;
     }
 
     @Override
@@ -215,7 +189,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return MuleTestUtils.getTestService(message.getMuleContext());
+            return MuleTestUtils.getTestFlow(message.getMuleContext());
         }
         catch (Exception e)
         {
@@ -266,11 +240,6 @@ public class OutboundRoutingTestEvent implements MuleEvent
     }
 
     @Override
-    public void captureReplyToDestination()
-    {
-    }
-
-    @Override
     public boolean isSynchronous()
     {
         return false;
@@ -317,45 +286,6 @@ public class OutboundRoutingTestEvent implements MuleEvent
 
     @Override
     public void clearFlowVariables()
-    {
-    }
-
-    @Override
-    public DataType<?> getSessionVariableDataType(String key)
-    {
-        return null;
-    }
-
-    @Override
-    public Object getSessionVariable(String key)
-    {
-        return null;
-    }
-
-    @Override
-    public void setSessionVariable(String key, Object value)
-    {
-    }
-
-    @Override
-    public void setSessionVariable(String key, Serializable value, DataType dataType)
-    {
-
-    }
-
-    @Override
-    public void removeSessionVariable(String key)
-    {
-    }
-
-    @Override
-    public Set<String> getSessionVariableNames()
-    {
-        return new HashSet<String>();
-    }
-
-    @Override
-    public void clearSessionVariables()
     {
     }
 

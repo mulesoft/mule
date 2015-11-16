@@ -9,6 +9,10 @@
 
     <context:property-placeholder location="heisenberg.properties"/>
 
+    <heisenberg:door victim="Top Level Skyler" address="308 Negra Arroyo Lane" name="door"/>
+
+    <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
+
     <heisenberg:config name="heisenberg"
                        myName="Heisenberg"
                        age="50"
@@ -103,6 +107,44 @@
 
     <flow name="alias">
         <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52"  />
+    </flow>
+
+
+    <flow name="knockStaticInlineDoor">
+        <heisenberg:knock>
+            <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane" />
+        </heisenberg:knock>
+    </flow>
+
+    <flow name="knockStaticTopLevelDoor">
+        <heisenberg:knock door="door" />
+    </flow>
+
+    <flow name="knockDynamicTopLevelDoor">
+        <heisenberg:knock door="dynamicDoor" />
+    </flow>
+
+    <flow name="knockDynamicInlineDoor">
+        <heisenberg:knock>
+            <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" />
+        </heisenberg:knock>
+    </flow>
+
+    <flow name="knockManyWithInlineList">
+        <heisenberg:knock-many>
+            <heisenberg:doors>
+                <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane" />
+                <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" />
+            </heisenberg:doors>
+        </heisenberg:knock-many>
+    </flow>
+
+    <flow name="knockManyByExpression">
+        <heisenberg:knock-many doors="#[doors]" />
+    </flow>
+
+    <flow name="callSaul">
+        <heisenberg:call-saul />
     </flow>
 
 </mule>

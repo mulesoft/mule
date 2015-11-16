@@ -43,7 +43,6 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.service.Service;
 import org.mule.construct.Flow;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
@@ -797,7 +796,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     public void testOneWayOutboundEndpointWithService() throws Exception
     {
         MuleEvent event = getTestEventUsingFlow("");
-        when(event.getFlowConstruct()).thenReturn(mock(Service.class));
+        when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
 
         MessageProcessor mp = mock(MessageProcessor.class,
                                    withSettings().extraInterfaces(OutboundEndpoint.class));

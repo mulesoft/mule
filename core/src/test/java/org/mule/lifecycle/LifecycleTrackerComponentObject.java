@@ -7,30 +7,35 @@
 package org.mule.lifecycle;
 
 import org.mule.api.MuleEventContext;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.Callable;
-import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 
 /**
  * @author David Dossot (david@dossot.net)
  */
 public class LifecycleTrackerComponentObject extends AbstractLifecycleTracker
-        implements ServiceAware, Callable {
+        implements FlowConstructAware, Callable
+{
 
-    public void springInitialize() {
+    public void springInitialize()
+    {
         getTracker().add("springInitialize");
     }
 
-    public void springDestroy() {
+    public void springDestroy()
+    {
         getTracker().add("springDestroy");
     }
 
-     public void setService(final Service service)
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        getTracker().add("setService");
+        getTracker().add("setFlowConstruct");
     }
 
-    public Object onCall(final MuleEventContext eventContext) throws Exception {
+    public Object onCall(final MuleEventContext eventContext) throws Exception
+    {
         // dirty trick to get the component instance that was used for the
         // request
         return this;

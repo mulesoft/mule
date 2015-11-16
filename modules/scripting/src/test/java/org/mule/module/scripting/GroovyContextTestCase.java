@@ -126,7 +126,7 @@ public class GroovyContextTestCase extends FunctionalTestCase
     protected void runScenario(String flowName) throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("TEST", muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        DefaultMuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
         Flow flow = (Flow) getFlowConstruct(flowName);
         flow.process(event);
         FlowAssert.verify(flowName);

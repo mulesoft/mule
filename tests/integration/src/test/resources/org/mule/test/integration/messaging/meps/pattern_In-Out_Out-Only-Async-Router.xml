@@ -28,44 +28,29 @@
     <jms:endpoint queue="test.external.app" name="externalEndpoint" exchange-pattern="one-way"/>
     <jms:endpoint queue="test.reply" name="replyEndpoint" exchange-pattern="one-way"/>
 
-    <model>
-        <service name="In-Out_Out-Only-Async-Service">
-            <inbound>
-                <inbound-endpoint ref="inboundEndpoint"/>
-            </inbound>
+    <flow name="In-Out_Out-Only-Async-Service">
+        <inbound-endpoint ref="inboundEndpoint"/>
+        <request-reply timeout="4000">
+            <outbound-endpoint ref="externalEndpoint">
+                <message-properties-transformer>
+                    <add-message-property key="foo" value="bar"/>
+                </message-properties-transformer>
+                <jms:object-to-jmsmessage-transformer/>
+            </outbound-endpoint>
+            <inbound-endpoint ref="replyEndpoint"/>
+        </request-reply>
+    </flow>
 
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="externalEndpoint">
-                        <message-properties-transformer>
-                            <add-message-property key="foo" value="bar"/>
-                        </message-properties-transformer>
-                        <jms:object-to-jmsmessage-transformer/>
-                    </outbound-endpoint>
-                    <reply-to ref="replyEndpoint"/>
-                </pass-through-router>
-            </outbound>
-
-            <async-reply failOnTimeout="true" timeout="4000">
-                <inbound-endpoint ref="replyEndpoint"/>
-                <single-async-reply-router/>
-            </async-reply>
-
-        </service>
-
-        <service name="ExternalApp">
-            <inbound>
-                <inbound-endpoint ref="externalEndpoint">
-                    <message-properties-transformer>
-                        <!-- propagate the property explicitly -->
-                        <add-message-property key="foo" value="#[header:INBOUND:foo]"/>
-                    </message-properties-transformer>
-                </inbound-endpoint>
-            </inbound>
-            <test:component logMessageDetails="true">
-                <test:return-data>got it!</test:return-data>
-            </test:component>
-        </service>
-    </model>
+    <flow name="ExternalApp">
+        <inbound-endpoint ref="externalEndpoint">
+            <message-properties-transformer>
+                <!-- propagate the property explicitly -->
+                <add-message-property key="foo" value="#[header:INBOUND:foo]"/>
+            </message-properties-transformer>
+        </inbound-endpoint>
+        <test:component logMessageDetails="true">
+            <test:return-data>got it!</test:return-data>
+        </test:component>
+    </flow>
     <!--// END SNIPPET: full-config -->
 </mule>

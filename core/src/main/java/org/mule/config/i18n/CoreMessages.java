@@ -15,7 +15,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.DataType;
@@ -320,17 +319,6 @@ public class CoreMessages extends MessageFactory
     public static Message cannotReadPayloadAsString(String type)
     {
         return factory.createMessage(BUNDLE_PATH, 70, type);
-    }
-
-    @Deprecated
-    public static Message routingFailedOnEndpoint(Service service, ImmutableEndpoint endpoint)
-    {
-        EndpointURI endpointURI = null;
-        if (endpoint != null)
-        {
-            endpointURI = endpoint.getEndpointURI();
-        }
-        return factory.createMessage(BUNDLE_PATH, 72, service.getName(), endpointURI);
     }
 
     public static Message cannotInstanciateFinder(String serviceFinder)
@@ -1017,12 +1005,6 @@ public class CoreMessages extends MessageFactory
     public static Message notMuleXaTransaction(Object tx)
     {
         return factory.createMessage(BUNDLE_PATH, 248, tx.getClass());
-    }
-
-    @Deprecated
-    public static Message noServiceQueueTimeoutSet(Service service)
-    {
-        return factory.createMessage(BUNDLE_PATH, 249, service);
     }
 
     public static Message failedToProcessExtractorFunction(String name)

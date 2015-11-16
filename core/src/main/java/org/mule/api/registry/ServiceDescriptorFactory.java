@@ -9,7 +9,6 @@ package org.mule.api.registry;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.model.DefaultModelServiceDescriptor;
 import org.mule.transport.service.DefaultTransportServiceDescriptor;
 import org.mule.transport.service.MetaTransportServiceDescriptor;
 import org.mule.transport.service.TransportServiceDescriptor;
@@ -94,11 +93,6 @@ public class ServiceDescriptorFactory
             }
             Properties exceptionMappingProps = SpiUtils.findServiceDescriptor(ServiceType.EXCEPTION, name + "-exception-mappings");
             ((TransportServiceDescriptor) sd).setExceptionMappings(exceptionMappingProps);
-        }
-        else if (type.equals(ServiceType.MODEL))
-        {
-            logger.warn(CoreMessages.modelDeprecated());
-            sd = new DefaultModelServiceDescriptor(name, props);
         }
         else
         {

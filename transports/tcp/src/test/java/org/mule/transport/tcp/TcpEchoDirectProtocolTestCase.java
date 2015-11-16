@@ -8,39 +8,27 @@ package org.mule.transport.tcp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class TcpEchoDirectProtocolTestCase extends AbstractServiceAndFlowTestCase
+public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase
 {
+
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public TcpEchoDirectProtocolTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-echo-test-service.xml"},
-            {ConfigVariant.FLOW, "tcp-echo-test-flow.xml"}
-        });
+        return "tcp-echo-test-flow.xml";
     }
 
     @Test

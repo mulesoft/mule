@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xmlns:pop3="http://www.mulesoft.org/schema/mule/pop3"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:pop3="http://www.mulesoft.org/schema/mule/pop3" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/pop3 http://www.mulesoft.org/schema/mule/pop3/current/mule-pop3.xsd">
 
-    <model name="main">
-        <service name="default config">
-            <inbound>
-                <vm:inbound-endpoint path="in-default" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <exception-based-router>
-                    <!-- this doesn't exist -->
-                    <smtp:outbound-endpoint user="error" host="localhost" port="${port1}"/>
-                    <vm:outbound-endpoint path="out-default" exchange-pattern="one-way"/>
-                </exception-based-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="default config">
+        <vm:inbound-endpoint path="in-default" exchange-pattern="request-response"/>
+        <first-successful>
+            <smtp:outbound-endpoint user="error" host="localhost" port="${port1}"/>
+            <vm:outbound-endpoint path="out-default" exchange-pattern="one-way"/>
+        </first-successful>
+    </flow>
+
 </mule>

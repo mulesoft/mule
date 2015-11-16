@@ -10,7 +10,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -24,7 +23,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -59,7 +57,7 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
             inputData.add(String.valueOf(i));
         }
         MuleEvent responseEvent = flow.process(getTestEvent(inputData));
-        assertThat(responseEvent.<List>getSessionVariable("recordsToUpdate").size(), is(numberOfElements));
+        assertThat(responseEvent.getSession().<List>getProperty("recordsToUpdate").size(), is(numberOfElements));
     }
 
     private void assertNotNullAndNotExceptionResponse(MuleMessage response)

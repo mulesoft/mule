@@ -9,25 +9,15 @@ package org.mule.config.spring;
 import org.mule.api.MuleException;
 import org.mule.api.client.MuleClient;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class NamedInterceptorTestCase extends AbstractInterceptorTestCase
 {
-    public NamedInterceptorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/named-interceptor-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/config/spring/named-interceptor-test-flow.xml"}});
+        return "org/mule/config/spring/named-interceptor-test-flow.xml";
     }
 
     @Test

@@ -9,39 +9,28 @@ package org.mule.transport.vm.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class EndpointContentTypeTestCase extends AbstractServiceAndFlowTestCase
+public class EndpointContentTypeTestCase extends FunctionalTestCase
 {
-    public EndpointContentTypeTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/config/content-type-setting-endpoint-configs-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/config/content-type-setting-endpoint-configs-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/config/content-type-setting-endpoint-configs-flow.xml"}
-        });
-    }      
-    
     @Test
     public void testContentTypes() throws Exception
     {

@@ -122,11 +122,9 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
 
     private void injectFieldDependencies() throws InitialisationException
     {
-        for (Object object : lookupObjects(Object.class))
-        {
-            injectInto(object);
-        }
+        lookupObjects(Object.class).forEach(this::injectInto);
     }
+
     private <T> T injectInto(T object)
     {
         for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class)))
@@ -150,6 +148,7 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
 
         return object;
     }
+
 
     private void initialiseObjects() throws InitialisationException
     {

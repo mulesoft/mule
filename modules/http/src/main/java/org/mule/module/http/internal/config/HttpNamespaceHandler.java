@@ -12,7 +12,6 @@ import org.mule.config.spring.parsers.delegate.RootOrNestedElementBeanDefinition
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.module.http.internal.HttpMapParam;
 import org.mule.module.http.internal.HttpMessageBuilderRef;
 import org.mule.module.http.internal.HttpParamType;

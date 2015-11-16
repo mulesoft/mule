@@ -15,13 +15,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.ssl.DefaultTlsContextFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -34,9 +32,8 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 {
     public static final int TIMEOUT = 5000;
     public static final String ERROR_PROCESSING_NEWS = "error processing news";
@@ -52,16 +49,10 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
 
     private DefaultTlsContextFactory tlsContextFactory;
 
-    public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-service.xml"},
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml"}});
+        return "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml";
     }
 
     @Before

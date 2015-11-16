@@ -265,7 +265,7 @@
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
-                The expression-filename-parser element configures the ExpressionFilenameParser, which can use any expression language supported by Mule to construct a file name for the current message. Expressions can be xpath, xquery, ognl, mvel, header, function, and more. 
+                The expression-filename-parser element configures the ExpressionFilenameParser, which can use any expression language supported by Mule to construct a file name for the current message. Expressions can be xpath, xquery, mvel, header, function, and more.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

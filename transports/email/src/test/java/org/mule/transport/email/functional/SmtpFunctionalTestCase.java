@@ -6,32 +6,27 @@
  */
 package org.mule.transport.email.functional;
 
-import java.util.Arrays;
-import java.util.Collection;
+import static org.junit.Assert.assertEquals;
+
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import static org.junit.Assert.assertEquals;
 
 public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpFunctionalTestCase(ConfigVariant variant, String configResources)
+    public SmtpFunctionalTestCase()
     {
-        super(variant, STRING_MESSAGE, "smtp", configResources);
+        super(STRING_MESSAGE, "smtp");
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "smtp-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "smtp-functional-test-flow.xml"}
-        });
-    }      
-    
+        return "smtp-functional-test-flow.xml";
+    }
+
     @Test
     @Ignore("MULE-6926: flaky test")
     public void testSend() throws Exception

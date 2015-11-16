@@ -21,15 +21,6 @@ public class NullSessionHandler implements SessionHandler
         return null;
     }
 
-    /**
-     * @deprecated Use retrieveSessionInfoFromMessage(MuleMessage message) instead
-     */
-    @Deprecated
-    public void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException
-    {
-        retrieveSessionInfoFromMessage(message);
-    }
-
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
         // noop

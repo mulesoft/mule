@@ -18,6 +18,7 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.transformer.types.MimeTypes.ANY;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
@@ -70,7 +71,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
 
         assertThat(muleMessage.getEncoding(), equalTo(DEFAULT_ENCODING));
-        assertThat(muleMessage.getPropertyNames(), not(hasItem(MuleProperties.MULE_ENCODING_PROPERTY)));
+        assertThat(muleMessage.getPropertyNames(OUTBOUND), not(hasItem(MuleProperties.MULE_ENCODING_PROPERTY)));
     }
 
     @Test
@@ -86,22 +87,11 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void updatesEncodingWithPropertyAndScope() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setProperty(MuleProperties.MULE_ENCODING_PROPERTY, CUSTOM_ENCODING, PropertyScope.OUTBOUND);
+        muleMessage.setProperty(MuleProperties.MULE_ENCODING_PROPERTY, CUSTOM_ENCODING, OUTBOUND);
 
         assertThat(muleMessage.getEncoding(), equalTo(CUSTOM_ENCODING));
-        assertThat(muleMessage.getPropertyNames(), hasItem(MuleProperties.MULE_ENCODING_PROPERTY));
-        assertThat(muleMessage.getProperty(MuleProperties.MULE_ENCODING_PROPERTY), Matchers.<Object>equalTo(CUSTOM_ENCODING));
-    }
-
-    @Test
-    public void updatesEncodingWithProperty() throws Exception
-    {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setProperty(MuleProperties.MULE_ENCODING_PROPERTY, CUSTOM_ENCODING);
-
-        assertThat(muleMessage.getEncoding(), equalTo(CUSTOM_ENCODING));
-        assertThat(muleMessage.getPropertyNames(), hasItem(MuleProperties.MULE_ENCODING_PROPERTY));
-        assertThat(muleMessage.getProperty(MuleProperties.MULE_ENCODING_PROPERTY), Matchers.<Object>equalTo(CUSTOM_ENCODING));
+        assertThat(muleMessage.getPropertyNames(OUTBOUND), hasItem(MuleProperties.MULE_ENCODING_PROPERTY));
+        assertThat(muleMessage.getProperty(MuleProperties.MULE_ENCODING_PROPERTY, OUTBOUND), Matchers.<Object>equalTo(CUSTOM_ENCODING));
     }
 
     @Test
@@ -293,21 +283,12 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void setsDefaultPropertyDataType() throws Exception
-    {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setProperty(TEST_PROPERTY, TEST);
-
-        assertDefaultPropertyDataType(muleMessage, PropertyScope.OUTBOUND);
-    }
-
-    @Test
     public void setsDefaultOutboundPropertyDataType() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setOutboundProperty(TEST_PROPERTY, TEST);
 
-        assertDefaultPropertyDataType(muleMessage, PropertyScope.OUTBOUND);
+        assertDefaultPropertyDataType(muleMessage, OUTBOUND);
     }
 
     @Test
@@ -319,16 +300,16 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         muleMessage.setOutboundProperty(TEST_PROPERTY, TEST, dataType);
 
-        assertPropertyDataType(muleMessage, PropertyScope.OUTBOUND, dataType);
+        assertPropertyDataType(muleMessage, OUTBOUND, dataType);
     }
 
     @Test
     public void setsDefaultOutboundScopePropertyDataType() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.OUTBOUND);
+        muleMessage.setProperty(TEST_PROPERTY, TEST, OUTBOUND);
 
-        assertDefaultPropertyDataType(muleMessage, PropertyScope.OUTBOUND);
+        assertDefaultPropertyDataType(muleMessage, OUTBOUND);
     }
 
     @Test
@@ -408,7 +389,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
         dataType.setEncoding(CUSTOM_ENCODING);
 
-        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.OUTBOUND, dataType);
+        muleMessage.setProperty(TEST_PROPERTY, TEST, OUTBOUND, dataType);
 
         DefaultMuleMessage inboundMessage = (DefaultMuleMessage) muleMessage.createInboundMessage();
 
@@ -422,34 +403,16 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
         dataType.setEncoding(CUSTOM_ENCODING);
 
-        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.OUTBOUND, dataType);
+        muleMessage.setProperty(TEST_PROPERTY, TEST, OUTBOUND, dataType);
 
-        assertPropertyDataType(muleMessage, PropertyScope.OUTBOUND, dataType);
-    }
-
-    @Test
-    public void updatesDataTypeWithContentTypeProperty() throws Exception
-    {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setProperty(MuleProperties.CONTENT_TYPE_PROPERTY, CUSTOM_CONTENT_TYPE);
-
-        assertDataType(muleMessage, String.class, CUSTOM_MIME_TYPE, CUSTOM_ENCODING);
+        assertPropertyDataType(muleMessage, OUTBOUND, dataType);
     }
 
     @Test
     public void updatesDataTypeWithContentTypePropertyAndScope() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setProperty(MuleProperties.CONTENT_TYPE_PROPERTY, CUSTOM_CONTENT_TYPE, PropertyScope.OUTBOUND);
-
-        assertDataType(muleMessage, String.class, CUSTOM_MIME_TYPE, CUSTOM_ENCODING);
-    }
-
-    @Test
-    public void updatesDataTypeWithContentTypeInProperties() throws Exception
-    {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.addProperties(Collections.<String, Object>singletonMap(MuleProperties.CONTENT_TYPE_PROPERTY, CUSTOM_CONTENT_TYPE));
+        muleMessage.setProperty(MuleProperties.CONTENT_TYPE_PROPERTY, CUSTOM_CONTENT_TYPE, OUTBOUND);
 
         assertDataType(muleMessage, String.class, CUSTOM_MIME_TYPE, CUSTOM_ENCODING);
     }

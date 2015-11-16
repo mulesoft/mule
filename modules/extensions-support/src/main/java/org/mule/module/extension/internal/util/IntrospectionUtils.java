@@ -6,7 +6,9 @@
  */
 package org.mule.module.extension.internal.util;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -14,15 +16,18 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
-import static org.reflections.ReflectionUtils.withParameters;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 import org.mule.api.NestedProcessor;
-import org.mule.extension.annotations.param.Ignore;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
-import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.annotation.api.Operation;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.param.Ignore;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -31,6 +36,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -105,9 +111,9 @@ public class IntrospectionUtils
         return toDataType(ResolvableType.forField(field));
     }
 
-    public static Field getField(Class<?> clazz, Parameter parameter)
+    public static Field getField(Class<?> clazz, ParameterModel parameterModel)
     {
-        return getField(clazz, getMemberName(parameter, parameter.getName()), parameter.getType().getRawType());
+        return getField(clazz, getMemberName(parameterModel, parameterModel.getName()), parameterModel.getType().getRawType());
     }
 
     public static Field getField(Class<?> clazz, ParameterDeclaration parameterDeclaration)
@@ -133,18 +139,44 @@ public class IntrospectionUtils
 
         if (isOperation(rawClass))
         {
-            return DataType.of(Operation.class);
+            return DataType.of(OperationModel.class);
         }
 
         if (List.class.isAssignableFrom(rawClass))
         {
             if (!ArrayUtils.isEmpty(generics) && isOperation(generics[0].getRawClass()))
             {
-                return DataType.of(rawClass, Operation.class);
+                return DataType.of(rawClass, OperationModel.class);
             }
         }
 
         return DataType.of(rawClass, toRawTypes(generics));
+    }
+
+    public static List<Class<?>> getInterfaceGenerics(Class<?> type, Class<?> implementedInterface)
+    {
+        ResolvableType interfaceType = null;
+        Class<?> searchClass = type;
+
+        while (!Object.class.equals(searchClass))
+        {
+            for (ResolvableType iType : ResolvableType.forClass(searchClass).getInterfaces())
+            {
+                if (iType.getRawClass().equals(implementedInterface))
+                {
+                    interfaceType = iType;
+                    break;
+                }
+            }
+            searchClass = searchClass.getSuperclass();
+        }
+
+        if (interfaceType == null)
+        {
+            throw new IllegalArgumentException(String.format("Class '%s' does not implement the '%s' interface", type.getName(), implementedInterface.getName()));
+        }
+
+        return Arrays.stream(interfaceType.getGenerics()).map(ResolvableType::getRawClass).collect(toList());
     }
 
     private static boolean isOperation(Class<?> rawClass)
@@ -191,15 +223,15 @@ public class IntrospectionUtils
         return object.getAnnotation(Optional.class) == null;
     }
 
-    public static boolean isRequired(Parameter parameter, boolean forceOptional)
+    public static boolean isRequired(ParameterModel parameterModel, boolean forceOptional)
     {
-        return !forceOptional && parameter.isRequired();
+        return !forceOptional && parameterModel.isRequired();
     }
 
-    public static boolean isDynamic(AccessibleObject object)
+    public static ExpressionSupport getExpressionSupport(AccessibleObject object)
     {
-        org.mule.extension.annotations.Parameter parameter = object.getAnnotation(org.mule.extension.annotations.Parameter.class);
-        return parameter != null ? parameter.isDynamic() : true;
+        Parameter parameter = object.getAnnotation(Parameter.class);
+        return parameter != null ? parameter.expressionSupport() : SUPPORTED;
     }
 
     public static boolean isVoid(Method method)
@@ -210,51 +242,22 @@ public class IntrospectionUtils
 
     public static Collection<Field> getParameterFields(Class<?> extensionType)
     {
-        return getAllFields(extensionType, withAnnotation(org.mule.extension.annotations.Parameter.class));
+        return getAllFields(extensionType, withAnnotation(Parameter.class));
     }
 
     public static Collection<Field> getParameterGroupFields(Class<?> extensionType)
     {
-        return getAllFields(extensionType, withAnnotation(org.mule.extension.annotations.ParameterGroup.class));
+        return getAllFields(extensionType, withAnnotation(ParameterGroup.class));
     }
 
     public static Collection<Method> getOperationMethods(Class<?> declaringClass)
     {
-        return getAllMethods(declaringClass, withAnnotation(org.mule.extension.annotations.Operation.class), withModifier(Modifier.PUBLIC));
-    }
-
-    public static Method getOperationMethod(Class<?> declaringClass, Operation operation)
-    {
-        Class<?>[] parameterTypes;
-        if (operation.getParameters().isEmpty())
-        {
-            parameterTypes = org.apache.commons.lang.ArrayUtils.EMPTY_CLASS_ARRAY;
-        }
-        else
-        {
-            parameterTypes = new Class<?>[operation.getParameters().size()];
-            int i = 0;
-            for (Parameter parameter : operation.getParameters())
-            {
-                parameterTypes[i++] = parameter.getType().getRawType();
-            }
-        }
-
-        Collection<Method> methods = getAllMethods(declaringClass,
-                                                   withAnnotation(org.mule.extension.annotations.Operation.class),
-                                                   withModifier(Modifier.PUBLIC),
-                                                   withName(operation.getName()),
-                                                   withParameters(parameterTypes));
-
-        checkArgument(!methods.isEmpty(), String.format("Could not find method %s in class %s", operation.getName(), declaringClass.getName()));
-        checkArgument(methods.size() == 1, String.format("More than one matching method was found in class %s for operation %s", declaringClass.getName(), operation.getName()));
-
-        return methods.iterator().next();
+        return getAllMethods(declaringClass, withAnnotation(Operation.class), withModifier(Modifier.PUBLIC));
     }
 
     public static String getAlias(Field field)
     {
-        org.mule.extension.annotations.Parameter parameter = field.getAnnotation(org.mule.extension.annotations.Parameter.class);
+        Parameter parameter = field.getAnnotation(Parameter.class);
         String alias = parameter != null ? parameter.alias() : EMPTY;
         return StringUtils.isEmpty(alias) ? field.getName() : alias;
     }

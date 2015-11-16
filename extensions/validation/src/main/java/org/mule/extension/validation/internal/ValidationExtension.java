@@ -18,14 +18,15 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.extension.annotations.Extensible;
-import org.mule.extension.annotations.Extension;
-import org.mule.extension.annotations.Operations;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.capability.Xml;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Operation;
+import org.mule.extension.annotation.api.Extensible;
+import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.Operations;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.capability.Xml;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.Validator;
 import org.mule.util.ObjectNameHelper;
@@ -34,9 +35,9 @@ import java.util.Locale;
 
 /**
  * An extension which provides validation capabilities by exposing a series of
- * {@link Validator}s as {@link org.mule.extension.introspection.Extension} {@link Operation}s
+ * {@link Validator}s as {@link ExtensionModel} {@link OperationModel}s
  *
- * This class not only defines the extension but also acts as the only available {@link Configuration}
+ * This class not only defines the extension but also acts as the only available {@link ConfigurationModel}
  * for it. It allows parametrizing the {@link Validator}s with custom {@link ExceptionFactory} and
  * i18n bundles (through a {@link I18NConfig}
  *
@@ -45,7 +46,7 @@ import java.util.Locale;
  *
  * @since 3.7.0
  */
-@Extension(name = "validation", description = "Mule Validation Extension", version = "3.7")
+@Extension(name = "validation", description = "Mule Validation Extension")
 @Operations({CommonValidationOperations.class, CustomValidatorOperation.class, ValidationStrategies.class, NumberValidationOperation.class})
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/validation", namespace = "validation", schemaVersion = "3.7")
 @Extensible(alias = "validator-message-processor")

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -30,7 +31,7 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     public void setSessionPropertyUsingAPIGetInFlow() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         message.setProperty("key", "value", PropertyScope.SESSION);
 
@@ -44,7 +45,7 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     public void setSessionPropertyInFlowGetUsingAPI() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         Flow flowA = (Flow) muleContext.getRegistry().lookupFlowConstruct("B");
         MuleEvent result = flowA.process(event);
@@ -56,7 +57,7 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     public void propagateSessionPropertyOverTransportRequestResponse() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         Object nonSerializable = new Object();
         message.setProperty("key", "value", PropertyScope.SESSION);
@@ -80,7 +81,7 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     public void propagateSessionPropertyOverTransportOneWay() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         Object nonSerializable = new Object();
         message.setProperty("key", "value", PropertyScope.SESSION);
@@ -104,7 +105,7 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     public void nonSerializableSessionPropertyOneWayFlow() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         Object nonSerializable = new Object();
         message.setProperty("keyNonSerializable", nonSerializable, PropertyScope.SESSION);
@@ -127,7 +128,7 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     {
 
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         Object nonSerializable = new Object();
         message.setProperty("keyNonSerializable", nonSerializable, PropertyScope.SESSION);
@@ -150,7 +151,7 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     public void outboundEndpointSessionMerge() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
         Object nonSerializable = new Object();
         message.setProperty("keyNonSerializable", nonSerializable, PropertyScope.SESSION);
         message.setProperty("keyNonSerializable2", nonSerializable, PropertyScope.SESSION);
@@ -167,14 +168,14 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
         assertEquals(nonSerializable, result.getSession().getProperty("keyNonSerializable2"));
         assertEquals("value2NEW", result.getSession().getProperty("key2"));
         assertEquals("value3", result.getSession().getProperty("key3"));
-        assertNull(result.getMessage().getProperty("nonSerializableBean"));
+        assertNull(result.getMessage().getProperty("nonSerializableBean", OUTBOUND));
     }
 
     @Test
     public void requestReplySessionMerge() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
         Object nonSerializable = new Object();
         message.setProperty("keyNonSerializable", nonSerializable, PropertyScope.SESSION);
         message.setProperty("keyNonSerializable2", nonSerializable, PropertyScope.SESSION);
@@ -196,8 +197,9 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     public void requestReplyNoSessionPropagationSessionMerge() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestSession(
-            getTestService(), muleContext));
+        final Flow testFlow = getTestFlow();
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), testFlow,
+                                               getTestSession(testFlow, muleContext));
 
         Object nonSerializable = new Object();
         event.getSession().setProperty("keyNonSerializable", nonSerializable);

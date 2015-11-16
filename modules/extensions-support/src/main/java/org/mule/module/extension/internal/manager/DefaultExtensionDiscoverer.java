@@ -8,10 +8,13 @@ package org.mule.module.extension.internal.manager;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.introspection.declaration.Describer;
+import org.mule.extension.api.introspection.ExtensionFactory;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
+import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,7 +42,7 @@ final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
      * {@inheritDoc}
      */
     @Override
-    public List<Extension> discover(ClassLoader classLoader)
+    public List<ExtensionModel> discover(ClassLoader classLoader)
     {
         checkArgument(classLoader != null, "classloader cannot be null");
 
@@ -49,12 +52,9 @@ final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
             return ImmutableList.of();
         }
 
-        ImmutableList.Builder<Extension> builder = ImmutableList.builder();
-        for (Describer describer : describers)
-        {
-            builder.add(extensionFactory.createFrom(describer.describe()));
-        }
-
-        return builder.build();
+        return describers.stream().map(describer -> {
+            Descriptor descriptor = describer.describe(new DefaultDescribingContext());
+            return extensionFactory.createFrom(descriptor);
+        }).collect(new ImmutableListCollector<>());
     }
 }

@@ -440,12 +440,6 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
         return initialState;
     }
 
-    /** @deprecated use getResponseMessageProcessors() */
-    public List<Transformer> getResponseTransformers()
-    {
-        return getTransformersFromProcessorList(responseMessageProcessors);
-    }
-
     private List<Transformer> getTransformersFromProcessorList(List<MessageProcessor> processors)
     {
         List<Transformer> transformers = new LinkedList<Transformer>();

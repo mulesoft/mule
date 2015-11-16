@@ -12,17 +12,16 @@ import java.util.Properties;
 
 public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
-    public BeanPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
+    public BeanPropertyExtractorMultipleEndpointsTestCase()
     {
-        super(variant, configResources, false);
+        super(false);
     }
 
     @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "endpointsHolder.endpoints");
-        p.setProperty("selector.evaluator", "bean");
+        p.setProperty("selector.expression", "bean:endpointsHolder.endpoints");
         return p;
     }
 

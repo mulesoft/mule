@@ -6,14 +6,12 @@
  */
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.PatchMethod;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -25,31 +23,24 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-
-public class HttpMethodTestCase extends AbstractServiceAndFlowTestCase
+public class HttpMethodTestCase extends FunctionalTestCase
 {
     @ClassRule
     public static DynamicPort dynamicPort = new DynamicPort("port1");
 
     private HttpClient client;
 
-    public HttpMethodTestCase(ConfigVariant variant, String configResources)
+    public HttpMethodTestCase()
     {
-        super(variant, configResources);
         setDisposeContextPerClass(true);
         client = new HttpClient();
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-method-test-service.xml"},
-            {ConfigVariant.FLOW, "http-method-test-flow.xml"}
-        });
+        return "http-method-test-flow.xml";
     }
 
     @Test

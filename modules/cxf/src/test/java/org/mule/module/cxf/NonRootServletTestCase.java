@@ -8,10 +8,6 @@ package org.mule.module.cxf;
 
 public class NonRootServletTestCase extends ServletTestCase
 {
-    public NonRootServletTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Override
     protected String getContextPath()

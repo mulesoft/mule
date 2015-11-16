@@ -6,15 +6,14 @@
  */
 package org.mule.test.config;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleException;
+import org.mule.api.NameableObject;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.transformer.NoActionTransformer;
-import org.mule.transformer.TransformerUtils;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class EndpointTransformerTestCase extends AbstractMuleContextTestCase
 {
@@ -25,7 +24,7 @@ public class EndpointTransformerTestCase extends AbstractMuleContextTestCase
         muleContext.getRegistry().registerTransformer(new NoActionTransformer());
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
             "test:///tmp?transformers=NoActionTransformer");
-        assertEquals("NoActionTransformer", TransformerUtils.firstOrNull(endpoint.getTransformers()).getName());
+        assertEquals("NoActionTransformer", ((NameableObject) endpoint.getMessageProcessors().get(0)).getName());
     }
 
     @Test
@@ -34,6 +33,6 @@ public class EndpointTransformerTestCase extends AbstractMuleContextTestCase
         muleContext.getRegistry().registerTransformer(new NoActionTransformer());
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             "test:///tmp?responseTransformers=NoActionTransformer");
-        assertEquals("NoActionTransformer", TransformerUtils.firstOrNull(endpoint.getResponseTransformers()).getName());
+        assertEquals("NoActionTransformer", ((NameableObject) endpoint.getResponseMessageProcessors().get(0)).getName());
     }
 }

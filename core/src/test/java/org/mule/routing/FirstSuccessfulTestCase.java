@@ -156,7 +156,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
         try
         {
             MuleEvent event = mp.process(new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE,
-                getTestService(), session));
+                getTestFlow(), session));
             MuleMessage returnedMessage = event.getMessage();
             if (returnedMessage.getExceptionPayload() != null)
             {

@@ -12,10 +12,10 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlia
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.ReflectiveMethodOperationExecutor;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.api.runtime.OperationContext;
+import org.mule.module.extension.internal.runtime.executor.ReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -75,7 +75,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
             T group = type.newInstance();
             for (Field parameterField : parameterFields)
             {
-                Object value = operationContext.getParameterValue(getAlias(parameterField));
+                Object value = operationContext.getParameter(getAlias(parameterField));
                 if (value != null)
                 {
                     parameterField.set(group, value);

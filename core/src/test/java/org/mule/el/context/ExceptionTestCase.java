@@ -49,7 +49,7 @@ public class ExceptionTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MessagingException me = new MessagingException(CoreMessages.createStaticMessage(""),
-            new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService()),
+            new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow()),
             new IllegalAccessException());
         message.setExceptionPayload(new DefaultExceptionPayload(me));
         assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", message));

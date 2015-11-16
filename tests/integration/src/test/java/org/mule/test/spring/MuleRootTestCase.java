@@ -26,7 +26,6 @@ public class MuleRootTestCase extends FunctionalTestCase
     @Test
     public void testModel() throws MuleException
     {
-        assertNotNull("No model", muleContext.getRegistry().lookupModel("model"));
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("endpoint");
         assertNotNull("No endpoint", endpoint);
         String address = endpoint.getEndpointURI().getAddress();

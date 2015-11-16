@@ -13,14 +13,14 @@ import static org.mule.module.extension.internal.capability.xml.schema.Annotatio
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.extension.annotations.Configuration;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.annotation.api.Configuration;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.CollectionUtils;
 
@@ -39,7 +39,7 @@ import org.apache.commons.collections.Predicate;
 
 /**
  * Utility class that picks a {@link Declaration}
- * on which a {@link Extension} has already been described
+ * on which a {@link ExtensionModel} has already been described
  * and enriches such description with the javadocs extracted from the extension's acting classes.
  * <p/>
  * This is necessary because such documentation is not available on runtime, thus this class
@@ -85,7 +85,7 @@ final class SchemaDocumenter
                 ExecutableElement method = methods.get(operation.getName());
 
                  // there are two cases in which method can be null:
-                 //   * A synthetic operation which was not defined in any class but added by a capability
+                 //   * A synthetic operation which was not defined in any class but added by a model property
                  //   * An extension which operations are defined across multiple classes and the one being processed is not
                  //     the one which defined the operation being processed
                 if (method == null)

@@ -51,7 +51,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
 
     /**
      * For IoC only
-     * 
+     *
      * @deprecated Use MessageFilter(Filter filter)
      */
     @Deprecated

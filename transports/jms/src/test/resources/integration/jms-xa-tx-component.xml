@@ -14,109 +14,72 @@
        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd">
 
     <jbossts:transaction-manager/>
-    
+
     <vm:connector name="vmQueue"/>
 
     <vm:endpoint name="in" path="in" connector-ref="vmQueue" exchange-pattern="one-way"/>
     <vm:endpoint name="out" path="out" connector-ref="vmQueue" exchange-pattern="one-way"/>
-    
-    <model name="TEST">
-        <service name="Pre">
-            <inbound>
-                <inbound-endpoint ref="in"/>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="middle" exchange-pattern="one-way">
-                        <xa-transaction action="BEGIN_OR_JOIN"/>
-                    </jms:outbound-endpoint>
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </pass-through-router>
-            </outbound>
-        </service>
 
-        <service name="Part1">
-            <inbound>
-                <jms:inbound-endpoint queue="middle" exchange-pattern="one-way">
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="middle2" exchange-pattern="one-way">
-                        <xa-transaction action="BEGIN_OR_JOIN"/>
-                    </jms:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Pre">
+        <inbound-endpoint ref="in"/>
+        <test:component/>
+        <jms:outbound-endpoint queue="middle" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+        <!--<xa-transaction action="BEGIN_OR_JOIN"/>-->
+    </flow>
 
-        <service name="Part2">
-            <inbound>
-                <jms:inbound-endpoint queue="middle2" exchange-pattern="one-way">
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="middle3" exchange-pattern="one-way">
-                        <xa-transaction action="BEGIN_OR_JOIN"/>
-                    </jms:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Part1">
+        <jms:inbound-endpoint queue="middle" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint queue="middle2" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+    </flow>
 
-        <service name="Part3">
-            <inbound>
-                <jms:inbound-endpoint queue="middle3" exchange-pattern="one-way">
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="q4" exchange-pattern="one-way">
-                        <xa-transaction action="BEGIN_OR_JOIN"/>
-                    </jms:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Part2">
+        <jms:inbound-endpoint queue="middle2" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint queue="middle3" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+    </flow>
 
-        <service name="Part4">
-            <inbound>
-                <jms:inbound-endpoint queue="q4" exchange-pattern="one-way">
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="q5" exchange-pattern="one-way">
-                        <xa-transaction action="BEGIN_OR_JOIN"/>
-                    </jms:outbound-endpoint>
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Part3">
+        <jms:inbound-endpoint queue="middle3" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint queue="q4" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+    </flow>
 
-        <service name="Outbound">
-            <inbound>
-                <jms:inbound-endpoint queue="q5" exchange-pattern="one-way">
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out">
-                        <xa-transaction action="NONE"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="Part4">
+        <jms:inbound-endpoint queue="q4" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint queue="q5" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+        <!--<xa-transaction action="BEGIN_OR_JOIN"/>-->
+    </flow>
+
+    <flow name="Outbound">
+        <jms:inbound-endpoint queue="q5" exchange-pattern="one-way">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out">
+            <xa-transaction action="NONE"/>
+        </outbound-endpoint>
+    </flow>
+
 </mule>

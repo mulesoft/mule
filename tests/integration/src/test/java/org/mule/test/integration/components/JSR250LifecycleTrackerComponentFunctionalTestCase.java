@@ -10,30 +10,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.client.MuleClient;
 import org.mule.lifecycle.JSR250LifecycleTrackerComponent;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class JSR250LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/components/jsr250-component-lifecycle-config-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/components/jsr250-component-lifecycle-config-flow.xml"}});
-    }
 
-    public JSR250LifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/components/jsr250-component-lifecycle-config-flow.xml";
     }
 
     /**
@@ -45,16 +33,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
     @Test
     public void testSingletonServiceLifecycle() throws Exception
     {
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            testComponentLifecycle("MuleSingletonService",
-                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
-        }
-        else
-        {
-            testComponentLifecycle("MuleSingletonService",
-                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
-        }
+        testComponentLifecycle("MuleSingletonService", "[setProperty, setFlowConstruct, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
     }
 
     /**
@@ -66,16 +45,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
     @Test
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            testComponentLifecycle("MulePrototypeService",
-                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
-        }
-        else
-        {
-            testComponentLifecycle("MulePrototypeService",
-                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
-        }
+        testComponentLifecycle("MulePrototypeService", "[setProperty, setFlowConstruct, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
     }
 
     /**
@@ -87,16 +57,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
     @Test
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            testComponentLifecycle("MulePooledPrototypeService",
-                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
-        }
-        else
-        {
-            testComponentLifecycle("MulePooledPrototypeService",
-                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
-        }
+        testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setFlowConstruct, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
     }
 
     /**
@@ -110,22 +71,12 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
     @Test
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            testComponentLifecycle(
-                "MulePooledSingletonService",
-                "[setProperty, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
-        }
-        else
-        {
-            testComponentLifecycle(
-                "MulePooledSingletonService",
-                "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
-        }
+        testComponentLifecycle("MulePooledSingletonService",
+                               "[setProperty, setFlowConstruct, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
     }
 
     private void testComponentLifecycle(final String serviceName, final String expectedLifeCycle)
-        throws Exception
+            throws Exception
     {
 
         final JSR250LifecycleTrackerComponent tracker = exerciseComponent(serviceName);
@@ -139,7 +90,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
     {
         MuleClient client = muleContext.getClient();
         final JSR250LifecycleTrackerComponent ltc = (JSR250LifecycleTrackerComponent) client.send(
-            "vm://" + serviceName + ".In", getTestMuleMessage(NullPayload.getInstance())).getPayload();
+                "vm://" + serviceName + ".In", getTestMuleMessage(NullPayload.getInstance())).getPayload();
 
         assertNotNull(ltc);
         return ltc;

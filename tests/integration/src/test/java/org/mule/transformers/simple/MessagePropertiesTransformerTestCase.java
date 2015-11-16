@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.api.transport.PropertyScope.SESSION;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
@@ -149,7 +150,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertFalse(transformed.getInvocationPropertyNames().contains("badValue"));
         assertFalse(transformed.getInboundPropertyNames().contains("badValue"));
         assertFalse(transformed.getOutboundPropertyNames().contains("badValue"));
-        assertFalse(transformed.getSessionPropertyNames().contains("badValue"));
+        assertFalse(transformed.getPropertyNames(SESSION).contains("badValue"));
     }
 
     @Test
@@ -319,7 +320,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(msg.getInvocationPropertyNames(), transformed.getInvocationPropertyNames());
         assertEquals(msg.getInboundPropertyNames(), transformed.getInboundPropertyNames());
         assertEquals(msg.getOutboundPropertyNames(), transformed.getOutboundPropertyNames());
-        assertEquals(msg.getSessionPropertyNames(), transformed.getSessionPropertyNames());
+        assertEquals(msg.getPropertyNames(SESSION), transformed.getPropertyNames(SESSION));
     }
 
 }

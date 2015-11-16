@@ -6,19 +6,22 @@
  */
 package org.mule.module.extension;
 
+import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.annotations.Extensible;
-import org.mule.extension.annotations.Extension;
-import org.mule.extension.annotations.Operations;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.annotations.capability.Xml;
-import org.mule.extension.annotations.param.Optional;
+import org.mule.extension.annotation.api.Extensible;
+import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.Operations;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.capability.Xml;
+import org.mule.extension.annotation.api.connector.Providers;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.ExtensionManager;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -28,10 +31,11 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-@Extension(name = HeisenbergExtension.EXTENSION_NAME, description = HeisenbergExtension.EXTENSION_DESCRIPTION, version = HeisenbergExtension.EXTENSION_VERSION)
+@Extension(name = HeisenbergExtension.EXTENSION_NAME, description = HeisenbergExtension.EXTENSION_DESCRIPTION)
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
 @Xml(schemaLocation = HeisenbergExtension.SCHEMA_LOCATION, namespace = HeisenbergExtension.NAMESPACE, schemaVersion = HeisenbergExtension.SCHEMA_VERSION)
 @Extensible(alias = "heisenberg-empire")
+@Providers(HeisenbergConnectionProvider.class)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
 {
 
@@ -43,7 +47,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public static final String AGE = "50";
     public static final String EXTENSION_NAME = "heisenberg";
     public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";
-    public static final String EXTENSION_VERSION = "1.0";
 
     private int initialise = 0;
     private int start = 0;
@@ -91,6 +94,14 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     @Parameter(alias = "finalHealth")
     private HealthStatus endingHealth;
+
+    @Parameter(expressionSupport = REQUIRED)
+    @Optional
+    private String labAddress;
+
+    @Parameter(expressionSupport = NOT_SUPPORTED)
+    @Optional
+    private String firstEndevour;
 
     @Override
     public void initialise() throws InitialisationException
@@ -204,6 +215,16 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     void setMoney(BigDecimal money)
     {
         this.money = money;
+    }
+
+    public String getLabAddress()
+    {
+        return labAddress;
+    }
+
+    public String getFirstEndevour()
+    {
+        return firstEndevour;
     }
 
     @Override

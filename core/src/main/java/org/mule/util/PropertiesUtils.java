@@ -333,11 +333,4 @@ public final class PropertiesUtils
         }
         return i2;
     }
-
-    /** @deprecated Use {@link MapUtils#toString(Map, boolean)} instead */
-    @Deprecated
-    public static String propertiesToString(Map props, boolean newline)
-    {
-        return MapUtils.toString(props, newline);
-    }
 }

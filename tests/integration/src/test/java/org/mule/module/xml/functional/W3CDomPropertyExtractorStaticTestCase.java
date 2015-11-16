@@ -6,30 +6,25 @@
  */
 package org.mule.module.xml.functional;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class W3CDomPropertyExtractorStaticTestCase extends AbstractXmlPropertyExtractorTestCase
 {
-    public W3CDomPropertyExtractorStaticTestCase(ConfigVariant variant, String configResources)
+
+    public W3CDomPropertyExtractorStaticTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/property-extractor-static-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/xml/property-extractor-static-test-flow.xml"}});
+        return "org/mule/module/xml/property-extractor-static-test-flow.xml";
     }
 
     @Override

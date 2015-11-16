@@ -9,7 +9,6 @@ package org.mule.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -17,7 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -36,12 +35,12 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
     public void testMessageProcessor() throws Exception
     {
         MuleSession session = getTestSession(null, muleContext);
-        Service testService = getTestService("test", Apple.class);
-        assertNotNull(testService);
+        Flow flow = getTestFlow("test", Apple.class);
+        assertNotNull(flow);
 
         MessageChunkAggregator router = new MessageChunkAggregator();
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
@@ -54,9 +53,9 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
             muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, getTestService(), session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, getTestService(), session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, getTestService(), session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, getTestFlow(), session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, getTestFlow(), session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, getTestFlow(), session);
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));

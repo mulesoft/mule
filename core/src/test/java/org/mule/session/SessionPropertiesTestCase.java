@@ -69,7 +69,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void setSessionPropertyOnMessageGetFromSession() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         Object nonSerializable = new Object();
         message.setProperty("key", "value", PropertyScope.SESSION);
@@ -91,7 +91,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void setSessionPropertyOnSessionGetFromMessage() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         Object nonSerializable = new Object();
         event.getSession().setProperty("key", "value");
@@ -118,7 +118,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         async.start();
 
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         event.getSession().setProperty("key", "value");
 
@@ -154,7 +154,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void serializationSessionPropertyPropagation() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         event.getSession().setProperty("key", "value");
 
@@ -188,7 +188,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void defaultSessionHandlerSessionPropertyPropagation() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         event.getSession().setProperty("key", "value");
 
@@ -225,7 +225,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void serializationNonSerializableSessionPropertyPropagation() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         Object nonSerializable = new Object();
         event.getSession().setProperty("key", nonSerializable);
@@ -252,7 +252,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void defaultSessionHandlerNonSerializableSessionPropertyPropagation() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         Object nonSerializable = new Object();
         message.setProperty("key", nonSerializable, PropertyScope.SESSION);
@@ -287,7 +287,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE,
-            getTestService());
+            getTestFlow());
 
         SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
         Flow flow = new Flow("flow", muleContext);

@@ -8,8 +8,6 @@ package org.mule.config.spring.processors;
 
 import org.mule.api.NameableObject;
 import org.mule.api.agent.Agent;
-import org.mule.api.model.Model;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 
@@ -29,8 +27,6 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
             {
                     Connector.class,
                     Transformer.class,
-                    Service.class,
-                    Model.class,
                     Agent.class
             };
 

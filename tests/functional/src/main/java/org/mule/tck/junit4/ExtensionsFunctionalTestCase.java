@@ -7,6 +7,7 @@
 package org.mule.tck.junit4;
 
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createManifestFileIfNecessary;
 import static org.mule.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.DefaultMuleContext;
@@ -14,13 +15,14 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.introspection.declaration.Describer;
-import org.mule.extension.resources.GeneratedResource;
-import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ExtensionFactory;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.extension.api.resources.GeneratedResource;
+import org.mule.extension.api.resources.ResourcesGenerator;
+import org.mule.extension.api.resources.spi.GenerableResourceContributor;
+import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.manager.DefaultExtensionManager;
@@ -75,23 +77,10 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
 {
 
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry);
+    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
     private ExtensionManager extensionManager;
     private File generatedResourcesDirectory;
 
-
-    /**
-     * Performs all the logic inherited from the super class, plus invokes
-     * {@link #createExtensionsManager()}
-     *
-     * @throws Exception in case of any failure
-     */
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        super.doSetUpBeforeMuleContextCreation();
-        createExtensionsManager();
-    }
 
     /**
      * Implement this method to limit the amount of extensions
@@ -137,8 +126,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
             @Override
             protected void doConfigure(MuleContext muleContext) throws Exception
             {
-                ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
-                initialiseIfNeeded(extensionManager, muleContext);
+                createExtensionsManager(muleContext);
             }
         });
     }
@@ -148,10 +136,19 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
         return ImmutableList.copyOf(serviceRegistry.lookupProviders(GenerableResourceContributor.class));
     }
 
-    private void createExtensionsManager() throws Exception
+    private void createExtensionsManager(MuleContext muleContext) throws Exception
     {
         extensionManager = new DefaultExtensionManager();
+        generatedResourcesDirectory = getGenerationTargetDirectory();
+        createManifestFileIfNecessary(generatedResourcesDirectory);
 
+        ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+        initialiseIfNeeded(extensionManager, muleContext);
+        discoverExtensions();
+    }
+
+    private void discoverExtensions() throws Exception
+    {
         Describer[] describers = getDescribers();
         if (ArrayUtils.isEmpty(describers))
         {
@@ -176,16 +173,14 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
             loadExtensionsFromDescribers(extensionManager, describers);
         }
 
-        generatedResourcesDirectory = getGenerationTargetDirectory();
-
         ResourcesGenerator generator = new ExtensionsTestInfrastructureResourcesGenerator(serviceRegistry, generatedResourcesDirectory);
 
         List<GenerableResourceContributor> resourceContributors = getGenerableResourceContributors();
-        for (Extension extension : extensionManager.getExtensions())
+        for (ExtensionModel extensionModel : extensionManager.getExtensions())
         {
             for (GenerableResourceContributor contributor : resourceContributors)
             {
-                contributor.contribute(extension, generator);
+                contributor.contribute(extensionModel, generator);
             }
         }
 
@@ -196,7 +191,7 @@ public abstract class ExtensionsFunctionalTestCase extends FunctionalTestCase
     {
         for (Describer describer : describers)
         {
-            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe()));
+            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe(new DefaultDescribingContext())));
         }
     }
 

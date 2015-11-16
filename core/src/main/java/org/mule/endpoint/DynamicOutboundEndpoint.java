@@ -241,11 +241,6 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         return prototypeEndpoint.getResponseTimeout();
     }
 
-    public List<Transformer> getResponseTransformers()
-    {
-        return prototypeEndpoint.getResponseTransformers();
-    }
-
     public EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
     {
         return prototypeEndpoint.getMessageProcessorsFactory();
@@ -269,11 +264,6 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     public TransactionConfig getTransactionConfig()
     {
         return prototypeEndpoint.getTransactionConfig();
-    }
-
-    public List<Transformer> getTransformers()
-    {
-        return prototypeEndpoint.getTransformers();
     }
 
     public boolean isDeleteUnacceptedMessages()

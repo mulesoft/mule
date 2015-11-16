@@ -701,13 +701,6 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
         this.connector = connector;
     }
 
-    /** @deprecated Use addMessageProcessor() */
-    @Deprecated
-    public void addTransformer(Transformer transformer)
-    {
-        this.transformers.add(transformer);
-    }
-
     /** @deprecated Use setMessageProcessors() */
     @Deprecated
     public void setTransformers(List<Transformer> newTransformers)
@@ -729,13 +722,6 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     protected EndpointMessageProcessorChainFactory getDefaultMessageProcessorsFactory()
     {
         return new DefaultEndpointMessageProcessorChainFactory();
-    }
-
-    /** @deprecated Use addResponseMessageProcessor() */
-    @Deprecated
-    public void addResponseTransformer(Transformer transformer)
-    {
-        this.responseTransformers.add(transformer);
     }
 
     /** @deprecated Use setResponseMessageProcessors() */

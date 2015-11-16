@@ -13,26 +13,15 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcSerializableMuleEventTestCase extends AbstractJdbcFunctionalTestCase
 {
 
-    public JdbcSerializableMuleEventTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "jdbc-serializable-mule-event.xml"}
-        });
+        return "jdbc-serializable-mule-event.xml";
     }
 
     @Test

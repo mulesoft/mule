@@ -1,27 +1,18 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:file="http://www.mulesoft.org/schema/mule/file"
-       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xsi:schemaLocation="
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
            http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd">
 
-    <model>
-        <service name="TcpReceiver">
-            <inbound>
-                <tcp:inbound-endpoint host="localhost" port="4444" exchange-pattern="one-way"/>
-                <forwarding-router/>
-            </inbound>
-            <null-component/>
-            <outbound>
-                <pass-through-router>
-                    <file:outbound-endpoint path="temp/tests/mule"/>
-                </pass-through-router>
-            </outbound>
-        </service>    
-    </model>
+    <flow name="TcpReceiver">
+        <tcp:inbound-endpoint host="localhost" port="4444" exchange-pattern="one-way"/>
+        <file:outbound-endpoint path="temp/tests/mule"/>
+    </flow>
+
 </mule>

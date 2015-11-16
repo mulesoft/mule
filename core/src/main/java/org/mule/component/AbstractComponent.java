@@ -29,11 +29,9 @@ import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.SimpleService;
 import org.mule.context.notification.ComponentMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.management.stats.ComponentStatistics;
@@ -342,11 +340,8 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
             sb.append(".");
         }
         sb.append("component");
-        if (!(flowConstruct instanceof Service || flowConstruct instanceof SimpleService))
-        {
-            sb.append(".");
-            sb.append(System.identityHashCode(this));
-        }
+        sb.append(".");
+        sb.append(System.identityHashCode(this));
         return sb.toString();
     }
 

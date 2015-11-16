@@ -7,11 +7,10 @@
 package org.mule.transport.jms.integration;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertNull;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.transport.NullPayload;
 
 import org.junit.Test;
 
@@ -41,7 +40,8 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     {
         MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in2Sync", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE, response.getPayload());
+        // TODO This behaviour appears inconsistent.  NullPayload would be more appropriate.
+        assertNull(response);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in3", TEST_MESSAGE, null);
 
-        assertEquals(NullPayload.getInstance(), response.getPayload());
+        assertEquals(TEST_MESSAGE, response.getPayload());
     }
 
     @Test

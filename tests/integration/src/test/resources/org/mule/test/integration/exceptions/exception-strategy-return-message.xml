@@ -8,44 +8,26 @@
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-    <model>
-        <service name="InputService">
-            <inbound>
-                <vm:inbound-endpoint path="in-custom-strategy" exchange-pattern="request-response" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="badService" exchange-pattern="request-response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="InputService">
+        <vm:inbound-endpoint path="in-custom-strategy" exchange-pattern="request-response"/>
+        <vm:outbound-endpoint path="badService" exchange-pattern="request-response"/>
+    </flow>
 
-        <service name="InputService2">
-            <inbound>
-                <vm:inbound-endpoint path="in-default-strategy" exchange-pattern="request-response" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="badService2" exchange-pattern="request-response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="InputService2">
+        <vm:inbound-endpoint path="in-default-strategy" exchange-pattern="request-response"/>
+        <vm:outbound-endpoint path="badService2" exchange-pattern="request-response"/>
+    </flow>
 
 
-        <service name="ExceptionService">
-            <inbound>
-                <vm:inbound-endpoint path="badService" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component throwException="true" />
-            <custom-exception-strategy class="org.mule.test.integration.exceptions.TestExceptionStrategy" /> 
-        </service>
+    <flow name="ExceptionService">
+        <vm:inbound-endpoint path="badService" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+        <custom-exception-strategy class="org.mule.test.integration.exceptions.TestExceptionStrategy"/>
+    </flow>
 
-        <service name="ExceptionService2">
-            <inbound>
-                <vm:inbound-endpoint path="badService2" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component throwException="true" />
-        </service>
+    <flow name="ExceptionService2">
+        <vm:inbound-endpoint path="badService2" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+    </flow>
 
-    </model>
 </mule>

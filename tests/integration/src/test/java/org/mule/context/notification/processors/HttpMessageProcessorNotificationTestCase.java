@@ -7,7 +7,6 @@
 package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.spring.util.ProcessingStrategyUtils;
@@ -21,8 +20,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Rule;
+import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class HttpMessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
 
@@ -33,9 +34,8 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
     public SystemProperty systemProperty;
 
 
-    public HttpMessageProcessorNotificationTestCase(ConfigVariant variant, String configResources, boolean nonBlocking)
+    public HttpMessageProcessorNotificationTestCase(boolean nonBlocking)
     {
-        super(variant, configResources);
         if (nonBlocking)
         {
             systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
@@ -47,11 +47,15 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "org/mule/test/integration/notifications/nonblocking-message-processor" +
-                                     "-notification-test-flow.xml", false},
-                {ConfigVariant.FLOW, "org/mule/test/integration/notifications/nonblocking-message-processor" +
-                                     "-notification-test-flow.xml", true}
+                {false},
+                {true}
         });
+    }
+
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/notifications/nonblocking-message-processor-notification-test-flow.xml";
     }
 
     @Override

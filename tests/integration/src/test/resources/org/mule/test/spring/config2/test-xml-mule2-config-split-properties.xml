@@ -10,20 +10,14 @@
 
     <mule:mule>
 
-        <mule:model name="main" inherit="true">
-
-            <mule:service name="testPropertiesComponent">
-                <mule:inbound>
-                    <mule:inbound-endpoint 
-                        address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
-                        exchange-pattern="one-way"/>
-                </mule:inbound>
-                <mule:component>
-                    <mule:spring-object bean="prop-test-ref"/>
-                </mule:component>
-            </mule:service>
-
-        </mule:model>
+        <mule:flow name="testPropertiesComponent">
+            <mule:inbound-endpoint
+                    address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
+                    exchange-pattern="one-way"/>
+            <mule:component>
+                <mule:spring-object bean="prop-test-ref"/>
+            </mule:component>
+        </mule:flow>
 
     </mule:mule>
 

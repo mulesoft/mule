@@ -152,7 +152,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                              + StringMessageUtils.truncate(message.getPayloadForLogging(), 100, false));
                 if (route instanceof OutboundEndpoint)
                 {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getTransformers());
+                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
                 }
             }
             catch (Exception e)
@@ -160,7 +160,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                 logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage());
                 if (route instanceof OutboundEndpoint)
                 {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getTransformers());
+                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
                 }
             }
         }

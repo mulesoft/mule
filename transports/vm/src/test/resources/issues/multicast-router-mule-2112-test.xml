@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
@@ -12,32 +12,23 @@
     <vm:endpoint name="endpointHop1" path="hop1" exchange-pattern="request-response"/>
     <vm:endpoint name="endpointHop2" path="hop2" exchange-pattern="request-response"/>
 
-    <model name="main">
-        <custom-service name="multicastComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <vm:inbound-endpoint ref="inbound"/>
-            </inbound>
-            
-            <outbound>
-                <multicasting-router>
-                    <vm:outbound-endpoint ref="endpointHop1"/>
-                    <vm:outbound-endpoint ref="endpointHop2"/>
-                </multicasting-router>
-            </outbound>
-        </custom-service>
+    <flow name="multicastComponent">
+        <vm:inbound-endpoint ref="inbound"/>
 
-        <custom-service name="hop1" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <vm:inbound-endpoint ref="endpointHop1"/>
-            </inbound>
-            <test:component appendString=" Received"/>
-        </custom-service>
+        <all>
+            <vm:outbound-endpoint ref="endpointHop1"/>
+            <vm:outbound-endpoint ref="endpointHop2"/>
+        </all>
+    </flow>
 
-        <custom-service name="hop2" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <vm:inbound-endpoint ref="endpointHop2"/>
-            </inbound>
-            <test:component appendString=" Received"/>
-        </custom-service>
-    </model>
+    <flow name="hop1">
+        <vm:inbound-endpoint ref="endpointHop1"/>
+        <test:component appendString=" Received"/>
+    </flow>
+
+    <flow name="hop2">
+        <vm:inbound-endpoint ref="endpointHop2"/>
+        <test:component appendString=" Received"/>
+    </flow>
+
 </mule>

@@ -10,33 +10,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.client.MuleClient;
 import org.mule.lifecycle.AbstractLifecycleTracker;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author David Dossot (david@dossot.net) See
  *         http://mule.mulesoft.org/jira/browse/MULE-3846
  */
-public class LifecycleTrackerComponentFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/components/component-lifecycle-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/components/component-lifecycle-config-flow.xml"}});
-    }
 
-    public LifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/components/component-lifecycle-config-flow.xml";
     }
 
     /**
@@ -51,16 +40,8 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     @Test
     public void testSpringBeanServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, initialise, start, stop, dispose, springDestroy]";
-        }
-        else
-        {
-            expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, initialise, setService, start, stop, dispose, springDestroy]";
-        }
+        //TODO(pablo.kraan): MERGE - is this correct to have initialise and setFlowConstruct as expected phases?
+        String expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, initialise, setFlowConstruct, start, stop, dispose, springDestroy]";
 
         testComponentLifecycle("SpringBeanService", expectedLifeCycle);
     }
@@ -77,16 +58,8 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     @Test
     public void testSpringBeanService2Lifecycle() throws Exception
     {
-        String expectedLifeCycle;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            expectedLifeCycle = "[setProperty, setMuleContext, initialise, start, stop, dispose]";
-        }
-        else
-        {
-            expectedLifeCycle = "[setProperty, setMuleContext, initialise, setService, start, stop, dispose]";
-        }
+        //TODO(pablo.kraan): MERGE - is this correct to have initialise and setFlowConstruct as expected phases?
+        String expectedLifeCycle = "[setProperty, setMuleContext, initialise, setFlowConstruct, start, stop, dispose]";
 
         testComponentLifecycle("SpringBeanService2", expectedLifeCycle);
     }
@@ -100,16 +73,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     @Test
     public void testSingletonServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            expectedLifeCycle = "[setProperty, setMuleContext, initialise, start, stop, dispose]";
-        }
-        else
-        {
-            expectedLifeCycle = "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]";
-        }
+        String expectedLifeCycle = "[setProperty, setFlowConstruct, setMuleContext, initialise, start, stop, dispose]";
 
         testComponentLifecycle("MuleSingletonService", expectedLifeCycle);
     }
@@ -123,16 +87,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     @Test
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            expectedLifeCycle = "[setProperty, setMuleContext, initialise, start, stop, dispose]";
-        }
-        else
-        {
-            expectedLifeCycle = "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]";
-        }
+        String expectedLifeCycle = "[setProperty, setFlowConstruct, setMuleContext, initialise, start, stop, dispose]";
 
         testComponentLifecycle("MulePrototypeService", expectedLifeCycle);
     }
@@ -146,16 +101,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     @Test
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            expectedLifeCycle = "[setProperty, setMuleContext, initialise, start, stop, dispose]";
-        }
-        else
-        {
-            expectedLifeCycle = "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]";
-        }
+        String expectedLifeCycle = "[setProperty, setFlowConstruct, setMuleContext, initialise, start, stop, dispose]";
 
         testComponentLifecycle("MulePooledPrototypeService", expectedLifeCycle);
     }
@@ -171,16 +117,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     @Test
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            expectedLifeCycle = "[setProperty, setMuleContext, initialise, initialise, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]";
-        }
-        else
-        {
-            expectedLifeCycle = "[setProperty, setService, setMuleContext, initialise, initialise, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]";
-        }
+        String expectedLifeCycle = "[setProperty, setFlowConstruct, setMuleContext, initialise, initialise, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]";
 
         testComponentLifecycle("MulePooledSingletonService", expectedLifeCycle);
     }

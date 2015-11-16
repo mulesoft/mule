@@ -6,6 +6,7 @@
  */
 package org.mule.module.scripting.component;
 
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.DefaultMuleEventContext;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -14,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -241,16 +241,12 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put("eventContext", new DefaultMuleEventContext(event));
         bindings.put("id", event.getId());
         bindings.put("flowConstruct", event.getFlowConstruct());
-        if (event.getFlowConstruct() instanceof Service)
-        {
-            bindings.put("service", event.getFlowConstruct());
-        }
     }
 
     private void populateHeadersVariablesAndException(Bindings bindings, MuleMessage message)
     {
         bindings.put("flowVars", new MesssagePropertyMap(message, PropertyScope.INVOCATION));
-        bindings.put("sessionVars", new MesssagePropertyMap(message, PropertyScope.SESSION));
+        bindings.put("sessionVars", new MesssagePropertyMap(message, SESSION));
 
         // Only add exception is present
         if (message.getExceptionPayload() != null)
@@ -265,9 +261,9 @@ public class Scriptable implements Initialisable, MuleContextAware
 
     private void populateVariablesInOrder(Bindings bindings, MuleMessage message)
     {
-        for (String key : message.getSessionPropertyNames())
+        for (String key : message.getPropertyNames(SESSION))
         {
-            bindings.put(key, message.getSessionProperty(key));
+            bindings.put(key, message.getProperty(key, SESSION));
         }
         for (String key : message.getInvocationPropertyNames())
         {

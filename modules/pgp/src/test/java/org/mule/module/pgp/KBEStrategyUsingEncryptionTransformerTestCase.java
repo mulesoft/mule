@@ -27,7 +27,7 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
     {
         String msg = "Test Message";
 
-        MuleEvent event = getTestEvent(msg, getTestService("orange", Orange.class));
+        MuleEvent event = getTestEvent(msg, getTestFlow("orange", Orange.class));
         event = RequestContext.setEvent(event);
 
         EncryptionTransformer etrans = new EncryptionTransformer();

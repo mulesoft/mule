@@ -6,36 +6,29 @@
  */
 package org.mule.management;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.context.notification.CustomNotificationListener;
-import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.context.notification.CustomNotification;
-import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.ServiceNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
-        implements ModelNotificationListener, MuleContextNotificationListener
+        implements MuleContextNotificationListener
 {
 
     private final AtomicBoolean managerStopped = new AtomicBoolean(false);
     private final AtomicInteger managerStoppedEvents = new AtomicInteger(0);
-    private final AtomicBoolean modelStopped = new AtomicBoolean(false);
-    private final AtomicInteger modelStoppedEvents = new AtomicInteger(0);
     private final AtomicInteger componentStartedCount = new AtomicInteger(0);
     private final AtomicInteger customNotificationCount = new AtomicInteger(0);
 
@@ -56,7 +49,6 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
     {
         muleContext.registerListener(this);
         muleContext.stop();
-        assertTrue(modelStopped.get());
         assertTrue(managerStopped.get());
     }
 
@@ -71,23 +63,12 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testMultipleRegistrationsDifferentSubscriptions() throws Exception
-    {
-        muleContext.registerListener(this, "_mule*");
-        muleContext.registerListener(this, "_mul*");
-        muleContext.stop();
-        assertTrue(modelStopped.get());
-        assertEquals(2, modelStoppedEvents.get());
-    }
-
-    @Test
     public void testUnregistering() throws Exception
     {
         muleContext.registerListener(this);
         muleContext.unregisterListener(this);
         muleContext.stop();
         // these should still be false because we unregistered ourselves
-        assertFalse(modelStopped.get());
         assertFalse(managerStopped.get());
     }
 
@@ -104,60 +85,6 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
 
         assertTrue(managerStopped.get());
         assertEquals(1, managerStoppedEvents.get());
-    }
-
-    @Test
-    public void testStandardNotificationsWithSubscription() throws Exception
-    {
-        final CountDownLatch latch = new CountDownLatch(1);
-        muleContext.registerListener(new ServiceNotificationListener<ServiceNotification>()
-        {
-            public void onNotification(ServiceNotification notification)
-            {
-                if (notification.getAction() == ServiceNotification.SERVICE_STARTED)
-                {
-                    componentStartedCount.incrementAndGet();
-                    assertEquals("component1", notification.getResourceIdentifier());
-                    latch.countDown();
-                }
-            }
-        }, "component1");
-
-        getTestService("component2", Apple.class);
-        getTestService("component1", Apple.class);
-
-
-        // Wait for the notifcation event to be fired as they are queued
-        latch.await(20000, TimeUnit.MILLISECONDS);
-        assertEquals(1, componentStartedCount.get());
-    }
-
-    @Test
-    public void testStandardNotificationsWithWildcardSubscription() throws Exception
-    {
-        final CountDownLatch latch = new CountDownLatch(2);
-
-        muleContext.registerListener(new ServiceNotificationListener<ServiceNotification>()
-        {
-            public void onNotification(ServiceNotification notification)
-            {
-                if (notification.getAction() == ServiceNotification.SERVICE_STARTED)
-                {
-                    componentStartedCount.incrementAndGet();
-                    assertFalse("noMatchComponent".equals(notification.getResourceIdentifier()));
-                    latch.countDown();
-                }
-            }
-        }, "component*");
-
-        //Components automatically get registered
-        getTestService("component2", Apple.class);
-        getTestService("component1", Apple.class);
-        getTestService("noMatchComponent", Apple.class);
-
-        // Wait for the notifcation event to be fired as they are queued
-        latch.await(2000, TimeUnit.MILLISECONDS);
-        assertEquals(2, componentStartedCount.get());
     }
 
     @Test
@@ -217,18 +144,10 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
 
     public void onNotification(ServerNotification notification)
     {
-        if (notification.getAction() == ModelNotification.MODEL_STOPPED)
+        if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
         {
-            modelStopped.set(true);
-            modelStoppedEvents.incrementAndGet();
-        }
-        else
-        {
-            if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
-            {
-                managerStopped.set(true);
-                managerStoppedEvents.incrementAndGet();
-            }
+            managerStopped.set(true);
+            managerStoppedEvents.incrementAndGet();
         }
     }
 

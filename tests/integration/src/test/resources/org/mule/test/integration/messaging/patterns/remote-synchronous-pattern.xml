@@ -12,28 +12,16 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <model name="Remote_Synchronous_Message_Pattern">
-        <service name="RemoteSynchronousService">
-            <inbound>
-                <jms:inbound-endpoint queue="test.in" exchange-pattern="request-response"/>
-            </inbound>
+    <flow name="RemoteSynchronousService">
+        <jms:inbound-endpoint queue="test.in" exchange-pattern="request-response"/>
+        <test:component/>
+        <jms:outbound-endpoint queue="another.service" exchange-pattern="request-response" responseTimeout="5000"/>
+    </flow>
 
-            <test:component/>
+    <flow name="AnotherService">
+        <jms:inbound-endpoint queue="another.service" exchange-pattern="request-response"/>
+        <test:component/>
+    </flow>
 
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="another.service" exchange-pattern="request-response" responseTimeout="5000"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-
-        <service name="AnotherService">
-            <inbound>
-                <jms:inbound-endpoint queue="another.service" exchange-pattern="request-response"/>
-            </inbound>
-
-            <test:component/>
-        </service>
-    </model>
 </mule>
 <!--// END SNIPPET: full-config -->

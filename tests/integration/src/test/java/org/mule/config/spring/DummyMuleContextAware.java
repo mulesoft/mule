@@ -56,11 +56,6 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         return null;
     }
 
-    public void setReturnClass(Class clazz)
-    {
-        //no-op
-    }
-
     public Class getReturnClass()
     {
         return null;

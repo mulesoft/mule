@@ -9,26 +9,15 @@ package org.mule.context.notification;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.context.notification.ExceptionStrategyNotification.PROCESS_START;
-
 import org.mule.api.client.MuleClient;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized;
 
 public class ExceptionStrategyNotificationTestCase extends AbstractNotificationTestCase
 {
-    public ExceptionStrategyNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {{ConfigVariant.FLOW,
-                "org/mule/test/integration/notifications/exception-strategy-notification-test-flow.xml"}});
+        return "org/mule/test/integration/notifications/exception-strategy-notification-test-flow.xml";
     }
 
     @Override

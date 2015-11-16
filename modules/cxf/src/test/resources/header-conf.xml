@@ -41,16 +41,10 @@
         <outbound-endpoint address="vm://test"
             exchange-pattern="request-response" />
     </flow>
-    
-  <model name="TestCxfModel">
-  
 
-    
-    <custom-service name="testService" class="org.mule.tck.testmodels.mule.TestSedaService">
-      <inbound>
+    <flow name="testService">
           <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
-      </inbound>
       <test:component appendString=" Received"/>
-    </custom-service>
-  </model>
+    </flow>
+
 </mule>

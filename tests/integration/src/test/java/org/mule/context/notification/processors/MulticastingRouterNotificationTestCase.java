@@ -7,29 +7,20 @@
 package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.client.MuleClient;
 import org.mule.context.notification.Node;
 import org.mule.context.notification.RestrictedNode;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-
-import org.junit.runners.Parameterized;
 
 public class MulticastingRouterNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
-    public MulticastingRouterNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {{ConfigVariant.FLOW,
-                "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml"}});
+        return "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml";
     }
 
     @Override

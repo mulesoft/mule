@@ -6,23 +6,40 @@
  */
 package org.mule.module.extension.internal.introspection;
 
+import static java.util.stream.Collectors.toList;
+import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.ExtensionFactory;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
-import org.mule.extension.introspection.declaration.DescribingContext;
-import org.mule.extension.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
-import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.extension.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.introspection.declaration.spi.DescriberPostProcessor;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.ExtensionFactory;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.extension.api.runtime.Interceptor;
 import org.mule.module.extension.internal.DefaultDescribingContext;
+import org.mule.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
+import org.mule.module.extension.internal.introspection.validation.ModelValidator;
+import org.mule.module.extension.internal.introspection.validation.NameClashModelValidator;
+import org.mule.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
+import org.mule.util.CollectionUtils;
+import org.mule.util.ValueHolder;
+import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,35 +47,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Default implementation of {@link ExtensionFactory} which uses a
- * {@link ServiceRegistry} to locate instances of {@link DescriberPostProcessor}.
- * The discovery of {@link DescriberPostProcessor}s will happen when the
- * {@link #DefaultExtensionFactory(ServiceRegistry)} constructor is invoked
- * and the list of discovered instances will be used during the whole duration of this instance
+ * Default implementation of {@link ExtensionFactory}.
+ * <p>
+ * It transforms {@link Descriptor} instances into fully fledged instances of
+ * {@link ImmutableExtensionModel}. Because the {@link Descriptor} is a raw, unvalidated
+ * object model, this instance uses a fixed list of {@link ModelValidator} to assure
+ * that the produced model is legal.
+ * <p>
+ * It uses a {@link ServiceRegistry} to locate instances of {@link ModelEnricher}.
+ * The discovery happens when the {@link #DefaultExtensionFactory(ServiceRegistry, ClassLoader)}
+ * constructor is invoked and the list of discovered instances will be used during
+ * the whole duration of this instance.
  *
  * @since 3.7.0
  */
 public final class DefaultExtensionFactory implements ExtensionFactory
 {
 
-    private final List<DescriberPostProcessor> postProcessors;
+    private final List<ModelEnricher> modelEnrichers;
+    private final List<ModelValidator> modelValidators;
 
     /**
      * Creates a new instance and uses the given {@code serviceRegistry} to
-     * locate instances of {@link DescriberPostProcessor}
+     * locate instances of {@link ModelEnricher}
      *
-     * @param serviceRegistry a [@link ServiceRegistry
+     * @param serviceRegistry a {@link ServiceRegistry}
+     * @param classLoader     the {@link ClassLoader} on which the {@code serviceRegistry} will search into
      */
-    public DefaultExtensionFactory(ServiceRegistry serviceRegistry)
+    public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader)
     {
-        postProcessors = searchPostProcessors(serviceRegistry);
+        modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
+        modelValidators = ImmutableList.<ModelValidator>builder()
+                .add(new NameClashModelValidator())
+                .add(new ConnectionProviderModelValidator())
+                .build();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Extension createFrom(Descriptor descriptor)
+    public ExtensionModel createFrom(Descriptor descriptor)
     {
         return createFrom(descriptor, new DefaultDescribingContext(descriptor.getRootDeclaration()));
     }
@@ -67,126 +96,144 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
-    public Extension createFrom(Descriptor descriptor, DescribingContext describingContext)
+    public ExtensionModel createFrom(Descriptor descriptor, DescribingContext describingContext)
     {
-        applyPostProcessors(describingContext);
-        return toExtension(descriptor.getRootDeclaration().getDeclaration());
+        enrichModel(describingContext);
+        ExtensionModel extensionModel = toExtension(descriptor.getRootDeclaration().getDeclaration());
+        modelValidators.forEach(v -> v.validate(extensionModel));
+
+        return extensionModel;
     }
 
-    private Extension toExtension(Declaration declaration)
+    private ExtensionModel toExtension(Declaration declaration)
     {
         validateMuleVersion(declaration);
-        return new ImmutableExtension(declaration.getName(),
-                                      declaration.getDescription(),
-                                      declaration.getVersion(),
-                                      sortConfigurations(toConfigurations(declaration.getConfigurations())),
-                                      alphaSortDescribedList(toOperations(declaration.getOperations())),
-                                      declaration.getCapabilities());
+        ValueHolder<ExtensionModel> extensionModelValueHolder = new ValueHolder<>();
+        ExtensionModel extensionModel = new ImmutableExtensionModel(declaration.getName(),
+                                                                    declaration.getDescription(),
+                                                                    declaration.getVersion(),
+                                                                    sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
+                                                                    alphaSortDescribedList(toOperations(declaration.getOperations())),
+                                                                    toConnectionProviders(declaration.getConnectionProviders()),
+                                                                    declaration.getModelProperties());
+
+        extensionModelValueHolder.set(extensionModel);
+        return extensionModel;
     }
 
-    private List<Configuration> sortConfigurations(List<Configuration> configurations)
+    private List<ConfigurationModel> sortConfigurations(List<ConfigurationModel> configurationModels)
     {
-        List<Configuration> sorted = new ArrayList<>(configurations.size());
+        if (CollectionUtils.isEmpty(configurationModels))
+        {
+            return configurationModels;
+        }
+
+        List<ConfigurationModel> sorted = new ArrayList<>(configurationModels.size());
 
         // first one is kept as default while the rest are alpha sorted
-        sorted.add(configurations.get(0));
+        sorted.add(configurationModels.get(0));
 
-        if (configurations.size() > 1)
+        if (configurationModels.size() > 1)
         {
-            sorted.addAll(alphaSortDescribedList(configurations.subList(1, configurations.size())));
+            sorted.addAll(alphaSortDescribedList(configurationModels.subList(1, configurationModels.size())));
         }
 
         return sorted;
     }
 
 
-    private List<Configuration> toConfigurations(List<ConfigurationDeclaration> declarations)
+    private List<ConfigurationModel> toConfigurations(List<ConfigurationDeclaration> declarations, ValueHolder<ExtensionModel> extensionModelValueHolder)
     {
-        checkArgument(!declarations.isEmpty(), "A extension must have at least one configuration");
-
-        List<Configuration> configurations = new ArrayList<>(declarations.size());
-        for (ConfigurationDeclaration declaration : declarations)
-        {
-            configurations.add(toConfiguration(declaration));
-        }
-
-        return configurations;
+        return declarations.stream()
+                .map(declaration -> toConfiguration(declaration, extensionModelValueHolder))
+                .collect(toList());
     }
 
-    private Configuration toConfiguration(ConfigurationDeclaration declaration)
+    private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration, ValueHolder<ExtensionModel> extensionModel)
     {
-        return new ImmutableConfiguration(declaration.getName(),
-                                          declaration.getDescription(),
-                                          declaration.getConfigurationInstantiator(),
-                                          toConfigParameters(declaration.getParameters()),
-                                          declaration.getCapabilities());
+        return new ImmutableConfigurationModel(declaration.getName(),
+                                               declaration.getDescription(),
+                                               extensionModel::get,
+                                               declaration.getConfigurationFactory(),
+                                               toParameters(declaration.getParameters()),
+                                               declaration.getModelProperties(),
+                                               declaration.getInterceptorFactories());
     }
 
-    private List<Operation> toOperations(List<OperationDeclaration> declarations)
+    private List<OperationModel> toOperations(List<OperationDeclaration> declarations)
     {
-        if (declarations.isEmpty())
-        {
-            return ImmutableList.of();
-        }
-
-        List<Operation> operations = new ArrayList<>(declarations.size());
-        for (OperationDeclaration declaration : declarations)
-        {
-            operations.add(toOperation(declaration));
-        }
-
-        return operations;
+        return declarations.stream().map(this::toOperation).collect(toList());
     }
 
-    private Operation toOperation(OperationDeclaration declaration)
+    private OperationModel toOperation(OperationDeclaration declaration)
     {
-        List<Parameter> parameters = toOperationParameters(declaration.getParameters());
-        return new ImmutableOperation(declaration.getName(),
-                                      declaration.getDescription(),
-                                      declaration.getExecutorFactory(),
-                                      parameters,
-                                      declaration.getCapabilities());
+        List<ParameterModel> parameterModels = toOperationParameters(declaration.getParameters());
+
+        List<Interceptor> interceptors = createInterceptors(declaration.getInterceptorFactories());
+        OperationExecutorFactory executorFactory = new OperationExecutorFactoryWrapper(declaration.getExecutorFactory(), interceptors);
+
+        return new ImmutableOperationModel(declaration.getName(),
+                                           declaration.getDescription(),
+                                           executorFactory,
+                                           parameterModels,
+                                           declaration.getModelProperties(),
+                                           declaration.getInterceptorFactories());
     }
 
-    private List<Parameter> toConfigParameters(List<ParameterDeclaration> declarations)
+    private List<ConnectionProviderModel> toConnectionProviders(List<ConnectionProviderDeclaration> declarations)
     {
-
-        List<Parameter> parameters = toParameters(declarations);
-        alphaSortDescribedList(parameters);
-
-        return parameters;
+        return declarations.stream().map(this::toConnectionProvider).collect(new ImmutableListCollector<>());
     }
 
-    private List<Parameter> toOperationParameters(List<ParameterDeclaration> declarations)
+    private ConnectionProviderModel toConnectionProvider(ConnectionProviderDeclaration declaration)
+    {
+        return new ImmutableConnectionProviderModel(
+                declaration.getName(),
+                declaration.getDescription(),
+                declaration.getConfigurationType(),
+                declaration.getConnectionType(),
+                declaration.getFactory(),
+                toParameters(declaration.getParameters()),
+                declaration.getModelProperties());
+    }
+
+    private List<ParameterModel> toOperationParameters(List<ParameterDeclaration> declarations)
     {
         return toParameters(declarations);
     }
 
-    private List<Parameter> toParameters(List<ParameterDeclaration> declarations)
+    private List<ParameterModel> toParameters(List<ParameterDeclaration> declarations)
     {
         if (declarations.isEmpty())
         {
             return ImmutableList.of();
         }
 
-        List<Parameter> parameters = new ArrayList<>(declarations.size());
-        for (ParameterDeclaration declaration : declarations)
-        {
-            parameters.add(toParameter(declaration));
-        }
-
-        return parameters;
+        return declarations.stream().map(this::toParameter).collect(toList());
     }
 
-    private Parameter toParameter(ParameterDeclaration parameter)
+    private ParameterModel toParameter(ParameterDeclaration parameter)
     {
-        return new ImmutableParameter(parameter.getName(),
-                                      parameter.getDescription(),
-                                      parameter.getType(),
-                                      parameter.isRequired(),
-                                      parameter.isDynamic(),
-                                      parameter.getDefaultValue(),
-                                      parameter.getCapabilities());
+        Object defaultValue = parameter.getDefaultValue();
+        if (defaultValue instanceof String)
+        {
+            if (parameter.getExpressionSupport() == NOT_SUPPORTED && isExpression((String) defaultValue))
+            {
+                throw new IllegalModelDefinitionException(String.format("Parameter '%s' is marked as not supporting expressions yet it contains one as a default value. Please fix this", parameter.getName()));
+            }
+            else if (parameter.getExpressionSupport() == REQUIRED && !isExpression((String) defaultValue))
+            {
+                throw new IllegalModelDefinitionException(String.format("Parameter '%s' requires expressions yet it contains a constant as a default value. Please fix this", parameter.getName()));
+            }
+        }
+
+        return new ImmutableParameterModel(parameter.getName(),
+                                           parameter.getDescription(),
+                                           parameter.getType(),
+                                           parameter.isRequired(),
+                                           parameter.getExpressionSupport(),
+                                           parameter.getDefaultValue(),
+                                           parameter.getModelProperties());
     }
 
     private void validateMuleVersion(Declaration declaration)
@@ -197,22 +244,18 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         }
         catch (IllegalArgumentException e)
         {
-            throw new IllegalArgumentException(String.format("Invalid version %s for capability '%s'", declaration.getVersion(), declaration.getName()));
+            throw new IllegalArgumentException(String.format("Invalid version %s for extension '%s'", declaration.getVersion(), declaration.getName()));
         }
     }
 
-    private void applyPostProcessors(DescribingContext describingContext)
+    private void enrichModel(DescribingContext describingContext)
     {
-        for (DescriberPostProcessor postProcessor : postProcessors)
-        {
-            postProcessor.postProcess(describingContext);
-        }
+        modelEnrichers.forEach(enricher -> enricher.enrich(describingContext));
     }
 
-    private List<DescriberPostProcessor> searchPostProcessors(ServiceRegistry serviceRegistry)
+    private boolean isExpression(String value)
     {
-        return ImmutableList.<DescriberPostProcessor>builder()
-                .addAll(serviceRegistry.lookupProviders(DescriberPostProcessor.class, getClass().getClassLoader()))
-                .build();
+        return value.startsWith(DEFAULT_EXPRESSION_PREFIX) &&
+               value.endsWith(DEFAULT_EXPRESSION_POSTFIX);
     }
 }

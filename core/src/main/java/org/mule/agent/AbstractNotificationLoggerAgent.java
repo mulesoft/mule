@@ -15,23 +15,19 @@ import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
 import org.mule.api.context.notification.MessageProcessorNotificationListener;
-import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.context.notification.ComponentMessageNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.ManagementNotification;
 import org.mule.context.notification.MessageProcessorNotification;
-import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.SecurityNotification;
-import org.mule.context.notification.ServiceNotification;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,8 +50,6 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private boolean ignoreManagerNotifications = false;
-    private boolean ignoreModelNotifications = false;
-    private boolean ignoreComponentNotifications = false;
     private boolean ignoreConnectionNotifications = false;
     private boolean ignoreSecurityNotifications = false;
     private boolean ignoreManagementNotifications = false;
@@ -112,26 +106,6 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     public void setIgnoreMessageNotifications(boolean ignoreMessageNotifications)
     {
         this.ignoreMessageNotifications = ignoreMessageNotifications;
-    }
-
-    public boolean isIgnoreModelNotifications()
-    {
-        return ignoreModelNotifications;
-    }
-
-    public void setIgnoreModelNotifications(boolean ignoreModelNotifications)
-    {
-        this.ignoreModelNotifications = ignoreModelNotifications;
-    }
-
-    public boolean isIgnoreComponentNotifications()
-    {
-        return ignoreComponentNotifications;
-    }
-
-    public void setIgnoreComponentNotifications(boolean ignoreComponentNotifications)
-    {
-        this.ignoreComponentNotifications = ignoreComponentNotifications;
     }
 
     public boolean isIgnoreSecurityNotifications()
@@ -225,48 +199,6 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             {
                 @Override
                 public void onNotification(MuleContextNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-        if (!ignoreModelNotifications)
-        {
-            ServerNotificationListener<ModelNotification> l
-                = new ModelNotificationListener<ModelNotification>()
-            {
-                @Override
-                public void onNotification(ModelNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-        if (!ignoreComponentNotifications)
-        {
-            ServerNotificationListener<ServiceNotification> l
-                = new ServiceNotificationListener<ServiceNotification>()
-            {
-                @Override
-                public void onNotification(ServiceNotification notification)
                 {
                     logEvent(notification);
                 }

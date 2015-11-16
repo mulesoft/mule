@@ -6,66 +6,92 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import org.mule.extension.introspection.Extension;
-import org.mule.util.CollectionUtils;
+import static java.lang.String.format;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.util.Preconditions.checkArgument;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.RegistrationException;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.runtime.ConfigurationProvider;
+import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ExpirableConfigurationProvider;
+import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Hold the state related to registered {@link Extension}s and their instances.
+ * Hold the state related to registered {@link ExtensionModel extensionModels} and their instances.
  * <p/>
  * It also provides utility methods and caches to easily locate pieces of such state.
+ * <p/>
+ * It acts as a facade of the {@link MuleRegistry}, which is where {@link ConfigurationProvider} are
+ * finally stored.
  *
  * @since 3.7.0
  */
 final class ExtensionRegistry
 {
 
-    private final LoadingCache<Extension, ExtensionStateTracker> extensionStates = CacheBuilder.newBuilder().build(new CacheLoader<Extension, ExtensionStateTracker>()
+    private final LoadingCache<ExtensionModel, List<ConfigurationProvider>> providersByExtension = CacheBuilder.newBuilder().build(new CacheLoader<ExtensionModel, List<ConfigurationProvider>>()
     {
         @Override
-        public ExtensionStateTracker load(Extension key) throws Exception
+        public List<ConfigurationProvider> load(ExtensionModel key) throws Exception
         {
-            return new ExtensionStateTracker();
+            return registry.lookupObjects(ConfigurationProvider.class).stream()
+                    .filter(provider -> provider.getModel().getExtensionModel() == key)
+                    .collect(new ImmutableListCollector<>());
         }
     });
 
-    private final Map<String, Extension> extensions = new ConcurrentHashMap<>();
-    private final Map<Class<?>, Set<Extension>> capabilityToExtension = new ConcurrentHashMap<>();
+    private final Map<String, ExtensionModel> extensions = new ConcurrentHashMap<>();
+    private final MuleRegistry registry;
 
-    ExtensionRegistry()
+    /**
+     * Creates a new instance
+     *
+     * @param registry the {@link MuleRegistry} to use for holding instances
+     */
+    ExtensionRegistry(MuleRegistry registry)
     {
+        this.registry = registry;
     }
 
     /**
      * Registers the given {@code extension}
      *
-     * @param name      the registration name you want for the {@code extension}
-     * @param extension a {@link Extension}
+     * @param name           the registration name you want for the {@code extension}
+     * @param extensionModel a {@link ExtensionModel}
      */
-    void registerExtension(String name, Extension extension)
+    void registerExtension(String name, ExtensionModel extensionModel)
     {
-        extensions.put(name, extension);
+        extensions.put(name, extensionModel);
     }
 
     /**
-     * @return an immutable view of the currently registered {@link Extension}
+     * @return an immutable view of the currently registered {@link ExtensionModel}
      */
-    Set<Extension> getExtensions()
+    Set<ExtensionModel> getExtensions()
     {
         return ImmutableSet.copyOf(extensions.values());
     }
 
     /**
-     * @param name the registration name of the {@link Extension} you want to test
-     * @return {@code true} if an {@link Extension} is registered under {@code name}. {@code false} otherwise
+     * @param name the registration name of the {@link ExtensionModel} you want to test
+     * @return {@code true} if an {@link ExtensionModel} is registered under {@code name}. {@code false} otherwise
      */
     boolean containsExtension(String name)
     {
@@ -73,48 +99,82 @@ final class ExtensionRegistry
     }
 
     /**
-     * Returns a registered {@link Extension} of the given {@code name}
+     * Returns all the {@link ConfigurationProvider configuration providers} which serve
+     * {@link ConfigurationModel configuration models} owned by {@code extensionModel}
      *
-     * @param name the name of the extension that is being retrieved
-     * @return the registered {@link Extension} or {@code null} if nothing was registered with that {@code name}
+     * @param extensionModel a registered {@link ExtensionModel}
+     * @return an immutable {@link List}. Might be empty but will never be {@code null}
      */
-    Extension getExtension(String name)
+    List<ConfigurationProvider> getConfigurationProviders(ExtensionModel extensionModel)
     {
-        return extensions.get(name);
+        return providersByExtension.getUnchecked(extensionModel);
     }
 
     /**
-     * @param extension a registered {@link Extension}
-     * @return the {@link ExtensionStateTracker} object related to the given {@code extension}
+     * Returns the {@link ConfigurationProvider} registered under the given
+     * {@code key}
+     *
+     * @param key the key for the fetched {@link ConfigurationProvider}
+     * @param <T> the generic type for the returned value
+     * @return a {@link ConfigurationProvider}
+     * @throws IllegalArgumentException if no provider registered under that {@code key}
      */
-    ExtensionStateTracker getExtensionState(Extension extension)
+    <T> ConfigurationProvider<T> getConfigurationProvider(String key)
     {
-        return extensionStates.getUnchecked(extension);
-    }
+        ConfigurationProvider<T> configurationProvider = registry.get(key);
 
-    /**
-     * @param capabilityType the {@link Class} of a capability
-     * @param <C>            the capability type
-     * @return an immutable view of all registered {@link Extension} which have the given {@code capabilityType}
-     */
-    <C> Set<Extension> getExtensionsCapableOf(Class<C> capabilityType)
-    {
-        Set<Extension> cachedCapables = capabilityToExtension.get(capabilityType);
-        if (CollectionUtils.isEmpty(cachedCapables))
+        if (configurationProvider == null)
         {
-            ImmutableSet.Builder<Extension> capables = ImmutableSet.builder();
-            for (Extension extension : getExtensions())
-            {
-                if (extension.isCapableOf(capabilityType))
-                {
-                    capables.add(extension);
-                }
-            }
-
-            cachedCapables = capables.build();
-            capabilityToExtension.put(capabilityType, cachedCapables);
+            throw new IllegalArgumentException(String.format("There is no registered configurationProvider under name '%s'", key));
         }
 
-        return cachedCapables;
+        return configurationProvider;
     }
+
+    /**
+     * Registers the given {@code configurationProvider} in the underlying {@link #registry}.
+     * <p/>
+     * The {@code configurationProvider} is registered under a key matching its
+     * {@link ConfigurationProvider#getName()}.
+     *
+     * @param configurationProvider a {@link ConfigurationProvider} to be registered
+     * @throws IllegalArgumentException if {@code configurationProvider} is {@code null}
+     * @throws MuleRuntimeException     if the {@code configurationProvider} could not be registered
+     */
+    void registerConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        checkArgument(configurationProvider != null, "Cannot register a null configurationProvider");
+        try
+        {
+            registry.registerObject(configurationProvider.getName(), configurationProvider);
+        }
+        catch (RegistrationException e)
+        {
+            throw new MuleRuntimeException(createStaticMessage(format(
+                    "Found exception while registering configuration provider '%'", configurationProvider.getName()))
+                    , e);
+        }
+
+        providersByExtension.invalidate(configurationProvider.getModel().getExtensionModel());
+    }
+
+    /**
+     * Returns a {@link Multimap} which keys are registrations keys and the values are the {@link ConfigurationInstance}
+     * instances which are expired
+     *
+     * @return an immutable {@link Multimap}
+     */
+    Multimap<String, ConfigurationInstance<Object>> getExpiredConfigs()
+    {
+        ListMultimap<String, ConfigurationInstance<Object>> expired = ArrayListMultimap.create();
+        for (ExtensionModel extensionModel : extensions.values())
+        {
+            getConfigurationProviders(extensionModel).stream()
+                    .filter(provider -> provider instanceof ExpirableConfigurationProvider)
+                    .forEach(provider -> expired.putAll(provider.getName(), ((ExpirableConfigurationProvider) provider).getExpired()));
+        }
+
+        return Multimaps.unmodifiableListMultimap(expired);
+    }
+
 }

@@ -8,17 +8,14 @@ package org.mule.transport.vm.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -30,26 +27,19 @@ import javax.transaction.xa.Xid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
+public class VmXATransactionTestCase extends FunctionalTestCase
 {
+
     protected static final Log logger = LogFactory.getLog(VmTransactionTestCase.class);
     protected static volatile boolean success = true;
     protected static volatile boolean wouldBeDisabled = false;
 
-    public VmXATransactionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm-xa-transaction-service.xml"},
-            {ConfigVariant.FLOW, "vm-xa-transaction-flow.xml"}
-        });
+        return "vm-xa-transaction-flow.xml";
     }
 
     @Test

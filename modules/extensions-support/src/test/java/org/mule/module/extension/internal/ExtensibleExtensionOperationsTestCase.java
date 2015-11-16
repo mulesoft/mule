@@ -7,28 +7,24 @@
 package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.emptyIterable;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
-import static org.mule.module.extension.HeisenbergExtension.EXTENSION_VERSION;
-import org.mule.extension.annotations.Extensible;
-import org.mule.extension.annotations.ExtensionOf;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.Operations;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.module.extension.internal.capability.metadata.ExtendingOperationCapability;
-
-import java.util.Set;
+import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.Extensible;
+import org.mule.extension.annotation.api.ExtensionOf;
+import org.mule.extension.annotation.api.Operation;
+import org.mule.extension.annotation.api.Operations;
+import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 
 import org.junit.Test;
 
 public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBasedDescriberTestCase
 {
+
     private static final String SAY_HELLO_OPERATION = "sayHello";
     private static final String SAY_BYE_OPERATION = "sayBye";
 
@@ -55,19 +51,16 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
         assertOperationExtensionOf(SAY_BYE_OPERATION, ExtensibleExtension.class);
     }
 
-    private void assertOperationExtensionOf(String operationName, Class capabilityType)
+    private void assertOperationExtensionOf(String operationName, Class propertyType)
     {
-        Declaration declaration = getDescriber().describe().getRootDeclaration().getDeclaration();
+        Declaration declaration = getDescriber().describe(new DefaultDescribingContext()).getRootDeclaration().getDeclaration();
         OperationDeclaration operation = getOperation(declaration, operationName);
-        assertThat(operation.getCapabilities(), is(not(emptyIterable())));
 
-        Set<ExtendingOperationCapability> extendingOperationCapabilities = operation.getCapabilities(ExtendingOperationCapability.class);
-        assertThat(extendingOperationCapabilities, hasSize(1));
-        ExtendingOperationCapability<ExtensibleExtension> capability = extendingOperationCapabilities.iterator().next();
-        assertThat(capability.getType(), is(sameInstance(capabilityType)));
+        ExtendingOperationModelProperty<ExtensibleExtension> modelProperty = operation.getModelProperty(ExtendingOperationModelProperty.KEY);
+        assertThat(modelProperty.getType(), is(sameInstance(propertyType)));
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations(ExtensibleExtensionOperation.class)
     @Extensible
     public static class ExtensibleExtension
@@ -75,14 +68,14 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations({ClassLevelExtensionOfOperation.class, MethodLevelExtensionOfOperation.class})
     public static class ExtendingExtension
     {
 
     }
 
-    @org.mule.extension.annotations.Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION, version = EXTENSION_VERSION)
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     @Operations({MethodLevelExtensionOfOperation.class, ExtensibleExtensionOperation.class})
     @Extensible
     public static class ExtensibleExtendingExtension
@@ -93,6 +86,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
     @ExtensionOf(ExtensibleExtension.class)
     private static class ClassLevelExtensionOfOperation
     {
+
         @Operation
         public String sayHello()
         {
@@ -103,6 +97,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     private static class MethodLevelExtensionOfOperation
     {
+
         @ExtensionOf(ExtensibleExtension.class)
         @Operation
         public String sayBye()
@@ -113,6 +108,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     private static class ExtensibleExtensionOperation
     {
+
         @Operation
         public String sayHello()
         {

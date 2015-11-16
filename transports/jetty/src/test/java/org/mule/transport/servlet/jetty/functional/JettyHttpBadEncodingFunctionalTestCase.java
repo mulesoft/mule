@@ -16,10 +16,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 public class JettyHttpBadEncodingFunctionalTestCase extends JettyHttpEncodingFunctionalTestCase
 {
-    public JettyHttpBadEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Override
     public void testSend() throws Exception

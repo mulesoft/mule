@@ -6,20 +6,13 @@
  */
 package org.mule.module.cxf;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeThat;
 import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transport.http.HttpConnector;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -29,7 +22,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 
 public class HttpSecurityTestCase extends AbstractHttpSecurityTestCase
@@ -37,8 +29,6 @@ public class HttpSecurityTestCase extends AbstractHttpSecurityTestCase
 
     @Rule
     public SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
-
-    private static final String HTTP_SECURITY_CONF_FLOW_HTTPN_XML = "http-security-conf-flow-httpn.xml";
 
     private static String soapRequest =
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
@@ -56,19 +46,10 @@ public class HttpSecurityTestCase extends AbstractHttpSecurityTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public HttpSecurityTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-security-conf-service.xml"},
-            {ConfigVariant.FLOW, "http-security-conf-flow.xml"},
-            {ConfigVariant.FLOW, HTTP_SECURITY_CONF_FLOW_HTTPN_XML}
-        });
+        return "http-security-conf-flow-httpn.xml";
     }
 
     /**
@@ -98,18 +79,5 @@ public class HttpSecurityTestCase extends AbstractHttpSecurityTestCase
 
         result = client.executeMethod(method);
         assertEquals(401, result);
-    }
-
-    @Test
-    public void testBasicAuthWithCxfClient() throws Exception
-    {
-        assumeThat(configResources, is(not(equalTo(HTTP_SECURITY_CONF_FLOW_HTTPN_XML)))); // New http module doesn't support urls like "cxf:*"
-
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage result = client.send("cxf:http://admin:admin@localhost:" + dynamicPort1.getNumber() + "/services/Echo?method=echo", getTestMuleMessage("Hello"));
-
-        final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
-        assertEquals(200, status);
     }
 }

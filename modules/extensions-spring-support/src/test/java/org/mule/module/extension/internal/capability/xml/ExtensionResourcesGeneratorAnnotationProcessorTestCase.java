@@ -70,6 +70,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
 
         assert_().about(javaSources())
                 .that(testSourceFiles())
+                .withCompilerOptions("-Aextension.version=1.0.0-dev")
                 .processedWith(new ExtensionResourcesGeneratorAnnotationProcessor())
                 .compilesWithoutError()
                 .and().generatesFileNamed(StandardLocation.SOURCE_OUTPUT, "", "mule-documentation.xsd")

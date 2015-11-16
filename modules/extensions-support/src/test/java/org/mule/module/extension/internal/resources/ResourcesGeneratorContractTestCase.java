@@ -16,10 +16,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.resources.GeneratedResource;
-import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.resources.GeneratedResource;
+import org.mule.extension.api.resources.ResourcesGenerator;
+import org.mule.extension.api.resources.spi.GenerableResourceContributor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -65,10 +65,10 @@ public abstract class ResourcesGeneratorContractTestCase extends AbstractMuleTes
         when(serviceRegistry.lookupProviders(same(GenerableResourceContributor.class), any(ClassLoader.class)))
                 .thenReturn(Arrays.asList(contributor));
 
-        Extension extension = mock(Extension.class);
+        ExtensionModel extensionModel = mock(ExtensionModel.class);
 
-        generator.generateFor(extension);
+        generator.generateFor(extensionModel);
 
-        verify(contributor).contribute(extension, generator);
+        verify(contributor).contribute(extensionModel, generator);
     }
 }

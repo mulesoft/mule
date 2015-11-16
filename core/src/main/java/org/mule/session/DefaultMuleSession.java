@@ -6,9 +6,7 @@
  */
 package org.mule.session;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleSession;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
@@ -62,9 +60,6 @@ public final class DefaultMuleSession implements MuleSession
 
     private Map<String, TypedValue> properties;
 
-    @Deprecated
-    private FlowConstruct flowConstruct;
-
     public DefaultMuleSession()
     {
         id = UUID.getUUID();
@@ -87,34 +82,6 @@ public final class DefaultMuleSession implements MuleSession
     private TypedValue createTypedValue(MuleSession session, String key)
     {
         return new TypedValue(session.getProperty(key), session.getPropertyDataType(key));
-    }
-
-    // Deprecated constructor
-
-    @Deprecated
-    public DefaultMuleSession(MuleContext muleContext)
-    {
-        this();
-    }
-
-    @Deprecated
-    public DefaultMuleSession(FlowConstruct flowConstruct, MuleContext muleContext)
-    {
-        this();
-        this.flowConstruct = flowConstruct;
-    }
-
-    @Deprecated
-    public DefaultMuleSession(MuleSession source, MuleContext muleContext)
-    {
-        this(source);
-    }
-
-    @Deprecated
-    public DefaultMuleSession(MuleSession source, FlowConstruct flowConstruct)
-    {
-        this(source);
-        this.flowConstruct = flowConstruct;
     }
 
     @Override
@@ -177,45 +144,6 @@ public final class DefaultMuleSession implements MuleSession
         DataType dataType = DataTypeFactory.createFromObject(value);
 
         properties.put(key, new TypedValue(value, dataType));
-    }
-
-    /**
-     * Will retrieve a session level property.
-     *
-     * @param key the key for the object data being stored on the session
-     * @return the value of the session data or null if the property does not exist
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getProperty(Object key)
-    {
-        TypedValue typedValue = properties.get(key);
-        return typedValue == null ? null : (T) typedValue.getValue();
-    }
-
-    /**
-     * Will retrieve a session level property and remove it from the session
-     *
-     * @param key the key for the object data being stored on the session
-     * @return the value of the session data or null if the property does not exist
-     */
-    @Override
-    public Object removeProperty(Object key)
-    {
-        return properties.remove(key);
-    }
-
-    /**
-     * Returns an iterater of property keys for the session properties on this session
-     *
-     * @return an iterater of property keys for the session properties on this session
-     * @deprecated Use getPropertyNamesAsSet() instead
-     */
-    @Override
-    @Deprecated
-    public Iterator<String> getPropertyNames()
-    {
-        return properties.keySet().iterator();
     }
 
     @Override
@@ -291,13 +219,14 @@ public final class DefaultMuleSession implements MuleSession
     @Override
     public <T> T getProperty(String key)
     {
-        return this.<T> getProperty((Object) key);
+        TypedValue typedValue = properties.get(key);
+        return typedValue == null ? null : (T) typedValue.getValue();
     }
 
     @Override
     public Object removeProperty(String key)
     {
-        return removeProperty((Object) key);
+        return properties.remove(key);
     }
 
     // //////////////////////////
@@ -331,18 +260,6 @@ public final class DefaultMuleSession implements MuleSession
     public void clearProperties()
     {
         properties.clear();
-    }
-
-    @Override
-    public FlowConstruct getFlowConstruct()
-    {
-        return flowConstruct;
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
     }
 
     @Override

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xmlns:xm="http://www.mulesoft.org/schema/mule/xml"
-       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xm="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -16,88 +16,63 @@
         http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
         http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
-    <endpoint name="httpService" 
-              address="http://www.webservicex.net/stockquote.asmx/GetQuote" 
+    <endpoint name="httpService"
+              address="http://www.webservicex.net/stockquote.asmx/GetQuote"
               exchange-pattern="request-response"/>
 
     <endpoint name="cxfService"
-              address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote" 
+              address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"
               exchange-pattern="request-response"/>
 
-    <model>
-        <service name="httpService1">
-            <inbound>
-                <vm:inbound-endpoint path="httpService1" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="httpService" exchange-pattern="request-response">
-                        <message-properties-transformer>
-                            <!-- take the content-type from the client's request -->
-                            <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
-                        </message-properties-transformer>
-                        <response>
-                            <message-properties-transformer scope="outbound">
-                                <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
-                            </message-properties-transformer>
-                        </response>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="httpService1">
+        <vm:inbound-endpoint path="httpService1" exchange-pattern="request-response"/>
+        <outbound-endpoint ref="httpService" exchange-pattern="request-response">
+            <message-properties-transformer>
+                <!-- take the content-type from the client's request -->
+                <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
+            </message-properties-transformer>
+            <response>
+                <message-properties-transformer scope="outbound">
+                    <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
+                </message-properties-transformer>
+            </response>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="cxfService1">
-            <inbound>
-                <vm:inbound-endpoint path="cxfService1" exchange-pattern="request-response" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="cxfService" exchange-pattern="request-response">
-                        <response>
-                            <message-properties-transformer scope="outbound">
-                                <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
-                            </message-properties-transformer>
-                        </response>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="cxfService1">
+        <vm:inbound-endpoint path="cxfService1" exchange-pattern="request-response"/>
+        <outbound-endpoint ref="cxfService" exchange-pattern="request-response">
+            <response>
+                <message-properties-transformer scope="outbound">
+                    <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
+                </message-properties-transformer>
+            </response>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="httpService2">
-            <inbound>
-                <vm:inbound-endpoint path="httpService2" exchange-pattern="request-response" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="httpService" exchange-pattern="request-response">
-                        <message-properties-transformer>
-                            <!-- take the content-type from the client's request -->
-                            <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
-                            <add-message-property key="some" value="#[header:INBOUND:some]"/>
-                            <add-message-property key="other" value="#[header:INBOUND:other]"/>
-                        </message-properties-transformer>
-                        <property key="responseProperties" value="some,other" />
-                   </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="httpService2">
+        <vm:inbound-endpoint path="httpService2" exchange-pattern="request-response"/>
+        <outbound-endpoint ref="httpService" exchange-pattern="request-response">
+            <message-properties-transformer>
+                <!-- take the content-type from the client's request -->
+                <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
+                <add-message-property key="some" value="#[header:INBOUND:some]"/>
+                <add-message-property key="other" value="#[header:INBOUND:other]"/>
+            </message-properties-transformer>
+            <property key="responseProperties" value="some,other"/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="cxfService2">
-            <inbound>
-                <vm:inbound-endpoint path="cxfService2" exchange-pattern="request-response" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="cxfService" exchange-pattern="request-response">
-                        <message-properties-transformer>
-                            <!-- Note that we don't specify content-type here, cxf does-->
-                            <add-message-property key="some" value="#[header:INBOUND:some]"/>
-                            <add-message-property key="other" value="#[header:INBOUND:other]"/>
-                        </message-properties-transformer>
-                        <property key="responseProperties" value="some,other" />
-                       </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="cxfService2">
+        <vm:inbound-endpoint path="cxfService2" exchange-pattern="request-response"/>
+        <outbound-endpoint ref="cxfService" exchange-pattern="request-response">
+            <message-properties-transformer>
+                <!-- Note that we don't specify content-type here, cxf does-->
+                <add-message-property key="some" value="#[header:INBOUND:some]"/>
+                <add-message-property key="other" value="#[header:INBOUND:other]"/>
+            </message-properties-transformer>
+            <property key="responseProperties" value="some,other"/>
+        </outbound-endpoint>
+    </flow>
+
 </mule>

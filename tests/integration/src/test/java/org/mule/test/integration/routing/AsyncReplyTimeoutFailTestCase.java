@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.routing;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.context.notification.RoutingNotificationListener;
@@ -56,6 +57,7 @@ public class AsyncReplyTimeoutFailTestCase extends FunctionalTestCase
             assertTrue(ExceptionUtils.getRootCause(e) instanceof CorrelationTimeoutException);
         }
 
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+        //
+        assertFalse(latch.await(3000, TimeUnit.MILLISECONDS));
     }
 }

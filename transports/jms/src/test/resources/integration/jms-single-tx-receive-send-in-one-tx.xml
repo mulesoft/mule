@@ -10,24 +10,17 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
-    
-    <model name="TEST">
-        <service name="Part2">
-            <inbound>
-                <inbound-endpoint address="${inbound.destination}" exchange-pattern="one-way">
-                    <jms:transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" exchange-pattern="one-way">
-                        <jms:transaction action="ALWAYS_JOIN"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+
+    <flow name="Part2">
+        <inbound-endpoint address="${inbound.destination}" exchange-pattern="one-way">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint address="${outbound.destination}" exchange-pattern="one-way">
+            <jms:transaction action="ALWAYS_JOIN"/>
+        </outbound-endpoint>
+    </flow>
+
 </mule>

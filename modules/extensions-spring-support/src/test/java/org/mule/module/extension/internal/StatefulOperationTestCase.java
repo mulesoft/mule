@@ -73,7 +73,7 @@ public class StatefulOperationTestCase extends ExtensionsFunctionalTestCase
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("myName", name);
 
-        HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationInstanceFromRegistry(configName, event);
+        HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationFromRegistry(configName, event);
         assertThat(heisenbergExtension.getMoney(), equalTo(BigDecimal.valueOf(expectedAmount)));
     }
 

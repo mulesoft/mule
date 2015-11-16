@@ -8,32 +8,19 @@ package org.mule.test.integration.resolvers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MethodEntryPointWithTransformerTestCase extends AbstractServiceAndFlowTestCase
+public class MethodEntryPointWithTransformerTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-flow.xml"}});
-    }
 
-    public MethodEntryPointWithTransformerTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-flow.xml";
     }
 
     /**

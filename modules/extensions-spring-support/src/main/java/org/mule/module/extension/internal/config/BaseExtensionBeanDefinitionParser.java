@@ -40,7 +40,7 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
 
     /**
      * Creates and returns a singleton {@link BeanDefinition}. Actual parsing
-     * is delegated to the {@link #doParse(BeanDefinitionBuilder, Element)}
+     * is delegated to the {@link #doParse(BeanDefinitionBuilder, Element, ParserContext)}
      * method
      *
      * @param element       a {@link Element}
@@ -52,8 +52,7 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
     {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(type);
         builder.setScope(BeanDefinition.SCOPE_SINGLETON);
-
-        doParse(builder, element);
+        doParse(builder, element, parserContext);
 
         BeanDefinition definition = builder.getBeanDefinition();
         setNoRecurseOnDefinition(definition);
@@ -64,8 +63,9 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
     /**
      * Performs component specific parsing logic.
      *
-     * @param builder a {@link BeanDefinitionBuilder}
-     * @param element the {@link Element} being parsed
+     * @param builder       a {@link BeanDefinitionBuilder}
+     * @param element       the {@link Element} being parsed
+     * @param parserContext the current{@link ParserContext}
      */
-    protected abstract void doParse(BeanDefinitionBuilder builder, Element element);
+    protected abstract void doParse(BeanDefinitionBuilder builder, Element element, ParserContext parserContext);
 }

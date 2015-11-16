@@ -1,61 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <model name="REST Functional TestCase">
+    <flow name="RESTServiceWrapper1">
+        <inbound-endpoint address="vm://in1" exchange-pattern="request-response"/>
+        <http:rest-service-component
+                serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
+                httpMethod="POST">
+            <http:payloadParameterName value="symbol"/>
+        </http:rest-service-component>
+    </flow>
 
-        <service name="RESTServiceWrapper1">
-            <inbound>
-                <inbound-endpoint address="vm://in1" exchange-pattern="request-response"/>
-            </inbound>
-            <http:rest-service-component
-                    serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
-                    httpMethod="POST">
-                <http:payloadParameterName value="symbol"/>
-            </http:rest-service-component>
-        </service>
+    <flow name="RESTServiceWrapper2">
+        <inbound-endpoint address="vm://in2" exchange-pattern="request-response"/>
+        <http:rest-service-component
+                serviceUrl="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"
+                httpMethod="POST">
+            <http:payloadParameterName value="FromCurrency"/>
+            <http:payloadParameterName value="ToCurrency"/>
+        </http:rest-service-component>
+    </flow>
 
-        <service name="RESTServiceWrapper2">
-            <inbound>
-                <inbound-endpoint address="vm://in2" exchange-pattern="request-response"/>
-            </inbound>
-            <http:rest-service-component
-                    serviceUrl="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"
-                    httpMethod="POST">
-                <http:payloadParameterName value="FromCurrency"/>
-                <http:payloadParameterName value="ToCurrency"/>
-            </http:rest-service-component>
-        </service>
+    <flow name="RESTServiceWrapper3">
+        <inbound-endpoint address="vm://in3" exchange-pattern="request-response"/>
+        <http:rest-service-component
+                serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
+                httpMethod="GET">
+            <http:payloadParameterName value="symbol"/>
+        </http:rest-service-component>
+    </flow>
 
-        <service name="RESTServiceWrapper3">
-            <inbound>
-                <inbound-endpoint address="vm://in3" exchange-pattern="request-response"/>
-            </inbound>
-            <http:rest-service-component
-                    serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
-                    httpMethod="GET">
-                <http:payloadParameterName value="symbol"/>
-            </http:rest-service-component>
-        </service>
+    <flow name="RESTServiceWrapper4">
+        <inbound-endpoint address="vm://in4" exchange-pattern="request-response"/>
+        <http:rest-service-component
+                serviceUrl="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"
+                httpMethod="GET">
+            <http:payloadParameterName value="FromCurrency"/>
+            <http:payloadParameterName value="ToCurrency"/>
+        </http:rest-service-component>
+    </flow>
 
-        <service name="RESTServiceWrapper4">
-            <inbound>
-                <inbound-endpoint address="vm://in4" exchange-pattern="request-response"/>
-            </inbound>
-            <http:rest-service-component
-                    serviceUrl="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"
-                    httpMethod="GET">
-                <http:payloadParameterName value="FromCurrency"/>
-                <http:payloadParameterName value="ToCurrency"/>
-            </http:rest-service-component>
-        </service>
-    </model>
 </mule>

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class MultipleTransformerRefsTestCase  extends AbstractEndpointTestCase
     public void testMultipleRefs() throws MuleException
     {
         ImmutableEndpoint endpoint = doTest("many");
-        List transformers = endpoint.getTransformers();
+        List<MessageProcessor> transformers = endpoint.getMessageProcessors();
         assertNotNull(transformers);
         // this lets us check ordering before size, safely, which is useful on failure
         assertTrue(transformers.size() > 0);
@@ -49,7 +50,7 @@ public class MultipleTransformerRefsTestCase  extends AbstractEndpointTestCase
     public void testSingleRef() throws MuleException
     {
         ImmutableEndpoint endpoint = doTest("single");
-        List transformers = endpoint.getTransformers();
+        List<MessageProcessor> transformers = endpoint.getMessageProcessors();
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertEquals("a", ((Transformer) transformers.get(0)).getName());

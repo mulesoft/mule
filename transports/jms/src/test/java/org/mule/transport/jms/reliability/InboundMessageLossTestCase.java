@@ -8,9 +8,7 @@ package org.mule.transport.jms.reliability;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
@@ -40,7 +38,10 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
     @Override
     protected String[] getConfigFiles()
     {
-        return new String[] { "reliability/activemq-config.xml", "reliability/inbound-message-loss.xml" };
+        return new String[] {
+                "reliability/activemq-config.xml",
+                "reliability/inbound-message-loss-flow.xml"
+        };
     }
 
     @Override
@@ -81,19 +82,23 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
     {
         putMessageOnQueue("transformerException");
 
-        // Delivery failed so message should have been redelivered
-        assertTrue("Message was not redelivered",
-            messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+        // perspective, the message has been delivered successfully.
+        // Note that this behavior is different from services because the exception occurs before
+        // the SEDA queue for services.
+        assertFalse("Message should not have been redelivered",
+                    messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
 
     @Test
     public void testRouterException() throws Exception
     {
-        putMessageOnQueue("routerException");
-
-        // Delivery failed so message should have been redelivered
-        assertTrue("Message was not redelivered",
-            messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+        // perspective, the message has been delivered successfully.
+        // Note that this behavior is different from services because the exception occurs before
+        // the SEDA queue for services.
+        assertFalse("Message should not have been redelivered",
+                    messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
 
     @Test

@@ -6,6 +6,7 @@
  */
 package org.mule.lifecycle.phases;
 
+import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.component.Component;
 import org.mule.api.config.Config;
@@ -15,14 +16,12 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.model.Model;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.MuleContextNotification;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.annotation.AnnotationMetaData;
@@ -46,7 +45,7 @@ import javax.annotation.PreDestroy;
  *
  * This phase is responsible for disposing objects. Any object that implements {@link org.mule.api.lifecycle.Disposable} will
  * have its {@link org.mule.api.lifecycle.Disposable#dispose()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.service.Service}, {@link org.mule.api.model.Model}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.transport.Connector}, followed
+ * {@link org.mule.api.construct.FlowConstruct}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.transport.Connector}, followed
  * by any other object that implements {@link org.mule.api.lifecycle.Disposable}.
  *
  * @see org.mule.api.MuleContext
@@ -61,12 +60,12 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
     {
         super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
 
-        Set<LifecycleObject> orderedObjects = new LinkedHashSet<LifecycleObject>();
+        Set<LifecycleObject> orderedObjects = new LinkedHashSet<>();
         // Stop in the opposite order to start
         orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-        orderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
         orderedObjects.add(new NotificationLifecycleObject(Agent.class));
         orderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        orderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         orderedObjects.add(new NotificationLifecycleObject(Config.class));
         orderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
         orderedObjects.add(new NotificationLifecycleObject(Object.class));
@@ -84,7 +83,7 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         a CONTEXT_DISPOSING event and calling dispose on the transformer.  This is necessary since transformers are prototype objects
         and not managed by DI containers such as Spring after the creation of the object
          */
-        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, OutboundRouterCollection.class, OutboundRouter.class, Transformer.class});
+        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, OutboundRouter.class, Transformer.class, MuleContext.class});
     }
 
      @Override

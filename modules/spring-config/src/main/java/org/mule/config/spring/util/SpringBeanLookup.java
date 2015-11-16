@@ -9,8 +9,6 @@ package org.mule.config.spring.util;
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.object.AbstractObjectFactory;
 
@@ -88,11 +86,6 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
         {
             //The servie cannot be autowired from within Spring, so we do it here
             ((FlowConstructAware)instance).setFlowConstruct(flowConstruct);
-        }
-        if(instance instanceof ServiceAware  && flowConstruct instanceof Service)
-        {
-            //The servie cannot be autowired from within Spring, so we do it here
-            ((ServiceAware)instance).setService((Service) flowConstruct);
         }
         fireInitialisationCallbacks(instance);
         return instance;

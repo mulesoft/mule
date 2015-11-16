@@ -87,12 +87,12 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
             rollback(ex);
 
             logger.debug("Routing exception message");
-            routeException(event, null, ex);
+            routeException(event, ex);
         }
         else
         {
             logger.debug("Routing exception message");
-            routeException(event, null, ex);
+            routeException(event, ex);
         }
 
         closeStream(event.getMessage());

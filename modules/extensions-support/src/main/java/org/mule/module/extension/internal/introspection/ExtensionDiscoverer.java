@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Extension;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ExtensionModel;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public interface ExtensionDiscoverer
      * {@link ExtensionManager#discoverExtensions(ClassLoader)}
      *
      * @param classLoader the {@link ClassLoader} on which the search will be performed
-     * @return a {@link List} of {@link Extension}. Might be empty but it will never be {@code null}
+     * @return a {@link List} of {@link ExtensionModel}. Might be empty but it will never be {@code null}
      */
-    List<Extension> discover(ClassLoader classLoader);
+    List<ExtensionModel> discover(ClassLoader classLoader);
 }

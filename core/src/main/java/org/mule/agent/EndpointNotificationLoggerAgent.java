@@ -19,7 +19,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
-import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.exception.MessagingExceptionHandlerToSystemAdapter;
 
@@ -45,8 +44,6 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         ignoredNotifications.add(MuleContextNotification.CONTEXT_STOPPED);
         ignoredNotifications.add(MuleContextNotification.CONTEXT_DISPOSING);
         ignoredNotifications.add(MuleContextNotification.CONTEXT_DISPOSED);
-        ignoredNotifications.add(ModelNotification.MODEL_STOPPED);
-        ignoredNotifications.add(ModelNotification.MODEL_DISPOSED);
     }
 
     @Override

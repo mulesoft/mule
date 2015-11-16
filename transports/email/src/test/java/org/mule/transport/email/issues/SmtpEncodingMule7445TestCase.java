@@ -8,29 +8,22 @@ package org.mule.transport.email.issues;
 
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class SmtpEncodingMule7445TestCase extends AbstractEmailFunctionalTestCase
 {
 
     private static final String MESSAGE = "This is a messag\u00ea with weird chars \u00f1.";
 
-    public SmtpEncodingMule7445TestCase(ConfigVariant variant, String configResources)
+    public SmtpEncodingMule7445TestCase()
     {
-        super(variant, STRING_MESSAGE, "smtp", configResources, MESSAGE);
+        super(STRING_MESSAGE, "smtp", DEFAULT_EMAIL, DEFAULT_USER, MESSAGE, DEFAULT_PASSWORD, null);
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-                {ConfigVariant.SERVICE, "smtp-functional-test-service.xml"},
-                {ConfigVariant.FLOW, "smtp-functional-test-flow.xml"}
-        });
+        return "smtp-functional-test-flow.xml";
     }
 
     @Test

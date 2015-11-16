@@ -9,45 +9,34 @@ package org.mule.module.spring.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.CredentialsNotSetException;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class EncryptionFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class EncryptionFunctionalTestCase extends FunctionalTestCase
 {
+
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    public EncryptionFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "encryption-test-flow.xml";
     }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "encryption-test-service.xml"},
-            {ConfigVariant.FLOW, "encryption-test-flow.xml"}
-        });
-    }      
 
     @Test
     public void testAuthenticationFailureNoContext() throws Exception

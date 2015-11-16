@@ -7,38 +7,26 @@
 package org.mule.test.transformers;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class AutoTransformerTestCase extends AbstractServiceAndFlowTestCase
+public class AutoTransformerTestCase extends FunctionalTestCase
 {
     private static Latch latch;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/transformer/auto-transformer-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/transformer/auto-transformer-test-flow.xml"}
-        });
-    }
-
-    public AutoTransformerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/transformer/auto-transformer-test-flow.xml";
     }
 
     @Test

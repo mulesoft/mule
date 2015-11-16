@@ -10,7 +10,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.api.transport.PropertyScope.INVOCATION;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.message.DefaultExceptionPayload;
@@ -139,10 +140,16 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(!filter.accept(message));
-        message.removeProperty("foo");
+        removeProperty(message);
         assertTrue(!filter.accept(message));
         message.setOutboundProperty("foo", "car");
         assertTrue(filter.accept(message));
+    }
+
+    private void removeProperty(MuleMessage message)
+    {
+        message.removeProperty("foo", OUTBOUND);
+        message.removeProperty("foo", INVOCATION);
     }
 
     @Test
@@ -154,7 +161,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(!filter.accept(message));
-        message.removeProperty("foo");
+        removeProperty(message);
         assertTrue(!filter.accept(message));
         message.setOutboundProperty("foo", "car");
         assertTrue(filter.accept(message));
@@ -169,7 +176,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(!filter.accept(message));
-        message.removeProperty("foo");
+        removeProperty(message);
         assertTrue(!filter.accept(message));
         message.setInvocationProperty("foo", "car");
         assertTrue(filter.accept(message));
@@ -184,7 +191,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(!filter.accept(message));
-        message.removeProperty("foo");
+        removeProperty(message);
         assertTrue(!filter.accept(message));
         message.setInvocationProperty("foo", "car");
         assertTrue(filter.accept(message));

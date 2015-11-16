@@ -12,13 +12,11 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -26,28 +24,18 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
+public class CxfBadSoapRequestTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
 
-    public CxfBadSoapRequestTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "soap-request-conf-service.xml"},
-            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"},
-            {ConfigVariant.FLOW, "soap-request-conf-flow-httpn.xml"}
-        });
+        return "soap-request-conf-flow-httpn.xml";
     }
 
     @Test

@@ -7,17 +7,17 @@
 package org.mule.transport.email.functional;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
+import org.mule.transport.AbstractConnector;
+import org.mule.transport.email.GreenMailUtilities;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Probe;
-import org.mule.tck.probe.Prober;
-import org.mule.transport.AbstractConnector;
-import org.mule.transport.email.GreenMailUtilities;
 
 public class NonInfiniteMoveToCopiesMule6069TestCase extends
         AbstractEmailFunctionalTestCase {
@@ -26,17 +26,16 @@ public class NonInfiniteMoveToCopiesMule6069TestCase extends
     static private int numberOfMadePolls;
     protected AbstractConnector imapConnector;
     protected RetrieveMessageReceiverPollCounter receiverPollCounter;
-    
-    public NonInfiniteMoveToCopiesMule6069TestCase(ConfigVariant variant,
-            String configResources) {
-        super(variant, STRING_MESSAGE, "imap", configResources);
+
+    public NonInfiniteMoveToCopiesMule6069TestCase()
+    {
+        super(STRING_MESSAGE, "imap");
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters() 
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                { ConfigVariant.FLOW, "NonInfiniteMoveToCopiesMule6069.xml" } });
+        return "NonInfiniteMoveToCopiesMule6069.xml";
     }
 
     @Test

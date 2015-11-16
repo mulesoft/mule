@@ -8,7 +8,7 @@ package org.mule.test.integration.enricher;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -52,7 +52,7 @@ public class EnricherSessionPropertiesTestCase extends FunctionalTestCase
             Object enrichedContent = event.getMessage().getInvocationProperty("enrichedContent");
             assertThat((String) enrichedContent, is("some message received by subflow"));
             assertThat(event.getSession().<String> getProperty("subFlowSessionProperty"), is("someValue"));
-            assertThat(event.getMessage().<String> getSessionProperty("subFlowSessionProperty"),
+            assertThat(event.getMessage().<String> getProperty("subFlowSessionProperty", SESSION),
                 is("someValue"));
             assertThat(event.getSession().<String> getProperty("mainFlowSessionProperty"), is("someValue"));
             return event;

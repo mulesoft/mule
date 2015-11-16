@@ -21,7 +21,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.routing.Aggregator;
 import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.service.Service;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
@@ -61,17 +60,6 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         }
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, messageInfoMapping,
             muleContext, flowConstruct, persistentStores, storePrefix);
-
-        // Inherit failOnTimeout from async-reply if this aggregator is being used
-        // for async-reply
-        if (flowConstruct instanceof Service)
-        {
-            Service service = (Service) flowConstruct;
-            if (service.getAsyncReplyMessageSource().getMessageProcessors().contains(this))
-            {
-                failOnTimeout = service.getAsyncReplyMessageSource().isFailOnTimeout();
-            }
-        }
 
         eventCorrelator.setTimeout(timeout);
         eventCorrelator.setFailOnTimeout(isFailOnTimeout());

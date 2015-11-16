@@ -17,10 +17,6 @@ import org.junit.Test;
 
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
-    public HttpBadEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Test
     public void testSend() throws Exception

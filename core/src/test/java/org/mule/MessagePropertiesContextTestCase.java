@@ -191,16 +191,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
     }
 
     @Test
-    public void setsDefaultPropertyMetaData() throws Exception
-    {
-        MessagePropertiesContext properties = new MessagePropertiesContext();
-        properties.setProperty("Prop", "foo");
-        DataType<?> dataType = properties.getPropertyDataType("Prop", PropertyScope.OUTBOUND);
-
-        assertThat(dataType, like(String.class, MimeTypes.ANY, null));
-    }
-
-    @Test
     public void setsDefaultScopedPropertyMetaData() throws Exception
     {
         DataType dataType = DataTypeFactory.create(Integer.class, MimeTypes.APPLICATION_XML);

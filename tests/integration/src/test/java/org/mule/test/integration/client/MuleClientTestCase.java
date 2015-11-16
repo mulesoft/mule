@@ -25,24 +25,6 @@ public class MuleClientTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testClientSendDirect() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        MuleMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
-        assertNotNull(message);
-        assertEquals("Test Client Send message Received", message.getPayload());
-    }
-
-    @Test
-    public void testClientDispatchDirect() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
-    }
-
-    @Test
     public void testClientSendGlobalEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

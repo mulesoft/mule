@@ -34,7 +34,7 @@
         <vm:inbound-endpoint path="exceptionProcessor" exchange-pattern="request-response"/>
 
         <message-properties-transformer scope="session">
-            <add-message-property key="ErrorCount" value="#[groovy:((Integer) message.getSessionProperty('ErrorCount')) +1]"/>
+            <add-message-property key="ErrorCount" value="#[groovy:((Integer) message.getProperty('ErrorCount', org.mule.api.transport.PropertyScope.SESSION)) +1]"/>
         </message-properties-transformer>
     </flow>
 </mule>

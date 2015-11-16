@@ -367,7 +367,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         AsynMessageFiringNotificationListener listener = new AsynMessageFiringNotificationListener(notificationLatch);
         muleContext.registerListener(listener);
 
-        MuleEvent event = MuleTestUtils.getTestEventUsingFlow(TEST_MESSAGE, MessageExchangePattern.ONE_WAY, muleContext);
+        MuleEvent event = MuleTestUtils.getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY, muleContext);
         assertAsync(messageProcessor, event);
         notificationLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
 

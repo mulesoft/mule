@@ -8,10 +8,9 @@ package org.mule.test.integration.routing.outbound;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,16 +20,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-public class ExpressionRecipientListAsyncTestCase extends AbstractServiceAndFlowTestCase
+@RunWith(Parameterized.class)
+public class ExpressionRecipientListAsyncTestCase extends FunctionalTestCase
 {
+
+    protected ConfigVariant variant;
+    protected String configResources;
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow.xml"},
             {ConfigVariant.FLOW_EL,
@@ -39,7 +43,8 @@ public class ExpressionRecipientListAsyncTestCase extends AbstractServiceAndFlow
 
     public ExpressionRecipientListAsyncTestCase(ConfigVariant variant, String configResources)
     {
-        super(variant, configResources);
+        this.variant = variant;
+        this.configResources = configResources;
     }
 
     @Test
@@ -71,5 +76,16 @@ public class ExpressionRecipientListAsyncTestCase extends AbstractServiceAndFlow
         assertTrue(results.contains("test 1 Received"));
         assertTrue(results.contains("test 2 Received"));
         assertTrue(results.contains("test 3 Received"));
+    }
+
+    public static enum ConfigVariant
+    {
+        FLOW, FLOW_EL
+    }
+
+    @Override
+    public String getConfigResources()
+    {
+        return configResources;
     }
 }

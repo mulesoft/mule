@@ -14,18 +14,16 @@ public class JXPathExpressionTestCase extends AbstractXmlPropertyExtractorTestCa
 
     public static final String MESSAGE = "<endpoint>{0}</endpoint>";
 
-    public JXPathExpressionTestCase(ConfigVariant variant, String configResources)
+    public JXPathExpressionTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/endpoint");
-        p.setProperty("selector.evaluator", "jxpath");
-
+        p.setProperty("selector.expression", "jxpath:/endpoint");
         return p;
     }
 

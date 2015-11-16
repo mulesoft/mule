@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"
-       version="mule3.2">
+      version="mule3.2">
 
-    <model name="main">
-        <service name="service">
-            <inbound>
-                <inbound-endpoint address="test://foo"/>
-            </inbound>
-            <component>
-                <spring-object bean="orange">
-                    <property key="brand" value="Tutti Frutti"/>
-                </spring-object>
-            </component>
-        </service>
-    </model>
+    <flow name="service">
+        <inbound-endpoint address="test://foo"/>
+        <component>
+            <spring-object bean="orange">
+                <property key="brand" value="Tutti Frutti"/>
+            </spring-object>
+        </component>
+    </flow>
+
 </mule>

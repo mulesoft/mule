@@ -1,36 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd">
 
     <tcp:connector name="default" validateConnections="true">
-      <tcp:streaming-protocol />
+        <tcp:streaming-protocol/>
     </tcp:connector>
 
-    <model name="echoModel">
-        <service name="echo">
-            <inbound>
-                <inbound-endpoint address="tcp://localhost:${port1}" exchange-pattern="one-way"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="http://localhost:${port2}" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="echo">
+        <inbound-endpoint address="tcp://localhost:${port1}" exchange-pattern="one-way"/>
+        <outbound-endpoint address="http://localhost:${port2}" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="testComponent">
-            <inbound>
-                <inbound-endpoint address="tcp://localhost:${port2}" exchange-pattern="one-way" name="testInbound"/>
-            </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
-            </component>
-        </service>
-    </model>
+    <flow name="testComponent">
+        <inbound-endpoint address="tcp://localhost:${port2}" exchange-pattern="one-way" name="testInbound"/>
+        <component>
+            <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
+        </component>
+    </flow>
+
 </mule>

@@ -17,12 +17,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.SecurityException;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
 import org.mule.config.ExceptionHelper;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.SecurityNotification;
@@ -243,58 +240,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         processOutboundRouterStatistics(event.getFlowConstruct());
     }
 
-    /*
-     * Kept for backward compatibility
-     */
-    /**
-     * @deprecated use {@link #routeException(org.mule.api.MuleEvent, Throwable)} instead
-     */
-    @Deprecated
-    protected void routeException(MuleEvent event, MessageProcessor target, Throwable t)
-    {
-        routeException(event,t);
-    }
-
-    /*
-     * Kept for backward compatibility
-     */
-    /**
-     * @deprecated use {@link #rollback(Exception)} instead
-     */
-    @Deprecated
-    protected void rollback(RollbackSourceCallback rollbackMethod)
-    {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null)
-        {
-            try
-            {
-                tx.rollback();
-
-                // TODO The following was in the catch clause of TransactionTemplate previously.
-                // Do we need to do this here?  If so, where can we store these variables (suspendedXATx, joinedExternal)
-                // so that they are available to us in the exception handler?
-                //
-                //if (suspendedXATx != null)
-                //{
-                //  resumeXATransaction(suspendedXATx);
-                //}
-                //if (joinedExternal != null)
-                //{
-                //    TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
-                //}
-            }
-            catch (TransactionException e)
-            {
-                logger.error(e);
-            }
-        }
-        else if (rollbackMethod != null)
-        {
-            rollbackMethod.rollback();
-        }
-    }
-
     protected void closeStream(MuleMessage message)
     {
         if (muleContext == null || muleContext.isDisposing() || muleContext.isDisposed())
@@ -442,78 +387,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
     {
         return;
-    }
-
-    /*
-     * kept for backward compatibility
-     */
-     /**
-     * @deprecated use {@link #rollback(Exception)} instead.
-     * parameter should be null
-     */
-    @Deprecated
-    protected void rollbackTransaction()
-    {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        try
-        {
-            if (tx != null)
-            {
-                tx.setRollbackOnly();
-            }
-        }
-        catch (TransactionException e)
-        {
-            doLogException(e);
-        }
-    }
-
-    /*
-     * Kept for backward compatibility
-     */
-    /**
-     * If there is a current transaction this method will mark it for rollback This
-     * method should not be called if an event is routed from this exception handler
-     * to an endpoint that should take part in the current transaction
-     *
-     * @deprecated this method should not be used anymore. Transactions must be handled by provided ExceptionStrategy
-     */
-    @Deprecated
-    protected void handleTransaction(Throwable t)
-    {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-
-        if (tx == null)
-        {
-            return;
-        }
-        // Work with the root exception, not anything thaat wraps it
-        t = ExceptionHelper.getRootException(t);
-        boolean transactionRollback = false;
-
-        if (rollbackTxFilter == null && commitTxFilter == null)
-        {
-            // By default, rollback the transaction
-            rollbackTransaction();
-            transactionRollback = true;
-        }
-        else if (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName()))
-        {
-            // the rollback filter take preceedence over th ecommit filter
-            rollbackTransaction();
-            transactionRollback = true;
-        }
-        else if (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()))
-        {
-            // we only have to rollback if the commitTxFilter does NOT match
-            rollbackTransaction();
-            transactionRollback = true;
-        }
-
-        if (transactionRollback && t instanceof MessagingException)
-        {
-            ((MessagingException)t).setCauseRollback(true);
-        }
     }
 
     protected void commit()

@@ -6,33 +6,36 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
+import static org.springframework.util.xml.DomUtils.getChildElements;
 import org.mule.api.NestedProcessor;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.extension.introspection.DataQualifier;
-import org.mule.extension.introspection.DataQualifierVisitor;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.api.introspection.DataQualifier;
+import org.mule.extension.api.introspection.DataQualifierVisitor;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
+import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.introspection.SimpleTypeDataQualifierVisitor;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
-import org.mule.module.extension.internal.runtime.resolver.CachingValueResolverWrapper;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
-import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.TemplateParser;
@@ -50,6 +53,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -58,7 +62,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
@@ -84,12 +87,26 @@ final class XmlExtensionParserUtils
      *
      * @param element an {@link Element} being parsed
      * @param builder a {@link BeanDefinitionBuilder}
+     * @return the parsed name
      */
-    static void parseConfigName(Element element, BeanDefinitionBuilder builder)
+    static String parseConfigName(Element element, BeanDefinitionBuilder builder)
     {
-        String name = AutoIdUtils.getUniqueName(element, "mule-bean");
+        return parseName(element, "config", builder);
+    }
+
+    //TODO: Discuss EE-4683
+    static void parseConnectionProviderName(Element element, BeanDefinitionBuilder builder)
+    {
+        parseName(element, "connection-provider", builder);
+    }
+
+    static String parseName(Element element, String type, BeanDefinitionBuilder builder)
+    {
+        String name = AutoIdUtils.getUniqueName(element, type);
         element.setAttribute("name", name);
         builder.addConstructorArgValue(name);
+
+        return name;
     }
 
     /**
@@ -108,13 +125,13 @@ final class XmlExtensionParserUtils
      * {@code parameter}. It then returns a {@link ValueResolver} which will provide
      * the actual value extracted from the {@code element}
      *
-     * @param element   a {@link ElementDescriptor}
-     * @param parameter a {@link Parameter}
+     * @param element        a {@link ElementDescriptor}
+     * @param parameterModel a {@link ParameterModel}
      * @return a {@link ValueResolver}
      */
-    static ValueResolver parseParameter(ElementDescriptor element, Parameter parameter)
+    static ValueResolver parseParameter(ElementDescriptor element, ParameterModel parameterModel)
     {
-        return parseElement(element, parameter.getName(), parameter.getType(), parameter.getDefaultValue());
+        return parseElement(element, parameterModel.getName(), parameterModel.getType(), parameterModel.getDefaultValue());
     }
 
     /**
@@ -202,50 +219,69 @@ final class XmlExtensionParserUtils
 
     /**
      * Creates a new {@link ResolverSet} which provides a {@link ValueResolver valueResolvers}
-     * for each {@link Parameter} in the {@code parameters} list,
+     * for each {@link ParameterModel} in the {@code parameters} list,
      * taking the same {@code element} as source
      *
-     * @param element    a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
-     * @param parameters a {@link List} of {@link Parameter}s
+     * @param element         a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
+     * @param parameterModels a {@link List} of {@link ParameterModel parameterModels}
      * @return a {@link ResolverSet}
+     * @throws ConfigurationException in case of invalid configuration
      */
-    static ResolverSet getResolverSet(ElementDescriptor element, List<Parameter> parameters)
+    static ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels) throws ConfigurationException
     {
-        return getResolverSet(element, parameters, ImmutableMap.<String, List<MessageProcessor>>of());
+        return getResolverSet(element, parameterModels, ImmutableMap.<String, List<MessageProcessor>>of());
     }
 
     /**
      * Creates a new {@link ResolverSet} which provides a {@link ValueResolver valueResolvers}
-     * for each {@link Parameter} in the {@code parameters} list, taking as source the given {@code element}
-     * an a {@code nestedOperations} {@link Map} which has {@link Parameter} names as keys, and {@link List}s
+     * for each {@link ParameterModel} in the {@code parameters} list, taking as source the given {@code element}
+     * an a {@code nestedOperations} {@link Map} which has {@link ParameterModel} names as keys, and {@link List}s
      * of {@link MessageProcessor} as values.
-     * <p/>
-     * For each {@link Parameter} in the {@code parameters} list, if an entry exists in the {@code nestedOperations}
+     * <p>
+     * For each {@link ParameterModel} in the {@code parameters} list, if an entry exists in the {@code nestedOperations}
      * {@link Map}, a {@link ValueResolver} that generates {@link NestedProcessor} instances will be added to the
      * {@link ResolverSet}. Otherwise, a {@link ValueResolver} will be inferred from the given {@code element} just
      * like the {@link #getResolverSet(ElementDescriptor, List)} method does
      *
      * @param element          a {@link ElementDescriptor} from which the {@link ValueResolver valueResolvers} will be taken from
-     * @param parameters       a {@link List} of {@link Parameter}s
-     * @param nestedOperations a {@link Map} which has {@link Parameter} names as keys, and {@link List}s
+     * @param parameterModels  a {@link List} of {@link ParameterModel parameterModels}
+     * @param nestedOperations a {@link Map} which has {@link ParameterModel} names as keys, and {@link List}s
      *                         of {@link MessageProcessor} as values
      * @return a {@link ResolverSet}
+     * @throws ConfigurationException in case of invalid configuration
      */
-    static ResolverSet getResolverSet(ElementDescriptor element, List<Parameter> parameters, Map<String, List<MessageProcessor>> nestedOperations)
+    static ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels, Map<String, List<MessageProcessor>> nestedOperations) throws ConfigurationException
     {
         ResolverSet resolverSet = new ResolverSet();
 
-        for (Parameter parameter : parameters)
+        for (ParameterModel parameterModel : parameterModels)
         {
-            List<MessageProcessor> nestedProcessors = nestedOperations.get(parameter.getName());
+            List<MessageProcessor> nestedProcessors = nestedOperations.get(parameterModel.getName());
             if (!CollectionUtils.isEmpty(nestedProcessors))
             {
-                addNestedProcessorResolver(resolverSet, parameter, nestedProcessors);
+                addNestedProcessorResolver(resolverSet, parameterModel, nestedProcessors);
             }
             else
             {
-                ValueResolver<?> resolver = parseParameter(element, parameter);
-                resolverSet.add(parameter, resolver != null ? resolver : new StaticValueResolver(null));
+                ValueResolver<?> resolver = parseParameter(element, parameterModel);
+                if (resolver == null)
+                {
+                    resolver = new StaticValueResolver(null);
+                }
+
+                if (resolver.isDynamic() && parameterModel.getExpressionSupport() == ExpressionSupport.NOT_SUPPORTED)
+                {
+                    throw new ConfigurationException(createStaticMessage(String.format(
+                            "An expression value was given for parameter '%s' but it doesn't support expressions", parameterModel.getName())));
+                }
+
+                if (!resolver.isDynamic() && parameterModel.getExpressionSupport() == ExpressionSupport.REQUIRED && parameterModel.isRequired())
+                {
+                    throw new ConfigurationException(createStaticMessage(String.format(
+                            "A fixed value was given for parameter '%s' but it only supports expressions", parameterModel.getName())));
+                }
+
+                resolverSet.add(parameterModel, resolver);
             }
         }
 
@@ -358,7 +394,7 @@ final class XmlExtensionParserUtils
                 @Override
                 protected void defaultOperation()
                 {
-                    resolverValueHolder.set(new CachingValueResolverWrapper(new RegistryLookupValueResolver(value.toString())));
+                    resolverValueHolder.set(new RegistryLookupValueResolver(value.toString()));
                 }
             };
 
@@ -517,7 +553,7 @@ final class XmlExtensionParserUtils
         }
     }
 
-    private static void addNestedProcessorResolver(ResolverSet resolverSet, Parameter parameter, List<MessageProcessor> nestedProcessors)
+    private static void addNestedProcessorResolver(ResolverSet resolverSet, ParameterModel parameterModel, List<MessageProcessor> nestedProcessors)
     {
         List<ValueResolver<NestedProcessor>> nestedProcessorResolvers = new ArrayList<>(nestedProcessors.size());
         for (MessageProcessor nestedProcessor : nestedProcessors)
@@ -525,23 +561,21 @@ final class XmlExtensionParserUtils
             nestedProcessorResolvers.add(new NestedProcessorValueResolver(nestedProcessor));
         }
 
-        if (nestedProcessors.size() == 1 && parameter.getType().getQualifier() != DataQualifier.LIST)
+        if (nestedProcessors.size() == 1 && parameterModel.getType().getQualifier() != DataQualifier.LIST)
         {
-            resolverSet.add(parameter, new NestedProcessorValueResolver(nestedProcessors.get(0)));
+            resolverSet.add(parameterModel, new NestedProcessorValueResolver(nestedProcessors.get(0)));
         }
         else
         {
-            resolverSet.add(parameter, CollectionValueResolver.of(ArrayList.class, nestedProcessorResolvers));
+            resolverSet.add(parameterModel, CollectionValueResolver.of(ArrayList.class, nestedProcessorResolvers));
         }
     }
 
     private static void parseElementDescriptorChilds(Element element, BeanDefinitionBuilder builder)
     {
-        ManagedList<BeanDefinition> managedChilds = new ManagedList<>();
-        for (Element child : DomUtils.getChildElements(element))
-        {
-            managedChilds.add(toElementDescriptorBeanDefinition(child));
-        }
+        ManagedList<BeanDefinition> managedChilds = getChildElements(element).stream()
+                .map(XmlExtensionParserUtils::toElementDescriptorBeanDefinition)
+                .collect(Collectors.toCollection(() -> new ManagedList<>()));
 
         builder.addConstructorArgValue(managedChilds);
     }

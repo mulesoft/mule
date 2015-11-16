@@ -14,43 +14,24 @@
     <endpoint name="ep2" address="${middle2.destination}" exchange-pattern="one-way"/>
     <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
 
-    <model name="test">
-        <service name="InputPart">
-            <inbound>
-                <inbound-endpoint ref="in"/>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="ep1"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="InputPart">
+        <inbound-endpoint ref="in"/>
+        <test:component/>
+        <outbound-endpoint ref="ep1"/>
+    </flow>
 
-        <service name="MiddlePart">
-            <inbound>
-                <inbound-endpoint ref="ep1"/>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="ep2"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="MiddlePart">
+        <inbound-endpoint ref="ep1"/>
+        <test:component/>
+        <outbound-endpoint ref="ep2"/>
+    </flow>
 
-        <service name="OutputPart">
-            <inbound>
-                <inbound-endpoint ref="ep2"/>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="OutputPart">
+        <inbound-endpoint ref="ep2"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out"/>
+    </flow>
+
 </mule>

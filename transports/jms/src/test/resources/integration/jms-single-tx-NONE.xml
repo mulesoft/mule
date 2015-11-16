@@ -13,38 +13,22 @@
     <endpoint name="middle" address="${middle.destination}" exchange-pattern="one-way"/>
     <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
 
-    <model name="jmsTest">
+    <flow name="InputPart">
+        <inbound-endpoint ref="in">
+            <jms:transaction action="NONE"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="middle"/>
+    </flow>
 
-        <service name="InputPart">
-            <inbound>
-                <inbound-endpoint ref="in">
-                    <jms:transaction action="NONE"/>
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="middle"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="OutputPart">
+        <inbound-endpoint ref="middle"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out"/>
+    </flow>
 
-        <service name="OutputPart">
-            <inbound>
-                <inbound-endpoint ref="middle"/>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-
-
-    </model>
 </mule>

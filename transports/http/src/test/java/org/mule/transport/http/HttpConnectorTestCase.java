@@ -16,17 +16,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
+import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -101,11 +102,10 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void testValidListener() throws Exception
     {
-        Service service = getTestService("orange", Orange.class);
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
                 getTestEndpointURI());
 
-        getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), service);
+        getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), mock(Flow.class));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         thrown.expect(ConnectorException.class);
         thrown.expectMessage(startsWith(LISTENER_ALREADY_REGISTERED));
 
-        Service service = getTestService("orange", Orange.class);
+        Flow service = getTestFlow("orange", Orange.class);
         InboundEndpoint allInterfacesEndpoint = muleContext.getEndpointFactory().getInboundEndpoint(
                 existingEndpointUri);
 
@@ -401,14 +401,14 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     public void httpClientDisableStaleConnectionSystemProperty() throws Exception
     {
         testWithSystemProperty(HttpConnector.DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY, "true",
-            new TestCallback()
-            {
-                @Override
-                public void run() throws Exception
-                {
-                    assertHttpClientStaleConnectionCheck(getInitialisedHttpConnector(), false);
-                }
-            });
+                               new TestCallback()
+                               {
+                                   @Override
+                                   public void run() throws Exception
+                                   {
+                                       assertHttpClientStaleConnectionCheck(getInitialisedHttpConnector(), false);
+                                   }
+                               });
     }
 
     protected HttpConnector getInitialisedHttpConnector() throws Exception, InitialisationException
@@ -427,25 +427,25 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     public void singleDispatcherPerEndpointSyetemProperty() throws Exception
     {
         testWithSystemProperty(HttpConnector.SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY, "true",
-            new TestCallback()
-            {
+                               new TestCallback()
+                               {
 
-                @Override
-                public void run() throws Exception
-                {
-                    HttpConnector httpConnector = (HttpConnector) createConnector();
-                    httpConnector.initialise();
+                                   @Override
+                                   public void run() throws Exception
+                                   {
+                                       HttpConnector httpConnector = (HttpConnector) createConnector();
+                                       httpConnector.initialise();
 
-                    OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
-                        "http://localhost:8080");
-                    httpConnector.createDispatcherMessageProcessor(endpoint);
+                                       OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
+                                               "http://localhost:8080");
+                                       httpConnector.createDispatcherMessageProcessor(endpoint);
 
-                    assertNotNull(httpConnector.borrowDispatcher(endpoint));
-                    assertEquals(httpConnector.borrowDispatcher(endpoint),
-                        httpConnector.borrowDispatcher(endpoint));
-                    assertEquals(0, httpConnector.getDispatchers().getNumIdle());
-                }
-            });
+                                       assertNotNull(httpConnector.borrowDispatcher(endpoint));
+                                       assertEquals(httpConnector.borrowDispatcher(endpoint),
+                                                    httpConnector.borrowDispatcher(endpoint));
+                                       assertEquals(0, httpConnector.getDispatchers().getNumIdle());
+                                   }
+                               });
     }
 
     @Test

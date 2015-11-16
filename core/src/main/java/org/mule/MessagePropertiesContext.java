@@ -17,7 +17,6 @@ import org.mule.transformer.types.TypedValue;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.util.MapUtils;
-import org.mule.util.ObjectUtils;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -117,16 +116,6 @@ public class MessagePropertiesContext implements Serializable
         }
     }
 
-    /**
-     * @deprecated use the overloaded version with an explicit lookup scope. This method will now use only the
-     *             outbound scope.
-     */
-    @Deprecated
-    public Object getProperty(String key)
-    {
-        return getProperty(key, PropertyScope.OUTBOUND);
-    }
-
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, PropertyScope scope)
     {
@@ -219,19 +208,6 @@ public class MessagePropertiesContext implements Serializable
      *
      * @param key the key on which to associate the value
      * @param value the property value
-     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)}
-     */
-    @Deprecated
-    public void setProperty(String key, Object value)
-    {
-        getScopedProperties(DEFAULT_SCOPE).put(key, new TypedValue(value, DataTypeFactory.createFromObject(value)));
-    }
-
-    /**
-     * Set a property on the message
-     *
-     * @param key the key on which to associate the value
-     * @param value the property value
      * @param scope the scope to se the property on
      * @see org.mule.api.transport.PropertyScope
      */
@@ -264,62 +240,6 @@ public class MessagePropertiesContext implements Serializable
     public Set<String> getPropertyNames(PropertyScope scope)
     {
         return Collections.unmodifiableSet(getScopedProperties(scope).keySet());
-    }
-
-    public Object getProperty(String key, Object defaultValue)
-    {
-        Object value = getProperty(key);
-        if (value == null)
-        {
-            value = defaultValue;
-        }
-        return value;
-    }
-
-    public byte getByteProperty(String name, byte defaultValue)
-    {
-        return ObjectUtils.getByte(getProperty(name), defaultValue);
-    }
-
-    public short getShortProperty(String name, short defaultValue)
-    {
-        return ObjectUtils.getShort(getProperty(name), defaultValue);
-    }
-
-    public int getIntProperty(String name, int defaultValue)
-    {
-        return ObjectUtils.getInt(getProperty(name), defaultValue);
-    }
-
-    public long getLongProperty(String name, long defaultValue)
-    {
-        return ObjectUtils.getLong(getProperty(name), defaultValue);
-    }
-
-    public float getFloatProperty(String name, float defaultValue)
-    {
-        return ObjectUtils.getFloat(getProperty(name), defaultValue);
-    }
-
-    public double getDoubleProperty(String name, double defaultValue)
-    {
-        return ObjectUtils.getDouble(getProperty(name), defaultValue);
-    }
-
-    public boolean getBooleanProperty(String name, boolean defaultValue)
-    {
-        return ObjectUtils.getBoolean(getProperty(name), defaultValue);
-    }
-
-    @Deprecated
-    public String getStringProperty(String name, String defaultValue)
-    {
-        return getStringProperty(name, PropertyScope.OUTBOUND, defaultValue);
-    }
-
-    public String getStringProperty(String name, PropertyScope scope, String defaultValue)
-    {
-        return ObjectUtils.getString(getProperty(name, scope), defaultValue);
     }
 
     @Override

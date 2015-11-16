@@ -28,7 +28,7 @@ public class RouterTestUtils
         when(endpoint.getProperties()).thenReturn(toMock.getProperties());
         when(endpoint.getFilter()).thenReturn(toMock.getFilter());
         when(endpoint.getName()).thenReturn(toMock.getName());
-        when(endpoint.getResponseTransformers()).thenReturn(toMock.getResponseTransformers());
+        when(endpoint.getResponseMessageProcessors()).thenReturn(toMock.getResponseMessageProcessors());
         return endpoint;
     }
 }

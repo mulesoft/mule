@@ -8,23 +8,34 @@ package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class HeisenbergDefaultConfigTestCase extends ExtensionsFunctionalTestCase
 {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
+    @Mock
+    private ConfigurationModel configurationModel;
+
+    @Mock
+    private ConfigurationProvider<Object> configurationProvider;
 
     @Override
     protected String getConfigFile()
@@ -42,11 +53,14 @@ public class HeisenbergDefaultConfigTestCase extends ExtensionsFunctionalTestCas
     public void twoConfigsAndNoConfigRef() throws Exception
     {
         ExtensionManager extensionManager = muleContext.getExtensionManager();
-        Extension extension = extensionManager.getExtensions().iterator().next();
-        assertThat(extension.getName(), is(EXTENSION_NAME));
+        ExtensionModel extensionModel = extensionManager.getExtensions().stream().findFirst().get();
+        assertThat(extensionModel.getName(), is(EXTENSION_NAME));
 
-        ConfigurationInstanceProvider<Object> configurationInstanceProvider = mock(ConfigurationInstanceProvider.class);
-        extensionManager.registerConfigurationInstanceProvider(extension, "secondConfig", configurationInstanceProvider);
+        when(configurationProvider.getName()).thenReturn("secondConfig");
+        when(configurationProvider.getModel()).thenReturn(configurationModel);
+        when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
+
+        extensionManager.registerConfigurationProvider(configurationProvider);
 
         expectedException.expectCause(IsInstanceOf.<IllegalStateException>instanceOf(IllegalStateException.class));
         runFlow("sayMyName");

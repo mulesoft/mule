@@ -11,18 +11,16 @@ import java.util.Properties;
 public class BeanPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public BeanPropertyExtractorTestCase(ConfigVariant variant, String configResources)
+    public BeanPropertyExtractorTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "childBean.value");
-        p.setProperty("selector.evaluator", "bean");
-
+        p.setProperty("selector.expression", "payload.childBean.value");
         return p;
     }
 

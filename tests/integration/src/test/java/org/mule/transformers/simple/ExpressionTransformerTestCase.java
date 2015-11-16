@@ -236,7 +236,7 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
             muleContext);
 
         MuleEvent resultEvent = flow.process(new DefaultMuleEvent(message, getTestInboundEndpoint(""),
-            getTestService(), getTestSession(null, muleContext)));
+            getTestFlow(), getTestSession(null, muleContext)));
         assertNotNull(resultEvent);
         assertNotNull(resultEvent.getMessage().getPayload());
         Object payload = resultEvent.getMessage().getPayload();

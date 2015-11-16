@@ -122,20 +122,4 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
         ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
         return deserialize(bais, cl, muleContext);
     }
-    
-    /**
-     * @deprecated Call deserialize(InputStream inputStream, MuleContext muleContext) instead
-     */
-    public static Object deserialize(InputStream inputStream, ClassLoader cl)
-    {
-        return deserialize(inputStream, cl, null);
-    }
-    
-    /**
-     * @deprecated Call deserialize(byte[] objectData, MuleContext muleContext) instead
-     */
-    public static Object deserialize(byte[] objectData, ClassLoader cl)
-    {
-        return deserialize(objectData, cl, null);
-    }    
 }

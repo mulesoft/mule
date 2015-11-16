@@ -6,48 +6,50 @@
  */
 package org.mule.module.extension.internal.util;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
+import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.introspection.Configuration;
-import org.mule.extension.introspection.Described;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
-import org.mule.extension.runtime.ConfigurationInstanceRegistrationCallback;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.ConfigurationObjectBuilder;
-import org.mule.module.extension.internal.runtime.DynamicConfigurationInstanceProvider;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.module.extension.internal.runtime.StaticConfigurationInstanceProvider;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.extension.api.introspection.Described;
+import org.mule.extension.api.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.ExpressionSupport;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.InterceptableModel;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.ParametrizedModel;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.extension.api.runtime.Interceptor;
+import org.mule.extension.api.runtime.InterceptorFactory;
+import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
+import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.util.ArrayUtils;
+import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.LinkedHashMultiset;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
-
 /**
- * Utilities for handling {@link Extension extensions}
+ * Utilities for handling {@link ExtensionModel extensions}
  *
  * @since 3.7.0
  */
@@ -56,33 +58,6 @@ public class MuleExtensionUtils
 
     private MuleExtensionUtils()
     {
-    }
-
-    /**
-     * Verifies that none of the {@link Described} items in {@code describedCollection} have an
-     * equivalent value for {@link Described#getName()}
-     *
-     * @param describedCollections an array of {@link Collection}s with instances of {@link Described}
-     * @throws IllegalArgumentException if the validation fails
-     */
-    public static void validateRepeatedNames(Collection<? extends Described>... describedCollections)
-    {
-        if (ArrayUtils.isEmpty(describedCollections))
-        {
-            return;
-        }
-
-        List<Described> all = new ArrayList<>();
-        for (Collection<? extends Described> describedCollection : describedCollections)
-        {
-            all.addAll(describedCollection);
-        }
-
-        Set<String> clashes = collectRepeatedNames(all);
-        if (!clashes.isEmpty())
-        {
-            throw new IllegalArgumentException("The following names have been assigned to multiple components: " + Joiner.on(", ").join(clashes));
-        }
     }
 
     /**
@@ -125,6 +100,69 @@ public class MuleExtensionUtils
     }
 
     /**
+     * Collects the {@link ParameterModel parameters} from {@code model} which
+     * supports or requires expressions
+     *
+     * @param model a {@link ParametrizedModel}
+     * @return a {@link List} of {@link ParameterModel}. Can be empty but will never be {@code null}
+     */
+    public static List<ParameterModel> getDynamicParameters(ParametrizedModel model)
+    {
+        return model.getParameterModels().stream()
+                .filter(parameter -> acceptsExpressions(parameter.getExpressionSupport()))
+                .collect(toList());
+    }
+
+    /**
+     * @param support a {@link ExpressionSupport}
+     * @return Whether or not the given {@code support} is one which accepts or requires expressions
+     */
+    public static boolean acceptsExpressions(ExpressionSupport support)
+    {
+        return support == SUPPORTED || support == REQUIRED;
+    }
+
+    /**
+     * Returns a {@link List} with all the {@link OperationModel} in the {@code extensionModel}
+     * which require a connection.
+     *
+     * @param extensionModel a {@link ExtensionModel}
+     * @return a {@link List} of {@link OperationModel}. It might be empty but will never be {@code null}
+     */
+    public static List<OperationModel> getConnectedOperations(ExtensionModel extensionModel)
+    {
+        return extensionModel.getOperationModels().stream()
+                .filter(o -> o.getModelProperty(ConnectionTypeModelProperty.KEY) != null)
+                .collect(toList());
+    }
+
+    public static Class<?> getOperationsConnectionType(ExtensionModel extensionModel)
+    {
+        Set<Class<?>> connectionTypes = extensionModel.getOperationModels().stream()
+                .map(operation -> {
+                    ConnectionTypeModelProperty connectionProperty = operation.getModelProperty(ConnectionTypeModelProperty.KEY);
+                    return connectionProperty != null ? connectionProperty.getConnectionType() : null;
+                })
+                .filter(type -> type != null)
+                .collect(toSet());
+
+        if (isEmpty(connectionTypes))
+        {
+            return null;
+        }
+        else if (connectionTypes.size() > 1)
+        {
+            throw new IllegalModelDefinitionException(String.format("Extension '%s' has operation which require connections of different types ([%s]). " +
+                                                                    "Please standarize on one single connection type to ensure that all operations work with any compatible %s",
+                                                                    extensionModel.getName(), Joiner.on(", ").join(connectionTypes), ConnectionProvider.class.getSimpleName()));
+        }
+        else
+        {
+            return connectionTypes.stream().findFirst().get();
+        }
+    }
+
+    /**
      * Sorts the given {@code list} in ascending alphabetic order, using {@link Described#getName()}
      * as the sorting criteria
      *
@@ -134,7 +172,7 @@ public class MuleExtensionUtils
      */
     public static <T extends Described> List<T> alphaSortDescribedList(List<T> list)
     {
-        if (CollectionUtils.isEmpty(list))
+        if (isEmpty(list))
         {
             return list;
         }
@@ -143,37 +181,49 @@ public class MuleExtensionUtils
         return list;
     }
 
-    public static <T> ConfigurationInstanceProvider<T> createConfigurationInstanceProvider(
-            String name,
-            Extension extension,
-            Configuration configuration,
-            ResolverSet resolverSet,
-            MuleContext muleContext,
-            ConfigurationInstanceRegistrationCallback registrationCallback) throws Exception
+    /**
+     * Creates a new {@link List} of {@link Interceptor interceptors} using the
+     * factories returned by {@link InterceptableModel#getInterceptorFactories()}
+     *
+     * @param model the model on which {@link InterceptableModel#getInterceptorFactories()} is to be invoked
+     * @return an immutable {@link List} with instances of {@link Interceptor}
+     */
+    public static List<Interceptor> createInterceptors(InterceptableModel model)
     {
-        ConfigurationObjectBuilder configurationObjectBuilder = new ConfigurationObjectBuilder(name, extension, configuration, resolverSet, registrationCallback);
-
-        if (resolverSet.isDynamic())
-        {
-            return new DynamicConfigurationInstanceProvider<>(configurationObjectBuilder, resolverSet);
-        }
-        else
-        {
-            MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
-            return new StaticConfigurationInstanceProvider<>((T) configurationObjectBuilder.build(event));
-        }
+        return createInterceptors(model.getInterceptorFactories());
     }
 
-    public static OperationContextAdapter asOperationContextAdapter(OperationContext operationContext)
+    /**
+     * Creates a new {@link List} of {@link Interceptor interceptors} using the
+     * {@code interceptorFactories}
+     *
+     * @param interceptorFactories a {@link List} with instances of {@link InterceptorFactory}
+     * @return an immutable {@link List} with instances of {@link Interceptor}
+     */
+    public static List<Interceptor> createInterceptors(List<InterceptorFactory> interceptorFactories)
     {
-        checkArgument(operationContext != null, "operationContext cannot be null");
-        if (!(operationContext instanceof OperationContextAdapter))
+        if (isEmpty(interceptorFactories))
         {
-            throw new IllegalArgumentException(String.format("operationContext was expected to be an instance of %s but got %s instead",
-                                                             OperationContextAdapter.class.getName(), operationContext.getClass().getName()));
+            return ImmutableList.of();
         }
 
-        return (OperationContextAdapter) operationContext;
+        return interceptorFactories.stream()
+                .map(InterceptorFactory::createInterceptor)
+                .collect(new ImmutableListCollector<>());
+    }
+
+    /**
+     * Returns the value of {@link ImplementingTypeModelProperty#getType()} if the {@code model}
+     * is enriched with such property
+     *
+     * @param model the model presumed to be enriched
+     * @param <T>   the generic type of the returned type
+     * @return a {@link Class} or {@code null} if the {@code model} is not enriched with that property
+     */
+    public static <T> Class<T> getImplementingType(EnrichableModel model)
+    {
+        ImplementingTypeModelProperty property = model.getModelProperty(ImplementingTypeModelProperty.KEY);
+        return property != null ? (Class<T>) property.getType() : null;
     }
 
     public static String getDefaultValue(Optional optional)
@@ -192,37 +242,22 @@ public class MuleExtensionUtils
         return new DefaultMuleEvent(new DefaultMuleMessage(null, muleContext), REQUEST_RESPONSE, (FlowConstruct) null);
     }
 
-    private static Set<String> collectRepeatedNames(Collection<? extends Described> describedCollection)
+    /**
+     * Returns the {@link Method} that was used to declare the given
+     * {@code operationDeclaration}.
+     *
+     * @param operationDeclaration a {@link OperationDeclaration}
+     * @return A {@link Method} or {@code null} if the {@code operationDeclaration} was defined by other means
+     */
+    public static Method getImplementingMethod(OperationDeclaration operationDeclaration)
     {
-        if (CollectionUtils.isEmpty(describedCollection))
+        ImplementingMethodModelProperty methodProperty = operationDeclaration.getModelProperty(ImplementingMethodModelProperty.KEY);
+        if (methodProperty != null)
         {
-            return ImmutableSet.of();
+            return methodProperty.getMethod();
         }
 
-        Multiset<String> names = LinkedHashMultiset.create();
-
-        for (Described described : describedCollection)
-        {
-            if (described == null)
-            {
-                throw new IllegalArgumentException("A null described was provided");
-            }
-            names.add(described.getName());
-        }
-
-        names = Multisets.copyHighestCountFirst(names);
-        Set<String> repeatedNames = new HashSet<>();
-        for (String name : names)
-        {
-            if (names.count(name) == 1)
-            {
-                break;
-            }
-
-            repeatedNames.add(name);
-        }
-
-        return repeatedNames;
+        return null;
     }
 
     private static class DescribedComparator implements Comparator<Described>

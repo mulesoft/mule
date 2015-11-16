@@ -20,18 +20,16 @@ public class W3CDomXPathExpressionWithNamespaceTestCase extends AbstractXmlPrope
 
     public static final String MESSAGE = "<foo:endpoint xmlns:foo=\"http://foo.com\">{0}</foo:endpoint>";
 
-    public W3CDomXPathExpressionWithNamespaceTestCase(ConfigVariant variant, String configResources)
+    public W3CDomXPathExpressionWithNamespaceTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/foo:endpoint");
-        p.setProperty("selector.evaluator", "xpath");
-
+        p.setProperty("selector.expression", "xpath:/foo:endpoint");
         return p;
     }
 

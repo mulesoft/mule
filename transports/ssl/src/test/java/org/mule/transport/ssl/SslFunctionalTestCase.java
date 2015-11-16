@@ -12,13 +12,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.testmodels.mule.TestSedaService;
 import org.mule.util.JdkVersionUtils;
 import org.mule.util.JdkVersionUtils.JdkVersion;
 
@@ -71,8 +70,8 @@ public class SslFunctionalTestCase extends FunctionalTestCase
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
 
-        Service c = muleContext.getRegistry().lookupService("testComponent2");
-        assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
+        Flow c = (Flow) muleContext.getRegistry().lookupFlowConstruct("testComponent2");
+        //assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
         Object ftc = getComponent(c);
         assertNotNull("Functional Test Service not found in the model.", ftc);
         assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);

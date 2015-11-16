@@ -22,14 +22,10 @@
 
     <endpoint name="out3" address="${outbound.destination}" connector-ref="jmsConnector2"
         exchange-pattern="request-response"/>
-        
-    <model name="model">
-        <service name="out3echo">
-            <inbound>
-                <inbound-endpoint ref="out3"/>
-            </inbound>
-            <echo-component/>
-        </service>
-    </model>
+
+    <flow name="out3echo">
+        <inbound-endpoint ref="out3"/>
+        <echo-component/>
+    </flow>
 
 </mule>

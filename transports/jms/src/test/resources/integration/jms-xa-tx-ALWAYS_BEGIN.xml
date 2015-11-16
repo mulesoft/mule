@@ -15,24 +15,17 @@
 
     <jbossts:transaction-manager/>
 
-    <model name="TEST">
-        <service name="Part1">
-            <inbound>
-                <jms:inbound-endpoint ref="in">
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <component>
-                <singleton-object
-                        class="org.mule.transport.jms.integration.JmsXAAlwaysBeginTestCase$TestRollbackComponent"/>
-            </component>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint ref="out">
-                        <xa-transaction action="ALWAYS_BEGIN"/>
-                    </jms:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="Part1">
+        <jms:inbound-endpoint ref="in">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <component>
+            <singleton-object
+                    class="org.mule.transport.jms.integration.JmsXAAlwaysBeginTestCase$TestRollbackComponent"/>
+        </component>
+        <jms:outbound-endpoint ref="out">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </jms:outbound-endpoint>
+    </flow>
+
 </mule>

@@ -40,7 +40,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
         
         RequestContext.setEvent(
                 new DefaultMuleEvent(testObject, getTestInboundEndpoint("test"),
-                                     getTestService(), MuleTestUtils.getTestSession(muleContext)));
+                                     getTestFlow(), MuleTestUtils.getTestSession(muleContext)));
     }
 
     @Override

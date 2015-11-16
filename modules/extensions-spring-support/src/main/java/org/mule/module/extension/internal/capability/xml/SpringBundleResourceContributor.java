@@ -6,17 +6,18 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.property.XmlModelProperty;
+import org.mule.extension.api.resources.ResourcesGenerator;
+import org.mule.extension.api.resources.spi.GenerableResourceContributor;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
-import org.mule.module.extension.internal.config.ExtensionsNamespaceHandler;
-import org.mule.module.extension.internal.util.CapabilityUtils;
+import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
+
+import java.util.Properties;
 
 /**
- * Implementation of {@link org.mule.extension.resources.spi.GenerableResourceContributor}
+ * Implementation of {@link org.mule.extension.api.resources.spi.GenerableResourceContributor}
  * Spring bundles
  *
  * @since 3.7.0
@@ -25,53 +26,53 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
 {
 
     @Override
-    public void contribute(Extension extension, ResourcesGenerator resourcesGenerator)
+    public void contribute(ExtensionModel extensionModel, ResourcesGenerator resourcesGenerator)
     {
-        XmlCapability capability = CapabilityUtils.getSingleCapability(extension, XmlCapability.class);
+        XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.KEY);
 
-        generateSchema(extension, capability, resourcesGenerator);
-        generateSpringBundle(extension, capability, resourcesGenerator);
+        generateSchema(extensionModel, xmlProperty, resourcesGenerator);
+        generateSpringBundle(extensionModel, xmlProperty, resourcesGenerator);
     }
 
-    private void generateSchema(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
+    private void generateSchema(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
     {
-        String schema = new SchemaGenerator().generate(extension, capability);
-        resourcesGenerator.get(getXsdFileName(extension)).getContentBuilder().append(schema);
+        String schema = new SchemaGenerator().generate(extensionModel, xmlProperty);
+        resourcesGenerator.get(getXsdFileName(extensionModel)).getContentBuilder().append(schema);
     }
 
-    private void generateSpringBundle(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
+    private void generateSpringBundle(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
     {
-        writeSpringHandlerBundle(capability, resourcesGenerator);
-        writeSpringSchemaBundle(extension, capability, resourcesGenerator);
+        writeSpringHandlerBundle(xmlProperty, resourcesGenerator);
+        writeSpringSchemaBundle(extensionModel, xmlProperty, resourcesGenerator);
     }
 
-    private void writeSpringHandlerBundle(XmlCapability capability, ResourcesGenerator resourcesGenerator)
+    private void writeSpringHandlerBundle(XmlModelProperty capability, ResourcesGenerator resourcesGenerator)
     {
-        String content = String.format("%s=%s", capability.getSchemaLocation(), ExtensionsNamespaceHandler.class.getName());
+        String content = String.format("%s=%s", capability.getSchemaLocation(), ExtensionNamespaceHandler.class.getName());
         resourcesGenerator.get("spring.handlers").getContentBuilder().append(springBundleScape(content));
     }
 
-    private void writeSpringSchemaBundle(Extension extension, XmlCapability capability, ResourcesGenerator resourcesGenerator)
+    private void writeSpringSchemaBundle(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
     {
         StringBuilder builder = resourcesGenerator.get("spring.schemas").getContentBuilder();
-        builder.append(getSpringSchemaBundle(extension, capability, capability.getSchemaVersion()));
-        builder.append(getSpringSchemaBundle(extension, capability, "current"));
+        builder.append(getSpringSchemaBundle(extensionModel, xmlProperty, xmlProperty.getSchemaVersion()));
+        builder.append(getSpringSchemaBundle(extensionModel, xmlProperty, "current"));
     }
 
-    private String getSpringSchemaBundle(Extension extension, XmlCapability capability, String version)
+    private String getSpringSchemaBundle(ExtensionModel extensionModel, XmlModelProperty xmlProperty, String version)
     {
-        String filename = getXsdFileName(extension);
-        return springBundleScape(String.format("%s/%s/%s=META-INF/%s\n", capability.getSchemaLocation(), version, filename, filename));
+        String filename = getXsdFileName(extensionModel);
+        return springBundleScape(String.format("%s/%s/%s=META-INF/%s\n", xmlProperty.getSchemaLocation(), version, filename, filename));
     }
 
-    private String getXsdFileName(Extension extension)
+    private String getXsdFileName(ExtensionModel extensionModel)
     {
-        return String.format("mule-%s%s", extension.getName(), SchemaConstants.XSD_EXTENSION);
+        return String.format("mule-%s%s", extensionModel.getName(), SchemaConstants.XSD_EXTENSION);
     }
 
 
     /**
-     * Colon is a special character for the {@link java.util.Properties} class
+     * Colon is a special character for the {@link Properties} class
      * that spring uses to parse the bundle. Thus, such character needs to be escaped
      * with a backslash
      *

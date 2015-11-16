@@ -146,7 +146,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
 
     private void assertResponseContentType(String contentType)
     {
-        assertThat(contentType, is(response.getInboundProperty(CONTENT_TYPE.toLowerCase())));
+        assertThat(response.getInboundProperty(CONTENT_TYPE.toLowerCase()), is(contentType));
     }
 
     /**

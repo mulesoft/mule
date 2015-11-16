@@ -6,54 +6,47 @@
  */
 package org.mule.test.integration.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import org.mule.api.NameableObject;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
-public class ResponseTransformerTestCase extends AbstractServiceAndFlowTestCase
+public class ResponseTransformerTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/config/response-transformer-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/config/response-transformer-test-flow.xml"}});
-    }
 
-    public ResponseTransformerTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/config/response-transformer-test-flow.xml";
     }
 
     @Test
     public void testTransformers()
     {
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject("endpoint");
-        assertFalse(endpoint.getTransformers().isEmpty());
-        assertEquals(2, endpoint.getTransformers().size());
-        checkNames("normal", endpoint.getTransformers());
-        assertFalse(endpoint.getResponseTransformers().isEmpty());
-        assertEquals(2, endpoint.getResponseTransformers().size());
-        checkNames("response", endpoint.getResponseTransformers());
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupObject("endpoint");
+        assertFalse(endpoint.getMessageProcessors().isEmpty());
+        assertEquals(2, endpoint.getMessageProcessors().size());
+        checkNames("normal", endpoint.getMessageProcessors());
+        assertFalse(endpoint.getResponseMessageProcessors().isEmpty());
+        final List<MessageProcessor> messageProcessors = ((InterceptingChainLifecycleWrapper) endpoint.getResponseMessageProcessors().get(0)).getMessageProcessors();
+        assertEquals(2, messageProcessors.size());
+        checkNames("response", messageProcessors);
     }
 
-    protected void checkNames(String prefix, List<Transformer> transformers)
+    protected void checkNames(String prefix, List<MessageProcessor> transformers)
     {
-        Iterator<Transformer> iterator = transformers.iterator();
+        Iterator<MessageProcessor> iterator = transformers.iterator();
         for (int count = 1; iterator.hasNext(); count++)
         {
-            Transformer transformer = iterator.next();
+            NameableObject transformer = (NameableObject) iterator.next();
             logger.debug(transformer);
             assertEquals(prefix + count, transformer.getName());
         }

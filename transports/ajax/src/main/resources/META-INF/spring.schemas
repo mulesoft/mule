@@ -1,8 +1,0 @@
-http\://www.mulesoft.org/schema/mule/ajax/3.1/mule-ajax.xsd=META-INF/mule-ajax.xsd
-http\://www.mulesoft.org/schema/mule/ajax/3.2/mule-ajax.xsd=META-INF/mule-ajax.xsd
-http\://www.mulesoft.org/schema/mule/ajax/3.3/mule-ajax.xsd=META-INF/mule-ajax.xsd
-http\://www.mulesoft.org/schema/mule/ajax/3.4/mule-ajax.xsd=META-INF/mule-ajax.xsd
-http\://www.mulesoft.org/schema/mule/ajax/3.5/mule-ajax.xsd=META-INF/mule-ajax.xsd
-http\://www.mulesoft.org/schema/mule/ajax/3.6/mule-ajax.xsd=META-INF/mule-ajax.xsd
-http\://www.mulesoft.org/schema/mule/ajax/3.7/mule-ajax.xsd=META-INF/mule-ajax.xsd
-http\://www.mulesoft.org/schema/mule/ajax/current/mule-ajax.xsd=META-INF/mule-ajax.xsd

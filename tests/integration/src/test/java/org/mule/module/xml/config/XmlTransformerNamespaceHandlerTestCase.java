@@ -155,8 +155,8 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     protected AbstractTransformer getAndTestEndpointTransformer(String endpointName, Class clazz) throws MuleException
     {
         assertTrue(AbstractTransformer.class.isAssignableFrom(clazz));
-        assertEquals(1, muleContext.getEndpointFactory().getInboundEndpoint(endpointName).getTransformers().size());
-        AbstractTransformer transformer= (AbstractTransformer) muleContext.getEndpointFactory().getInboundEndpoint(endpointName).getTransformers().get(0);
+        assertEquals(1, muleContext.getEndpointFactory().getInboundEndpoint(endpointName).getMessageProcessors().size());
+        AbstractTransformer transformer= (AbstractTransformer) muleContext.getEndpointFactory().getInboundEndpoint(endpointName).getMessageProcessors().get(0);
 
         assertNotNull(transformer);
         assertTrue(clazz.isAssignableFrom(transformer.getClass()));
@@ -166,7 +166,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     protected void assertAbstractTransformerOk(AbstractTransformer transformer, String name)
     {
         assertTrue(transformer.isIgnoreBadInput());
-        assertEquals(Object.class, transformer.getReturnClass());
+        assertEquals(Object.class, transformer.getReturnDataType().getType());
         assertEquals(name, transformer.getName());
         // AbstractXmlTransformer instances have an output encoding
         if (transformer instanceof AbstractXmlTransformer)

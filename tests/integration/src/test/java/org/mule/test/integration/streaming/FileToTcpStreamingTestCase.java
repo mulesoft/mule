@@ -7,40 +7,28 @@
 package org.mule.test.integration.streaming;
 
 import static org.junit.Assert.assertEquals;
-
-import org.junit.Ignore;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.file.FileExists;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("MULE-6926: Flaky test - fails on build server")
-public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
+public class FileToTcpStreamingTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/streaming/file-to-tcp-streaming-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/streaming/file-to-tcp-streaming-flow.xml"}
-        });
-    }
-
-    public FileToTcpStreamingTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/streaming/file-to-tcp-streaming-flow.xml";
     }
 
     @Override

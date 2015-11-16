@@ -10,174 +10,117 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <!--<vm:endpoint name="processAttachment" address="vm://attachment?method=processAttachment" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachments?method=processAttachments" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachmentsOptional" address="vm://attachmentsOptional?method=processAttachmentsOptional" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processUnmodifiableAttachments" address="vm://attachmentsUnmodifiable?method=processUnmodifiableAttachments" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processSingleMapAttachment" address="vm://singleAttachmentMap?method=processSingleMapAttachment" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachmentsList" address="vm://attachmentsList?method=processAttachmentsList" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachmentsListOptional" address="vm://attachmentsListOptional?method=processAttachmentsListOptional" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processUnmodifiableAttachmentsList" address="vm://attachmentsListUnmodifiable?method=processUnmodifiableAttachmentsList" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://singleAttachmentList?method=processSingleAttachmentList" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentsAll?method=processAttachmentsAll" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentsListAll?method=processAttachmentsListAll" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentsWildcard?method=processAttachmentsWildcard" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentsListWildcard?method=processAttachmentsListWildcard" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentsMultiWildcard?method=processAttachmentsMultiWildcard" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentsListMultiWildcard?method=processAttachmentsListMultiWildcard" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentWithType?method=processAttachmentWithType" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentOptional?method=processAttachmentOptional" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentsAllOptional?method=processAttachmentsAllOptional" exchange-pattern="request-response"/>-->
-    <!--<vm:endpoint name="processAttachments" address="vm://attachmentsListAllOptional?method=processAttachmentsListAllOptional" exchange-pattern="request-response"/>-->
-    <model name="main">
+    <flow name="attachments1">
+        <inbound-endpoint address="vm://attachment?method=processAttachment" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments1">
-            <inbound>
-                <inbound-endpoint address="vm://attachment?method=processAttachment" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments2">
+        <inbound-endpoint address="vm://attachments?method=processAttachments" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments2">
-            <inbound>
-                <inbound-endpoint address="vm://attachments?method=processAttachments" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments3">
+        <inbound-endpoint address="vm://attachmentsOptional?method=processAttachmentsOptional"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments3">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsOptional?method=processAttachmentsOptional"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments4">
+        <inbound-endpoint address="vm://attachmentsUnmodifiable?method=processUnmodifiableAttachments"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments4">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsUnmodifiable?method=processUnmodifiableAttachments"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
-
-        <service name="attachments5">
-            <inbound>
-                <inbound-endpoint address="vm://singleAttachmentMap?method=processSingleMapAttachment"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments5">
+        <inbound-endpoint address="vm://singleAttachmentMap?method=processSingleMapAttachment"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
 
-        <service name="attachments6">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsList?method=processAttachmentsList"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments6">
+        <inbound-endpoint address="vm://attachmentsList?method=processAttachmentsList"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments7">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsListOptional?method=processAttachmentsListOptional"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments7">
+        <inbound-endpoint address="vm://attachmentsListOptional?method=processAttachmentsListOptional"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments8">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsListUnmodifiable?method=processUnmodifiableAttachmentsList"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments8">
+        <inbound-endpoint address="vm://attachmentsListUnmodifiable?method=processUnmodifiableAttachmentsList"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments9">
-            <inbound>
-                <inbound-endpoint address="vm://singleAttachmentList?method=processSingleAttachmentList"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments9">
+        <inbound-endpoint address="vm://singleAttachmentList?method=processSingleAttachmentList"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments10">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsAll?method=processAttachmentsAll"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments10">
+        <inbound-endpoint address="vm://attachmentsAll?method=processAttachmentsAll"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments11">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsListAll?method=processAttachmentsListAll"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments11">
+        <inbound-endpoint address="vm://attachmentsListAll?method=processAttachmentsListAll"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments12">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsWildcard?method=processAttachmentsWildcard"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments12">
+        <inbound-endpoint address="vm://attachmentsWildcard?method=processAttachmentsWildcard"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments13">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsListWildcard?method=processAttachmentsListWildcard"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments13">
+        <inbound-endpoint address="vm://attachmentsListWildcard?method=processAttachmentsListWildcard"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments14">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsMultiWildcard?method=processAttachmentsMultiWildcard"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments14">
+        <inbound-endpoint address="vm://attachmentsMultiWildcard?method=processAttachmentsMultiWildcard"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments15">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsListMultiWildcard?method=processAttachmentsListMultiWildcard"
-                                  exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments15">
+        <inbound-endpoint address="vm://attachmentsListMultiWildcard?method=processAttachmentsListMultiWildcard"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments18">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentWithType?method=processAttachmentWithType" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments18">
+        <inbound-endpoint address="vm://attachmentWithType?method=processAttachmentWithType"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments19">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentOptional?method=processAttachmentOptional" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments19">
+        <inbound-endpoint address="vm://attachmentOptional?method=processAttachmentOptional"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments20">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsAllOptional?method=processAttachmentsAllOptional" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments20">
+        <inbound-endpoint address="vm://attachmentsAllOptional?method=processAttachmentsAllOptional"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments21">
-            <inbound>
-                <inbound-endpoint address="vm://attachmentsListAllOptional?method=processAttachmentsListAllOptional" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
-        </service>
-
-    </model>
+    <flow name="attachments21">
+        <inbound-endpoint address="vm://attachmentsListAllOptional?method=processAttachmentsListAllOptional"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.InboundAttachmentsAnnotationComponent"/>
+    </flow>
 
 </mule>

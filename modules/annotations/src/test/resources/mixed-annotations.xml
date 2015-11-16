@@ -8,19 +8,15 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <model name="main">
-        <service name="mixed1">
-            <inbound>
-                <inbound-endpoint address="vm://allAnnotated?method=processAllAnnotated" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
-        </service>
+    <flow name="mixed1">
+        <inbound-endpoint address="vm://allAnnotated?method=processAllAnnotated" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
+    </flow>
 
-        <service name="mixed2">
-            <inbound>
-                <inbound-endpoint address="vm://someAnnotated?method=processPayloadNotAnnotated" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
-        </service>
-    </model>
+    <flow name="mixed2">
+        <inbound-endpoint address="vm://someAnnotated?method=processPayloadNotAnnotated"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
+    </flow>
+
 </mule>

@@ -23,18 +23,25 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class JdbcReconnectionTestCase extends AbstractJdbcFunctionalTestCase
 {
+    private final String configFile;
 
-    public JdbcReconnectionTestCase(ConfigVariant variant, String configResources)
+    public JdbcReconnectionTestCase(String configFile)
     {
-        super(variant, configResources);
+        super();
+        this.configFile = configFile;
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "jdbc-reconnection-blocking-config.xml"},
-                {ConfigVariant.FLOW, "jdbc-reconnection-nonblocking-config.xml"}});
+                {"jdbc-reconnection-blocking-config.xml"},
+                {"jdbc-reconnection-nonblocking-config.xml"}});
+    }
+
+    @Override
+    protected String getConfigFile() {
+        return configFile;
     }
 
     @Test

@@ -6,14 +6,12 @@
  */
 package org.mule.module.extension.internal;
 
-import org.mule.extension.introspection.declaration.Describer;
-import org.mule.extension.introspection.declaration.fluent.Declaration;
-import org.mule.extension.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.CollectionUtils;
-
-import org.apache.commons.collections.Predicate;
 
 public abstract class AbstractAnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
 {
@@ -36,13 +34,6 @@ public abstract class AbstractAnnotationsBasedDescriberTestCase extends Abstract
 
     protected OperationDeclaration getOperation(Declaration declaration, final String operationName)
     {
-        return (OperationDeclaration) CollectionUtils.find(declaration.getOperations(), new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object object)
-            {
-                return ((OperationDeclaration) object).getName().equals(operationName);
-            }
-        });
+        return (OperationDeclaration) CollectionUtils.find(declaration.getOperations(), object -> ((OperationDeclaration) object).getName().equals(operationName));
     }
 }

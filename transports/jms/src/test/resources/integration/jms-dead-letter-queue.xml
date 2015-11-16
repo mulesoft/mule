@@ -9,22 +9,14 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
-    <model name="test">
-        <service name="DeadLetter">
-            <inbound>
-                <inbound-endpoint ref="in" />
-            </inbound>
-            <test:component throwException="true"/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out" />
-                </pass-through-router>
-            </outbound>
-            <default-exception-strategy>
-                <commit-transaction exception-pattern="*"/>
-                <outbound-endpoint ref="dlq" />
-            </default-exception-strategy>
-        </service>
-    </model>
+    <flow name="DeadLetter">
+        <inbound-endpoint ref="in"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="out"/>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <outbound-endpoint ref="dlq"/>
+        </default-exception-strategy>
+    </flow>
 
 </mule>

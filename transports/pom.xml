@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.transports</groupId>
     <artifactId>mule-transports</artifactId>
@@ -13,27 +13,16 @@
 
     <modules>
         <module>all-transports</module>
-        <module>axis</module>
-        <module>ajax</module>
-        <module>ejb</module>
         <module>email</module>
         <module>file</module>
-        <module>ftp</module>
         <module>http</module>
         <module>jdbc</module>
         <module>jetty</module>
         <module>jms</module>
-        <module>multicast</module>
-        <module>quartz</module>
-        <module>rmi</module>
         <module>servlet</module>
-        <module>sftp</module>
         <module>ssl</module>
-        <module>stdio</module>
         <module>tcp</module>
-        <module>udp</module>
         <module>vm</module>
-        <module>xmpp</module>
     </modules>
 
     <build>

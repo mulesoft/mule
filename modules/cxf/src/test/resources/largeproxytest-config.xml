@@ -21,35 +21,24 @@
                     sendBufferSize="0"/>
     <jetty:connector name="jettyConnector"/>
 
-    <model name="proxies">
+    <flow name="echoProxy">
+        <inbound-endpoint address="jetty://localhost:${port1}/services/EchoProxy"
+                          exchange-pattern="request-response" connector-ref="jettyConnector">
+            <cxf:proxy-service/>
+        </inbound-endpoint>
+        <outbound-endpoint address="http://localhost:${port2}/services/Echo"
+                           exchange-pattern="request-response" connector-ref="HttpConnector">
+            <cxf:proxy-client/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="echoProxy">
-            <inbound>
-                <inbound-endpoint address="jetty://localhost:${port1}/services/EchoProxy"
-                                  exchange-pattern="request-response" connector-ref="jettyConnector">
-                    <cxf:proxy-service />
-                </inbound-endpoint>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="http://localhost:${port2}/services/Echo"
-                                       exchange-pattern="request-response" connector-ref="HttpConnector">
-                        <cxf:proxy-client />   
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="echoService">
+        <inbound-endpoint
+                address="jetty://localhost:${port2}/services/Echo" exchange-pattern="request-response"
+                connector-ref="jettyConnector">
+            <cxf:simple-service/>
+        </inbound-endpoint>
+        <component class="org.mule.component.simple.EchoComponent"/>
+    </flow>
 
-        <service name="echoService">
-            <inbound>
-                <inbound-endpoint
-                        address="jetty://localhost:${port2}/services/Echo" exchange-pattern="request-response"
-                        connector-ref="jettyConnector">
-                    <cxf:simple-service />
-                </inbound-endpoint>
-            </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
-        </service>
-
-    </model>
 </mule>

@@ -43,7 +43,7 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
     @Test
     public void splitter() throws Exception
     {
-        testFlowNonBlocking("splitter", getTestEventUsingFlow(new String[] {"1", "2", "3"}));
+        testFlowNonBlocking("splitter", getTestEvent(new String[] {"1", "2", "3"}));
     }
 
     @Test

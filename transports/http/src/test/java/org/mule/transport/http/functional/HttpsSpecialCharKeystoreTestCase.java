@@ -15,11 +15,6 @@ import org.apache.commons.io.FileUtils;
 public class HttpsSpecialCharKeystoreTestCase extends HttpsFunctionalTestCase
 {
 
-    public HttpsSpecialCharKeystoreTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {

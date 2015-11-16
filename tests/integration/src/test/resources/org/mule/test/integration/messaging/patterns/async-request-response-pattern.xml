@@ -16,28 +16,20 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <model name="Async_Request-Response_Message_Pattern">
-        <service name="AsyncRequestResponseService">
-            <inbound>
-                <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" 
-                    exchange-pattern="request-response"/>
-            </inbound>
-
-            <test:component/>
-
-            <outbound>
-                <multicasting-router>
-                    <jms:outbound-endpoint queue="service1" exchange-pattern="one-way"/>
-                    <jms:outbound-endpoint queue="service2" exchange-pattern="one-way"/>
-                    <reply-to address="jms://reply.queue"/>
-                </multicasting-router>
-            </outbound>
-
-            <async-reply timeout="5000">
-                <jms:inbound-endpoint queue="reply.queue" exchange-pattern="one-way"/>
-                <collection-async-reply-router/>
-            </async-reply>
-        </service>
-    </model>
+    <flow name="AsyncRequestResponseService">
+        <http:inbound-endpoint host="localhost" port="8080" path="/mule/services"
+                               exchange-pattern="request-response"/>
+        <test:component/>
+        <request-reply timeout="5000">
+            <all>
+                <jms:outbound-endpoint queue="service1" exchange-pattern="one-way"/>
+                <jms:outbound-endpoint queue="service2" exchange-pattern="one-way"/>
+                <reply-to address="jms://reply.queue"/>
+            </all>
+            <jms:inbound-endpoint queue="reply.queue" exchange-pattern="one-way">
+                <collection-aggregator/>
+            </jms:inbound-endpoint>
+        </request-reply>
+    </flow>
 </mule>
 <!--// END SNIPPET: full-config -->

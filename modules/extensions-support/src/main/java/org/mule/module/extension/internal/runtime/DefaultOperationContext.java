@@ -6,13 +6,12 @@
  */
 package org.mule.module.extension.internal.runtime;
 
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,72 +26,114 @@ import java.util.Map;
 public class DefaultOperationContext implements OperationContextAdapter
 {
 
-    private final String configurationInstanceProviderName;
-    private final Extension extension;
-    private final Operation operation;
+    private final ConfigurationInstance<?> configuration;
     private final Map<String, Object> parameters;
+    private final Map<String, Object> variables = new HashMap<>();
+    private final OperationModel operationModel;
     private final MuleEvent event;
-    private final ExtensionManagerAdapter extensionManager;
-
-    private Object configurationInstance;
 
     /**
      * Creates a new instance with the given state
      *
-     * @param operation        the {@link Operation} that will be executed
-     * @param parameters       the parameters that the operation will use
-     * @param event            the current {@link MuleEvent}
-     * @param extensionManager the {@link ExtensionManagerAdapter} on which the {@link Extension} that owns the {@link Operation} is registered
+     * @param configuration the {@link ConfigurationInstance} that the operation will use
+     * @param parameters    the parameters that the operation will use
+     * @param event         the current {@link MuleEvent}
      */
-    public DefaultOperationContext(Extension extension,
-                                   Operation operation,
-                                   String configurationInstanceProviderName,
-                                   ResolverSetResult parameters,
-                                   MuleEvent event,
-                                   ExtensionManagerAdapter extensionManager)
+    public DefaultOperationContext(ConfigurationInstance<Object> configuration, ResolverSetResult parameters, OperationModel operationModel, MuleEvent event)
     {
-        this.extension = extension;
-        this.operation = operation;
-        this.configurationInstanceProviderName = configurationInstanceProviderName;
+        this.configuration = configuration;
         this.event = event;
-        this.extensionManager = extensionManager;
+        this.operationModel = operationModel;
 
-        Map<Parameter, Object> parameterMap = parameters.asMap();
+        Map<ParameterModel, Object> parameterMap = parameters.asMap();
         this.parameters = new HashMap<>(parameterMap.size());
-        for (Map.Entry<Parameter, Object> parameter : parameterMap.entrySet())
+        parameters.asMap().entrySet().forEach(parameter -> this.parameters.put(parameter.getKey().getName(), parameter.getValue()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public <C> ConfigurationInstance<C> getConfiguration()
+    {
+        return (ConfigurationInstance<C>) configuration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T getParameter(String parameterName)
+    {
+        return (T) parameters.get(parameterName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T getTypeSafeParameter(String parameterName, Class<? extends T> expectedType)
+    {
+        Object value = getParameter(parameterName);
+        if (value == null)
         {
-            this.parameters.put(parameter.getKey().getName(), parameter.getValue());
+            return null;
         }
-    }
 
-    @Override
-    public <C> C getConfigurationInstance()
-    {
-        if (configurationInstance == null)
+        if (!expectedType.isInstance(value))
         {
-            configurationInstance = StringUtils.isBlank(configurationInstanceProviderName)
-                                    ? extensionManager.getConfigurationInstance(extension, this)
-                                    : extensionManager.getConfigurationInstance(extension, configurationInstanceProviderName, this);
+            throw new IllegalArgumentException(String.format("'%s' was expected to be of type '%s' but type '%s' was found instead",
+                                                             parameterName, expectedType.getName(), value.getClass().getName()));
         }
 
-        return (C) configurationInstance;
+        return (T) value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Operation getOperation()
+    public <T> T getVariable(String key)
     {
-        return operation;
+        return (T) variables.get(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Object getParameterValue(String parameterName)
+    public Object setVariable(String key, Object value)
     {
-        return parameters.get(parameterName);
+        checkArgument(key != null, "null keys are not allowed");
+        checkArgument(value != null, "null values are not allowed");
+        return variables.put(key, value);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T removeVariable(String key)
+    {
+        checkArgument(key != null, "null keys are not allowed");
+        return (T) variables.remove(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleEvent getEvent()
     {
         return event;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OperationModel getOperationModel()
+    {
+        return operationModel;
     }
 }
