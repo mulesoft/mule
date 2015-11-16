@@ -34,8 +34,8 @@ public class QueueControlDataFile
      * Creates a QueueControlDataFile for storing / retrieving information
      *
      * @param queueFileProvider file provider to use to store control data
-     * @param firstFile  first queue file. Used for write and read in case there is no control data yet.
-     * @param secondFile second queue file.
+     * @param firstFile         first queue file. Used for write and read in case there is no control data yet.
+     * @param secondFile        second queue file.
      */
     public QueueControlDataFile(QueueFileProvider queueFileProvider, File firstFile, File secondFile)
     {
@@ -149,5 +149,15 @@ public class QueueControlDataFile
                 logger.debug(e);
             }
         }
+    }
+
+    /**
+     * Deletes the underlying file. This method must only be invoked
+     * after {@link #close()} has been executed on {@code this}
+     * instance
+     */
+    public void delete()
+    {
+        queueFileProvider.delete();
     }
 }
