@@ -160,7 +160,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-transport-jetty-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-jms-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-servlet-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-sftp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ssl-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-tcp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-vm-${productVersion}.jar
@@ -292,7 +291,6 @@
 /mule-standalone-${productVersion}/lib/opt/jruby-core-1.7.4.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-stdlib-1.7.4.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-engine-1.1-jdk14.jar
-/mule-standalone-${productVersion}/lib/opt/jsch-0.1.51.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.6.jar
@@ -304,7 +302,6 @@
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.9.jar
-/mule-standalone-${productVersion}/lib/opt/mimepull-1.9.3.jar
 /mule-standalone-${productVersion}/lib/opt/msg-simple-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/msv-core-2011.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-impl-2.1.1.jar
