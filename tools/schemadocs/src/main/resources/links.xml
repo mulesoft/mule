@@ -111,12 +111,6 @@
     <link><item>file:file-to-byte-array-transformer</item><page>File+Transport</page></link>
     <link><item>file:file-to-string-transformer</item><page>File+Transport</page></link>
 
-    <link><item>ftp:connector</item><page>FTP+Transport</page></link>
-    <link><item>ftp:filename-parser</item><page>FTP+Transport</page></link>
-    <link><item>ftp:inbound-endpoint</item><page>FTP+Transport</page></link>
-    <link><item>ftp:outbound-endpoint</item><page>FTP+Transport</page></link>
-    <link><item>ftp:endpoint</item><page>FTP+Transport</page></link>
-
     <link><item>http:connector</item><page>HTTP+Transport</page></link>
     <link><item>http:rest-service-component</item><page>HTTP+Transport</page></link>
     <link><item>http:payloadParameterName</item><page>HTTP+Transport</page></link>
