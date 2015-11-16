@@ -8,7 +8,6 @@
     <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-pop3.xsd">pop3</transport>
     <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-pop3s.xsd">pop3s</transport>
     <transport dist="ce">file</transport>
-    <transport dist="ce">ftp</transport>
     <transport dist="ce">http</transport>
     <transport dist="ce">jbpm</transport>
     <transport dist="ce">jdbc</transport>
