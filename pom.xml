@@ -1287,7 +1287,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
             <dependency>
                 <groupId>org.mule.extensions</groupId>
                 <artifactId>mule-extensions-api</artifactId>

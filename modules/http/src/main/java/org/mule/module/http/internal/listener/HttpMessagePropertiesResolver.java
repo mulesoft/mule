@@ -6,12 +6,16 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static java.util.Collections.emptyMap;
+import static org.mule.module.http.internal.HttpParser.decodeQueryString;
+import static org.mule.module.http.internal.HttpParser.decodeUriParams;
+import static org.mule.module.http.internal.HttpParser.extractPath;
+import static org.mule.module.http.internal.HttpParser.extractQueryParams;
+
 import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
 
 import java.security.cert.Certificate;
-import java.util.Collections;
 import java.util.Map;
 
 public class HttpMessagePropertiesResolver
@@ -70,17 +74,17 @@ public class HttpMessagePropertiesResolver
     public void addPropertiesTo(Map<String, Object> propertiesMap)
     {
         final String resolvedListenerPath = listenerPath.getResolvedPath();
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY, this.method);
-        final String path = HttpParser.extractPath(uri);
-        final String rawQueryString = HttpParser.extractQueryParams(uri);
-        final ParameterMap queryParams = HttpParser.decodeQueryString(rawQueryString);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS, queryParams == null ? Collections.emptyMap() : queryParams.toImmutableParameterMap());
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY, method);
+        final String path = extractPath(uri);
+        final String rawQueryString = extractQueryParams(uri);
+        final ParameterMap queryParams = decodeQueryString(rawQueryString);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS, queryParams == null ? emptyMap() : queryParams.toImmutableParameterMap());
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_STRING, rawQueryString);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY, path);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY, this.protocol);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_REQUEST_URI, this.uri);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY, protocol);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_REQUEST_URI, uri);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS, remoteHostAddress);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_URI_PARAMS, HttpParser.decodeUriParams(resolvedListenerPath, path));
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_URI_PARAMS, decodeUriParams(resolvedListenerPath, path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, resolvedListenerPath);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH, listenerPath.getRelativePath(path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_SCHEME, scheme);

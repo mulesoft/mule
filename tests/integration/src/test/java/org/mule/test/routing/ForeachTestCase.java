@@ -59,7 +59,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testDefaultConfiguration() throws Exception
+    public void defaultConfiguration() throws Exception
     {
         final Collection<String> payload = new ArrayList<String>();
         payload.add("julio");
@@ -81,7 +81,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testDefaultConfigurationPlusMP() throws Exception
+    public void defaultConfigurationPlusMP() throws Exception
     {
         final Collection<String> payload = new ArrayList<String>();
         payload.add("syd");
@@ -104,7 +104,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testDefaultConfigurationExpression() throws Exception
+    public void defaultConfigurationExpression() throws Exception
     {
         final Collection<String> names = new ArrayList<String>();
         names.add("residente");
@@ -127,7 +127,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testPartitionedConfiguration() throws Exception
+    public void partitionedConfiguration() throws Exception
     {
         final Collection<String> payload = new ArrayList<String>();
         payload.add("gulp");
@@ -154,7 +154,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testRootMessageConfiguration() throws Exception
+    public void rootMessageConfiguration() throws Exception
     {
         final Collection<String> payload = new ArrayList<String>();
         payload.add("pyotr");
@@ -171,7 +171,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testCounterConfiguration() throws Exception
+    public void counterConfiguration() throws Exception
     {
         final Collection<String> payload = new ArrayList<String>();
         payload.add("wolfgang");
@@ -189,7 +189,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testMessageCollectionConfiguration() throws Exception
+    public void messageCollectionConfiguration() throws Exception
     {
         MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
         for (int i = 0; i < 10; i++)
@@ -206,7 +206,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testMessageCollectionConfigurationOneWay() throws Exception
+    public void messageCollectionConfigurationOneWay() throws Exception
     {
         MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
         for (int i = 0; i < 10; i++)
@@ -221,7 +221,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testMapPayload() throws Exception
+    public void mapPayload() throws Exception
     {
         final Map<String, String> payload = new HashMap<String, String>();
         payload.put("name", "david");
@@ -237,7 +237,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testMapExpression() throws Exception
+    public void mapExpression() throws Exception
     {
         final Collection<String> names = new ArrayList<String>();
         names.add("Sergei");
@@ -258,14 +258,14 @@ public class ForeachTestCase extends FunctionalTestCase
                         + "<Item PartNumber=\"926-AA\"><Price>35</Price></Item>" + "</Items>" + "</PurchaseOrder>";
 
     @Test
-    public void testXmlUpdate() throws Exception
+    public void xmlUpdate() throws Exception
     {
         client.send("vm://input-10", sampleXml, null);
         FlowAssert.verify("process-order-update");
     }
 
     @Test
-    public void testXmlUpdateByteArray() throws Exception
+    public void xmlUpdateByteArray() throws Exception
     {
         byte[] xmlba = sampleXml.getBytes();
         client.send("vm://input-10", xmlba, null);
@@ -273,7 +273,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testXmlUpdateInputStream() throws Exception
+    public void xmlUpdateInputStream() throws Exception
     {
         InputStream xmlis = new ByteArrayInputStream(sampleXml.getBytes());
         client.send("vm://input-10-is", xmlis, null);
@@ -281,14 +281,14 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testXmlUpdateMel() throws Exception
+    public void xmlUpdateMel() throws Exception
     {
         client.send("vm://input-10-mel", sampleXml, null);
         FlowAssert.verify("process-order-update-mel");
     }
 
     @Test
-    public void testJsonUpdate() throws Exception
+    public void jsonUpdate() throws Exception
     {
         String json = "{\"order\": {\"name\": \"Ellen\", \"email\": \"ellen@mail.com\", \"items\": [{\"key1\": \"value1\"}, {\"key2\": \"value2\"}] } }";
         client.send("vm://input-11", json, null);
@@ -296,7 +296,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testArrayPayload() throws Exception
+    public void arrayPayload() throws Exception
     {
         String[] payload = {"uno", "dos", "tres"};
         MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
@@ -310,7 +310,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testVariableScope() throws Exception
+    public void variableScope() throws Exception
     {
         final Collection<String> payload = new ArrayList<String>();
         payload.add("pedro");
@@ -325,7 +325,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testTwoOneAfterAnother() throws Exception
+    public void twoOneAfterAnother() throws Exception
     {
         final Collection<String> payload = new ArrayList<String>();
         payload.add("rosa");
@@ -343,9 +343,9 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testNestedConfig() throws Exception
+    public void nestedConfig() throws Exception
     {
-        final ArrayList<ArrayList<String>> payload = createNestedPayload();
+        final List<List<String>> payload = createNestedPayload();
         MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
 
         MuleMessage result = client.send("vm://input-15", parent);
@@ -367,9 +367,9 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testNestedCounters() throws Exception
+    public void nestedCounters() throws Exception
     {
-        final ArrayList<ArrayList<String>> payload = createNestedPayload();
+        final List<List<String>> payload = createNestedPayload();
         MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
 
         MuleMessage result = client.send("vm://input-16", parent);
@@ -391,12 +391,12 @@ public class ForeachTestCase extends FunctionalTestCase
         }
     }
 
-    private ArrayList<ArrayList<String>> createNestedPayload()
+    private List<List<String>> createNestedPayload()
     {
-        final ArrayList<ArrayList<String>> payload = new ArrayList<ArrayList<String>>();
-        final ArrayList<String> elem1 = new ArrayList<String>();
-        final ArrayList<String> elem2 = new ArrayList<String>();
-        final ArrayList<String> elem3 = new ArrayList<String>();
+        final List<List<String>> payload = new ArrayList<>();
+        final List<String> elem1 = new ArrayList<String>();
+        final List<String> elem2 = new ArrayList<String>();
+        final List<String> elem3 = new ArrayList<String>();
         elem1.add("a1");
         elem1.add("a2");
         elem1.add("a3");
@@ -411,7 +411,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testPropertiesRestored() throws Exception
+    public void propertiesRestored() throws Exception
     {
         String[] payload = {"uno", "dos", "tres"};
         MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
@@ -427,7 +427,7 @@ public class ForeachTestCase extends FunctionalTestCase
 
 
     @Test
-    public void testMVELList() throws Exception
+    public void mvelList() throws Exception
     {
         MuleMessage parent = new DefaultMuleMessage(null, muleContext);
         client.send("vm://input-18", parent);
@@ -444,7 +444,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testMVELMap() throws Exception
+    public void mvelMap() throws Exception
     {
         MuleMessage parent = new DefaultMuleMessage(null, muleContext);
         client.send("vm://input-19", parent);
@@ -465,7 +465,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testMVELCollection() throws Exception
+    public void mvelCollection() throws Exception
     {
         MuleMessage parent = new DefaultMuleMessage(null, muleContext);
         client.send("vm://input-20", parent);
@@ -486,7 +486,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testMVELArray() throws Exception
+    public void mvelArray() throws Exception
     {
         MuleMessage parent = new DefaultMuleMessage(null, muleContext);
 
@@ -506,7 +506,7 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testRequestReply() throws Exception
+    public void requestReply() throws Exception
     {
         MuleMessage parent = new DefaultMuleMessage(null, muleContext);
         MuleMessage msg = client.send("vm://input-22", parent);
