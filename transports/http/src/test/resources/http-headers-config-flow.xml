@@ -19,13 +19,6 @@
     <http:endpoint name="clientEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
     <http:endpoint name="serverEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
 
-    <http:endpoint name="clientEndpoint2" host="localhost" port="${port2}" contentType="application/xml"
-        exchange-pattern="one-way">
-        <property key="Content-Disposition" value="attachment; filename=foo.zip"/>
-        <property key="X-Test" value="foo"/>
-    </http:endpoint>
-    <http:endpoint name="serverEndpoint2" host="localhost" port="${port2}" exchange-pattern="request-response"/>
-
     <flow name="ProductDataSourceRepository">
         <http:inbound-endpoint ref="serverEndpoint" contentType="application/x-download">
             <properties>
@@ -33,13 +26,7 @@
                 <spring:entry key="Content-Type" value="application/x-download"/>
             </properties>
         </http:inbound-endpoint>
-        <echo-component></echo-component>
+        <set-payload value="#[message.inboundProperties['accept']]"/>
     </flow>
 
-    <flow name="TestService2">
-        <http:inbound-endpoint ref="serverEndpoint2"/>
-        <test:component logMessageDetails="true"/>
-        <vm:outbound-endpoint path="out" connector-ref="vm" exchange-pattern="one-way"/>
-    </flow>
-    
 </mule>
