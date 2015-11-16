@@ -24,7 +24,7 @@ import org.mule.module.extension.internal.introspection.MuleExtensionAnnotationP
 import org.mule.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
-import org.mule.module.extension.internal.runtime.resolver.ConnectorArgumentResolver;
+import org.mule.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ContentMetadataArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.ContentTypeArgumentResolver;
 import org.mule.module.extension.internal.runtime.resolver.EventArgumentResolver;
@@ -46,7 +46,7 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 {
 
     private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
-    private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectorArgumentResolver();
+    private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
     private static final ArgumentResolver<MuleMessage> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
     private static final ArgumentResolver<MuleEvent> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
     private static final ArgumentResolver<ContentMetadata> CONTENT_METADATA_ARGUMENT_RESOLVER = new ContentMetadataArgumentResolver();

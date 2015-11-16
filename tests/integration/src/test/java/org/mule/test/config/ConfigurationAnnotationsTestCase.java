@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.AnnotatedObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;

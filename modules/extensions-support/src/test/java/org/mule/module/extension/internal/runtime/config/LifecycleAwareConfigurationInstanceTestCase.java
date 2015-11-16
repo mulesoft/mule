@@ -11,19 +11,22 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
-import org.mule.api.config.MuleProperties;
+import static org.mule.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connector.ConnectionManager;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.extension.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.module.extension.internal.AbstractInterceptableContractTestCase;
 import org.mule.tck.size.SmallTest;
@@ -38,11 +41,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class LifecycleAwareConfigurationTestCase extends AbstractInterceptableContractTestCase<LifecycleAwareConfigurationInstance>
+public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterceptableContractTestCase<LifecycleAwareConfigurationInstance>
 {
 
     private static final String NAME = "name";
@@ -56,14 +60,19 @@ public class LifecycleAwareConfigurationTestCase extends AbstractInterceptableCo
         );
     }
 
-    private ConfigurationModel configurationModel = mock(ConfigurationModel.class);
+    @Mock
+    private ConfigurationModel configurationModel;
 
-    private Lifecycle value = mock(Lifecycle.class);
+    @Mock
+    private Lifecycle value;
+
+    @Mock
+    private ConnectionManager connectionManager;
 
     private String name;
     private Optional<ConnectionProvider> connectionProvider;
 
-    public LifecycleAwareConfigurationTestCase(String name, ConnectionProvider connectionProvider)
+    public LifecycleAwareConfigurationInstanceTestCase(String name, ConnectionProvider connectionProvider)
     {
         this.name = name;
         this.connectionProvider = Optional.ofNullable(connectionProvider);
@@ -76,8 +85,9 @@ public class LifecycleAwareConfigurationTestCase extends AbstractInterceptableCo
     public void before() throws Exception
     {
         MockitoAnnotations.initMocks(this);
+        muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
+        muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
         super.before();
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_TIME_SUPPLIER, timeSupplier);
     }
 
     @Override
@@ -102,6 +112,20 @@ public class LifecycleAwareConfigurationTestCase extends AbstractInterceptableCo
         else
         {
             verify(injector, never()).inject(any(ConnectionProvider.class));
+        }
+    }
+
+    @Test
+    public void connectionBinded() throws Exception
+    {
+        interceptable.initialise();
+        if (connectionProvider.isPresent())
+        {
+            verify(connectionManager).bind(value, connectionProvider.get());
+        }
+        else
+        {
+            verify(connectionManager, never()).bind(anyObject(), anyObject());
         }
     }
 
@@ -136,7 +160,20 @@ public class LifecycleAwareConfigurationTestCase extends AbstractInterceptableCo
         {
             verify((Stoppable) connectionProvider.get()).stop();
         }
+    }
 
+    @Test
+    public void connectionUnbinded() throws Exception
+    {
+        interceptable.stop();
+        if (connectionProvider.isPresent())
+        {
+            verify(connectionManager).unbind(value);
+        }
+        else
+        {
+            verify(connectionManager, never()).unbind(anyObject());
+        }
     }
 
     @Test

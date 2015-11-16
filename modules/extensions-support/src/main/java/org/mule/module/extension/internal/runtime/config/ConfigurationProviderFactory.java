@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.runtime.config;
 
 import org.mule.api.MuleContext;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;

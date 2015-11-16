@@ -101,6 +101,8 @@
 
         <spring:bean name="_muleTimeSupplier" class="org.mule.time.TimeSupplier" />
 
+        <spring:bean name="_muleConnectionManager" class="org.mule.internal.connection.DefaultConnectionManager" />
+
         <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
         the transformers will be available even when using the TransientRegistry only -->
 

@@ -11,7 +11,7 @@ import static org.mule.module.extension.internal.introspection.ImplicitObjectUti
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;

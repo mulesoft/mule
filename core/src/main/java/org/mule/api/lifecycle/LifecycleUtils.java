@@ -201,6 +201,22 @@ public class LifecycleUtils
         }
     }
 
+    /**
+     * Verifies that the given {@code muleContext} is not stopped or in the process of stopping
+     *
+     * @param muleContext  the {@link MuleContext} to test
+     * @param errorMessage the message of the {@link Exception} to be thrown if the assertion fails
+     * @throws IllegalStateException if the {@code muleContext} is stopped or stopping
+     * @since 4.0
+     */
+    public static void assertNotStopping(MuleContext muleContext, String errorMessage)
+    {
+        if (muleContext.isStopped() || muleContext.isStopping())
+        {
+            throw new IllegalStateException(errorMessage);
+        }
+    }
+
     private static void doApplyPhase(String phase, Collection<? extends Object> objects, Logger logger) throws MuleException
     {
         if (CollectionUtils.isEmpty(objects))

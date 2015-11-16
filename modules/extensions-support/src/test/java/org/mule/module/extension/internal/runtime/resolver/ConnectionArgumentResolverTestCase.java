@@ -9,8 +9,10 @@ package org.mule.module.extension.internal.runtime.resolver;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+import org.mule.api.connection.ManagedConnection;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -22,19 +24,22 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConnectorArgumentResolverTestCase extends AbstractMuleTestCase
+public class ConnectionArgumentResolverTestCase extends AbstractMuleTestCase
 {
 
     @Mock
     private OperationContextAdapter operationContext;
 
-    private ConnectorArgumentResolver resolver = new ConnectorArgumentResolver();
+    private ConnectionArgumentResolver resolver = new ConnectionArgumentResolver();
 
     @Test
-    public void resolve()
+    public void resolve() throws Exception
     {
-        Object connection = new Object();
-        when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(connection);
+        ManagedConnection managedConnection = mock(ManagedConnection.class);
+        final Object connection = new Object();
+        when(managedConnection.getConnection()).thenReturn(connection);
+        when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(managedConnection);
+
         assertThat(resolver.resolve(operationContext), is(sameInstance(connection)));
     }
 

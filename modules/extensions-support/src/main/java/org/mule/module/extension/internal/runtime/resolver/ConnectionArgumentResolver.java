@@ -8,6 +8,10 @@ package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.connection.ConnectionException;
+import org.mule.api.connection.ManagedConnection;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
@@ -15,13 +19,13 @@ import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 /**
  * Returns the value of the {@link ExtensionProperties#CONNECTION_PARAM} variable,
  * which is expected to have been previously set on the supplied {@link OperationContext}.
- * <p/>
+ * <p>
  * Notice that for this to work, the {@link OperationContext}
  * has to be an instance of {@link OperationContextAdapter}
  *
  * @since 4.0
  */
-public class ConnectorArgumentResolver implements ArgumentResolver<Object>
+public class ConnectionArgumentResolver implements ArgumentResolver<Object>
 {
 
     /**
@@ -36,9 +40,18 @@ public class ConnectorArgumentResolver implements ArgumentResolver<Object>
     @Override
     public Object resolve(OperationContext operationContext)
     {
-        Object connection = ((OperationContextAdapter) operationContext).getVariable(CONNECTION_PARAM);
-        checkArgument(connection != null, "No connection was provided for the operation");
+        ManagedConnection managedConnection = ((OperationContextAdapter) operationContext).getVariable(CONNECTION_PARAM);
+        checkArgument(managedConnection != null, "No connection was provided for the operation");
 
-        return connection;
+        try
+        {
+            return managedConnection.getConnection();
+        }
+        catch (ConnectionException e)
+        {
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage(String.format("Error was found trying to obtain a connection to execute operation '%s' of extension '%s'",
+                                                                                            operationContext.getOperationModel().getName(),
+                                                                                            operationContext.getConfiguration().getModel().getExtensionModel().getName())), e);
+        }
     }
 }

@@ -18,7 +18,6 @@ import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class PetStoreSimpleConnectionTestCase extends ExtensionsFunctionalTestCase
@@ -58,7 +57,6 @@ public class PetStoreSimpleConnectionTestCase extends ExtensionsFunctionalTestCa
     }
 
     @Test
-    @Ignore("MULE-8952: Reenable after MULE-8952")
     public void stopAndDisconnect() throws Exception
     {
         PetStoreClient client = getClient();

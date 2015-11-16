@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderFactory;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ParameterModel;

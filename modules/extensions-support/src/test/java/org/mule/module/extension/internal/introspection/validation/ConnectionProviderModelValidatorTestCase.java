@@ -6,6 +6,8 @@
  */
 package org.mule.module.extension.internal.introspection.validation;
 
+import org.mule.api.connection.ConnectionException;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extension;
@@ -14,8 +16,6 @@ import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.connector.Provider;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
-import org.mule.extension.api.connection.ConnectionException;
-import org.mule.extension.api.connection.ConnectionProvider;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
