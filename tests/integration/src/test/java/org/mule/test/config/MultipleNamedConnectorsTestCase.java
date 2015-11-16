@@ -6,28 +6,17 @@
  */
 package org.mule.test.config;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class MultipleNamedConnectorsTestCase extends AbstractServiceAndFlowTestCase
+public class MultipleNamedConnectorsTestCase extends FunctionalTestCase
 {
 
-    public MultipleNamedConnectorsTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "multiple-named-connectors-test-service.xml"},
-            {ConfigVariant.FLOW, "multiple-named-connectors-test-flow.xml"}
-        });
+        return "multiple-named-connectors-test-flow.xml";
     }
 
     @Test

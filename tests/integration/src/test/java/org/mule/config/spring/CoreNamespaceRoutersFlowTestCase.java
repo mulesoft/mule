@@ -81,26 +81,25 @@ public class CoreNamespaceRoutersFlowTestCase extends FunctionalTestCase
         assertTrue(router instanceof CustomRouter);
     }
 
-    protected MessageProcessor lookupCustomRouterFromFlow(String serviceName) throws Exception
+    protected MessageProcessor lookupCustomRouterFromFlow(String flowName) throws Exception
     {
-        Flow service = lookupFlow(serviceName);
-        return service.getMessageProcessors().get(0);
+        Flow flow = lookupFlow(flowName);
+        return flow.getMessageProcessors().get(0);
     }
 
-    protected MessageProcessor lookupMessageProcessorFromFlow(String serviceName) throws Exception
+    protected MessageProcessor lookupMessageProcessorFromFlow(String flowName) throws Exception
     {
-        Flow service = lookupFlow(serviceName);
-        List<MessageProcessor> routers =
-            service.getMessageProcessors();
+        Flow flow = lookupFlow(flowName);
+        List<MessageProcessor> routers = flow.getMessageProcessors();
         assertEquals(1, routers.size());
         return routers.get(0);
     }
 
-    protected Flow lookupFlow(String serviceName)
+    protected Flow lookupFlow(String flowName)
     {
-        Flow service = muleContext.getRegistry().lookupObject(serviceName);
-        assertNotNull(service);
-        return service;
+        Flow flow = muleContext.getRegistry().lookupObject(flowName);
+        assertNotNull(flow);
+        return flow;
     }
     
     public static class CustomRouter extends AbstractOutboundRouter

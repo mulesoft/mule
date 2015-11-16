@@ -10,9 +10,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.routing.outbound.FilteringOutboundRouter;
 
-public class ExceptionThrowingOutboundRouter extends OutboundPassThroughRouter
+public class ExceptionThrowingOutboundRouter extends FilteringOutboundRouter
 {
     public MuleEvent process(MuleEvent event) throws MuleException
     {

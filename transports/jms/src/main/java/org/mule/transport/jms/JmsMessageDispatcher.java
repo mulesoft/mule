@@ -110,7 +110,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         {
             logger.debug("dispatching on endpoint: " + endpoint.getEndpointURI()
                     + ". MuleEvent id is: " + event.getId()
-                    + ". Outbound transformers are: " + endpoint.getTransformers());
+                    + ". Outbound transformers are: " + endpoint.getMessageProcessors());
         }
 
         try

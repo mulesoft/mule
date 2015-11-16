@@ -9,14 +9,13 @@ package org.mule.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +28,7 @@ import org.junit.Test;
  * SEE DIAGNOSTICS. OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA
  * TRANSFERRED, CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
  */
-public abstract class AbstractStreamingCapacityTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCase
 {
     public static final long ONE_KB = 1024;
     public static final long ONE_MB = ONE_KB * ONE_KB;
@@ -38,9 +37,8 @@ public abstract class AbstractStreamingCapacityTestCase extends AbstractServiceA
 
     private long size;
 
-    public AbstractStreamingCapacityTestCase(ConfigVariant variant, String configResources, long size)
+    public AbstractStreamingCapacityTestCase(long size)
     {
-        super(variant, configResources);
         this.size = size;
     }
 

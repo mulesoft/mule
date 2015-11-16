@@ -9,17 +9,12 @@ package org.mule.module.xml.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 
 public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestCase
@@ -30,18 +25,10 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
             "  <child/>\n" +
             "</org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/xml-transformer-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/xml/xml-transformer-functional-test-flow.xml"}
-        });
-    }
-
-    public XmlTransformerFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/module/xml/xml-transformer-functional-test-flow.xml";
     }
 
     protected MuleClient sendXml() throws MuleException

@@ -6,31 +6,31 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.module.extension.internal.util.CapabilityUtils.getSingleCapability;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.extension.annotations.Extension;
-import org.mule.extension.annotations.Parameter;
-import org.mule.extension.annotations.RestrictedTo;
-import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.annotations.param.Payload;
-import org.mule.extension.introspection.Capable;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.declaration.fluent.CapableDeclaration;
-import org.mule.module.extension.internal.capability.metadata.MemberNameCapability;
-import org.mule.module.extension.internal.util.CapabilityUtils;
+import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.RestrictedTo;
+import org.mule.extension.annotation.api.param.Connection;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.extension.api.runtime.ContentType;
+import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
-import org.mule.util.ParamReader;
+import org.mule.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -40,12 +40,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Utilities for reading annotations as a mean to
- * describe extensions
+ * Utilities for reading annotations as a mean to describe extensions
  *
  * @since 3.7.0
  */
@@ -55,6 +53,8 @@ public final class MuleExtensionAnnotationParser
     private static final Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
             .add(MuleEvent.class)
             .add(MuleMessage.class)
+            .add(ContentMetadata.class)
+            .add(ContentType.class)
             .build();
 
     static String getParameterName(Field field, Parameter parameterAnnotation)
@@ -68,16 +68,16 @@ public final class MuleExtensionAnnotationParser
         return StringUtils.isEmpty(alias) ? defaultName : alias;
     }
 
-    static String getMemberName(CapableDeclaration<?> capable, String defaultName)
+    public static String getMemberName(BaseDeclaration<?> declaration, String defaultName)
     {
-        MemberNameCapability memberNameCapability = CapabilityUtils.getSingleCapability(capable.getCapabilities(), MemberNameCapability.class);
-        return memberNameCapability != null ? memberNameCapability.getName() : defaultName;
+        MemberNameModelProperty memberNameModelProperty = declaration.getModelProperty(MemberNameModelProperty.KEY);
+        return memberNameModelProperty != null ? memberNameModelProperty.getName() : defaultName;
     }
 
-    public static String getMemberName(Capable capable, String defaultName)
+    public static String getMemberName(EnrichableModel enrichableModel, String defaultName)
     {
-        MemberNameCapability memberNameCapability = getSingleCapability(capable, MemberNameCapability.class);
-        return memberNameCapability != null ? memberNameCapability.getName() : defaultName;
+        MemberNameModelProperty memberNameModelProperty = enrichableModel.getModelProperty(MemberNameModelProperty.KEY);
+        return memberNameModelProperty != null ? memberNameModelProperty.getName() : defaultName;
     }
 
     static Extension getExtension(Class<?> extensionType)
@@ -89,11 +89,11 @@ public final class MuleExtensionAnnotationParser
         return extension;
     }
 
-    static List<ParameterDescriptor> parseParameters(Method method)
+    static List<ParsedParameter> parseParameters(Method method)
     {
-        String[] paramNames = getParamNames(method);
+        List<String> paramNames = getParamNames(method);
 
-        if (ArrayUtils.isEmpty(paramNames))
+        if (CollectionUtils.isEmpty(paramNames))
         {
             return ImmutableList.of();
         }
@@ -101,58 +101,51 @@ public final class MuleExtensionAnnotationParser
         DataType[] parameterTypes = IntrospectionUtils.getMethodArgumentTypes(method);
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
-        List<ParameterDescriptor> parameterDescriptors = new LinkedList<>();
+        List<ParsedParameter> parsedParameters = new LinkedList<>();
 
-        for (int i = 0; i < paramNames.length; i++)
+
+        for (int i = 0; i < paramNames.size(); i++)
         {
             Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
 
-            if (annotations.containsKey(org.mule.extension.annotations.ParameterGroup.class))
+            if (annotations.containsKey(ParameterGroup.class))
             {
-                parseGroupParameters(parameterTypes[i], parameterDescriptors);
+                parseGroupParameters(parameterTypes[i], parsedParameters);
             }
             else
             {
-                ParameterDescriptor parameterDescriptor = doParseParameter(paramNames[i], parameterTypes[i], annotations);
-                if (parameterDescriptor != null)
-                {
-                    parameterDescriptors.add(parameterDescriptor);
-                }
+                ParsedParameter parsedParameter = doParseParameter(paramNames.get(i), parameterTypes[i], annotations);
+                parsedParameters.add(parsedParameter);
             }
         }
 
-        return parameterDescriptors;
+        return parsedParameters;
     }
 
-    private static void parseGroupParameters(DataType parameterType, List<ParameterDescriptor> parameterDescriptors)
+    private static void parseGroupParameters(DataType parameterType, List<ParsedParameter> parsedParameters)
     {
         for (Field field : IntrospectionUtils.getParameterFields(parameterType.getRawType()))
         {
-            if (field.getAnnotation(org.mule.extension.annotations.ParameterGroup.class) != null)
+            if (field.getAnnotation(org.mule.extension.annotation.api.ParameterGroup.class) != null)
             {
-                parseGroupParameters(getFieldDataType(field), parameterDescriptors);
+                parseGroupParameters(getFieldDataType(field), parsedParameters);
             }
             else
             {
-                ParameterDescriptor parameterDescriptor = doParseParameter(field.getName(), getFieldDataType(field), toMap(field.getAnnotations()));
-                if (parameterDescriptor != null)
+                ParsedParameter parsedParameter = doParseParameter(field.getName(), getFieldDataType(field), toMap(field.getAnnotations()));
+                if (parsedParameter != null)
                 {
-                    parameterDescriptors.add(parameterDescriptor);
+                    parsedParameters.add(parsedParameter);
                 }
             }
         }
     }
 
-    private static ParameterDescriptor doParseParameter(String paramName, DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
+    private static ParsedParameter doParseParameter(String paramName, DataType dataType, Map<Class<? extends Annotation>, Annotation> annotations)
     {
-        if (IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) || annotations.containsKey(UseConfig.class))
-        {
-            return null;
-        }
+        ParsedParameter parameter = new ParsedParameter(annotations);
+        parameter.setAdvertised(shouldAdvertise(dataType, annotations));
 
-        DataType dataType = parameterType;
-
-        ParameterDescriptor parameter = new ParameterDescriptor();
         parameter.setName(getParameterName(paramName, (Parameter) annotations.get(Parameter.class)));
         parameter.setType(dataType);
 
@@ -167,14 +160,6 @@ public final class MuleExtensionAnnotationParser
             parameter.setRequired(true);
         }
 
-        Payload payload = (Payload) annotations.get(Payload.class);
-        if (payload != null)
-        {
-            parameter.setRequired(false);
-            parameter.setDefaultValue("#[payload]");
-            parameter.setHidden(true);
-        }
-
         RestrictedTo typeRestriction = (RestrictedTo) annotations.get(RestrictedTo.class);
         if (typeRestriction != null)
         {
@@ -183,21 +168,22 @@ public final class MuleExtensionAnnotationParser
         return parameter;
     }
 
-    public static String[] getParamNames(Method method)
+    private static boolean shouldAdvertise(DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
     {
-        String[] paramNames;
-        try
+        return !(IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) ||
+               annotations.containsKey(UseConfig.class) ||
+               annotations.containsKey(Connection.class));
+    }
+
+    public static List<String> getParamNames(Method method)
+    {
+        ImmutableList.Builder<String> paramNames = ImmutableList.builder();
+        for (java.lang.reflect.Parameter parameter : method.getParameters())
         {
-            paramNames = new ParamReader(method.getDeclaringClass()).getParameterNames(method);
-        }
-        catch (IOException e)
-        {
-            throw new IllegalStateException(
-                    String.format("Could not read parameter names from method '%s' of class '%s'", method.getName(), method.getDeclaringClass().getName())
-                    , e);
+            paramNames.add(parameter.getName());
         }
 
-        return paramNames;
+        return paramNames.build();
     }
 
     public static Map<Class<? extends Annotation>, Annotation> toMap(Annotation[] annotations)

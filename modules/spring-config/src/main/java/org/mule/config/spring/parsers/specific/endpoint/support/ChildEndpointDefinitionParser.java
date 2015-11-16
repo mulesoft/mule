@@ -67,7 +67,7 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
             return "tap";
         }
         else if ("binding".equals(parent) || "java-interface-binding".equals(parent)
-                 || "publish-notifications".equals(parent) || "remote-dispatcher-agent".equals(parent))
+                 || "publish-notifications".equals(parent))
         {
             return "endpoint";
         }

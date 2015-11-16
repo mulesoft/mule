@@ -22,15 +22,13 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -38,9 +36,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionStrategyTestCase extends FunctionalTestCase
 {
 
     private static final String requestPayload =
@@ -64,26 +61,17 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
             "</soap:Envelope>";
 
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
-    private static final String EXCEPTION_STRATEGY_FLOW_CONF_HTTPN_XML = "exception-strategy-flow-conf-httpn.xml";
 
     private CountDownLatch latch;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public ExceptionStrategyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "exception-strategy-service-conf.xml"},
-                {ConfigVariant.FLOW, "exception-strategy-flow-conf.xml"},
-                {ConfigVariant.FLOW, EXCEPTION_STRATEGY_FLOW_CONF_HTTPN_XML}
-        });
+        return "exception-strategy-flow-conf-httpn.xml";
     }
 
     @Test
@@ -167,10 +155,6 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
 
-        if (configResources != EXCEPTION_STRATEGY_FLOW_CONF_HTTPN_XML)
-        {
-            assertTrue(response.getExceptionPayload() != null);
-        }
         assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString());
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }

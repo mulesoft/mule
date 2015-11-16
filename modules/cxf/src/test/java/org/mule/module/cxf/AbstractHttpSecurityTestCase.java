@@ -7,7 +7,7 @@
 package org.mule.module.cxf;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.ssl.DefaultTlsContextFactory;
 
 import java.io.IOException;
@@ -21,13 +21,8 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.junit.Before;
 
-public class AbstractHttpSecurityTestCase extends AbstractServiceAndFlowTestCase
+public class AbstractHttpSecurityTestCase extends FunctionalTestCase
 {
-
-    public AbstractHttpSecurityTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Before
     public void setUp() throws Exception

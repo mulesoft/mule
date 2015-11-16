@@ -9,11 +9,9 @@ package org.mule.processor.chain;
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.ProcessorExecutor;
-import org.mule.api.service.Service;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.processor.BlockingProcessorExecutor;
 import org.mule.processor.NonBlockingProcessorExecutor;
-import org.mule.service.processor.ServiceProcessorExecutor;
 
 import java.util.List;
 
@@ -32,10 +30,6 @@ public class ProcessorExecutorFactory
         if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
         {
             return new NonBlockingProcessorExecutor(event, processors, executionTemplate, copyOnVoidEvent);
-        }
-        else if (event.getFlowConstruct() instanceof Service)
-        {
-            return new ServiceProcessorExecutor(event, processors, executionTemplate, copyOnVoidEvent);
         }
         else
         {

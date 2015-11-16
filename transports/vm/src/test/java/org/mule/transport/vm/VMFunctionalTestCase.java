@@ -15,38 +15,30 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.QueueStore;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.queue.DelegateQueueManager;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class VMFunctionalTestCase extends FunctionalTestCase
 {
-
     @Rule
     public SystemProperty useOldQueueMode = new SystemProperty(DelegateQueueManager.MULE_QUEUE_OLD_MODE_KEY, "true");
 
-    public VMFunctionalTestCase(ConfigVariant variant, String configResources)
+    public VMFunctionalTestCase()
     {
-        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/vm-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "vm/vm-functional-test-flow.xml"}
-        });
+        return "vm/vm-functional-test-flow.xml";
     }
 
     @Test

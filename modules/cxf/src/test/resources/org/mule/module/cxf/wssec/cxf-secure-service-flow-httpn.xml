@@ -1,22 +1,20 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-    xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http"
-    xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
     <http:request-config name="requestConfig" host="localhost" port="${port1}" />
 
-    <flow name="cxfClient">
-        <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="1000" repeatCount="0"
-            startDelay="1000">
-            <quartz:event-generator-job/>
-        </quartz:inbound-endpoint>
+    <flow name="cxfClient" processingStrategy="synchronous">
+        <poll>
+            <fixed-frequency-scheduler frequency="1000" startDelay="1000" timeUnit="MILLISECONDS"/>
+            <set-payload value="TEST"/>
+        </poll>
         <component>
             <singleton-object class="org.mule.module.cxf.jaxws.ClientMessageGenerator"/>
         </component>

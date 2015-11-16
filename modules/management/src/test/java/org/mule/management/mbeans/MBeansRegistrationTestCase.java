@@ -8,10 +8,19 @@ package org.mule.management.mbeans;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.mule.module.management.agent.JmxApplicationAgent;
+import org.mule.module.management.agent.JmxServerNotificationAgent;
+import org.mule.module.management.mbean.ConnectorService;
+import org.mule.module.management.mbean.EndpointService;
+import org.mule.module.management.mbean.FlowConstructService;
+import org.mule.module.management.mbean.FlowConstructStats;
+import org.mule.module.management.mbean.MuleConfigurationService;
+import org.mule.module.management.mbean.MuleService;
+import org.mule.module.management.mbean.StatisticsService;
+import org.mule.module.management.support.JmxSupport;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -21,35 +30,21 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.management.agent.JmxApplicationAgent;
-import org.mule.module.management.agent.JmxServerNotificationAgent;
-import org.mule.module.management.mbean.ConnectorService;
-import org.mule.module.management.mbean.EndpointService;
-import org.mule.module.management.mbean.FlowConstructService;
-import org.mule.module.management.mbean.FlowConstructStats;
-import org.mule.module.management.mbean.ModelService;
-import org.mule.module.management.mbean.MuleConfigurationService;
-import org.mule.module.management.mbean.MuleService;
-import org.mule.module.management.mbean.RouterStats;
-import org.mule.module.management.mbean.ServiceService;
-import org.mule.module.management.mbean.StatisticsService;
-import org.mule.module.management.support.JmxSupport;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 /**
  * Verify that expected MBeans are registered based on the config.
  */
-public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
+public class MBeansRegistrationTestCase extends FunctionalTestCase
 {
 
     private MBeanServer mBeanServer;
     private String domainName;
     private JmxSupport jmxSupport;
 
-    public MBeansRegistrationTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "mbeans-test-flow.xml";
     }
 
     @Override
@@ -60,13 +55,6 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
         jmxSupport = jmxAgent.getJmxSupportFactory().getJmxSupport();
         domainName = jmxSupport.getDomainName(muleContext);
         mBeanServer = jmxAgent.getMBeanServer();
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mbeans-test-service.xml"},
-            {ConfigVariant.FLOW, "mbeans-test-flow.xml"}});
     }
 
     /**
@@ -83,7 +71,6 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
         assertTrue(mbeanClasses.contains(MuleService.class.getName()));
         assertTrue(mbeanClasses.contains(MuleConfigurationService.class.getName()));
         assertTrue(mbeanClasses.contains(StatisticsService.class.getName()));
-        assertTrue(mbeanClasses.contains(ModelService.class.getName()));
 
         // Only if registerMx4jAdapter="true"
         assertTrue(mbeanClasses.contains(mx4j.tools.adaptor.http.HttpAdaptor.class.getName()));
@@ -99,20 +86,10 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
         List<String> mbeanClasses = getMBeanClasses();
 
         assertTrue(mbeanClasses.contains(ConnectorService.class.getName()));
-        assertTrue(mbeanClasses.contains(ModelService.class.getName()));
-        
-        if(variant.equals(ConfigVariant.SERVICE))
-        {
-            assertTrue(mbeanClasses.contains(ServiceService.class.getName()));
-            assertTrue(mbeanClasses.contains(RouterStats.class.getName()));
-        }
-        else
-        {
-            assertTrue(mbeanClasses.contains(FlowConstructService.class.getName()));            
-            assertTrue(mbeanClasses.contains(FlowConstructStats.class.getName()));
-        }
-               
-        
+
+        assertTrue(mbeanClasses.contains(FlowConstructService.class.getName()));
+        assertTrue(mbeanClasses.contains(FlowConstructStats.class.getName()));
+
         assertTrue(mbeanClasses.contains(EndpointService.class.getName()));
     }
 

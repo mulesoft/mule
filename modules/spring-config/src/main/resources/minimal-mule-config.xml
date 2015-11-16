@@ -99,6 +99,8 @@
             <spring:constructor-arg  ref="_muleContext"/>
         </spring:bean>
 
+        <spring:bean name="_muleTimeSupplier" class="org.mule.time.TimeSupplier" />
+
         <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
         the transformers will be available even when using the TransientRegistry only -->
 
@@ -112,8 +114,6 @@
 
         <notifications>
             <notification event="CONTEXT"/>
-            <notification event="MODEL"/>
-            <notification event="SERVICE"/>
             <notification event="SECURITY"/>
             <notification event="MANAGEMENT"/>
             <notification event="CONNECTION"/>

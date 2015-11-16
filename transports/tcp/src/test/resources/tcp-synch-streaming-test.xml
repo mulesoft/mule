@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
@@ -12,13 +12,9 @@
         <tcp:streaming-protocol/>
     </tcp:connector>
 
-    <model name="main">
-        <service name="echo">
-            <inbound>
-                <tcp:inbound-endpoint address="tcp://localhost:${port1}?endpointName=myEndpoint"
-                    exchange-pattern="one-way" name="inEcho"/>
-            </inbound>
-            <echo-component/>
-        </service>
-    </model>
+    <flow name="echo">
+        <tcp:inbound-endpoint address="tcp://localhost:${port1}?endpointName=myEndpoint"
+                              exchange-pattern="one-way" name="inEcho"/>
+        <echo-component/>
+    </flow>
 </mule>

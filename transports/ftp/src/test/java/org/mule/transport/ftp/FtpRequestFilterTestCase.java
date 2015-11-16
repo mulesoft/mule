@@ -12,11 +12,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class FtpRequestFilterTestCase extends AbstractFtpServerTestCase
 {
@@ -25,17 +21,11 @@ public class FtpRequestFilterTestCase extends AbstractFtpServerTestCase
     private static final String FILE_XML = "file.xml";
     private static final String FTP_FILTER_ENDPOINT = "ftpFilterEndpoint";
 
-    public FtpRequestFilterTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "ftp-request-filter-config.xml"}
-        });
+        return "ftp-request-filter-config.xml";
     }
 
     @Test

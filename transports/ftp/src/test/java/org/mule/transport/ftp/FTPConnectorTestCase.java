@@ -6,13 +6,14 @@
  */
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.construct.Flow;
 import org.mule.transport.AbstractConnectorTestCase;
 
 import java.util.HashMap;
@@ -20,8 +21,6 @@ import java.util.Map;
 
 import org.apache.commons.pool.ObjectPool;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Test configuration of FTP connector. It's all done in code, no configuration files
@@ -59,9 +58,8 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     public void testConnectorPollingFrequency() throws Exception
     {
         InboundEndpoint endpoint = getTestInboundEndpoint("mock");
-        Service service = getTestService("apple", Apple.class);
         FtpConnector connector = (FtpConnector)getConnector();
-        MessageReceiver receiver = connector.createReceiver(service, endpoint);
+        MessageReceiver receiver = connector.createReceiver(mock(Flow.class), endpoint);
         assertEquals("Connector's polling frequency must not be ignored.", POLLING_FREQUENCY,
             ((FtpMessageReceiver)receiver).getFrequency());
     }
@@ -78,9 +76,8 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
 
         InboundEndpoint endpoint = getTestInboundEndpoint("mock", null, null, null, props, null);
 
-        Service service = getTestService("apple", Apple.class);
         FtpConnector connector = (FtpConnector)getConnector();
-        MessageReceiver receiver = connector.createReceiver(service, endpoint);
+        MessageReceiver receiver = connector.createReceiver(mock(Flow.class), endpoint);
         assertEquals("Polling frequency endpoint override must not be ignored.", POLLING_FREQUENCY_OVERRIDE,
             ((FtpMessageReceiver)receiver).getFrequency());
     }

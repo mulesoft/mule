@@ -6,10 +6,10 @@
  */
 package org.mule.module.xml.config;
 
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.module.xml.transformer.XsltTransformer;
 
-public class XsltTransformerDefinitionParser extends MessageProcessorDefinitionParser
+public class XsltTransformerDefinitionParser extends TransformerMessageProcessorDefinitionParser
 {
     public XsltTransformerDefinitionParser()
     {

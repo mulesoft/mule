@@ -8,11 +8,11 @@ package org.mule.config.spring.parsers;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,17 +20,15 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration. 
  */
-public abstract class AbstractBadConfigTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractBadConfigTestCase extends FunctionalTestCase
 {
-    private String configResources;
-    
-    public AbstractBadConfigTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, "");
-        this.configResources = configResources;
-    }
-
     protected final transient Log logger = LogFactory.getLog(getClass());
+
+    @Override
+    protected MuleContext createMuleContext() throws Exception
+    {
+        return null;
+    }
 
     public void assertErrorContains(String phrase) throws Exception
     {
@@ -54,6 +52,6 @@ public abstract class AbstractBadConfigTestCase extends AbstractServiceAndFlowTe
 
     protected ConfigurationBuilder getConfigurationBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(configResources);
+        return new SpringXmlConfigurationBuilder(getConfigFile());
     }
 }

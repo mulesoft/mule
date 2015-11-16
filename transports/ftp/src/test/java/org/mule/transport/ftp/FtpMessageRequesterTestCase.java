@@ -21,24 +21,17 @@ import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
 {
     private static final String TEST_FILE_NAME = "test.txt";
     private static final String TEST_FILE_NAME_2 = "_test.txt";
     private static final String separator = "/";
-    public FtpMessageRequesterTestCase(ConfigVariant variant, String configResources)
+    
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "ftp-message-requester-test.xml"}
-        });
+        return "ftp-message-requester-test.xml";
     }
 
     @Test

@@ -26,7 +26,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.chain(new StringAppendTransformer("1"), new ResponseMessageProcessorAdapter(
             new StringAppendTransformer("3")), new StringAppendTransformer("2"));
-        assertEquals("0123", builder.build().process(getTestEventUsingFlow("0")).getMessageAsString());
+        assertEquals("0123", builder.build().process(getTestEvent("0")).getMessageAsString());
     }
 
     @Test
@@ -35,7 +35,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.chain(new StringAppendTransformer("1"), new ResponseMessageProcessorAdapter(
             new ReturnNullMP()), new StringAppendTransformer("2"));
-        assertEquals("012", builder.build().process(getTestEventUsingFlow("0")).getMessageAsString());
+        assertEquals("012", builder.build().process(getTestEvent("0")).getMessageAsString());
     }
 
     @Test
@@ -47,7 +47,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
             new ResponseMessageProcessorAdapter(new DefaultMessageProcessorChainBuilder().chain(
                 new StringAppendTransformer("a"), new StringAppendTransformer("b")).build()),
             new StringAppendTransformer("2"));
-        assertEquals("012ab", builder.build().process(getTestEventUsingFlow("0")).getMessageAsString());
+        assertEquals("012ab", builder.build().process(getTestEvent("0")).getMessageAsString());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
             new ResponseMessageProcessorAdapter(new DefaultMessageProcessorChainBuilder().chain(
                 new StringAppendTransformer("a"), new StringAppendTransformer("b"), new ReturnNullMP())
                 .build()), new StringAppendTransformer("2"));
-        assertEquals("012", builder.build().process(getTestEventUsingFlow("0")).getMessageAsString());
+        assertEquals("012", builder.build().process(getTestEvent("0")).getMessageAsString());
     }
 
     private static class ReturnNullMP implements MessageProcessor

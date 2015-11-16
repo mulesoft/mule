@@ -6,8 +6,6 @@
  */
 package org.mule.transport.email.functional;
 
-import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.FLOW;
-
 import java.util.Collection;
 
 import org.junit.runners.Parameterized;
@@ -17,7 +15,7 @@ public class ImapRetrieveMessagesNoDeleteTestCase extends AbstractImapRetrieveMe
 
     public ImapRetrieveMessagesNoDeleteTestCase(int initialReadMessages)
     {
-        super(FLOW, "imap-no-delete-messages-test.xml", initialReadMessages);
+        super(initialReadMessages);
     }
 
     @Parameterized.Parameters
@@ -25,4 +23,11 @@ public class ImapRetrieveMessagesNoDeleteTestCase extends AbstractImapRetrieveMe
     {
         return READ_MESSAGES_PARAMETERS;
     }
+
+    @Override
+    protected String getConfigFile()
+    {
+        return "imap-no-delete-messages-test.xml";
+    }
+
 }

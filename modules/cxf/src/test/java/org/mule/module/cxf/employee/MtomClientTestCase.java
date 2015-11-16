@@ -7,38 +7,26 @@
 package org.mule.module.cxf.employee;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MtomClientTestCase extends AbstractServiceAndFlowTestCase
+public class MtomClientTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public MtomClientTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "mtom-client-conf-flow-httpn.xml";
     }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mtom-client-conf-service.xml"},
-            {ConfigVariant.FLOW, "mtom-client-conf-flow.xml"},
-            {ConfigVariant.FLOW, "mtom-client-conf-flow-httpn.xml"}
-        });
-    }      
 
     @Test
     public void testEchoService() throws Exception

@@ -15,7 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -38,7 +38,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
     private static final int AGE = 31;
 
     private ResolverSet set;
-    private Map<Parameter, ValueResolver> mapping;
+    private Map<ParameterModel, ValueResolver> mapping;
 
     @Mock
     private MuleEvent event;
@@ -78,11 +78,11 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalStateException.class)
     public void addRepeatedParameter() throws Exception
     {
-        Parameter parameter = getParameter("name", String.class);
+        ParameterModel parameterModel = getParameter("name", String.class);
         ValueResolver<String> resolver = getResolver(NAME);
 
-        set.add(parameter, resolver);
-        set.add(parameter, resolver);
+        set.add(parameterModel, resolver);
+        set.add(parameterModel, resolver);
     }
 
     @Test
@@ -101,20 +101,20 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
         assertThat(set.isDynamic(), is(true));
     }
 
-    private void assertResult(ResolverSetResult result, Map<Parameter, ValueResolver> mapping) throws Exception
+    private void assertResult(ResolverSetResult result, Map<ParameterModel, ValueResolver> mapping) throws Exception
     {
         assertThat(result, is(notNullValue()));
-        for (Map.Entry<Parameter, ValueResolver> entry : mapping.entrySet())
+        for (Map.Entry<ParameterModel, ValueResolver> entry : mapping.entrySet())
         {
             Object value = result.get(entry.getKey());
             assertThat(value, is(entry.getValue().resolve(event)));
         }
     }
 
-    private ResolverSet buildSet(Map<Parameter, ValueResolver> mapping)
+    private ResolverSet buildSet(Map<ParameterModel, ValueResolver> mapping)
     {
         ResolverSet set = new ResolverSet();
-        for (Map.Entry<Parameter, ValueResolver> entry : mapping.entrySet())
+        for (Map.Entry<ParameterModel, ValueResolver> entry : mapping.entrySet())
         {
             set.add(entry.getKey(), entry.getValue());
         }

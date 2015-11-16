@@ -6,6 +6,7 @@
  */
 package org.mule.lifecycle.phases;
 
+import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.component.Component;
 import org.mule.api.config.Config;
@@ -13,12 +14,11 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.model.Model;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.annotation.AnnotationMetaData;
@@ -37,7 +37,7 @@ import javax.annotation.PostConstruct;
  * <p/>
  * This phase is responsible for initialising objects. Any object that implements {@link org.mule.api.lifecycle.Initialisable} will
  * have its {@link org.mule.api.lifecycle.Initialisable#initialise()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.model.Model}, {@link org.mule.api.service.Service}, followed
+ * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.construct.FlowConstruct}, followed
  * by any other object that implements {@link org.mule.api.lifecycle.Initialisable}.
  *
  * @see org.mule.api.MuleContext
@@ -52,15 +52,15 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase
         super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
         registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
 
-        Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
-        startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Model.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
-        setOrderedLifecycleObjects(startOrderedObjects);
-        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, OutboundRouterCollection.class, OutboundRouter.class});
+        Set<LifecycleObject> orderedObjects = new LinkedHashSet<>();
+        orderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
+        orderedObjects.add(new NotificationLifecycleObject(Config.class));
+        orderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        orderedObjects.add(new NotificationLifecycleObject(Agent.class));
+        orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
+        orderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
+        setOrderedLifecycleObjects(orderedObjects);
+        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, OutboundRouter.class, MuleContext.class});
     }
 
 

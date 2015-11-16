@@ -15,31 +15,26 @@ import org.mule.tck.probe.Prober;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class FtpRequestTimeoutTestCase extends AbstractFtpServerTestCase
 {
 
     private static CountDownLatch latch = new CountDownLatch(1);
 
-    public FtpRequestTimeoutTestCase(ConfigVariant variant, String configResources)
+    public FtpRequestTimeoutTestCase()
     {
-        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
+
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "ftp-request-timeout-config.xml"}
-        });
+        return "ftp-request-timeout-config.xml";
     }
 
     @Test

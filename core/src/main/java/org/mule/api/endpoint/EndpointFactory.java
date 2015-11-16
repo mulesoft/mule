@@ -68,22 +68,6 @@ public interface EndpointFactory extends MuleContextAware
     OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException;
 
     /**
-     * @param endpointUri
-     * @throws MuleException
-     * @deprecated
-     */
-    @Deprecated
-    InboundEndpoint getInboundEndpoint(EndpointURI endpointUri) throws MuleException;
-
-    /**
-     * @param endpointUri
-     * @throws MuleException
-     * @deprecated
-     */
-    @Deprecated
-    OutboundEndpoint getOutboundEndpoint(EndpointURI endpointUri) throws MuleException;
-
-    /**
      * Used to retrieve the an EndpointBuilder equal to the one would be used to create an endpoint.<br/><br/>
      *  This is
      * useful if you need to customize a builder before creation of an endpoint as you can use this method to

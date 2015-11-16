@@ -18,15 +18,13 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.CharSetUtils;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -39,9 +37,8 @@ import org.hamcrest.core.IsNull;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
 {
     public static final int TIMEOUT = 5000;
     public static final String JSON_REQUEST = "{\"userId\":\"15\"}";
@@ -57,18 +54,16 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public RollbackExceptionStrategyTestCase(ConfigVariant variant, String configResources)
+    public RollbackExceptionStrategyTestCase()
     {
-        super(variant, configResources);
         System.setProperty("maxRedelivery", String.valueOf(MAX_REDELIVERY));
         System.setProperty("shortMaxRedelivery", String.valueOf(SHORT_MAX_REDELIVERY));
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/rollback-exception-strategy-use-case-service.xml"},
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/rollback-exception-strategy-use-case-flow.xml"}});
+        return "org/mule/test/integration/exceptions/rollback-exception-strategy-use-case-flow.xml";
     }
 
     @Test
@@ -116,7 +111,8 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
         final MutableInt deliveredTimes = new MutableInt(0);
         LocalMuleClient client = muleContext.getClient();
-        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
+        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
+        {
             @Override
             public void onNotification(ExceptionNotification notification)
             {
@@ -147,7 +143,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
 	            latch.countDown();
 	        }
 	    });
-	    client.dispatch("vm://in5","some message",null);
+	    client.dispatch("vm://in5", "some message", null);
 	    if (!latch.await(TIMEOUT, TimeUnit.MILLISECONDS))
 	    {
 	        fail("message should have been delivered at least 5 times");
@@ -268,7 +264,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         }
         result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
         assertThat(result,IsNull.<Object>notNullValue());
-        assertThat(result.getPayloadAsString(),is(MESSAGE + " apt4 apt5"));
+        assertThat(result.getPayloadAsString(), is(MESSAGE + " apt4 apt5"));
     }
 
     @Test
@@ -286,7 +282,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
                 latch.countDown();
             }
         });
-        client.dispatch("vm://in3","some message",null);
+        client.dispatch("vm://in3", "some message", null);
         if (!latch.await(TIMEOUT, TimeUnit.MILLISECONDS))
         {
             fail("message should have been delivered at least 5 times");

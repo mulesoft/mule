@@ -8,21 +8,16 @@ package org.mule.transport.tcp.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 
 import org.junit.Test;
 
-public abstract class AbstractStreamingDownloadMule1389TestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractStreamingDownloadMule1389TestCase extends FunctionalTestCase
 {
-    public AbstractStreamingDownloadMule1389TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Test
     public void testDownloadSpeed() throws Exception

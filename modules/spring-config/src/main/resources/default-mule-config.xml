@@ -6,12 +6,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-
-    <model name="_muleSystemModel"/>
-
     <spring:beans>
-
-        <spring:bean name="_muleAnnotationsProcessor" class="org.mule.config.spring.processors.DecoratingFlowAnnotationsBeanProcessor"/>
 
         <spring:bean name="_muleTransformerAnnotationProcessor" class="org.mule.config.spring.processors.TransformerAnnotatedBeanProcessor"/>
 

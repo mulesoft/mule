@@ -8,6 +8,4 @@
 
     <!-- Empty default configuration file for testing MuleServer. -->
 
-    <model name="dummy"/>
-    
 </mule>

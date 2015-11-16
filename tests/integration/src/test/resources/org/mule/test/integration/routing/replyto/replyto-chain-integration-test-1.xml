@@ -1,52 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <!-- Testing with ActiveMq -->
     <jms:activemq-connector name="jmsConnector"/>
-    
-    <model name="InjectionProblem">
-        <service name="pojo1">
-            <inbound>
-                <inbound-endpoint address="vm://pojo1" exchange-pattern="request-response" 
-                    responseTimeout="10000"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="jms://pojo2" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-            <async-reply timeout="7000">
-                <inbound-endpoint address="jms://response" exchange-pattern="one-way"/>
-                <single-async-reply-router/>
-            </async-reply>
-        </service>
 
-        <service name="pojo2">
-            <inbound>
-                <inbound-endpoint address="jms://pojo2" exchange-pattern="one-way"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="jms://pojo3" exchange-pattern="one-way"/>
-                    <reply-to address="jms://response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="pojo1">
+        <inbound-endpoint address="vm://pojo1" exchange-pattern="request-response"
+                          responseTimeout="10000"/>
+        <echo-component/>
+        <request-reply timeout="7000">
+            <outbound-endpoint address="jms://pojo2" exchange-pattern="one-way"/>
+            <inbound-endpoint address="jms://response" exchange-pattern="one-way"/>
+        </request-reply>
+    </flow>
 
-        <service name="pojo3">
-            <inbound>
-                <inbound-endpoint address="jms://pojo3" exchange-pattern="one-way"/>
-            </inbound>
-            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
-        </service>
-    </model>
+    <flow name="pojo2">
+        <inbound-endpoint address="jms://pojo2" exchange-pattern="one-way"/>
+        <echo-component/>
+        <request-reply>
+            <outbound-endpoint address="jms://pojo3" exchange-pattern="one-way"/>
+            <inbound-endpoint address="jms://response"/>
+        </request-reply>
+    </flow>
+
+    <flow name="pojo3">
+        <inbound-endpoint address="jms://pojo3" exchange-pattern="one-way"/>
+        <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+    </flow>
+
 </mule>

@@ -8,10 +8,6 @@ package org.mule.transport.servlet.jetty;
 
 public class JettyContinuationsTwoEndpointsSinglePortTestCase extends JettyTwoEndpointsSinglePortTestCase
 {
-    public JettyContinuationsTwoEndpointsSinglePortTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Override
     protected String getConfigFile()

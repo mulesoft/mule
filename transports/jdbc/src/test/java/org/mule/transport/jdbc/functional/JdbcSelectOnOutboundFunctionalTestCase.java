@@ -9,34 +9,26 @@ package org.mule.transport.jdbc.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
-    public JdbcSelectOnOutboundFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String[] getConfigFiles()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-select-outbound-service.xml"},
-            {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-select-outbound-flow.xml"}
-        });
+        return new String[] {
+                AbstractJdbcFunctionalTestCase.getConfig(),
+                "jdbc-select-outbound-flow.xml"
+        };
     }
 
     @Test

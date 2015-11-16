@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-modules</artifactId>
@@ -14,32 +14,24 @@
     <description>Modules which extend the Mule Core but do not qualify as Transports</description>
 
     <modules>
-        <module>atom</module>
         <module>annotations</module>
         <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
-        <module>bpm</module>
         <module>cxf</module>
         <module>db</module>
         <module>devkit-support</module>
-        <module>drools</module>
         <module>extensions-support</module>
         <module>launcher</module>
         <module>client</module>
-        <module>guice</module>
         <module>http</module>
         <module>jaas</module>
         <module>jboss-transactions</module>
-        <module>jbpm</module>
-        <module>jersey</module>
         <module>json</module>
         <module>management</module>
         <module>oauth</module>
-        <module>ognl</module>
         <module>pgp</module>
         <module>reboot</module>
-        <module>rss</module>
         <module>schedulers</module>
         <module>scripting</module>
         <module>spring-extras</module>
@@ -49,7 +41,6 @@
         <module>extensions-spring-support</module>
         
         <module>spring-security</module>
-        <module>sxc</module>
         <module>tomcat</module>
         <module>ws</module>
         <module>xml</module>

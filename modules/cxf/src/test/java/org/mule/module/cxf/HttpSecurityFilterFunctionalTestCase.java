@@ -11,12 +11,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConstants;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -27,10 +25,10 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTestCase
 {
+    
     @Rule
     public SystemProperty disablePropertiesMapping = new SystemProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY, "false");
 
@@ -49,22 +47,12 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
-    
-    public HttpSecurityFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "http-security-filter-test-flow-httpn.xml";
     }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-security-filter-test-service.xml"},
-            {ConfigVariant.FLOW, "http-security-filter-test-flow.xml"},
-            {ConfigVariant.FLOW, "http-security-filter-test-flow-httpn.xml"}
-        });
-    }      
-
 
     /**
      * By putting this test method that uses https first we can test MULE-4558
@@ -90,8 +78,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertThat(get.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                                                 + "but there was no security context on the session. Authentication denied on endpoint" ));
+            assertThat(get.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.transport.http.filters.HttpBasicAuthenticationFilter " +
+                                                                 "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {
@@ -115,8 +103,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
         {
             int status = client.executeMethod(post);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertThat(post.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                                                 + "but there was no security context on the session. Authentication denied on endpoint" ));
+            assertThat(post.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.transport.http.filters.HttpBasicAuthenticationFilter " +
+                                                                  "but there was no security context on the session. Authentication denied on endpoint" ));
         }
         finally
         {

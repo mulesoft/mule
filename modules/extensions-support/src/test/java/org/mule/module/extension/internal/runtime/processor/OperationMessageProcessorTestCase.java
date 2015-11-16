@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,22 +24,27 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.extension.runtime.OperationExecutor;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.OperationContext;
+import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.nio.charset.Charset;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -51,18 +55,21 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     private static final String CONFIG_NAME = "config";
 
     @Mock
-    private Extension extension;
+    private ExtensionModel extensionModel;
 
     @Mock
-    private Operation operation;
+    private ConfigurationModel configurationModel;
 
     @Mock
-    private ExtensionManagerAdapter extensionManager;
+    private OperationModel operationModel;
+
+    @Mock
+    private ExtensionManager extensionManager;
 
     @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class})
     private OperationExecutor operationExecutor;
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -75,18 +82,30 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     private MuleEvent event;
 
     @Mock
-    private Object configurationInstance;
+    private ConfigurationInstance<Object> configurationInstance;
+
+    @Mock
+    private Object configuration;
 
 
     private OperationMessageProcessor messageProcessor;
-    private String configurationInstanceName = CONFIG_NAME;
+    private String configurationName = CONFIG_NAME;
 
     @Before
     public void before() throws Exception
     {
-        when(operation.getExecutor()).thenReturn(operationExecutor);
+        configureMockEvent(event);
+
+        when(operationModel.getExecutor()).thenReturn(operationExecutor);
         when(resolverSet.resolve(event)).thenReturn(parameters);
-        when(extensionManager.getConfigurationInstance(same(extension), same(configurationInstanceName), any(OperationContext.class))).thenReturn(configurationInstance);
+
+        when(configurationInstance.getName()).thenReturn(CONFIG_NAME);
+        when(configurationInstance.getModel()).thenReturn(configurationModel);
+        when(configurationInstance.getValue()).thenReturn(configuration);
+
+        when(extensionManager.getConfiguration(CONFIG_NAME, event)).thenReturn(configurationInstance);
+        when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
+
         messageProcessor = createOperationMessageProcessor();
     }
 
@@ -110,14 +129,13 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
         OperationContextAdapter operationContextAdapter = (OperationContextAdapter) operationContext;
 
         assertThat(operationContextAdapter.getEvent(), is(sameInstance(event)));
-        assertThat(operationContextAdapter.getOperation(), is(sameInstance(operation)));
-        assertThat(operationContextAdapter.getConfigurationInstance(), is(sameInstance(configurationInstance)));
+        assertThat(operationContextAdapter.getConfiguration().getValue(), is(sameInstance(configuration)));
     }
 
     @Test
     public void operationReturnsMuleEvent() throws Exception
     {
-        MuleEvent responseEvent = mock(MuleEvent.class);
+        MuleEvent responseEvent = configureMockEvent(mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS));
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(responseEvent);
 
         assertThat(messageProcessor.process(event), is(sameInstance(responseEvent)));
@@ -147,11 +165,12 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     @Test
     public void executesWithDefaultConfig() throws Exception
     {
-        configurationInstanceName = null;
+        configurationName = null;
         messageProcessor = createOperationMessageProcessor();
 
         Object defaultConfigInstance = new Object();
-        when(extensionManager.getConfigurationInstance(same(extension), any(OperationContext.class))).thenReturn(defaultConfigInstance);
+        when(configurationInstance.getValue()).thenReturn(defaultConfigInstance);
+        when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
 
         ArgumentCaptor<OperationContext> operationContextCaptor = ArgumentCaptor.forClass(OperationContext.class);
         messageProcessor.process(event);
@@ -160,7 +179,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
         OperationContext operationContext = operationContextCaptor.getValue();
 
         assertThat(operationContext, is(instanceOf(OperationContextAdapter.class)));
-        assertThat(operationContext.getConfigurationInstance(), is(sameInstance(defaultConfigInstance)));
+        assertThat(operationContext.getConfiguration().getValue(), is(sameInstance(defaultConfigInstance)));
     }
 
     @Test
@@ -193,10 +212,16 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
 
     private OperationMessageProcessor createOperationMessageProcessor() throws Exception
     {
-        OperationMessageProcessor messageProcessor = new OperationMessageProcessor(extension, operation, configurationInstanceName, resolverSet, extensionManager);
+        OperationMessageProcessor messageProcessor = new OperationMessageProcessor(extensionModel, operationModel, configurationName, resolverSet, extensionManager);
         messageProcessor.setMuleContext(muleContext);
         messageProcessor.initialise();
 
         return messageProcessor;
+    }
+
+    private MuleEvent configureMockEvent(MuleEvent mockEvent)
+    {
+        when(mockEvent.getMessage().getEncoding()).thenReturn(Charset.defaultCharset().name());
+        return mockEvent;
     }
 }

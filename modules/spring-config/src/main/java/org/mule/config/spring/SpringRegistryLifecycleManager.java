@@ -22,16 +22,15 @@ import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.extension.ExtensionManager;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
@@ -78,21 +77,21 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             super();
 
             Set<LifecycleObject> initOrderedObjects = new LinkedHashSet<>();
-            initOrderedObjects.add(new NotificationLifecycleObject(ExtensionManager.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionEvaluator.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionEnricher.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguage.class));
+            initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(Model.class));
             initOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
             setOrderedLifecycleObjects(initOrderedObjects);
 
             setIgnoredObjectTypes(new Class[] {
+                    ExtensionManager.class,
                     SpringRegistry.class,
                     SpringRegistryBootstrap.class,
                     Component.class,
@@ -102,7 +101,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
                     AbstractAsyncRequestReplyRequester.class,
                     OutboundRouter.class,
                     MessageProcessorChain.class,
-                    OutboundRouterCollection.class,
                     MuleContext.class
             });
         }
@@ -122,7 +120,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             setIgnoredObjectTypes(new Class[] {
                     Component.class,
                     MessageSource.class,
-                    OutboundRouterCollection.class,
                     OutboundRouter.class,
                     Transformer.class,
                     MuleContext.class,

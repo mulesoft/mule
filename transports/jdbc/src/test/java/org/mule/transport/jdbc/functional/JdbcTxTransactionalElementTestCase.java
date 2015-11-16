@@ -7,35 +7,25 @@
 package org.mule.transport.jdbc.functional;
 
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.api.MuleEvent;
+import org.mule.construct.Flow;
 
 import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.mule.api.MuleEvent;
-import org.mule.api.transaction.TransactionException;
-import org.mule.api.transport.DispatchException;
-import org.mule.construct.Flow;
 
 public class JdbcTxTransactionalElementTestCase extends AbstractJdbcFunctionalTestCase
 {
-    public JdbcTxTransactionalElementTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String[] getConfigFiles()
     {
-        super(variant, configResources);
+        return new String[] {
+                AbstractJdbcFunctionalTestCase.getConfig(),
+                "jdbc-tx-transactional-element.xml"
+        };
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-                {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-tx-transactional-element.xml"}
-        });
-    }
-    
     @Before
     public void setUp() throws Exception
     {

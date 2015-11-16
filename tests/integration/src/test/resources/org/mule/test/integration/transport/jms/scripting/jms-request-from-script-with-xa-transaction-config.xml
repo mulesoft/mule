@@ -19,41 +19,26 @@
 
     <jms:activemq-xa-connector name="jmsConnectorXA" maxRedelivery="3" disableTemporaryReplyToDestinations="true"/>
 
-    <model name="testModel">
-        <service name="addDataToQueue">
-            <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="fcs.cache.update.queue"
-                                           connector-ref="jmsConnector" exchange-pattern="request-response">
-                    </jms:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="addDataToQueue">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <jms:outbound-endpoint queue="fcs.cache.update.queue"
+                               connector-ref="jmsConnector" exchange-pattern="request-response">
+        </jms:outbound-endpoint>
+    </flow>
 
-        <service name="startBatch">
-            <inbound>
-                <vm:inbound-endpoint path="startBatch" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="fcs.cache.xa.batch.queue" connector-ref="jmsConnector"
-                                           exchange-pattern="request-response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
- 
-        <service name="processBatchData">
-            <inbound>
-                <jms:inbound-endpoint queue="fcs.cache.xa.batch.queue" connector-ref="jmsConnectorXA"
-                                      responseTimeout="10000">
-                    <xa-transaction action="ALWAYS_BEGIN" timeout="10000"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <scripting:component>
-                <scripting:script engine="groovy"><![CDATA[
+    <flow name="startBatch">
+        <vm:inbound-endpoint path="startBatch" exchange-pattern="request-response"/>
+        <jms:outbound-endpoint queue="fcs.cache.xa.batch.queue" connector-ref="jmsConnector"
+                               exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="processBatchData">
+        <jms:inbound-endpoint queue="fcs.cache.xa.batch.queue" connector-ref="jmsConnectorXA"
+                              responseTimeout="10000">
+            <xa-transaction action="ALWAYS_BEGIN" timeout="10000"/>
+        </jms:inbound-endpoint>
+        <scripting:component>
+            <scripting:script engine="groovy"><![CDATA[
                     import org.mule.api.*;
 
                      String jmsUrl = "jms://fcs.cache.update.queue?connector=jmsConnectorXA";
@@ -68,18 +53,14 @@
                     }
                     return result;
                 ]]>
-                </scripting:script>
-            </scripting:component>
+            </scripting:script>
+        </scripting:component>
 
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="status.queue"
-                                           connector-ref="jmsConnectorXA">
-                        <xa-transaction action="BEGIN_OR_JOIN"/>
-                    </jms:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+        <jms:outbound-endpoint queue="status.queue"
+                               connector-ref="jmsConnectorXA">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+    </flow>
+
 </mule>
 

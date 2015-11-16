@@ -71,9 +71,9 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     @Test
     public void setSessionVariableDefaultDataType() throws Exception
     {
-        muleEvent.setSessionVariable(PROPERTY_NAME, PROPERTY_VALUE);
+        muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
 
-        DataType<?> dataType = muleEvent.getSessionVariableDataType(PROPERTY_NAME);
+        DataType<?> dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
         assertThat(dataType, DataTypeMatcher.like(String.class, MimeTypes.ANY, null));
     }
 
@@ -83,9 +83,9 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
         DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
         dataType.setEncoding(CUSTOM_ENCODING);
 
-        muleEvent.setSessionVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType);
+        muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
-        DataType<?> actualDataType = muleEvent.getSessionVariableDataType(PROPERTY_NAME);
+        DataType<?> actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
         assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
     }
 

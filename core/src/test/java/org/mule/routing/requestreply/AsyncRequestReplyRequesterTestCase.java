@@ -19,10 +19,8 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
-import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -37,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.resource.spi.work.Work;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestCase
@@ -73,7 +72,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         asyncReplyMP.setListener(target);
         asyncReplyMP.setReplySource(target.getMessageSource());
 
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestService());
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
 
         MuleEvent resultEvent = asyncReplyMP.process(event);
 
@@ -101,8 +100,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         asyncReplyMP.setListener(asyncMP);
         asyncReplyMP.setReplySource(target.getMessageSource());
 
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestService(),
-            getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
 
         MuleEvent resultEvent = asyncReplyMP.process(event);
 
@@ -133,8 +131,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         asyncReplyMP.setListener(asyncMP);
         asyncReplyMP.setReplySource(target.getMessageSource());
 
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestService(),
-            getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
 
         try
         {
@@ -148,6 +145,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     }
 
     @Test
+    @Ignore("See MULE-8830")
     public void returnsNullWhenInterruptedWhileWaitingForReply() throws Exception
     {
         final Latch fakeLatch = new Latch()
@@ -168,8 +166,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
             }
         };
 
-        final MuleEvent event = getTestEvent(TEST_MESSAGE, getTestService(),
-                                             getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        final MuleEvent event = getTestEvent(TEST_MESSAGE);
 
         final CountDownLatch processingLatch = new CountDownLatch(1);
 
@@ -208,6 +205,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     }
 
     @Test
+    @Ignore("See MULE-8830")
     public void testMultiple() throws Exception
     {
         asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
@@ -228,9 +226,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         asyncReplyMP.setListener(asyncMP);
         asyncReplyMP.setReplySource(target.getMessageSource());
 
-        final InboundEndpoint inboundEndpoint = getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
-        final Service service = getTestService();
-
         final AtomicInteger count = new AtomicInteger();
         for (int i = 0; i < 500; i++)
         {
@@ -241,7 +236,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
                     MuleEvent event;
                     try
                     {
-                        event = getTestEvent(TEST_MESSAGE, service, inboundEndpoint);
+                        event = getTestEvent(TEST_MESSAGE);
                         MuleEvent resultEvent = asyncReplyMP.process(event);
 
                         // Can't assert same because we copy event for async currently

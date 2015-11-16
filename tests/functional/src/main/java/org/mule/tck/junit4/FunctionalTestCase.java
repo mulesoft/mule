@@ -6,9 +6,7 @@
  */
 package org.mule.tck.junit4;
 
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -22,14 +20,11 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
-import org.mule.api.service.Service;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
-import org.mule.construct.SimpleService;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.functional.FlowAssert;
@@ -139,15 +134,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      */
     protected Object getComponent(FlowConstruct flowConstruct) throws Exception
     {
-        if (flowConstruct instanceof Service)
-        {
-            return getComponentObject(((Service) flowConstruct).getComponent());
-        }
-        else if (flowConstruct instanceof SimpleService)
-        {
-            return getComponentObject(((SimpleService) flowConstruct).getComponent());
-        }
-        else if (flowConstruct instanceof AbstractPipeline)
+        if (flowConstruct instanceof AbstractPipeline)
         {
             AbstractPipeline flow = (AbstractPipeline) flowConstruct;
             // Retrieve the first component
@@ -209,16 +196,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected void stopFlowConstruct(String flowName) throws Exception
     {
         FlowConstruct flowConstruct = getFlowConstruct(flowName);
-        if (flowConstruct instanceof Service)
-        {
-            Service service = (Service) flowConstruct;
-            service.stop();
-        }
-        else
-        {
-            Flow flow = (Flow) flowConstruct;
-            flow.stop();
-        }
+        Flow flow = (Flow) flowConstruct;
+        flow.stop();
     }
 
     /**

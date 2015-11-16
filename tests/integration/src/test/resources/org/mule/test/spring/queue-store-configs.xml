@@ -1,76 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <model name="main">
-        <service name="serviceDefault">
-            <inbound>
-                <inbound-endpoint address="test://foo1"/>
-            </inbound>
-            <echo-component/>
-            <!-- no explicit queue-profile configured -->
-        </service>
-        
-        <service name="serviceNoObjectStore">
-            <inbound>
-                <inbound-endpoint address="test://foo2"/>
-            </inbound>
-            <echo-component/>
-            <!--  no explicit configuration of the ObjectStore to use -->
-            <queue-profile maxOutstandingMessages="42"/>
-        </service>
+    <flow name="serviceDefault">
+        <inbound-endpoint address="test://foo1"/>
+        <echo-component/>
+        <!-- no explicit queue-profile configured -->
+    </flow>
 
-        <service name="serviceExplicitDefaultMemoryObjectStore">
-            <inbound>
-                <inbound-endpoint address="test://foo3"/>
-            </inbound>
-            <echo-component/>
-            <queue-profile>
-                <default-in-memory-queue-store/>
-            </queue-profile>
-        </service>
-        
-        <service name="serviceExplicitDefaultPersistentObjectStore">
-            <inbound>
-                <inbound-endpoint address="test://foo4"/>
-            </inbound>
-            <echo-component/>
-            <queue-profile>
-                <default-persistent-queue-store/>
-            </queue-profile>
-        </service>
+    <flow name="serviceNoObjectStore" processingStrategy="serviceNoObjectStorePS">
+        <inbound-endpoint address="test://foo2"/>
+        <echo-component/>
+    </flow>
+    <queued-asynchronous-processing-strategy name="serviceNoObjectStorePS" maxQueueSize="42"/>
 
-        <service name="serviceExplicitObjectStore">
-            <inbound>
-                <inbound-endpoint address="test://foo5"/>
-            </inbound>
-            <echo-component/>
-            <queue-profile>
-                <custom-queue-store class="org.mule.config.spring.QueueStoreConfigurationTestCase$TestQueueStore"/>
-            </queue-profile>
-        </service>
-    </model>
-    
+    <flow name="serviceExplicitDefaultMemoryObjectStore" processingStrategy="serviceExplicitDefaultMemoryObjectStorePS">
+        <inbound-endpoint address="test://foo3"/>
+        <echo-component/>
+    </flow>
+    <queued-asynchronous-processing-strategy name="serviceExplicitDefaultMemoryObjectStorePS">
+        <default-in-memory-queue-store/>
+    </queued-asynchronous-processing-strategy>
+
+    <flow name="serviceExplicitDefaultPersistentObjectStore"
+          processingStrategy="serviceExplicitDefaultPersistentObjectStorePS">
+        <inbound-endpoint address="test://foo4"/>
+        <echo-component/>
+    </flow>
+    <queued-asynchronous-processing-strategy name="serviceExplicitDefaultPersistentObjectStorePS">
+        <default-persistent-queue-store/>
+    </queued-asynchronous-processing-strategy>
+
+    <flow name="serviceExplicitObjectStore" processingStrategy="serviceExplicitObjectStorePS">
+        <inbound-endpoint address="test://foo5"/>
+        <echo-component/>
+    </flow>
+    <queued-asynchronous-processing-strategy name="serviceExplicitObjectStorePS">
+        <custom-queue-store class="org.mule.config.spring.QueueStoreConfigurationTestCase$TestQueueStore"/>
+    </queued-asynchronous-processing-strategy>
+
     <flow name="flowDefault">
         <inbound-endpoint address="test://foo6"/>
         <echo-component/>
     </flow>
-    
+
     <flow name="flowQueuedAsync" processingStrategy="queued-asynchronous">
         <inbound-endpoint address="test://foo7"/>
         <echo-component/>
     </flow>
 
-    <queued-asynchronous-processing-strategy name="queuedAsyncStrategyPersistentStore">
-        <default-persistent-queue-store />
-    </queued-asynchronous-processing-strategy>
-
     <flow name="flowQueuedAsyncPersistentStore" processingStrategy="queuedAsyncStrategyPersistentStore">
         <inbound-endpoint address="test://foo8"/>
         <echo-component/>
     </flow>
+    <queued-asynchronous-processing-strategy name="queuedAsyncStrategyPersistentStore">
+        <default-persistent-queue-store/>
+    </queued-asynchronous-processing-strategy>
+
 </mule>

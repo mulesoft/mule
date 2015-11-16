@@ -6,33 +6,31 @@
  */
 package org.mule.module.extension.internal.util;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import org.mule.DefaultMuleContext;
+import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
-import org.mule.extension.runtime.ConfigurationInstanceProvider;
-import org.mule.extension.runtime.OperationContext;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.runtime.DefaultOperationContext;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.config.MuleManifest;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.jar.Manifest;
+
 import org.apache.commons.lang.ArrayUtils;
-import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public abstract class ExtensionsTestUtils
 {
@@ -62,69 +60,71 @@ public abstract class ExtensionsTestUtils
         return resolver;
     }
 
-    public static Parameter getParameter(String name, Class<?> type)
+    public static ParameterModel getParameter(String name, Class<?> type)
     {
-        Parameter parameter = mock(Parameter.class);
-        when(parameter.getName()).thenReturn(name);
-        when(parameter.getType()).thenReturn(DataType.of(type));
+        ParameterModel parameterModel = mock(ParameterModel.class);
+        when(parameterModel.getName()).thenReturn(name);
+        when(parameterModel.getType()).thenReturn(DataType.of(type));
 
-        return parameter;
+        return parameterModel;
     }
 
     public static void stubRegistryKeys(MuleContext muleContext, final String... keys)
     {
-        when(muleContext.getRegistry().get(anyString())).thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
+        when(muleContext.getRegistry().get(anyString())).thenAnswer(invocation -> {
+            String name = (String) invocation.getArguments()[0];
+            if (name != null)
             {
-                String name = (String) invocation.getArguments()[0];
-                if (name != null)
+                for (String key : keys)
                 {
-                    for (String key : keys)
+                    if (name.contains(key))
                     {
-                        if (name.contains(key))
-                        {
-                            return null;
-                        }
+                        return null;
                     }
                 }
-
-                return RETURNS_DEEP_STUBS.get().answer(invocation);
             }
+
+            return RETURNS_DEEP_STUBS.get().answer(invocation);
         });
     }
 
-    public static void assertRegisteredWithUniqueMadeKey(MuleContext muleContext, String key, Object object) throws Exception
+    public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent) throws Exception
     {
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-        verify(muleContext.getRegistry()).registerObject(captor.capture(), same(object));
-        assertThat(captor.getValue(), containsString(key));
+        ExtensionManager extensionManager = muleEvent.getMuleContext().getExtensionManager();
+        return (C) extensionManager.getConfiguration(key, muleEvent).getValue();
     }
 
-    public static <C> C getConfigurationInstanceFromExtensionManager(String key, Extension extension, MuleEvent muleEvent) throws Exception
+    public static File getMetaInfDirectory(Class clazz)
     {
-        return extractExtensionManager(muleEvent).getConfigurationInstance(extension, key, getOperationContext(muleEvent));
+        URL classUrl = clazz.getResource(clazz.getSimpleName() + ".class");
+        String classPath = classUrl.getPath();
+        return new File(String.format("%starget/test-classes/META-INF", classPath.substring(0, classPath.indexOf("target"))));
     }
 
-    public static <C> C getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent) throws Exception
+    public static File createManifestFileIfNecessary(File targetDirectory) throws IOException
     {
-        ConfigurationInstanceProvider<C> configurationInstanceProvider = muleEvent.getMuleContext().getRegistry().get(key);
-        return configurationInstanceProvider.get(getOperationContext(muleEvent));
+        return createManifestFileIfNecessary(targetDirectory, MuleManifest.getManifest());
     }
 
-    private static ExtensionManagerAdapter extractExtensionManager(MuleEvent muleEvent)
+    public static File createManifestFileIfNecessary(File targetDirectory, Manifest sourceManifest) throws IOException
     {
-        return (ExtensionManagerAdapter) muleEvent.getMuleContext().getExtensionManager();
+        File manifestFile = new File(targetDirectory.getPath(), "MANIFEST.MF");
+        if (!manifestFile.exists())
+        {
+            Manifest manifest = new Manifest(sourceManifest);
+            try (FileOutputStream fileOutputStream = new FileOutputStream(manifestFile))
+            {
+                manifest.write(fileOutputStream);
+            }
+        }
+        return manifestFile;
     }
 
-    private static OperationContext getOperationContext(MuleEvent event) throws Exception
+    public static Injector spyInjector(MuleContext muleContext)
     {
-        return new DefaultOperationContext(mock(Extension.class),
-                                           mock(Operation.class),
-                                           "",
-                                           mock(ResolverSetResult.class),
-                                           event,
-                                           extractExtensionManager(event));
+        Injector spy = spy(muleContext.getInjector());
+        ((DefaultMuleContext) muleContext).setInjector(spy);
+
+        return spy;
     }
 }

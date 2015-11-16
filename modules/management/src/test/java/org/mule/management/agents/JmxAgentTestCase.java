@@ -6,6 +6,8 @@
  */
 package org.mule.management.agents;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.component.simple.EchoComponent;
 import org.mule.config.DefaultMuleConfiguration;
@@ -30,9 +32,6 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class JmxAgentTestCase extends AbstractMuleContextTestCase
 {
@@ -177,7 +176,7 @@ public class JmxAgentTestCase extends AbstractMuleContextTestCase
     {
         // create a service with an invalid name. It is registered in the registry as side effect
         // so the JmxAgent will pick it up while registring services
-        getTestService("invalid:service:name", EchoComponent.class);
+        getTestFlow("invalid:service:name", EchoComponent.class);
 
         // when registering services, the one we just put into the registry will be exposed
         // to the local MBean server, too. If a MalformedObjectNameException is thrown during
@@ -186,18 +185,16 @@ public class JmxAgentTestCase extends AbstractMuleContextTestCase
         agent.setMuleContext(muleContext);
         agent.initialise();
 
-        agent.registerServiceServices();
+        agent.registerFlowConstructServices();
     }
 
     private static class TestJmxAgent extends JmxApplicationAgent
     {
-        /**
-         * Open up method for test access
-         */
+
         @Override
-        public void registerServiceServices() throws NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException, MalformedObjectNameException
+        public void registerFlowConstructServices() throws NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException, MalformedObjectNameException
         {
-            super.registerServiceServices();
+            super.registerFlowConstructServices();
         }
     }
 }

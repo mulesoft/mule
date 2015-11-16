@@ -12,13 +12,10 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <model name="Request-Response_Message_Pattern">
-        <service name="SynchronousService">
-            <inbound>
-                <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component/>
-        </service>
-    </model>
+    <flow name="SynchronousService">
+        <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" exchange-pattern="request-response"/>
+        <test:component/>
+    </flow>
+
 </mule>
 <!--// END SNIPPET: full-config -->

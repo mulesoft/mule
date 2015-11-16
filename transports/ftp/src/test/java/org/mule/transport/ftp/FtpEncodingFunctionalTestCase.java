@@ -8,39 +8,28 @@ package org.mule.transport.ftp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
 {
+
     private static final String TEST_MESSAGE_EUC_JP_ENCODED = "\u3053";
     private static final int FIVE_SECONDS_TIMEOUT = 5000;
     private static final String ENCODING = "EUC-JP";
 
     private File testDataFile;
 
-    public FtpEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ftp-encoding-functional-config-service.xml"},
-            {ConfigVariant.FLOW, "ftp-encoding-functional-config-flow.xml"}
-        });
+        return "ftp-encoding-functional-config-flow.xml";
     }
 
     @Test

@@ -27,39 +27,22 @@
                 return message.getPayloadAsString() + "'s Response sent to asyncResponse"
             }
 
-           return null
-       </scripting:text>
+            return null
+        </scripting:text>
     </scripting:script>
 
-    <model name="Case1692UnitTest">
+    <flow name="SyncAsync">
+        <vm:inbound-endpoint path="singleSyncAsyncEntry" exchange-pattern="request-response"/>
+        <message-property-filter pattern="messageType=sync"/>
+        <vm:outbound-endpoint path="async" exchange-pattern="one-way"/>
+        <scripting:component script-ref="testComponent"/>
+    </flow>
 
-        <service name="SyncAsync">
-            <inbound>
-                <vm:inbound-endpoint path="singleSyncAsyncEntry" exchange-pattern="request-response"/>
-                <selective-consumer-router>
-                    <message-property-filter pattern="messageType=sync"/>
-                </selective-consumer-router>
-                <forwarding-catch-all-strategy>
-                    <vm:outbound-endpoint path="async" exchange-pattern="one-way"/>
-                </forwarding-catch-all-strategy>
-            </inbound>
-            <scripting:component script-ref="testComponent"/>
-        </service>
+    <flow name="AsyncRequest">
+        <vm:inbound-endpoint path="async" exchange-pattern="one-way"/>
+        <message-property-filter pattern="messageType=async"/>
+        <scripting:component script-ref="testComponent"/>
+        <vm:outbound-endpoint path="asyncResponse" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="AsyncRequest">
-            <inbound>
-                <vm:inbound-endpoint path="async" exchange-pattern="one-way"/>
-                <selective-consumer-router>
-                    <message-property-filter pattern="messageType=async"/>
-                </selective-consumer-router>
-
-            </inbound>
-            <scripting:component script-ref="testComponent"/>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="asyncResponse" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
 </mule>

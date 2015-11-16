@@ -47,7 +47,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
     protected void doSetUp() throws Exception
     {
         MuleEvent event = getTestEvent("testing",
-                getTestService("apple", Apple.class),
+                getTestFlow("apple", Apple.class),
                 getTestInboundEndpoint("test", "test://foo"));
         RequestContext.setEvent(event);
 
@@ -690,9 +690,6 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
         Object o = extractor.evaluate("context.serviceName", message);
         assertEquals("apple", o);
 
-        o = extractor.evaluate("context.modelName", message);
-        assertNotNull(o);
-
         o = extractor.evaluate("context.inboundEndpoint", message);
         assertEquals("test://foo", o.toString());
 
@@ -725,9 +722,6 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
         Object o = muleContext.getExpressionManager().evaluate("mule:context.serviceName", message);
         assertEquals("apple", o);
-
-        o = muleContext.getExpressionManager().evaluate("mule:context.modelName", message);
-        assertNotNull(o);
 
         o = muleContext.getExpressionManager().evaluate("mule:context.inboundEndpoint", message);
         assertEquals("test://foo", o.toString());

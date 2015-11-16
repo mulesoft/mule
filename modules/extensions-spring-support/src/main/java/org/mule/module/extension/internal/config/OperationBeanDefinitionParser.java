@@ -15,11 +15,11 @@ import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.enricher.MessageEnricher;
-import org.mule.extension.introspection.DataQualifier;
-import org.mule.extension.introspection.DataType;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.Operation;
-import org.mule.extension.introspection.Parameter;
+import org.mule.extension.api.introspection.DataQualifier;
+import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.ArrayUtils;
@@ -50,13 +50,13 @@ import org.w3c.dom.Element;
 final class OperationBeanDefinitionParser implements BeanDefinitionParser
 {
 
-    private final Extension extension;
-    private final Operation operation;
+    private final ExtensionModel extensionModel;
+    private final OperationModel operationModel;
 
-    OperationBeanDefinitionParser(Extension extension, Operation operation)
+    OperationBeanDefinitionParser(ExtensionModel extensionModel, OperationModel operationModel)
     {
-        this.extension = extension;
-        this.operation = operation;
+        this.extensionModel = extensionModel;
+        this.operationModel = operationModel;
     }
 
     @Override
@@ -65,8 +65,8 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OperationMessageProcessorFactoryBean.class);
         builder.setScope(BeanDefinition.SCOPE_PROTOTYPE);
         parseConfigRef(element, builder);
-        builder.addConstructorArgValue(extension);
-        builder.addConstructorArgValue(operation);
+        builder.addConstructorArgValue(extensionModel);
+        builder.addConstructorArgValue(operationModel);
         builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
         builder.addConstructorArgValue(parseNestedOperations(element, parserContext));
         builder.addConstructorArgReference(MuleProperties.OBJECT_MULE_CONTEXT);
@@ -82,16 +82,16 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
     {
         final ManagedMap<String, ManagedList<MessageProcessor>> nestedOperations = new ManagedMap<>();
 
-        for (final Parameter parameter : operation.getParameters())
+        for (final ParameterModel parameterModel : operationModel.getParameterModels())
         {
-            final DataType type = parameter.getType();
+            final DataType type = parameterModel.getType();
             type.getQualifier().accept(new AbstractDataQualifierVisitor()
             {
 
                 @Override
                 public void onOperation()
                 {
-                    nestedOperations.put(parameter.getName(), parseNestedProcessor(element, parameter, parserContext));
+                    nestedOperations.put(parameterModel.getName(), parseNestedProcessor(element, parameterModel, parserContext));
                 }
 
                 @Override
@@ -100,7 +100,7 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
                     DataType[] generics = type.getGenericTypes();
                     if (!ArrayUtils.isEmpty(generics) && generics[0].getQualifier() == DataQualifier.OPERATION)
                     {
-                        nestedOperations.put(parameter.getName(), parseNestedProcessor(element, parameter, parserContext));
+                        nestedOperations.put(parameterModel.getName(), parseNestedProcessor(element, parameterModel, parserContext));
                     }
                 }
             });
@@ -135,9 +135,9 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         }
     }
 
-    private ManagedList<MessageProcessor> parseNestedProcessor(Element element, Parameter parameter, ParserContext parserContext)
+    private ManagedList<MessageProcessor> parseNestedProcessor(Element element, ParameterModel parameterModel, ParserContext parserContext)
     {
-        element = DomUtils.getChildElementByTagName(element, NameUtils.hyphenize(parameter.getName()));
+        element = DomUtils.getChildElementByTagName(element, NameUtils.hyphenize(parameterModel.getName()));
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(MessageProcessorChainFactoryBean.class);
         BeanDefinition beanDefinition = builder.getBeanDefinition();
         String childBeanName = generateChildBeanName(element);

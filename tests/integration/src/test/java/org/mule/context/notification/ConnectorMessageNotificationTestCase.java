@@ -15,11 +15,7 @@ import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
-import org.junit.runners.Parameterized.Parameters;
 
 public class ConnectorMessageNotificationTestCase extends AbstractNotificationTestCase
 {
@@ -32,17 +28,10 @@ public class ConnectorMessageNotificationTestCase extends AbstractNotificationTe
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/notifications/connector-message-notification-test-flow.xml"}
-        });
-    }
-
-    public ConnectorMessageNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/notifications/connector-message-notification-test-flow.xml";
     }
 
     @Override

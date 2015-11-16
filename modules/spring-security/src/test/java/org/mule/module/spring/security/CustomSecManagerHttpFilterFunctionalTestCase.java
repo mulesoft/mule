@@ -6,6 +6,12 @@
  */
 package org.mule.module.spring.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -13,34 +19,16 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class CustomSecManagerHttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class CustomSecManagerHttpFilterFunctionalTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-                {ConfigVariant.FLOW, "custom-security-manager-test.xml"}
-        });
-    }
-
-    public CustomSecManagerHttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
+        return "custom-security-manager-test.xml";
     }
 
     protected String getUrl()

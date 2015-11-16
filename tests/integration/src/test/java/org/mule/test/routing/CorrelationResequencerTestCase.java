@@ -8,36 +8,26 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CorrelationResequencerTestCase extends AbstractServiceAndFlowTestCase
+public class CorrelationResequencerTestCase extends FunctionalTestCase
 {
     private CountDownLatch receiveLatch = new CountDownLatch(6);
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "correlation-resequencer-test-service.xml"},
-            {ConfigVariant.FLOW, "correlation-resequencer-test-flow.xml"}});
-    }
-
-    public CorrelationResequencerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "correlation-resequencer-test-flow.xml";
     }
 
     @Override

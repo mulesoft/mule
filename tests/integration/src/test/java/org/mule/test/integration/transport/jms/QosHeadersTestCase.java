@@ -6,10 +6,9 @@
  */
 package org.mule.test.integration.transport.jms;
 
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -23,24 +22,14 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class QosHeadersTestCase extends AbstractServiceAndFlowTestCase
+public class QosHeadersTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/providers/jms/qosheaders-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/providers/jms/qosheaders-test-flow.xml"}});
-    }
 
-    public QosHeadersTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/providers/jms/qosheaders-test-flow.xml";
     }
 
     @Test

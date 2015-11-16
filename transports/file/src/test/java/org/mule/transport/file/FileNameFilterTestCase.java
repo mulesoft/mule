@@ -14,26 +14,16 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class FileNameFilterTestCase extends AbstractFileFunctionalTestCase
 {
 
-    public FileNameFilterTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "file-filename-filter-config.xml"}
-        });
+        return "file-filename-filter-config.xml";
     }
 
     @Test

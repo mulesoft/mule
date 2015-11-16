@@ -12,23 +12,16 @@
     <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
     <endpoint name="in.topic" address="${broadcast.topic.destination}" exchange-pattern="one-way"/>
 
-    <model name="TEST">
-        <service name="InputPart">
-            <inbound>
-                <inbound-endpoint ref="in">
-                    <jms:transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="in.topic">
-                        <jms:transaction action="NONE"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="InputPart">
+        <inbound-endpoint ref="in">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="in.topic">
+            <jms:transaction action="NONE"/>
+        </outbound-endpoint>
+    </flow>
+
 </mule>

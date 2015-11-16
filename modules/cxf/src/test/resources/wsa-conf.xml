@@ -1,28 +1,25 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:spring="http://www.springframework.org/schema/beans"
-  xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-  xmlns:cxf-core="http://cxf.apache.org/core"
-  xmlns:wsa="http://cxf.apache.org/ws/addressing"
-  xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:cxf-core="http://cxf.apache.org/core"
+      xmlns:wsa="http://cxf.apache.org/ws/addressing"
+      xsi:schemaLocation="
        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
        http://cxf.apache.org/ws/addressing http://cxf.apache.org/schemas/ws-addr-conf.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
-  <model name="TestCxfModel">
-    <service name="echoService">
-      <inbound>
-          <inbound-endpoint address="http://localhost:${port1}/services/employee" exchange-pattern="request-response">
-              <cxf:jaxws-service mtomEnabled="false">
+    <flow name="echoService">
+        <inbound-endpoint address="http://localhost:${port1}/services/employee" exchange-pattern="request-response">
+            <cxf:jaxws-service mtomEnabled="false">
                 <cxf:features>
-                  <wsa:addressing />
+                    <wsa:addressing/>
                 </cxf:features>
-              </cxf:jaxws-service>
-          </inbound-endpoint>
-      </inbound>
-      <component class="org.mule.module.cxf.employee.EmployeeDirectoryImpl"/>
-    </service>
-  </model>
+            </cxf:jaxws-service>
+        </inbound-endpoint>
+        <component class="org.mule.module.cxf.employee.EmployeeDirectoryImpl"/>
+    </flow>
+
 </mule>

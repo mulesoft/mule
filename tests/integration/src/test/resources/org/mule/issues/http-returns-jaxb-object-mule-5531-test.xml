@@ -3,24 +3,18 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
-      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
-http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd 
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+            http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
 
     <flow name="26384076-3877-4b23-809d-14b7fd22535f">
-        <http:inbound-endpoint host="localhost" port="${port1}" path="test" keep-alive="false" doc:name="HTTP" doc:description="Process HTTP reqests or responses."/>
-        <component class="org.mule.cxf.weatherservice.mycode.CreateZipQuery" doc:name="Component" doc:description="Invoke a Java component"/>
-        <cxf:jaxws-client clientClass="org.mule.cxf.weatherservice.myweather.Weather" port="WeatherSoap" operation="GetCityWeatherByZIP" doc:name="SOAP" doc:description="Make a web service available via CXF"/>
+        <http:inbound-endpoint host="localhost" port="${port1}" path="test" keep-alive="false"/>
+        <component class="org.mule.cxf.weatherservice.mycode.CreateZipQuery"/>
+        <cxf:jaxws-client clientClass="org.mule.cxf.weatherservice.myweather.Weather" port="WeatherSoap"
+                          operation="GetCityWeatherByZIP"/>
         <object-to-string-transformer></object-to-string-transformer>
         <component class="org.mule.issues.HttpReturnsJaxbObject5531TestCase$WeatherReport"/>
-        <!-- <http:outbound-endpoint address="http://wsf.cdyne.com/WeatherWS/Weather.asmx" doc:name="HTTP" doc:description="Process HTTP reqests or responses."/> -->
-     </flow>
+    </flow>
 </mule>

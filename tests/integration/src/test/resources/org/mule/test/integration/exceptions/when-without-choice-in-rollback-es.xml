@@ -4,11 +4,9 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <model>
-        <service name="invalidFlow">
+        <flow name="invalidFlow">
             <logger/>
             <rollback-exception-strategy when="#[exception.causedBy(java.lang.Exception)]"/>
-        </service>
-    </model>
+        </flow>
 
 </mule>

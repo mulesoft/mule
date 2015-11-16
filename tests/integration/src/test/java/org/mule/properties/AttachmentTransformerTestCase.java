@@ -110,7 +110,7 @@ public class AttachmentTransformerTestCase extends FunctionalTestCase
         attachments.put("attach2",attach2);
         attachments.put("attach22",attach22);
         MuleMessage message = new DefaultMuleMessage("data", null, attachments,muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        DefaultMuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
         Flow flow = (Flow) getFlowConstruct(flowName);
         flow.process(event);
         FlowAssert.verify(flowName);

@@ -7,12 +7,10 @@
 package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.mule.extension.introspection.declaration.DescribingContext;
-import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -26,6 +24,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DefaultDescribingContextTestCase extends AbstractMuleTestCase
 {
 
+    private static final String KEY = "key";
+    private static final String VALUE = "value";
     private DeclarationDescriptor descriptor;
 
     private DescribingContext context;
@@ -33,27 +33,40 @@ public class DefaultDescribingContextTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
-        descriptor = new DeclarationDescriptor("name", "version");
+        descriptor = new DeclarationDescriptor();
         context = new DefaultDescribingContext(descriptor);
+        context.addParameter(KEY, VALUE);
     }
 
     @Test
-    public void getExtensionType()
+    public void getDeclarationDescriptor()
     {
         assertThat(descriptor, is(sameInstance(context.getDeclarationDescriptor())));
     }
 
     @Test
-    public void customParameters()
+    public void getParameter()
     {
-        assertThat(context.getCustomParameters(), is(notNullValue()));
-        assertThat(context.getCustomParameters().isEmpty(), is(true));
-
-        final String key = "key";
-        final String value = "value";
-
-        context.getCustomParameters().put(key, value);
-        assertThat(context.getCustomParameters().values(), hasSize(1));
-        assertThat(context.getCustomParameters().get(key), is(sameInstance((Object) value)));
+        assertThat(context.getParameter(KEY, String.class), is(sameInstance((Object) VALUE)));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void wrongParameterType()
+    {
+        context.getParameter(KEY, Long.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullParameterKey()
+    {
+        context.addParameter(null, VALUE);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullParameterValur()
+    {
+        context.addParameter(KEY, null);
+    }
+
+
 }

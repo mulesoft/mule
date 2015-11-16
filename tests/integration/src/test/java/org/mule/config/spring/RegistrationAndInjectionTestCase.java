@@ -113,7 +113,7 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
 
     private void assertInjection(TestLifecycleObject object)
     {
-        assertThat(object.getObjectStoreManager(), is(muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)));
+        assertThat(muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER), is(object.getObjectStoreManager()));
         assertThat(object.getMuleContext(), is(muleContext));
 
         // just to make sure that injection is to thank for this

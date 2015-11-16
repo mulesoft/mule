@@ -11,53 +11,26 @@
     <bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
 
     <mule:mule>
-        <mule:model name="main" inherit="true">
-            <mule:service name="appleComponent2">                
-                <mule:inbound>
-                    <mule:inbound-endpoint name="nonTransactedInboundEndpoint" 
-                        address="test://endpoint.in3" exchange-pattern="one-way"/>
-                    <mule:inbound-endpoint name="transactedInboundEndpoint" 
-                        address="test://endpoint.in2" exchange-pattern="request-response">
-                        <mule:custom-transaction action="ALWAYS_BEGIN" factory-ref="txFactory"/>
-                        <mule:properties>
-                            <entry key="testEndpointProperty" value="Prop1"/>
-                        </mule:properties>
-                    </mule:inbound-endpoint>
-                </mule:inbound>
+        <mule:queued-asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
+                                                 poolExhaustedAction="DISCARD" maxQueueSize="102">
+            <mule:default-persistent-queue-store/>
+        </mule:queued-asynchronous-processing-strategy>
 
-                <mule:pooled-component class="org.mule.tck.testmodels.fruit.Apple">
-                    <mule:pooling-profile maxActive="9" maxIdle="6" maxWait="4002" 
-                        exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>
-                </mule:pooled-component>
-
-                <mule:outbound>
-                    <mule:filtering-router>
-                        <mule:outbound-endpoint name="transactedOutboundEndpoint" 
-                            address="test://endpoint.out" exchange-pattern="request-response">
-                            <!-- mule:transaction action="ALWAYS_BEGIN" -->
-                            <!-- TODO -->
-                            <!-- no support for constraints? -->
-                            <!-- factory required? -->
-                            <!-- /mule:transaction -->
-                        </mule:outbound-endpoint>
-                    </mule:filtering-router>
-                </mule:outbound>
-                <!-- outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint name="transactedOutboundEndpoint" type="sender" 
-                        address="test://endpoint.out" exchange-pattern="request-response">
-                        <transaction action="ALWAYS_BEGIN">
-                            <constraint batchSize="3" className="org.mule.transaction.constraints.BatchConstraint"/>
-                        </transaction>
-                    </endpoint>
-                </router>
-            </outbound-router -->
-
-                <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
-                <mule:queue-profile maxOutstandingMessages="102">
-                    <mule:default-persistent-queue-store/>
-                </mule:queue-profile>
-            </mule:service>
-        </mule:model>
+        <mule:flow name="appleComponent2" processingStrategy="customStrategy">
+            <mule:composite-source>
+                <mule:inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"
+                                  exchange-pattern="one-way"/>
+                <mule:inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2"
+                                  exchange-pattern="one-way">
+                    <mule:property key="testEndpointProperty" value="Prop1"/>
+                </mule:inbound-endpoint>
+            </mule:composite-source>
+            <mule:pooled-component class="org.mule.tck.testmodels.fruit.Apple">
+                <mule:pooling-profile maxActive="9" maxIdle="6" maxWait="4002"
+                                 exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>
+            </mule:pooled-component>
+            <mule:outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"
+                               exchange-pattern="one-way"/>
+        </mule:flow>
     </mule:mule>
 </beans>

@@ -7,13 +7,11 @@
 package org.mule.transport.file.issues;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.construct.Flow;
 import org.mule.transport.file.AbstractFileFunctionalTestCase;
@@ -28,10 +26,6 @@ import org.junit.Test;
  */
 public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestCase
 {
-    public IndirectReceiveMule1842TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Test
     public void testIndirectRequest() throws Exception
@@ -46,14 +40,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
 
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(url);
 
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            ((CompositeMessageSource) ((Flow) relay).getMessageSource()).addSource(endpoint);
-        }
-        else
-        {
-            ((CompositeMessageSource) ((Service) relay).getMessageSource()).addSource(endpoint);
-        }
+        ((CompositeMessageSource) ((Flow) relay).getMessageSource()).addSource(endpoint);
 
         ((Stoppable) relay).stop();
         ((Startable) relay).start();

@@ -8,39 +8,28 @@ package org.mule.module.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import com.thoughtworks.xstream.converters.extended.ISO8601DateConverter;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowTestCase
+public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
 {
     private CountDownLatch latch = new CountDownLatch(1);
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/xstream-additional-converters-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/xml/xstream-additional-converters-flow.xml"}});
-    }
-
-    public XStreamAdditionalConvertersTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/module/xml/xstream-additional-converters-flow.xml";
     }
 
     @Override

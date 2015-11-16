@@ -10,31 +10,22 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
-import org.mule.VoidMuleEvent;
 import org.mule.api.CompletionHandler;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.construct.Flow;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.transformer.simple.StringAppendTransformer;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTestCase
@@ -45,7 +36,7 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
     @Test
     public void blockingProcess() throws MuleException, Exception
     {
-        MuleEvent request = getTestEventUsingFlow(TEST_MESSAGE);
+        MuleEvent request = getTestEvent(TEST_MESSAGE);
         MuleEvent response = nonBlockingMessageProcessor.process(request);
 
         // Test processor echos request so we can assert request equals response.

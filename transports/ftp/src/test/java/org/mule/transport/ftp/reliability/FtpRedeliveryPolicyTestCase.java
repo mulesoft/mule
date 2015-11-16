@@ -14,12 +14,8 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.listener.ExceptionListener;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class FtpRedeliveryPolicyTestCase extends AbstractFtpServerTestCase
 {
@@ -30,18 +26,12 @@ public class FtpRedeliveryPolicyTestCase extends AbstractFtpServerTestCase
     @Rule
     public SystemProperty maxRedeliveryAttemptsSystemProperty = new SystemProperty("maxRedeliveryAttempts", Integer.toString(MAX_REDELIVERY_ATTEMPTS));
 
-    public FtpRedeliveryPolicyTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "reliability/ftp-redelivery-policy-config.xml";
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "reliability/ftp-redelivery-policy-config.xml"}
-        });
-    }
     @Test
     public void testRedeliveryPolicyDLQConsumesMessage() throws Exception
     {

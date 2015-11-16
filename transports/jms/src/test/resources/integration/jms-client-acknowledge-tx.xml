@@ -14,44 +14,30 @@
     <endpoint name="middle2" address="${middle2.destination}" exchange-pattern="one-way"/>
     <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
 
-    <model name="jmsTest">
+    <flow name="InputPart">
+        <inbound-endpoint ref="in">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="middle">
+            <jms:transaction action="NONE"/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="InputPart">
-            <inbound>
-                <inbound-endpoint ref="in">
-                    <jms:transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="middle">
-                        <jms:transaction action="NONE"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="JmsClientAcknowledgeTransactionFactory">
+        <inbound-endpoint ref="middle">
+            <jms:transaction action="ALWAYS_BEGIN"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out">
+            <jms:transaction action="NONE"/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="JmsClientAcknowledgeTransactionFactory">
-            <inbound>
-                <inbound-endpoint ref="middle">
-                    <jms:transaction action="ALWAYS_BEGIN"/>
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out">
-                        <jms:transaction action="NONE"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+</model>
 
-    </model>
-
-</mule>
+        </mule>

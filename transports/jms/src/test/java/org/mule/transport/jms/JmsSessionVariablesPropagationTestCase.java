@@ -9,7 +9,7 @@ package org.mule.transport.jms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -36,6 +36,6 @@ public class JmsSessionVariablesPropagationTestCase extends FunctionalTestCase
         assertNull(message.getExceptionPayload());
         assertEquals(payload, message.getPayload());
 
-        assertEquals("test", message.getSessionProperty("test"));
+        assertEquals("test", message.getProperty("test", SESSION));
     }
 }

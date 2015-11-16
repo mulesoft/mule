@@ -8,11 +8,10 @@ package org.mule.test.integration.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.QueuePersistenceObjectStore;
@@ -25,6 +24,7 @@ import org.junit.Test;
 
 public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
+
     protected static final int WAIT_TIME_MILLIS = 500;
     protected static final int NUM_MESSAGES = 500;
 
@@ -53,116 +53,69 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
     @Test
     public void testInFlightMessagesWhenServiceStopped() throws Exception
     {
-        Service service = muleContext.getRegistry().lookupService("TestService");
-        populateSedaQueue(service, NUM_MESSAGES);
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("TestService");
+        populateSedaQueue(flow, NUM_MESSAGES);
 
-        stopService(service);
+        stopService(flow);
 
-        assertNoLostMessages(NUM_MESSAGES, service);
+        assertNoLostMessages(NUM_MESSAGES, flow);
         // Seda queue is empty because queue is not persistent and therefore is
         // emptied when service is stopped
-        assertSedaQueueEmpty(service);
-    }
-
-    @Test
-    public void testInFlightMessagesPausedServiceWhenServiceStopped() throws Exception
-    {
-        Service service = muleContext.getRegistry().lookupService("PausedTestService");
-        populateSedaQueue(service, NUM_MESSAGES);
-
-        stopService(service);
-
-        // The service is paused so no message get processed. Because the service is
-        // stopped messages aren't lost. If Mule was disposed then messages would be
-        // lost
-        assertNoLostMessages(NUM_MESSAGES, service);
-
-        assertOutboundEmpty();
+        assertSedaQueueEmpty(flow);
     }
 
     @Test
     @Ignore("MULE-6926: flaky test (caused by usage of Thead.sleep)")
     public void testInFlightMessagesPersistentQueueServiceWhenServiceStopped() throws Exception
     {
-        Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("TestPersistentQueueService");
 
-        populateSedaQueue(service, NUM_MESSAGES);
+        populateSedaQueue(flow, NUM_MESSAGES);
 
-        stopService(service);
+        stopService(flow);
 
-        assertNoLostMessages(NUM_MESSAGES, service);
+        assertNoLostMessages(NUM_MESSAGES, flow);
 
         // Start, process some messages, stop and make sure no messages get lost.
-        startService(service);
+        startService(flow);
         Thread.sleep(WAIT_TIME_MILLIS * 2);
-        stopService(service);
+        stopService(flow);
 
-        assertNoLostMessages(NUM_MESSAGES, service);
+        assertNoLostMessages(NUM_MESSAGES, flow);
 
         // Let mule finish up with the rest of the messages until seda queue is empty
-        startService(service);
+        startService(flow);
         Thread.sleep(WAIT_TIME_MILLIS * 10);
-        stopService(service);
+        stopService(flow);
 
-        assertNoLostMessages(NUM_MESSAGES, service);
-        assertSedaQueueEmpty(service);
-    }
-
-    @Test
-    @Ignore("MULE-6926: flaky test (caused by usage of Thead.sleep)")
-    public void testInFlightMessagesPausedPersistentQueueServiceWhenServiceStopped() throws Exception
-    {
-        Service service = muleContext.getRegistry().lookupService("PausedTestPersistentQueueService");
-        populateSedaQueue(service, NUM_MESSAGES);
-
-        stopService(service);
-
-        // Paused service does not process messages before or during stop().
-        assertOutboundEmpty();
-        assertNoLostMessages(NUM_MESSAGES, service);
-
-        // Start, process some messages, stop and make sure no messages get lost.
-        startService(service);
-        service.resume();
-        Thread.sleep(WAIT_TIME_MILLIS * 2);
-        stopService(service);
-
-        assertNoLostMessages(NUM_MESSAGES, service);
-
-        // Let mule finish up with the rest of the messages until seda queue is empty
-        startService(service);
-        service.resume();
-        Thread.sleep(WAIT_TIME_MILLIS * 20);
-        stopService(service);
-
-        assertNoLostMessages(NUM_MESSAGES, service);
-        assertSedaQueueEmpty(service);
+        assertNoLostMessages(NUM_MESSAGES, flow);
+        assertSedaQueueEmpty(flow);
     }
 
     @Test
     @Ignore("MULE-6926: flaky test (caused by usage of Thead.sleep)")
     public void testInFlightMessagesPersistentQueueServiceWhenMuleDisposed() throws Exception
     {
-        Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
-        populateSedaQueue(service, NUM_MESSAGES);
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("TestPersistentQueueService");
+        populateSedaQueue(flow, NUM_MESSAGES);
 
         muleContext.dispose();
 
-        assertNoLostMessages(NUM_MESSAGES, service);
+        assertNoLostMessages(NUM_MESSAGES, flow);
 
         recreateAndStartMuleContext();
         Thread.sleep(WAIT_TIME_MILLIS);
         muleContext.dispose();
 
-        assertNoLostMessages(NUM_MESSAGES, service);
+        assertNoLostMessages(NUM_MESSAGES, flow);
 
         // Let mule finish up with the rest of the messages until seda queue is empty
         recreateAndStartMuleContext();
         Thread.sleep(WAIT_TIME_MILLIS * 10);
         muleContext.dispose();
 
-        assertNoLostMessages(NUM_MESSAGES, service);
-        assertSedaQueueEmpty(service);
+        assertNoLostMessages(NUM_MESSAGES, flow);
+        assertSedaQueueEmpty(flow);
     }
 
     protected void recreateAndStartMuleContext() throws Exception, MuleException
@@ -171,12 +124,12 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         muleContext.start();
     }
 
-    protected void populateSedaQueue(Service service, int numMessages) throws MuleException, Exception
+    protected void populateSedaQueue(Flow flow, int numMessages) throws MuleException, Exception
     {
         for (int i = 0; i < numMessages; i++)
         {
-            service.dispatchEvent(getTestEvent("test", service, muleContext.getEndpointFactory()
-                .getInboundEndpoint("test://test")));
+            flow.process((getTestEvent("test", getTestFlow(), muleContext.getEndpointFactory()
+                    .getInboundEndpoint("test://test"))));
         }
     }
 
@@ -187,22 +140,22 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
      *
      * @throws Exception
      */
-    protected synchronized void assertNoLostMessages(int numMessages, Service service) throws Exception
+    protected synchronized void assertNoLostMessages(int numMessages, Flow flow) throws Exception
     {
-        logger.info("SEDA Queue: " + getSedaQueueSize(service) + ", Outbound endpoint: "
+        logger.info("SEDA Queue: " + getSedaQueueSize(flow) + ", Outbound endpoint: "
                     + getOutSize());
-        assertEquals(numMessages, getOutSize() + getSedaQueueSize(service));
+        assertEquals(numMessages, getOutSize() + getSedaQueueSize(flow));
     }
 
-    protected synchronized void assertSedaQueueEmpty(Service service) throws MuleException
+    protected synchronized void assertSedaQueueEmpty(Flow flow) throws MuleException
     {
-        assertEquals(0, getSedaQueueSize(service));
+        assertEquals(0, getSedaQueueSize(flow));
     }
 
-    protected synchronized void assertSedaQueueNotEmpty(Service service) throws MuleException
+    protected synchronized void assertSedaQueueNotEmpty(Flow flow) throws MuleException
     {
-        assertTrue(String.format("Seda queue for service '%s' is empty", service.getName()),
-            getSedaQueueSize(service) > 0);
+        assertTrue(String.format("Seda queue for service '%s' is empty", flow.getName()),
+                   getSedaQueueSize(flow) > 0);
     }
 
     protected synchronized void assertOutboundEmpty() throws Exception
@@ -215,14 +168,14 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertTrue("VM Out queue is empty", getOutSize() > 0);
     }
 
-    protected int getSedaQueueSize(Service service) throws MuleException
+    protected int getSedaQueueSize(Flow flow) throws MuleException
     {
-        return getQueueSize(getSedaQueueName(service));
+        return getQueueSize(getSedaQueueName(flow));
     }
 
-    protected String getSedaQueueName(Service service)
+    protected String getSedaQueueName(Flow flow)
     {
-        return "seda.queue(" + service.getName() + ")";
+        return "seda.queue(" + flow.getName() + ")";
     }
 
     protected int getOutSize() throws Exception
@@ -248,16 +201,16 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         }
     }
 
-    protected void stopService(Service service) throws Exception
+    protected void stopService(Flow flow) throws Exception
     {
-        service.stop();
+        flow.stop();
         muleContext.getRegistry().lookupConnector("outPersistentConnector").stop();
     }
 
-    protected void startService(Service service) throws Exception
+    protected void startService(Flow flow) throws Exception
     {
         muleContext.getRegistry().lookupConnector("outPersistentConnector").start();
-        service.start();
+        flow.start();
     }
 
 }

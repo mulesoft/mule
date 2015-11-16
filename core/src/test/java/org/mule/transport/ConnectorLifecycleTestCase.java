@@ -18,10 +18,10 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.service.Service;
-import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageRequester;
+import org.mule.construct.Flow;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
@@ -294,11 +294,11 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
     @Test
     public void testReceiversLifecycle() throws Exception
     {
-        Service service = getTestService();
-        service.start();
+        Flow flow = getTestFlow();
+        flow.start();
         try
         {
-            connector.registerListener(getTestInboundEndpoint("in", "test://in"), getSensingNullMessageProcessor(), service);
+            connector.registerListener(getTestInboundEndpoint("in", "test://in"), getSensingNullMessageProcessor(), flow);
 
             assertEquals(1, connector.receivers.size());
             assertFalse((connector.receivers.get("in")).isConnected());
@@ -308,7 +308,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
             assertTrue((connector.receivers.get("in")).isConnected());
             assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-            connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getSensingNullMessageProcessor(), service);
+            connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getSensingNullMessageProcessor(), flow);
 
             assertEquals(2, connector.receivers.size());
             assertTrue((connector.receivers.get("in")).isConnected());
@@ -341,16 +341,16 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
         }
         finally
         {
-            service.dispose();
+            flow.dispose();
         }
     }
 
     @Test
     public void testReceiversServiceLifecycle() throws Exception
     {
-        Service service = getTestService();
+        Flow flow = MuleTestUtils.getTestFlow(MuleTestUtils.APPLE_SERVICE, muleContext, false);
         InboundEndpoint endpoint = getTestInboundEndpoint("in", "test://in");
-        ((CompositeMessageSource) service.getMessageSource()).addSource(endpoint);
+        flow.setMessageSource(endpoint);
         connector = (TestConnector) endpoint.getConnector();
 
         assertEquals(0, connector.receivers.size());
@@ -358,7 +358,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
         connector.start();
         assertEquals(0, connector.receivers.size());
 
-        service.start();
+        flow.initialise();
+        flow.start();
         assertEquals(1, connector.receivers.size());
         assertTrue((connector.receivers.get("in")).isConnected());
         assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
@@ -377,7 +378,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
         assertTrue((connector.receivers.get("in")).isConnected());
         assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-        service.stop();
+        flow.stop();
         assertEquals(0, connector.receivers.size());
 
         connector.stop();

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-standalone</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
@@ -163,13 +163,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Include all Mule Patterns -->
-        <dependency>
-            <groupId>org.mule.patterns</groupId>
-            <artifactId>mule-patterns-all</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-        </dependency>
         <!-- Include all Mule Transports -->
         <dependency>
             <groupId>org.mule.transports</groupId>

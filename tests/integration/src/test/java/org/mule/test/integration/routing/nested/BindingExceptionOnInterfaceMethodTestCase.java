@@ -8,35 +8,21 @@ package org.mule.test.integration.routing.nested;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class BindingExceptionOnInterfaceMethodTestCase extends AbstractServiceAndFlowTestCase
+public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCase
 {
     private static final String PREFIX = "Exception in service component: ";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/nested/binding-exception-on-interface-method-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/routing/nested/binding-exception-on-interface-method-flow.xml"}});
-    }
-
-    public BindingExceptionOnInterfaceMethodTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/routing/nested/binding-exception-on-interface-method-flow.xml";
     }
 
     @Test

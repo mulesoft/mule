@@ -13,18 +13,15 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.introspection.capability.XmlCapability;
-import org.mule.extension.resources.GeneratedResource;
-import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.module.extension.internal.capability.xml.ImmutableXmlCapability;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.property.XmlModelProperty;
+import org.mule.extension.api.resources.GeneratedResource;
+import org.mule.extension.api.resources.ResourcesGenerator;
+import org.mule.module.extension.internal.capability.xml.ImmutableXmlModelProperty;
 import org.mule.module.extension.internal.capability.xml.SpringBundleResourceContributor;
-import org.mule.module.extension.internal.config.ExtensionsNamespaceHandler;
+import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
@@ -43,34 +40,32 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     private static final String EXTENSION_NAME = "extension";
     private static final String EXTENSION_VERSION = "version";
     private static final String SCHEMA_LOCATION = "mulesoft.com/extension";
-    private static final String UNSCAPED_LOCATION_PREFIX = "http://";
+    private static final String UNESCAPED_LOCATION_PREFIX = "http://";
     private static final String ESCAPED_LOCATION_PREFIX = "http\\://";
     private static final String SCHEMA_NAME = "mule-extension.xsd";
 
     @Mock
-    private Extension extension;
+    private ExtensionModel extensionModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private ServiceRegistry serviceRegistry;
 
     private ResourcesGenerator generator;
 
-    private XmlCapability xmlCapability;
+    private XmlModelProperty xmlModelProperty;
 
     private SpringBundleResourceContributor contributor;
 
     @Before
     public void before()
     {
-        xmlCapability = new ImmutableXmlCapability(EXTENSION_VERSION, "test", UNSCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
-        Set<XmlCapability> capabilities = new HashSet<>();
-        capabilities.add(xmlCapability);
-        when(extension.getCapabilities(XmlCapability.class)).thenReturn(capabilities);
+        xmlModelProperty = new ImmutableXmlModelProperty(EXTENSION_VERSION, "test", UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
+        when(extensionModel.getModelProperty(XmlModelProperty.KEY)).thenReturn(xmlModelProperty);
 
         generator = new AnnotationProcessorResourceGenerator(mock(ProcessingEnvironment.class), serviceRegistry);
 
-        when(extension.getName()).thenReturn(EXTENSION_NAME);
-        when(extension.getVersion()).thenReturn(EXTENSION_VERSION);
+        when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
+        when(extensionModel.getVersion()).thenReturn(EXTENSION_VERSION);
 
         contributor = new SpringBundleResourceContributor();
     }
@@ -78,7 +73,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     @Test
     public void generateSchema()
     {
-        contributor.contribute(extension, generator);
+        contributor.contribute(extensionModel, generator);
 
         GeneratedResource resource = generator.get(SCHEMA_NAME);
         assertNotNull(resource);
@@ -88,17 +83,17 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     @Test
     public void springHandlers()
     {
-        contributor.contribute(extension, generator);
+        contributor.contribute(extensionModel, generator);
 
         GeneratedResource resource = generator.get("spring.handlers");
         assertNotNull(resource);
-        assertEquals(String.format("%s=%s", ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, ExtensionsNamespaceHandler.class.getName()), resource.getContentBuilder().toString());
+        assertEquals(String.format("%s=%s", ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, ExtensionNamespaceHandler.class.getName()), resource.getContentBuilder().toString());
     }
 
     @Test
     public void springSchemas()
     {
-        contributor.contribute(extension, generator);
+        contributor.contribute(extensionModel, generator);
 
         GeneratedResource resource = generator.get("spring.schemas");
         assertNotNull(resource);

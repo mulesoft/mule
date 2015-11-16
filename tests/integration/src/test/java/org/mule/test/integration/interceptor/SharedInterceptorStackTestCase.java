@@ -6,36 +6,24 @@
  */
 package org.mule.test.integration.interceptor;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.interceptor.Interceptor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-
-public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCase
+public class SharedInterceptorStackTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "shared-interceptor-stack-service.xml"},
-            {ConfigVariant.FLOW, "shared-interceptor-stack-flow.xml"}
-        });
-    }
 
-    public SharedInterceptorStackTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "shared-interceptor-stack-flow.xml";
     }
 
     @Test

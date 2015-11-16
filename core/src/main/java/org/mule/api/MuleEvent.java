@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.Set;
 
 /**
- * <code>MuleEvent</code> represents any data event occuring in the Mule environment. All data sent or
+ * <code>MuleEvent</code> represents any data event occurring in the Mule environment. All data sent or
  * received within the mule environment will be passed between components as an MuleEvent.
  * <p/>
  * <p/>
@@ -36,7 +36,6 @@ import java.util.Set;
 public interface MuleEvent extends Serializable
 {
     int TIMEOUT_WAIT_FOREVER = 0;
-    int TIMEOUT_DO_NOT_WAIT = -1;
     int TIMEOUT_NOT_SET_VALUE = Integer.MIN_VALUE;
 
     /**
@@ -55,21 +54,6 @@ public interface MuleEvent extends Serializable
      * @throws MuleException if the message cannot be converted into an array of bytes
      */
     byte[] getMessageAsBytes() throws MuleException;
-
-    /**
-     * Transforms the message into it's recognised or expected format. The transformer used is the one
-     * configured on the endpoint through which this event was received.
-     * 
-     * @return the message transformed into it's recognised or expected format.
-     * @throws TransformerException if a failure occurs in the transformer
-     * @see org.mule.api.transformer.Transformer
-     * @deprecated Since Mule 3.0 this method does nothing. The message is already transformed before the
-     *             event reaches a component IF you need to have access to the original message, the must be
-     *             no transformations before the component, this means that any 'connector-level' transfromers
-     *             will have to be explicitly overriden via the service overrides on the connector.
-     */
-    @Deprecated
-    Object transformMessage() throws TransformerException;
 
     /**
      * Transforms the message into the requested format. The transformer used is the one configured on the
@@ -92,18 +76,6 @@ public interface MuleEvent extends Serializable
      * @see org.mule.api.transformer.Transformer if the transform fails or the outputtype is null
      */
     <T> T transformMessage(DataType<T> outputType) throws TransformerException;
-
-    /**
-     * Transforms the message into it's recognised or expected format and then into an array of bytes. The
-     * transformer used is the one configured on the endpoint through which this event was received.
-     * 
-     * @return the message transformed into it's recognised or expected format as an array of bytes.
-     * @throws TransformerException if a failure occurs in the transformer
-     * @see org.mule.api.transformer.Transformer
-     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
-     */
-    @Deprecated
-    byte[] transformMessageToBytes() throws TransformerException;
 
     /**
      * Returns the message transformed into it's recognised or expected format and then into a String. The
@@ -141,29 +113,6 @@ public interface MuleEvent extends Serializable
     String getId();
 
     /**
-     * Gets a property associated with the current event. This method will check all property scopes on the
-     * currnet message and the current session
-     * 
-     * @param name the property name
-     * @return the property value or null if the property does not exist
-     * @deprecated
-     */
-    @Deprecated
-    Object getProperty(String name);
-
-    /**
-     * Gets a property associated with the current event. This method will check all property scopes on the
-     * currnet message and the current session
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated
-     */
-    @Deprecated
-    Object getProperty(String name, Object defaultValue);
-
-    /**
      * Retrieves the service session for the current event
      * 
      * @return the service session for the event
@@ -183,7 +132,7 @@ public interface MuleEvent extends Serializable
      * obtaining a reference to the MuleEvent context, either by implementing
      * <code>org.mule.api.lifecycle.Callable</code> or calling <code>RequestContext.getEventContext</code> to
      * obtain the MuleEventContext for the current thread. The user can programmatically control how events
-     * are dispached.
+     * are dispatched.
      * 
      * @return Returns true is the user has set stopFurtherProcessing.
      * @see org.mule.api.MuleContext
@@ -278,16 +227,6 @@ public interface MuleEvent extends Serializable
      */
     Object getReplyToDestination();
 
-    /**
-     * Set the reply-to destination from the current message, and remove it from the message, to prevent any
-     * further propagation.
-     * @deprecated this method was used to move the replyToDestination from the message to the event. The
-     *             same must now be done explicitly inside the message receiver which creates the event.
-     *
-     */
-    @Deprecated
-    void captureReplyToDestination();
-
     boolean isSynchronous();
 
     void setMessage(MuleMessage message);
@@ -324,60 +263,6 @@ public interface MuleEvent extends Serializable
     Set<String> getFlowVariableNames();
 
     void clearFlowVariables();
-
-    /**
-     * @deprecated use {@code getSession()} to manipulate session state
-     */
-    @Deprecated
-    <T> T getSessionVariable(String key);
-
-    /**
-     * Gets the data type for a given session variable
-     *
-     * @param key the name or key of the variable. This must be non-null.
-     * @return the property data type or null if the flow variable does not exist
-     * @deprecated use {@code getSession()} to manipulate session state
-     */
-    @Deprecated
-    DataType<?> getSessionVariableDataType(String key);
-
-    /**
-     * Sets a session variable value with a default data type
-     *
-     * @param key the name or key of the variable. This must be non-null.
-     * @deprecated use {@code getSession()} to manipulate session state
-     */
-    @Deprecated
-    void setSessionVariable(String key, Object value);
-
-    /**
-     * Sets a session variable value with a given data type
-     *
-     * @param key the name or key of the variable. This must be non-null.
-     * @param value value for the variable
-     * @param dataType value's dataType. Not null.
-     * @deprecated use {@code getSession()} to manipulate session state
-     */
-    @Deprecated
-    void setSessionVariable(String key, Serializable value, DataType dataType);
-
-    /**
-     * @deprecated use {@code getSession()} to manipulate session state
-     */
-    @Deprecated
-    void removeSessionVariable(String key);
-
-    /**
-     * @deprecated use {@code getSession()} to manipulate session state
-     */
-    @Deprecated
-    Set<String> getSessionVariableNames();
-
-    /**
-     * @deprecated use {@code getSession()} to manipulate session state
-     */
-    @Deprecated
-    void clearSessionVariables();
 
     /**
      * Indicates if notifications should be fired when processing this message.

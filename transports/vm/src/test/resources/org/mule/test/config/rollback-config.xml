@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:file="http://www.mulesoft.org/schema/mule/file"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
-      xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-       http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/current/mule-ajax.xsd">
+
+
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
         <flow name="syncService">
         <vm:inbound-endpoint path="async" exchange-pattern="one-way">

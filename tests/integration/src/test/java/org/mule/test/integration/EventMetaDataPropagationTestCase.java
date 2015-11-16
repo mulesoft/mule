@@ -9,7 +9,6 @@ package org.mule.test.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -18,18 +17,15 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
-import org.mule.api.service.Service;
+import org.mule.api.transformer.TransformerException;
 import org.mule.construct.Flow;
-import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,40 +33,23 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTestCase
+public class EventMetaDataPropagationTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/event-metadata-propagation-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/event-metadata-propagation-config-flow.xml"}});
-    }
 
-    public EventMetaDataPropagationTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/event-metadata-propagation-config-flow.xml";
     }
 
     @Test
     public void testEventMetaDataPropagation() throws MuleException
     {
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            Flow flow = muleContext.getRegistry().lookupObject("component1");
-            MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                ((InboundEndpoint) flow.getMessageSource()), flow);
-            flow.process(event);
-        }
-        else
-        {
-            Service service = muleContext.getRegistry().lookupService("component1");
-            MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), service);
-            service.sendEvent(event);
-        }
+        Flow flow = muleContext.getRegistry().lookupObject("component1");
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
+                                               ((InboundEndpoint) flow.getMessageSource()), flow);
+        flow.process(event);
     }
 
     public static class DummyComponent implements Callable
@@ -88,7 +67,7 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
                 props.put("longParam", (long) 123456789);
                 props.put("booleanParam", Boolean.TRUE);
                 MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props, muleContext);
-                msg.addAttachment("test1", new DataHandler(new DataSource()
+                msg.addOutboundAttachment("test1", new DataHandler(new DataSource()
                 {
                     @Override
                     public InputStream getInputStream() throws IOException
@@ -136,11 +115,11 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
      * Extend AbstractMessageAwareTransformer, even though it's deprecated, to ensure
      * that it keeps working for compatibility with older user-written transformers.
      */
-    @SuppressWarnings("deprecation")
-    public static class DummyTransformer extends AbstractMessageAwareTransformer
+    public static class DummyTransformer extends AbstractMessageTransformer
     {
+
         @Override
-        public Object transform(MuleMessage msg, String outputEncoding)
+        public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
         {
             assertEquals("param1", msg.getOutboundProperty("stringParam"));
             final Object o = msg.getOutboundProperty("objectParam");

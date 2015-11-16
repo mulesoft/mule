@@ -12,20 +12,11 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <model name="Synchronous_Message_Pattern">
-        <service name="SynchronousService">
-            <inbound>
-                <jms:inbound-endpoint queue="test.in" exchange-pattern="request-response"/>
-            </inbound>
+    <flow name="SynchronousService">
+        <jms:inbound-endpoint queue="test.in" exchange-pattern="request-response"/>
+        <test:component/>
+        <jms:outbound-endpoint queue="test.out" exchange-pattern="one-way"/>
+    </flow>
 
-            <test:component/>
-
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="test.out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
 </mule>
 <!--// END SNIPPET: full-config -->

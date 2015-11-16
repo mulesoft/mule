@@ -7,11 +7,13 @@
 package org.mule.module.extension.internal;
 
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extension.introspection.declaration.DescribingContext;
-import org.mule.extension.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Default implementation of {@link DescribingContext}.
@@ -25,6 +27,11 @@ public final class DefaultDescribingContext implements DescribingContext
 
     private final DeclarationDescriptor declarationDescriptor;
     private final Map<String, Object> customParameters = new HashMap<>();
+
+    public DefaultDescribingContext()
+    {
+        this(new DeclarationDescriptor());
+    }
 
     public DefaultDescribingContext(DeclarationDescriptor declarationDescriptor)
     {
@@ -44,28 +51,33 @@ public final class DefaultDescribingContext implements DescribingContext
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> getCustomParameters()
+    public void addParameter(String key, Object value)
     {
-        return customParameters;
+        checkArgument(!StringUtils.isBlank(key), "key cannot be blank");
+        checkArgument(value != null, "value cannot be null");
+
+        customParameters.put(key, value);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public <T> T getCheckedParameter(String key, Class<T> expectedType)
+    public <T> T getParameter(String key, Class<T> expectedType)
     {
-        Object parameter = getCustomParameters().get(key);
+        Object parameter = customParameters.get(key);
         if (parameter == null)
         {
             return null;
         }
 
-        checkArgument(expectedType.isInstance(parameter),
-                      String.format("Custom parameter '%s' was expected to be of class '%s' but got '%s' instead",
-                                    key,
-                                    expectedType.getName(),
-                                    parameter.getClass().getName()));
+        if (!expectedType.isInstance(parameter))
+        {
+            throw new IllegalArgumentException(String.format("Custom parameter '%s' was expected to be of class '%s' but got '%s' instead",
+                                                             key,
+                                                             expectedType.getName(),
+                                                             parameter.getClass().getName()));
+        }
 
         return (T) parameter;
     }

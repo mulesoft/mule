@@ -14,30 +14,22 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.FLOW;
-import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.transaction.Transaction;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.listener.ExceptionListener;
 import org.mule.tck.listener.SystemExceptionListener;
 import org.mule.transaction.TransactionCoordination;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Assume;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCase
 {
 
     private static final int TIMEOUT = 5000;
@@ -53,18 +45,11 @@ public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAn
     private static final String OUT_2_JMS_ENDPOINT = "jms://out2?connector=activeMq";
 
     private Transaction mockTransaction = mock(Transaction.class);
-
-    public CatchExceptionStrategyTransactionTestCase(ConfigVariant variant, String configResources)
+    
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml"},
-                {SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-service.xml"}});
+        return "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml";
     }
 
     @Test
@@ -125,9 +110,6 @@ public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAn
     @Test
     public void transactionCommitFailureTriggersExceptionStrategyUsingFilter() throws Exception
     {
-        //Skip test since it's not possible to replicate flow config with services
-        Assume.assumeThat(variant, is(FLOW));
-
         MuleMessage muleMessage = getTestMuleMessage();
         muleMessage.setOutboundProperty("filterMessage", true);
         transactionCommitFailureExecutesExceptionStrategy(muleMessage);

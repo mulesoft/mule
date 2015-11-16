@@ -9,35 +9,23 @@ package org.mule.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This test has been re-written to use entry point resolvers.
  */
-public class NoArgsCallWrapperFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
 {
     private static final int RECEIVE_TIMEOUT = 5000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "no-args-call-wrapper-config-service.xml"},
-            {ConfigVariant.FLOW, "no-args-call-wrapper-config-flow.xml"}});
-    }
-
-    public NoArgsCallWrapperFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "no-args-call-wrapper-config-flow.xml";
     }
 
     @Test

@@ -17,7 +17,7 @@ import org.mule.util.ClassUtils;
  *
  * @since 3.7.0
  */
-public class DefaultObjectBuilder<T> extends BaseObjectBuilder<T>
+public final class DefaultObjectBuilder<T> extends BaseObjectBuilder<T>
 {
 
     private final Class<T> prototypeClass;

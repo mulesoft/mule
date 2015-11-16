@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import org.mule.extension.runtime.OperationContext;
+import org.mule.extension.api.runtime.OperationContext;
 
 /**
  * An implementation of {@link ArgumentResolver} which resolves
@@ -29,11 +29,11 @@ public class ByParameterNameArgumentResolver<T> implements ArgumentResolver<T>
      * {@inheritDoc}
      *
      * @param operationContext an {@link OperationContext}
-     * @return the result of invoking {@link OperationContext#getParameterValue(String)} with {@link #parameterName}
+     * @return the result of invoking {@link OperationContext#getParameter(String)} with {@link #parameterName}
      */
     @Override
     public T resolve(OperationContext operationContext)
     {
-        return (T) operationContext.getParameterValue(parameterName);
+        return (T) operationContext.getParameter(parameterName);
     }
 }

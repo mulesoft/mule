@@ -55,8 +55,7 @@ public class StringToNumber extends AbstractTransformer implements DiscoverableT
             {
                 try
                 {
-                    return NumberUtils.convertNumberToTargetClass(numberFormat.parse((String) src),
-                        getReturnClass());
+                    return NumberUtils.convertNumberToTargetClass(numberFormat.parse((String) src), getType());
                 }
                 catch (Exception e)
                 {
@@ -65,14 +64,13 @@ public class StringToNumber extends AbstractTransformer implements DiscoverableT
             }
             else
             {
-                return NumberUtils.parseNumber((String) src, getReturnClass());
+                return NumberUtils.parseNumber((String) src, getType());
             }
         }
     }
 
     @SuppressWarnings({"unchecked"})
-    @Override
-    public Class<? extends Number> getReturnClass()
+    private Class<? extends Number> getType()
     {
         return (Class<Number>) super.getReturnDataType().getType();
     }

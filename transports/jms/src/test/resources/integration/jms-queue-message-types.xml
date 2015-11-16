@@ -9,17 +9,10 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
-    <model name="test">
-        <service name="PassThrough">
-            <inbound>
-                <inbound-endpoint ref="in"/>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="PassThrough">
+        <inbound-endpoint ref="in"/>
+        <test:component/>
+        <outbound-endpoint ref="out"/>
+    </flow>
+
 </mule>

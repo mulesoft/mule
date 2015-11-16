@@ -9,14 +9,10 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpVersion;
@@ -24,28 +20,19 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests as per http://www.io.com/~maus/HttpKeepAlive.html
  */
-public class Http10FunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class Http10FunctionalTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-10-config-service.xml"},
-            {ConfigVariant.FLOW, "http-10-config-flow.xml"}
-        });
-    }
-
-    public Http10FunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "http-10-config-flow.xml";
     }
 
     private HttpClient setupHttpClient()

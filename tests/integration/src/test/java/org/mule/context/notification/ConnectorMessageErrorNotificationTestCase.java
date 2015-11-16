@@ -10,17 +10,12 @@ import static org.mule.context.notification.BaseConnectorMessageNotification.MES
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
-
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
-import org.junit.runners.Parameterized.Parameters;
 
 public class ConnectorMessageErrorNotificationTestCase extends AbstractNotificationTestCase
 {
@@ -33,17 +28,10 @@ public class ConnectorMessageErrorNotificationTestCase extends AbstractNotificat
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/notifications/connector-message-error-notification-test-flow.xml"}
-        });
-    }
-
-    public ConnectorMessageErrorNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/notifications/connector-message-error-notification-test-flow.xml";
     }
 
     @Override

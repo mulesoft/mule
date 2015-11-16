@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
@@ -12,37 +12,22 @@
 
     <jms:activemq-connector name="jmsConnector" specification="1.1"/>
 
-    <model name="InjectionProblem">
-        <service name="pojo1">
-            <inbound>
-                <vm:inbound-endpoint path="pojo1" exchange-pattern="request-response" responseTimeout="10000"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint queue="pojo2" exchange-pattern="request-response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-        
-        <service name="pojo2">
-            <inbound>
-                <jms:inbound-endpoint queue="pojo2" exchange-pattern="request-response"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="pojo3" exchange-pattern="request-response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-        
-        <!-- This service will append " Received" to the message so we know we're getting the correct one -->
-        <service name="pojo3">
-            <inbound>
-                <vm:inbound-endpoint path="pojo3" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
-        </service>
-    </model>
+    <flow name="pojo1">
+        <vm:inbound-endpoint path="pojo1" exchange-pattern="request-response" responseTimeout="10000"/>
+        <echo-component/>
+        <jms:outbound-endpoint queue="pojo2" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="pojo2">
+        <jms:inbound-endpoint queue="pojo2" exchange-pattern="request-response"/>
+        <echo-component/>
+        <vm:outbound-endpoint path="pojo3" exchange-pattern="request-response"/>
+    </flow>
+
+    <!-- This service will append " Received" to the message so we know we're getting the correct one -->
+    <flow name="pojo3">
+        <vm:inbound-endpoint path="pojo3" exchange-pattern="request-response"/>
+        <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+    </flow>
+
 </mule>

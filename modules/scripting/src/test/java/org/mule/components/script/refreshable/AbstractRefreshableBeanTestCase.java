@@ -8,24 +8,18 @@ package org.mule.components.script.refreshable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 
-public abstract class AbstractRefreshableBeanTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
 {
     protected static final int WAIT_TIME = 1000;
-
-    public AbstractRefreshableBeanTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     protected void writeScript(String src, String path) throws IOException
     {

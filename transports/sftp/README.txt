@@ -1,1 +1,0 @@
-In order to run all of the tests for the sftp transport, you need to copy sftp-settings.properties.template to sftp-settings.properties.  The integration tests will be skipped if sftp-settings.properties is not found in the test classpath.

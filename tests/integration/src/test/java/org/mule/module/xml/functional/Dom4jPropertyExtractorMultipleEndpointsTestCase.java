@@ -15,18 +15,16 @@ import org.dom4j.Element;
 public class Dom4jPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public Dom4jPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
+    public Dom4jPropertyExtractorMultipleEndpointsTestCase()
     {
-        super(variant, configResources, false);
+        super(false);
     }
 
     @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/endpoints/endpoint");
-        p.setProperty("selector.evaluator", "xpath");
-
+        p.setProperty("selector.expression", "xpath:/endpoints/endpoint");
         return p;
     }
 

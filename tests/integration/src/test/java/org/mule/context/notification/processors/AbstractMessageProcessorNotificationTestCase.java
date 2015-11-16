@@ -13,10 +13,6 @@ import org.mule.context.notification.RestrictedNode;
 
 public abstract class AbstractMessageProcessorNotificationTestCase extends AbstractNotificationTestCase
 {
-    public AbstractMessageProcessorNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     protected RestrictedNode pre()
     {

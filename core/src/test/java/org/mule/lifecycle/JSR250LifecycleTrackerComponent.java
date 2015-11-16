@@ -9,12 +9,12 @@ package org.mule.lifecycle;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-public class JSR250LifecycleTrackerComponent implements Startable, Stoppable, MuleContextAware, ServiceAware, Callable
+public class JSR250LifecycleTrackerComponent implements Startable, Stoppable, MuleContextAware, FlowConstructAware, Callable
 {
 
     private final List<String> tracker = new ArrayList<String>();
@@ -57,9 +57,9 @@ public class JSR250LifecycleTrackerComponent implements Startable, Stoppable, Mu
         tracker.add("stop");
     }
 
-    public void setService(final Service service)
+    public void setFlowConstruct(final FlowConstruct flowConstruct)
     {
-        getTracker().add("setService");
+        getTracker().add("setFlowConstruct");
     }
 
     public Object onCall(final MuleEventContext eventContext) throws Exception {

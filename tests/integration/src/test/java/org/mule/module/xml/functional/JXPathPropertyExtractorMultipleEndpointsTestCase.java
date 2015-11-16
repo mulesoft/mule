@@ -11,18 +11,16 @@ import java.util.Properties;
 public class JXPathPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public JXPathPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
+    public JXPathPropertyExtractorMultipleEndpointsTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/endpoints/endpoint");
-        p.setProperty("selector.evaluator", "jxpath");
-
+        p.setProperty("selector.expression", "jxpath:/endpoints/endpoint");
         return p;
     }
 

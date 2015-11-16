@@ -12,10 +12,23 @@ import org.mule.api.context.MuleContextAware;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
+/**
+ * Utility class for performing lifecycle operations on objects, as long
+ * as they implement cooresponding annotations such as {@link Initialisable},
+ * {@link Startable}, {@link Stoppable}, {@link Disposable} or even
+ * {@link MuleContextAware}.
+ * <p>
+ * The {@link Optional} object container is also supported, in which case the
+ * operation will be evaluated on the value it holds or not at all if the value
+ * is not present.
+ *
+ * @since 3.7.0
+ */
 public class LifecycleUtils
 {
 
@@ -47,6 +60,7 @@ public class LifecycleUtils
      */
     public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException
     {
+        object = unwrap(object);
         if (muleContext != null && object instanceof MuleContextAware)
         {
             ((MuleContextAware) object).setMuleContext(muleContext);
@@ -87,6 +101,7 @@ public class LifecycleUtils
      */
     public static void startIfNeeded(Object object) throws MuleException
     {
+        object = unwrap(object);
         if (object instanceof Startable)
         {
             ((Startable) object).start();
@@ -118,6 +133,30 @@ public class LifecycleUtils
     }
 
     /**
+     * For each item in the {@code objects} collection, it invokes the {@link Stoppable#stop()}
+     * if it implements the {@link Stoppable} interface.
+     * <p>
+     * This method is considered safe because it will not throw exception and the {@link Stoppable#stop()}
+     * method will be called on all the {@code objects} regarding on any (or all) of them throwing exceptions.
+     * Any exceptions generated will be logged using the provided {@code logger} and processing will
+     * continue
+     *
+     * @param objects the list of objects to be stopped
+     * @param logger  the {@link Logger} in which any exception found is to be logged
+     */
+    public static void safeStopIfNeeded(Collection<? extends Object> objects, Logger logger)
+    {
+        try
+        {
+            doApplyPhase(Stoppable.PHASE_NAME, objects, logger);
+        }
+        catch (Exception e)
+        {
+            logger.warn("Found unexpected exception during safe stop", e);
+        }
+    }
+
+    /**
      * Invokes the {@link Stoppable#stop()} on {@code object} if it implements the {@link Stoppable} interface.
      *
      * @param object the object you're trying to stop
@@ -143,7 +182,7 @@ public class LifecycleUtils
     /**
      * For each item in the {@code objects} collection, it invokes {@link Disposable#dispose()}
      * if it implements the {@link Disposable} interface.
-     * <p/>
+     * <p>
      * Per each dispose operation that fails, the exception will be silently logged using the
      * provided {@code logger}
      *
@@ -171,6 +210,7 @@ public class LifecycleUtils
 
         for (Object object : objects)
         {
+            object = unwrap(object);
             if (object == null)
             {
                 continue;
@@ -199,7 +239,7 @@ public class LifecycleUtils
             {
                 if (logger != null)
                 {
-                    logger.error(String.format("Could not apply phase %s on object of class %s", phase, object.getClass().getName()), e);
+                    logger.error(String.format("Could not apply %s phase on object of class %s", phase, object.getClass().getName()), e);
                 }
                 else
                 {
@@ -207,5 +247,16 @@ public class LifecycleUtils
                 }
             }
         }
+    }
+
+    private static Object unwrap(Object value)
+    {
+        if (value instanceof Optional)
+        {
+            Optional<?> optional = (Optional) value;
+            return optional.isPresent() ? optional.get() : null;
+        }
+
+        return value;
     }
 }

@@ -9,7 +9,7 @@ package org.mule.config.builders;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
-import org.mule.extension.ExtensionManager;
+import org.mule.extension.api.ExtensionManager;
 import org.mule.util.ClassUtils;
 
 /**
@@ -31,10 +31,10 @@ public class ExtensionsManagerConfigurationBuilder extends AbstractConfiguration
             ClassUtils.isClassOnPath(EXTENSIONS_MANAGER_CLASS_NAME, getClass()))
         {
             ExtensionManager extensionManager = (ExtensionManager) ClassUtils.instanciateClass(EXTENSIONS_MANAGER_CLASS_NAME);
-            extensionManager.discoverExtensions(Thread.currentThread().getContextClassLoader());
-
             ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
             initialiseIfNeeded(extensionManager, muleContext);
+
+            extensionManager.discoverExtensions(Thread.currentThread().getContextClassLoader());
         }
     }
 }

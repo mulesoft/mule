@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import static org.mule.util.Preconditions.checkArgument;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -137,5 +139,29 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
 
         buf.append('}');
         return buf.toString();
+    }
+
+    /**
+     * Puts the {@code key}/{@code value} pair into the given {@code map} only as long
+     * as the {@code key} is not already present on the {@code map}. This method is not thread-safe
+     * per-se. If the {@code map} is a shared resource then it's up to the caller to handle
+     * concurrency.
+     *
+     * @param map   a {@link Map}
+     * @param key   the key
+     * @param value the value
+     * @param <K>   the generic type of the key
+     * @param <V>   the generic type of the value
+     * @throws IllegalStateException if the {@code map} already contains the {@code key}
+     */
+    public static <K, V> void idempotentPut(Map<K, V> map, K key, V value)
+    {
+        checkArgument(key != null, "key cannot be null");
+        if (map.containsKey(key))
+        {
+            throw new IllegalStateException(String.format("Key '%s' is already registered with value %s", key, map.get(key)));
+        }
+
+        map.put(key, value);
     }
 }

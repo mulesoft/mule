@@ -11,7 +11,7 @@ import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
 import org.mule.execution.TransactionalExecutionTemplate;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransactionFactory;
@@ -32,14 +32,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public abstract class AbstractExternalTransactionTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractExternalTransactionTestCase extends FunctionalTestCase
 {
-    public AbstractExternalTransactionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     protected static final Log logger = LogFactory.getLog(AbstractExternalTransactionTestCase.class);
+
     protected MuleContext context;
     protected TransactionManager tm;
 

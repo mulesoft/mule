@@ -17,7 +17,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerServiceTestCase
+public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
@@ -28,7 +28,6 @@ public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNa
         return "authentication-config-flow.xml";
     }
  
-    @Override
     @Test
     public void testEndpointConfiguration()
     {

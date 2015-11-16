@@ -6,33 +6,22 @@
  */
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class DynamicEndpointRoutingTestCase extends AbstractServiceAndFlowTestCase
+public class DynamicEndpointRoutingTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dynamic-endpoint-routing-test-service.xml"},
-            {ConfigVariant.FLOW, "dynamic-endpoint-routing-test-flow.xml"}});
-    }
 
-    public DynamicEndpointRoutingTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "dynamic-endpoint-routing-test-flow.xml";
     }
 
     @Test

@@ -25,17 +25,11 @@
 
     <custom-transformer class="org.mule.transport.file.transformers.FileToByteArray" name="FileToByteArray"/>
 
-    <model name="ESTest">
-        <service name="FolderTO">
-            <inbound>
-                <file:inbound-endpoint ref="get"
-                                       comparator="org.mule.transport.file.comparator.OlderFirstComparator"
-                                       reverseOrder="true">
-                    <file:file-to-byte-array-transformer/>
-                </file:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <threading-profile doThreading="false"/>
-        </service>
-    </model>
+    <flow name="FolderTO" processingStrategy="synchronous">
+        <file:inbound-endpoint ref="get" comparator="org.mule.transport.file.comparator.OlderFirstComparator"
+            reverseOrder="true">
+            <file:file-to-byte-array-transformer />
+        </file:inbound-endpoint>
+        <test:component />
+    </flow>
 </mule>

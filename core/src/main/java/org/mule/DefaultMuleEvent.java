@@ -609,24 +609,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     /**
-     * This method will attempt to convert the transformed message into an array of bytes It will first check
-     * if the result of the transformation is a byte array and return that. Otherwise if the the result is a
-     * string it will serialized the CONTENTS of the string not the String object. finally it will check if
-     * the result is a Serializable object and convert that to an array of bytes.
-     *
-     * @return a byte[] representation of the message
-     * @throws TransformerException if an unsupported encoding is being used or if the result message is not a
-     *             String byte[] or Seializable object
-     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
-     */
-    @Override
-    @Deprecated
-    public byte[] transformMessageToBytes() throws TransformerException
-    {
-        return transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
-    }
-
-    /**
      * Returns the message transformed into it's recognised or expected format and then into a String. The
      * transformer used is the one configured on the endpoint through which this event was received.
      *
@@ -671,34 +653,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public String getId()
     {
         return id;
-    }
-
-    /**
-     * @see #getMessage()
-     * @deprecated use appropriate scope-aware calls on the MuleMessage (via event.getMessage())
-     */
-    @Override
-    @Deprecated
-    public Object getProperty(String name)
-    {
-        throw new UnsupportedOperationException(
-            "Method's behavior has changed in Mule 3, use "
-                            + "event.getMessage() and suitable scope-aware property access "
-                            + "methods on it");
-    }
-
-    /**
-     * @see #getMessage()
-     * @deprecated use appropriate scope-aware calls on the MuleMessage (via event.getMessage())
-     */
-    @Override
-    @Deprecated
-    public Object getProperty(String name, Object defaultValue)
-    {
-        throw new UnsupportedOperationException(
-            "Method's behavior has changed in Mule 3, use "
-                            + "event.getMessage() and suitable scope-aware property access "
-                            + "methods on it");
     }
 
     @Override
@@ -935,14 +889,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     @Override
-    @Deprecated
-    public Object transformMessage() throws TransformerException
-    {
-        logger.warn("Deprecation warning: MuleEvent.transformMessage does nothing in Mule 3.x.  The message is already transformed before the event reaches a component");
-        return message.getPayload();
-    }
-
-    @Override
     public ProcessingTime getProcessingTime()
     {
         return processingTime;
@@ -982,12 +928,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public Object getReplyToDestination()
     {
         return replyToDestination;
-    }
-
-    @Override
-    public void captureReplyToDestination()
-    {
-
     }
 
     @Override
@@ -1154,189 +1094,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public void removeFlowVariable(String key)
     {
         flowVariables.remove(key);
-    }
-
-    @Override
-    public <T> T getSessionVariable(String key)
-    {
-        return session.<T> getProperty(key);
-    }
-
-    @Override
-    public DataType<?> getSessionVariableDataType(String key)
-    {
-        return session.getPropertyDataType(key);
-    }
-
-    @Override
-    public void setSessionVariable(String key, Object value)
-    {
-        session.setProperty(key, value);
-    }
-
-    @Override
-    public void setSessionVariable(String key, Serializable value, DataType dataType)
-    {
-        session.setProperty(key, value, dataType);
-    }
-
-    @Override
-    public void removeSessionVariable(String key)
-    {
-        session.removeProperty(key);
-    }
-
-    @Override
-    public Set<String> getSessionVariableNames()
-    {
-        return session.getPropertyNamesAsSet();
-    }
-
-    @Override
-    public void clearSessionVariables()
-    {
-        session.clearProperties();
-    }
-
-    // Deprecated constructors
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message, MessageExchangePattern exchangePattern, MuleSession session)
-    {
-        this(message, exchangePattern, session, message.getMuleContext()
-            .getConfiguration()
-            .getDefaultResponseTimeout(), null, null);
-    }
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message,
-                            MessageExchangePattern exchangePattern,
-                            MuleSession session,
-                            OutputStream outputStream)
-    {
-        this(message, exchangePattern, session, message.getMuleContext()
-            .getConfiguration()
-            .getDefaultResponseTimeout(), null, outputStream);
-    }
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message,
-                            MessageExchangePattern exchangePattern,
-                            MuleSession session,
-                            int timeout,
-                            Credentials credentials,
-                            OutputStream outputStream)
-    {
-        this(message, URI.create("none"), exchangePattern, session, timeout, credentials, outputStream);
-    }
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message,
-                            URI messageSourceURI,
-                            MessageExchangePattern exchangePattern,
-                            MuleSession session)
-    {
-        this(message, messageSourceURI, exchangePattern, session, message.getMuleContext()
-            .getConfiguration()
-            .getDefaultResponseTimeout(), null, null);
-    }
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message,
-                            URI messageSourceURI,
-                            MessageExchangePattern exchangePattern,
-                            MuleSession session,
-                            OutputStream outputStream)
-    {
-        this(message, messageSourceURI, exchangePattern, session, message.getMuleContext()
-            .getConfiguration()
-            .getDefaultResponseTimeout(), null, outputStream);
-    }
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message,
-                            URI messageSourceURI,
-                            MessageExchangePattern exchangePattern,
-                            MuleSession session,
-                            int timeout,
-                            Credentials credentials,
-                            OutputStream outputStream)
-    {
-        this(message, messageSourceURI, exchangePattern, session.getFlowConstruct(), session, timeout,
-            credentials, outputStream);
-    }
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, MuleSession session)
-    {
-        this(message, endpoint, session, null, null, null);
-    }
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message,
-                            InboundEndpoint endpoint,
-                            MuleSession session,
-                            ReplyToHandler replyToHandler,
-                            OutputStream outputStream,
-                            Object replyToDestination)
-    {
-        this(message, endpoint, session.getFlowConstruct(), session, replyToHandler, replyToDestination, outputStream);
-    }
-
-    /**
-     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
-     * constructor is only here for backwards compatibility.
-     */
-    @Deprecated
-    public DefaultMuleEvent(MuleMessage message,
-                            URI messageSourceURI,
-                            String messageSourceName,
-                            MessageExchangePattern exchangePattern,
-                            MuleSession session,
-                            int timeout,
-                            Credentials credentials,
-                            OutputStream outputStream,
-                            String encoding,
-                            boolean transacted,
-                            boolean synchronous,
-                            Object replyToDestination,
-                            ReplyToHandler replyToHandler)
-    {
-        this(message, messageSourceURI, messageSourceName, exchangePattern, session.getFlowConstruct(),
-            session, timeout, credentials, outputStream, encoding, transacted, synchronous,
-            replyToDestination, replyToHandler);
     }
 
     @Override

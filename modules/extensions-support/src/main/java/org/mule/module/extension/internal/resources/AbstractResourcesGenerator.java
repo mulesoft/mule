@@ -7,10 +7,10 @@
 package org.mule.module.extension.internal.resources;
 
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.introspection.Extension;
-import org.mule.extension.resources.GeneratedResource;
-import org.mule.extension.resources.ResourcesGenerator;
-import org.mule.extension.resources.spi.GenerableResourceContributor;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.resources.GeneratedResource;
+import org.mule.extension.api.resources.ResourcesGenerator;
+import org.mule.extension.api.resources.spi.GenerableResourceContributor;
 
 import com.google.common.collect.ImmutableList;
 
@@ -60,11 +60,11 @@ public abstract class AbstractResourcesGenerator implements ResourcesGenerator
      * {@inheritDoc}
      */
     @Override
-    public void generateFor(Extension extension)
+    public void generateFor(ExtensionModel extensionModel)
     {
         for (GenerableResourceContributor contributor : serviceRegistry.lookupProviders(GenerableResourceContributor.class, getClass().getClassLoader()))
         {
-            contributor.contribute(extension, this);
+            contributor.contribute(extensionModel, this);
         }
     }
 

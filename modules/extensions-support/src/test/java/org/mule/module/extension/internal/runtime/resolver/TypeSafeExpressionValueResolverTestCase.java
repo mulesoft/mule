@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.expression.DefaultExpressionManager;
-import org.mule.extension.introspection.DataType;
+import org.mule.extension.api.introspection.DataType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

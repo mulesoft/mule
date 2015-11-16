@@ -6,37 +6,25 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertTrue;
-
-// START SNIPPET: full-class
-public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
+public class InOnlyTestCase extends FunctionalTestCase
 {
     public static final long TIMEOUT = 3000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Only-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Only-flow.xml"}});
-    }
-
-    public InOnlyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/messaging/meps/pattern_In-Only-flow.xml";
     }
 
     @Test

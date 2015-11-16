@@ -30,7 +30,6 @@ import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -137,31 +136,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      * Register a supported data type with this transformer.  The will allow objects that match this data type to be
      * transformed by this transformer.
      *
-     * @param aClass the source type to allow
-     * @deprecated use registerSourceType(DataType)
-     */
-    @Deprecated
-    protected void registerSourceType(Class<?> aClass)
-    {
-        registerSourceType(new SimpleDataType<Object>(aClass));
-    }
-
-    /**
-     * Unregister a supported source type from this transformer
-     *
-     * @param aClass the type to remove
-     * @deprecated use unregisterSourceType(DataType)
-     */
-    @Deprecated
-    protected void unregisterSourceType(Class<?> aClass)
-    {
-        unregisterSourceType(new SimpleDataType<Object>(aClass));
-    }
-
-    /**
-     * Register a supported data type with this transformer.  The will allow objects that match this data type to be
-     * transformed by this transformer.
-     *
      * @param dataType the source type to allow
      */
     protected void registerSourceType(DataType<?> dataType)
@@ -215,13 +189,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         name = string;
     }
 
-    @Deprecated
-    @Override
-    public Class<?> getReturnClass()
-    {
-        return returnType.getType();
-    }
-
     @Override
     public void setReturnDataType(DataType<?> type)
     {
@@ -234,16 +201,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     public DataType<?> getReturnDataType()
     {
         return returnType;
-    }
-
-    @Override
-    @Deprecated
-    public void setReturnClass(Class<?> newClass)
-    {
-        DataType<?> tempReturnType = new SimpleDataType<Object>(newClass);
-        tempReturnType.setMimeType(mimeType);
-        tempReturnType.setEncoding(encoding);
-        setReturnDataType(tempReturnType);
     }
 
     public void setMimeType(String mimeType) throws MimeTypeParseException
@@ -294,32 +251,10 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         this.allowNullReturn = allowNullReturn;
     }
 
-    @Deprecated
-    @Override
-    public boolean isSourceTypeSupported(Class<?> aClass)
-    {
-        return isSourceDataTypeSupported(DataTypeFactory.create(aClass), false);
-    }
-
     @Override
     public boolean isSourceDataTypeSupported(DataType<?> dataType)
     {
         return isSourceDataTypeSupported(dataType, false);
-    }
-
-    /**
-     * Determines whether that data type passed in is supported by this transformer
-     *
-     * @param aClass     the type to check against
-     * @param exactMatch if the source type on this transformer is open (can be anything) it will return true unless an
-     *                   exact match is requested using this flag
-     * @return true if the source type is supported by this transformer, false otherwise
-     * @deprecated use {@link #isSourceDataTypeSupported(org.mule.api.transformer.DataType, boolean)}
-     */
-    @Deprecated
-    public boolean isSourceTypeSupported(Class<MuleMessage> aClass, boolean exactMatch)
-    {
-        return isSourceDataTypeSupported(new SimpleDataType<MuleMessage>(aClass), exactMatch);
     }
 
     /**
@@ -504,19 +439,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     protected String generateTransformerName()
     {
         return TransformerUtils.generateTransformerName(getClass(), returnType);
-    }
-
-    @Deprecated
-    @Override
-    public List<Class<?>> getSourceTypes()
-    {
-        //A work around to support the legacy API
-        List<Class<?>> sourceClasses = new ArrayList<Class<?>>();
-        for (DataType<?> sourceType : sourceTypes)
-        {
-            sourceClasses.add(sourceType.getType());
-        }
-        return Collections.unmodifiableList(sourceClasses);
     }
 
     @Override

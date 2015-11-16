@@ -44,7 +44,7 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
                 try
                 {
                     return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload(),
-                        muleContext), MessageExchangePattern.REQUEST_RESPONSE, getTestService(),
+                        muleContext), MessageExchangePattern.REQUEST_RESPONSE, getTestFlow(),
                         getTestSession(null, muleContext));
                 }
                 catch (Exception e)

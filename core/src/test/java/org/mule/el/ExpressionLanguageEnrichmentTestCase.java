@@ -113,7 +113,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
             MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
         expressionManager.enrich("flowVars['foo']", event, "bar");
         Assert.assertEquals("bar", event.getFlowVariable("foo"));
-        Assert.assertNull(event.getSessionVariable("foo"));
+        Assert.assertNull(event.getSession().getProperty("foo"));
     }
 
     @Test
@@ -122,7 +122,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("", muleContext),
             MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
         expressionManager.enrich("sessionVars['foo']", event, "bar");
-        Assert.assertEquals("bar", event.getSessionVariable("foo"));
+        Assert.assertEquals("bar", event.getSession().getProperty("foo"));
         Assert.assertNull(event.getFlowVariable("foo"));
     }
 

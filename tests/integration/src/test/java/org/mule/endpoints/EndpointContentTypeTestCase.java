@@ -7,35 +7,23 @@
 package org.mule.endpoints;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /** Test configuration of content-type in various endpoints */
-public class EndpointContentTypeTestCase  extends AbstractServiceAndFlowTestCase
+public class EndpointContentTypeTestCase  extends FunctionalTestCase
 {   
-    public EndpointContentTypeTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return  "content-type-setting-endpoint-configs-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "content-type-setting-endpoint-configs-service.xml"},
-            {ConfigVariant.FLOW, "content-type-setting-endpoint-configs-flow.xml"}
-        });
-    }      
-    
     @Test
     public void testContentType()  throws Exception
     {

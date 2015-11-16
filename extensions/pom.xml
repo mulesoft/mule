@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,7 +20,9 @@
     <modules>
          <module>validation</module>
     </modules>
-
+    <properties>
+        <mule.version>${project.parent.version}</mule.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.mule.extensions</groupId>
@@ -29,23 +31,23 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -81,6 +83,9 @@
                             <processors>
                                 <processor>org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor</processor>
                             </processors>
+                            <options>
+                                <extension.version>${project.version}</extension.version>
+                            </options>
                         </configuration>
                     </execution>
                 </executions>

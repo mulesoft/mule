@@ -8,42 +8,30 @@ package org.mule.transport.jms.integration;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class JmsResponseElementTestCase extends AbstractServiceAndFlowTestCase
+public class JmsResponseElementTestCase extends FunctionalTestCase
 {
     public static final String MESSAGE = "A Message";
     public static final String EXPECTED_MODIFIED_MESSAGE = "A Message jms flow content";
     public static final int TIMEOUT = 3000;
     public static final int TINY_TIMEOUT = 300;
 
-    public JmsResponseElementTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-                {ConfigVariant.SERVICE, "integration/jms-response-element-config-service.xml"},
-                {ConfigVariant.FLOW, "integration/jms-response-element-config-flow.xml"}
-        });
+        return "integration/jms-response-element-config-flow.xml";
     }
 
     @Test

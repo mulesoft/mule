@@ -36,12 +36,12 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextTestC
         ImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
         assertTrue(ep instanceof InboundEndpoint);
         assertFalse(ep instanceof OutboundEndpoint);
-        assertNotNull(ep.getTransformers());
+        assertNotNull(ep.getMessageProcessors());
         // We no longer apply default transport transformers as part of endpoint processing
-        assertEquals(0, ep.getTransformers().size());
-        assertNotNull(ep.getResponseTransformers());
+        assertEquals(0, ep.getMessageProcessors().size());
+        assertNotNull(ep.getResponseMessageProcessors());
         // We no longer apply default transport transformers as part of endpoint processing
-        assertEquals(0, ep.getResponseTransformers().size());
+        assertEquals(0, ep.getResponseMessageProcessors().size());
         testDefaultCommonEndpointAttributes(ep);
     }
 
@@ -54,10 +54,10 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextTestC
         assertFalse(ep instanceof InboundEndpoint);
         assertTrue(ep instanceof OutboundEndpoint);
         // We no longer apply default transport transformers as part of endpoint processing
-        assertEquals(0, ep.getTransformers().size());
-        assertNotNull(ep.getResponseTransformers());
+        assertEquals(0, ep.getMessageProcessors().size());
+        assertNotNull(ep.getResponseMessageProcessors());
         // We no longer apply default transport transformers as part of endpoint processing
-        assertEquals(0, ep.getResponseTransformers().size());
+        assertEquals(0, ep.getResponseMessageProcessors().size());
         testDefaultCommonEndpointAttributes(ep);
     }
 

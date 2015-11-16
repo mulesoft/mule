@@ -6,6 +6,8 @@
  */
 package org.mule.transport;
 
+import static org.mule.api.transport.PropertyScope.INVOCATION;
+import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
@@ -17,12 +19,10 @@ import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 
 import java.util.List;
 
@@ -156,26 +156,11 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         {
             boolean hasResponse = endpoint.getExchangePattern().hasResponse();
             remoteSync = hasResponse || doSend;
-            if (remoteSync)
-            {
-                // service will be null for client calls
-                if (event.getFlowConstruct() != null && event.getFlowConstruct() instanceof Service)
-                {
-                    ServiceAsyncReplyCompositeMessageSource responseRouters = ((Service) event.getFlowConstruct()).getAsyncReplyMessageSource();
-                    if (responseRouters != null && responseRouters.getEndpoints().size() > 0)
-                    {
-                        remoteSync = false;
-                    }
-                    else
-                    {
-                        remoteSync = true;
-                    }
-                }
-            }
         }
         if (!remoteSync)
         {
-            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, OUTBOUND);
+            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, INVOCATION);
         }
         return remoteSync;
     }

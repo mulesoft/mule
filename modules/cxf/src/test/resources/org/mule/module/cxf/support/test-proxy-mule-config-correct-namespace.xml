@@ -4,7 +4,7 @@
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    
+
       xsi:schemaLocation="
             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -12,34 +12,25 @@
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
 
-    <model name="CxfSimpleProxy">
-        <service name="Gateway">
-            <inbound>
-                <inbound-endpoint address="http://localhost:8088/TestProxy" 
-                                          exchange-pattern="request-response">
-                    <cxf:proxy-service port="TestPOJOComponentPort"
-                                       service="TestPOJOComponent" 
-                                       namespace="http://someOtherPackage.support.cxf.transport.mule/"
-                                       wsdlLocation="./org/mule/module/cxf/support/TestProxyImpl.wsdl"
+    <flow name="Gateway">
+        <inbound-endpoint address="http://localhost:8088/TestProxy"
+                          exchange-pattern="request-response">
+            <cxf:proxy-service port="TestPOJOComponentPort"
+                               service="TestPOJOComponent"
+                               namespace="http://someOtherPackage.support.cxf.transport.mule/"
+                               wsdlLocation="./org/mule/module/cxf/support/TestProxyImpl.wsdl"
                     />
-                </inbound-endpoint>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="vm://TestProxyImpl" exchange-pattern="request-response">
-                        <cxf:proxy-client />
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+        </inbound-endpoint>
+        <outbound-endpoint address="vm://TestProxyImpl" exchange-pattern="request-response">
+            <cxf:proxy-client/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="Component">
-            <inbound>
-                <inbound-endpoint address="vm://TestProxyImpl" exchange-pattern="request-response">
-                    <cxf:proxy-service />
-                </inbound-endpoint>             
-            </inbound>
-            <component class="org.mule.module.cxf.support.someOtherPackage.TestPOJOComponent"/>
-        </service>
-    </model>
+    <flow name="Component">
+        <inbound-endpoint address="vm://TestProxyImpl" exchange-pattern="request-response">
+            <cxf:proxy-service/>
+        </inbound-endpoint>
+        <component class="org.mule.module.cxf.support.someOtherPackage.TestPOJOComponent"/>
+    </flow>
+
 </mule>

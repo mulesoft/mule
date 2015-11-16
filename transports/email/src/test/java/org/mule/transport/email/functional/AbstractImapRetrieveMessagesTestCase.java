@@ -55,9 +55,9 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
     private FlowExecutionListener flowExecutionListener;
     public int initialReadMessages;
 
-    public AbstractImapRetrieveMessagesTestCase(ConfigVariant variant, String configResources, int initialReadMessages)
+    public AbstractImapRetrieveMessagesTestCase(int initialReadMessages)
     {
-        super(variant, STRING_MESSAGE, "imap", configResources);
+        super(STRING_MESSAGE, "imap");
         this.initialReadMessages = initialReadMessages;
     }
 

@@ -6,21 +6,26 @@
  */
 package org.mule.context.notification;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.notification.ComponentMessageNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.service.Service;
-import org.mule.component.simple.EchoComponent;
-import org.mule.tck.MuleTestUtils;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.api.MuleMessage;
+import org.mule.api.component.Component;
+import org.mule.api.context.MuleContextBuilder;
+import org.mule.api.context.notification.ComponentMessageNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.component.DefaultJavaComponent;
+import org.mule.component.simple.EchoComponent;
+import org.mule.construct.Flow;
+import org.mule.object.SingletonObjectFactory;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Collections;
+
+import org.junit.Test;
 
 /**
  * Test ComponentNotifications/Listeners by sending events to a component. A pre and
@@ -29,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleContextTestCase
 {
 
-    protected Service service;
+    protected Component component;
     protected ServerNotificationManager manager;
     protected ComponentListener componentListener;
 
@@ -43,7 +48,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
         ServerNotificationManager notificationManager = new ServerNotificationManager();
         notificationManager.setNotificationDynamic(true);
         notificationManager.addInterfaceToType(ComponentMessageNotificationListener.class,
-            ComponentMessageNotification.class);
+                                               ComponentMessageNotification.class);
         contextBuilder.setNotificationManager(notificationManager);
     }
 
@@ -51,9 +56,17 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
     protected void doSetUp() throws Exception
     {
         setDisposeContextPerClass(true);
+
+        Flow flow = new Flow("testFlow", muleContext);
         componentListener = new ComponentListener();
-        service = getTestService("seda", EchoComponent.class);
-        if(!muleContext.isStarted()) muleContext.start();
+        component = new DefaultJavaComponent(new SingletonObjectFactory(EchoComponent.class));
+        flow.setMessageProcessors(Collections.<MessageProcessor>singletonList(component));
+        muleContext.getRegistry().registerFlowConstruct(flow);
+
+        if (!muleContext.isStarted())
+        {
+            muleContext.start();
+        }
     }
 
     @Test
@@ -61,7 +74,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
     {
         assertFalse(componentListener.isNotified());
 
-        service.sendEvent(MuleTestUtils.getTestEvent("test data", muleContext));
+        component.process(MuleTestUtils.getTestEvent("test data", muleContext));
 
         assertFalse(componentListener.isNotified());
         assertFalse(componentListener.isBefore());
@@ -76,7 +89,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
 
         assertFalse(componentListener.isNotified());
 
-        service.sendEvent(MuleTestUtils.getTestEvent("test data", muleContext));
+        component.process(MuleTestUtils.getTestEvent("test data", muleContext));
 
         // threaded processing, make sure the notifications have time to process
         Thread.sleep(100);

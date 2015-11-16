@@ -15,18 +15,16 @@ import javax.xml.parsers.ParserConfigurationException;
 public class W3CDomPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public W3CDomPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
+    public W3CDomPropertyExtractorMultipleEndpointsTestCase()
     {
-        super(variant, configResources, false);
+        super(false);
     }
 
     @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/endpoints/endpoint");
-        p.setProperty("selector.evaluator", "xpath");
-
+        p.setProperty("selector.expression", "xpath:/endpoints/endpoint");
         return p;
     }
 

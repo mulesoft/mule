@@ -6,35 +6,22 @@
  */
 package org.mule.test.integration.client;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-public class MuleClientInThreadTestCase extends AbstractServiceAndFlowTestCase
+import org.junit.Test;
+
+public class MuleClientInThreadTestCase extends FunctionalTestCase
 {
     int numMessages = 100000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/client/client-in-thread-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/client/client-in-thread-flow.xml"}
-        });
-    }
-
-    public MuleClientInThreadTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/client/client-in-thread-flow.xml";
     }
 
     @Test

@@ -19,23 +19,20 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
+public class CxfErrorBehaviorTestCase extends FunctionalTestCase
 {
     private static final String requestFaultPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
@@ -62,20 +59,11 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
-
-    public CxfErrorBehaviorTestCase(ConfigVariant variant, String configResources)
+    
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "cxf-error-behavior-service.xml"},
-                {ConfigVariant.FLOW, "cxf-error-behavior-flow.xml"},
-                {ConfigVariant.FLOW, "cxf-error-behavior-flow-httpn.xml"}
-        });
+        return "cxf-error-behavior-flow-httpn.xml";
     }
 
     @Test

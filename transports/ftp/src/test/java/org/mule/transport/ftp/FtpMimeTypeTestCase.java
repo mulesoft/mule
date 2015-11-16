@@ -13,28 +13,17 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.transformer.types.MimeTypes;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class FtpMimeTypeTestCase extends AbstractFtpServerTestCase
 {
 
     private static final int TIMEOUT = 5000;
 
-    public FtpMimeTypeTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "ftp-mime-type.xml"}
-        });
+        return "ftp-mime-type.xml";
     }
 
     @Test

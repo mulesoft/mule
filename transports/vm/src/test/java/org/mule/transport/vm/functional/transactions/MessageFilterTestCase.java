@@ -8,45 +8,34 @@ package org.mule.transport.vm.functional.transactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test transaction behavior when "joinExternal" is set to disallow joining external
  * transactions There is one test per legal transactional behavior (e.g.
  * ALWAYS_BEGIN).
  */
-public class MessageFilterTestCase extends AbstractServiceAndFlowTestCase
+public class MessageFilterTestCase extends FunctionalTestCase
 {
+
     protected static final Log logger = LogFactory.getLog(MessageFilterTestCase.class);
 
     private static String rejectMesage;
 
-    public MessageFilterTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/config/message-filter-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/config/message-filter-config-flow.xml"}});
+        return "org/mule/test/config/message-filter-config-flow.xml";
     }
 
     /** Check that the configuration specifies considers external transactions */

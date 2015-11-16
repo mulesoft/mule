@@ -9,14 +9,10 @@ package org.mule.api.component;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.service.Service;
 
 /**
  * <code>LifecycleAdapter</code> is a wrapper around a pojo service that adds
- * Lifecycle methods to the pojo. It also associates the pojo service with its
- * {@link Service} object.
- * 
- * @see Service
+ * Lifecycle methods to the pojo.
  */
 public interface LifecycleAdapter extends Lifecycle
 {

@@ -6,18 +6,15 @@
  */
 package org.mule.processor.chain;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.ProcessorExecutor;
-import org.mule.api.service.Service;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.construct.Flow;
 import org.mule.processor.BlockingProcessorExecutor;
 import org.mule.processor.NonBlockingProcessorExecutor;
-import org.mule.service.processor.ServiceProcessorExecutor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -34,14 +31,6 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase
 
     @Mock
     private MuleEvent muleEvent;
-
-    @Test
-    public void service()
-    {
-        when(muleEvent.getFlowConstruct()).thenReturn(mock(Service.class));
-        assertThat(createProcessorExecutor().getClass(), CoreMatchers.<Class>equalTo(
-                (ServiceProcessorExecutor.class)));
-    }
 
     @Test
     public void flow()

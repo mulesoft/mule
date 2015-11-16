@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><links xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
-    <link><item>mule:model</item><page>Configuring+Models</page></link>
-    <link><item>mule:service</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-service</item><page>Configuring+Models</page></link>
-    <link><item>mule:inbound</item><page>Configuring+Models</page></link>
-    <link><item>mule:outbound</item><page>Configuring+Models</page></link>
-    <link><item>mule:async-reply</item><page>Configuring+Models</page></link>
     <link><item>mule:component</item><page>Configuring+Models</page></link>
     <link><item>mule:threading-profile</item><page>Configuring+Models</page></link>
-    <link><item>mule:bridge-component</item><page>Configuring+Models</page></link>
     <link><item>mule:echo-component</item><page>Configuring+Models</page></link>
     <link><item>mule:log-component</item><page>Configuring+Models</page></link>
     <link><item>mule:null-component</item><page>Configuring+Models</page></link>
@@ -28,36 +21,12 @@
     <link><item>mule:exclude-entry-point</item><page>Configuring+Models</page></link>
     <link><item>mule:include-entry-point</item><page>Configuring+Models</page></link>
     <link><item>mule:queue-profile</item><page>Configuring+Models</page></link>
-    <link><item>mule:logging-catch-all-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-catch-all-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:forwarding-catch-all-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-forwarding-catch-all-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:idempotent-secure-hash-receiver-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:idempotent-receiver-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:wire-tap-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:forwarding-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:selective-consumer-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:correlation-resequencer-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:message-chunking-aggregator-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-correlation-aggregator-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-inbound-router</item><page>Configuring+Models</page></link>
     <link><item>mule:spring-object</item><page>Configuring+Models</page></link>
     <link><item>mule:singleton-object</item><page>Configuring+Models</page></link>
     <link><item>mule:prototype-object</item><page>Configuring+Models</page></link>
     <link><item>mule:pooled-object</item><page>Configuring+Models</page></link>
     <link><item>mule:binding</item><page>Configuring+Models</page></link>
     <link><item>mule:pooling-profile</item><page>Configuring+Models</page></link>
-    <link><item>mule:pass-through-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:filtering-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:chaining-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:exception-based-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:multicasting-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:template-endpoint-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:endpoint-selector-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:list-message-splitter-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:message-chunking-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:static-recipient-list-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-outbound-router</item><page>Configuring+Models</page></link>
 
     <link><item>mule:property</item><page>Additional+Configuration</page></link>
     <link><item>mule:properties</item><page>Additional+Configuration</page></link>
@@ -113,19 +82,6 @@
     <link><item>mule:dispatcher-threading-profile</item><page>General+Transport+Configuration</page></link>
     <link><item>mule:service-overrides</item><page>General+Transport+Configuration</page></link>
 
-    <link><item>axis:connector</item><page>Axis+Transport</page></link>
-    <link><item>axis:inbound-endpoint</item><page>Axis+Transport</page></link>
-    <link><item>axis:outbound-endpoint</item><page>Axis+Transport</page></link>
-    <link><item>axis:endpoint</item><page>Axis+Transport</page></link>
-    <link><item>axis:options</item><page>Axis+Transport</page></link>
-    <link><item>axis:option</item><page>Axis+Transport</page></link>
-    <link><item>axis:bean-type</item><page>Axis+Transport</page></link>
-    <link><item>axis:soap-service</item><page>Axis+Transport</page></link>
-    <link><item>axis:soap-method</item><page>Axis+Transport</page></link>
-    <link><item>axis:soap-parameter</item><page>Axis+Transport</page></link>
-    <link><item>axis:soap-return</item><page>Axis+Transport</page></link>
-    <link><item>axis:supported-scheme</item><page>Axis+Transport</page></link>
-
     <link><item>bpm:connector</item><page>BPM+Transport</page></link>
     <link><item>bpm:inbound-endpoint</item><page>BPM+Transport</page></link>
     <link><item>bpm:outbound-endpoint</item><page>BPM+Transport</page></link>
@@ -139,11 +95,6 @@
     <link><item>wsdl-cxf:inbound-endpoint</item><page>CXF+Transport</page></link>
     <link><item>wsdl-cxf:outbound-endpoint</item><page>CXF+Transport</page></link>
     <link><item>wsdl-cxf:endpoint</item><page>CXF+Transport</page></link>
-
-    <link><item>ejb:connector</item><page>EJB+Transport</page></link>
-    <link><item>ejb:inbound-endpoint</item><page>EJB+Transport</page></link>
-    <link><item>ejb:outbound-endpoint</item><page>EJB+Transport</page></link>
-    <link><item>ejb:endpoint</item><page>EJB+Transport</page></link>
 
     <link><item>email:email-to-string-transformer</item><page>Email+Transport</page></link>
     <link><item>email:string-to-email-transformer</item><page>Email+Transport</page></link>
@@ -247,12 +198,6 @@
     <link><item>pop3s:inbound-endpoint</item><page>POP3S+Transport</page></link>
     <link><item>pop3s:endpoint</item><page>POP3S+Transport</page></link>
 
-    <link><item>quartz:connector</item><page>Quartz+Transport</page></link>
-    <link><item>quartz:factory-property</item><page>Quartz+Transport</page></link>
-    <link><item>quartz:factory-properties</item><page>Quartz+Transport</page></link>
-    <link><item>quartz:outbound-endpoint</item><page>Quartz+Transport</page></link>
-    <link><item>quartz:endpoint</item><page>Quartz+Transport</page></link>
-
     <link><item>rmi:connector</item><page>RMI+Transport</page></link>
     <link><item>rmi:inbound-endpoint</item><page>RMI+Transport</page></link>
     <link><item>rmi:outbound-endpoint</item><page>RMI+Transport</page></link>
@@ -324,11 +269,6 @@
     <link><item>vm:outbound-endpoint</item><page>VM+Transport</page></link>
     <link><item>vm:endpoint</item><page>VM+Transport</page></link>
 
-    <link><item>xmpp:connector</item><page>XMPP+Transport</page></link>
-    <link><item>xmpp:inbound-endpoint</item><page>XMPP+Transport</page></link>
-    <link><item>xmpp:outbound-endpoint</item><page>XMPP+Transport</page></link>
-    <link><item>xmpp:endpoint</item><page>XMPP+Transport</page></link>
-
     <link><item>client:remote-dispatcher-agent</item><page>Client+Module</page></link>
     <link><item>client:remote-endpoint</item><page>Client+Module</page></link>
     <link><item>client:xml-wire-format</item><page>Client+Module</page></link>
@@ -359,9 +299,6 @@
     <link><item>management:publish-notifications</item><page>Management+Module</page></link>
     <link><item>management:yourkit-profiler</item><page>Management+Module</page></link>
     <link><item>management:custom-agent</item><page>Management+Module</page></link>
-
-    <link><item>ognl:filter</item><page>OGNL+Module</page></link>
-    <link><item>ognl:expression</item><page>OGNL+Module</page></link>
 
     <link><item>pgp:security-manager</item><page>PGP+Module</page></link>
     <link><item>pgp:security-provider</item><page>PGP+Module</page></link>

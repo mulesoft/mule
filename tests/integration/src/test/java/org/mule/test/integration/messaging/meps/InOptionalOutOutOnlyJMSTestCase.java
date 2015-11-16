@@ -10,12 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,10 +23,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("MULE-6926: Flaky test")
-public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
+public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
 {
     @ClassRule
     public static DynamicPort serverPort = new DynamicPort("serverPort");
@@ -36,6 +33,12 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
     public static final long TIMEOUT = 3000;
 
     private static BrokerService broker;
+
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-flow.xml";
+    }
 
     @BeforeClass
     public static void startBroker() throws Exception
@@ -49,21 +52,6 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
     public static void stopBroker() throws Exception
     {
         broker.stop();
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-flow.xml"}});
-    }
-
-    public InOptionalOutOutOnlyJMSTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
     }
 
     @Test

@@ -6,11 +6,14 @@
  */
 package org.mule.transformers.xml;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -57,7 +60,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("oBjeCt"));
         assertNull(msg.getInvocationProperty("oBjeCt"));
-        assertNull(msg.getSessionProperty("oBjeCt"));
+        assertNull(msg.getProperty("oBjeCt", SESSION));
 
         assertEquals("hello", msg.getOutboundProperty("string"));
         //with different case
@@ -65,15 +68,15 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("string"));
         assertNull(msg.getInvocationProperty("string"));
-        assertNull(msg.getSessionProperty("string"));
+        assertNull(msg.getProperty("string", SESSION));
 
-        assertEquals(1, msg.getInvocationProperty("number"));
+        assertThat(msg.getInvocationProperty("number"), is(1));
         //with different case
-        assertEquals(1, msg.getInvocationProperty("NUMBER"));
+        assertThat(msg.getInvocationProperty("NUMBER"), is(1));
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("number"));
         assertNull(msg.getOutboundProperty("number"));
-        assertNull(msg.getSessionProperty("number"));
+        assertNull(msg.getProperty("number", SESSION));
 
         assertEquals("1234", msg.getCorrelationId());
         assertEquals("UTF-8", msg.getEncoding());

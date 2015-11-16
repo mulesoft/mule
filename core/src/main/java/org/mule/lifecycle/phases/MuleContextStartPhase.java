@@ -14,12 +14,11 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.queue.QueueManager;
@@ -31,42 +30,42 @@ import java.util.Set;
  * The Start phase for the MuleContext. Calling
  * {@link MuleContext#start()} will initiate this phase via the
  * {@link org.mule.api.lifecycle.LifecycleManager}.
- *
+ * <p/>
  * The MuleContextStartPhase defines the lifecycle behaviour when the Mule context is started.  The MuleContext is associated
  * with one or more registries that inherit the lifecycle of the MuleContext.
- *
+ * <p/>
  * This phase is responsible for starting objects. Any object that implements {@link org.mule.api.lifecycle.Startable} will
  * have its {@link org.mule.api.lifecycle.Startable#start()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.model.Model}, {@link org.mule.api.service.Service}, followed
+ * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.construct.FlowConstruct}, followed
  * by any other object that implements {@link org.mule.api.lifecycle.Startable}.
  *
  * @see org.mule.api.MuleContext
  * @see org.mule.api.lifecycle.LifecycleManager
  * @see org.mule.api.lifecycle.Startable
- *
  * @since 3.0
  */
 public class MuleContextStartPhase extends DefaultLifecyclePhase
 {
+
     public MuleContextStartPhase()
     {
-        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, Component.class, OutboundRouterCollection.class, OutboundRouter.class});
+        this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, Component.class, OutboundRouter.class, MuleContext.class});
     }
 
-    public MuleContextStartPhase(Class<?>[] ignorredObjects)
+    public MuleContextStartPhase(Class<?>[] ignoredObjects)
     {
         super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 
-        Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
+        Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<>();
         startOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
+        startOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Model.class));
         startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 
-        setIgnoredObjectTypes(ignorredObjects);
+        setIgnoredObjectTypes(ignoredObjects);
         setOrderedLifecycleObjects(startOrderedObjects);
         registerSupportedPhase(Initialisable.PHASE_NAME);
         //Start/Stop/Start 

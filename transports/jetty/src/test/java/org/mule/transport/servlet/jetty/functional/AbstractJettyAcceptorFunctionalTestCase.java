@@ -7,6 +7,7 @@
 package org.mule.transport.servlet.jetty.functional;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -110,7 +111,7 @@ public abstract class AbstractJettyAcceptorFunctionalTestCase extends Functional
     {
         final MuleClient client = muleContext.getClient();
         final MuleMessage message = client.send(String.format("%s://localhost:%s", protocol, port1.getNumber()), getTestMuleMessage(TEST_MESSAGE), getRequestOptionsBuilder().build());
-        assertEquals(200, message.getInboundProperty("http.status"));
+        assertThat(message.getInboundProperty("http.status"), is(200));
         assertEquals(TEST_MESSAGE + " received", message.getPayloadAsString());
     }
 

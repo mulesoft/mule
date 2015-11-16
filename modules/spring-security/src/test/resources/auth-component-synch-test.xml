@@ -23,17 +23,14 @@
             <mule:password-encryption-strategy name="PBE" password="mule"/>
         </mule:security-manager>
 
-        <mule:model name="test">
-            <mule:service name="echoUMO">
-                <mule:inbound>
-                    <mule:inbound-endpoint address="vm://test" exchange-pattern="request-response">
-                        <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:inbound-endpoint>
-                </mule:inbound>
-                <mule:component>
-                    <mule:spring-object bean="echoComponent"/>
-                </mule:component>
-            </mule:service>
-        </mule:model>
+        <mule:flow name="echoUMO">
+            <mule:inbound-endpoint address="vm://test" exchange-pattern="request-response">
+                <mule:encryption-security-filter strategy-ref="PBE"/>
+            </mule:inbound-endpoint>
+            <mule:component>
+                <mule:spring-object bean="echoComponent"/>
+            </mule:component>
+        </mule:flow>
+
     </mule:mule>
 </beans>

@@ -24,9 +24,4 @@
         </custom-filter>
     </endpoint>
     
-    <model name="main">
-        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-            <spring:property name="testProperty" value="bar"/>
-        </custom-exception-strategy>
-    </model>
 </mule>

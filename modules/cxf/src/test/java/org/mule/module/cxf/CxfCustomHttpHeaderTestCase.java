@@ -18,23 +18,20 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase implements FunctionalTestNotificationListener
+public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements FunctionalTestNotificationListener
 {
 
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
@@ -56,19 +53,10 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public CxfCustomHttpHeaderTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "headers-conf-service.xml"},
-            {ConfigVariant.FLOW, "headers-conf-flow.xml"},
-            {ConfigVariant.FLOW, "headers-conf-flow-httpn.xml"}
-        });
+        return "headers-conf-flow-httpn.xml";
     }
 
     @Override

@@ -26,18 +26,11 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
-    public FtpFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ftp-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "ftp-functional-test-flow.xml"}
-        });
+        return "ftp-functional-test-flow.xml";
     }
 
     @Test

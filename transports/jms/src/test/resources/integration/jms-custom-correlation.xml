@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xsi:schemaLocation="
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -13,41 +13,25 @@
     <vm:connector name="vmConnector"/>
 
     <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector1"
-        exchange-pattern="one-way"/>
+              exchange-pattern="one-way"/>
 
-    <model name="Model">
-        <service name="JMSService">
-            <inbound>
-                <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
-                        exchange-pattern="one-way">
-                        <property key="priority" value="1"/>
-                    </outbound-endpoint>
-                    <reply-to ref="replyTo"/>
-                    <!-- This isn't very intuitive. What we are saying here is correlate on the 'customCorrelation' header.  Access the
-                         correlationId as usual, since it will be null it will use the messgeIdExpression -->
+    <flow name="JMSService">
+        <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
+        <request-reply>
+            <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
+                               exchange-pattern="one-way">
+                <property key="priority" value="1"/>
+            </outbound-endpoint>
+            <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"
+                              exchange-pattern="one-way"/>
+        </request-reply>
+        <expression-message-info-mapping messageIdExpression="#[header:INBOUND:customCorrelation]"
+                                         correlationIdExpression="#[message:correlationId]"/>
+    </flow>
 
-                    <!-- A better approach here would be to add a property to the router called "correlationId", that is used to set the
-                     correlationId on outgoing messages -->
-                </pass-through-router>
-            </outbound>
-            <async-reply>
-                <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"
-                    exchange-pattern="one-way"/>
-                <single-async-reply-router/>
-            </async-reply>
-            <expression-message-info-mapping  messageIdExpression="#[header:INBOUND:customCorrelation]" correlationIdExpression="#[message:correlationId]"/>
-        </service>
+    <flow name="TestService1">
+        <inbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"/>
+        <test:component appendString=" #[context:serviceName]"/>
+    </flow>
 
-        <service name="TestService1">
-            <inbound>
-                <inbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"/>
-            </inbound>
-            <test:component appendString=" #[context:serviceName]"/>
-        </service>
-
-    </model>
 </mule>

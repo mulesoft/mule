@@ -33,7 +33,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase
@@ -46,12 +45,12 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
      * Verify that regardless of the XML library used, validation errors are handled correctly.
      * @return
      */
-    @Parameters
+    @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                                             {false},
-                                             {true}
+                {false},
+                {true}
         });
     }
 
@@ -71,12 +70,6 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     public void testNamedFlowExceptionStrategyFails() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testNamedServiceExceptionStrategyFails() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/named-service-exception-strategy.xml");
     }
 
     @Test(expected = ConfigurationException.class)

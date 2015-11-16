@@ -63,21 +63,9 @@ public class CompositeConverter implements Converter
     }
 
     @Override
-    public boolean isSourceTypeSupported(Class<?> aClass)
-    {
-        return chain.size() > 0 && chain.peekFirst().isSourceTypeSupported(aClass);
-    }
-
-    @Override
     public boolean isSourceDataTypeSupported(DataType<?> dataType)
     {
         return chain.size() > 0 && chain.peekFirst().isSourceDataTypeSupported(dataType);
-    }
-
-    @Override
-    public List<Class<?>> getSourceTypes()
-    {
-        return chain.peekFirst().getSourceTypes();
     }
 
     @Override
@@ -123,24 +111,6 @@ public class CompositeConverter implements Converter
         }
 
         return current;
-    }
-
-    @Override
-    public void setReturnClass(Class<?> theClass)
-    {
-        if (chain.size() > 0)
-        {
-            chain.peekLast().setReturnClass(theClass);
-            return;
-        }
-
-        throw new IllegalStateException("Cannot set return class on an empty converter chain");
-    }
-
-    @Override
-    public Class<?> getReturnClass()
-    {
-        return chain.peekLast().getReturnClass();
     }
 
     @Override

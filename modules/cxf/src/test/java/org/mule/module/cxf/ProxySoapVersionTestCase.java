@@ -10,19 +10,15 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class ProxySoapVersionTestCase extends AbstractServiceAndFlowTestCase
+public class ProxySoapVersionTestCase extends FunctionalTestCase
 {
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
 
@@ -56,22 +52,13 @@ public class ProxySoapVersionTestCase extends AbstractServiceAndFlowTestCase
         + "<!-- comment 7 -->"
         + "</soap12:Envelope>";
 
-    public ProxySoapVersionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant,  configResources);
-    }
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "proxy-soap-version-conf-service.xml"},
-                {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "proxy-soap-version-conf-flow.xml"},
-                {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "proxy-soap-version-conf-flow-httpn.xml"}
-        });
+        return "proxy-soap-version-conf-flow-httpn.xml";
     }
 
     @Test

@@ -19,13 +19,8 @@ import groovy.transform.Field
 @Field String settings
 @Field deploySignatures = true
 @Field packagingExceptions = ['geomail': 'war']
-@Field deployExceptions = ['archetypes', 'integration-axis', 'loanbroker-legacy']
-@Field artifactIdExceptions = ['jboss-transactions'      : 'mule-module-jbossts',
-                               'bobberplus'              : 'bobberplus',
-                               'mule-transport-archetype': 'mule-transport-archetype',
-                               'mule-project-archetype'  : 'mule-project-archetype',
-                               'mule-module-archetype'   : 'mule-module-archetype',
-                               'mule-catalog-archetype'  : 'mule-catalog-archetype']
+@Field deployExceptions = []
+@Field artifactIdExceptions = ['jboss-transactions'      : 'mule-module-jbossts']
 
 parseArguments(args)
 deployJars()

@@ -1,0 +1,2 @@
+org.mule.module.extension.internal.capability.xml.XmlModelEnricher
+org.mule.module.extension.internal.capability.xml.schema.SchemaDocumenterModelEnricher

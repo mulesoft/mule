@@ -76,6 +76,6 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
 
     protected MuleEvent createTestRequestEvent(InboundEndpoint endpoint) throws Exception
     {
-        return new DefaultMuleEvent(inMessage, endpoint, getTestService(), getTestSession(null, muleContext));
+        return new DefaultMuleEvent(inMessage, endpoint, getTestFlow(), getTestSession(null, muleContext));
     }    
 }

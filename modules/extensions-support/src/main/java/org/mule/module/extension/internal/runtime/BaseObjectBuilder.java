@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
+public abstract class BaseObjectBuilder<T> implements ObjectBuilder<T>
 {
 
     private final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();

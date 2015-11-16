@@ -14,53 +14,34 @@
     <gzip-compress-transformer name="Compress"/>
     <gzip-uncompress-transformer name="Uncompress"/>
 
-    <model name="test">
-        <service name="InputPart">
-            <inbound>
-                <inbound-endpoint ref="in" />
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="middle">
-                        <transformer ref="Compress" />
-                        <transformer ref="ObjectToJms" />
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="InputPart">
+        <inbound-endpoint ref="in"/>
+        <test:component/>
+        <outbound-endpoint ref="middle">
+            <transformer ref="Compress"/>
+            <transformer ref="ObjectToJms"/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="MiddlePart">
-            <inbound>
-                <inbound-endpoint ref="middle">
-                    <transformer ref="Uncompress" />
-                </inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="middle2">
-                        <transformer ref="Compress" />
-                        <transformer ref="ObjectToJms" />
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="MiddlePart">
+        <inbound-endpoint ref="middle">
+            <transformer ref="Uncompress"/>
+        </inbound-endpoint>
+        <test:component/>
+        <outbound-endpoint ref="middle2">
+            <transformer ref="Compress"/>
+            <transformer ref="ObjectToJms"/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="OutputPart">
-            <inbound>
-                <inbound-endpoint ref="middle2">
-                    <transformer ref="Uncompress" />
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="OutputPart">
+        <inbound-endpoint ref="middle2">
+            <transformer ref="Uncompress"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out"/>
+    </flow>
+
 </mule>

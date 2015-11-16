@@ -8,7 +8,8 @@
 
     <configuration defaultExceptionStrategy-ref="defaultExceptionStrategy"/>
 
-    <custom-exception-strategy name="defaultExceptionStrategy" class="org.mule.test.integration.exceptions.DefaultExceptionStrategyTestCase$CustomExceptionStrategy"/>
+    <custom-exception-strategy name="defaultExceptionStrategy"
+                               class="org.mule.test.integration.exceptions.DefaultExceptionStrategyTestCase$CustomExceptionStrategy"/>
 
     <flow name="flowNoExceptionStrategy">
         <logger/>
@@ -18,33 +19,5 @@
         <logger/>
         <catch-exception-strategy/>
     </flow>
-
-    <model>
-        <catch-exception-strategy/>
-
-        <service name="serviceNoExceptionStrategy">
-            <inbound>
-                <vm:inbound-endpoint path="in1"/>
-            </inbound>
-            <log-component/>
-        </service>
-
-        <service name="serviceExceptionStrategy">
-            <inbound>
-                <vm:inbound-endpoint path="in2"/>
-            </inbound>
-            <log-component/>
-            <default-exception-strategy/>
-        </service>
-    </model>
-
-    <model>
-        <service name="serviceNoExceptionStrategyInModel">
-            <inbound>
-                <vm:inbound-endpoint path="in3"/>
-            </inbound>
-            <log-component/>
-        </service>
-    </model>
 
 </mule>

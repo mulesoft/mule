@@ -49,11 +49,6 @@ public class MuleProperties
     public static final String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
     public static final String MULE_ENCODING_PROPERTY = PROPERTY_PREFIX + "ENCODING";
     public static final String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
-    /**
-     * @deprecated This property is no longer needed and will be removed in the next major release
-     */
-    @Deprecated
-    public static final String MULE_SESSION_ID_PROPERTY = PROPERTY_PREFIX + "SESSION_ID";
     public static final String MULE_SESSION_PROPERTY = PROPERTY_PREFIX + "SESSION";
     public static final String MULE_MESSAGE_ID_PROPERTY = PROPERTY_PREFIX + "MESSAGE_ID";
     public static final String MULE_CORRELATION_ID_PROPERTY = PROPERTY_PREFIX + "CORRELATION_ID";
@@ -90,13 +85,6 @@ public class MuleProperties
 
     /**
      * *****************************************************************************
-     * Model Service descriptor properties
-     * *****************************************************************************
-     */
-    public static final String MODEL_CLASS = "model";
-
-    /**
-     * *****************************************************************************
      * Transport Service descriptor properties
      * *****************************************************************************
      */
@@ -128,7 +116,6 @@ public class MuleProperties
 
     // Object Name Keys
     public static final String OBJECT_MULE_CONTEXT = "_muleContext";
-    public static final String OBJECT_SYSTEM_MODEL = "_muleSystemModel";
     public static final String OBJECT_MULE_CONTEXT_PROCESSOR = "_muleContextProcessor";
     public static final String OBJECT_PROPERTY_PLACEHOLDER_PROCESSOR = "_mulePropertyPlaceholderProcessor";
     public static final String OBJECT_OBJECT_NAME_PROCESSOR = "_muleObjectNameProcessor";
@@ -170,6 +157,7 @@ public class MuleProperties
     public static final String OBJECT_CLUSTER_CONFIGURATION = "_muleClusterConfiguration";
     public static final String OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR = "_muleConnectorMessageProcessorLocator";
     public static final String OBJECT_EXTENSION_MANAGER = "_muleExtensionManager";
+    public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";

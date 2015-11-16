@@ -16,8 +16,6 @@ public interface SoapConstants
     public static final String LIST_PROPERTY = "list";
     public static final String SOAP_ENDPOINT_PREFIX = "soap:";
     public static final String METHOD_NAMESPACE_PROPERTY = "methodNamespace";
-    // i don't udnerstand what is going on here, but these are two different properties and
-    // axis fails (in partiuclar, look at AxisJmsEndpointFormat test) if they are unified.
     public static final String SOAP_ACTION_PROPERTY = "soapAction";
     public static final String SOAP_ACTION_PROPERTY_CAPS = "SOAPAction";
     public static final String WSDL_URL_PROPERTY = "WSDL_URL";

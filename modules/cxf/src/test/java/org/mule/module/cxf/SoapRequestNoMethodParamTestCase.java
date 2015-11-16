@@ -8,21 +8,20 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.DefaultMuleMessage;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class SoapRequestNoMethodParamTestCase extends AbstractServiceAndFlowTestCase
+public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase
 {
 
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
@@ -33,19 +32,10 @@ public class SoapRequestNoMethodParamTestCase extends AbstractServiceAndFlowTest
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    public SoapRequestNoMethodParamTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "soap-request-conf-service.xml"},
-            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"},
-            {ConfigVariant.FLOW, "soap-request-conf-flow-httpn.xml"}
-        });
+        return "soap-request-conf-flow-httpn.xml";
     }
 
     @Test

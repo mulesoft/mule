@@ -10,27 +10,18 @@
 
     <jetty:connector name="httpConnector" useContinuations="true"/>
 
-    <model name="test">
-
-        <service name="mycomponent1">
-            <inbound>
+        <flow name="mycomponent1">
                 <jetty:inbound-endpoint address="http://localhost:${port1}/mycomponent1" exchange-pattern="request-response"/>
-            </inbound>
             <test:component>
                 <test:return-data>mycomponent1</test:return-data>
             </test:component>
+        </flow>
 
-        </service>
-
-        <service name="mycomponent2">
-            <inbound>
+        <flow name="mycomponent2">
                 <jetty:inbound-endpoint address="http://localhost:${port1}/mycomponent2" exchange-pattern="request-response"/>
-            </inbound>
             <test:component>
                 <test:return-data>mycomponent2</test:return-data>
             </test:component>
-        </service>
-
-    </model>
+        </flow>
 
 </mule>

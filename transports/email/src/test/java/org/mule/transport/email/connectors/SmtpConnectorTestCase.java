@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -23,11 +22,12 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.service.Service;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
+import org.mule.component.DefaultJavaComponent;
+import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transport.email.AbstractMailConnector;
@@ -36,6 +36,8 @@ import org.mule.transport.email.SmtpConnector;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
 import com.icegreen.greenmail.util.ServerSetup;
+
+import java.util.ArrayList;
 
 import javax.mail.URLName;
 import javax.mail.internet.MimeMessage;
@@ -106,19 +108,19 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         //muleContext.getRegistry().registerConnector(createConnector(false));
         OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
             getTestEndpointURI());
-        
-        Service service = getTestService(uniqueName("testComponent"), FunctionalTestComponent.class);
-        // TODO Simplify this API for adding an outbound endpoint.
-        OutboundPassThroughRouter passThroughRouter = new OutboundPassThroughRouter();
-        passThroughRouter.addRoute(endpoint);
-        ((OutboundRouterCollection) service.getOutboundMessageProcessor()).addRoute(passThroughRouter);
-        //muleContext.getRegistry().registerComponent(service);
+
+        Flow flow = new Flow("testComponent", muleContext);
+        flow.setMessageProcessors(new ArrayList<MessageProcessor>());
+        FunctionalTestComponent component = new FunctionalTestComponent();
+        flow.getMessageProcessors().add(new DefaultJavaComponent(new SingletonObjectFactory(component)));
+        flow.getMessageProcessors().add(endpoint);
+        muleContext.getRegistry().registerFlowConstruct(flow);
 
         MuleMessage message = new DefaultMuleMessage(MESSAGE, muleContext);
         message.setOutboundProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);
         MuleSession session = getTestSession(null, muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
-            getTestService("apple", Apple.class), session, new ResponseOutputStream(System.out));
+            getTestFlow("apple", Apple.class), session, new ResponseOutputStream(System.out));
         endpoint.process(event);
 
         getServers().waitForIncomingEmail(AbstractEmailFunctionalTestCase.DELIVERY_DELAY_MS, 1);

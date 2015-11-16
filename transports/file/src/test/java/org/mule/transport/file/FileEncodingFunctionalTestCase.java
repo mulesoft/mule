@@ -10,15 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.transport.file.FileTestUtils.createDataFile;
 import static org.mule.transport.file.FileTestUtils.createFolder;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
@@ -26,18 +21,11 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
     private static final int FIVE_SECONDS_TIMEOUT = 5000;
     private static final String ENCODING = "EUC-JP";
 
-    public FileEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "file-encoding-test-service.xml"},
-            {ConfigVariant.FLOW, "file-encoding-test-flow.xml"}
-        });
+        return "file-encoding-test-flow.xml";
     }
 
     @Test

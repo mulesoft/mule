@@ -18,18 +18,16 @@ import org.w3c.dom.Element;
 public class W3CDomPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public W3CDomPropertyExtractorTestCase(ConfigVariant variant, String configResources)
+    public W3CDomPropertyExtractorTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/endpoint");
-        p.setProperty("selector.evaluator", "xpath");
-
+        p.setProperty("selector.expression", "xpath:/endpoint");
         return p;
     }
 

@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.runtime.OperationContext;
+import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
@@ -17,28 +17,16 @@ import org.mule.module.extension.internal.runtime.OperationContextAdapter;
  * <p/>
  * Notice that for this to work, the {@link OperationContext}
  * has to be an instance of {@link OperationContextAdapter}
- * <p/>
- * Because this {@link ArgumentResolver} is stateless and thread-safe,
- * it is exposed as a singleton
  *
  * @since 3.7.0
  */
 public final class EventArgumentResolver implements ArgumentResolver<MuleEvent>
 {
 
-    private static final EventArgumentResolver INSTANCE = new EventArgumentResolver();
-
-    public static EventArgumentResolver getInstance()
-    {
-        return INSTANCE;
-    }
-
-    private EventArgumentResolver()
-    {
-    }
-
     /**
-     * {@inheritDoc}
+     * Returns the {@link MuleEvent} associated to the {@code operationContext}
+     *
+     * @throws ClassCastException if {@code operationContext} is not an {@link OperationContextAdapter}
      */
     @Override
     public MuleEvent resolve(OperationContext operationContext)

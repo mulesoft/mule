@@ -9,9 +9,9 @@ package org.mule.transport.file;
 import static org.mockito.Mockito.mock;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.construct.Flow;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.util.FileUtils;
 
@@ -35,12 +35,10 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         Connector connector = endpoint.getConnector();
         connector.start();
 
-        Service mockComponent = mock(Service.class);
-
         read.deleteOnExit();
         move.deleteOnExit();
 
-        return new FileMessageReceiver(connector, mockComponent, endpoint,
+        return new FileMessageReceiver(connector, mock(Flow.class), endpoint,
             read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
     }
 

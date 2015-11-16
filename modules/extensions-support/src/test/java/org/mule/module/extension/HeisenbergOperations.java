@@ -6,18 +6,23 @@
  */
 package org.mule.module.extension;
 
+import static java.util.stream.Collectors.toList;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.transport.PropertyScope;
-import org.mule.extension.ExtensionManager;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.annotations.RestrictedTo;
-import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.annotations.param.Optional;
-import org.mule.extension.annotations.param.Payload;
+import org.mule.extension.annotation.api.ContentMetadataParameters;
+import org.mule.extension.annotation.api.Operation;
+import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.RestrictedTo;
+import org.mule.extension.annotation.api.param.Connection;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.extension.api.runtime.ContentType;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -26,13 +31,15 @@ public class HeisenbergOperations
 {
 
     private static final String SECRET_PACKAGE = "secretPackage";
+    private static final String CONTENT_TYPE = "contentType";
     private static final String METH = "meth";
 
     @Inject
     private ExtensionManager extensionManager;
 
     @Operation
-    public String sayMyName(@UseConfig HeisenbergExtension config)
+    @ContentMetadataParameters
+    public String sayMyName(@UseConfig HeisenbergExtension config, ContentMetadata contentMetadata)
     {
         return config.getPersonalInfo().getName();
     }
@@ -44,13 +51,19 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public String getEnemy(@UseConfig HeisenbergExtension config, int index)
+    public String getEnemy(@UseConfig HeisenbergExtension config, int index, ContentMetadata contentMetadata)
     {
+        if (contentMetadata.isOutputModifiable())
+        {
+            Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
+            contentMetadata.setOutputContentType(new ContentType(lastSupportedEncoding, "dead/dead"));
+        }
+
         return config.getEnemies().get(index);
     }
 
     @Operation
-    public String kill(@Payload String victim, String goodbyeMessage) throws Exception
+    public String kill(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage) throws Exception
     {
         return killWithCustomMessage(victim, goodbyeMessage);
     }
@@ -89,9 +102,10 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public void hideMethInEvent(MuleEvent event)
+    public void hideMethInEvent(MuleEvent event, ContentType contentType)
     {
         event.setFlowVariable(SECRET_PACKAGE, METH);
+        event.setFlowVariable(CONTENT_TYPE, contentType);
     }
 
     @Operation
@@ -104,5 +118,23 @@ public class HeisenbergOperations
     public void hideMethInMessage(MuleMessage message)
     {
         message.setProperty(SECRET_PACKAGE, METH, PropertyScope.INVOCATION);
+    }
+
+    @Operation
+    public String knock(KnockeableDoor door)
+    {
+        return door.knock();
+    }
+
+    @Operation
+    public List<String> knockMany(List<KnockeableDoor> doors)
+    {
+        return doors.stream().map(KnockeableDoor::knock).collect(toList());
+    }
+
+    @Operation
+    public String callSaul(@Connection HeisenbergConnection connection)
+    {
+        return connection.callSaul();
     }
 }

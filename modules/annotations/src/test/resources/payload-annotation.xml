@@ -8,26 +8,21 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <model name="main">
-        <service name="payload1">
-            <inbound>
-                <inbound-endpoint address="vm://payload1?method=processNoTransformString" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
-        </service>
+    <flow name="payload1">
+        <inbound-endpoint address="vm://payload1?method=processNoTransformString" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
+    </flow>
 
-        <service name="payload2">
-            <inbound>
-                <inbound-endpoint address="vm://payload2?method=processAutoTransformString" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
-        </service>
+    <flow name="payload2">
+        <inbound-endpoint address="vm://payload2?method=processAutoTransformString"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
+    </flow>
 
-        <service name="payload3">
-            <inbound>
-                <inbound-endpoint address="vm://payload3?method=processFailedAutoTransformString" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
-        </service>
-    </model>
+    <flow name="payload3">
+        <inbound-endpoint address="vm://payload3?method=processFailedAutoTransformString"
+                          exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
+    </flow>
+
 </mule>
