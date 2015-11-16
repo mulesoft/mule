@@ -292,9 +292,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         lock.lock();
         try
         {
-            randomAccessFileQueueStore1.close();
-            randomAccessFileQueueStore2.close();
-            queueControlDataFile.close();
+            doClose();
         }
         finally
         {
@@ -346,10 +344,46 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         return readFile == randomAccessFileQueueStore1 ? randomAccessFileQueueStore2 : randomAccessFileQueueStore1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose()
     {
-        doClear();
-        close();
+        Lock lock = filesLock.writeLock();
+        lock.lock();
+        try
+        {
+            doClose();
+            delete();
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
+
+    private void delete()
+    {
+        Lock lock = filesLock.writeLock();
+        lock.lock();
+        try
+        {
+            randomAccessFileQueueStore1.delete();
+            randomAccessFileQueueStore2.delete();
+            queueControlDataFile.delete();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    private void doClose()
+    {
+        randomAccessFileQueueStore1.close();
+        randomAccessFileQueueStore2.close();
+        queueControlDataFile.close();
+    }
+
 }

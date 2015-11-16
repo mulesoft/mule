@@ -50,6 +50,7 @@ class RandomAccessFileQueueStore
 
     /**
      * Adds element at the end of the queue.
+     *
      * @param element element to add
      */
     public synchronized void addLast(byte[] element)
@@ -135,6 +136,7 @@ class RandomAccessFileQueueStore
 
     /**
      * Adds a collection of elements at the end of the queue.
+     *
      * @param items collection of elements to add.
      * @return true if it were able to add them all, false otherwise.
      */
@@ -234,7 +236,7 @@ class RandomAccessFileQueueStore
 
     /**
      * Free all resources held for the queue.
-     *
+     * <p/>
      * Do not removes elements from the queue.
      */
     public synchronized void close()
@@ -245,12 +247,26 @@ class RandomAccessFileQueueStore
         }
         catch (IOException e)
         {
-            logger.warn(e.getMessage());
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(e);
-            }
+            logAndIgnore(e);
         }
+    }
+
+    private void logAndIgnore(IOException e)
+    {
+        logger.warn(e.getMessage());
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(e);
+        }
+    }
+
+    /**
+     * Deletes the files backing this queue. This method must only be invoked
+     * after {@link #close()} has been executed on {@code this} instance
+     */
+    public synchronized void delete()
+    {
+        queueFileProvider.delete();
     }
 
     private byte[] readDataInCurrentPosition() throws IOException
