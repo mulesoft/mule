@@ -7,6 +7,7 @@
 package org.mule.module.launcher;
 
 import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.NullDeploymentListener;
@@ -52,20 +53,24 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     private final Map<String, ZombieFile> artifactZombieMap = new HashMap<String, ZombieFile>();
     private final File artifactDir;
     private final ObservableList<T> artifacts;
+    private final ArtifactDeploymentTemplate deploymentTemplate;
     private ArtifactFactory<T> artifactFactory;
     private DeploymentListener deploymentListener = new NullDeploymentListener();
 
 
-    public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory, final ObservableList<T> artifacts, final ReentrantLock lock)
+    public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory, final ObservableList<T> artifacts, final ReentrantLock lock,
+            ArtifactDeploymentTemplate deploymentTemplate)
     {
         this.deployer = deployer;
         this.artifactFactory = artifactFactory;
         this.artifacts = artifacts;
         this.deploymentLock = lock;
+        this.deploymentTemplate = deploymentTemplate;
         this.artifactDir = artifactFactory.getArtifactDir();
         this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
     }
 
+    @Override
     public T deployPackagedArtifact(String zip) throws DeploymentException
     {
         URL url;
@@ -87,6 +92,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
     }
 
+    @Override
     public T deployExplodedArtifact(String artifactDir) throws DeploymentException
     {
         String artifactName = artifactDir;
@@ -108,6 +114,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         return deployExplodedApp(artifactName);
     }
 
+    @Override
     public void undeployArtifact(String artifactId)
     {
         ZombieFile zombieFile = artifactZombieMap.get(artifactId);
@@ -126,6 +133,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         return artifactFactory.getArtifactDir();
     }
 
+    @Override
     public T deployPackagedArtifact(URL artifactAchivedUrl) throws DeploymentException
     {
         T artifact;
@@ -174,6 +182,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         logger.error(msg, t);
     }
 
+    @Override
     public Map<URL, Long> getArtifactsZombieMap()
     {
         Map<URL, Long> result = new HashMap<URL, Long>();
@@ -186,6 +195,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         return result;
     }
 
+    @Override
     public void setArtifactFactory(final ArtifactFactory<T> artifactFactory)
     {
         this.artifactFactory = artifactFactory;
@@ -229,6 +239,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         return deployer;
     }
 
+    @Override
     public void setDeploymentListener(CompositeDeploymentListener deploymentListener)
     {
         this.deploymentListener = deploymentListener;
@@ -250,10 +261,13 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
         if (artifact != null)
         {
+            deploymentTemplate.preRedeploy(artifact);
             undeployArtifact(artifactName);
         }
 
-        return deployPackagedArtifact(artifactUrl);
+        T deployedAtifact = deployPackagedArtifact(artifactUrl);
+        deploymentTemplate.postRedeploy(deployedAtifact);
+        return deployedAtifact;
     }
 
     private T deployExplodedApp(String addedApp) throws DeploymentException
@@ -322,6 +336,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
     }
 
+    @Override
     public void deployArtifact(T artifact) throws DeploymentException
     {
         try
@@ -400,10 +415,15 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
     private void trackArtifact(T artifact)
     {
-        T previousArtifact = findArtifact(artifact.getArtifactName());
-        artifacts.remove(previousArtifact);
+        preTrackArtifact(artifact);
 
         artifacts.add(artifact);
+    }
+
+    public void preTrackArtifact(T artifact)
+    {
+        T previousArtifact = findArtifact(artifact.getArtifactName());
+        artifacts.remove(previousArtifact);
     }
 
     private void undeploy(T artifact)
@@ -498,6 +518,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
     }
 
+    @Override
     public void redeploy(T artifact) throws DeploymentException
     {
         if (logger.isInfoEnabled())
@@ -513,7 +534,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
         catch (Throwable e)
         {
-            //TODO make the exception beter
+            // TODO make the exception better
             deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
         }
 
