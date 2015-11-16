@@ -172,7 +172,7 @@
         <commonsBeanUtilsVersion>1.8.0</commonsBeanUtilsVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
         <commonsCodecVersion>1.3</commonsCodecVersion>
-        <commonsCollectionsVersion>3.2.1</commonsCollectionsVersion>
+        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
