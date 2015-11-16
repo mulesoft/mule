@@ -6,6 +6,7 @@
  */
 package org.mule.util.queue;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
@@ -30,6 +31,7 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
 {
 
     private static final int MAXIMUM_NUMBER_OF_BYTES = 100;
+    public static final String TEST_QUEUE_NAME = "test-queue";
 
     @Rule
     public TemporaryFolder workingDirectory = new TemporaryFolder();
@@ -60,14 +62,14 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
     {
         MuleTestUtils.testWithSystemProperty(DualRandomAccessFileQueueStoreDelegate.MAX_LENGTH_PER_FILE_PROPERTY_KEY,
                                              String.valueOf(MAXIMUM_NUMBER_OF_BYTES), new MuleTestUtils.TestCallback()
-        {
-            @Override
-            public void run() throws Exception
-            {
-                int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
-                verifyNextMessage(lastInsertedMessageIndex);
-            }
-        });
+                {
+                    @Override
+                    public void run() throws Exception
+                    {
+                        int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
+                        verifyNextMessage(lastInsertedMessageIndex);
+                    }
+                });
     }
 
     @Test
@@ -75,16 +77,43 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
     {
         MuleTestUtils.testWithSystemProperty(DualRandomAccessFileQueueStoreDelegate.MAX_LENGTH_PER_FILE_PROPERTY_KEY,
                                              String.valueOf(MAXIMUM_NUMBER_OF_BYTES), new MuleTestUtils.TestCallback()
-        {
-            @Override
-            public void run() throws Exception
-            {
-                int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
-                corruptQueueControlData();
-                verifyNextMessage(lastInsertedMessageIndex);
-            }
-        });
+                {
+                    @Override
+                    public void run() throws Exception
+                    {
+                        int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
+                        corruptQueueControlData();
+                        verifyNextMessage(lastInsertedMessageIndex);
+                    }
+                });
     }
+
+    @Test
+    public void allFilesDeletedAfterDispose()
+    {
+        DualRandomAccessFileQueueStoreDelegate queueStore = createTestQueueStore();
+        queueStore.add("item");
+
+        File queueFolder = new File(workingDirectory.getRoot().getAbsolutePath() + "/queuestore");
+        assertThat(queueFolder.exists(), is(true));
+        assertThat(queueFilesExist(queueFolder), is(true));
+
+        queueStore.dispose();
+        assertThat(queueFilesExist(queueFolder), is(false));
+    }
+
+    private boolean queueFilesExist(File queueFolder)
+    {
+        for (File file : queueFolder.listFiles())
+        {
+            if (file.getName().contains(TEST_QUEUE_NAME))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private void corruptQueueControlData() throws IOException
     {
@@ -141,7 +170,7 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
     {
         final MuleContext mockMuleContext = Mockito.mock(MuleContext.class);
         when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
-        return new DualRandomAccessFileQueueStoreDelegate("test-queue", workingDirectory.getRoot().getAbsolutePath(), mockMuleContext, 0);
+        return new DualRandomAccessFileQueueStoreDelegate(TEST_QUEUE_NAME, workingDirectory.getRoot().getAbsolutePath(), mockMuleContext, 0);
     }
 
 }
