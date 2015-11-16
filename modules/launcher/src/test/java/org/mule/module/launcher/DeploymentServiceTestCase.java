@@ -733,13 +733,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testBrokenAppArchiveWithoutArgument() throws Exception
+    public void brokenAppArchiveWithoutArgument() throws Exception
     {
         doBrokenAppArchiveTest();
     }
 
     @Test
-    public void testBrokenAppArchiveAsArgument() throws Exception
+    public void brokenAppArchiveAsArgument() throws Exception
     {
         Map<String, Object> startupOptions = new HashMap<String, Object>();
         startupOptions.put("app", brokenAppDescriptor.id);
@@ -788,7 +788,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testDeployAppNameWithZipSuffix() throws Exception
+    public void deployAppNameWithZipSuffix() throws Exception
     {
         addPackedAppFromResource(emptyAppDescriptor.zipPath, "empty-app.zip.zip");
 
@@ -1212,6 +1212,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Thread deploymentServiceThread = new Thread(new Runnable()
         {
+            @Override
             public void run()
             {
                 deploymentService.start();
@@ -1222,11 +1223,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Mockito.doAnswer(new Answer()
         {
+            @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
             {
 
                 Thread deploymentClientThread = new Thread(new Runnable()
                 {
+                    @Override
                     public void run()
                     {
                         ReentrantLock deploymentLock = deploymentService.getLock();
@@ -1518,6 +1521,27 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Domain secondDomain = deploymentService.getDomains().get(0);
 
         assertNotSame(firstDomain, secondDomain);
+    }
+
+    @Test
+    public void redeploysDomainZipRefreshesApps() throws IOException
+    {
+        addPackedDomainFromResource(dummyDomainDescriptor.zipPath);
+
+        addPackedAppFromResource(dummyDomainApp1Descriptor.zipPath);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+
+        reset(domainDeploymentListener);
+
+        addPackedDomainFromResource(dummyDomainDescriptor.zipPath);
+        assertUndeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertUndeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
     }
 
     @Test
@@ -2447,6 +2471,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -2460,6 +2485,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Failed to deploy application: " + artifactName;
@@ -2472,6 +2498,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -2485,6 +2512,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return String.format("Did not received notification '%s' for app '%s'", "onMuleContextCreated", appName);
@@ -2497,6 +2525,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -2510,6 +2539,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return String.format("Did not received notification '%s' for app '%s'", "onMuleContextInitialised", appName);
@@ -2522,6 +2552,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -2535,6 +2566,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return String.format("Did not received notification '%s' for app '%s'", "onMuleContextConfigured", appName);
@@ -2547,6 +2579,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -2560,6 +2593,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Failed to undeployArtifact application: " + appName;
@@ -2625,6 +2659,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -2638,6 +2673,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Application deployment was supposed to fail for: " + artifactName;
@@ -2654,6 +2690,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         {
             prober.check(new Probe()
             {
+                @Override
                 public boolean isSatisfied()
                 {
                     try
@@ -2667,6 +2704,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                     }
                 }
 
+                @Override
                 public String describeFailure()
                 {
                     return "No deployment has started";
