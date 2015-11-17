@@ -9,11 +9,16 @@ package org.mule.module.ws.functional;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
+    @Rule
+    public SystemProperty wsdlLocation = new SystemProperty("wsdlLocation", "TestIncludedTypes.wsdl");
+
     @Override
     protected String getConfigFile()
     {

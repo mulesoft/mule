@@ -6,6 +6,7 @@
  */
 package org.mule.module.ws.consumer;
 
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -101,7 +102,7 @@ public class WSDLUtils
 
     /**
      * Fixes schemaLocation attributes in a parsed schema, allowing references that do not contain
-     * a base path (for example, references to local schemas in the classpath).
+     * a base path (for example, references to local schemas in the classpath) but not modifying external references.
      */
     private static void fixSchemaLocations(Schema schema)
     {
@@ -133,7 +134,7 @@ public class WSDLUtils
                     if (namedItem != null)
                     {
                         String schemaLocation = namedItem.getNodeValue();
-                        if (!schemaLocation.startsWith(basePath))
+                        if (!schemaLocation.startsWith(basePath) && !schemaLocation.startsWith(HTTP.getScheme()))
                         {
                             namedItem.setNodeValue(basePath + schemaLocation);
                         }
@@ -148,7 +149,7 @@ public class WSDLUtils
         for (SchemaReference schemaReference : schemaReferences)
         {
             String schemaLocationURI = schemaReference.getSchemaLocationURI();
-            if (schemaLocationURI != null && !schemaLocationURI.startsWith(basePath))
+            if (schemaLocationURI != null && !schemaLocationURI.startsWith(basePath) && !schemaLocationURI.startsWith(HTTP.getScheme()))
             {
                 schemaReference.setSchemaLocationURI(basePath + schemaLocationURI);
             }
