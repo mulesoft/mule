@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://consumer.ws.module.mule.org/"
+                  name="TestService" targetNamespace="http://consumer.ws.module.mule.org/">
+
+    <!--
+    This WSDL contains the type definitions for the TestService, and includes the schema from a separate file "TestSchema.xsd".
+    -->
+
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://consumer.ws.module.mule.org/">
+            <xsd:include schemaLocation="http://localhost:%s/TestSchema.xsd"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="noParams">
+        <wsdl:part element="tns:noParams" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="noParamsResponse">
+        <wsdl:part element="tns:noParamsResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="TestService">
+        <wsdl:operation name="noParams">
+            <wsdl:input message="tns:noParams" name="noParams">
+            </wsdl:input>
+            <wsdl:output message="tns:noParamsResponse" name="noParamsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+</wsdl:definitions>
