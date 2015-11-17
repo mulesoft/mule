@@ -44,6 +44,7 @@ public class WSDLUtils
     private static final String XML_IMPORT_ELEMENT = "import";
     private static final String XML_INCLUDE_ELEMENT = "include";
     private static final String XML_SCHEMA_LOCATION_ATTRIBUTE = "schemaLocation";
+    private static final String HTTP = "http";
 
     /**
      * Returns all the XML schemas from a WSDL definition.
@@ -101,7 +102,7 @@ public class WSDLUtils
 
     /**
      * Fixes schemaLocation attributes in a parsed schema, allowing references that do not contain
-     * a base path (for example, references to local schemas in the classpath).
+     * a base path (for example, references to local schemas in the classpath) but not modifying external references.
      */
     private static void fixSchemaLocations(Schema schema)
     {
@@ -133,7 +134,7 @@ public class WSDLUtils
                     if (namedItem != null)
                     {
                         String schemaLocation = namedItem.getNodeValue();
-                        if (!schemaLocation.startsWith(basePath))
+                        if (!schemaLocation.startsWith(basePath) && !schemaLocation.startsWith(HTTP))
                         {
                             namedItem.setNodeValue(basePath + schemaLocation);
                         }
@@ -148,7 +149,7 @@ public class WSDLUtils
         for (SchemaReference schemaReference : schemaReferences)
         {
             String schemaLocationURI = schemaReference.getSchemaLocationURI();
-            if (schemaLocationURI != null && !schemaLocationURI.startsWith(basePath))
+            if (schemaLocationURI != null && !schemaLocationURI.startsWith(basePath) && !schemaLocationURI.startsWith(HTTP))
             {
                 schemaReference.setSchemaLocationURI(basePath + schemaLocationURI);
             }
