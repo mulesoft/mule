@@ -7,9 +7,7 @@
 package org.mule.transport.servlet.jetty.functional;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -37,7 +35,7 @@ public class JettyHeadersTestCase extends FunctionalTestCase
         method.addRequestHeader("Accept", null);
         int statusCode = new HttpClient().executeMethod(method);
 
-        assertThat(statusCode, is(OK.getStatusCode()));
-        assertThat(method.getResponseBodyAsString(), is(EMPTY));
+        assertTrue(200 == statusCode);
+        assertTrue(EMPTY.equals(method.getResponseBodyAsString()));
     }
 }
