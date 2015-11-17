@@ -36,7 +36,7 @@ public class FtpRequestFilterTestCase extends AbstractFtpServerTestCase
         MuleMessage response = muleContext.getClient().request(FTP_FILTER_ENDPOINT, RECEIVE_TIMEOUT);
 
         assertThat("The file was not processed.", response, is(notNullValue()));
-        assertThat(response.getPayloadAsString(), is(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), is(TEST_MESSAGE));
         assertThat(fileExists(FILE_TXT), is(false));
     }
 

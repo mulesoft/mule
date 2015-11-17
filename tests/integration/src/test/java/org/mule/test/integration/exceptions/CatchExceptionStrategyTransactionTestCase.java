@@ -93,12 +93,12 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
         stopFlowConstruct(XA_TRANSACTION_BEHAVIOR_FLOW);
         MuleMessage outMessage = client.request(OUT_2_JMS_ENDPOINT, TIMEOUT);
         assertThat(outMessage, notNullValue());
-        assertThat(outMessage.getPayloadAsString(), is(MESSAGE));
+        assertThat(getPayloadAsString(outMessage), is(MESSAGE));
         MuleMessage inMessage = client.request(IN_2_JMS_ENDPOINT, SHORT_TIMEOUT);
         assertThat(inMessage, nullValue());
         MuleMessage inVmMessage = client.request(IN_2_VM_ENDPOINT, TIMEOUT);
         assertThat(inVmMessage, notNullValue());
-        assertThat(inVmMessage.getPayloadAsString(), is(MESSAGE));
+        assertThat(getPayloadAsString(inVmMessage), is(MESSAGE));
     }
 
     @Test

@@ -6,6 +6,7 @@
  */
 package org.mule.el.context;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -36,10 +37,12 @@ import javax.activation.DataHandler;
 public class MessageContext
 {
     protected MuleMessage message;
+    private MuleContext muleContext;
 
-    public MessageContext(MuleMessage message)
+    public MessageContext(MuleMessage message, MuleContext muleContext)
     {
         this.message = message;
+        this.muleContext = muleContext;
     }
 
     public String getId()
@@ -98,12 +101,12 @@ public class MessageContext
 
     public <T> T payloadAs(Class<T> type) throws TransformerException
     {
-        return message.getPayload(type);
+        return (T) muleContext.getTransformationService().getPayload(message, type);
     }
 
     public Object payloadAs(DataType<?> dt) throws TransformerException
     {
-        return message.getPayload(dt);
+        return muleContext.getTransformationService().getPayload(message,dt);
     }
 
     public void setPayload(Object payload)

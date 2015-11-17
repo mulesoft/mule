@@ -6,6 +6,9 @@
  */
 package org.mule.transformers.jaxb;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.jaxb.model.Item;
@@ -16,10 +19,6 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class JaxbAutoTransformerTestCase extends AbstractMuleContextTestCase
 {
     public static final String ITEM_XML = "<item><code>1234</code><description>Vacuum Cleaner</description><in-stock>true</in-stock></item>";
@@ -28,7 +27,7 @@ public class JaxbAutoTransformerTestCase extends AbstractMuleContextTestCase
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(ITEM_XML, muleContext);
-        Item item = message.getPayload(DataTypeFactory.create(Item.class));
+        Item item = getPayload(message, DataTypeFactory.create(Item.class));
 
         assertNotNull(item);
         assertEquals("1234", item.getCode());
@@ -36,7 +35,7 @@ public class JaxbAutoTransformerTestCase extends AbstractMuleContextTestCase
         assertTrue(item.isInStock());
 
         //and back again
-        Document doc = message.getPayload(DataTypeFactory.create(Document.class));
+        Document doc = getPayload(message, DataTypeFactory.create(Document.class));
         
         assertNotNull(doc);
         assertEquals("1234", XMLUtils.selectValue("/item/code", doc));

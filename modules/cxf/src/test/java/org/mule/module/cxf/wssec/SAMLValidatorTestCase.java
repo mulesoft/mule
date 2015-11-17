@@ -63,7 +63,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
         MuleMessage received = client.send("vm://greetMe", request);
 
         assertNotNull(received);
-        assertEquals("Hello me", received.getPayloadAsString());
+        assertEquals("Hello me", getPayloadAsString(received));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
         MuleMessage received = client.send("vm://greetMeSigned", request);
 
         assertNotNull(received);
-        assertEquals("Hello me", received.getPayloadAsString());
+        assertEquals("Hello me", getPayloadAsString(received));
     }
 
     public static class PasswordCallbackHandler implements CallbackHandler

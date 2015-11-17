@@ -78,7 +78,7 @@ public class ProxyPortMatchingSoapVersionTest extends FunctionalTestCase
 
         // As there is nothing else after the service, if there were no problems the same contents of the request
         // will be returned.
-        assertEquals(request, result.getMessage().getPayloadAsString());
+        assertEquals(request, getPayloadAsString(result.getMessage()));
     }
 
     private void assertInvalidRequest(String flowName, String request) throws Exception
@@ -86,7 +86,7 @@ public class ProxyPortMatchingSoapVersionTest extends FunctionalTestCase
         Flow flow = (Flow) getFlowConstruct(flowName);
         MuleEvent result = flow.process(getTestEvent(request));
 
-        assertTrue(result.getMessage().getPayloadAsString().contains("VersionMismatch"));
+        assertTrue(getPayloadAsString(result.getMessage()).contains("VersionMismatch"));
     }
 
     private String getRequest(String schema)

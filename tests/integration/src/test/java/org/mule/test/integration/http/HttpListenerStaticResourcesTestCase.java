@@ -171,7 +171,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
         String url = format("http://localhost:%d/", port3.getNumber());
         executeRequest(url, false);
         assertThat(OK.getStatusCode(), is(responseCode));
-        assertThat(response.getPayloadAsString(), is(INDEX_HTML_CONTENT));
+        assertThat(getPayloadAsString(response), is(INDEX_HTML_CONTENT));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
         }
         response = muleContext.getClient().send(url, getTestMuleMessage(), optionsBuilder.build());
         responseCode = response.getInboundProperty(HTTP_STATUS_PROPERTY);
-        payload = response.getPayloadAsString();
+        payload = getPayloadAsString(response);
     }
 
 }

@@ -41,6 +41,6 @@ public class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFuncti
 
         String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
                                   "<text>TEST</text></ns:noParamsResponse>";
-        assertXMLEqual(expectedResponse, event.getMessage().getPayloadAsString());
+        assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
     }
 }

@@ -48,7 +48,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
 
         MuleMessage message = client.send(endpoint, "Test Client Send message", null);
         assertNotNull(message);
-        assertEquals("Received: Test Client Send message", message.getPayloadAsString());
+        assertEquals("Received: Test Client Send message", getPayloadAsString(message));
 
         // The SpringRegistry is read-only so we can't unregister the service!
         // muleContext.getRegistry().unregisterComponent("vmComponent");

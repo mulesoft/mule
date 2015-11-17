@@ -62,7 +62,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
         assertThat(allEntries.get(TX_ID).size(), is(1));
         XaQueueTxJournalEntry logEntry = allEntries.get(TX_ID).iterator().next();
         assertThat(logEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(((MuleEvent) logEntry.getValue()).getMessage().getPayloadAsString(), is(SOME_VALUE));
+        assertThat(getPayloadAsString(((MuleEvent) logEntry.getValue()).getMessage()), is(SOME_VALUE));
         assertThat(logEntry.isAdd(), is(true));
     }
 
@@ -79,7 +79,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
         assertThat(allEntries.get(TX_ID).size(), is(1));
         XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
         assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(((MuleEvent) journalEntry.getValue()).getMessage().getPayloadAsString(), is(SOME_VALUE));
+        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
         assertThat(journalEntry.isAddFirst(), is(true));
     }
 
@@ -96,7 +96,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
         assertThat(allEntries.get(TX_ID).size(), is(1));
         XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
         assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(((MuleEvent) journalEntry.getValue()).getMessage().getPayloadAsString(), is(SOME_VALUE));
+        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
         assertThat(journalEntry.isRemove(), is(true));
     }
 
@@ -156,7 +156,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
         assertThat(allEntries.get(TX_ID).size(), is(numberOfOffers));
         XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
         assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(((MuleEvent) journalEntry.getValue()).getMessage().getPayloadAsString(), is(SOME_VALUE));
+        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
         assertThat(journalEntry.isAdd(), is(true));
     }
 

@@ -42,7 +42,7 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertEquals("text/baz;charset=UTF-16BE", reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
         assertEquals("UTF-16BE", reply.getEncoding());
-        assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(reply));
     }
 
     /**

@@ -50,6 +50,6 @@ public class ReplyToChainIntegration5TestCase extends FunctionalTestCase
         flowExecutedLatch.await(TIMEOUT, TimeUnit.MILLISECONDS);
         org.mule.api.MuleMessage response = client.request("jms://response", TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), Is.is(EXPECTED_PAYLOAD));
+        assertThat(getPayloadAsString(response), Is.is(EXPECTED_PAYLOAD));
     }
 }

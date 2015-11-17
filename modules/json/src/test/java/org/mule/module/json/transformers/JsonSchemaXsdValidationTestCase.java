@@ -97,7 +97,7 @@ public class JsonSchemaXsdValidationTestCase extends AbstractMuleContextTestCase
         boolean accepted = filter.accept(message);
         assertTrue(accepted);
         assertEquals(0, errorHandler.getErrorCount());
-        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(message), false);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class JsonSchemaXsdValidationTestCase extends AbstractMuleContextTestCase
         boolean accepted = filter.accept(message);
         assertTrue(accepted);
         assertEquals(0, errorHandler.getErrorCount());
-        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(message), false);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class JsonSchemaXsdValidationTestCase extends AbstractMuleContextTestCase
         boolean accepted = filter.accept(message);
         assertTrue(accepted);
         assertEquals(0, errorHandler.getErrorCount());
-        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(message), false);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class JsonSchemaXsdValidationTestCase extends AbstractMuleContextTestCase
         boolean accepted = filter.accept(message);
         assertTrue(accepted);
         assertEquals(0, errorHandler.getErrorCount());
-        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(message), false);
     }
 
     @Test

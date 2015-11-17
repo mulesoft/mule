@@ -77,7 +77,7 @@ public class LargeProxyTestCase extends FunctionalTestCase
                     try
                     {
                         MuleMessage result = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/EchoProxy", msg, null);
-                        String payloadAsStr = result.getPayloadAsString();
+                        String payloadAsStr = getPayloadAsString(result);
                         assertTrue("The payload length should never be 0", payloadAsStr.length() != 0);
                         assertTrue(payloadAsStr.indexOf(largeString) != -1);
                         latch.countDown();

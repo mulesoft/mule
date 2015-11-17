@@ -47,7 +47,7 @@ public class  AppAndDomainLifecycleTestCase extends AbstractMuleTestCase
             firstAppContext.stop();
             MuleMessage response = secondAppContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld", new DefaultMuleMessage("test", firstAppContext));
             assertThat(response, notNullValue());
-            assertThat(response.getPayloadAsString(), is("hello world"));
+            assertThat(secondAppContext.getTransformationService().getPayloadAsString(response), is("hello world"));
             assertThat((domainContext.getRegistry().<Connector>get("sharedHttpConnector")).isStarted(), Is.is(true));
         }
         finally

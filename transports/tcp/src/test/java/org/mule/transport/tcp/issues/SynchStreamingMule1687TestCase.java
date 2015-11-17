@@ -47,6 +47,6 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
 
         Object payload = message.getPayload();
         assertTrue(payload instanceof InputStream);
-        assertEquals("Some value - set to make test ok", message.getPayloadAsString());
+        assertEquals("Some value - set to make test ok", getPayloadAsString(message));
     }
 }

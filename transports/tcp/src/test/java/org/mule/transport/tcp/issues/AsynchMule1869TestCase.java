@@ -47,7 +47,7 @@ public class AsynchMule1869TestCase extends FunctionalTestCase
 
         MuleMessage result =  client.request("asyncClientEndpoint", 10000);
         assertNotNull("No message received", result);
-        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(result));
     }
 
 }

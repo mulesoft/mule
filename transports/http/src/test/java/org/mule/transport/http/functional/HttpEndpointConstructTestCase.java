@@ -32,6 +32,6 @@ public class HttpEndpointConstructTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/testA", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE, response.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(response));
     }
 }

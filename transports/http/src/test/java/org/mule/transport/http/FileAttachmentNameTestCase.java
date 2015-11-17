@@ -47,6 +47,6 @@ public class FileAttachmentNameTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("http://localhost:" + httpPort.getValue() + "/testInput", msg);
 
-        assertThat(response.getPayloadAsString(), equalTo("testAttachment:testAttachment.txt"));
+        assertThat(getPayloadAsString(response), equalTo("testAttachment:testAttachment.txt"));
     }
 }

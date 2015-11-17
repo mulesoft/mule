@@ -57,7 +57,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
     public void testErrorExpressionOnRegexFilterPass() throws Exception
     {
         MuleMessage result = muleContext.getClient().send("restServiceEndpoint2", TEST_REQUEST, null);
-        assertEquals("echo=" + TEST_REQUEST,result.getPayloadAsString());
+        assertEquals("echo=" + TEST_REQUEST,getPayloadAsString(result));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
         props.put("bar-optional-header", "bar");
 
         MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", null, props);
-        assertEquals("foo=boo&faz=baz&far=bar",result.getPayloadAsString());
+        assertEquals("foo=boo&faz=baz&far=bar",getPayloadAsString(result));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
         props.put("baz-header", "baz");
 
         MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", null, props);
-        assertEquals("foo=boo&faz=baz",result.getPayloadAsString());
+        assertEquals("foo=boo&faz=baz",getPayloadAsString(result));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage result = muleContext.getClient().send("vm://toFlow", TEST_REQUEST, null);
         assertNotNull(result);
-        assertEquals("echo=Test Http Request", result.getPayloadAsString());
+        assertEquals("echo=Test Http Request", getPayloadAsString(result));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage result = muleContext.getClient().send("vm://restservice4", TEST_REQUEST, null);
         assertNotNull(result);
-        assertEquals("foo/bar", result.getPayloadAsString());
+        assertEquals("foo/bar", getPayloadAsString(result));
     }
 
     public static class CopyContentTypeFromRequest implements Callable

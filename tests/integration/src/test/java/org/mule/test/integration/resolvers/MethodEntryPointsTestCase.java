@@ -65,7 +65,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         msg.setOutboundProperty("method", "reverseString");
         MuleMessage message = client.send("vm://service", msg);
         assertNotNull(message);
-        assertEquals("olleh", message.getPayloadAsString());
+        assertEquals("olleh", getPayloadAsString(message));
     }
 
     @Test
@@ -76,7 +76,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         msg.setOutboundProperty("method", "upperCaseString");
         MuleMessage message = client.send("vm://service", msg);
         assertNotNull(message);
-        assertEquals("HELLO", message.getPayloadAsString());
+        assertEquals("HELLO", getPayloadAsString(message));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://service2-reverseString", "hello", null);
         assertNotNull(message);
-        assertEquals("olleh", message.getPayloadAsString());
+        assertEquals("olleh", getPayloadAsString(message));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://service2-upperCaseString", "hello", null);
         assertNotNull(message);
-        assertEquals(message.getPayloadAsString(), "HELLO");
+        assertEquals(getPayloadAsString(message), "HELLO");
     }
 
     @Test
@@ -105,7 +105,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "reverseString");
         MuleMessage message = client.send("vm://service", "hello", props);
         assertNotNull(message);
-        assertEquals("olleh", message.getPayloadAsString());
+        assertEquals("olleh", getPayloadAsString(message));
     }
 
     @Test
@@ -116,6 +116,6 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "upperCaseString");
         MuleMessage message = client.send("vm://service", "hello", props);
         assertNotNull(message);
-        assertEquals("HELLO", message.getPayloadAsString());
+        assertEquals("HELLO", getPayloadAsString(message));
     }
 }

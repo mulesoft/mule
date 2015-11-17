@@ -191,7 +191,7 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
         assertNull(transferEncodingHeader);
         assertThat(Integer.parseInt(contentLengthHeader), equalTo(TEST_MESSAGE.length()));
         assertTrue(response.getMessage().getPayload() instanceof InputStream);
-        assertThat(response.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
+        assertThat(getPayloadAsString(response.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 
     private void assertStreaming(String flowName, MuleEvent event) throws Exception
@@ -202,7 +202,7 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
         assertThat(transferEncodingHeader, equalTo(CHUNKED));
         assertNull(contentLengthHeader);
         assertTrue(response.getMessage().getPayload() instanceof InputStream);
-        assertThat(response.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
+        assertThat(getPayloadAsString(response.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 
 

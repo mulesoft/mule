@@ -187,12 +187,12 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
     protected void applyOutboundTransformers(MuleEvent event) throws MuleException
     {
-        event.getMessage().applyTransformers(event, defaultOutboundTransformers);
+        connector.getMuleContext().getTransformationService().applyTransformers(event.getMessage(), event, defaultOutboundTransformers);
     }
 
     protected void applyResponseTransformers(MuleEvent event) throws MuleException
     {
-        event.getMessage().applyTransformers(event, defaultResponseTransformers);
+        connector.getMuleContext().getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers);
     }
 
     protected abstract void doDispatch(MuleEvent event) throws Exception;

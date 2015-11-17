@@ -21,6 +21,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.transformer.TransformerTemplate;
@@ -179,9 +180,9 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
             }
             else
             {
-                event.getMessage().applyTransformers(
-                    event, Collections.singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(
-                        result))));
+                muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections
+                        .<Transformer>singletonList(new TransformerTemplate(new TransformerTemplate
+                                .OverwitePayloadCallback(result))));
                 return event.getMessage();
             }
         }

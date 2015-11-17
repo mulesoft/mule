@@ -61,7 +61,7 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
     {
         Flow flow = (Flow) getFlowConstruct("payloadTargetFlow");
         MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
-        assertThat(event.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
+        assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
         InputStream customTarget = event.getMessage().getOutboundProperty("customTarget");
         assertThat(customTarget, notNullValue());
         assertThat(IOUtils.toString(customTarget), equalTo(DEFAULT_RESPONSE));
-        assertThat(event.getMessage().getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
     }
 
 }

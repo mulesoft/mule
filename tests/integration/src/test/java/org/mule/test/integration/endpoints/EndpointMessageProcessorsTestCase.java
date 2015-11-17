@@ -74,31 +74,31 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 
         response = client.request("vm://wiretap2", TIMEOUT);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().startsWith("input"));
-        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
+        assertTrue(getPayloadAsString(response).startsWith("input"));
+        assertTrue(getPayloadAsString(response).endsWith(":A:B:service1 (tapped)"));
         response = client.request("vm://wiretap2", TIMEOUT);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().startsWith("input"));
-        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
+        assertTrue(getPayloadAsString(response).startsWith("input"));
+        assertTrue(getPayloadAsString(response).endsWith(":A:B:service1 (tapped)"));
         response = client.request("vm://wiretap2", TIMEOUT);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().startsWith("input"));
-        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
+        assertTrue(getPayloadAsString(response).startsWith("input"));
+        assertTrue(getPayloadAsString(response).endsWith(":A:B:service1 (tapped)"));
         response = client.request("vm://wiretap2", TIMEOUT);
         assertNull(response);
 
         response = client.request("vm://out4", TIMEOUT);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().startsWith("input"));
-        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
+        assertTrue(getPayloadAsString(response).startsWith("input"));
+        assertTrue(getPayloadAsString(response).endsWith(":A:B:service1:E:F"));
         response = client.request("vm://out4", TIMEOUT);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().startsWith("input"));
-        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
+        assertTrue(getPayloadAsString(response).startsWith("input"));
+        assertTrue(getPayloadAsString(response).endsWith(":A:B:service1:E:F"));
         response = client.request("vm://out4", TIMEOUT);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().startsWith("input"));
-        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
+        assertTrue(getPayloadAsString(response).startsWith("input"));
+        assertTrue(getPayloadAsString(response).endsWith(":A:B:service1:E:F"));
         response = client.request("vm://out4", TIMEOUT);
         assertNull(response);
     }

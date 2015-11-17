@@ -22,9 +22,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-
+import org.mule.TransformationService;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -35,7 +36,6 @@ import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
@@ -46,12 +46,16 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 @SmallTest
+@RunWith(MockitoJUnitRunner.class)
 public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends AbstractMuleTestCase
 {
 
@@ -80,6 +84,10 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         }
     };
     private CountDownLatch routeCountDownLatch;
+    @Mock
+    private MuleContext muleContext;
+    @Mock
+    private TransformationService transformationService;
 
     @Before
     public void setUp() throws Exception
@@ -106,6 +114,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         configureMockRouteToCountDownRouteLatch();
         configureExceptionStrategyToReleaseLatchWhenExecuted();
         configureDLQToReleaseLatchWhenExecuted();
+        when(muleContext.getTransformationService()).thenReturn(transformationService);
+        when(transformationService.getPayloadAsBytes(any(MuleMessage.class))).thenAnswer(invocation -> invocation.getArguments()[0].toString().getBytes());
     }
 
     @Test(expected = InitialisationException.class)
@@ -433,6 +443,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         };
         processingStrategy.setUntilSuccessfulConfiguration(mockUntilSuccessfulConfiguration);
         processingStrategy.setMessagingExceptionHandler(mockEvent.getFlowConstruct().getExceptionListener());
+        processingStrategy.setMuleContext(muleContext);
         processingStrategy.initialise();
         processingStrategy.start();
         return processingStrategy;

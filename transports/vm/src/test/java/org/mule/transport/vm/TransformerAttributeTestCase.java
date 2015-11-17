@@ -33,7 +33,7 @@ public class TransformerAttributeTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://simple", OUTBOUND_MESSAGE, null);
         assertNotNull(message);
         assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)  + " Received",
-                message.getPayloadAsString());
+                getPayloadAsString(message));
     }
 
     @Test
@@ -43,6 +43,6 @@ public class TransformerAttributeTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://chained", OUTBOUND_MESSAGE, null);
         assertNotNull(message);
         assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)  + " Received",
-                message.getPayloadAsString());
+                getPayloadAsString(message));
     }
 }

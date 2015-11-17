@@ -51,7 +51,7 @@ public class HttpListenerHeaderSizeTestCase extends FunctionalTestCase
         int queryParamSize = Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) - SIZE_DELTA;
         MuleMessage response = sendRequestWithQueryParam(queryParamSize);
         assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));
-        assertThat(response.getPayloadAsBytes().length, is(queryParamSize));
+        assertThat(getPayloadAsBytes(response).length, is(queryParamSize));
     }
 
     private MuleMessage sendRequestWithQueryParam(int queryParamSize) throws MuleException

@@ -38,7 +38,7 @@ public class MultipleNamespacesFunctionalTestCase extends AbstractWSConsumerFunc
         MuleMessage response = client.send("vm://in", ECHO_REQUEST, null);
 
         XMLUnit.setIgnoreWhitespace(true);
-        assertXMLEqual(EXPECTED_RESPONSE, response.getPayloadAsString());
+        assertXMLEqual(EXPECTED_RESPONSE, getPayloadAsString(response));
     }
 
 }

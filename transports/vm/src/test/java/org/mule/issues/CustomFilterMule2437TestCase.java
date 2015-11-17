@@ -8,7 +8,6 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -44,6 +43,6 @@ public class CustomFilterMule2437TestCase extends FunctionalTestCase
         client.dispatch("vm://in", getTestMuleMessage(message));
         MuleMessage response = client.request(destination, TIMEOUT);
         assertNotNull(response);
-        assertEquals(message, response.getPayloadAsString());
+        assertEquals(message, getPayloadAsString(response));
     }
 }

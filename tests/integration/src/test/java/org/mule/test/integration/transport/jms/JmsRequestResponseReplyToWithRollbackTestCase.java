@@ -29,6 +29,6 @@ public class JmsRequestResponseReplyToWithRollbackTestCase extends FunctionalTes
 
         MuleMessage response = client.send("jms://testIn", TEST_MESSAGE, null);
 
-        assertEquals("ROLLBACK", response.getPayloadAsString());
+        assertEquals("ROLLBACK", getPayloadAsString(response));
     }
 }

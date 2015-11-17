@@ -37,7 +37,7 @@ public class JettyHttpsClientAuthenticationTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://authenticatedClientEndpoint", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE, response.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(response));
     }
 
     @Test

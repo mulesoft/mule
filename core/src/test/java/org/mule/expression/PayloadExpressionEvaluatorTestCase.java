@@ -68,6 +68,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleContextTestC
     public void testWithTransform() throws Exception
     {
         MessagePayloadExpressionEvaluator eval = new MessagePayloadExpressionEvaluator();
+        eval.setMuleContext(muleContext);
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
 
         //i.e. ${payload:byte[]}
@@ -87,6 +88,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleContextTestC
     public void testWithMoreComplexTransform() throws Exception
     {
         MessagePayloadExpressionEvaluator eval = new MessagePayloadExpressionEvaluator();
+        eval.setMuleContext(muleContext);
         MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), muleContext);
 
         //Lets register our transformer so Mule can find it

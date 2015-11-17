@@ -53,8 +53,8 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
     public void testProxyEnvelope() throws Exception
     {
         MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-envelope");
-        assertFalse(result.getPayloadAsString().contains("Fault"));
-        assertTrue(result.getPayloadAsString().contains("joe"));
+        assertFalse(getPayloadAsString(result).contains("Fault"));
+        assertTrue(getPayloadAsString(result).contains("joe"));
     }
 
     @Ignore("MULE-6926: Flaky Test")
@@ -63,8 +63,8 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
     {
         MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-body");
 
-        assertFalse(result.getPayloadAsString().contains("Fault"));
-        assertFalse(result.getPayloadAsString().contains("joe"));
+        assertFalse(getPayloadAsString(result).contains("Fault"));
+        assertFalse(getPayloadAsString(result).contains("joe"));
     }
 
     protected MuleMessage sendRequest(String url) throws MuleException

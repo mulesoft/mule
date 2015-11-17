@@ -121,6 +121,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testSuccessfulDeliveryStreamPayload() throws Exception
     {
+        untilSuccessful.setMuleContext(muleContext);
         untilSuccessful.initialise();
         untilSuccessful.start();
 

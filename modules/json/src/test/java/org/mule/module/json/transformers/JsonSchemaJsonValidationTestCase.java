@@ -56,7 +56,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
         MuleMessage message = new DefaultMuleMessage(EXPECTED_JSON, muleContext);
         boolean accepted = filter.accept(message);
         assertTrue(accepted);
-        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(message), false);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
         MuleMessage message = new DefaultMuleMessage(reader, muleContext);
         boolean accepted = filter.accept(message);
         assertTrue(accepted);
-        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(message), false);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
         MuleMessage message = new DefaultMuleMessage(bytes, muleContext);
         boolean accepted = filter.accept(message);
         assertTrue(accepted);
-        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(message), false);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
         MuleMessage message = new DefaultMuleMessage(new ByteArrayInputStream(EXPECTED_JSON.getBytes()), muleContext);
         boolean accepted = filter.accept(message);
         assertTrue(accepted);
-        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_JSON, getPayloadAsString(message), false);
     }
 
     @Test

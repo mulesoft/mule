@@ -75,7 +75,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
         client.dispatch("vm://inChoice", request);
         MuleMessage result = client.request("vm://outChoice", 5000);
         assertNotNull(result);
-        assertEquals("ABC", result.getPayloadAsString());
+        assertEquals("ABC", getPayloadAsString(result));
     }
     
     @Test
@@ -90,7 +90,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
         client.dispatch("vm://inChoice", request);
         MuleMessage result = client.request("vm://outChoice", 5000);
         assertNotNull(result);
-        assertEquals("AB", result.getPayloadAsString());
+        assertEquals("AB", getPayloadAsString(result));
     }
 }
 

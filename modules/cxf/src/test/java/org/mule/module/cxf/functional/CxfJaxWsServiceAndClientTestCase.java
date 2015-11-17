@@ -81,6 +81,6 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase
 
         MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS);
 
-        assertEquals(RESPONSE_PAYLOAD, result.getPayloadAsString());
+        assertEquals(RESPONSE_PAYLOAD, getPayloadAsString(result));
     }
 }

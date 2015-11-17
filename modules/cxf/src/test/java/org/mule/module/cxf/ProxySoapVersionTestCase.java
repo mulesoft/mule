@@ -66,7 +66,7 @@ public class ProxySoapVersionTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy-soap-version", getTestMuleMessage(msgWithComment), HTTP_REQUEST_OPTIONS);
-        String resString = result.getPayloadAsString();
+        String resString = getPayloadAsString(result);
         assertTrue(resString.contains(doGoogleSearch));
     }
 }

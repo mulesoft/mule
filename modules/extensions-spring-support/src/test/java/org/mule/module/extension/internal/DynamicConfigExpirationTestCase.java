@@ -36,7 +36,7 @@ public class DynamicConfigExpirationTestCase extends ExtensionsFunctionalTestCas
     {
         final String myName = "Walt";
         final MuleEvent event = getTestEvent(myName);
-        String returnedName = runFlow("dynamic", event).getMessage().getPayloadAsString();
+        String returnedName = getPayloadAsString(runFlow("dynamic", event).getMessage());
 
         HeisenbergExtension config = (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", event).getValue();
 

@@ -43,7 +43,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
     {
         MuleMessage message = send("data");
         assertNotNull(message);
-        String response = message.getPayloadAsString();
+        String response = getPayloadAsString(message);
         assertEquals("data", response);
     }
 
@@ -57,7 +57,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
         byte[] data = fillBuffer(new byte[size]);
         MuleMessage message = send(data);
         assertNotNull(message);
-        byte[] response = message.getPayloadAsBytes();
+        byte[] response = getPayloadAsBytes(message);
         assertEquals(data.length, response.length);
         assertTrue(Arrays.equals(data, response));
     }
@@ -74,7 +74,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
         {
             MuleMessage message = send(data);
             assertNotNull(message);
-            byte[] response = message.getPayloadAsBytes();
+            byte[] response = getPayloadAsBytes(message);
             assertEquals(data.length, response.length);
             assertTrue(Arrays.equals(data, response));
         }
@@ -86,7 +86,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
         byte[] data = fillBuffer(new byte[1024 * 1024]);
         MuleMessage message = send(data);
         assertNotNull(message);
-        byte[] response = message.getPayloadAsBytes();
+        byte[] response = getPayloadAsBytes(message);
         assertEquals(data.length, response.length);
         assertTrue(Arrays.equals(data, response));
     }

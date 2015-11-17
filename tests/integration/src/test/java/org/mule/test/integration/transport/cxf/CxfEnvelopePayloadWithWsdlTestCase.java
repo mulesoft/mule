@@ -41,7 +41,7 @@ public class CxfEnvelopePayloadWithWsdlTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:28182/ScratchCardServiceV1", getTestMuleMessage(msg), newOptions().disableStatusCodeValidation().method(HttpConstants.METHOD_POST).build());
         assertNotNull("The result shouln't have been null", result);
 
-        final String payloadAsString = result.getPayloadAsString();
+        final String payloadAsString = getPayloadAsString(result);
         XMLAssert.assertXMLEqual(msg, payloadAsString);
     }
 }

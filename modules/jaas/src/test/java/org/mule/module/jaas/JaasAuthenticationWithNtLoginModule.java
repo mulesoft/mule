@@ -37,6 +37,6 @@ public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalT
         MuleMessage m = muleContext.getClient().send("vm://test", "Test", props);
 
         assertNotNull(m);
-        assertTrue(m.getPayloadAsString().equals("Test Received"));
+        assertTrue(getPayloadAsString(m).equals("Test Received"));
     }
 }

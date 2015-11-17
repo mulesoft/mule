@@ -45,7 +45,7 @@ public class BulkExecuteTargetTestCase extends AbstractBulkExecuteTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://bulkUpdateCustomTarget", TEST_MESSAGE, null);
 
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
 
         assertBulkModeResult(response.getInboundProperty("updateCounts"));
     }

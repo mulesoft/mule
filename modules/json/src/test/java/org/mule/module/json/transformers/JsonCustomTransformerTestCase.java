@@ -6,7 +6,10 @@
  */
 package org.mule.module.json.transformers;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.ContainsTransformerMethods;
@@ -25,12 +28,8 @@ import org.mule.transformer.types.SimpleDataType;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.junit.Test;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
 {
@@ -49,7 +48,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage(PERSON_JSON, muleContext);
 
-        Person person = message.getPayload(DataTypeFactory.create(Person.class));
+        Person person = getPayload(message, DataTypeFactory.create(Person.class));
         assertNotNull(person);
         assertEquals("John Doe", person.getName());
         assertEquals("01/01/1970", person.getDob());
@@ -66,7 +65,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
         ByteArrayInputStream in = new ByteArrayInputStream(EMAIL_JSON.getBytes());
         DefaultMuleMessage message = new DefaultMuleMessage(in, muleContext);
         message.setInboundProperty("foo", "fooValue");
-        EmailAddress emailAddress = message.getPayload(new SimpleDataType<EmailAddress>(EmailAddress.class));
+        EmailAddress emailAddress = getPayload(message, new SimpleDataType<EmailAddress>(EmailAddress.class));
         assertNotNull(emailAddress);
         assertEquals("home", emailAddress.getType());
         assertEquals("john.doe@gmail.com", emailAddress.getAddress());
@@ -76,7 +75,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
     public void testCustomListTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(ITEMS_JSON, muleContext);
-        List<Item> items = message.getPayload(new CollectionDataType<List<Item>>(List.class, Item.class));
+        List<Item> items = getPayload(message, new CollectionDataType<List<Item>>(List.class, Item.class));
         assertNotNull(items);
         assertEquals("1234", items.get(0).getCode());
         assertEquals("Vacuum Cleaner", items.get(0).getDescription());
@@ -88,7 +87,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
         String people_json = "[" + PERSON_JSON + "," + PERSON_JSON + "]";
         message = new DefaultMuleMessage(people_json, muleContext);
 
-        List<Person> people = message.getPayload(new CollectionDataType<List<Person>>(List.class, Person.class));
+        List<Person> people = getPayload(message, new CollectionDataType<List<Person>>(List.class, Person.class));
         assertNotNull(people);
         assertEquals(2, people.size());
     }
@@ -101,7 +100,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
         String people_json = "[" + PERSON_JSON + "," + PERSON_JSON + "]";
         MuleMessage message = new DefaultMuleMessage(people_json, muleContext);
 
-        List<Person> people = message.getPayload(new ListDataType<List<Person>>(Person.class));
+        List<Person> people = getPayload(message, new ListDataType<List<Person>>(Person.class));
         assertNotNull(people);
         assertEquals(2, people.size());
     }
@@ -117,7 +116,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
         
         assertThat(transformer, org.hamcrest.core.IsInstanceOf.instanceOf(AnnotatedTransformerProxy.class));
         MuleMessage message = new DefaultMuleMessage(new League(), muleContext);
-        assertThat(message.getPayload(String.class), is(TransformerProvider.RESULT));
+        assertThat(getPayload(message, String.class), is(TransformerProvider.RESULT));
     }
 
     @JsonAutoDetect

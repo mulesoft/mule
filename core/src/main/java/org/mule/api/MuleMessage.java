@@ -7,12 +7,9 @@
 package org.mule.api;
 
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,7 +39,6 @@ public interface MuleMessage extends Serializable
      * @throws UnsupportedOperationException if scope specified is {@link org.mule.api.transport.PropertyScope#INBOUND}
      */
     void clearProperties(PropertyScope scope);
-
 
 
     /**
@@ -101,6 +97,7 @@ public interface MuleMessage extends Serializable
     /**
      * Gets all property names in a given scope. Prefer using one of the convenience
      * scope-aware methods instead, this one is meant for internal access mostly.
+     *
      * @param scope the scope of property names
      * @return all property keys on this message in the given scope
      * @see #getInvocationPropertyNames()
@@ -216,6 +213,7 @@ public interface MuleMessage extends Serializable
      * present on the message in the scope specified.  The method will also type check against the default value
      * to ensure that the value is of the correct type.  If null is used for the default value no type checking is
      * done.
+     *
      * @param name the name or key of the property. This must be non-null.
      * @param scope The scope of the property to retrieve.  This must be non-null.
      * @param defaultValue the value to return if the property is not in the scope provided. Can be null
@@ -332,6 +330,7 @@ public interface MuleMessage extends Serializable
     /**
      * Allows for arbitrary data attachments to be associated with the Message. These attachments work in the
      * same way that email attachments work. Attachments can be binary or text
+     *
      * @param name the name to associate with the attachment
      * @param dataHandler The attachment {@link javax.activation.DataHandler} to use. This will be used to interact with the attachment data
      * @throws Exception if the attachment cannot be added for any reason
@@ -344,6 +343,7 @@ public interface MuleMessage extends Serializable
      *  Adds an outgoing attachment to the message
      * @param object the input stream to the contents of the attachment. This object can either be a {@link java.net.URL}, which will construct a URL data source, or
      * a {@link java.io.File}, which will construct a file data source.  Any other object will be used as the raw contents of the attachment
+     *
      * @param contentType the content type of the attachment.  Note that the charset attribute can be specifed too i.e. text/plain;charset=UTF-8
      * @param name the name to associate with the attachments
      * @throws Exception if the attachment cannot be read or created
@@ -415,44 +415,7 @@ public interface MuleMessage extends Serializable
     void release();
 
     /**
-     * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
-     * message. This method provides the only way to alter the paylaod of this message without recreating a
-     * copy of the message
-     * @param event the event being processed
-     * @param transformers the transformers to apply to the message payload
-     * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
-     * are incompatible with the message payload
-     */
-    void applyTransformers(MuleEvent event, List<? extends Transformer> transformers) throws MuleException;
-
-    /**
-     * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
-     * message. This method provides the only way to alter the paylaod of this message without recreating a
-     * copy of the message
-     * @param event the event being processed
-     * @param transformers the transformers to apply to the message payload
-     * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
-     * are incompatible with the message payload
-     */
-    void applyTransformers(MuleEvent event, Transformer... transformers) throws MuleException;
-
-    /**
-     * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
-     * message. This method provides the only way to alter the paylaod of this message without recreating a
-     * copy of the message
-     * @param event the event being processed
-     * @param transformers the transformers to apply to the message payload
-     * @param outputType the required output type for this transformation. by adding this parameter some additional
-     * transformations will occur on the message payload to ensure that the final payload is of the specified type.
-     * If no transformers can be found in the registry that can transform from the return type of the transformation
-     * list to the outputType and exception will be thrown
-     * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
-     * are incompatible with the message payload
-     */
-    void applyTransformers(MuleEvent event, List<? extends Transformer> transformers, Class<?> outputType) throws MuleException;
-
-    /**
-     * Update the message payload. This is typically only called if the
+     * Updates the message payload. This is typically only called if the
      * payload was originally an InputStream. In which case, if the InputStream
      * is consumed, it needs to be replaced for future access.
      *
@@ -469,85 +432,10 @@ public interface MuleMessage extends Serializable
     void setPayload(Object payload, DataType<?> dataType);
 
     /**
-     * Will attempt to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a transformer that can do this transformation. If a transformer cannot be found
-     * an exception is thrown.  Any transformers added to the registry will be checked for compatibility
-     * @param outputType the desired return type
-     * @return The converted payload of this message. Note that this method will not alter the payload of this
-     * message *unless* the payload is an InputStream in which case the stream will be read and the payload will become
-     * the fully read stream.
-     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
-     * payload
-     */
-    <T> T getPayload(Class<T> outputType) throws TransformerException;
-
-    /**
-     * Will attempt to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a transformer that can do this transformation. If a transformer cannot be found
-     * an exception is thrown.  Any transformers added to the registry will be checked for compatability
-     * @param outputType the desired return type
-     * @return The converted payload of this message. Note that this method will not alter the payload of this
-     * message *unless* the payload is an InputStream in which case the stream will be read and the payload will become
-     * the fully read stream.
-     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
-     * payload
-     */
-    <T> T getPayload(DataType<T> outputType) throws TransformerException;
-
-
-    /**
-     * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    String getPayloadAsString(String encoding) throws Exception;
-
-    /**
-     * Converts the message implementation into a String representation. If encoding
-     * is required it will use the encoding set on the message
-     *
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     *
-     */
-    String getPayloadAsString() throws Exception;
-
-    /**
-     * Converts the message implementation into a byte array representation
-     *
-     * @return byte array of the message
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     *
-     */
-    byte[] getPayloadAsBytes() throws Exception;
-
-    /**
-     * Returns the original payload used to create this message. The payload of the message can change
-     * if {@link #applyTransformers(MuleEvent,java.util.List)} or
-     * {@link #applyTransformers(MuleEvent, java.util.List, Class)} is called.
+     * Returns the original payload used to create this message.
      * @return the original payload used to create this message
      */
     Object getOriginalPayload();
-
-    /**
-     * Get the message payload for logging without throwing exception
-     * Converts the message implementation into a String representation.
-     *
-     * @return message payload as object
-     */
-    String getPayloadForLogging();
-
-    /**
-     * Get the message payload for logging without throwing exception
-     * Converts the message implementation into a String representation. If encoding
-     * is required it will use the encoding set on the message
-     *
-     * @return message payload as object
-     */
-    String getPayloadForLogging(String encoding);
 
     /**
      * @deprecated
@@ -573,4 +461,28 @@ public interface MuleMessage extends Serializable
      * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
      */
     void clearAttachments();
+
+    /**
+     * Updates the value of the message originalPayload.  This is typically updating automatically but there are some
+     * circumstances such as where {@link MuleMessage#setPayload(Object)} is used directly where this may be required.
+     *
+     * @param originalPayload new value for originalPayload
+     */
+    void setOriginalPayload(Object originalPayload);
+
+    /**
+     * Copy properties from inbound and outbound scopes in the source message to current message.  If properties already
+     * exist in the current message then they will be overwritten.
+     *
+     * @param source message to copy properties from
+     */
+    void copyMessageProperties(MuleMessage source);
+
+    /**
+     * Copy inbound and outbound attachments in the source message to current message.  If attachments already exist in
+     * the current message then they will be overwritten.
+     *
+     * @param source message to copy attachments from
+     */
+    void copyAttachments(MuleMessage source);
 }

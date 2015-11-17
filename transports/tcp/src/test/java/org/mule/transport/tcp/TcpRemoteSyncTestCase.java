@@ -54,7 +54,7 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals("Received: " + message, reply.getPayloadAsString());
+        assertEquals("Received: " + message, getPayloadAsString(reply));
     }
 
     @Test
@@ -71,6 +71,6 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals("Received: " + message, reply.getPayloadAsString());
+        assertEquals("Received: " + message, getPayloadAsString(reply));
     }
 }

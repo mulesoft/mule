@@ -9,7 +9,6 @@ package org.mule.transport.servlet.jetty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -19,13 +18,9 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.junit.runners.Parameterized.Parameters;
 
 public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
@@ -51,7 +46,7 @@ public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
             {
                 assertTrue(callbackMade.compareAndSet(false, true));
                 MuleMessage msg = context.getMessage();
-                assertEquals(TEST_MESSAGE, msg.getPayloadAsString());
+                assertEquals(TEST_MESSAGE, getPayloadAsString(msg));
             }
         };
 
@@ -62,7 +57,7 @@ public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertNotNull(result);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
         assertTrue("Callback never fired", callbackMade.get());
     }
 }

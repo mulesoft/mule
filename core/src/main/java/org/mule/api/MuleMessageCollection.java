@@ -34,4 +34,20 @@ public interface MuleMessageCollection extends MuleMessage
     Object[] getPayloadsAsArray();
 
     int size();
+
+    /**
+     * Returns the list of  {@link MuleMessage} instances that make up this message collection.  If the payload is
+     * invalid then the value returned by this method may be inconsistent with {@link #getPayload()}.
+     *
+     * @return list of {@link MuleMessage} instances.
+     */
+    List<MuleMessage> getMessageList();
+
+    /**
+     * Determines if the message collection payload has been invalidated.  This occurs when the original payload, a
+     * collection of {@link MuleMessage}'s is replaced using {@link MuleMessageCollection#setPayload(Object)}.
+     *
+     * @return true is the payload of this collection has been invalidated.
+     */
+    boolean isInvalidatedPayload();
 }

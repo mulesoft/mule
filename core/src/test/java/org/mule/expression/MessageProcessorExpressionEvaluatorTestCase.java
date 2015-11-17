@@ -6,6 +6,7 @@
  */
 package org.mule.expression;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
@@ -18,8 +19,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
@@ -47,45 +46,43 @@ public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleCon
     public void testNameOnly() throws Exception
     {
         MessageProcessorExpressionEvaluator evaluator = new MessageProcessorExpressionEvaluator();
-        assertEquals("0123",
-            ((MuleMessage) evaluator.evaluate("processor", createTestMessage())).getPayloadAsString());
+        assertEquals("0123", getPayloadAsString((MuleMessage) evaluator.evaluate("processor", createTestMessage())));
     }
 
     @Test
     public void testNameOnlyExpressionManager() throws ExpressionRuntimeException, Exception
     {
-        assertEquals("0123", ((MuleMessage) expressionManager.evaluate("#[process:processor]",
-            createTestMessage())).getPayloadAsString());
+        assertEquals("0123", getPayloadAsString((MuleMessage) expressionManager.evaluate("#[process:processor]",
+            createTestMessage())));
     }
 
     @Test
     public void testNestedPayloadExpression() throws Exception
     {
         MessageProcessorExpressionEvaluator evaluator = new MessageProcessorExpressionEvaluator();
-        assertEquals("0123",
-            ((MuleMessage) evaluator.evaluate("processor:payload:", createTestMessage())).getPayloadAsString());
+        assertEquals("0123", getPayloadAsString((MuleMessage) evaluator.evaluate("processor:payload:", createTestMessage())));
     }
 
     @Test
     public void testNestedPayloadExpressionExpressionManager() throws ExpressionRuntimeException, Exception
     {
-        assertEquals("0123", ((MuleMessage) expressionManager.evaluate("#[process:processor:#[payload:]]",
-            createTestMessage())).getPayloadAsString());
+        assertEquals("0123", getPayloadAsString((MuleMessage) expressionManager.evaluate("#[process:processor:#[payload:]]",
+            createTestMessage())));
     }
 
     @Test
     public void testNestedHeaderExpression() throws Exception
     {
         MessageProcessorExpressionEvaluator evaluator = new MessageProcessorExpressionEvaluator();
-        assertEquals("value123", ((MuleMessage) evaluator.evaluate("processor:header:one",
-            createTestMessage())).getPayloadAsString());
+        assertEquals("value123", getPayloadAsString((MuleMessage) evaluator.evaluate("processor:header:one",
+            createTestMessage())));
     }
 
     @Test
     public void testNestedHeaderExpressionExpressionManager() throws ExpressionRuntimeException, Exception
     {
-        assertEquals("value123", ((MuleMessage) expressionManager.evaluate(
-            "#[process:processor:#[header:one]]", createTestMessage())).getPayloadAsString());
+        assertEquals("value123", getPayloadAsString((MuleMessage) expressionManager.evaluate(
+            "#[process:processor:#[header:one]]", createTestMessage())));
     }
 
     private MuleMessage createTestMessage()

@@ -25,6 +25,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
@@ -606,4 +607,55 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     {
         return new File(getWorkingDirectory(), fileName);
     }
+
+    /**
+     * Uses {@link org.mule.TransformationService} to get a {@link String} representation of a message.
+     *
+     * @param message message to get payload from
+     * @return String representation of the message payload
+     * @throws Exception if there is an unexpected error obtaining the payload representation
+     */
+    protected String getPayloadAsString(MuleMessage message) throws Exception
+    {
+        return muleContext.getTransformationService().getPayloadAsString(message);
+    }
+
+    /**
+     * Uses {@link org.mule.TransformationService} to get byte[] representation of a message.
+     *
+     * @param message message to get payload from
+     * @return byte[] representation of the message payload
+     * @throws Exception if there is an unexpected error obtaining the payload representation
+     */
+    protected byte[] getPayloadAsBytes(MuleMessage message) throws Exception
+    {
+        return muleContext.getTransformationService().getPayloadAsBytes(message);
+    }
+
+    /**
+     * Uses {@link org.mule.TransformationService} to get representation of a message for a given {@link DataType}
+     *
+     * @param message message to get payload from
+     * @param dataType dataType to be transformed to
+     * @return representation of the message payload of the required dataType
+     * @throws Exception if there is an unexpected error obtaining the payload representation
+     */
+    protected <T> T getPayload(MuleMessage message, DataType<T> dataType) throws Exception
+    {
+        return (T) muleContext.getTransformationService().getPayload(message, dataType);
+    }
+
+    /**
+     * Uses {@link org.mule.TransformationService} to get representation of a message for a given {@link Class}
+     *
+     * @param message message to get payload from
+     * @param clazz type of the payload to be transformed to
+     * @return representation of the message payload of the required class
+     * @throws Exception if there is an unexpected error obtaining the payload representation
+     */
+    protected <T> T getPayload(MuleMessage message, Class clazz) throws Exception
+    {
+        return (T) muleContext.getTransformationService().getPayload(message, clazz);
+    }
+
 }

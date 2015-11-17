@@ -29,7 +29,7 @@ public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
         message.setOutboundProperty("foo", "fooValue");
 
         MuleMessage result = client.send("inbound", message);
-        assertEquals("test bar", result.getPayloadAsString());
+        assertEquals("test bar", getPayloadAsString(result));
         assertEquals("fooValue", result.<Object> getInboundProperty("foo"));
     }
 }

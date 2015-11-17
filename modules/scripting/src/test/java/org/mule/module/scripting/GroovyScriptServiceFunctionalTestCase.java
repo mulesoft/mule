@@ -31,7 +31,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
         client.dispatch("vm://in1", "Important Message", null);
         MuleMessage response = client.request("vm://out1", RECEIVE_TIMEOUT);
         assertNotNull(response);
-        assertEquals("Important Message Received", response.getPayloadAsString());
+        assertEquals("Important Message Received", getPayloadAsString(response));
     }
 
     @Ignore("MULE-6926: flaky test")
@@ -42,7 +42,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
         client.dispatch("vm://in2", "Important Message", null);
         MuleMessage response = client.request("vm://out2", RECEIVE_TIMEOUT);
         assertNotNull(response);
-        assertEquals("Important Message Received", response.getPayloadAsString());
+        assertEquals("Important Message Received", getPayloadAsString(response));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
         client.dispatch("vm://in3", "Important Message", null);
         MuleMessage response = client.request("vm://out3", RECEIVE_TIMEOUT);
         assertNotNull(response);
-        assertEquals("Important Message Received", response.getPayloadAsString());
+        assertEquals("Important Message Received", getPayloadAsString(response));
     }
 
     @Ignore("MULE-6926: flaky test")
@@ -63,6 +63,6 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
         client.dispatch("vm://in4", "Important Message", null);
         MuleMessage response = client.request("vm://out4", RECEIVE_TIMEOUT);
         assertNotNull(response);
-        assertEquals("Important Message Received A-OK", response.getPayloadAsString());
+        assertEquals("Important Message Received A-OK", getPayloadAsString(response));
     }
 }

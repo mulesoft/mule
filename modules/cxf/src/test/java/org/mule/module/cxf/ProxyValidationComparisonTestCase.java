@@ -75,7 +75,7 @@ public class ProxyValidationComparisonTestCase extends FunctionalTestCase
         MuleMessage responseWithValidation = getResponseFor(payload +"Validation");
         MuleMessage responseWithNoValidation = getResponseFor(payload + "NoValidation");
 
-        assertXMLEqual(responseWithValidation.getPayloadAsString(), responseWithNoValidation.getPayloadAsString());
+        assertXMLEqual(getPayloadAsString(responseWithValidation), getPayloadAsString(responseWithNoValidation));
     }
 
     private MuleMessage getResponseFor(String path) throws MuleException

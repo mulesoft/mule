@@ -38,7 +38,7 @@ public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://pojo1", message, props);
         assertNotNull(result);
-        assertEquals("Received: " + message, result.getPayloadAsString());
+        assertEquals("Received: " + message, getPayloadAsString(result));
     }
 
     @Test
@@ -49,6 +49,6 @@ public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
-        assertEquals("Received: " + message, result.getPayloadAsString());
+        assertEquals("Received: " + message, getPayloadAsString(result));
     }
 }

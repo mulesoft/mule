@@ -38,7 +38,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase
         Thread.sleep(100);
         MuleMessage result =  client.request("asyncClientEndpoint", 10000);
         assertNotNull(result);
-        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(result));
     }
 
     public void timeMultipleSend() throws Exception
@@ -61,7 +61,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase
         for (int i = 0; i < count; i++)
         {
             MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
-            assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+            assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
         }
         long later = System.currentTimeMillis();
         double speed = count * 1000.0 / (later - now);

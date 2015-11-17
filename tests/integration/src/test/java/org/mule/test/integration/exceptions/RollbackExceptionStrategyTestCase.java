@@ -128,7 +128,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
         assertThat(deliveredTimes.intValue(), is(EXPECTED_DELIVERED_TIMES));
         MuleMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT);
         assertThat(dlqMessage, IsNull.<Object>notNullValue());
-        assertThat(dlqMessage.getPayloadAsString(), is(MESSAGE_EXPECTED));
+        assertThat(getPayloadAsString(dlqMessage), is(MESSAGE_EXPECTED));
     }
 
 	@Test
@@ -150,7 +150,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
 	    }
         MuleMessage result = client.send("vm://in5", MESSAGE, null, TIMEOUT);
         assertThat(result,IsNull.<Object>notNullValue());
-        assertThat(result.getPayloadAsString(),is(MESSAGE + " Rolled Back"));
+        assertThat(getPayloadAsString(result),is(MESSAGE + " Rolled Back"));
 	}
 
     @Test
@@ -163,11 +163,11 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
             result = client.send("vm://in6", MESSAGE, null, TIMEOUT);
             assertThat(result,IsNull.<Object>notNullValue());
             assertThat(result.getExceptionPayload(),IsNull.<Object>notNullValue());
-            assertThat(result.getPayloadAsString(),is(MESSAGE + " apt1 apt2 apt3"));
+            assertThat(getPayloadAsString(result),is(MESSAGE + " apt1 apt2 apt3"));
         }
         result = client.send("vm://in6", MESSAGE, null, TIMEOUT);
         assertThat(result,IsNull.<Object>notNullValue());
-        assertThat(result.getPayloadAsString(),is(MESSAGE + " apt4 groovified"));
+        assertThat(getPayloadAsString(result),is(MESSAGE + " apt4 groovified"));
     }
 
     @Test
@@ -192,7 +192,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
         assertThat(deliveredTimes.intValue(), is(EXPECTED_DELIVERED_TIMES));
         MuleMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT);
         assertThat(dlqMessage, IsNull.<Object>notNullValue());
-        assertThat(dlqMessage.getPayloadAsString(), is(MESSAGE_EXPECTED));
+        assertThat(getPayloadAsString(dlqMessage), is(MESSAGE_EXPECTED));
     }
 
 
@@ -228,7 +228,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
         response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()),  getTestMuleMessage(MESSAGE), httpRequestOptions);
         assertThat(response.<Integer>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is(200));
         assertThat(response.getExceptionPayload(),IsNull.<Object>nullValue());
-        assertThat(response.getPayloadAsString(), is(MESSAGE_EXPECTED));
+        assertThat(getPayloadAsString(response), is(MESSAGE_EXPECTED));
     }
 
     @Test
@@ -260,11 +260,11 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
             result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
             assertThat(result,IsNull.<Object>notNullValue());
             assertThat(result.getExceptionPayload(),IsNull.<Object>notNullValue());
-            assertThat(result.getPayloadAsString(),is(MESSAGE + " apt1 apt2 apt3"));
+            assertThat(getPayloadAsString(result),is(MESSAGE + " apt1 apt2 apt3"));
         }
         result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
         assertThat(result,IsNull.<Object>notNullValue());
-        assertThat(result.getPayloadAsString(), is(MESSAGE + " apt4 apt5"));
+        assertThat(getPayloadAsString(result), is(MESSAGE + " apt4 apt5"));
     }
 
     @Test

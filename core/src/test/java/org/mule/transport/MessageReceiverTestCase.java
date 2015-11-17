@@ -8,9 +8,8 @@ package org.mule.transport;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import org.mule.MessageExchangePattern;
+import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -52,6 +51,8 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     private MuleContext muleContext;
     @Mock
     private MuleSession muleSession;
+    @Mock
+    private TransformationService transformationService;
 
     @Before
     public void setup()
@@ -59,6 +60,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
         Mockito.when(muleSession.getId()).thenReturn("1");
         MuleConfiguration muleConfiguration = Mockito.mock(MuleConfiguration.class);
         Mockito.when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+        Mockito.when(muleContext.getTransformationService()).thenReturn(transformationService);
     }
 
     @Test
@@ -92,6 +94,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     {
         AbstractConnector connector = Mockito.mock(AbstractConnector.class);
         Mockito.when(connector.getSessionHandler()).thenReturn(new NullSessionHandler());
+        Mockito.when(connector.getMuleContext()).thenReturn(muleContext);
 
         FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
 

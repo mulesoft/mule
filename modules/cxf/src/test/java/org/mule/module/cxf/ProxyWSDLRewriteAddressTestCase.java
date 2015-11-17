@@ -97,7 +97,7 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
 
     private Document getWsdl(MuleMessage response) throws Exception
     {
-        return XMLUnit.buildTestDocument(new InputSource(new StringReader(response.getPayloadAsString())));
+        return XMLUnit.buildTestDocument(new InputSource(new StringReader(getPayloadAsString(response))));
     }
 
     private List<Element> getPorts(Document wsdl)

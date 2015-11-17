@@ -64,6 +64,6 @@ public class ProxyWithValidationTestCase extends FunctionalTestCase
     {
         MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/Echo", getTestMuleMessage(SAMPLE_REQUEST), HTTP_REQUEST_OPTIONS);
 
-        assertTrue(response.getPayloadAsString().contains("bla"));
+        assertTrue(getPayloadAsString(response).contains("bla"));
     }
 }

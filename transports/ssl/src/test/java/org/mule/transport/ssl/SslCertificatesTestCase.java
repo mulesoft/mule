@@ -59,7 +59,7 @@ public class SslCertificatesTestCase extends FunctionalTestCase
         {
             String msg = TEST_MESSAGE + i;
             MuleMessage result = client.send("in", msg, null);
-            assertEquals(msg  + " Received", result.getPayloadAsString());
+            assertEquals(msg + " Received", getPayloadAsString(result));
         }
 
         Iterator<Certificate[]> certificates = callback.getCertificates().iterator();

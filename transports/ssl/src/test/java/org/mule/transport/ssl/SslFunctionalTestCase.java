@@ -57,7 +57,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
         for (int i = 0; i < NUM_MESSAGES; ++i)
         {
             MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null);
-            assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+            assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
         }
 
         Flow c = (Flow) muleContext.getRegistry().lookupFlowConstruct("testComponent2");
@@ -91,6 +91,6 @@ public class SslFunctionalTestCase extends FunctionalTestCase
         Thread.sleep(100);
         MuleMessage response = client.request("asyncEndpoint", 5000);
         assertNotNull("Response is null", response);
-        assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(response));
     }
 }

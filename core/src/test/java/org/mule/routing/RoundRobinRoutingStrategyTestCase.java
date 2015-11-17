@@ -63,13 +63,13 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
         List<MessageProcessor> messageProcessors = getMessageProcessorsList();
         MuleEvent eventToRouteId1 = getEventWithId(ID_1);
         MuleEvent eventToRouteId2 = getEventWithId(ID_2);
-        assertEquals(LETTER_A, roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_B, roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_A, roundRobinRoutingStrategy.route(eventToRouteId2, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_C, roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_B, roundRobinRoutingStrategy.route(eventToRouteId2, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_C, roundRobinRoutingStrategy.route(eventToRouteId2, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_A, roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage().getPayloadAsString());
+        assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage()));
+        assertEquals(LETTER_B, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage()));
+        assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId2, messageProcessors).getMessage()));
+        assertEquals(LETTER_C, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage()));
+        assertEquals(LETTER_B, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId2, messageProcessors).getMessage()));
+        assertEquals(LETTER_C, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId2, messageProcessors).getMessage()));
+        assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage()));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
     {
         List<MessageProcessor> messageProcessors = getMessageProcessorsListWithFailingMessageProcessor();
         MuleEvent eventToRoute = getEventWithId(ID_1);
-        assertEquals(LETTER_A, roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage().getPayloadAsString());
+        assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
         try
         {
             roundRobinRoutingStrategy.route(eventToRoute, messageProcessors);
@@ -87,8 +87,8 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
         {
             assertEquals(EXCEPTION_MESSAGE, me.getCause().getMessage());
         }
-        assertEquals(LETTER_B, roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_A, roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage().getPayloadAsString());
+        assertEquals(LETTER_B, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
+        assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
     }
 
     @Test
@@ -96,10 +96,10 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
     {
         List<MessageProcessor> messageProcessors = getMessageProcessorsList();
         MuleEvent eventToRoute = getEventWithId(null);
-        assertEquals(LETTER_A, roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_B, roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_C, roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage().getPayloadAsString());
-        assertEquals(LETTER_A, roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage().getPayloadAsString());
+        assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
+        assertEquals(LETTER_B, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
+        assertEquals(LETTER_C, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
+        assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
     }
 
 }

@@ -45,7 +45,7 @@ public class ExecuteDdlTargetTestCase extends AbstractExecuteDdlTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://executeDdlCustomTarget", TEST_MESSAGE, null);
 
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
         assertTableCreation(response.<Integer>getInboundProperty("updateCount"));
     }
 }

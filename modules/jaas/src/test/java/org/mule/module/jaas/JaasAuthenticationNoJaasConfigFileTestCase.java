@@ -9,7 +9,6 @@ package org.mule.module.jaas;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -17,12 +16,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.util.ExceptionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JaasAuthenticationNoJaasConfigFileTestCase extends AbstractJaasFunctionalTestCase
 {
@@ -41,7 +37,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends AbstractJaasFunc
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
-        assertEquals("Test Received", m.getPayloadAsString());
+        assertEquals("Test Received", getPayloadAsString(m));
     }
 
     @Test
@@ -52,7 +48,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends AbstractJaasFunc
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
-        assertEquals("Test Received", m.getPayloadAsString());
+        assertEquals("Test Received", getPayloadAsString(m));
     }
 
     @Test

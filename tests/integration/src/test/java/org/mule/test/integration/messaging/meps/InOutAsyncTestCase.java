@@ -39,7 +39,7 @@ public class InOutAsyncTestCase extends FunctionalTestCase
 
         MuleMessage result = client.send("inboundEndpoint", "some data", props);
         assertNotNull(result);
-        assertEquals("got it!", result.getPayloadAsString());
+        assertEquals("got it!", getPayloadAsString(result));
 
         final Object foo = result.getInboundProperty("foo");
         assertNotNull(foo);

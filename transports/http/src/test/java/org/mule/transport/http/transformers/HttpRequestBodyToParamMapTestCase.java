@@ -9,14 +9,16 @@ package org.mule.transport.http.transformers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 import static org.mule.transport.http.HttpConstants.DEFAULT_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.transport.http.HttpConstants.METHOD_PUT;
-
 import org.mule.DefaultMuleMessage;
+import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
@@ -26,6 +28,7 @@ import org.mule.tck.size.SmallTest;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -38,6 +41,18 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
+    @Mock
+    private TransformationService transformationService;
+
+    @Before
+    public void setup() throws Exception
+    {
+        when(muleContext.getTransformationService()).thenReturn(transformationService);
+        when(transformationService.getPayloadAsString(any(MuleMessage.class), any(String.class))).thenAnswer
+                (inv -> ((MuleMessage) inv.getArguments()[0]).getPayload());
+        when(transformationService.getPayloadAsBytes(any(MuleMessage.class))).thenAnswer
+                (inv -> (((String) ((MuleMessage) inv.getArguments()[0]).getPayload()).getBytes()));
+    }
 
     @Test
     public void validGet() throws TransformerException
@@ -70,6 +85,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
     private Object transform(MuleMessage msg) throws TransformerException
     {
         HttpRequestBodyToParamMap transformer = new HttpRequestBodyToParamMap();
+        transformer.setMuleContext(muleContext);
         return transformer.transformMessage(msg, "UTF-8");
     }
 
@@ -93,21 +109,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
         {
             payload = "http://localhost/?" + payload;
         }
-        MuleMessage msg = new DefaultMuleMessage(payload, inboundProperties, null, null, muleContext)
-        {
-            @Override
-            public String getPayloadAsString(String encoding) throws Exception
-            {
-                return super.getPayload().toString();
-            }
-
-            @Override
-            public byte[] getPayloadAsBytes() throws Exception
-            {
-                return ((String) super.getPayload()).getBytes();
-            }
-        };
-        return msg;
+        return new DefaultMuleMessage(payload, inboundProperties, null, null, muleContext);
     }
 
 }

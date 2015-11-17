@@ -35,7 +35,7 @@ public class PropertiesTestCase extends FunctionalTestCase
 
         MuleMessage msg1 = createOutboundMessage();
         MuleMessage response = client.send("vm://in", msg1);
-        assertEquals(response.getPayloadAsString(), "OK(success)");
+        assertEquals(getPayloadAsString(response), "OK(success)");
         assertNull(response.getInboundProperty("outbound1"));
         assertNull(response.getInboundProperty("outbound2"));
         assertNull(response.getOutboundProperty("outbound1"));
@@ -50,7 +50,7 @@ public class PropertiesTestCase extends FunctionalTestCase
         MuleMessage msg2 = createOutboundMessage();
         client.dispatch("vm://inQueue", msg2);
         response = client.request("vm://outQueue", RECEIVE_TIMEOUT);
-        assertEquals(response.getPayloadAsString(), "OK");
+        assertEquals(getPayloadAsString(response), "OK");
         assertEquals("yes", response.getInboundProperty("outbound1"));
         assertEquals("no", response.getInboundProperty("outbound2"));
         assertNull(response.getOutboundProperty("outbound1"));

@@ -95,7 +95,7 @@
         <expression-transformer expression="#[message.outboundAttachments['attach']]"/>
         <expression-transformer expression="#[groovy:message.getPayload().getInputStream()]"/>
         <object-to-string-transformer/>
-        <test:assert expression="#[groovy:message.getPayloadAsString().equals('some text')]"/>
+        <test:assert expression="#[groovy:muleContext.getTransformationService().getPayloadAsString(message).equals('some text')]"/>
     </flow>
 
     <flow name="enrichAttachmentUsingDataHandler" processingStrategy="synchronous">

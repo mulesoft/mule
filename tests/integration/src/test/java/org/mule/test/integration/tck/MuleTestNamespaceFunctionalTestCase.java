@@ -35,7 +35,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://service1", "foo", null);
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
-        assertEquals("Foo Bar Car Jar", message.getPayloadAsString());
+        assertEquals("Foo Bar Car Jar", getPayloadAsString(message));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://service2", "foo", null);
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
-        assertEquals(result, message.getPayloadAsString());
+        assertEquals(result, getPayloadAsString(message));
     }
 
     @Test
@@ -56,7 +56,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://service3", "foo", null);
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
-        assertEquals("foo received in testService3", message.getPayloadAsString());
+        assertEquals("foo received in testService3", getPayloadAsString(message));
     }
 
     @Test

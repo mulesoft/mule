@@ -77,7 +77,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return message.getPayloadAsBytes();
+            return getMuleContext().getTransformationService().getPayloadAsBytes(message);
         }
         catch (Exception e)
         {
@@ -90,7 +90,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return message.getPayloadAsString();
+            return getMuleContext().getTransformationService().getPayloadAsString(message);
         }
         catch (Exception e)
         {
@@ -103,7 +103,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return message.getPayloadAsString(encoding);
+            return getMuleContext().getTransformationService().getPayloadAsString(message, encoding);
         }
         catch (Exception e)
         {

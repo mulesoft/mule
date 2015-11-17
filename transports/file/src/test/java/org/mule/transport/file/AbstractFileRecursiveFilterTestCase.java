@@ -38,6 +38,6 @@ public class AbstractFileRecursiveFilterTestCase extends FunctionalTestCase
 
         MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
         assertNotNull(response);
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
     }
 }

@@ -48,7 +48,7 @@ public class HttpJmsBridgeTestCase extends FunctionalTestCase
 
         MuleMessage msg = client.request("vm://out", 10000);
         assertNotNull(msg);
-        assertEquals(payload, msg.getPayloadAsString());
+        assertEquals(payload, getPayloadAsString(msg));
         assertEquals("value", msg.getInboundProperty(customHeader));
     }
 }

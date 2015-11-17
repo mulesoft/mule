@@ -69,14 +69,14 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase
     public void proxyRPCBodyPayload() throws Exception
     {
         MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
-        assertTrue(XMLUnit.compareXML(getAllResponse, response.getPayloadAsString()).identical());
+        assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
     }
 
     @Test
     public void proxyRPCBodyEnvelope() throws Exception
     {
         MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope", getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
-        assertTrue(XMLUnit.compareXML(getAllResponse, response.getPayloadAsString()).identical());
+        assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
     }
 
 }

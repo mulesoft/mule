@@ -37,7 +37,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("clientEndpoint1", getTestMuleMessage(null));
-        assertEquals("boobar", result.getPayloadAsString());
+        assertEquals("boobar", getPayloadAsString(result));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
         props.put("foo", "noo");
         props.put("far", "nar");
         MuleMessage result = client.send("clientEndpoint2", null, props);
-        assertEquals("noonar", result.getPayloadAsString());
+        assertEquals("noonar", getPayloadAsString(result));
     }
 
     @Test

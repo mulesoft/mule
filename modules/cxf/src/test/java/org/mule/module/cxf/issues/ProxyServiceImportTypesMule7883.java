@@ -70,7 +70,7 @@ public class ProxyServiceImportTypesMule7883 extends FunctionalTestCase
         String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/test";
         MuleMessage response = muleContext.getClient().send(proxyAddress + targetUrl, getTestMuleMessage(NullPayload.getInstance()));
 
-        Document wsdl = XMLUnit.buildTestDocument(new InputSource(new StringReader(response.getPayloadAsString())));
+        Document wsdl = XMLUnit.buildTestDocument(new InputSource(new StringReader(getPayloadAsString(response))));
         List<Element> imports = DOMUtils.findAllElementsByTagName(wsdl.getDocumentElement(), importType + ":import");
 
         assertThat(imports.get(0).getAttribute(locationAttributeName), is(proxyAddress + expectedImportUrl));

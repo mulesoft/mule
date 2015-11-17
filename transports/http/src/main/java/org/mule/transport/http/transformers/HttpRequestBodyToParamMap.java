@@ -57,12 +57,12 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             String queryString;
             if (isGet)
             {
-                URI uri = new URI(message.getPayloadAsString(outputEncoding));
+                URI uri = new URI(muleContext.getTransformationService().getPayloadAsString(message, outputEncoding));
                 queryString = uri.getRawQuery();
             }
             else
             {
-                queryString = new String(message.getPayloadAsBytes());
+                queryString = new String(muleContext.getTransformationService().getPayloadAsBytes(message));
             }
 
             if (StringUtils.isNotBlank(queryString))

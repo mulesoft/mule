@@ -6,6 +6,9 @@
  */
 package org.mule.transport.http.transformers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -14,10 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class FormTransformerTestCase extends AbstractMuleContextTestCase
 {
@@ -29,6 +28,7 @@ public class FormTransformerTestCase extends AbstractMuleContextTestCase
         super.doSetUp();
 
         transformer = new FormTransformer();
+        transformer.setMuleContext(muleContext);
     }
 
     @Test

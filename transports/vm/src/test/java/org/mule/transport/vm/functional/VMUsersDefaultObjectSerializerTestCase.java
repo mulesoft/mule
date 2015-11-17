@@ -68,13 +68,13 @@ public class VMUsersDefaultObjectSerializerTestCase extends FunctionalTestCase
 
         MuleMessage response = muleContext.getClient().request("vm://in", 5000);
         assertThat(response, is(notNullValue()));
-        assertThat(response.getPayloadAsString(), is(payload));
+        assertThat(getPayloadAsString(response), is(payload));
 
         ArgumentCaptor<MuleMessage> messageArgumentCaptor = ArgumentCaptor.forClass(MuleMessage.class);
         verify(objectSerializer, atLeastOnce()).serialize(messageArgumentCaptor.capture());
         MuleMessage capturedMessage = messageArgumentCaptor.getValue();
         assertThat(capturedMessage, is(notNullValue()));
-        assertThat(capturedMessage.getPayloadAsString(), is(payload));
+        assertThat(getPayloadAsString(capturedMessage), is(payload));
 
         verify(objectSerializer, atLeastOnce()).deserialize(any(byte[].class));
     }

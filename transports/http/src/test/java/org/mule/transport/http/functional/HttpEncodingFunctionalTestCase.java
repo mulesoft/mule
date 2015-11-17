@@ -49,7 +49,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertEquals("text/baz;charset=UTF-16BE", reply.<String>getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
         assertEquals("UTF-16BE", reply.getEncoding());
-        assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(reply));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     private void runPostEncodingTest(String encoding, String payload) throws Exception
     {
         MuleMessage reply = runEncodingTest(encoding, payload, HttpConstants.METHOD_POST);
-        assertEquals(payload + " Received", reply.getPayloadAsString());
+        assertEquals(payload + " Received", getPayloadAsString(reply));
     }
 
     private void runGetEncodingTest(String encoding, String payload) throws Exception
@@ -133,7 +133,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         MuleMessage reply = runEncodingTest(encoding, payload, HttpConstants.METHOD_GET);
 
         String expectedReplyMessage = "/" + encoding + "?body=" + URLEncoder.encode(payload, encoding);
-        assertEquals(expectedReplyMessage + " Received", reply.getPayloadAsString());
+        assertEquals(expectedReplyMessage + " Received", getPayloadAsString(reply));
     }
 
     private MuleMessage runEncodingTest(String encoding, String payload, String httpMethod) throws Exception

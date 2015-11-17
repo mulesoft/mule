@@ -57,7 +57,7 @@ public class HttpRequestRecipientListTestCase extends FunctionalTestCase
         {
             MuleMessage message = messages[i];
             assertThat(message, notNullValue());
-            assertThat(message.getPayloadAsString(), is("inXFlowResponse".replace("X", String.valueOf(i + 1))));
+            assertThat(getPayloadAsString(message), is("inXFlowResponse".replace("X", String.valueOf(i + 1))));
         }
     }
 

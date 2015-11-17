@@ -45,6 +45,6 @@ public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase
 
         assertNotNull(msg);
         assertNotNull(msg.getPayload());
-        assertEquals(response, msg.getPayloadAsString());
+        assertEquals(response, getPayloadAsString(msg));
     }
 }

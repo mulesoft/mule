@@ -68,7 +68,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://httpService1", "symbol=IBM", props);
         assertNotNull(response);
-        checkPayLoad(response.getPayloadAsString());
+        checkPayLoad(getPayloadAsString(response));
         assertEquals("TestID", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
         assertEquals("TestGroupSize", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
         assertEquals("TestSequence", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
@@ -89,7 +89,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://cxfService1", "IBM", props);
         assertNotNull(response);
-        checkPayLoad(response.getPayloadAsString());
+        checkPayLoad(getPayloadAsString(response));
         assertEquals("TestID", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
         assertEquals("TestGroupSize", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
         assertEquals("TestSequence", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
@@ -155,7 +155,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://httpService2", "symbol=IBM", props);
         assertNotNull(response);
-        checkPayLoad(response.getPayloadAsString());
+        checkPayLoad(getPayloadAsString(response));
         assertEquals("thing", response.getInboundProperty("some"));
         assertEquals("stuff", response.getInboundProperty("other"));
     }
@@ -174,7 +174,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://cxfService2", "symbol=IBM", props);
         assertNotNull(response);
-        checkPayLoad(response.getPayloadAsString());
+        checkPayLoad(getPayloadAsString(response));
         assertEquals("thing", response.getOutboundProperty("some"));
         assertEquals("stuff", response.getOutboundProperty("other"));
     }

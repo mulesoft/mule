@@ -58,7 +58,7 @@ public class MessageFilterTestCase extends FunctionalTestCase
         rejectMesage = null;
 
         response = client.send("vm://order.validation", "OK-ABC-DEF", null);
-        assertEquals("OK-ABC-DEF(success)", response.getPayloadAsString());
+        assertEquals("OK-ABC-DEF(success)", getPayloadAsString(response));
         assertNull(rejectMesage);
     }
 
@@ -75,7 +75,7 @@ public class MessageFilterTestCase extends FunctionalTestCase
             try
             {
                 MuleMessage msg = event.getMessage();
-                String payload = msg.getPayloadAsString();
+                String payload = event.getMuleContext().getTransformationService().getPayloadAsString(msg);
                 rejectMesage = payload + "(rejected!-1)";
                 return null;
             }
@@ -99,7 +99,7 @@ public class MessageFilterTestCase extends FunctionalTestCase
             try
             {
                 MuleMessage msg = event.getMessage();
-                String payload = msg.getPayloadAsString();
+                String payload = event.getMuleContext().getTransformationService().getPayloadAsString(msg);
                 rejectMesage = payload + "(rejected!-2)";
                 return null;
             }

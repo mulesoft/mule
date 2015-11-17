@@ -168,7 +168,7 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
     @Test
     public void operationWithStaticInlinePojoParameter() throws Exception
     {
-        String response = runFlow("knockStaticInlineDoor").getMessage().getPayloadAsString();
+        String response = getPayloadAsString(runFlow("knockStaticInlineDoor").getMessage());
         assertKnockedDoor(response, "Inline Skyler");
     }
 
@@ -181,7 +181,7 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
     @Test
     public void operationWithStaticTopLevelPojoParameter() throws Exception
     {
-        String response = runFlow("knockStaticTopLevelDoor").getMessage().getPayloadAsString();
+        String response = getPayloadAsString(runFlow("knockStaticTopLevelDoor").getMessage());
         assertKnockedDoor(response, "Top Level Skyler");
     }
 
@@ -215,7 +215,7 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
     @Test
     public void operationWhichRequiresConnection() throws Exception
     {
-        assertThat(runFlow("callSaul").getMessage().getPayloadAsString(), is("You called " + SAUL_OFFICE_NUMBER));
+        assertThat(getPayloadAsString(runFlow("callSaul").getMessage()), is("You called " + SAUL_OFFICE_NUMBER));
     }
 
     private void assertDynamicDoor(String flowName) throws Exception
@@ -229,7 +229,7 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("victim", victim);
 
-        assertKnockedDoor(runFlow(flowName, event).getMessage().getPayloadAsString(), victim);
+        assertKnockedDoor(getPayloadAsString(runFlow(flowName, event).getMessage()), victim);
     }
 
     private void assertKnockedDoor(String actual, String expected)

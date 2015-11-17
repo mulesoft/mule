@@ -117,7 +117,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         MuleMessage response = muleContext.getClient().send(
                 String.format("http://localhost:%d/services/%s", dynamicPort.getNumber(), path),
                 getTestMuleMessage(getRequestPayload(soapMethod)), HTTP_REQUEST_OPTIONS);
-        assertFault(faultTemplate, response.getPayloadAsString(), faultMessage);
+        assertFault(faultTemplate, getPayloadAsString(response), faultMessage);
 
     }
 

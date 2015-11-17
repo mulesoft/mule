@@ -40,7 +40,7 @@ public class InOnlyOptionalOutTestCase extends FunctionalTestCase
 
         MuleMessage result = client.request("receivedEndpoint", TIMEOUT);
         assertNotNull(result);
-        assertEquals("foo header received", result.getPayloadAsString());
+        assertEquals("foo header received", getPayloadAsString(result));
 
         result = client.request("notReceivedEndpoint", TIMEOUT);
         assertNull(result);

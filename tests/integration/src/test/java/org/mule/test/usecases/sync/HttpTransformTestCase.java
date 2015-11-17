@@ -47,7 +47,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         gu.setMuleContext(muleContext);
         gu.setReturnDataType(DataTypeFactory.STRING);
         assertNotNull(message.getPayload());
-        String result = (String)gu.transform(message.getPayloadAsBytes());
+        String result = (String)gu.transform(getPayloadAsBytes(message));
         assertEquals("<string>payload</string>", result);
     }
 

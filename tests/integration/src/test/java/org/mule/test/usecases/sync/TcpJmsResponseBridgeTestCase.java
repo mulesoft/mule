@@ -34,6 +34,6 @@ public class TcpJmsResponseBridgeTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("tcp://localhost:" + tcpPort.getNumber(), "request", null);
         assertNotNull(message);
-        assertEquals("Received: request", message.getPayloadAsString());
+        assertEquals("Received: request", getPayloadAsString(message));
     }
 }

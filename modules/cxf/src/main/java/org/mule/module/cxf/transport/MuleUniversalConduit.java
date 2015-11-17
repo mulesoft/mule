@@ -339,7 +339,8 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             // Sometimes there may not actually be a body, in which case
             // we want to act appropriately. E.g. one way invocations over a proxy
-            InputStream is = result.getPayload(DataTypeFactory.create(InputStream.class));
+            InputStream is = (InputStream) result.getMuleContext().getTransformationService().getPayload(result,
+                                                                                                         DataTypeFactory.create(InputStream.class));
             PushbackInputStream pb = new PushbackInputStream(is);
             result.setPayload(pb, DataTypeFactory.XML_STRING);
 

@@ -45,6 +45,6 @@ public abstract class AbstractJmsRequestFromScriptTestCase extends FunctionalTes
         // Checks that the batch has processed the two messages without error
         MuleMessage message = muleClient.request("jms://status.queue?connector=jmsConnector", 5000);
         assertNotNull(message);
-        assertEquals("messagemessage", message.getPayloadAsString());
+        assertEquals("messagemessage", getPayloadAsString(message));
     }
 }

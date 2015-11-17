@@ -33,7 +33,7 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         Map props = new HashMap();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("anotherClientEndpoint", TEST_MESSAGE, props);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 
 }

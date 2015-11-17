@@ -25,6 +25,6 @@ public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestC
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://" + path, payload, properties);
-        assertEquals(result, response.getPayloadAsString());
+        assertEquals(result, getPayloadAsString(response));
     }
 }

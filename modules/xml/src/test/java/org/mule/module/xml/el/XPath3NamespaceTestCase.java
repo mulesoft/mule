@@ -27,7 +27,7 @@ public class XPath3NamespaceTestCase extends FunctionalTestCase
     public void xpathWithNamespace() throws Exception
     {
         InputStream soapEnvelope = getClass().getResourceAsStream("/request.xml");
-        String result = runFlow("xpathWithNamespace", soapEnvelope).getMessage().getPayloadAsString();
+        String result = getPayloadAsString(runFlow("xpathWithNamespace", soapEnvelope).getMessage());
         assertThat(result, equalTo("Hello!"));
     }
 }

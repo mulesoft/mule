@@ -29,6 +29,6 @@ public class EndpointBridgingTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://bridge.inbound", "test", null);
         assertNotNull(result);
-        assertEquals("Received: test", result.getPayloadAsString());
+        assertEquals("Received: test", getPayloadAsString(result));
     }
 }

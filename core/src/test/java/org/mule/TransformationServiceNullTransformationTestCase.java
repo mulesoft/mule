@@ -24,7 +24,7 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMuleMessageNullTransformationTestCase extends AbstractMuleTestCase
+public class TransformationServiceNullTransformationTestCase extends AbstractMuleTestCase
 {
 
     @Test
@@ -34,6 +34,7 @@ public class DefaultMuleMessageNullTransformationTestCase extends AbstractMuleTe
         MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
         when(muleConfiguration.isCacheMessageOriginalPayload()).thenReturn(false);
         when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+        TransformationService transformationService = new TransformationService(muleContext);
 
         DataType dataType = DataTypeFactory.create(Object.class);
 
@@ -48,7 +49,7 @@ public class DefaultMuleMessageNullTransformationTestCase extends AbstractMuleTe
         when(transformer2.getReturnDataType()).thenReturn(dataType);
 
         DefaultMuleMessage message = new DefaultMuleMessage(null, muleContext);
-        message.applyTransformers(null, transformer1, transformer2);
+        transformationService.applyTransformers(message, null, transformer1, transformer2);
 
         assertEquals("foo", message.getPayload());
         verify(transformer1, never()).transform(null);

@@ -6,6 +6,8 @@
  */
 package org.mule.routing.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
@@ -14,9 +16,6 @@ import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
 
 /**
  * <code>WildcardFilter</code> is used to match Strings against wildcards. It
@@ -49,7 +48,7 @@ public class WildcardFilter implements Filter, ObjectFilter
     {
         try
         {
-            return accept(message.getPayloadAsString());
+            return accept(message.getMuleContext().getTransformationService().getPayloadAsString(message));
         }
         catch (Exception e)
         {

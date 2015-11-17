@@ -52,9 +52,9 @@ public class JettyEndpointsAndWebappTestCase extends AbstractWebappsTestCase
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
         MuleMessage response = client.send(String.format("http://localhost:%d/contextA", port2.getNumber()), getTestMuleMessage(TEST_MESSAGE), httpRequestOptions);
-        assertEquals(TEST_MESSAGE, response.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(response));
         response = client.send(String.format("http://localhost:%d/contextB", port3.getNumber()), getTestMuleMessage(TEST_MESSAGE), httpRequestOptions);
-        assertEquals(TEST_MESSAGE, response.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(response));
     }
 
     @Test

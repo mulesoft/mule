@@ -56,7 +56,7 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         if (result != null)
         {
-            System.out.println("result = " + result.getPayloadAsString());
+            System.out.println("result = " + getPayloadAsString(result));
         }
         assertNull(result);
     }
@@ -65,6 +65,6 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase
     {
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        results.add(result.getPayloadAsString());
+        results.add(getPayloadAsString(result));
     }
 }

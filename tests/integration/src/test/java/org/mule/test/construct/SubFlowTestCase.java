@@ -28,7 +28,7 @@ public class SubFlowTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://ProcessorChainViaProcessorRef", "", null);
-        assertEquals("1xyz2", result.getPayloadAsString());
+        assertEquals("1xyz2", getPayloadAsString(result));
 
         assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
             result.getInboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
@@ -42,7 +42,7 @@ public class SubFlowTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://ProcessorChainViaFlowRef", "", null);
 
-        assertEquals("1xyz2", result.getPayloadAsString());
+        assertEquals("1xyz2", getPayloadAsString(result));
 
         assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
             result.getInboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
@@ -55,7 +55,7 @@ public class SubFlowTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://SubFlowViaProcessorRef", "", null);
-        assertEquals("1xyz2", result.getPayloadAsString());
+        assertEquals("1xyz2", getPayloadAsString(result));
 
         assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
             result.getInboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
@@ -69,7 +69,7 @@ public class SubFlowTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://SubFlowViaFlowRef", "", null);
 
-        assertEquals("1xyz2", result.getPayloadAsString());
+        assertEquals("1xyz2", getPayloadAsString(result));
 
         assertEquals("[setMuleContext, setService, setMuleContext, initialise, start]",
             result.getInboundProperty(LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY));
@@ -81,21 +81,21 @@ public class SubFlowTestCase extends FunctionalTestCase
     public void testFlowviaFlowRef() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertEquals("1xyz2", client.send("vm://FlowViaFlowRef", "", null).getPayloadAsString());
+        assertEquals("1xyz2", getPayloadAsString(client.send("vm://FlowViaFlowRef", "", null)));
     }
 
     @Test
     public void testServiceviaFlowRef() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertEquals("1xyz2", client.send("vm://ServiceViaFlowRef", "", null).getPayloadAsString());
+        assertEquals("1xyz2", getPayloadAsString(client.send("vm://ServiceViaFlowRef", "", null)));
     }
 
     @Test
     public void testFlowWithSubFlowWithComponent() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertEquals("0", client.send("vm://flowWithsubFlowWithComponent", "0", null).getPayloadAsString());
+        assertEquals("0", getPayloadAsString(client.send("vm://flowWithsubFlowWithComponent", "0", null)));
 
     }
 
@@ -103,28 +103,28 @@ public class SubFlowTestCase extends FunctionalTestCase
     public void testFlowWithSameSubFlowTwice() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertEquals("0xyzxyz", client.send("vm://flowWithSameSubFlowTwice", "0", null).getPayloadAsString());
+        assertEquals("0xyzxyz", getPayloadAsString(client.send("vm://flowWithSameSubFlowTwice", "0", null)));
     }
 
     @Test
     public void testFlowWithSameSubFlowSingletonTwice() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertEquals("0xyzxyz", client.send("vm://flowWithSameSubFlowSingletonTwice", "0", null).getPayloadAsString());
+        assertEquals("0xyzxyz", getPayloadAsString(client.send("vm://flowWithSameSubFlowSingletonTwice", "0", null)));
     }
 
     @Test
     public void testFlowWithSameGlobalChainTwice() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertEquals("0xyzxyz", client.send("vm://flowWithSameGlobalChainTwice", "0", null).getPayloadAsString());
+        assertEquals("0xyzxyz", getPayloadAsString(client.send("vm://flowWithSameGlobalChainTwice", "0", null)));
     }
 
     @Test
     public void testFlowWithSameGlobalChainSingletonTwice() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertEquals("0xyzxyz", client.send("vm://flowWithSameGlobalChainSingletonTwice", "0", null).getPayloadAsString());
+        assertEquals("0xyzxyz", getPayloadAsString(client.send("vm://flowWithSameGlobalChainSingletonTwice", "0", null)));
     }
 
 }

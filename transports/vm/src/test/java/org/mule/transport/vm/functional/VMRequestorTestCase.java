@@ -43,7 +43,7 @@ public class VMRequestorTestCase extends FunctionalTestCase
         {
             result = client.request("vm://out", 3000L);
             assertNotNull(result);
-            results.add(result.getPayloadAsString());
+            results.add(getPayloadAsString(result));
         }
 
         assertEquals(10, results.size());

@@ -6,6 +6,9 @@
  */
 package org.mule.module.json.transformers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
@@ -16,10 +19,6 @@ import org.mule.transformer.types.DataTypeFactory;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class JsonAutoTransformerTestCase extends AbstractMuleContextTestCase
 {
     public static final String ITEM_JSON = "{\"code\":\"1234\",\"description\":\"Vacuum Cleaner\",\"in-stock\":true}";
@@ -29,7 +28,7 @@ public class JsonAutoTransformerTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage(ITEM_JSON, muleContext);
 
-        Item item = message.getPayload(DataTypeFactory.create(Item.class));
+        Item item = getPayload(message, DataTypeFactory.create(Item.class));
         assertNotNull(item);
         assertEquals("1234", item.getCode());
         assertEquals("Vacuum Cleaner", item.getDescription());
@@ -37,7 +36,7 @@ public class JsonAutoTransformerTestCase extends AbstractMuleContextTestCase
 
         //and back again
         message = new DefaultMuleMessage(item, muleContext);
-        String json = message.getPayload(DataType.STRING_DATA_TYPE);
+        String json = getPayload(message, DataType.STRING_DATA_TYPE);
         assertNotNull(json);
         assertEquals(ITEM_JSON, json);
         JsonData data = new JsonData(json);

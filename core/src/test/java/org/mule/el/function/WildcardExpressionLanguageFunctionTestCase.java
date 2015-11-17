@@ -6,9 +6,11 @@
  */
 package org.mule.el.function;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
+import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionExecutor;
@@ -35,13 +37,15 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
     protected ExpressionExecutor<MVELExpressionLanguageContext> expressionExecutor;
     protected MVELExpressionLanguageContext context;
     protected WildcardExpressionLanguageFuntion wildcardFunction;
+    protected MuleContext muleContext;
 
     @Before
     public void setup() throws InitialisationException
     {
         ParserConfiguration parserConfiguration = new ParserConfiguration();
         expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
-        context = new MVELExpressionLanguageContext(parserConfiguration, Mockito.mock(MuleContext.class));
+        muleContext = Mockito.mock(MuleContext.class);
+        context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
         wildcardFunction = new WildcardExpressionLanguageFuntion();
         context.declareFunction("wildcard", wildcardFunction);
     }
@@ -229,8 +233,10 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
     protected void addMessageToContextWithPayload(String payload) throws TransformerException
     {
         MuleMessage message = Mockito.mock(MuleMessage.class);
-        Mockito.when(message.getPayload(Mockito.any(Class.class))).thenReturn(payload);
-        context.addFinalVariable("message", new MessageContext(message));
+        TransformationService transformationService = Mockito.mock(TransformationService.class);
+        when(muleContext.getTransformationService()).thenReturn(transformationService);
+        Mockito.when(transformationService.getPayload(any(MuleMessage.class), Mockito.any(Class.class))).thenReturn(payload);
+        context.addFinalVariable("message", new MessageContext(message, muleContext));
     }
 
 }

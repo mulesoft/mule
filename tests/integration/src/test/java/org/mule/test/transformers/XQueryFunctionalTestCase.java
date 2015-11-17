@@ -54,6 +54,6 @@ public class XQueryFunctionalTestCase extends FunctionalTestCase
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
         //Compare results
-        assertTrue(XMLUnit.compareXML(message.getPayloadAsString(), resultData).similar());
+        assertTrue(XMLUnit.compareXML(getPayloadAsString(message), resultData).similar());
     }
 }

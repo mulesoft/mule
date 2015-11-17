@@ -91,7 +91,7 @@ public class JsonExpressionEvaluator extends AbstractExpressionEvaluator
         
         try
         {
-            String json = message.getPayloadAsString();
+            String json = message.getMuleContext().getTransformationService().getPayloadAsString(message);
             JsonData data = new JsonData(json);
             try
             {

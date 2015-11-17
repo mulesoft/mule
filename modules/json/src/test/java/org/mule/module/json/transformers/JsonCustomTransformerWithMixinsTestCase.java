@@ -6,6 +6,10 @@
  */
 package org.mule.module.json.transformers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.json.JsonData;
@@ -14,11 +18,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.types.DataTypeFactory;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class JsonCustomTransformerWithMixinsTestCase extends AbstractMuleContextTestCase
 {
@@ -38,13 +37,13 @@ public class JsonCustomTransformerWithMixinsTestCase extends AbstractMuleContext
         //2) that we successfully marshal and marshal an object that is not annotated directly
         MuleMessage message=  new DefaultMuleMessage(APPLE_JSON, muleContext);
 
-        Apple apple = message.getPayload(DataTypeFactory.create(Apple.class));
+        Apple apple = getPayload(message, DataTypeFactory.create(Apple.class));
         assertNotNull(apple);
         assertFalse(apple.isWashed());
         assertTrue(apple.isBitten());
 
         message=  new DefaultMuleMessage(apple, muleContext);
-        String json = message.getPayload(DataTypeFactory.STRING);
+        String json = getPayloadAsString(message);
         assertNotNull(json);
         JsonData data = new JsonData(json);
         assertEquals("true", data.getAsString("bitten"));

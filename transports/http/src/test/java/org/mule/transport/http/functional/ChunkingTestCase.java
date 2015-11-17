@@ -38,13 +38,13 @@ public class ChunkingTestCase extends FunctionalTestCase
 
         MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inMain")).getAddress(),
             msg, null);
-        assertEquals("Hello", result.getPayloadAsString());
+        assertEquals("Hello", getPayloadAsString(result));
         int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
 
         result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inMain")).getAddress(),
             msg, null);
-        assertEquals("Hello", result.getPayloadAsString());
+        assertEquals("Hello", getPayloadAsString(result));
         status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
     }

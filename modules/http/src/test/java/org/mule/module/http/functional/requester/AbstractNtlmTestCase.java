@@ -101,7 +101,7 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
         MuleEvent event = runFlow(getFlowName());
 
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
-        assertThat(event.getMessage().getPayloadAsString(), equalTo(AUTHORIZED));
+        assertThat(getPayloadAsString(event.getMessage()), equalTo(AUTHORIZED));
     }
 
     protected String getFlowName()

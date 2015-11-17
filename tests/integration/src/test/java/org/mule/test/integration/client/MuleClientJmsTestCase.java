@@ -96,8 +96,8 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
             MuleMessage message = client.request("jms://replyTo.queue", 5000);
             assertNotNull("message should not be null from Reply queue", message);
             logger.debug("Count is " + i);
-            logger.debug("ReplyTo Message is: " + message.getPayloadAsString());
-            assertTrue(message.getPayloadAsString().startsWith("Received"));
+            logger.debug("ReplyTo Message is: " + getPayloadAsString(message));
+            assertTrue(getPayloadAsString(message).startsWith("Received"));
         }
         time = System.currentTimeMillis() - start;
         logger.debug("It took " + time + "ms to receive " + i + " messages");

@@ -124,6 +124,6 @@ public abstract class AbstractSecurityFilter implements MuleContextAware, Securi
             }
         });
 
-        message.applyTransformers(event, trans);
+        muleContext.getTransformationService().applyTransformers(event.getMessage(), event, trans);
     }
 }

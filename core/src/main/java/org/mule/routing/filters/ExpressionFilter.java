@@ -195,6 +195,10 @@ public class ExpressionFilter implements Filter, MuleContextAware
                 fullExpression = config.getFullExpression(muleContext.getExpressionManager());
             }
         }
+        if (delegateFilter instanceof MuleContextAware)
+        {
+            ((MuleContextAware) delegateFilter).setMuleContext(muleContext);
+        }
         return fullExpression;
     }
 

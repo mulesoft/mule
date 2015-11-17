@@ -85,7 +85,7 @@ public class HttpListenerValidateCertificateTestCase extends FunctionalTestCase
     {
         MuleMessage response = muleContext.getClient().send(url, getTestMuleMessage(payload),
                                                             newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).build());
-        return response.getPayloadAsString();
+        return getPayloadAsString(response);
     }
 
     private void assertValidRequest(String url) throws Exception

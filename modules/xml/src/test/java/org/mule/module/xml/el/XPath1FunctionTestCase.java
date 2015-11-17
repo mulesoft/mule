@@ -53,7 +53,7 @@ public class XPath1FunctionTestCase extends AbstractELTestCase
     public void xpathFunctionStringText() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("<root foo=\"bar\"/>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
+        message.setPayload(getPayload(message, Document.class));
         assertEquals("bar", evaluate("xpath('/root/@foo').text", message));
     }
 

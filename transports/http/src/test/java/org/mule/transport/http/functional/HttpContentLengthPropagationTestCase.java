@@ -49,6 +49,6 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
         trans.initialise();
         final byte[] locallyTransformedBytes = (byte[]) trans.doTransform(fileContents, "UTF-8");
 
-        assertEquals(new String(locallyTransformedBytes), result.getPayloadAsString());
+        assertEquals(new String(locallyTransformedBytes), getPayloadAsString(result));
     }
 }

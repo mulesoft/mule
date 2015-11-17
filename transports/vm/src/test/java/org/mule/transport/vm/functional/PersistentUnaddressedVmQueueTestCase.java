@@ -32,6 +32,6 @@ public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase
         client.dispatch("vm://receiver1?connector=Connector1", "Test", null);
         MuleMessage result = client.request("vm://out?connector=Connector2", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(result.getPayloadAsString(), "Test");
+        assertEquals(getPayloadAsString(result), "Test");
     }
 }

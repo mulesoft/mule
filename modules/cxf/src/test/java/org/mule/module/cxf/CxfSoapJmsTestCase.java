@@ -42,6 +42,6 @@ public class CxfSoapJmsTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://testInput", SAMPLE_REQUEST, null);
 
         assertNotNull("Got a null response", response);
-        assertTrue("Got wrong response", response.getPayloadAsString().contains("ns2:sayHiResponse"));
+        assertTrue("Got wrong response", getPayloadAsString(response).contains("ns2:sayHiResponse"));
     }
 }

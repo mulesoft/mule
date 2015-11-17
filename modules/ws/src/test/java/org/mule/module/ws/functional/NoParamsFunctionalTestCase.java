@@ -33,7 +33,7 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
 
         String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
                                   "<text>TEST</text></ns:noParamsResponse>";
-        assertXMLEqual(expectedResponse, event.getMessage().getPayloadAsString());
+        assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
 
         event = flow.process(event);
 
-        assertXMLEqual(expectedResponse, event.getMessage().getPayloadAsString());
+        assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
     }
 
 }

@@ -39,6 +39,6 @@ public class TransformerWeightingFunctionalTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("vm://testInput", XML_REQUEST, null);
-        XMLAssert.assertXMLEqual(XML_REQUEST, response.getPayloadAsString());
+        XMLAssert.assertXMLEqual(XML_REQUEST, getPayloadAsString(response));
     }
 }

@@ -70,7 +70,7 @@ public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutR
                     client.dispatch(url, muleMessage);
 
                     MuleMessage response = client.request("vm://response", RECEIVE_TIMEOUT);
-                    results[0] = payload.equals(response.getPayloadAsString());
+                    results[0] = payload.equals(getPayloadAsString(response));
                 }
                 catch (Exception e)
                 {

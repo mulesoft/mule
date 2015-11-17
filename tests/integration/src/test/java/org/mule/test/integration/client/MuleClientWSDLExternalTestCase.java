@@ -48,7 +48,7 @@ public class MuleClientWSDLExternalTestCase extends AbstractMuleContextTestCase
         {
             MuleClient client = new MuleClient(muleContext);
             result = client.send(url, input, properties);
-            resultPayload = (result != null ? result.getPayloadAsString() : StringUtils.EMPTY);
+            resultPayload = (result != null ? getPayloadAsString(result) : StringUtils.EMPTY);
         }
         catch (MuleException e)
         {

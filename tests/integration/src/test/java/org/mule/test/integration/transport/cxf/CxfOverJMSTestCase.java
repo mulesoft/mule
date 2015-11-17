@@ -40,7 +40,7 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
         client.dispatch("jms://TestComponent", new DefaultMuleMessage(req, muleContext));
         MuleMessage message = client.request("jms://testout", 10000);
         assertNotNull(message.getPayload());
-        assertTrue(message.getPayloadAsString().indexOf("return>hello") != -1);
+        assertTrue(getPayloadAsString(message).indexOf("return>hello") != -1);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
         MuleMessage message = client.request("jms://testout", 10000);
         assertNotNull("message reply is null", message);
         assertNotNull("message payload is null", message.getPayload());
-        assertTrue(message.getPayloadAsString().equals("hello"));
+        assertTrue(getPayloadAsString(message).equals("hello"));
     }
 
     // MULE-4677
@@ -65,6 +65,6 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:63081/services/testBridge",
             new DefaultMuleMessage(req, muleContext));
         assertNotNull(result.getPayload());
-        assertTrue(result.getPayloadAsString().contains("<ns2:echo>hello</ns2:echo>"));
+        assertTrue(getPayloadAsString(result).contains("<ns2:echo>hello</ns2:echo>"));
     }
 }

@@ -34,6 +34,6 @@ public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://in", "HELLO", null);
         assertNotNull(response);
         assertNotNull(response.getPayload());
-        assertEquals("Both Cookies Found!", response.getPayloadAsString());
+        assertEquals("Both Cookies Found!", getPayloadAsString(response));
     }
 }

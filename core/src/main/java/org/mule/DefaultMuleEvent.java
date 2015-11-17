@@ -581,7 +581,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         try
         {
-            return message.getPayloadAsBytes();
+            return getMuleContext().getTransformationService().getPayloadAsBytes(message);
         }
         catch (Exception e)
         {
@@ -599,13 +599,13 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     @Override
-    public <T> T transformMessage(DataType<T> outputType) throws TransformerException
+    public Object transformMessage(DataType outputType) throws TransformerException
     {
         if (outputType == null)
         {
             throw new TransformerException(CoreMessages.objectIsNull("outputType"));
         }
-        return message.getPayload(outputType);
+        return getMuleContext().getTransformationService().getPayload(message, outputType);
     }
 
     /**
@@ -619,7 +619,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public String transformMessageToString() throws TransformerException
     {
-        return transformMessage(DataTypeFactory.createWithEncoding(String.class, getEncoding()));
+        return (String) transformMessage(DataTypeFactory.createWithEncoding(String.class, getEncoding()));
     }
 
     @Override
@@ -640,7 +640,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         try
         {
-            return message.getPayloadForLogging(encoding);
+            return getMuleContext().getTransformationService().getPayloadAsString(message, encoding);
         }
         catch (Exception e)
         {

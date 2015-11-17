@@ -76,7 +76,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/inMidFlow",
                                            request, newOptions().method(POST.name()).disableStatusCodeValidation()
                                                    .build());
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
     }
 
     protected void assertValidResponse(String address, Map<String, Object> properties) throws Exception
@@ -84,7 +84,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
         MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, response.getPayloadAsString());
+        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
     }
 
     protected void assertSoapFault(String address, String message, Map<String, Object> properties, String expectedErrorMessage) throws Exception
@@ -92,7 +92,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
         MuleMessage request = new DefaultMuleMessage(message, properties, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        String responsePayload = response.getPayloadAsString();
+        String responsePayload = getPayloadAsString(response);
         assertThat(responsePayload, Matchers.containsString(expectedErrorMessage));
     }
 

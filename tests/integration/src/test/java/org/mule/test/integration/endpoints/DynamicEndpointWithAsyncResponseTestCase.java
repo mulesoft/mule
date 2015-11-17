@@ -38,7 +38,7 @@ public class DynamicEndpointWithAsyncResponseTestCase extends FunctionalTestCase
 
         DefaultLocalMuleClient client = new DefaultLocalMuleClient(muleContext);
         MuleMessage response = client.send("vm://vmProxy", message);
-        assertEquals("hello Received", response.getPayloadAsString());
+        assertEquals("hello Received", getPayloadAsString(response));
 
         response = client.request("vm://vmOut", 5000);
         assertNotNull(response);

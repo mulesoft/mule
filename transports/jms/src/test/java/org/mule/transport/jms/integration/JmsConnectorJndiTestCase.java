@@ -57,7 +57,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
     }
 
     /**
@@ -84,7 +84,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
     }
 
     /**
@@ -99,7 +99,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
     }
 
     /**
@@ -125,7 +125,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
     }
 
     /**
@@ -152,7 +152,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
     }
 
     /**
@@ -167,7 +167,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
     }
 
     /**

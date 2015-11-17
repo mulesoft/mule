@@ -56,7 +56,7 @@ public class HttpContentTypeTestCase extends FunctionalTestCase
 
         assertContentTypeProperty(response);
 
-        assertThat(response.getPayloadAsString(), equalTo(EXPECTED_CONTENT_TYPE));
+        assertThat(getPayloadAsString(response), equalTo(EXPECTED_CONTENT_TYPE));
     }
 
     private void assertContentTypeProperty(MuleMessage response)

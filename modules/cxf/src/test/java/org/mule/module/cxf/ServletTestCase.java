@@ -75,7 +75,7 @@ public class ServletTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT + getContextPath()
                                          + "/services/mycomponent", getTestMuleMessage(request));
-        String res = result.getPayloadAsString();
+        String res = getPayloadAsString(result);
 
         assertTrue(res.indexOf("Test String") != -1);
     }
@@ -88,7 +88,7 @@ public class ServletTestCase extends FunctionalTestCase
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT + getContextPath()
                                          + "/services/mycomponent/echo/text/Test String", new DefaultMuleMessage("", props, muleContext));
-        String res = result.getPayloadAsString();
+        String res = getPayloadAsString(result);
         assertTrue(res.indexOf("Test String") != -1);
     }
 }

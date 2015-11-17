@@ -43,6 +43,6 @@ public class AsynchronousSslMule1854TestCase extends FunctionalTestCase
         Thread.sleep(500);
         MuleMessage response = client.request("asyncEndpoint", 5000);
         assertNotNull("Response is null", response);
-        assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received Async", getPayloadAsString(response));
     }
 }

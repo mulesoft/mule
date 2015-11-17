@@ -203,7 +203,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Message being processed is: " + (event.getMessage().getPayloadForLogging()));
+                    logger.debug("Message being processed is: " + (muleContext.getTransformationService().getPayloadForLogging(event.getMessage())));
                 }
                 String component = "Unknown";
                 if (event.getFlowConstruct() != null)

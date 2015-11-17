@@ -55,7 +55,7 @@ public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.request("vm://toclient", 5000);
         assertNotNull(result);
-        assertEquals("foo", result.getPayloadAsString());
+        assertEquals("foo", getPayloadAsString(result));
 
         result = client.request("vm://toclient2", 1000);
         //This seems a little odd that we forward the exception to the outbound endpoint, but I guess users

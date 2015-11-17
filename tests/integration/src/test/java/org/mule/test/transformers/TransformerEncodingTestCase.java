@@ -55,7 +55,7 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
     private void testEncoding(String endpointUrl, MuleMessage message) throws Exception
     {
         MuleMessage response = muleContext.getClient().send(endpointUrl, message);
-        assertThat(response.getPayloadAsString(), is(PAYLOAD));
+        assertThat(getPayloadAsString(response), is(PAYLOAD));
     }
 
     private MuleMessage getMuleMessage() throws IOException

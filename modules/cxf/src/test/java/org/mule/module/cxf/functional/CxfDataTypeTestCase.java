@@ -53,7 +53,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     {
         MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
         MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        Assert.assertThat(received.getPayloadAsString(), not(containsString("Fault")));
+        Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
         MuleMessage received = muleContext.getClient().send("vm://helloClient", request);
-        Assert.assertThat(received.getPayloadAsString(), not(containsString("Fault")));
+        Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     {
         MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
         MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        Assert.assertThat(received.getPayloadAsString(), not(containsString("Fault")));
+        Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo", new DefaultMuleMessage(xml, props, muleContext), newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        Assert.assertThat(result.getPayloadAsString(), not(containsString("Fault")));
+        Assert.assertThat(getPayloadAsString(result), not(containsString("Fault")));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
         MuleMessage received = muleContext.getClient().send("vm://helloClient", request);
-        Assert.assertThat(received.getPayloadAsString(), not(containsString("Fault")));
+        Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 
     public static class EnsureXmlDataType extends EnsureDataType

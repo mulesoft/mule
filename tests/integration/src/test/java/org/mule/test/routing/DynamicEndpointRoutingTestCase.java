@@ -32,6 +32,6 @@ public class DynamicEndpointRoutingTestCase extends FunctionalTestCase
         MuleMessage response = result.getMessage(5000);
         assertNotNull(response);
         assertNotNull(response.getPayload());
-        assertEquals("step2Service", response.getPayloadAsString());
+        assertEquals("step2Service", getPayloadAsString(response));
     }
 }

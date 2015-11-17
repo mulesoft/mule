@@ -40,6 +40,6 @@ public class ExceptionHandlingMule2167TestCase extends FunctionalTestCase
         MuleMessage message = client.request("vm://out-default", WAIT_MS);
         assertNotNull("null message", message);
         assertNotNull("null payload", message.getPayload());
-        assertEquals(MESSAGE, message.getPayloadAsString());
+        assertEquals(MESSAGE, getPayloadAsString(message));
     }
 }

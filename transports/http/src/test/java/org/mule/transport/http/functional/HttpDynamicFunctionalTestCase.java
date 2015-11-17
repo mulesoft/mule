@@ -44,10 +44,10 @@ public class HttpDynamicFunctionalTestCase extends FunctionalTestCase
         props.put("path", "foo");
 
         MuleMessage result = client.send("clientEndpoint", TEST_REQUEST, props);
-        assertEquals(TEST_REQUEST + " Received 1", result.getPayloadAsString());
+        assertEquals(TEST_REQUEST + " Received 1", getPayloadAsString(result));
 
         props.put("port", dynamicPort2.getNumber());
         result = client.send("clientEndpoint", TEST_REQUEST, props);
-        assertEquals(TEST_REQUEST + " Received 2", result.getPayloadAsString());
+        assertEquals(TEST_REQUEST + " Received 2", getPayloadAsString(result));
     }
 }

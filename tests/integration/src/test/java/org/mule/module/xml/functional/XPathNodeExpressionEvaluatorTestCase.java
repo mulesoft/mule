@@ -40,6 +40,6 @@ public class XPathNodeExpressionEvaluatorTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         MuleMessage message = client.send("vm://testInput", SAMPLE_REQUEST, null);
-        XMLAssert.assertXMLEqual(EXPECTED_RESPONSE, message.getPayloadAsString());
+        XMLAssert.assertXMLEqual(EXPECTED_RESPONSE, getPayloadAsString(message));
     }
 }

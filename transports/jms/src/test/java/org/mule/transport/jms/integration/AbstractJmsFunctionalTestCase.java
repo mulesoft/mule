@@ -463,7 +463,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertNull(result.getExceptionPayload());
-        byte[] bytes = result.getPayloadAsBytes();
+        byte[] bytes = getPayloadAsBytes(result);
         assertEquals("Wrong number of bytes", expected.length, bytes.length);
         for (int i=0; i < expected.length; ++i)
         {

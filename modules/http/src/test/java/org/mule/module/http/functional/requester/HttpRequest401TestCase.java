@@ -43,7 +43,7 @@ public class HttpRequest401TestCase extends AbstractHttpRequestTestCase
     {
         MuleMessage response = runFlow("executeRequest").getMessage();
         assertThat((int) response.getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_UNAUTHORIZED));
-        assertThat(response.getPayloadAsString(), is(UNAUTHORIZED_MESSAGE));
+        assertThat(getPayloadAsString(response), is(UNAUTHORIZED_MESSAGE));
     }
 
 }

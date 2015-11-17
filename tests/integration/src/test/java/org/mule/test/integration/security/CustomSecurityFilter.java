@@ -51,7 +51,7 @@ public class CustomSecurityFilter extends AbstractEndpointSecurityFilter
     {
         try
         {
-            return event.getMessage().getPayloadAsString().equals(FunctionalTestCase.TEST_MESSAGE);
+            return event.getMuleContext().getTransformationService().getPayloadAsString(event.getMessage()).equals(FunctionalTestCase.TEST_MESSAGE);
         }
         catch (Exception e)
         {

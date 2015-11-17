@@ -62,7 +62,7 @@ public class DynamicAllTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
         MuleEvent result = getTestFlow(DYNAMIC_ALL).process(getTestEvent(TEST_MESSAGE));
-        assertThat(result.getMessage().getPayloadAsString(), is(LETTER_A));
+        assertThat(getPayloadAsString(result.getMessage()), is(LETTER_A));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class DynamicAllTestCase extends DynamicRouterTestCase
         for (int i = 0; i < letters.length; i++)
         {
             MuleMessage message = messageCollection.getMessage(i);
-            assertThat(message.getPayloadAsString(), is(letters[i]));
+            assertThat(getPayloadAsString(message), is(letters[i]));
         }
         return resultEvent;
     }

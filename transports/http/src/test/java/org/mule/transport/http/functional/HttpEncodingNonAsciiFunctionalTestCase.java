@@ -123,7 +123,7 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertNotNull(reply);
         assertEquals("EUC-JP", reply.getEncoding());
-        assertEquals(getTestMessage(Locale.JAPAN) + " Received", reply.getPayloadAsString());
+        assertEquals(getTestMessage(Locale.JAPAN) + " Received", getPayloadAsString(reply));
     }
 
     private void setupAssertIncomingMessage(String method, final Latch latch,

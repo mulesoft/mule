@@ -28,7 +28,7 @@ public class OutboundHttpEndpointAuthenticationTestCase extends FunctionalTestCa
     public void testOutboundAutenticationSend() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        String payload = client.send("outbound", TEST_MESSAGE, null).getPayloadAsString();
+        String payload = getPayloadAsString(client.send("outbound", TEST_MESSAGE, null));
         assertEquals(TEST_MESSAGE, payload);
     }
 
@@ -37,7 +37,7 @@ public class OutboundHttpEndpointAuthenticationTestCase extends FunctionalTestCa
     {
         MuleClient client = muleContext.getClient();
         client.dispatch("outbound", TEST_MESSAGE, null);
-        String payload = client.request("out", RECEIVE_TIMEOUT).getPayloadAsString();
+        String payload = getPayloadAsString(client.request("out", RECEIVE_TIMEOUT));
         assertEquals(TEST_MESSAGE, payload);
     }
 }

@@ -35,6 +35,7 @@ public class LifecycleTrackerTransformer extends AbstractTransformer implements 
     public void setMuleContext(final MuleContext context)
     {
         tracker.add("setMuleContext");
+        muleContext = context;
     }
 
 

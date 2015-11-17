@@ -40,7 +40,7 @@ public class HttpDispatcherLifecycleTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("http://localhost:" + port.getValue(), TEST_MESSAGE, null);
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
 
         muleContext.dispose();
 

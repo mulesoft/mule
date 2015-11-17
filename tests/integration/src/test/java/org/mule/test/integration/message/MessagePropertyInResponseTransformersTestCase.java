@@ -36,6 +36,6 @@ public class MessagePropertyInResponseTransformersTestCase extends FunctionalTes
         MuleMessage result = client.send("http://localhost:63081/ser", new DefaultMuleMessage(payload, muleContext));
         assertEquals(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root xmlns=\"http://simple.component.mule.org/\"><testval>bar</testval></root>",
-            result.getPayloadAsString());
+            getPayloadAsString(result));
     }
 }

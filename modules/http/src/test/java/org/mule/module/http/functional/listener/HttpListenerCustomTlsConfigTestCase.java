@@ -38,7 +38,7 @@ public class HttpListenerCustomTlsConfigTestCase extends FunctionalTestCase
     {
         Flow flow = (Flow) getFlowConstruct("testFlowGlobalContextClient");
         final MuleEvent res = flow.process(getTestEvent("data"));
-        assertThat(res.getMessage().getPayloadAsString(), is("ok"));
+        assertThat(getPayloadAsString(res.getMessage()), is("ok"));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class HttpListenerCustomTlsConfigTestCase extends FunctionalTestCase
     {
         Flow flow = (Flow) getFlowConstruct("testFlowNestedContextClient");
         final MuleEvent res = flow.process(getTestEvent("data"));
-        assertThat(res.getMessage().getPayloadAsString(), is("all right"));
+        assertThat(getPayloadAsString(res.getMessage()), is("all right"));
     }
 
 }

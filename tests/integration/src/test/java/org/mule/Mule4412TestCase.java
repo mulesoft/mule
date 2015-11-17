@@ -66,8 +66,8 @@ public class Mule4412TestCase extends FunctionalTestCase
         int times = FilterCounter.counter.get();
         assertTrue("did not filter one time as expected, times filtered " + times, times == 1);
         assertNotNull(reply);
-        assertEquals("wrong message received : " + reply.getPayloadAsString(), TEST_MESSAGE,
-            reply.getPayloadAsString());
+        assertEquals("wrong message received : " + getPayloadAsString(reply), TEST_MESSAGE,
+            getPayloadAsString(reply));
         assertEquals("'pass' property value not correct", "true", reply.getInboundProperty("pass"));
 
         // make sure there are no more messages

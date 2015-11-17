@@ -45,7 +45,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
         MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT);
         assertThat(response, notNullValue());
         assertThat(response.getPayload(), IsNot.not(IsInstanceOf.instanceOf(NullPayload.class)));
-        assertThat(response.getPayloadAsString(), not(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), not(TEST_MESSAGE));
         assertThat(response.getExceptionPayload(), notNullValue()); //to be fixed
         assertThat(response.getExceptionPayload(), instanceOf(ExceptionPayload.class)); //to be review/fixed
     }

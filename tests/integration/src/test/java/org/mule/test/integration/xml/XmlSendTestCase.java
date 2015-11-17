@@ -95,6 +95,6 @@ public class XmlSendTestCase extends FunctionalTestCase
 
         // this will submit the xml via a POST request
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", getTestMuleMessage(xml));
-        assertThat(message.getPayloadAsString(), equalTo("some"));
+        assertThat(getPayloadAsString(message), equalTo("some"));
     }
 }

@@ -32,7 +32,7 @@ public class MessagePropertyScopesTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in1", "Hello World", null);
         assertNotNull(response);
-        String payload = response.getPayloadAsString();
+        String payload = getPayloadAsString(response);
         assertNotNull(payload);
         assertEquals("java.util.Date", payload);
     }

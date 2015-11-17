@@ -78,7 +78,7 @@ public class CustomRouteResolver implements DynamicRouteResolver
         {
             try
             {
-                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + letter);
+                event.getMessage().setPayload(event.getMuleContext().getTransformationService().getPayloadAsString(event.getMessage()) + letter);
             }
             catch (Exception e)
             {

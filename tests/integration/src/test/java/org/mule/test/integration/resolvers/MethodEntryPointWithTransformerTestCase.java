@@ -35,6 +35,6 @@ public class MethodEntryPointWithTransformerTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://in", "payload", null);
         assertNotNull(response);
         assertNotNull(response.getPayload());
-        assertEquals("Transformed payload", response.getPayloadAsString());
+        assertEquals("Transformed payload", getPayloadAsString(response));
     }
 }

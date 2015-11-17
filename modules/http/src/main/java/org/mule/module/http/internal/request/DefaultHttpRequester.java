@@ -437,7 +437,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         {
             try
             {
-                event.getMessage().getPayloadAsBytes();
+                muleContext.getTransformationService().getPayloadAsBytes(event.getMessage());
             }
             catch (Exception e)
             {

@@ -93,7 +93,7 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
             @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
-                requestPayload = context.getMessage().getPayloadAsString();
+                requestPayload = getPayloadAsString(context.getMessage());
                 requestURI = context.getMessage().getInboundProperty(HTTP_REQUEST_URI);
             }
         });
@@ -110,7 +110,7 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
         assertThat(requestPayload, equalTo(TEST_MESSAGE));
         assertThat(requestURI, equalTo(PATH));
         assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(OK.getStatusCode()));
-        assertThat(event.getMessage().getPayloadAsString(), equalTo(OK_RESPONSE));
+        assertThat(getPayloadAsString(event.getMessage()), equalTo(OK_RESPONSE));
 
         proxyServer.stop();
     }
