@@ -21,3 +21,4 @@ MULE-7858: Support for spring events and related classes in the spring-extras mo
 MULE-7470: Model/Service interfaces and implementations have been removed, as have the associated configuration elements.
            Use Mule Flow's which provide the same functionality with more flexibility.
 MULE-7723: ScriptConfigurationBuilder and related resources have been removed
+MULE-9068: The TransformationService should now be used to transform MuleMessages's rather than using the message 'applyTransformers' methods.
