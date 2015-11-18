@@ -83,8 +83,7 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
         assertThat(getDocDescription(flow), is("Main flow"));
         assertThat(getSourceFile(flow), is("annotations.xml"));
         assertThat(getSourceFileLine(flow), is(10));
-        // initialState is added by the xsd with a default value
-        assertThat(getSourceElement(flow), is("<flow name=\"Bridge\" doc:name=\"Bridge flow\" initialState=\"started\">" + SystemUtils.LINE_SEPARATOR +
+        assertThat(getSourceElement(flow), is("<flow name=\"Bridge\" doc:name=\"Bridge flow\">" + SystemUtils.LINE_SEPARATOR +
                                               "<annotations>" + SystemUtils.LINE_SEPARATOR +
                                               "<doc:description>Main flow</doc:description>" + SystemUtils.LINE_SEPARATOR +
                                               "</annotations>" + SystemUtils.LINE_SEPARATOR +
