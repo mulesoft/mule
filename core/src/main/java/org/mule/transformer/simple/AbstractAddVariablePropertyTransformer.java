@@ -90,9 +90,9 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
 
     public void setIdentifier(String identifier)
     {
-        if (identifier == null)
+        if (StringUtils.isBlank(identifier))
         {
-            throw new IllegalArgumentException("Key must not be null");
+            throw new IllegalArgumentException("Key cannot be blank");
         }
         this.identifierEvaluator = new AttributeEvaluator(identifier);
     }
