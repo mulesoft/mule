@@ -20,6 +20,7 @@ import org.mule.connector.MuleConnectorOperationLocator;
 import org.mule.el.mvel.MVELExpressionLanguageWrapper;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.execution.MuleMessageProcessingManager;
+import org.mule.internal.connection.DefaultConnectionManager;
 import org.mule.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.security.MuleSecurityManager;
@@ -64,6 +65,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
         configureQueueManager(muleContext);
 
+        registry.registerObject(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
         registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
 
         registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
@@ -106,7 +108,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext));
         registry.registerObject(MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator());
         registry.registerObject(MuleProperties.OBJECT_TIME_SUPPLIER, new TimeSupplier());
-        registry.registerObject(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
+        registry.registerObject(MuleProperties.OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager());
     }
 
     private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException

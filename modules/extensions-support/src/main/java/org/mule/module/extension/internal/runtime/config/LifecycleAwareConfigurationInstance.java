@@ -12,8 +12,9 @@ import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleException;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connector.ConnectionManager;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.extension.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.runtime.ConfigurationInstance;
@@ -37,7 +38,13 @@ import org.slf4j.LoggerFactory;
  * <p>
  * It also implements the {@link Interceptable} interface which means that it contains
  * a list of {@link Interceptor interceptors}, on which IoC and lifecycle is propagated
- * as well
+ * as well.
+ * <p>
+ * In the case of the {@link #connectionProvider} being present, then it also binds the
+ * {@link #value} to the {@link ConnectionProvider} by the means of
+ * {@link ConnectionManager#bind(Object, ConnectionProvider)} when the {@link #initialise()}
+ * phase is executed. That bound will be broken on the {@link #stop()} phase by using
+ * {@link ConnectionManager#unbind(Object)}
  *
  * @since 4.0
  */
@@ -55,6 +62,9 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
 
     @Inject
     private TimeSupplier timeSupplier;
+
+    @Inject
+    private ConnectionManager connectionManager;
 
     /**
      * Creates a new instance
@@ -132,8 +142,11 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     public void stop() throws MuleException
     {
         stopIfNeeded(value);
-        //TODO: MULE-8952 -> stopping this should cause the connections opened by this provider to be properly disposed
-        stopIfNeeded(connectionProvider);
+        if (connectionProvider.isPresent())
+        {
+            connectionManager.unbind(value);
+            stopIfNeeded(connectionProvider);
+        }
         super.stop();
     }
 
@@ -150,8 +163,14 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
 
     private void doInitialise() throws InitialisationException
     {
-        initialiseIfNeeded(connectionProvider, muleContext);
+        if (connectionProvider.isPresent())
+        {
+            initialiseIfNeeded(connectionProvider, muleContext);
+            connectionManager.bind(value, connectionProvider.get());
+        }
+
         initialiseIfNeeded(value, muleContext);
+
         super.initialise();
     }
 

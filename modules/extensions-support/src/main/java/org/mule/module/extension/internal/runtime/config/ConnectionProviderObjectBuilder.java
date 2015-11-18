@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;

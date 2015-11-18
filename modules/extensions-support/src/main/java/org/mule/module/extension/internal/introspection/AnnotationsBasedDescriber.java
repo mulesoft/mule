@@ -17,6 +17,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extensible;
@@ -28,7 +29,6 @@ import org.mule.extension.annotation.api.connector.Provider;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
-import org.mule.extension.api.connection.ConnectionProvider;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.DescribingContext;

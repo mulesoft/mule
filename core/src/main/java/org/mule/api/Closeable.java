@@ -20,6 +20,6 @@ public interface Closeable
      * 
      * @throws MuleException if an exception occurs closing the resource
      */
-    public void close() throws MuleException;
+    void close() throws MuleException;
 
 }

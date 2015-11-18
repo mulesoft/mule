@@ -119,6 +119,7 @@
 # /lib/mule
 #
 /mule-standalone-${productVersion}/lib/mule
+/mule-standalone-${productVersion}/lib/mule/mule-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-common-3.5.0-M5-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar

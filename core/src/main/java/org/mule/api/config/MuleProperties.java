@@ -158,6 +158,7 @@ public class MuleProperties
     public static final String OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR = "_muleConnectorMessageProcessorLocator";
     public static final String OBJECT_EXTENSION_MANAGER = "_muleExtensionManager";
     public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
+    public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";

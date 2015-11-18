@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.config;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExpirationPolicy;

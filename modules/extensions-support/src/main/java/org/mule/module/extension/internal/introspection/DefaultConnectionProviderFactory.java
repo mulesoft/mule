@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ConnectionProviderFactory;
 

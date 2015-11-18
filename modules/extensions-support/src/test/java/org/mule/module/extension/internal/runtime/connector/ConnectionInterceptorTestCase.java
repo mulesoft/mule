@@ -18,6 +18,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connector.ConnectionManager;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
@@ -60,6 +62,9 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
 
         connectionProvider.setUsername(USER);
         connectionProvider.setPassword(PASSWORD);
+
+        ConnectionManager connectionManager = muleContext.getRegistry().lookupObject(ConnectionManager.class);
+        connectionManager.bind(config, connectionProvider);
 
         interceptor = new ConnectionInterceptor();
         muleContext.getInjector().inject(interceptor);
@@ -114,101 +119,26 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
         assertThat(latch.await(5, TimeUnit.SECONDS), is(true));
         assertThat(connection, is(sameInstance(mockConnection)));
         verify(connectionProvider).connect(config);
-
     }
 
     @Test
     public void after()
     {
+        ManagedConnection managedConnection = mock(ManagedConnection.class);
+        when(operationContext.removeVariable(CONNECTION_PARAM)).thenReturn(managedConnection);
+
         interceptor.after(operationContext, null);
         verify(operationContext).removeVariable(CONNECTION_PARAM);
+        verify(managedConnection).release();
     }
-
-    //TODO: MULE-8952 -> test these cases on the connection service
-
-    //@Test
-    //public void connectionProviderFailsToDisconnect() throws Exception
-    //{
-    //    final Exception exception = setconnectionProviderWhichFailsToDisconnect();
-    //
-    //    //have a connection established
-    //    getConnection();
-    //
-    //    try
-    //    {
-    //        interceptor.stop();
-    //        fail("was expecting a failure");
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        assertThat(e, is(sameInstance(exception)));
-    //    }
-    //
-    //    verify(connectionProvider).stop();
-    //
-    //    //stop again to verify that the write lock was released. If it didn't then this will hang
-    //    //and the test will time out
-    //    interceptor.stop();
-    //}
-    //
-    //@Test
-    //public void connectionProviderFailsToStop() throws Exception
-    //{
-    //    final Exception exception = setconnectionProviderWhichFailsToStop();
-    //
-    //    try
-    //    {
-    //        interceptor.stop();
-    //        fail("was expecting a failure");
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        assertThat(e, is(sameInstance(exception)));
-    //    }
-    //
-    //    verify(connectionProvider).stop();
-    //
-    //    //stop again to verify that the write lock was released. If it didn't then this will hang
-    //    //and the test will time out
-    //    try
-    //    {
-    //        interceptor.stop();
-    //        fail("re stopping should fail");
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        // expected
-    //    }
-    //}
-
-    //private Exception setconnectionProviderWhichFailsToDisconnect() throws Exception
-    //{
-    //    connectionProvider = mock(PetStoreConnectionProvider.class);
-    //    final Exception exception = new RuntimeException();
-    //    doThrow(exception).when(connectionProvider).disconnect(Mockito.any(PetStoreClient.class));
-    //    when(connectionProvider.connect(config)).thenReturn(mock(PetStoreClient.class));
-    //    before();
-    //
-    //    return exception;
-    //}
-    //
-    //private Exception setconnectionProviderWhichFailsToStop() throws Exception
-    //{
-    //    connectionProvider = mock(PetStoreConnectionProvider.class);
-    //    final Exception exception = new RuntimeException();
-    //    doThrow(exception).when(connectionProvider).stop();
-    //    before();
-    //
-    //    return exception;
-    //}
-
 
     private PetStoreClient getConnection() throws Exception
     {
-        ArgumentCaptor<PetStoreClient> connectionCaptor = ArgumentCaptor.forClass(PetStoreClient.class);
+        ArgumentCaptor<ManagedConnection> connectionCaptor = ArgumentCaptor.forClass(ManagedConnection.class);
         interceptor.before(operationContext);
 
         verify(operationContext, atLeastOnce()).setVariable(same(CONNECTION_PARAM), connectionCaptor.capture());
-        return connectionCaptor.getValue();
+        ManagedConnection<PetStoreClient> managedConnection = connectionCaptor.getValue();
+        return managedConnection.getConnection();
     }
 }

@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.runtime.ExpirationPolicy;
 import org.mule.module.extension.HeisenbergConnectionProvider;

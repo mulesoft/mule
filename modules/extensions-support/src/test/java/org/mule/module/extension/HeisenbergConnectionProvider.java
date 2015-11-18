@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension;
 
+import org.mule.api.connection.ConnectionException;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.Optional;
-import org.mule.extension.api.connection.ConnectionException;
-import org.mule.extension.api.connection.ConnectionProvider;
 
 public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergExtension, HeisenbergConnection>
 {

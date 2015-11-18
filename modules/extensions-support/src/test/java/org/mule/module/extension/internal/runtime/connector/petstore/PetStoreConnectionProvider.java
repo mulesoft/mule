@@ -8,10 +8,10 @@ package org.mule.module.extension.internal.runtime.connector.petstore;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.api.connection.ConnectionProvider;
 
 import javax.inject.Inject;
 

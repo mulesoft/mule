@@ -114,6 +114,8 @@
             <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
+                <!-- Mule API -->
+                <include>org.mule:mule-api</include>
                 <!-- extensions API -->
                 <include>org.mule.extensions:mule-extensions-api</include>
                 <include>org.mule.extensions:mule-extensions-annotations</include>
@@ -176,6 +178,8 @@
     _exclude_ all libs which should _not_ go into this directory (usually
     because they are already in a different directory). -->
             <excludes>
+                <!--Mule API-->
+                <exclude>org.mule:mule-api</exclude>
                 <!--extensions API-->
                 <exclude>org.mule.extensions:mule-extensions-api</exclude>
                 <exclude>org.mule.extensions:mule-extensions-annotations</exclude>

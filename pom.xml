@@ -226,6 +226,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
+        <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
         <muleMvelVersion>2.1.9-MULE-008</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
@@ -269,6 +270,11 @@
     <!-- Declare all dependencies that are used in more than one module here. -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-api</artifactId>
+                <version>${muleApiVersion}</version>
+            </dependency>
             <dependency>
                 <groupId>org.mule.common</groupId>
                 <artifactId>mule-common</artifactId>

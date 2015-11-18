@@ -8,18 +8,16 @@ package org.mule.module.extension.internal.runtime.connector;
 
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleContext;
-import org.mule.extension.api.connection.ConnectionException;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionException;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connector.ConnectionManager;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
@@ -30,17 +28,11 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-//TODO: Much of the logic here should be moved to the ConnectionService when MULE-8952 is implemented
 public final class ConnectionInterceptor implements Interceptor
 {
 
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final Lock readLock = readWriteLock.readLock();
-    private final Lock writeLock = readWriteLock.writeLock();
-    private Object connection = null;
-
     @Inject
-    private MuleContext muleContext;
+    private ConnectionManager connectionManager;
 
     /**
      * Adds a {@code Connection} as a parameter in the {@code operationContext}, following the
@@ -66,25 +58,16 @@ public final class ConnectionInterceptor implements Interceptor
     @Override
     public void after(OperationContext operationContext, Object result)
     {
-        ((OperationContextAdapter) operationContext).removeVariable(CONNECTION_PARAM);
+        ManagedConnection connection = ((OperationContextAdapter) operationContext).removeVariable(CONNECTION_PARAM);
+        if (connection != null)
+        {
+            connection.release();
+        }
     }
 
     //TODO: MULE-8909 && MULE-8910: validate the connection before returning it. Reconnect if necessary
     private Object getConnection(OperationContext operationContext) throws ConnectionException
     {
-        readLock.lock();
-        try
-        {
-            if (connection != null)
-            {
-                return connection;
-            }
-        }
-        finally
-        {
-            readLock.unlock();
-        }
-
         Optional<ConnectionProvider> connectionProvider = operationContext.getConfiguration().getConnectionProvider();
         if (!connectionProvider.isPresent())
         {
@@ -95,25 +78,6 @@ public final class ConnectionInterceptor implements Interceptor
                                                           operationContext.getConfiguration().getName()));
         }
 
-        writeLock.lock();
-        try
-        {
-            //check another thread didn't beat us to it
-            if (connection != null)
-            {
-                return connection;
-            }
-
-            if (muleContext.isStopped() || muleContext.isStopping())
-            {
-                throw new IllegalStateException("Mule is shutting down... cannot create a new connection");
-            }
-
-            return connection = connectionProvider.get().connect(operationContext.getConfiguration().getValue());
-        }
-        finally
-        {
-            writeLock.unlock();
-        }
+        return connectionManager.getConnection(operationContext.getConfiguration().getValue());
     }
 }

@@ -10,7 +10,7 @@ import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;

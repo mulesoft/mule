@@ -14,7 +14,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getOper
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
-import org.mule.extension.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
