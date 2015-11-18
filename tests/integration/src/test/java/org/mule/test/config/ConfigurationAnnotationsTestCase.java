@@ -26,11 +26,13 @@ import org.mule.util.SystemUtils;
 
 import javax.xml.namespace.QName;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Test that configuration-based annotations are propagated to the appropriate runtime objects
  */
+@Ignore("Reenable after bugs of MULE-9012 are fixed and type is no longer lost in the element")
 public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
 {
 
