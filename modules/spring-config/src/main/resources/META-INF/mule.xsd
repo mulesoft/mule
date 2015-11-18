@@ -4456,7 +4456,7 @@
     <xsd:complexType name="setPropertyType">
         <xsd:complexContent>
             <xsd:extension base="abstractAddPropertyTransformerType">
-                <xsd:attribute name="propertyName" type="attributeType" use="required"/>
+                <xsd:attribute name="propertyName" type="nonEmptyAttributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -4502,7 +4502,7 @@
     <xsd:complexType name="setVariableType">
         <xsd:complexContent>
             <xsd:extension base="abstractAddPropertyTransformerType">
-                <xsd:attribute name="variableName" type="attributeType" use="required"/>
+                <xsd:attribute name="variableName" type="nonEmptyAttributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -8438,6 +8438,12 @@
 
     <xsd:simpleType name="attributeType">
         <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="nonEmptyAttributeType">
+        <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+        </xsd:restriction>
     </xsd:simpleType>
 
     <!--==============================================================-->
