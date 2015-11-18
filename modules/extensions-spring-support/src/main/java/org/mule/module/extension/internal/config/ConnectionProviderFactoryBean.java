@@ -10,9 +10,9 @@ import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
-import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -32,11 +32,14 @@ import org.springframework.beans.factory.FactoryBean;
 public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
 {
 
-    private final ValueResolver<ConnectionProvider> resolver;
+    private final ResolverSet resolverSet;
+    private final ConnectionProviderModel providerModel;
+    private ValueResolver<ConnectionProvider> resolver;
+    private PoolingProfile poolingProfile = null;
 
     public ConnectionProviderFactoryBean(ConnectionProviderModel providerModel, ElementDescriptor element)
     {
-        ResolverSet resolverSet;
+        this.providerModel = providerModel;
         try
         {
             resolverSet = getResolverSet(element, providerModel.getParameterModels());
@@ -45,16 +48,19 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
         {
             throw new MuleRuntimeException(createStaticMessage("Could not parse connection provider"), e);
         }
-        ObjectBuilder<ConnectionProvider> builder = new ConnectionProviderObjectBuilder(providerModel, resolverSet);
-        resolver = new ObjectBuilderValueResolver<>(builder);
     }
 
     /**
      * @return A {@link ValueResolver} which yields instances of {@link ConnectionProvider}
      */
     @Override
-    public ValueResolver getObject() throws Exception
+    public synchronized ValueResolver getObject() throws Exception
     {
+        if (resolver == null)
+        {
+            resolver = new ObjectBuilderValueResolver<>(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile));
+        }
+
         return resolver;
     }
 
@@ -74,5 +80,10 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     public boolean isSingleton()
     {
         return true;
+    }
+
+    public void setPoolingProfile(PoolingProfile poolingProfile)
+    {
+        this.poolingProfile = poolingProfile;
     }
 }

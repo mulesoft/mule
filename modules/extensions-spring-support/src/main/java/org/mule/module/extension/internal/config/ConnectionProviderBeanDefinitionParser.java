@@ -6,13 +6,19 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_POOLING_PROFILE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConnectionProviderName;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
+import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
+import org.mule.api.config.PoolingProfile;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -46,5 +52,23 @@ final class ConnectionProviderBeanDefinitionParser extends BaseExtensionBeanDefi
 
         builder.addConstructorArgValue(providerModel);
         builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
+
+        for (Element poolingProfileElement : DomUtils.getChildElements(element))
+        {
+            if (poolingProfileElement.getSchemaTypeInfo().isDerivedFrom(MULE_NAMESPACE, MULE_ABSTRACT_POOLING_PROFILE_TYPE.getLocalPart(), DERIVATION_EXTENSION))
+            {
+                builder.addPropertyValue("poolingProfile", getPoolingProfileParser().parse(poolingProfileElement, parserContext));
+                break;
+            }
+        }
+    }
+
+    //TODO: MULE-9047 should have a better way of parsing this
+    private BeanDefinitionParser getPoolingProfileParser()
+    {
+        OrphanDefinitionParser poolingProfileParser = new OrphanDefinitionParser(PoolingProfile.class, true);
+        poolingProfileParser.addMapping("initialisationPolicy", PoolingProfile.POOL_INITIALISATION_POLICIES);
+        poolingProfileParser.addMapping("exhaustedAction", PoolingProfile.POOL_EXHAUSTED_ACTIONS);
+        return poolingProfileParser;
     }
 }

@@ -10,7 +10,7 @@ import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connection.ConnectionHandler;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
@@ -58,7 +58,7 @@ public final class ConnectionInterceptor implements Interceptor
     @Override
     public void after(OperationContext operationContext, Object result)
     {
-        ManagedConnection connection = ((OperationContextAdapter) operationContext).removeVariable(CONNECTION_PARAM);
+        ConnectionHandler connection = ((OperationContextAdapter) operationContext).removeVariable(CONNECTION_PARAM);
         if (connection != null)
         {
             connection.release();

@@ -20,6 +20,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionHandlingStrategy;
+import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.Interceptable;
@@ -143,6 +145,12 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         {
 
         }
+
+        @Override
+        public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        {
+            return handlingStrategyFactory.cached();
+        }
     }
 
     public static class InvalidConnectionTypeProvider implements ConnectionProvider<TestConfig, Kiwi>
@@ -158,6 +166,12 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         public void disconnect(Kiwi kiwi)
         {
 
+        }
+
+        @Override
+        public ConnectionHandlingStrategy<Kiwi> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        {
+            return handlingStrategyFactory.cached();
         }
     }
 }

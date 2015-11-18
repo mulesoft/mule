@@ -120,11 +120,4 @@ public abstract class ExtensionsTestUtils
         return manifestFile;
     }
 
-    public static Injector spyInjector(MuleContext muleContext)
-    {
-        Injector spy = spy(muleContext.getInjector());
-        ((DefaultMuleContext) muleContext).setInjector(spy);
-
-        return spy;
-    }
 }

@@ -8,7 +8,7 @@ package org.mule.api.connector;
 
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connection.ConnectionHandler;
 
 /**
  * Manages all the connections opened between the boundaries of an application.
@@ -18,7 +18,7 @@ import org.mule.api.connection.ManagedConnection;
  * method. That relationship can be broken through the {@link #unbind(Object)} method.
  * <p>
  * Once the config-provider pair has been bound, connections can be obtained through the {@link #getConnection(Object)}
- * method. That method will yield a {@link ManagedConnection} which will hide the details of how the connection
+ * method. That method will yield a {@link ConnectionHandler} which will hide the details of how the connection
  * is actually being managed while also avoiding the need to pass around config, provider or even this manager.
  * <p>
  * All implementations are required to be thread-safe
@@ -40,9 +40,8 @@ public interface ConnectionManager
      * @param connectionProvider the {@link ConnectionProvider} that produces the connections
      * @param <Config>           the generic type of the {@code config}
      * @param <Connection>       the generic type of the connections to be produced
-     * @return a {@link ManagedConnection}
      */
-    <Config, Connection> ManagedConnection<Connection> bind(Config config, ConnectionProvider<Config, Connection> connectionProvider);
+    <Config, Connection> void bind(Config config, ConnectionProvider<Config, Connection> connectionProvider);
 
     /**
      * Breaks the binding that was previously produced by invoking {@link #bind(Object, ConnectionProvider)} with
@@ -59,7 +58,7 @@ public interface ConnectionManager
     void unbind(Object config);
 
     /**
-     * Obtains a {@link ManagedConnection} for a {@code config} which was previously bound
+     * Obtains a {@link ConnectionHandler} for a {@code config} which was previously bound
      * through the {@link #bind(Object, ConnectionProvider)} method.
      * <p>
      * This method does not guarantee if the returned connections are always different, reused,
@@ -67,14 +66,14 @@ public interface ConnectionManager
      * of the bounded {@link ConnectionProvider}.
      * <p>
      * Once the requester has finished using the obtained connection, it is <b>MANDATORY</b>
-     * for it to invoke the {@link ManagedConnection#release()} method on it.
+     * for it to invoke the {@link ConnectionHandler#release()} method on it.
      *
      * @param config       a config for which a binding has been established through {@link #bind(Object, ConnectionProvider)}
      * @param <Config>     the generic type of the supplied config
      * @param <Connection> the generic type of the returned connection
-     * @return a {@link ManagedConnection} wrapping the produced connection
+     * @return a {@link ConnectionHandler} wrapping the produced connection
      * @throws ConnectionException if the conection could not be established or if no such binding exists for the {@code config}
      */
-    <Config, Connection> ManagedConnection<Connection> getConnection(Config config) throws ConnectionException;
+    <Config, Connection> ConnectionHandler<Connection> getConnection(Config config) throws ConnectionException;
 
 }

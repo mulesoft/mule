@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * A {@link ManagedConnectionAdapter} which always returns the same connection (therefore cached),
+ * A {@link ConnectionHandlerAdapter} which always returns the same connection (therefore cached),
  * which is not established until {@link #getConnection()} is first invoked.
  * <p>
  * This implementation is thread-safe.
@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @param <Connection> the generic type of the connection being wrapped
  * @since 4.0
  */
-final class LazyCachedManagedConnection<Config, Connection> implements ManagedConnectionAdapter<Connection>
+final class CachedConnectionHandler<Config, Connection> implements ConnectionHandlerAdapter<Connection>
 {
 
     private final Config config;
@@ -42,10 +42,10 @@ final class LazyCachedManagedConnection<Config, Connection> implements ManagedCo
      * Creates a new instance
      *
      * @param config             the {@code Config} that owns the wrapped connection
-     * @param connectionProvider the {@link ConnectionProvider} to be used to managed the connetion
+     * @param connectionProvider the {@link ConnectionProvider} to be used to managed the connection
      * @param muleContext        the owning {@link MuleContext}
      */
-    public LazyCachedManagedConnection(Config config, ConnectionProvider<Config, Connection> connectionProvider, MuleContext muleContext)
+    public CachedConnectionHandler(Config config, ConnectionProvider<Config, Connection> connectionProvider, MuleContext muleContext)
     {
         this.config = config;
         this.connectionProvider = connectionProvider;
@@ -117,7 +117,7 @@ final class LazyCachedManagedConnection<Config, Connection> implements ManagedCo
         writeLock.lock();
         try
         {
-            if (connectionProvider != null)
+            if (connectionProvider != null && connection != null)
             {
                 connectionProvider.disconnect(connection);
             }

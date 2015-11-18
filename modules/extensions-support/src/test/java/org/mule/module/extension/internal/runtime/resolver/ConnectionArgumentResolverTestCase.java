@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connection.ConnectionHandler;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -35,10 +35,10 @@ public class ConnectionArgumentResolverTestCase extends AbstractMuleTestCase
     @Test
     public void resolve() throws Exception
     {
-        ManagedConnection managedConnection = mock(ManagedConnection.class);
+        ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
         final Object connection = new Object();
-        when(managedConnection.getConnection()).thenReturn(connection);
-        when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(managedConnection);
+        when(connectionHandler.getConnection()).thenReturn(connection);
+        when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(connectionHandler);
 
         assertThat(resolver.resolve(operationContext), is(sameInstance(connection)));
     }

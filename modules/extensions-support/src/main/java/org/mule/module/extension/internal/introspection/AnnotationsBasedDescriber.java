@@ -18,6 +18,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extensible;
@@ -25,7 +26,6 @@ import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.ExtensionOf;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.connector.Provider;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
@@ -268,11 +268,11 @@ public final class AnnotationsBasedDescriber implements Describer
         String name = DEFAULT_CONNECTION_PROVIDER_NAME;
         String description = EMPTY;
 
-        Provider providerAnnotation = providerClass.getAnnotation(Provider.class);
-        if (providerAnnotation != null)
+        Alias aliasAnnotation = providerClass.getAnnotation(Alias.class);
+        if (aliasAnnotation != null)
         {
-            name = providerAnnotation.name() + CUSTOM_CONNECTION_PROVIDER_SUFFIX;
-            description = providerAnnotation.description();
+            name = aliasAnnotation.value() + CUSTOM_CONNECTION_PROVIDER_SUFFIX;
+            description = aliasAnnotation.description();
         }
 
         List<Class<?>> providerGenerics = getInterfaceGenerics(providerClass, ConnectionProvider.class);

@@ -7,7 +7,6 @@
 package org.mule.module.extension.internal.runtime.config;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
@@ -24,8 +23,8 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.module.extension.internal.util.IntrospectionUtils;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -148,16 +147,15 @@ public final class ConfigurationInstanceFactory<T>
             return;
         }
 
-        Class<? extends ConnectionProvider> providerClass = optionalConnectionProvider.get().getClass();
-        List<Class<?>> providerGenerics = getInterfaceGenerics(providerClass, ConnectionProvider.class);
+        ConnectionProvider provider = optionalConnectionProvider.get();
 
-        if (!configurationValue.getClass().isAssignableFrom(providerGenerics.get(0)))
+        if (!configurationValue.getClass().isAssignableFrom(IntrospectionUtils.getConfigType(provider)))
         {
             throw invalidConnectionProviderException(name);
         }
 
         Class<?> connectionType = getOperationsConnectionType(configurationModel.getExtensionModel());
-        if (connectionType != null && !providerGenerics.get(1).isAssignableFrom(connectionType))
+        if (connectionType != null && !IntrospectionUtils.getConnectionType(provider).isAssignableFrom(connectionType))
         {
             throw invalidConnectionProviderException(name);
         }

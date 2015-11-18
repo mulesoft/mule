@@ -6,11 +6,14 @@
  */
 package org.mule.module.extension.internal.capability.xml.schema;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.api.introspection.DataQualifier.LIST;
 import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
+import static org.mule.module.extension.internal.capability.xml.schema.PoolingSupport.REQUIRED;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_DESCRIPTION_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
@@ -26,6 +29,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_NAMESPACE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
@@ -190,11 +194,29 @@ public final class SchemaBuilder
         schema.getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
 
         final ExplicitGroup choice = new ExplicitGroup();
-        choice.setMinOccurs(BigInteger.ZERO);
+        choice.setMinOccurs(ZERO);
         choice.setMaxOccurs(UNBOUNDED);
 
+        addConnectionProviderPoolingProfile(choice, providerModel);
         registerParameters(providerType, choice, providerModel.getParameterModels());
         return this;
+    }
+
+    private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
+    {
+        PoolingSupport poolingSupport = SchemaBuilderUtils.getPoolingDefinition(providerModel);
+        if (poolingSupport == PoolingSupport.NOT_SUPPORTED)
+        {
+            return;
+        }
+
+        TopLevelElement objectElement = new TopLevelElement();
+
+        objectElement.setMinOccurs(poolingSupport == REQUIRED ? ONE : ZERO);
+        objectElement.setMaxOccurs("1");
+        objectElement.setRef(MULE_POOLING_PROFILE_TYPE);
+
+        choice.getParticle().add(objectFactory.createElement(objectElement));
     }
 
     public SchemaBuilder registerConfigElement(final ConfigurationModel configurationModel)
@@ -202,9 +224,8 @@ public final class SchemaBuilder
         ExtensionType config = registerExtension(configurationModel.getName());
         config.getAttributeOrAttributeGroup().add(createNameAttribute());
 
-
         final ExplicitGroup choice = new ExplicitGroup();
-        choice.setMinOccurs(new BigInteger("0"));
+        choice.setMinOccurs(ZERO);
         choice.setMaxOccurs(UNBOUNDED);
 
         addConnectionProviderElement(choice, configurationModel);
@@ -237,8 +258,8 @@ public final class SchemaBuilder
             TopLevelElement objectElement = new TopLevelElement();
 
             objectElement.setMinOccurs(getFirstImplicit(extensionModel.getConnectionProviders()) != null
-                                       ? BigInteger.ZERO
-                                       : BigInteger.ONE);
+                                       ? ZERO
+                                       : ONE);
 
             objectElement.setMaxOccurs("1");
             objectElement.setRef(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
@@ -252,7 +273,7 @@ public final class SchemaBuilder
         if (!getDynamicParameters(configurationModel).isEmpty())
         {
             TopLevelElement objectElement = new TopLevelElement();
-            objectElement.setMinOccurs(BigInteger.ZERO);
+            objectElement.setMinOccurs(ZERO);
             objectElement.setMaxOccurs("1");
             objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT);
 
@@ -455,7 +476,7 @@ public final class SchemaBuilder
         // this top level element is for declaring the object inside a config or operation
         TopLevelElement objectElement = new TopLevelElement();
         objectElement.setName(name);
-        objectElement.setMinOccurs(required ? BigInteger.ONE : BigInteger.ZERO);
+        objectElement.setMinOccurs(required ? ONE : ZERO);
         objectElement.setMaxOccurs("1");
         objectElement.setComplexType(newLocalComplexTypeWithBase(type, description));
         objectElement.setAnnotation(createDocAnnotation(description));
@@ -559,7 +580,7 @@ public final class SchemaBuilder
     {
         name = hyphenize(name);
 
-        BigInteger minOccurs = required ? BigInteger.ONE : BigInteger.ZERO;
+        BigInteger minOccurs = required ? ONE : ZERO;
         String collectionName = hyphenize(NameUtils.singularize(name));
         LocalComplexType collectionComplexType = generateCollectionComplexType(collectionName, description, type);
 
@@ -581,7 +602,7 @@ public final class SchemaBuilder
 
         final TopLevelElement collectionItemElement = new TopLevelElement();
         collectionItemElement.setName(name);
-        collectionItemElement.setMinOccurs(BigInteger.ZERO);
+        collectionItemElement.setMinOccurs(ZERO);
         collectionItemElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
 
         final DataType genericType = getFirstGenericType(type);
@@ -790,7 +811,7 @@ public final class SchemaBuilder
 
         TopLevelElement collectionElement = new TopLevelElement();
         collectionElement.setName(hyphenize(parameterModel.getName()));
-        collectionElement.setMinOccurs(parameterModel.isRequired() ? BigInteger.ONE : BigInteger.ZERO);
+        collectionElement.setMinOccurs(parameterModel.isRequired() ? ONE : ZERO);
         collectionElement.setMaxOccurs(maxOccurs);
         collectionElement.setComplexType(collectionComplexType);
         collectionElement.setAnnotation(createDocAnnotation(EMPTY));
@@ -809,7 +830,7 @@ public final class SchemaBuilder
 
         GroupRef group = new GroupRef();
         group.setRef(ref);
-        group.setMinOccurs(parameterModel.isRequired() ? BigInteger.ONE : BigInteger.ZERO);
+        group.setMinOccurs(parameterModel.isRequired() ? ONE : ZERO);
         group.setMaxOccurs(maxOccurs);
 
         return group;
