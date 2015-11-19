@@ -11,31 +11,20 @@ import static org.mule.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANN
 import org.mule.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.util.SystemUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Stack;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.xml.DefaultDocumentLoader;
 import org.springframework.beans.factory.xml.DocumentLoader;
-import org.springframework.util.xml.XmlValidationModeDetector;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.UserDataHandler;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.events.MutationEvent;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
@@ -43,30 +32,27 @@ import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Alternative to Spring's default document loader that uses <b>SAX</b> instead of <b>DOM</b> to parse the bean
- * definitions.
- * <p/>
- * Additionally, the elements in the parsed elements are augmented with metadata annotations.
+ * Alternative to Spring's default document loader that uses <b>SAX</b> to add metadata to the <b>DOM</b> elements that
+ * are the result of the default parser.
  * 
  * @since 3.8.0
  */
-public class MuleDocumentLoader implements DocumentLoader
+final class MuleDocumentLoader implements DocumentLoader
 {
 
-    /**
-     * JAXP attribute used to configure the schema language for validation.
-     */
-    private static final String SCHEMA_LANGUAGE_ATTRIBUTE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+    private static final UserDataHandler NULL_DATA_HANDLER = new UserDataHandler()
+    {
+        @Override
+        public void handle(short operation, String key, Object data, Node src, Node dst)
+        {
+            // Nothing to do.
+        }
+    };
 
-    /**
-     * JAXP attribute value indicating the XSD schema language.
-     */
-    private static final String XSD_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
-
-    private static final Log logger = LogFactory.getLog(MuleDocumentLoader.class);
+    private DocumentLoader defaultLoader = new DefaultDocumentLoader();
 
     /**
      * Load the {@link Document} at the supplied {@link InputSource} using the standard JAXP-configured XML parser.
@@ -75,121 +61,40 @@ public class MuleDocumentLoader implements DocumentLoader
     public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
                                  ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception
     {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Using JAXP provider [" + factory.getClass().getName() + "]");
-        }
-        Document doc = factory.newDocumentBuilder().newDocument();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        IOUtils.copy(inputSource.getByteStream(), output);
 
-        XMLReader documentReader = createDocumentReader(validationMode, namespaceAware);
+        InputSource defaultInputSource = new InputSource(new ByteArrayInputStream(output.toByteArray()));
+        InputSource enrichInputSource = new InputSource(new ByteArrayInputStream(output.toByteArray()));
 
-        SAXSource xmlSource = new SAXSource(createAnnotator(entityResolver, errorHandler, doc, documentReader), inputSource);
-        createSaxToDomTransformer(validationMode).transform(xmlSource, new DOMResult(doc));
+        Document doc = defaultLoader.loadDocument(defaultInputSource, entityResolver, errorHandler, validationMode, namespaceAware);
+
+        createSaxAnnotator(doc).parse(enrichInputSource);
+
         return doc;
     }
 
-    protected Transformer createSaxToDomTransformer(int validationMode) throws TransformerFactoryConfigurationError, TransformerConfigurationException
-    {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Using JAXP transformer provider [" + transformerFactory.getClass().getName() + "]");
-        }
-
-        if (validationMode != XmlValidationModeDetector.VALIDATION_NONE)
-        {
-            // by default saxon disables schema validation, so we have to reenable it manually.
-            if ("net.sf.saxon.TransformerFactoryImpl".equals(transformerFactory.getClass().getName()))
-            {
-                transformerFactory.setFeature("http://saxon.sf.net/feature/validation", true);
-            }
-        }
-
-        return transformerFactory.newTransformer();
-    }
-
-    protected XMLReader createDocumentReader(int validationMode, boolean namespaceAware) throws ParserConfigurationException, SAXException
+    protected XMLReader createSaxAnnotator(Document doc) throws ParserConfigurationException, SAXException
     {
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-        saxParserFactory.setNamespaceAware(namespaceAware);
-
-        if (validationMode != XmlValidationModeDetector.VALIDATION_NONE)
-        {
-            saxParserFactory.setValidating(true);
-            if (validationMode == XmlValidationModeDetector.VALIDATION_XSD)
-            {
-                // Enforce namespace aware for XSD...
-                saxParserFactory.setNamespaceAware(true);
-            }
-        }
-
         SAXParser saxParser = saxParserFactory.newSAXParser();
-        if (validationMode == XmlValidationModeDetector.VALIDATION_XSD)
-        {
-            saxParser.setProperty(SCHEMA_LANGUAGE_ATTRIBUTE, XSD_SCHEMA_LANGUAGE);
-        }
-
-        return saxParser.getXMLReader();
-    }
-
-    protected XmlMetadataAnnotator createAnnotator(EntityResolver entityResolver, ErrorHandler errorHandler, Document doc, XMLReader documentReader)
-    {
-        XmlMetadataAnnotator annotator = new XmlMetadataAnnotator(documentReader, doc);
-        if (entityResolver != null)
-        {
-            annotator.setEntityResolver(entityResolver);
-        }
-        if (errorHandler != null)
-        {
-            annotator.setErrorHandler(errorHandler);
-        }
-        return annotator;
+        XMLReader documentReader = saxParser.getXMLReader();
+        documentReader.setContentHandler(new XmlMetadataAnnotator(doc));
+        return documentReader;
     }
 
     /**
      * SAX filter that builds the metadata that will annotate the built nodes.
      */
-    private static class XmlMetadataAnnotator extends XMLFilterImpl
+    private final static class XmlMetadataAnnotator extends DefaultHandler
     {
         private Locator locator;
-        private Stack<Element> elementStack = new Stack<>();
+        private DomWalkerElement walker;
         private Stack<XmlMetadataAnnotations> annotationsStack = new Stack<>();
 
-        private UserDataHandler dataHandler = new UserDataHandler()
+        private XmlMetadataAnnotator(Document doc)
         {
-            /**
-             * Ensure metadata is copied to any new DOM node.
-             */
-            @Override
-            public void handle(short operation, String key, Object data, Node src, Node dst)
-            {
-                if (src != null && dst != null)
-                {
-                    XmlMetadataAnnotations metadataAnnotations = (XmlMetadataAnnotations) src.getUserData("metadataBuilder");
-                    if (metadataAnnotations != null)
-                    {
-                        dst.setUserData(METADATA_ANNOTATIONS_KEY, metadataAnnotations, dataHandler);
-                    }
-                }
-            }
-        };
-
-        private XmlMetadataAnnotator(XMLReader xmlReader, Document dom)
-        {
-            super(xmlReader);
-
-            // Add listener to DOM, so we know which node was added.
-            EventListener modListener = new EventListener()
-            {
-                @Override
-                public void handleEvent(Event e)
-                {
-                    EventTarget target = ((MutationEvent) e).getTarget();
-                    elementStack.push((Element) target);
-                }
-            };
-            ((EventTarget) dom).addEventListener("DOMNodeInserted", modListener, true);
+            this.walker = new DomWalkerElement(doc.getDocumentElement());
         }
 
         @Override
@@ -202,7 +107,7 @@ public class MuleDocumentLoader implements DocumentLoader
         @Override
         public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
         {
-            super.startElement(uri, localName, qName, atts);
+            walker = walker.walkIn();
 
             XmlMetadataAnnotations metadataBuilder = new XmlMetadataAnnotations(locator.getLineNumber());
             metadataBuilder.appendElementStart(qName, atts);
@@ -212,16 +117,12 @@ public class MuleDocumentLoader implements DocumentLoader
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException
         {
-            super.characters(ch, start, length);
-
             annotationsStack.peek().appendElementBody(new String(ch, start, length).trim());
         }
 
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException
         {
-            super.endElement(uri, localName, qName);
-
             XmlMetadataAnnotations metadataAnnotations = annotationsStack.pop();
             metadataAnnotations.appendElementEnd(qName);
 
@@ -230,8 +131,56 @@ public class MuleDocumentLoader implements DocumentLoader
                 annotationsStack.peek().appendElementBody(SystemUtils.LINE_SEPARATOR + metadataAnnotations.getElementString() + SystemUtils.LINE_SEPARATOR);
             }
 
-            Element node = elementStack.pop();
-            node.setUserData(METADATA_ANNOTATIONS_KEY, metadataAnnotations, dataHandler);
+            walker.getParentNode().setUserData(METADATA_ANNOTATIONS_KEY, metadataAnnotations, NULL_DATA_HANDLER);
+            walker = walker.walkOut();
+        }
+    }
+
+    /**
+     * Allows for sequential navigation of a DOM tree.
+     */
+    private final static class DomWalkerElement
+    {
+        private final DomWalkerElement parent;
+        private final Node node;
+
+        private int childIndex = 0;
+
+        public DomWalkerElement(Node node)
+        {
+            this.parent = null;
+            this.node = node;
+        }
+
+        private DomWalkerElement(DomWalkerElement parent, Node node)
+        {
+            this.parent = parent;
+            this.node = node;
+        }
+
+        public DomWalkerElement walkIn()
+        {
+            Node nextChild = node.getChildNodes().item(childIndex++);
+            while (nextChild != null && nextChild.getNodeType() != Node.ELEMENT_NODE)
+            {
+                nextChild = node.getChildNodes().item(childIndex++);
+            }
+            return new DomWalkerElement(this, nextChild);
+        }
+
+        public DomWalkerElement walkOut()
+        {
+            Node nextSibling = parent.node.getNextSibling();
+            while (nextSibling != null && nextSibling.getNodeType() != Node.ELEMENT_NODE)
+            {
+                nextSibling = nextSibling.getNextSibling();
+            }
+            return new DomWalkerElement(parent.parent, nextSibling);
+        }
+
+        public Node getParentNode()
+        {
+            return parent.node;
         }
     }
 }

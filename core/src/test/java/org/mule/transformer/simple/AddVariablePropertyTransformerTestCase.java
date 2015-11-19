@@ -171,6 +171,12 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void testAddVariableWithEmptyKey() throws InitialisationException, TransformerException
+    {
+        addVariableTransformer.setIdentifier("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void testAddVariableWithNullValue() throws InitialisationException, TransformerException
     {
         addVariableTransformer.setValue(null);

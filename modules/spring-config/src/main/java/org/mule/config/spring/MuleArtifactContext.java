@@ -202,8 +202,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
         // annotate parsed elements with metadata
 
-        //TODO: Reenable after bugs of MULE-9012 are fixed and type is no longer lost in the element
-        //beanDefinitionReader.setDocumentLoader(new MuleDocumentLoader());
+        beanDefinitionReader.setDocumentLoader(new MuleDocumentLoader());
         // hook in our custom hierarchical reader
         beanDefinitionReader.setDocumentReaderClass(getBeanDefinitionDocumentReaderClass());
         // add error reporting

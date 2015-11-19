@@ -16,9 +16,9 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
 /**
- *  Provides access to a RandomAccessFile for queue data.
- *
- *  Sanitizes the queue file names in case they are invalid.
+ * Provides access to a RandomAccessFile for queue data.
+ * <p/>
+ * Sanitizes the queue file names in case they are invalid.
  */
 public class QueueFileProvider
 {
@@ -37,7 +37,7 @@ public class QueueFileProvider
         {
             createQueueFile();
         }
-        catch(IOException e)
+        catch (IOException e)
         {
             //if file system does not support the name provided then use a hex representation of the name.
             this.file = new File(storeDirectory, toHex(fileName));
@@ -92,16 +92,23 @@ public class QueueFileProvider
 
     /**
      * recreates the file from scratch doing a delete then create.
+     *
      * @throws IOException
      */
     public void recreate() throws IOException
     {
-        FileUtils.deleteQuietly(file);
+        delete();
         createQueueFile();
+    }
+
+    public void delete()
+    {
+        FileUtils.deleteQuietly(file);
     }
 
     /**
      * closes the random access file.
+     *
      * @throws IOException
      */
     public void close() throws IOException

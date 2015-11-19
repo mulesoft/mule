@@ -77,8 +77,8 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xslt-text", new XsltTextDefinitionParser("xslt", String.class));
 
         //XQuery
-        registerBeanDefinitionParser("xquery-transformer", new TransformerMessageProcessorDefinitionParser(XQueryTransformer.class));
-        registerBeanDefinitionParser("xquery-text", new TextDefinitionParser("xquery"));
+        registerBeanDefinitionParser("xquery-transformer", new MessageProcessorDefinitionParser(XQueryTransformer.class));
+        registerBeanDefinitionParser("xquery-text", new TextDefinitionParser("xquery", true));
 
         //Used by XQuery and XSLT
         registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));
