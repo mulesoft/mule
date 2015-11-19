@@ -37,16 +37,26 @@ public class SelectExecutor extends AbstractSingleQueryExecutor
     {
         ResultSet resultSet;
 
-        if (statement instanceof PreparedStatement)
+        try
         {
-            resultSet = ((PreparedStatement) statement).executeQuery();
-        }
-        else
-        {
-            resultSet = statement.executeQuery(query.getQueryTemplate().getSqlText());
-        }
+            if (statement instanceof PreparedStatement)
+            {
+                resultSet = ((PreparedStatement) statement).executeQuery();
+            }
+            else
+            {
+                resultSet = statement.executeQuery(query.getQueryTemplate().getSqlText());
+            }
 
-        return resultHandler.processResultSet(connection, resultSet);
+            return resultHandler.processResultSet(connection, resultSet);
+        }
+        finally
+        {
+            if (!resultHandler.requiresMultipleOpenedResults())
+            {
+                statement.close();
+            }
+        }
     }
 
     @Override

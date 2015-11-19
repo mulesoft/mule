@@ -13,13 +13,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Returns an unprocessed {@link ResultSet}
+ * Returns an unprocessed {@link ResultSet}.
+ * <p/>
+ * <b>Warning!</b>
+ * <p/>
+ * The consumer of the returned {@link ResultSet} will be responsible of closing it.
  */
 public class NullResultSetHandler implements ResultSetHandler
 {
 
     @Override
-    public Object processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
+    public ResultSet processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
     {
         return resultSet;
     }
