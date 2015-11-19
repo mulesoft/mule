@@ -93,6 +93,12 @@ public abstract class AbstractDataQualifierVisitor implements DataQualifierVisit
         defaultOperation();
     }
 
+    @Override
+    public void onVoid()
+    {
+        defaultOperation();
+    }
+
     protected void defaultOperation()
     {
         //no op

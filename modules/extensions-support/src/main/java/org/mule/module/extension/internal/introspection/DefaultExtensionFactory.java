@@ -36,6 +36,7 @@ import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
 import org.mule.module.extension.internal.introspection.validation.ModelValidator;
 import org.mule.module.extension.internal.introspection.validation.NameClashModelValidator;
+import org.mule.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
 import org.mule.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 import org.mule.util.CollectionUtils;
 import org.mule.util.ValueHolder;
@@ -80,6 +81,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         modelValidators = ImmutableList.<ModelValidator>builder()
                 .add(new NameClashModelValidator())
                 .add(new ConnectionProviderModelValidator())
+                .add(new OperationReturnTypeModelValidator())
                 .build();
     }
 
@@ -176,6 +178,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                            declaration.getDescription(),
                                            executorFactory,
                                            parameterModels,
+                                           declaration.getReturnType(),
                                            declaration.getModelProperties(),
                                            declaration.getInterceptorFactories());
     }
