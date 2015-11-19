@@ -14,11 +14,12 @@ import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getEarthRecord;
 import static org.mule.module.db.integration.TestRecordUtil.getMarsRecord;
 import static org.mule.module.db.integration.TestRecordUtil.getVenusRecord;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class SelectStreamingChunkTestCase extends AbstractDbIntegrationTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://selectStreamingChunks", TEST_MESSAGE, null);
 
-        List<MuleMessage> chunks = (List<MuleMessage>) response.getPayload();
+        List chunks = (List) response.getPayload();
         assertEquals(2, chunks.size());
         assertThat(chunks.get(0), is(List.class));
         assertRecords(chunks.get(0), getVenusRecord(), getEarthRecord());

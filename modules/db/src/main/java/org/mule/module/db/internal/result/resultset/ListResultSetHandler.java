@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Processes a {@link ResultSet} returning a list of maps
+ * Processes a {@link ResultSet} returning a list of maps.
+ * <p/>
+ * The processed {@link ResultSet} is closed immediately after fetching its data.
  */
 public class ListResultSetHandler implements ResultSetHandler
 {
@@ -30,17 +32,20 @@ public class ListResultSetHandler implements ResultSetHandler
     }
 
     @Override
-    public Object processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
+    public List<Map<String, Object>> processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
     {
         List<Map<String, Object>> results = new LinkedList<Map<String, Object>>();
-
-        while (resultSet.next())
+        try
         {
-            results.add(rowHandler.process(resultSet));
+            while (resultSet.next())
+            {
+                results.add(rowHandler.process(resultSet));
+            }
         }
-
-        resultSet.close();
-
+        finally
+        {
+            resultSet.close();
+        }
         return results;
     }
 
