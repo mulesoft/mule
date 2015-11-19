@@ -8,11 +8,13 @@
 package org.mule.module.db.integration.storedprocedure;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -21,13 +23,11 @@ import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureRe
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.internal.result.statement.StatementResultIterator;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -59,7 +59,7 @@ public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase
         MuleMessage response = client.send("vm://storedProcedureCustomTarget", TEST_MESSAGE, null);
 
         assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
-        assertThat(response.<StatementResultIterator>getInboundProperty("statementResult"), CoreMatchers.is(instanceOf(Map.class)));
+        assertThat(response.getInboundProperty("statementResult"), is(instanceOf(Map.class)));
         verifyUpdatedRecord();
     }
 

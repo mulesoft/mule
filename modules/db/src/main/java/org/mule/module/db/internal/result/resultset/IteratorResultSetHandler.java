@@ -15,7 +15,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Processes a {@link ResultSet} returning an iterator of maps
+ * Processes a {@link ResultSet} returning an iterator of maps.
+ * <p/>
+ * The {@link ResultSet} backing the returned {@link ResultSetIterator} will be closed when the connection it came from
+ * is closed.
  */
 public class IteratorResultSetHandler implements ResultSetHandler
 {
@@ -29,7 +32,7 @@ public class IteratorResultSetHandler implements ResultSetHandler
     }
 
     @Override
-    public Object processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
+    public ResultSetIterator processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
     {
         streamingResultSetCloser.trackResultSet(connection, resultSet);
 
