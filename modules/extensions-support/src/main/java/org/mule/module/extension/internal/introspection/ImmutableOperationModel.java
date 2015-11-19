@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
@@ -27,6 +28,7 @@ final class ImmutableOperationModel extends AbstractInterceptableModel implement
 
     private final List<ParameterModel> parameterModels;
     private final OperationExecutorFactory executorFactory;
+    private final DataType returnType;
 
     /**
      * Creates a new instance with the given state
@@ -35,6 +37,7 @@ final class ImmutableOperationModel extends AbstractInterceptableModel implement
      * @param description          the operation's descriptor
      * @param executorFactory      a {@link OperationExecutorFactory}. Cannot be {@code null}
      * @param parameterModels      a {@link List} with the operation's {@link ParameterModel parameterModels}
+     * @param returnType           a {@link DataType} which represents the operation's output
      * @param modelProperties      A {@link Map} of custom properties which extend this model
      * @param interceptorFactories A {@link List} with the {@link InterceptorFactory} instances that should be applied to instances built from this model
      * @throws IllegalArgumentException if {@code name} is blank or {@code executorFactory} is {@code null}
@@ -43,12 +46,14 @@ final class ImmutableOperationModel extends AbstractInterceptableModel implement
                             String description,
                             OperationExecutorFactory executorFactory,
                             List<ParameterModel> parameterModels,
+                            DataType returnType,
                             Map<String, Object> modelProperties,
                             List<InterceptorFactory> interceptorFactories)
     {
         super(name, description, modelProperties, interceptorFactories);
-
         checkArgument(executorFactory != null, String.format("Operation '%s' cannot have a null executor factory", name));
+
+        this.returnType = returnType;
         this.executorFactory = executorFactory;
         this.parameterModels = immutableList(parameterModels);
     }
@@ -69,5 +74,14 @@ final class ImmutableOperationModel extends AbstractInterceptableModel implement
     public OperationExecutor getExecutor()
     {
         return executorFactory.createExecutor();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DataType getReturnType()
+    {
+        return returnType;
     }
 }

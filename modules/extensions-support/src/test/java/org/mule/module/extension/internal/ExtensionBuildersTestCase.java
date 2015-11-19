@@ -20,8 +20,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.api.introspection.DataQualifier.BOOLEAN;
+import static org.mule.extension.api.introspection.DataQualifier.INTEGER;
 import static org.mule.extension.api.introspection.DataQualifier.LIST;
+import static org.mule.extension.api.introspection.DataQualifier.POJO;
 import static org.mule.extension.api.introspection.DataQualifier.STRING;
+import static org.mule.extension.api.introspection.DataQualifier.VOID;
 import static org.mule.extension.api.introspection.DataType.of;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
@@ -82,6 +85,7 @@ import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -243,6 +247,12 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
                                    .defaultingTo("static"));
     }
 
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void operationWithNoReturnType()
+    {
+        factory.createFrom(descriptor.withOperation("noReturn").describedAs(""));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void nameWithSpaces()
     {
@@ -312,6 +322,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     {
         OperationModel operationModel = operationModels.get(2);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(CONSUMER))));
+        assertDataType(operationModel.getReturnType(), InputStream.class, POJO);
 
         assertThat(operationModel.getName(), equalTo(CONSUMER));
         assertThat(operationModel.getDescription(), equalTo(GO_GET_THEM_TIGER));
@@ -326,6 +337,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     {
         OperationModel operationModel = operationModels.get(1);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(BROADCAST))));
+        assertDataType(operationModel.getReturnType(), void.class, VOID);
 
         assertThat(operationModel.getName(), equalTo(BROADCAST));
         assertThat(operationModel.getDescription(), equalTo(BROADCAST_DESCRIPTION));
@@ -341,6 +353,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     {
         OperationModel operationModel = operationModels.get(0);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(ARG_LESS))));
+        assertDataType(operationModel.getReturnType(), int.class, INTEGER);
 
         assertThat(operationModel.getName(), equalTo(ARG_LESS));
         assertThat(operationModel.getDescription(), equalTo(HAS_NO_ARGS));
@@ -375,6 +388,12 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         {
             assertThat(parameterModel.getDefaultValue(), is(nullValue()));
         }
+    }
+
+    private void assertDataType(DataType dataType, Class<?> expectedRawType, DataQualifier expectedQualifier)
+    {
+        assertThat(dataType.getRawType(), equalTo(expectedRawType));
+        assertThat(dataType.getQualifier(), is(expectedQualifier));
     }
 
     private DeclarationDescriptor createDeclarationDescriptor()

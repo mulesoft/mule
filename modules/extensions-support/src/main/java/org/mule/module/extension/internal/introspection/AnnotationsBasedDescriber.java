@@ -243,7 +243,8 @@ public final class AnnotationsBasedDescriber implements Describer
         {
             OperationDescriptor operation = declaration.withOperation(method.getName())
                     .withModelProperty(ImplementingMethodModelProperty.KEY, new ImplementingMethodModelProperty(method))
-                    .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method));
+                    .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method))
+                    .whichReturns(IntrospectionUtils.getMethodReturnType(method));
 
             declareOperationParameters(method, operation);
             calculateExtendedTypes(actingClass, method, operation);
