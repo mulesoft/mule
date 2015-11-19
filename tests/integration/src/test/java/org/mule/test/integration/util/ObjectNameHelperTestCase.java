@@ -42,9 +42,6 @@ public class ObjectNameHelperTestCase extends AbstractMuleContextTestCase
         // Test generating a unique name when there is a matching endpoint
         ep = muleContext.getEndpointFactory().getInboundEndpoint("vm://my.queue");
         assertEquals("endpoint.vm.my.queue", ep.getName());
-        ep = muleContext.getEndpointFactory().getInboundEndpoint(
-            "pop3://ross:secret@mail.mycompany.com?subject=foo");
-        assertEquals("endpoint.pop3.ross.mycompany.com", ep.getName());
     }
 
     @Test

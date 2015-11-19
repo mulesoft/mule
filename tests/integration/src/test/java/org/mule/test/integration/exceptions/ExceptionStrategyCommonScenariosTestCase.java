@@ -8,17 +8,15 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.message.ExceptionMessage;
@@ -27,16 +25,10 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
-import org.mule.transport.email.FixedPortGreenMailSupport;
-import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import javax.mail.internet.MimeMessage;
 
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
@@ -178,33 +170,6 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         {
             throw e.getCause();
         }
-    }
-
-    @Test
-    public void testRollbackTransactionAndSendAnEmail() throws Exception
-    {
-        FixedPortGreenMailSupport greenMailSupport = new FixedPortGreenMailSupport(dynamicPort2.getNumber());
-
-        List<Integer> ports = new ArrayList<Integer>(6);
-        ports.add(dynamicPort1.getNumber());
-        ports.add(dynamicPort2.getNumber());
-        ports.add(dynamicPort3.getNumber());
-        ports.add(dynamicPort4.getNumber());
-        ports.add(dynamicPort5.getNumber());
-        ports.add(dynamicPort6.getNumber());
-
-        greenMailSupport.startServers(ports);
-        LocalMuleClient client = muleContext.getClient();
-        client.dispatch("jms://in6?connector=jmsConnectorNoRedelivery", MESSAGE_TO_SEND, null);
-        endMessageProcessorExecuted.await(TIMEOUT, TimeUnit.MILLISECONDS);
-        ((Lifecycle) getFlowConstruct("RollbackTransactionAndSendEmail")).stop();
-        MuleMessage response = client.request("jms://in6?connector=jmsConnectorNoRedelivery", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(getPayloadAsString(response), is(MESSAGE_TO_SEND));
-        greenMailSupport.getServers().waitForIncomingEmail(AbstractEmailFunctionalTestCase.DELIVERY_DELAY_MS, 1);
-        MimeMessage[] messages = greenMailSupport.getServers().getReceivedMessages();
-        assertNotNull("did not receive any messages", messages);
-        assertEquals("did not receive 1 mail", 1, messages.length);
     }
 
     public static class EndMessageProcessor implements MessageProcessor

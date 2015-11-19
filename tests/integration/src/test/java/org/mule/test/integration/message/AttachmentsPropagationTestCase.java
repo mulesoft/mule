@@ -13,10 +13,10 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.message.ds.StringDataSource;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.email.transformers.PlainTextDataSource;
 
 import java.util.Set;
 
@@ -60,7 +60,7 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
 
         // add an attachment, named after the componentname...
         String attachmentName = context.getFlowConstruct().getName();
-        DataHandler dataHandler = new DataHandler(new PlainTextDataSource("text/plain", ATTACHMENT_CONTENT));
+        DataHandler dataHandler = new DataHandler(new StringDataSource(ATTACHMENT_CONTENT, "doesNotMatter", "text/plain"));
         message.addOutboundAttachment(attachmentName, dataHandler);
 
         // return the list of attachment names
