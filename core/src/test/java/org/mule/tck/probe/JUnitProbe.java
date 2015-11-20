@@ -23,6 +23,8 @@ public abstract class JUnitProbe implements Probe
 
     private static final Logger logger = LoggerFactory.getLogger(JUnitProbe.class);
 
+    private AssertionError lastFailure;
+
     /**
      * Invokes {@link #test()} and returns its outcome, provided that it didn't
      * threw any {@link java.lang.Exception} or {@link java.lang.AssertionError}.
@@ -34,6 +36,11 @@ public abstract class JUnitProbe implements Probe
         try
         {
             return test();
+        }
+        catch (AssertionError e)
+        {
+            this.lastFailure = e;
+            return false;
         }
         catch (Throwable e)
         {
@@ -49,4 +56,10 @@ public abstract class JUnitProbe implements Probe
      * @throws Exception
      */
     protected abstract boolean test() throws Exception;
+
+    @Override
+    public String describeFailure()
+    {
+        return lastFailure.getMessage();
+    }
 }
