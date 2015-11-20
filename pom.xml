@@ -255,7 +255,7 @@
         <xmlSecurityVersion>1.5.3</xmlSecurityVersion>
         <xstreamVersion>1.4.7</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
-        <muleCommonVersion>3.5.0-M5-SNAPSHOT</muleCommonVersion>
+        <muleCommonVersion>3.8.0-SNAPSHOT</muleCommonVersion>
     </properties>
 
     <dependencies>
