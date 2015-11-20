@@ -85,6 +85,7 @@ import org.mockito.verification.VerificationMode;
 public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 {
 
+    private static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
     protected static final int DEPLOYMENT_TIMEOUT = 10000;
     protected static final String[] NONE = new String[0];
     protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
@@ -514,7 +515,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + dummyAppDescriptor.path, MULE_CONFIG_XML_FILE);
-        configFile.setLastModified(configFile.lastModified() + 1000);
+        configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
     }
@@ -532,7 +533,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + dummyAppDescriptor.path, MULE_CONFIG_XML_FILE);
-        configFile.setLastModified(configFile.lastModified() + 1000);
+        configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
     }
@@ -557,7 +558,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + incompleteAppDescriptor.path, MULE_CONFIG_XML_FILE);
-        configFile.setLastModified(configFile.lastModified() + 1000);
+        configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppDescriptor.id);
     }
@@ -582,7 +583,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + incompleteAppDescriptor.path, MULE_CONFIG_XML_FILE);
-        configFile.setLastModified(configFile.lastModified() + 1000);
+        configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppDescriptor.id);
     }
@@ -690,6 +691,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         String correctDomainConfigContent = IOUtils.toString(new FileInputStream(domainConfigFile));
         String wrongDomainFileContext = correctDomainConfigContent.replace("http-config", "http-config-wrong");
         FileUtils.copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
+        long firstFileTimestamp = domainConfigFile.lastModified();
 
         deploymentService.start();
 
@@ -701,6 +703,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(domainDeploymentListener);
 
         FileUtils.copyInputStreamToFile(new ByteArrayInputStream(correctDomainConfigContent.getBytes()), domainConfigFile);
+        alterTimestampIfNeeded(domainConfigFile, firstFileTimestamp);
 
         assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainDescriptor.id);
         assertDeploymentSuccess(applicationDeploymentListener, sharedHttpAppADescriptor.id);
@@ -728,7 +731,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + dummyAppDescriptor.path, MULE_CONFIG_XML_FILE);
-        configFile.setLastModified(configFile.lastModified() + 1000);
+        configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
         assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
@@ -1475,6 +1478,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        File dummyDomainFile = new File(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        long firstFileTimestamp = dummyDomainFile.lastModified();
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
@@ -1484,6 +1489,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(domainDeploymentListener);
 
         addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
         assertUndeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
@@ -1497,6 +1503,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        File dummyDomainFile = new File(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        long firstFileTimestamp = dummyDomainFile.lastModified();
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
@@ -1506,6 +1514,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(domainDeploymentListener);
 
         addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
         assertUndeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
@@ -1519,6 +1528,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     public void redeploysDomainZipRefreshesApps() throws IOException
     {
         addPackedDomainFromResource(dummyDomainDescriptor.zipPath);
+        File dummyDomainFile = new File(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        long firstFileTimestamp = dummyDomainFile.lastModified();
 
         addPackedAppFromResource(dummyDomainApp1Descriptor.zipPath);
 
@@ -1530,6 +1541,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(domainDeploymentListener);
 
         addPackedDomainFromResource(dummyDomainDescriptor.zipPath);
+        alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
+
         assertUndeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
         assertUndeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
@@ -1540,6 +1553,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     public void redeploysDomainZipDeployedAfterStartup() throws Exception
     {
         addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        File dummyDomainFile = new File(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        long firstFileTimestamp = dummyDomainFile.lastModified();
 
         deploymentService.start();
 
@@ -1551,11 +1566,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(domainDeploymentListener);
 
         addPackedDomainFromResource(DeploymentServiceTestCase.dummyDomainDescriptor.zipPath);
+        alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
         assertUndeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
         assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
         assertDomainDir(NONE, new String[] {dummyDomainDescriptor.id}, true);
+    }
+
+    protected void alterTimestampIfNeeded(File file, long firstTimestamp)
+    {
+        if (firstTimestamp == file.lastModified())
+        {
+            // File systems only have second precision. If both file writes happen during the same second, the last
+            // change will be ignored by the directory scanner.
+            file.setLastModified(file.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
+        }
     }
 
     @Test
@@ -1936,6 +1962,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // Deploy domain and apps and wait until success
         addPackedDomainFromResource(domainDescriptor.zipPath);
+        long firstFileTimestamp = new File(domainDescriptor.zipPath).lastModified();
         addPackedAppFromResource(appADescriptor.zipPath);
         addPackedAppFromResource(appBDescriptor.zipPath);
         assertDeploymentSuccess(domainDeploymentListener, domainDescriptor.id);
@@ -1955,6 +1982,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         File domainFolder = new File(domainsDir.getPath(), domainDescriptor.id);
         File configFile = new File(domainFolder, domainDescriptor.configFilePath);
         FileUtils.touch(configFile);
+        alterTimestampIfNeeded(configFile, firstFileTimestamp);
 
         assertUndeploymentSuccess(applicationDeploymentListener, appADescriptor.id);
         assertUndeploymentSuccess(applicationDeploymentListener, appBDescriptor.id);
@@ -2311,7 +2339,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
 
         // let the file system's write-behind cache commit the delete operation?
-        Thread.sleep(1000);
+        Thread.sleep(FILE_TIMESTAMP_PRECISION_MILLIS);
 
         // zip stays intact, no app dir created
         assertAppsDir(new String[] {"broken-app.zip"}, NONE, true);
@@ -2345,7 +2373,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(domainDeploymentListener);
 
         // let the file system's write-behind cache commit the delete operation?
-        Thread.sleep(1000);
+        Thread.sleep(FILE_TIMESTAMP_PRECISION_MILLIS);
 
         // zip stays intact, no app dir created
         assertDomainDir(new String[] {"broken-domain.zip"}, NONE, true);
@@ -2461,26 +2489,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-        prober.check(new Probe()
+        prober.check(new JUnitProbe()
         {
             @Override
-            public boolean isSatisfied()
+            protected boolean test() throws Exception
             {
-                try
-                {
-                    verify(listener, times(1)).onDeploymentSuccess(artifactName);
-                    return true;
-                }
-                catch (AssertionError e)
-                {
-                    return false;
-                }
+                verify(listener, times(1)).onDeploymentSuccess(artifactName);
+                return true;
             }
 
             @Override
             public String describeFailure()
             {
-                return "Failed to deploy application: " + artifactName;
+                return "Failed to deploy application: " + artifactName + System.lineSeparator() + super.describeFailure();
             }
         });
     }
@@ -2488,26 +2509,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private void assertMuleContextCreated(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-        prober.check(new Probe()
+        prober.check(new JUnitProbe()
         {
             @Override
-            public boolean isSatisfied()
+            public boolean test()
             {
-                try
-                {
-                    verify(listener, times(1)).onMuleContextCreated(eq(appName), any(MuleContext.class));
-                    return true;
-                }
-                catch (AssertionError e)
-                {
-                    return false;
-                }
+                verify(listener, times(1)).onMuleContextCreated(eq(appName), any(MuleContext.class));
+                return true;
             }
 
             @Override
             public String describeFailure()
             {
-                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextCreated", appName);
+                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextCreated", appName) + System.lineSeparator() + super.describeFailure();
             }
         });
     }
@@ -2515,26 +2529,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private void assertMuleContextInitialized(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-        prober.check(new Probe()
+        prober.check(new JUnitProbe()
         {
             @Override
-            public boolean isSatisfied()
+            public boolean test()
             {
-                try
-                {
-                    verify(listener, times(1)).onMuleContextInitialised(eq(appName), any(MuleContext.class));
-                    return true;
-                }
-                catch (AssertionError e)
-                {
-                    return false;
-                }
+                verify(listener, times(1)).onMuleContextInitialised(eq(appName), any(MuleContext.class));
+                return true;
             }
 
             @Override
             public String describeFailure()
             {
-                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextInitialised", appName);
+                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextInitialised", appName) + System.lineSeparator() + super.describeFailure();
             }
         });
     }
@@ -2542,26 +2549,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private void assertMuleContextConfigured(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-        prober.check(new Probe()
+        prober.check(new JUnitProbe()
         {
             @Override
-            public boolean isSatisfied()
+            public boolean test()
             {
-                try
-                {
-                    verify(listener, times(1)).onMuleContextConfigured(eq(appName), any(MuleContext.class));
-                    return true;
-                }
-                catch (AssertionError e)
-                {
-                    return false;
-                }
+                verify(listener, times(1)).onMuleContextConfigured(eq(appName), any(MuleContext.class));
+                return true;
             }
 
             @Override
             public String describeFailure()
             {
-                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextConfigured", appName);
+                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextConfigured", appName) + System.lineSeparator() + super.describeFailure();
             }
         });
     }
@@ -2569,26 +2569,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private void assertUndeploymentSuccess(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-        prober.check(new Probe()
+        prober.check(new JUnitProbe()
         {
             @Override
-            public boolean isSatisfied()
+            public boolean test()
             {
-                try
-                {
-                    verify(listener, times(1)).onUndeploymentSuccess(appName);
-                    return true;
-                }
-                catch (AssertionError e)
-                {
-                    return false;
-                }
+                verify(listener, times(1)).onUndeploymentSuccess(appName);
+                return true;
             }
 
             @Override
             public String describeFailure()
             {
-                return "Failed to undeployArtifact application: " + appName;
+                return "Failed to undeployArtifact application: " + appName + System.lineSeparator() + super.describeFailure();
             }
         });
     }
@@ -2901,7 +2894,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             File configFile = new File(tempFolder, configFileName);
             if (configFile.exists())
             {
-                configFile.setLastModified(System.currentTimeMillis() + 1000);
+                configFile.setLastModified(System.currentTimeMillis() + FILE_TIMESTAMP_PRECISION_MILLIS);
             }
 
             File appFolder = new File(destinationDir, artifactName);
