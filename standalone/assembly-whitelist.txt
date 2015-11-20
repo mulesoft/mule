@@ -120,7 +120,7 @@
 #
 /mule-standalone-${productVersion}/lib/mule
 /mule-standalone-${productVersion}/lib/mule/mule-api-1.0.0-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-common-3.5.0-M5-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-common-3.8.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-SNAPSHOT.jar
@@ -289,6 +289,7 @@
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.5.jar
 /mule-standalone-${productVersion}/lib/opt/joni-2.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-4.6.jar
+/mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-core-1.7.4.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-stdlib-1.7.4.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-engine-1.1-jdk14.jar
