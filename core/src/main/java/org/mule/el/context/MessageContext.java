@@ -104,7 +104,7 @@ public class MessageContext
         return (T) muleContext.getTransformationService().getPayload(message, type);
     }
 
-    public Object payloadAs(DataType<?> dt) throws TransformerException
+    public <T> T payloadAs(DataType<T> dt) throws TransformerException
     {
         return muleContext.getTransformationService().getPayload(message,dt);
     }

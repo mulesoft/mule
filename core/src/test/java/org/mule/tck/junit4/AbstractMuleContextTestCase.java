@@ -642,7 +642,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected <T> T getPayload(MuleMessage message, DataType<T> dataType) throws Exception
     {
-        return (T) muleContext.getTransformationService().getPayload(message, dataType);
+        return muleContext.getTransformationService().getPayload(message, dataType);
     }
 
     /**

@@ -599,7 +599,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     @Override
-    public Object transformMessage(DataType outputType) throws TransformerException
+    public <T> T transformMessage(DataType<T> outputType) throws TransformerException
     {
         if (outputType == null)
         {

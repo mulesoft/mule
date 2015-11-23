@@ -9,13 +9,18 @@ package org.mule.transport.http.transformers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
+import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -99,11 +104,17 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         assertThat("Missing 'Date' header", hasDateHeader, is(true));
     }
 
-    private MuleMessage createMockMessage()
+    private MuleMessage createMockMessage() throws TransformerException
     {
         MuleMessage msg = mock(MuleMessage.class);
+        MuleContext muleContext = mock(MuleContext.class);
+        TransformationService transformationService = mock(TransformationService.class);
         DataType objectDataType = DataType.OBJECT_DATA_TYPE;
         when(msg.getDataType()).thenReturn(objectDataType);
+        when(msg.getMuleContext()).thenReturn(muleContext);
+        when(muleContext.getTransformationService()).thenReturn(transformationService);
+        doReturn((OutputHandler) (event, out) -> {
+        }).when(transformationService).getPayload(any(MuleMessage.class), any(DataType.class));
         return msg;
     }
 
