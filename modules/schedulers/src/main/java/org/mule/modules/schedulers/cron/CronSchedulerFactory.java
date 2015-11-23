@@ -8,7 +8,7 @@ package org.mule.modules.schedulers.cron;
 
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.SchedulerFactory;
-import org.mule.transport.PollingReceiverWorker;
+import org.mule.transport.polling.PollingWorker;
 
 
 /**
@@ -18,13 +18,13 @@ import org.mule.transport.PollingReceiverWorker;
  *
  * @since 3.5.0
  */
-public class CronSchedulerFactory extends SchedulerFactory<PollingReceiverWorker>
+public class CronSchedulerFactory extends SchedulerFactory<PollingWorker>
 {
 
     private String expression;
 
     @Override
-    protected Scheduler doCreate(String name, PollingReceiverWorker job)
+    protected Scheduler doCreate(String name, PollingWorker job)
     {
         CronScheduler cronScheduler = new CronScheduler(name, job, expression);
         cronScheduler.setMuleContext(context);

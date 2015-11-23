@@ -32,7 +32,6 @@ import org.mule.exception.ChoiceMessagingExceptionStrategy;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.ConnectException;
-import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
 import java.beans.ExceptionListener;
 import java.util.List;
@@ -102,11 +101,6 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                 ((Startable) getMessageProcessorChain(flowConstruct)).start();
             }
             getConnector().registerListener(this, getMessageProcessorChain(flowConstruct), flowConstruct);
-            MessageProcessor polledMp = getPolledMessageProcessor();
-            if (polledMp instanceof Startable)
-            {
-                 ((Startable)polledMp).start();
-            }
         }
         // Let connection exceptions bubble up to trigger the reconnection strategy.
         catch (ConnectException ce)
@@ -127,11 +121,6 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
             if (getMessageProcessorChain(flowConstruct) instanceof Stoppable)
             {
                 ((Stoppable) getMessageProcessorChain(flowConstruct)).stop();
-            }
-            MessageProcessor polledMp = getPolledMessageProcessor();
-            if (polledMp instanceof Stoppable)
-            {
-                ((Stoppable)polledMp).stop();
             }
         }
         catch (Exception e)
@@ -158,25 +147,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         {
             ((Initialisable) processorChain).initialise();
         }
-        MessageProcessor polledMp = getPolledMessageProcessor();
-        if (polledMp instanceof MuleContextAware)
-        {
-            ((MuleContextAware) polledMp).setMuleContext(getMuleContext());
-        }
-        if (polledMp instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) polledMp).setFlowConstruct(flowContruct);
-        }
-        if (polledMp instanceof Initialisable)
-        {
-            ((Initialisable) polledMp).initialise();
-        }
         return processorChain;
-    }
-
-    protected MessageProcessor getPolledMessageProcessor()
-    {
-        return (MessageProcessor) getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
     }
 
     public void setFlowConstruct(FlowConstruct flowConstruct)

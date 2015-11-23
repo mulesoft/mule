@@ -15,7 +15,7 @@
 
 
     <notifications dynamic="true">
-        <notification event="ENDPOINT-MESSAGE"/>
+        <notification event="CONNECTOR-MESSAGE"/>
     </notifications>
 
     <flow name="pollfoo">

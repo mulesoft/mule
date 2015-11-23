@@ -6,37 +6,28 @@
  */
 package org.mule.modules.schedulers.cron;
 
-import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.transport.AbstractPollingMessageReceiver;
-import org.mule.transport.PollingReceiverWorker;
+import org.mule.transport.polling.PollingTask;
+import org.mule.transport.polling.PollingWorker;
 
-import org.junit.Before;
 import org.junit.Test;
 
 
 public class CronSchedulerTest  extends AbstractMuleContextTestCase
 {
 
-    private AbstractPollingMessageReceiver receiver = mock(AbstractPollingMessageReceiver.class);
-    private InboundEndpoint endpoint = mock(InboundEndpoint.class);
     private Prober pollingProber = new PollingProber(1000, 0l);
 
-    @Before
-    public void setExpects()
-    {
-        when(receiver.getEndpoint()).thenReturn(endpoint);
-        when(receiver.getReceiverKey()).thenReturn("receiverKey");
-        when(endpoint.getName()).thenReturn("endpointName");
-
-    }
     @Test
     public void validateLifecycleHappyPath() throws MuleException
     {
@@ -60,18 +51,18 @@ public class CronSchedulerTest  extends AbstractMuleContextTestCase
     @Test
     public void startAfterStopShouldNotFail() throws Exception
     {
-        final TestPollingWorker job = new TestPollingWorker(receiver);
-        CronScheduler scheduler = createScheduler(job);
-
+        PollingWorker mockPollingWorker = mock(PollingWorker.class);
+        CronScheduler scheduler = createScheduler(mockPollingWorker);
 
         scheduler.initialise();
         scheduler.start();
         scheduler.stop();
+
+        reset(mockPollingWorker);
+
+        verify(mockPollingWorker, never()).run();
+
         scheduler.start();
-
-
-        assertFalse(job.wasRun);
-
         scheduler.schedule();
 
         pollingProber.check(new Probe()
@@ -79,7 +70,19 @@ public class CronSchedulerTest  extends AbstractMuleContextTestCase
             @Override
             public boolean isSatisfied()
             {
-                return job.wasRun;
+                try
+                {
+                    verify(mockPollingWorker, atLeastOnce()).run();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException("unexpected exception from mock task");
+                }
+                catch (AssertionError e)
+                {
+                    return false;
+                }
             }
 
             @Override
@@ -92,32 +95,16 @@ public class CronSchedulerTest  extends AbstractMuleContextTestCase
 
     private CronScheduler createVoidScheduler()
     {
-        CronScheduler scheduler = new CronScheduler("name", new PollingReceiverWorker(receiver), "0/1 * * * * ?");
+        CronScheduler scheduler = new CronScheduler("name", new PollingWorker(mock(PollingTask.class), muleContext.getExceptionListener()), "0/1 * * * * ?");
         scheduler.setMuleContext(muleContext);
         return scheduler;
     }
 
-    private CronScheduler createScheduler(PollingReceiverWorker job)
+    private CronScheduler createScheduler(PollingWorker worker)
     {
-        CronScheduler cronScheduler = new CronScheduler("name", job, "0/1 * * * * ?");
+        CronScheduler cronScheduler = new CronScheduler("name", worker, "0/1 * * * * ?");
         cronScheduler.setMuleContext(muleContext);
         return cronScheduler;
     }
 
-    private class TestPollingWorker extends PollingReceiverWorker
-    {
-
-        boolean wasRun;
-
-        public TestPollingWorker(AbstractPollingMessageReceiver pollingMessageReceiver)
-        {
-            super(pollingMessageReceiver);
-        }
-
-        @Override
-        public void run()
-        {
-            wasRun = true;
-        }
-    }
 }

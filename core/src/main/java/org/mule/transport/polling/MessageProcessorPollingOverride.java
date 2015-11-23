@@ -25,4 +25,23 @@ public abstract class MessageProcessorPollingOverride
      * @return a new interceptor instance that cn be used to alter the functionality of a message processor polling component
      */
     public abstract MessageProcessorPollingInterceptor interceptor();
+
+
+    /**
+     * Override implementation that doesn't change anything. Used as a default when no override is defined
+     */
+    public static class NullOverride extends MessageProcessorPollingOverride
+    {
+
+        private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor()
+        {
+        };
+
+        @Override
+        public MessageProcessorPollingInterceptor interceptor()
+        {
+            return noOpInterceptor;
+        }
+    }
+
 }
