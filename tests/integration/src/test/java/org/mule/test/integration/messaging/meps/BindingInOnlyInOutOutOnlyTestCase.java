@@ -34,6 +34,6 @@ public class BindingInOnlyInOutOutOnlyTestCase extends FunctionalTestCase
 
         MuleMessage result = client.request("receivedEndpoint", TIMEOUT);
         assertNotNull(result);
-        assertEquals("Total: 15", result.getPayloadAsString());
+        assertEquals("Total: 15", getPayloadAsString(result));
     }
 }

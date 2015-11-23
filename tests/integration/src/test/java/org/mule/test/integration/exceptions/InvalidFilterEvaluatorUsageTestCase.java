@@ -68,7 +68,7 @@ public class InvalidFilterEvaluatorUsageTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().build();
         MuleMessage response = client.send("http://localhost:" + port.getNumber(), getTestMuleMessage(), httpRequestOptions);
-        assertTrue(response.getPayloadAsString().contains(evaluatorName));
-        assertTrue(response.getPayloadAsString().contains("java.lang.UnsupportedOperationException"));
+        assertTrue(getPayloadAsString(response).contains(evaluatorName));
+        assertTrue(getPayloadAsString(response).contains("java.lang.UnsupportedOperationException"));
     }
 }

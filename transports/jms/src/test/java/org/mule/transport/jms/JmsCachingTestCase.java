@@ -40,15 +40,15 @@ public class JmsCachingTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null);
-        assertThat(TEST_MESSAGE_1, equalTo(response.getPayloadAsString()));
+        assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
         response = client.send("vm://testInput", TEST_MESSAGE_2, null);
-        assertThat(TEST_MESSAGE_2, equalTo(response.getPayloadAsString()));
+        assertThat(TEST_MESSAGE_2, equalTo(getPayloadAsString(response)));
 
         Set<String> responses = new HashSet<String>();
         response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-        responses.add(response.getPayloadAsString());
+        responses.add(getPayloadAsString(response));
         response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-        responses.add(response.getPayloadAsString());
+        responses.add(getPayloadAsString(response));
 
         assertThat(responses, hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_2)));
     }

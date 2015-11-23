@@ -36,7 +36,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         MuleMessage result = client.send("clientEndpoint1", null, props);
-        assertEquals("boobar", result.getPayloadAsString());
+        assertEquals("boobar", getPayloadAsString(result));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
         props.put("foo", "noo");
         props.put("far", "nar");
         MuleMessage result = client.send("clientEndpoint2", null, props);
-        assertEquals("noonar", result.getPayloadAsString());
+        assertEquals("noonar", getPayloadAsString(result));
     }
 
     @Test(expected = DispatchException.class)

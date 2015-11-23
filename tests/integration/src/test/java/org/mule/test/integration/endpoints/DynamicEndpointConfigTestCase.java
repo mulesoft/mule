@@ -10,9 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.DataType;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,17 +38,17 @@ public class DynamicEndpointConfigTestCase extends FunctionalTestCase
         MuleMessage response = muleContext.getClient().send("vm://in1", msg);
         assertNotNull(response);
         assertNull(response.getExceptionPayload());
-        assertEquals("Data Received", response.getPayload(DataType.STRING_DATA_TYPE));
+        assertEquals("Data Received", getPayloadAsString(response));
 
         response = muleContext.getClient().send("vm://in2", msg);
         assertNotNull(response);
         assertNull(response.getExceptionPayload());
-        assertEquals("Data Received", response.getPayload(DataType.STRING_DATA_TYPE));
+        assertEquals("Data Received", getPayloadAsString(response));
 
         response = muleContext.getClient().send("vm://in3", msg);
         assertNotNull(response);
         assertNull(response.getExceptionPayload());
-        String payload = response.getPayload(DataType.STRING_DATA_TYPE);
+        String payload = getPayloadAsString(response);
         assertEquals("Data Also Received", payload);
     }
 }

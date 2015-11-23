@@ -6,6 +6,10 @@
  */
 package org.mule.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
@@ -16,17 +20,12 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class FilterExpressionParserTestCase extends AbstractMuleContextTestCase
 {
     @Test
     public void testSimpleFilters() throws Exception
     {
-        ExpressionFilterParser parser = new ExpressionFilterParser();
+        ExpressionFilterParser parser = new ExpressionFilterParser(muleContext);
         Filter f = parser.parseFilterString("#[regex:foo bar]");
         assertNotNull(f);
         assertTrue(f instanceof ExpressionFilter);

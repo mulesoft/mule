@@ -67,7 +67,7 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
     {
         try
         {
-            return ((MuleMessage) source).getPayloadAsString();
+            return muleContext.getTransformationService().getPayloadAsString((MuleMessage) source);
         }
         catch (Exception e)
         {

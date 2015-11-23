@@ -77,7 +77,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         muleContext.getClient().dispatch(getUrl(), getTestMuleMessage(new ByteArrayInputStream(TEST_MESSAGE.getBytes())), newOptions().method("POST").build());
         final MuleMessage vmMessage = getMessageReceivedByFlow();
         assertThat(vmMessage, notNullValue());
-        assertThat(vmMessage.getPayloadAsString(), is(TEST_MESSAGE));
+        assertThat(getPayloadAsString(vmMessage), is(TEST_MESSAGE));
         assertThat(vmMessage.getInboundProperty(HttpHeaders.Names.TRANSFER_ENCODING), Is.<Object>is(HttpHeaders.Values.CHUNKED));
     }
 
@@ -96,9 +96,9 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     public void sendHttpPutMethod() throws Exception
     {
         final MuleMessage response = muleContext.getClient().send(getUrl(), getTestMuleMessage(TEST_MESSAGE), newOptions().method(PUT_HTTP_METHOD).build());
-        assertThat(response.getPayloadAsString(), is(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), is(TEST_MESSAGE));
         final MuleMessage vmMessage = getMessageReceivedByFlow();
-        assertThat(vmMessage.getPayloadAsString(), is(TEST_MESSAGE));
+        assertThat(getPayloadAsString(vmMessage), is(TEST_MESSAGE));
         assertThat(vmMessage.getInboundProperty(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY), Is.<Object>is(PUT_HTTP_METHOD));
     }
 
@@ -106,14 +106,14 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     public void sendDisableRedirect() throws Exception
     {
         final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), getTestMuleMessage(NullPayload.class), newOptions().method(PUT_HTTP_METHOD).disableFollowsRedirect().build());
-        assertThat(response.getPayloadAsString(), is("test-response"));
+        assertThat(getPayloadAsString(response), is("test-response"));
     }
 
     @Test
     public void sendEnableRedirect() throws Exception
     {
         final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), getTestMuleMessage(NullPayload.class), newOptions().enableFollowsRedirect().build());
-        assertThat(response.getPayloadAsString(), is(NullPayload.getInstance().toString()));
+        assertThat(getPayloadAsString(response), is(NullPayload.getInstance().toString()));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         final MuleMessage message = getTestMuleMessage(NullPayload.class);
         final HttpRequestOptions options = newOptions().method(PUT_HTTP_METHOD).requestConfig(getRequestConfig()).build();
         final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), message, options);
-        assertThat(response.getPayloadAsString(), is(TEST_RESPONSE));
+        assertThat(getPayloadAsString(response), is(TEST_RESPONSE));
     }
 
     @Test
@@ -156,7 +156,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         final HttpRequestOptions options = newOptions().disableStatusCodeValidation().requestConfig(requestConfig).build();
         final MuleMessage response = muleContext.getClient().send(format("https://localhost:%s/", httpsPort.getNumber()), message, options);
         assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(200));
-        assertThat(response.getPayloadAsString(), is(TEST_RESPONSE));
+        assertThat(getPayloadAsString(response), is(TEST_RESPONSE));
     }
 
     public static class LatchMessageProcessor implements MessageProcessor

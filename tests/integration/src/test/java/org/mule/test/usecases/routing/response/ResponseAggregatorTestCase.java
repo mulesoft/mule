@@ -42,7 +42,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
         MuleMessage message = client.send("http://localhost:28081", getTestMuleMessage("request"), httpRequestOptions);
         assertNotNull(message);
-        assertEquals("Received: request", new String(message.getPayloadAsBytes()));
+        assertEquals("Received: request", new String(getPayloadAsBytes(message)));
     }
 
     @Test

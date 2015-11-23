@@ -76,7 +76,7 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
 
         event = flow.process(event);
 
-        assertThat(event.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
+        assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 
     @Override

@@ -9,15 +9,9 @@ package org.mule.transport.ftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.ReceiveException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,7 +36,7 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.request(getMuleFtpEndpoint(), getTimeout());
         assertNotNull(message);
-        assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(message));
 
         // verify that the file was deleted
         MuleMessage message2 = client.request(getMuleFtpEndpoint(), getTimeout());
@@ -57,7 +51,7 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.request(getMuleFtpEndpoint() + separator + TEST_FILE_NAME, getTimeout());
         assertNotNull(message);
-        assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(message));
         assertEquals(TEST_FILE_NAME, message.getInboundProperty("originalFilename"));
 
         // verify that the file was deleted
@@ -74,13 +68,13 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.request(getMuleFtpEndpoint() + separator + TEST_FILE_NAME, getTimeout());
         assertNotNull(message);
-        assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(message));
         assertEquals(TEST_FILE_NAME, message.getInboundProperty("originalFilename"));
         
         // retrieve file 2
         MuleMessage message2 = client.request(getMuleFtpEndpoint() + separator + TEST_FILE_NAME_2, getTimeout());
         assertNotNull(message2);
-        assertEquals(TEST_MESSAGE, message2.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(message2));
         assertEquals(TEST_FILE_NAME_2, message2.getInboundProperty("originalFilename"));
         
         // verify that all the files were deleted

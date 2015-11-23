@@ -34,6 +34,6 @@ public class HttpsPollingFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.request("vm://toTest", 60000);
         assertNotNull(message);
-        assertEquals("/ received", message.getPayloadAsString());
+        assertEquals("/ received", getPayloadAsString(message));
     }
 }

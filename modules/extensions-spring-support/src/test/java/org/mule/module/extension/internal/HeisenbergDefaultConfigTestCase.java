@@ -46,7 +46,7 @@ public class HeisenbergDefaultConfigTestCase extends ExtensionsFunctionalTestCas
     @Test
     public void usesDefaultConfig() throws Exception
     {
-        assertThat(runFlow("sayMyName").getMessage().getPayloadAsString(), is("Heisenberg"));
+        assertThat(getPayloadAsString(runFlow("sayMyName").getMessage()), is("Heisenberg"));
     }
 
     @Test

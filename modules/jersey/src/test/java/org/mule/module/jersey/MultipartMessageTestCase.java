@@ -56,6 +56,6 @@ public class MultipartMessageTestCase extends FunctionalTestCase
         OperationOptions options = newOptions().method("POST").build();
         MuleMessage result = client.send(format("http://localhost:%d/", port.getNumber()), testMuleMessage, options);
 
-        assertThat(result.getPayloadAsString(), is("Got " + UPLOADED_FILENAME));
+        assertThat(getPayloadAsString(result), is("Got " + UPLOADED_FILENAME));
     }
 }

@@ -52,7 +52,7 @@ public class UpdateTargetTestCase extends AbstractDbIntegrationTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://updateCustomTarger", TEST_MESSAGE, null);
 
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
         assertThat(response.<Integer>getInboundProperty("updateCount"), equalTo(1));
         verifyUpdatedRecord();
     }

@@ -60,7 +60,7 @@ public class HttpListenerMethodRoutingTestCase extends FunctionalTestCase
     public void callWithMethod() throws Exception
     {
         sendRequestAndAssertMethod(TEST_MESSAGE);
-        assertThat(muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT).getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT)), equalTo(TEST_MESSAGE));
     }
 
     @Test

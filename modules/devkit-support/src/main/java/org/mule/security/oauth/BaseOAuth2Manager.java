@@ -489,7 +489,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             {
                 try
                 {
-                    message.setPayload(message.getPayload(String.class));
+                    message.setPayload(muleContext.getTransformationService().getPayload(message, String.class));
                 }
                 catch (Exception e)
                 {

@@ -7,6 +7,7 @@
 package org.mule.tck.junit4;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -105,6 +106,18 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
             this.applicationName = applicationName;
             this.applicationResources = applicationResources;
         }
+    }
+
+    /**
+     * Uses {@link org.mule.TransformationService} to get a {@link String} representation of a message.
+     *
+     * @param message message to get payload from
+     * @return String representation of the message payload
+     * @throws Exception if there is an unexpected error obtaining the payload representation
+     */
+    protected String getPayloadAsString(MuleMessage message, MuleContext muleContext) throws Exception
+    {
+        return muleContext.getTransformationService().getPayloadAsString(message);
     }
 
 }

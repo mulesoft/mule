@@ -371,11 +371,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                 {
                     if (msg instanceof MuleMessageCollection)
                     {
-                        src = msg.getPayload(DataType.BYTE_ARRAY_DATA_TYPE);
+                        src = muleContext.getTransformationService().getPayload(msg, DataType.BYTE_ARRAY_DATA_TYPE);
                     }
                     else
                     {
-                        src = msg.getPayloadAsBytes();
+                        src = muleContext.getTransformationService().getPayloadAsBytes(msg);
                     }
                 }
                 catch (final Exception e)
@@ -471,7 +471,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         else
         {
             parts = new Part[msg.getOutboundAttachmentNames().size() + 1];
-            parts[i++] = new FilePart("payload", new ByteArrayPartSource("payload", msg.getPayloadAsBytes()));
+            parts[i++] = new FilePart("payload", new ByteArrayPartSource("payload", muleContext.getTransformationService().getPayloadAsBytes(msg)));
         }
 
         for (final Iterator<String> iterator = msg.getOutboundAttachmentNames().iterator(); iterator.hasNext(); i++)

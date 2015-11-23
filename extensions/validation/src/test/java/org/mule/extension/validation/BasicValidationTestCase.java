@@ -268,8 +268,8 @@ public class BasicValidationTestCase extends ValidationTestCase
     {
         final String flowName = "choice";
 
-        assertThat(runFlow(flowName, getTestEvent(VALID_EMAIL)).getMessage().getPayloadAsString(), is("valid"));
-        assertThat(runFlow(flowName, getTestEvent(INVALID_EMAIL)).getMessage().getPayloadAsString(), is("invalid"));
+        assertThat(getPayloadAsString(runFlow(flowName, getTestEvent(VALID_EMAIL)).getMessage()), is("valid"));
+        assertThat(getPayloadAsString(runFlow(flowName, getTestEvent(INVALID_EMAIL)).getMessage()), is("invalid"));
     }
 
     private void assertCustomValidator(String flowName,String customMessage, String expectedMessage) throws Exception

@@ -88,7 +88,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
             try
             {
                 logger.trace("Request payload: \n"
-                             + StringMessageUtils.truncate(message.getPayloadForLogging(), 100, false));
+                             + StringMessageUtils.truncate(muleContext.getTransformationService().getPayloadForLogging(message), 100, false));
                 if (route instanceof OutboundEndpoint)
                 {
                     logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
@@ -128,7 +128,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
                     try
                     {
                         logger.trace("Response payload: \n"
-                                     + StringMessageUtils.truncate(resultMessage.getPayloadForLogging(), 100,
+                                     + StringMessageUtils.truncate(muleContext.getTransformationService().getPayloadForLogging(resultMessage), 100,
                                                                    false));
                     }
                     catch (Exception e)

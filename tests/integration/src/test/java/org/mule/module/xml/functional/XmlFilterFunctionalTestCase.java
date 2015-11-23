@@ -35,7 +35,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
         MuleMessage response = client.request("notxml", TIMEOUT);
         assertNotNull(response);
         assertNotNull(response.getPayload());
-        assertEquals(STRING_MESSAGE, response.getPayloadAsString());
+        assertEquals(STRING_MESSAGE, getPayloadAsString(response));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
         MuleMessage response = client.request(endpoint, TIMEOUT * 2);
         assertNotNull(response);
         assertNotNull(response.getPayload());
-        assertEquals(xml, response.getPayloadAsString());
+        assertEquals(xml, getPayloadAsString(response));
     }
 
     @Test

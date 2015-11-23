@@ -323,7 +323,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         assertNotNull(result);
         assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING,
-            result.getMessage().getPayloadAsString());
+            getPayloadAsString(result.getMessage()));
     }
 
     @Test

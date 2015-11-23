@@ -55,7 +55,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         String expected = "<ns2:uploadAttachmentResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
                           "<result>OK</result></ns2:uploadAttachmentResponse>";
 
-        assertXMLEqual(expected, event.getMessage().getPayloadAsString());
+        assertXMLEqual(expected, getPayloadAsString(event.getMessage()));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
     {
         assertEquals(1, message.getInboundAttachmentNames().size());
 
-        String attachmentId = extractAttachmentId(message.getPayloadAsString());
+        String attachmentId = extractAttachmentId(getPayloadAsString(message));
         DataHandler attachment = message.getInboundAttachment(attachmentId);
 
         assertNotNull(attachment);

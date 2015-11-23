@@ -31,12 +31,14 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
     public static final String SESSION_VARS = "sessionVars";
 
     private MuleMessage muleMessage;
+    private MuleContext muleContext;
 
     public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration,
                                           final MuleContext muleContext,
                                           final MuleMessage message)
     {
         this.muleMessage = message;
+        this.muleContext = muleContext;
     }
 
     /**
@@ -71,12 +73,12 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
             if (MESSAGE.equals(name))
             {
                 return new MuleImmutableVariableResolver<MessageContext>(MESSAGE, new MessageContext(
-                    muleMessage), null);
+                    muleMessage, muleContext), null);
             }
             else if (PAYLOAD.equals(name))
             {
                 return new MuleVariableResolver<Object>(PAYLOAD, new MessageContext(
-                        muleMessage).getPayload(), null,
+                        muleMessage, muleContext).getPayload(), null,
                     new VariableAssignmentCallback<Object>()
                     {
                         @Override

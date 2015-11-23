@@ -110,7 +110,8 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             try
             {
                 MuleMessage message = event.getMessage();
-                message.applyTransformers(event, this);
+
+                muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this);
                 if (message instanceof DefaultMessageCollection)
                 {
                     if (((DefaultMessageCollection) message).isInvalidatedPayload())

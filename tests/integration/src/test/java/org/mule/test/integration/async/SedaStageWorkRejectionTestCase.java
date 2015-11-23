@@ -61,7 +61,7 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
             assertThat(result, is(notNullValue()));
             assertThat(result.getExceptionPayload(), is(nullValue()));
             assertThat(result.getPayload(), not(instanceOf(NullPayload.class)));
-            assertThat(result.getPayloadAsString(), containsString(TEST_MESSAGE));
+            assertThat(getPayloadAsString(result), containsString(TEST_MESSAGE));
         }
 
         // Third message doesn't arrive

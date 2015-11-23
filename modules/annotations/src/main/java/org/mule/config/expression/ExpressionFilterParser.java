@@ -7,7 +7,9 @@
 package org.mule.config.expression;
 
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
 import org.mule.api.routing.filter.Filter;
+import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.OrFilter;
 
@@ -26,6 +28,19 @@ import java.util.List;
  */
 public class ExpressionFilterParser
 {
+
+    private MuleContext muleContext;
+
+    /**
+     * Creates new instance.
+     *
+     * @param muleContext the instance of {@link MuleContext} for the current application. Required.
+     */
+    public ExpressionFilterParser(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
     public Filter parseFilterString(String filterString) throws DefaultMuleException
     {
         List<String> strings = split(filterString);
@@ -44,15 +59,21 @@ public class ExpressionFilterParser
             }
             else if (filter instanceof AndFilter)
             {
-                ((AndFilter) filter).getFilters().add(new org.mule.routing.filters.ExpressionFilter(s));
+                ExpressionFilter expressionFilter = new ExpressionFilter(s);
+                expressionFilter.setMuleContext(muleContext);
+                ((AndFilter) filter).getFilters().add(expressionFilter);
             }
             else if (filter instanceof OrFilter)
             {
-                ((OrFilter) filter).getFilters().add(new org.mule.routing.filters.ExpressionFilter(s));
+                ExpressionFilter expressionFilter = new ExpressionFilter(s);
+                expressionFilter.setMuleContext(muleContext);
+                ((OrFilter) filter).getFilters().add(expressionFilter);
             }
             else if (filter == null)
             {
-                filter = new org.mule.routing.filters.ExpressionFilter(s);
+                ExpressionFilter expressionFilter = new ExpressionFilter(s);
+                expressionFilter.setMuleContext(muleContext);
+                filter = expressionFilter;
             }
             else
             {

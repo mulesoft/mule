@@ -45,6 +45,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextTestCase
     public void testMulticastingRouterAsync() throws Exception
     {
         RegExFilter filter = new RegExFilter("(.*) Message");
+        filter.setMuleContext(muleContext);
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test1", null, filter, null);
         assertNotNull(endpoint1);
@@ -87,6 +88,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextTestCase
 
         MulticastingRouter router = createObject(MulticastingRouter.class);
         RegExFilter filter = new RegExFilter("(.*) Message");
+        filter.setMuleContext(muleContext);
         router.setFilter(filter);
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add(mockendpoint1);
@@ -151,6 +153,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextTestCase
     public void testMulticastingRouterCorrelationIdPropagation() throws Exception
     {
         RegExFilter filter = new RegExFilter("(.*) Message");
+        filter.setMuleContext(muleContext);
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test1", null, filter, null);
         assertNotNull(endpoint1);

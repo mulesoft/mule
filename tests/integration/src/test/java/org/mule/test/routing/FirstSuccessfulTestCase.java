@@ -29,13 +29,13 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://input", "XYZ", null);
-        assertEquals("XYZ is a string", response.getPayloadAsString());
+        assertEquals("XYZ is a string", getPayloadAsString(response));
 
         response = client.send("vm://input", Integer.valueOf(9), null);
-        assertEquals("9 is an integer", response.getPayloadAsString());
+        assertEquals("9 is an integer", getPayloadAsString(response));
 
         response = client.send("vm://input", Long.valueOf(42), null);
-        assertEquals("42 is a number", response.getPayloadAsString());
+        assertEquals("42 is a number", getPayloadAsString(response));
 
         response = client.send("vm://input", Boolean.TRUE, null);
         assertNotNull(response);
@@ -50,7 +50,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://input2", "XYZ", null);
-        assertEquals("XYZ is a string", response.getPayloadAsString());
+        assertEquals("XYZ is a string", getPayloadAsString(response));
     }
 
     @Test

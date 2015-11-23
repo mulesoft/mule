@@ -53,6 +53,6 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
     public void acceptsValidCertificate() throws Exception
     {
         MuleEvent result = runFlow("validCertFlow", TEST_MESSAGE);
-        assertThat(result.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
+        assertThat(getPayloadAsString(result.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 }

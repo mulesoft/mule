@@ -71,7 +71,7 @@ public class FlowRefTestCase extends FunctionalTestCase
         MuleMessage msg = client.send("vm://two.flow.ref.to.sub.flow", new DefaultMuleMessage("0",
             muleContext));
 
-        assertEquals("012xyzabc312xyzabc3", msg.getPayloadAsString());
+        assertEquals("012xyzabc312xyzabc3", getPayloadAsString(msg));
 
     }
 

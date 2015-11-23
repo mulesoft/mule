@@ -11,10 +11,12 @@ import static org.mule.util.ClassUtils.isConsumable;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.config.i18n.MessageFactory;
 
 import java.io.NotSerializableException;
@@ -23,10 +25,11 @@ import java.io.Serializable;
 /**
  * Abstract class with common logic for until successful processing strategies.
  */
-public abstract class AbstractUntilSuccessfulProcessingStrategy implements UntilSuccessfulProcessingStrategy
+public abstract class AbstractUntilSuccessfulProcessingStrategy implements UntilSuccessfulProcessingStrategy, MuleContextAware
 {
 
     private UntilSuccessfulConfiguration untilSuccessfulConfiguration;
+    private MuleContext muleContext;
 
     @Override
     public void setUntilSuccessfulConfiguration(final UntilSuccessfulConfiguration untilSuccessfulConfiguration)
@@ -121,7 +124,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
             {
                 if (isConsumable(message.getPayload().getClass()))
                 {
-                    message.getPayloadAsBytes();
+                    muleContext.getTransformationService().getPayloadAsBytes(message);
                 }
                 else
                 {
@@ -130,8 +133,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
             }
             else
             {
-                message.getPayloadAsBytes();
-            }
+                muleContext.getTransformationService().getPayloadAsBytes(message);            }
         }
         catch (final Exception e)
         {
@@ -147,4 +149,9 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
         }
     }
 
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 }

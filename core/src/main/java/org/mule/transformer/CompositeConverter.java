@@ -6,6 +6,7 @@
  */
 package org.mule.transformer;
 
+import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -32,6 +33,7 @@ public class CompositeConverter implements Converter
     private String name;
 
     private LinkedList<Converter> chain;
+    private TransformationService transformationService;
 
     /**
      * Create a new conversion chain using the specified converters
@@ -48,6 +50,7 @@ public class CompositeConverter implements Converter
         chain = new LinkedList<Converter>();
 
         name = compositeConverterName(converters);
+        this.transformationService = transformationService;
     }
 
     private String compositeConverterName(Converter[] converters)
@@ -177,7 +180,7 @@ public class CompositeConverter implements Converter
         {
             try
             {
-                event.getMessage().applyTransformers(event, this);
+                event.getMuleContext().getTransformationService().applyTransformers(event.getMessage(), event, this);
             }
             catch (Exception e)
             {

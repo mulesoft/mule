@@ -39,7 +39,7 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
         msg.setOutboundProperty("foo", "bar");
         result = client.send("inboundEndpoint", msg);
         assertNotNull(result);
-        assertEquals("got it!", result.getPayloadAsString());
+        assertEquals("got it!", getPayloadAsString(result));
 
         FlowConstruct async = muleContext.getRegistry().lookupFlowConstruct(
                 "In-Out_Out-Only-Async-Service");

@@ -37,7 +37,7 @@ public class WSRMTest extends FunctionalTestCase
     {
         MuleClient client = new DefaultLocalMuleClient(muleContext);
         MuleMessage result = client.send("anonymousReplyClientEndpoint", new DefaultMuleMessage("test", muleContext));
-        assertEquals("Hello test", result.getPayloadAsString());
+        assertEquals("Hello test", getPayloadAsString(result));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class WSRMTest extends FunctionalTestCase
     {
         MuleClient client = new DefaultLocalMuleClient(muleContext);
         MuleMessage result = client.send("decoupledClientEndpoint", new DefaultMuleMessage("test", muleContext));
-        assertEquals("Hello test", result.getPayloadAsString());
+        assertEquals("Hello test", getPayloadAsString(result));
     }
 
 }

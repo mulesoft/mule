@@ -62,7 +62,7 @@ public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCa
         {
             message = client.request(name, 2000L);
             assertNotNull(message);
-            XMLUnit.compareXML("<" + number + ">" + number + "</" + number + ">", message.getPayloadAsString());
+            XMLUnit.compareXML("<" + number + ">" + number + "</" + number + ">", getPayloadAsString(message));
         }
 
         assertNull(client.request(name, 1000L));

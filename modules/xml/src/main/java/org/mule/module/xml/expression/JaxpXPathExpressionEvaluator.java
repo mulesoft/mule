@@ -160,7 +160,7 @@ public class JaxpXPathExpressionEvaluator extends AbstractExpressionEvaluator im
         }
         try
         {
-            Node payload = message.getPayload(DataTypeFactory.create(Node.class));
+            Node payload = (Node) muleContext.getTransformationService().getPayload(message, DataTypeFactory.create(Node.class));
 
             XPathExpression xpath = getXPath(expression);
 

@@ -7,6 +7,7 @@
 package org.mule.api;
 
 import org.mule.DataTypeConversionResolver;
+import org.mule.TransformationService;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
@@ -379,5 +380,22 @@ public interface MuleContext extends Lifecycle
      * @since 3.8.0
      */
     Collection<ExceptionContextProvider> getExceptionContextProviders();
+
+    /**
+     * Gets application wide instance of {@link TransformationService} used for applying
+     * {@link org.mule.api.transformer.Transformer}'s to a {@link MuleMessage} and for obtaining different
+     * representations of the message payload.
+     *
+     * @return transformation service
+     */
+    TransformationService getTransformationService();
+
+    /**
+     * Sets application wide instance of {@link TransformationService}
+     *
+     * @param transformationService transformation service instance
+     */
+    void setTransformationService(TransformationService transformationService);
+
 }
 

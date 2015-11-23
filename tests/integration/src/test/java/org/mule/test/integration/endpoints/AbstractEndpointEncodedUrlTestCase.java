@@ -66,7 +66,7 @@ public abstract class AbstractEndpointEncodedUrlTestCase extends FunctionalTestC
         messageProperties.put("path", "test");
         MuleMessage response = client.send(inputUrl, TEST_MESSAGE, messageProperties);
 
-        assertThat(response.getPayloadAsString(), equalTo("Processed: bar"));
+        assertThat(getPayloadAsString(response), equalTo("Processed: bar"));
     }
 
     protected abstract String getDynamicUrl();

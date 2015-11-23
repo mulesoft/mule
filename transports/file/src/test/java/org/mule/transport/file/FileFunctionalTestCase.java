@@ -78,6 +78,6 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         MuleClient client = muleContext.getClient();
         Thread.sleep(1000);
         MuleMessage message = client.request("vm://receive?connector=vmQueue", 100000);
-        assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(message));
     }
 }

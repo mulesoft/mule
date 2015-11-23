@@ -43,7 +43,7 @@ public class RoutingNotification extends ServerNotification
     {
         try
         {
-            return ((MuleMessage)source).getPayloadAsString();
+            return muleContext.getTransformationService().getPayloadAsString((MuleMessage)source);
         }
         catch (Exception e)
         {

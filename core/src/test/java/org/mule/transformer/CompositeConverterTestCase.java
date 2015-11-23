@@ -17,6 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -214,10 +215,14 @@ public class CompositeConverterTestCase
         CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
         MuleEvent event = mock(MuleEvent.class);
         MuleMessage message = mock(MuleMessage.class);
+        MuleContext muleContext = mock(MuleContext.class);
+        TransformationService transformationService = mock(TransformationService.class);
         doReturn(message).when(event).getMessage();
+        doReturn(muleContext).when(event).getMuleContext();
+        doReturn(transformationService).when(muleContext).getTransformationService();
 
         compositeConverter.process(event);
 
-        verify(message, times(1)).applyTransformers(event, compositeConverter);
+        verify(transformationService, times(1)).applyTransformers(event.getMessage(), event, compositeConverter);
     }
 }

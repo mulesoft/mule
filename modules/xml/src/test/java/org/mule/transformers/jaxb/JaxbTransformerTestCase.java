@@ -6,6 +6,8 @@
  */
 package org.mule.transformers.jaxb;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.jaxb.model.EmailAddress;
@@ -18,9 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class JaxbTransformerTestCase extends AbstractMuleContextTestCase
 {
@@ -36,7 +35,7 @@ public class JaxbTransformerTestCase extends AbstractMuleContextTestCase
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(PERSON_XML, muleContext);
-        Person person = message.getPayload(DataTypeFactory.create(Person.class));
+        Person person = getPayload(message, DataTypeFactory.create(Person.class));
         assertNotNull(person);
         assertEquals("John Doe", person.getName());
         assertEquals("01/01/1970", person.getDob());
@@ -53,7 +52,7 @@ public class JaxbTransformerTestCase extends AbstractMuleContextTestCase
         ByteArrayInputStream in = new ByteArrayInputStream(PERSON_XML.getBytes());
         DefaultMuleMessage msg = new DefaultMuleMessage(in, muleContext);
         msg.setInboundProperty("foo", "fooValue");
-        List<EmailAddress> emailAddresses = msg.getPayload(new ListDataType<List<EmailAddress>>(EmailAddress.class));
+        List<EmailAddress> emailAddresses = getPayload(msg, new ListDataType<List<EmailAddress>>(EmailAddress.class));
         assertNotNull(emailAddresses);
         assertEquals(2, emailAddresses.size());
         assertEquals("home", emailAddresses.get(0).getType());

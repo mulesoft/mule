@@ -53,8 +53,8 @@ public class RESTTestCase extends FunctionalTestCase
         MuleMessage reply  = client.send("vm://in1", new DefaultMuleMessage("IBM", muleContext));
 
         assertNotNull(reply);
-        assertNotNull(reply.getPayloadAsString());
-        assertTrue(reply.getPayloadAsString().indexOf("Symbol&gt;IBM&lt;") > -1);
+        assertNotNull(getPayloadAsString(reply));
+        assertTrue(getPayloadAsString(reply).indexOf("Symbol&gt;IBM&lt;") > -1);
     }
 
     @Test
@@ -63,8 +63,8 @@ public class RESTTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage reply  = client.send("vm://in2", new DefaultMuleMessage(new Object[]{"ARS","ARS"}, muleContext));
 
-        assertNotNull(reply.getPayloadAsString());
-        assertTrue(reply.getPayloadAsString().indexOf(">0</double>") > -1);
+        assertNotNull(getPayloadAsString(reply));
+        assertTrue(getPayloadAsString(reply).indexOf(">0</double>") > -1);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class RESTTestCase extends FunctionalTestCase
         MuleMessage reply  = client.send("vm://in3", new DefaultMuleMessage(new Object[]{"IBM"}, muleContext));
 
         assertNotNull(reply);
-        String replyStr = reply.getPayloadAsString();
+        String replyStr = getPayloadAsString(reply);
         assertNotNull(replyStr);
         assertTrue("'Symbol&gt;IBM&lt;' not found in reply: " + replyStr, replyStr.indexOf("Symbol&gt;IBM&lt;") > -1);
     }
@@ -85,7 +85,7 @@ public class RESTTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage reply  = client.send("vm://in4", new DefaultMuleMessage(new Object[]{"ARS","ARS"}, muleContext));
 
-        String replyStr = reply.getPayloadAsString();
+        String replyStr = getPayloadAsString(reply);
         System.out.println(replyStr);
         assertTrue("'>0</double>' not found in reply: " + replyStr, replyStr.indexOf(">0</double>") > -1);
     }

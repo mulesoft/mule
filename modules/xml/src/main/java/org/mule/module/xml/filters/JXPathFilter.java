@@ -108,7 +108,7 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
         {
             try
             {
-                return accept(obj.getPayloadAsString());
+                return accept(muleContext.getTransformationService().getPayloadAsString(obj));
             }
             catch (Exception e)
             {

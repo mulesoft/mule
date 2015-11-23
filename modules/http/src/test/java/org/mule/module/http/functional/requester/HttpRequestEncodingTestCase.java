@@ -72,7 +72,7 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase
     {
         Flow flow = (Flow) getFlowConstruct("encodingTest");
         MuleEvent result = flow.process(getTestEvent(TEST_MESSAGE));
-        assertThat(result.getMessage().getPayloadAsString(), is(testMessage));
+        assertThat(getPayloadAsString(result.getMessage()), is(testMessage));
     }
 
 }

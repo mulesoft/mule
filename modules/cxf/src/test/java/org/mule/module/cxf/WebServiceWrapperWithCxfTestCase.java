@@ -39,7 +39,7 @@ public class WebServiceWrapperWithCxfTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://testin", getTestMuleMessage(testString));
         assertNotNull(result.getPayload());
-        assertEquals("Payload", testString, result.getPayloadAsString());
+        assertEquals("Payload", testString, getPayloadAsString(result));
     }
 
     @Test
@@ -51,6 +51,6 @@ public class WebServiceWrapperWithCxfTestCase extends FunctionalTestCase
                                             + "/services/TestUMO?method=onReceive");
         MuleMessage result = client.send("vm://testin2", testString, props);
         assertNotNull(result.getPayload());
-        assertEquals("Payload", testString, result.getPayloadAsString());
+        assertEquals("Payload", testString, getPayloadAsString(result));
     }
 }

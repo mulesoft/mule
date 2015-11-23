@@ -28,6 +28,6 @@ public class TransactionWithRecipientListTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("vm://input", "test", null);
-        assertEquals("test Received", response.getPayloadAsString());
+        assertEquals("test Received", getPayloadAsString(response));
     }
 }

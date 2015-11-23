@@ -26,6 +26,6 @@ public class WSConsumerWithXMLTransformerTestCase extends AbstractWSConsumerFunc
     {
         Flow client = (Flow) getFlowConstruct("client");
         MuleEvent response = client.process(getTestEvent(ECHO_REQUEST));
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, response.getMessage().getPayloadAsString());
+        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response.getMessage()));
     }
 }

@@ -11,18 +11,14 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.journal.JournalEntry;
 import org.mule.util.queue.DefaultQueueStore;
-import org.mule.util.queue.QueueStore;
 
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 
-import org.hamcrest.core.IsNot;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,7 +57,7 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         assertThat(allEntries.get(TX_ID).size(), is(1));
         LocalQueueTxJournalEntry logEntry = allEntries.get(TX_ID).iterator().next();
         assertThat(logEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(((MuleEvent) logEntry.getValue()).getMessage().getPayloadAsString(), is(SOME_VALUE));
+        assertThat(getPayloadAsString(((MuleEvent) logEntry.getValue()).getMessage()), is(SOME_VALUE));
         assertThat(logEntry.isAdd(), is(true));
     }
 
@@ -78,7 +74,7 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         assertThat(allEntries.get(TX_ID).size(), is(1));
         LocalQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
         assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(((MuleEvent) journalEntry.getValue()).getMessage().getPayloadAsString(), is(SOME_VALUE));
+        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
         assertThat(journalEntry.isAddFirst(), is(true));
     }
 
@@ -95,7 +91,7 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         assertThat(allEntries.get(TX_ID).size(), is(1));
         LocalQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
         assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(((MuleEvent) journalEntry.getValue()).getMessage().getPayloadAsString(), is(SOME_VALUE));
+        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
         assertThat(journalEntry.isRemove(), is(true));
     }
 
@@ -155,7 +151,7 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         assertThat(allEntries.get(TX_ID).size(), is(numberOfOffers));
         LocalQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
         assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(((MuleEvent) journalEntry.getValue()).getMessage().getPayloadAsString(), is(SOME_VALUE));
+        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
         assertThat(journalEntry.isAdd(), is(true));
     }
 

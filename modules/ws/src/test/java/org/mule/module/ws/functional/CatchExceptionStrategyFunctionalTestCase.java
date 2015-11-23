@@ -71,7 +71,7 @@ public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumer
         // Assert that the exception was thrown
         listener.waitUntilAllNotificationsAreReceived();
 
-        assertXMLEqual(EXPECTED_SOAP_FAULT_DETAIL, response.getPayloadAsString());
+        assertXMLEqual(EXPECTED_SOAP_FAULT_DETAIL, getPayloadAsString(response));
 
         assertNull(response.getExceptionPayload());
 

@@ -6,6 +6,9 @@
  */
 package org.mule.transformer;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.fail;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
@@ -20,10 +23,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractTransformerTestCase extends AbstractMuleContextTestCase
 {
@@ -111,7 +110,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
             Transformer trans = this.getTransformer();
             Transformer trans2 = this.getRoundTripTransformer();
             MuleMessage message = new DefaultMuleMessage(getTestData(), muleContext);
-            message.applyTransformers(null, Arrays.asList(trans, trans2));
+            muleContext.getTransformationService().applyTransformers(message, null, Arrays.asList(trans, trans2));
             Object result = message.getPayload();
             this.compareRoundtripResults(this.getTestData(), result);
         }

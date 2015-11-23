@@ -76,7 +76,7 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalT
     {
         MuleMessage replyMessage = sendRequest("http://localhost:" + httpPortProxy.getNumber() + "/proxy-envelope", request);
         assertNotNull(replyMessage);
-        assertFalse(replyMessage.getPayloadAsString().contains("Fault"));
+        assertFalse(getPayloadAsString(replyMessage).contains("Fault"));
         assertTrue(XMLUnit.compareXML(response, replyMessage.getPayload().toString()).identical());
     }
 

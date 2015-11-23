@@ -37,11 +37,11 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
         muleClient.dispatch("vm://in", "Flow data", null);
         MuleMessage response = muleClient.request("vm://out", RECEIVE_TIMEOUT * 2);
         assertNotNull(response);
-        assertEquals("Flow data", response.getPayloadAsString());
+        assertEquals("Flow data", getPayloadAsString(response));
         muleClient.dispatch("vm://in", "Flow data", null);
         response = muleClient.request("vm://out", RECEIVE_TIMEOUT * 2);
         assertNotNull(response);
-        assertEquals("Flow data", response.getPayloadAsString());
+        assertEquals("Flow data", getPayloadAsString(response));
     }
 
     @Override

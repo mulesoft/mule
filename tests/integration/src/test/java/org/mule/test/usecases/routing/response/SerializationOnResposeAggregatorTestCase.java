@@ -44,7 +44,7 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , getTestMuleMessage("request"), newOptions().method(POST.name()).build());
         assertNotNull(message);
-        assertEquals("request processed", new String(message.getPayloadAsBytes()));
+        assertEquals("request processed", new String(getPayloadAsBytes(message)));
     }
 
     private static class TestObjectStore extends SimpleMemoryObjectStore<Serializable>

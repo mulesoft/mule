@@ -48,7 +48,7 @@ public class SelectTargetTestCase extends AbstractDbIntegrationTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://queryCustomTarget", TEST_MESSAGE, null);
 
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
         assertRecords(response.getInboundProperty("resultSet"), getAllPlanetRecords());
     }
 }

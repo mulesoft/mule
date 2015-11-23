@@ -71,7 +71,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, ECHO_REQUEST, properties);
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, response.getPayloadAsString());
+        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
     }
 
     protected void assertSoapFault(String address, String expectedFaultCode) throws Exception

@@ -21,6 +21,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
+import org.mule.TransformationService;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -96,6 +97,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
                                 .getArguments()[1]);
                     }
                 });
+        when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
     }
 
     @Test

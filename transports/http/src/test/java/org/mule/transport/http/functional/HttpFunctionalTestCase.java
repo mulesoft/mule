@@ -65,6 +65,6 @@ public class HttpFunctionalTestCase extends FunctionalTestCase
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 }

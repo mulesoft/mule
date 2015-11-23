@@ -44,7 +44,7 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
 
         assertNotNull(message);
         assertEquals(ENCODING, message.getEncoding());
-        assertEquals(TEST_MESSAGE_EUC_JP_ENCODED, message.getPayloadAsString());
+        assertEquals(TEST_MESSAGE_EUC_JP_ENCODED, getPayloadAsString(message));
     }
 
     @Override

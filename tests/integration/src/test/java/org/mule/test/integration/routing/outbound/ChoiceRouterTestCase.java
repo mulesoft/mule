@@ -90,35 +90,35 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
     public void sendToValidRouteShouldReturnValidResult() throws Exception
     {
         MuleMessage result = muleContext.getClient().send(WITHOUT_DEFAULT_ROUTE_CHANNEL, "apple", null);
-        assertEquals("apple:fruit:fruit", result.getPayloadAsString());
+        assertEquals("apple:fruit:fruit", getPayloadAsString(result));
     }
 
     @Test
     public void sendToAppleRouteShouldHitFruitService() throws Exception
     {
         MuleMessage result = muleContext.getClient().send(WITH_DEFAULT_ROUTE_CHANNEL, "apple", null);
-        assertEquals("apple:fruit:fruit", result.getPayloadAsString());
+        assertEquals("apple:fruit:fruit", getPayloadAsString(result));
     }
 
     @Test
     public void sendToTurnipRouteShouldHitVeggieService() throws Exception
     {
         MuleMessage result = muleContext.getClient().send(WITH_DEFAULT_ROUTE_CHANNEL, "turnip", null);
-        assertEquals("turnip:veggie:veggie", result.getPayloadAsString());
+        assertEquals("turnip:veggie:veggie", getPayloadAsString(result));
     }
 
     @Test
     public void sendToBlueberryRouteShouldHitFruitService() throws Exception
     {
         MuleMessage result = muleContext.getClient().send(WITH_DEFAULT_ROUTE_CHANNEL, "blueberry", null);
-        assertEquals("blueberry:fruit:fruit", result.getPayloadAsString());
+        assertEquals("blueberry:fruit:fruit", getPayloadAsString(result));
     }
 
     @Test
     public void sendToInvalidRouteShouldHitDefaultRoute() throws Exception
     {
         MuleMessage result = muleContext.getClient().send(WITH_DEFAULT_ROUTE_CHANNEL, "car", null);
-        assertEquals("car:default:default", result.getPayloadAsString());
+        assertEquals("car:default:default", getPayloadAsString(result));
     }
 
     private ChoiceRouter findChoiceRouterInFlow(String flowName)

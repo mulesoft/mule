@@ -34,6 +34,6 @@ public class MuleMessageLengthTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 }

@@ -63,7 +63,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
         assertNotNull(resultEvent);
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
-        String payload = resultMessage.getPayloadAsString();
+        String payload = getPayloadAsString(resultMessage);
 
         assertTrue(payload.contains("test event A"));
         assertTrue(payload.contains("test event B"));

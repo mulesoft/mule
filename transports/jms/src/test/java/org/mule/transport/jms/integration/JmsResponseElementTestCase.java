@@ -39,7 +39,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://vminbound", "some message", null);
-        assertThat(response.getPayloadAsString(), is(EXPECTED_MODIFIED_MESSAGE));
+        assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.<String>getProperty("test", PropertyScope.INBOUND), Is.is("test"));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }
@@ -49,7 +49,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://vminbound2", MESSAGE, null);
-        assertThat(response.getPayloadAsString(), is(EXPECTED_MODIFIED_MESSAGE));
+        assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }
 
@@ -65,7 +65,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
         client.dispatch("jms://out", MESSAGE, messageProperties);
 
         MuleMessage response = client.request(replyToUri, TIMEOUT);
-        assertThat(response.getPayloadAsString(), is(EXPECTED_MODIFIED_MESSAGE));
+        assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
         response = client.request(replyToUri, TINY_TIMEOUT);
         assertThat(response, IsNull.<Object>nullValue());
@@ -76,7 +76,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("jms://in3", MESSAGE, null);
-        assertThat(response.getPayloadAsString(), is(EXPECTED_MODIFIED_MESSAGE));
+        assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }
 }

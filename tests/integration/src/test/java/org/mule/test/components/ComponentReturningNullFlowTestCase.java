@@ -32,7 +32,7 @@ public class ComponentReturningNullFlowTestCase extends FunctionalTestCase
 
         MuleMessage msg = client.send("vm://in", "test data", null);
         assertNotNull(msg);
-        final String payload = msg.getPayloadAsString();
+        final String payload = getPayloadAsString(msg);
         assertNotNull(payload);
         assertFalse("ERROR".equals(payload));
         assertTrue(msg.getPayload() instanceof NullPayload);

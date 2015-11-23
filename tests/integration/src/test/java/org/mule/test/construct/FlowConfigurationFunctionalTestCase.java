@@ -68,9 +68,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertNotNull(flow.getExceptionListener());
 
         assertEquals("012xyzabc3",
-            muleContext.getClient()
-                .send("vm://in", new DefaultMuleMessage("0", muleContext))
-                .getPayloadAsString());
+                     getPayloadAsString(muleContext.getClient().send("vm://in",
+                                                                     new DefaultMuleMessage("0", muleContext))));
 
     }
 
@@ -140,31 +139,27 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals(2, flow.getMessageProcessors().size());
 
         assertEquals("01xyz",
-            muleContext.getClient()
-                .send("vm://in2", new DefaultMuleMessage("0", muleContext))
-                .getPayloadAsString());
+            getPayloadAsString(muleContext.getClient()
+                .send("vm://in2", new DefaultMuleMessage("0", muleContext))));
         assertEquals("01xyz",
-            muleContext.getClient()
-                .send("vm://in3", new DefaultMuleMessage("0", muleContext))
-                .getPayloadAsString());
+            getPayloadAsString(muleContext.getClient()
+                .send("vm://in3", new DefaultMuleMessage("0", muleContext))));
     }
 
     @Test
     public void testInOutFlow() throws Exception
     {
         muleContext.getClient().send("vm://inout-in", new DefaultMuleMessage("0", muleContext));
-        assertEquals("0", muleContext.getClient()
-            .request("vm://inout-out", RECEIVE_TIMEOUT)
-            .getPayloadAsString());
+        assertEquals("0", getPayloadAsString(muleContext.getClient()
+            .request("vm://inout-out", RECEIVE_TIMEOUT)));
     }
 
     @Test
     public void testInOutAppendFlow() throws Exception
     {
         muleContext.getClient().send("vm://inout-append-in", new DefaultMuleMessage("0", muleContext));
-        assertEquals("0inout", muleContext.getClient()
-            .request("vm://inout-append-out", RECEIVE_TIMEOUT)
-            .getPayloadAsString());
+        assertEquals("0inout", getPayloadAsString(muleContext.getClient()
+            .request("vm://inout-append-out", RECEIVE_TIMEOUT)));
     }
 
     @Test
@@ -382,7 +377,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         assertNotNull(result);
         assertNotSame(payload, result.getPayload());
-        assertEquals(payload, result.getPayloadAsString());
+        assertEquals(payload, getPayloadAsString(result));
     }
 
     @Test
@@ -406,8 +401,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertNotNull(tapResult);
         assertNotSame(result, tapResult);
-        assertEquals(TEST_MESSAGE + "inout", result.getPayloadAsString());
-        assertEquals(TEST_MESSAGE + "intap", tapResult.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + "inout", getPayloadAsString(result));
+        assertEquals(TEST_MESSAGE + "intap", getPayloadAsString(tapResult));
     }
 
     @Test
@@ -417,7 +412,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
             new DefaultMuleMessage("", muleContext));
 
         assertNotNull(result);
-        assertEquals("abcdefghi", result.getPayloadAsString());
+        assertEquals("abcdefghi", getPayloadAsString(result));
     }
 
     @Test
@@ -430,8 +425,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         assertNotNull(result);
         assertNotNull(asyncResult);
-        assertEquals("0ac", result.getPayloadAsString());
-        assertEquals("0ab", asyncResult.getPayloadAsString());
+        assertEquals("0ac", getPayloadAsString(result));
+        assertEquals("0ab", getPayloadAsString(asyncResult));
     }
 
     @Test
@@ -445,8 +440,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         assertNotNull(result);
         assertNotNull(asyncResult);
-        assertEquals("0ac", result.getPayloadAsString());
-        assertEquals("0ab", asyncResult.getPayloadAsString());
+        assertEquals("0ac", getPayloadAsString(result));
+        assertEquals("0ab", getPayloadAsString(asyncResult));
     }
 
     @Test
@@ -461,8 +456,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         assertNotNull(result);
         assertNotNull(asyncResult);
-        assertEquals("0ac", result.getPayloadAsString());
-        assertEquals("0ab", asyncResult.getPayloadAsString());
+        assertEquals("0ac", getPayloadAsString(result));
+        assertEquals("0ab", getPayloadAsString(asyncResult));
     }
 
     @Test
@@ -551,35 +546,30 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testChoiceWithoutOutboundEndpoints() throws Exception
     {
         assertEquals("foo Hello foo",
-            muleContext.getClient()
-                .send("vm://choice2-in", new DefaultMuleMessage("foo", muleContext))
-                .getPayloadAsString());
+            getPayloadAsString(muleContext.getClient()
+                .send("vm://choice2-in", new DefaultMuleMessage("foo", muleContext))));
         assertEquals("bar Hello bar",
-            muleContext.getClient()
-                .send("vm://choice2-in", new DefaultMuleMessage("bar", muleContext))
-                .getPayloadAsString());
+            getPayloadAsString(muleContext.getClient()
+                .send("vm://choice2-in", new DefaultMuleMessage("bar", muleContext))));
         assertEquals("egh Hello ?",
-            muleContext.getClient()
-                .send("vm://choice2-in", new DefaultMuleMessage("egh", muleContext))
-                .getPayloadAsString());
+            getPayloadAsString(muleContext.getClient()
+                .send("vm://choice2-in", new DefaultMuleMessage("egh", muleContext))));
     }
 
     @Test
     public void testFlowRef() throws Exception
     {
         assertEquals("012xyzabc312xyzabc3",
-            muleContext.getClient()
-                .send("vm://flow-ref-in", new DefaultMuleMessage("0", muleContext))
-                .getPayloadAsString());
+            getPayloadAsString(muleContext.getClient()
+                .send("vm://flow-ref-in", new DefaultMuleMessage("0", muleContext))));
     }
 
     @Test
     public void testInvoke() throws Exception
     {
         assertEquals("0recieved",
-            muleContext.getClient()
-                .send("vm://invoke-in", new DefaultMuleMessage("0", muleContext))
-                .getPayloadAsString());
+            getPayloadAsString(muleContext.getClient()
+                .send("vm://invoke-in", new DefaultMuleMessage("0", muleContext))));
     }
 
     @Test
@@ -587,9 +577,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
         message.setOutboundProperty("one", "header1val");
-        assertEquals("header1valrecieved", muleContext.getClient()
-            .send("vm://invoke2-in", message)
-            .getPayloadAsString());
+        assertEquals("header1valrecieved", getPayloadAsString(muleContext.getClient()
+            .send("vm://invoke2-in", message)));
     }
 
     @Test
@@ -688,7 +677,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage message = muleContext.getClient().request("vm://poll-out", RECEIVE_TIMEOUT);
         assertNotNull(message);
-        assertEquals(" Hello fooout", message.getPayloadAsString());
+        assertEquals(" Hello fooout", getPayloadAsString(message));
     }
 
     @Test
@@ -696,7 +685,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage message = muleContext.getClient().request("vm://poll2-out", RECEIVE_TIMEOUT);
         assertNotNull(message);
-        assertEquals("pollappendout", message.getPayloadAsString());
+        assertEquals("pollappendout", getPayloadAsString(message));
     }
 
     @Test
@@ -740,6 +729,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         {
             Transformer before = new StringAppendTransformer(appendBefore);
             Transformer after = new StringAppendTransformer(appendAfter);
+            before.setMuleContext(muleContext);
+            after.setMuleContext(muleContext);
             return after.process(listener.process(before.process(event)));
         }
 

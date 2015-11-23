@@ -32,13 +32,13 @@ public class FlowOutboundInMiddleOfFlowTestCase extends FunctionalTestCase
         client.dispatch("vm://test.in", "message", null);
         
         MuleMessage msg = client.request("vm://test.out.1", 1000);
-        assertEquals("messagehello", msg.getPayloadAsString());
+        assertEquals("messagehello", getPayloadAsString(msg));
         
         MuleMessage msg2 = client.request("vm://test.out.2", 5000);
-        assertEquals("messagebye", msg2.getPayloadAsString());
+        assertEquals("messagebye", getPayloadAsString(msg2));
         
         MuleMessage msg3 = client.request("vm://test.out.3", 5000);
-        assertEquals("egassem", msg3.getPayloadAsString());
+        assertEquals("egassem", getPayloadAsString(msg3));
     }
 }
 

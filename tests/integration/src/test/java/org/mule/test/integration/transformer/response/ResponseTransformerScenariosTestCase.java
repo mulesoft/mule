@@ -57,29 +57,13 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         return "org/mule/test/integration/transformer/response/response-transformer-scenarios.xml";
     }
 
-    // ***** RESPONSE ENDPONTS ON INBOUND ENDPOINTS USED FOR SYNC RESPONSE AFTER ROUTING *****
-    // Applied by DefaultInternalMessageListener
-
-    // TODO FAILING MULE- 2969
-
-    // @Test
-    //public void testCxfSyncResponseTransformer() throws Exception
-    // {
-    // MuleClient client = new MuleClient();
-    // MuleMessage message = client.send("cxf:http://localhost:4444/services/CxfSync?method=echo",
-    // "request",
-    // null);
-    // assertNotNull(message);
-    // assertEquals("request" + "customResponse", message.getPayloadAsString());
-    // }
-
     @Test
     public void testVmSync() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://sync", "request", null);
         assertThat(message, notNullValue());
-        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUT_IN_RESP)));
+        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUT_IN_RESP)));
     }
 
     @Test
@@ -93,7 +77,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
         MuleMessage message = client.send("vm://syncResponseTransformer", "request", props);
         assertThat(message, notNullValue());
-        assertThat(message.getPayloadAsString(), is(equalTo("request" + CUSTOM_RESPONSE)));
+        assertThat(getPayloadAsString(message), is(equalTo("request" + CUSTOM_RESPONSE)));
     }
 
     @Test
@@ -112,7 +96,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         Date msgDate = format.parse(dateStr);
         assertThat(new Date().after(msgDate), is(true));
 
-        assertThat(message.getPayloadAsString(), is(equalTo("request")));
+        assertThat(getPayloadAsString(message), is(equalTo("request")));
     }
 
     @Test
@@ -130,26 +114,8 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         Date msgDate = format.parse(dateStr);
         assertThat(new Date().after(msgDate), is(true));
 
-        assertThat(message.getPayloadAsString(), is(equalTo("request" + CUSTOM_RESPONSE)));
+        assertThat(getPayloadAsString(message), is(equalTo("request" + CUSTOM_RESPONSE)));
     }
-
-    // ***** RESPONSE ENDPONTS ON INBOUND ENDPOINTS USED FOR REMOTE-SYNC RESPONSE AFTER ROUTRING *****
-    // Applied by ReplyToHandler
-
-    // DF: The following scenario is no longer supported as from Mule 3.2, a error is logged if response
-    // transformers are configured on a jms request-response inbound endpoint.
-
-    // @Test
-    // public void testJmsSyncResponseTransformer() throws Exception
-    // {
-    // MuleClient client = new MuleClient(muleContext);
-    // MuleMessage message = client.send("jms://sync", "request", null);
-    // assertNotNull(message);
-    // assertEquals("request" + CUSTOM_RESPONSE, message.getPayloadAsString());
-    // }
-
-    // ***** RESPONSE ENDPONTS ON OUTBOUND ENDPOINT *****
-    // Applied by DefaultMuleSession once result message is received from remote endpoint.
 
     @Test
     public void testVmSyncOutboundEndpointResponseTransformer() throws Exception
@@ -157,7 +123,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://syncOutboundEndpointResponseTransformer", "request", null);
         assertThat(message, notNullValue());
-        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE)));
+        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 
     @Test
@@ -167,7 +133,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://jmsSync", "request", null);
         assertThat(message, notNullValue());
 
-        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUT_IN_RESP)));
+        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUT_IN_RESP)));
     }
 
     @Test
@@ -176,7 +142,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://jmsSyncOutboundEndpointResponseTransformer", "request", null);
         assertThat(message, notNullValue());
-        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE + VM_RESPONSE)));
+        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 
     @Test
@@ -185,7 +151,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://chainedRouterOutboundEndpointResponseTransformer", "request", null);
         assertThat(message, notNullValue());
-        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND
+        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND
                                                             + VM_OUT_IN_RESP + VM_OUT_IN_RESP + CUSTOM_RESPONSE + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 
@@ -195,7 +161,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://nestedRouterOutboundEndpointResponseTransformer", "request", null);
         assertThat(message, notNullValue());
-        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND
+        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND
                                                             + VM_OUT_IN_RESP + CUSTOM_RESPONSE + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 }

@@ -51,7 +51,7 @@ public class MessageChunkSplitter extends AbstractSplitter
         byte[] data;
         try
         {
-            data = message.getPayloadAsBytes();
+            data = muleContext.getTransformationService().getPayloadAsBytes(message);
         }
         catch (Exception e)
         {

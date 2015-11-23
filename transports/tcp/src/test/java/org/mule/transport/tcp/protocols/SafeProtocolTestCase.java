@@ -65,7 +65,7 @@ public class SafeProtocolTestCase extends FunctionalTestCase
     {
         try
         {
-            if (message.getPayloadAsString().equals(TEST_MESSAGE + " Received"))
+            if (getPayloadAsString(message).equals(TEST_MESSAGE + " Received"))
             {
                 fail("expected error");
             }

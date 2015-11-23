@@ -164,7 +164,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
             }
             else
             {
-                return returnedMessage.getPayloadAsString();
+                return getPayloadAsString(returnedMessage);
             }
         }
         catch (Exception ex)
@@ -188,7 +188,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
             try
             {
                 DefaultMuleMessage msg;
-                String payload = event.getMessage().getPayloadAsString();
+                String payload = muleContext.getTransformationService().getPayloadAsString(event.getMessage());
                 if (payload.indexOf(rejectIfMatches) >= 0)
                 {
                     throw new DefaultMuleException("Saw " + rejectIfMatches);

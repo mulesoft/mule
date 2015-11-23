@@ -20,7 +20,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -54,7 +53,6 @@ import org.mule.routing.filters.AcceptAllFilter;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectUtils;
 
 import java.util.Arrays;
@@ -835,7 +833,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.chain(getAppendingMP("1"), new ResponseMessageProcessorAdapter(getAppendingMP("3")),
                       getAppendingMP("2"));
-        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessageAsString(), equalTo
+        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload(), equalTo
                 ("0123"));
 
         assertEquals(isMultipleThreadsUsed() ? 4 : 1, threads);
@@ -849,7 +847,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
                               (getAppendingMP("a"), new ResponseMessageProcessorAdapter(getAppendingMP("c")),
                                getAppendingMP("b")),
                       getAppendingMP("2"));
-        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessageAsString(), equalTo
+        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload(), equalTo
                 ("01abc2"));
 
         assertEquals(isMultipleThreadsUsed() ? 6 : 1, threads);
@@ -862,8 +860,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         builder.chain(getAppendingMP("1"), new ResponseMessageProcessorAdapter(DefaultMessageProcessorChain.from
                               (new ResponseMessageProcessorAdapter(getAppendingMP("4")), getAppendingMP("3"))),
                       getAppendingMP("2"));
-        process(builder.build(), getTestEventUsingFlow("0")).getMessageAsString();
-        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessageAsString(), equalTo
+        process(builder.build(), getTestEventUsingFlow("0"));
+        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload(), equalTo
                 ("01234"));
         assertEquals(isMultipleThreadsUsed() ? 9 : 1, threads);
     }
@@ -874,8 +872,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.chain(new ResponseMessageProcessorAdapter(DefaultMessageProcessorChain.from
                 (getAppendingMP("1"))));
-        process(builder.build(), getTestEventUsingFlow("0")).getMessageAsString();
-        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessageAsString(), equalTo
+        process(builder.build(), getTestEventUsingFlow("0"));
+        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload(), equalTo
                 ("01"));
         assertEquals(isMultipleThreadsUsed() ? 3 : 1, threads);
     }
@@ -911,7 +909,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         choiceRouter.addRoute(getAppendingMP("3"), new AcceptAllFilter());
 
         assertThat(process(DefaultMessageProcessorChain.from(choiceRouter), getTestEventUsingFlow("0"))
-                           .getMessageAsString(), equalTo("01"));
+                           .getMessage().getPayload(), equalTo("01"));
 
         assertEquals(isMultipleThreadsUsed() ? 2 : 1, threads);
     }
@@ -1000,7 +998,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            return new StringAppendTransformer("MessageProcessor").process(event);
+            return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload() + "MessageProcessor",
+                                                               event.getMuleContext()), event);
         }
     }
 
@@ -1009,7 +1008,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            return processNext(new StringAppendTransformer("InterceptingMessageProcessor").process(event));
+            return processNext(new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload() +
+                                                                           "InterceptingMessageProcessor", event
+                    .getMuleContext()), event));
         }
     }
 

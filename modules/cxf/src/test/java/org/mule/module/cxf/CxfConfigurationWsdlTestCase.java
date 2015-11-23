@@ -55,6 +55,6 @@ public class CxfConfigurationWsdlTestCase extends org.mule.tck.junit4.Functional
 
         // Don't want to compare full WSDL, just checking one tag's content
         String serviceLocation = String.format("<soap:address location=\"http://localhost:%s/\"/>", httpPort.getNumber());
-        assertThat(result.getPayloadAsString(), containsString(serviceLocation));
+        assertThat(getPayloadAsString(result), containsString(serviceLocation));
     }
 }

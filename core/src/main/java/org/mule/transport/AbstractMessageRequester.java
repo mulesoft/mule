@@ -131,7 +131,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
 
     protected void applyInboundTransformers(MuleMessage message) throws MuleException
     {
-        message.applyTransformers(null, defaultInboundTransformers);
+        connector.getMuleContext().getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
     }
 
     @Override

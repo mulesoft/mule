@@ -70,7 +70,7 @@ public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:28181/ScratchCardServiceV1", getTestMuleMessage(msg),
                                          HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull("The result shouln't have been null", result);
-        final String payloadAsString = result.getPayloadAsString();
+        final String payloadAsString = getPayloadAsString(result);
         assertNotNull("The payloadAsString shouln't have been null", payloadAsString);
         assertFalse("There shouldn't be a fault in the payload: " + payloadAsString,
             payloadAsString.contains("<soap:Fault>"));

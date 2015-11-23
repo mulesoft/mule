@@ -73,9 +73,9 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
 
-        assertTrue(resultMessage.getPayloadAsString().equals("test event A")
-                   || resultMessage.getPayloadAsString().equals("test event B")
-                   || resultMessage.getPayloadAsString().equals("test event C"));
+        assertTrue(getPayloadAsString(resultMessage).equals("test event A")
+                   || getPayloadAsString(resultMessage).equals("test event B")
+                   || getPayloadAsString(resultMessage).equals("test event C"));
 
     }
 
@@ -122,7 +122,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
 
-        assertEquals("test event C", resultMessage.getPayloadAsString());
+        assertEquals("test event C", getPayloadAsString(resultMessage));
     }
 
 

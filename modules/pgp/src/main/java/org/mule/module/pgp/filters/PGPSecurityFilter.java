@@ -49,7 +49,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         byte[] creds = null;
         try
         {
-            creds = message.getPayloadAsBytes();
+            creds = muleContext.getTransformationService().getPayloadAsBytes(message);
             creds = strategy.decrypt(creds, null);
         }
         catch (Exception e1)
@@ -147,7 +147,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         try
         {
-            updatePayload(event.getMessage(), strategy.encrypt(message.getPayloadAsBytes(), cryptInfo), event);
+            updatePayload(event.getMessage(), strategy.encrypt(muleContext.getTransformationService().getPayloadAsBytes(message), cryptInfo), event);
         }
         catch (Exception e1)
         {

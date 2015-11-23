@@ -30,7 +30,7 @@ public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCas
     {
         MuleMessage reply = muleContext.getClient().send("vm://invoker.in", TEST_MESSAGE, null);
         assertNotNull(reply);
-        String payload = reply.getPayloadAsString();
+        String payload = getPayloadAsString(reply);
         assertTrue(payload.contains("MuleRuntimeException"));
         assertTrue(payload.contains(PREFIX));
     }

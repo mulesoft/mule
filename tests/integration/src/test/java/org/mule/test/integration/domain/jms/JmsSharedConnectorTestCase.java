@@ -115,7 +115,7 @@ public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase
                 return "response message never arrived";
             }
         });
-        assertThat(response.get().getPayloadAsString(), is("works"));
+        assertThat(getPayloadAsString(response.get(), getMuleContextForApp(CLIENT_APP)), is("works"));
     }
 
     private String queueAddress(String inQueue)

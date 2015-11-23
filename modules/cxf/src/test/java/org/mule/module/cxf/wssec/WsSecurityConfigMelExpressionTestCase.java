@@ -59,7 +59,7 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
         MuleMessage received = client.send("vm://greetMe", request);
 
         assertNotNull(received);
-        assertEquals("Hello PasswordText", received.getPayloadAsString());
+        assertEquals("Hello PasswordText", getPayloadAsString(received));
     }
 
     @Test

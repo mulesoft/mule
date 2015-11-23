@@ -44,7 +44,7 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
         assertThat(response, IsNull.<Object>notNullValue());
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
         JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
         assertThat(actualJsonNode, is(expectedJsonNode));
     }

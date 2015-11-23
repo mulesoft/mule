@@ -9,10 +9,8 @@ package org.mule.transport.servlet.jetty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.transformer.DataType;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -61,7 +59,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends FunctionalTestCase
     }
 
     protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages)
-        throws MuleException
+            throws Exception
     {
         MuleClient client = muleContext.getClient();
 
@@ -69,7 +67,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends FunctionalTestCase
         for (int i = 0; i < noOfMessages; i++)
         {
             MuleMessage result = client.send(endpoint, message, null);
-            results.add(result.getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
+            results.add(getPayloadAsBytes(result));
         }
 
         assertEquals(noOfMessages, results.size());

@@ -61,7 +61,7 @@ public class WireTapCxfTestCase extends FunctionalTestCase
         MuleMessage response = client.send(url, getTestMuleMessage(msg));
         assertNotNull(response);
 
-        String responseString = response.getPayloadAsString();
+        String responseString = getPayloadAsString(response);
         assertTrue(responseString.contains("echoResponse"));
         assertFalse(responseString.contains("soap:Fault"));
 

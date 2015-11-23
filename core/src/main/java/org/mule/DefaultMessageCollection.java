@@ -13,10 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.types.DataTypeFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -28,10 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *  Note that the {@link #getPayload()} for this message will return a {@link java.util.List} of payload objects for
  * each of the Mule messages stored in this collection.
  *
- * Calling {@link org.mule.api.MuleMessage#getPayload(Class)} will attempt to transform all payloads and return a {@link java.util.List}.
- *
- * The methods {@link org.mule.api.MuleMessage#getPayloadAsString()} and {@link org.mule.api.MuleMessage#getPayloadAsBytes()} are unsupported, instead users should
- * call {@link org.mule.api.MuleMessage#getPayload(Class)} and pass in the return type <code>byte[].class</code> or <code>String.class</code>.
  */
 public class DefaultMessageCollection extends DefaultMuleMessage implements MuleMessageCollection
 {
@@ -188,7 +181,8 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         return getMessageList().get(index);
     }
 
-    protected List<MuleMessage> getMessageList()
+    @Override
+    public List<MuleMessage> getMessageList()
     {
         checkValidPayload();
         return messageList;
@@ -230,100 +224,11 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         }
     }
 
-    /**
-     * Applies the {@link org.mule.api.MuleMessage#getPayload(Class)} call to every message in the collection and returns a
-     * {@link java.util.List} of results.
-     *
-     * {@inheritDoc}
-     */
-    @Override
-    public Object getPayload(Class outputType) throws TransformerException
-    {
-        if (invalidatedPayload)
-        {
-            return super.getPayload(outputType);
-        }
-        else
-        {
-            DataType outputDataType = DataTypeFactory.create(outputType);
-            List<Object> results = new ArrayList<Object>(getMessageList().size());
-            for (MuleMessage message : getMessageList())
-            {
-                results.add(message.getPayload(outputDataType));
-            }
-            return results;
-        }
-    }
-
     @Override
     public int size()
     {
         checkValidPayload();
         return getMessageList().size();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        if (invalidatedPayload)
-        {
-            return super.getPayloadAsBytes();
-        }
-        else
-        {
-            throw new UnsupportedOperationException("getPayloadAsBytes(), use getPayload(DataType.BYTE_ARRAY_DATA_TYPE)");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPayloadAsString(String encoding) throws Exception
-    {
-        if (invalidatedPayload)
-        {
-            return super.getPayloadAsString(encoding);
-        }
-        else
-        {
-            throw new UnsupportedOperationException("getPayloadAsString(), use getPayload(DataType.STRING_DATA_TYPE)");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPayloadForLogging(String encoding)
-    {
-        if (invalidatedPayload)
-        {
-            return super.getPayloadForLogging(encoding);
-        }
-        else
-        {
-            return "[This is a message collection]";
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPayloadForLogging()
-    {
-        if (invalidatedPayload)
-        {
-            return super.getPayloadForLogging();
-        }
-        else
-        {
-            return "[This is a message collection]";
-        }
     }
 
     /**

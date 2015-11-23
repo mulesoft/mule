@@ -10,28 +10,21 @@ import static org.mule.api.transport.PropertyScope.INBOUND;
 import static org.mule.api.transport.PropertyScope.INVOCATION;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import static org.mule.util.SystemUtils.LINE_SEPARATOR;
-
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.message.ds.StringDataSource;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.MimeTypes;
 import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
@@ -52,10 +45,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -111,7 +102,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<String, DataHandler>();
 
-    private transient byte[] cache;
     protected transient MuleContext muleContext;
 
     // these are transient because serialisation generates a new instance
@@ -259,7 +249,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    protected void copyMessageProperties(MuleMessage muleMessage)
+    @Override
+    public void copyMessageProperties(MuleMessage muleMessage)
     {
         for (PropertyScope scope : new PropertyScope[]{INBOUND, PropertyScope.OUTBOUND})
         {
@@ -281,7 +272,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    private void copyAttachments(MuleMessage previous)
+    @Override
+    public void copyAttachments(MuleMessage previous)
     {
         if (previous.getInboundAttachmentNames().size() > 0)
         {
@@ -336,87 +328,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * {@inheritDoc}
      */
     @Override
-    public <T> T getPayload(Class<T> outputType) throws TransformerException
-    {
-        return getPayload(DataTypeFactory.create(outputType), getEncoding());
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> T getPayload(DataType<T> outputType) throws TransformerException
-    {
-        return getPayload(outputType, getEncoding());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public MuleContext getMuleContext()
     {
         return muleContext;
     }
 
-    /**
-     * Will attempt to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a transformer that can do this transformation. If a transformer cannot be
-     * found an exception is thrown. Any transformers added to the registry will be checked for
-     * compatability.
-     *
-     * @param resultType the desired return type
-     * @param encoding   the encoding to use if required
-     * @return The converted payload of this message. Note that this method will not alter the
-     *         payload of this message <b>unless</b> the payload is an {@link InputStream} in which
-     *         case the stream will be read and the payload will become the fully read stream.
-     * @throws TransformerException if a transformer cannot be found or there is an error during
-     *                              transformation of the payload.
-     * @since 3.0
-     */
-    @SuppressWarnings("unchecked")
-    protected <T> T getPayload(DataType<T> resultType, String encoding) throws TransformerException
-    {
-        // Handle null by ignoring the request
-        if (resultType == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
-        }
-
-        DataType source = DataTypeFactory.createFromObject(this);
-
-        // If no conversion is necessary, just return the payload as-is
-        if (resultType.isCompatibleWith(source))
-        {
-            return (T) getPayload();
-        }
-
-        // The transformer to execute on this message
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(source, resultType);
-        if (transformer == null)
-        {
-            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType));
-        }
-
-        // Pass in the message itself
-        Object result = transformer.transform(this, encoding);
-
-        // Unless we disallow Object.class as a valid return type we need to do this extra check
-        if (!resultType.getType().isAssignableFrom(result.getClass()))
-        {
-            throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
-        }
-
-        // If the payload is a stream and we've consumed it, then we should set the payload on the
-        // message. This is the only time this method will alter the payload on the message
-        if (isPayloadConsumed(source.getType()))
-        {
-            setPayload(result, dataType);
-        }
-
-        return (T) result;
-    }
 
     /**
      * Checks if the payload has been consumed for this message. This only applies to Streaming payload types
@@ -553,86 +469,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(WRITE);
         return properties.removeProperty(key, scope);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final String getPayloadAsString() throws Exception
-    {
-        assertAccess(READ);
-        return getPayloadAsString(getEncoding());
-    }
-
-     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPayloadForLogging(String encoding)
-    {
-        try
-        {
-            return getPayloadAsString(encoding);
-        }
-        catch (Exception e)
-        {
-            return  "[Message could not be converted to string]";
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPayloadForLogging()
-    {
-        try
-        {
-            return getPayloadAsString();
-        }
-        catch (Exception e)
-        {
-            return  "[Message could not be converted to string]";
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        assertAccess(READ);
-        if (cache != null)
-        {
-            return cache;
-        }
-        byte[] result = getPayload(DataType.BYTE_ARRAY_DATA_TYPE);
-        if (muleContext.getConfiguration().isCacheMessageAsBytes())
-        {
-            cache = result;
-        }
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPayloadAsString(String encoding) throws Exception
-    {
-        assertAccess(READ);
-        if (cache != null)
-        {
-            return new String(cache, encoding);
-        }
-        String result = getPayload(DataType.STRING_DATA_TYPE, encoding);
-        if (muleContext.getConfiguration().isCacheMessageAsBytes())
-        {
-            cache = result.getBytes(encoding);
-        }
-        return result;
     }
 
     /**
@@ -1236,8 +1072,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
 
         this.dataType = dataType.cloneDataType();
-
-        cache = null;
     }
 
     /**
@@ -1246,202 +1080,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public void release()
     {
-        cache = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void applyTransformers(MuleEvent event, List<? extends Transformer> transformers) throws MuleException
-    {
-        applyTransformers(event, transformers, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void applyTransformers(MuleEvent event, Transformer... transformers) throws MuleException
-    {
-        applyTransformers(event, Arrays.asList(transformers), null);
-    }
-
-    @Override
-    public void applyTransformers(MuleEvent event, List<? extends Transformer> transformers, Class<?> outputType) throws MuleException
-    {
-        if (!transformers.isEmpty())
-        {
-            applyAllTransformers(event, transformers);
-        }
-
-        if (null != outputType && !getPayload().getClass().isAssignableFrom(outputType))
-        {
-            setPayload(getPayload(DataTypeFactory.create(outputType)));
-        }
-    }
-
-    protected void applyAllTransformers(MuleEvent event, List<? extends Transformer> transformers) throws MuleException
-    {
-        if (!transformers.isEmpty())
-        {
-            for (int index = 0; index < transformers.size(); index++)
-            {
-                Transformer transformer = transformers.get(index);
-
-                Class<?> srcCls = getPayload().getClass();
-                DataType<?> originalSourceType = DataTypeFactory.create(srcCls);
-
-                if (transformer.isSourceDataTypeSupported(originalSourceType))
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Using " + transformer + " to transform payload.");
-                    }
-                    transformMessage(event, transformer);
-                }
-                else
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Transformer " + transformer + " doesn't support the source payload: " + srcCls);
-                    }
-
-                    if (useExtendedTransformations())
-                    {
-                        if (canSkipTransformer(transformers, index))
-                        {
-                            continue;
-                        }
-
-                        // Resolves implicit conversion if possible
-                        Transformer implicitTransformer = muleContext.getDataTypeConverterResolver().resolve(originalSourceType, transformer.getSourceDataTypes());
-
-                        if (implicitTransformer != null)
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Performing implicit transformation with: " + transformer);
-                            }
-                            transformMessage(event, implicitTransformer);
-                            transformMessage(event, transformer);
-                        }
-                        else
-                        {
-                            throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
-                        }
-                    }
-                    else if (!transformer.isIgnoreBadInput())
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Exiting from transformer chain (ignoreBadInput = false)");
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean canSkipTransformer(List<? extends Transformer> transformers, int index)
-    {
-        Transformer transformer = transformers.get(index);
-
-        boolean skipConverter = false;
-
-        if (transformer instanceof Converter)
-        {
-            if (index == transformers.size() - 1)
-            {
-                try
-                {
-                    TransformerUtils.checkTransformerReturnClass(transformer, payload);
-                    skipConverter = true;
-                }
-                catch (TransformerException e)
-                {
-                    // Converter cannot be skipped
-                }
-            }
-            else
-            {
-                skipConverter= true;
-            }
-        }
-
-        if (skipConverter)
-        {
-            logger.debug("Skipping converter: " + transformer);
-        }
-
-        return skipConverter;
-    }
-
-    private boolean useExtendedTransformations()
-    {
-        boolean result = true;
-        if (muleContext != null && muleContext.getConfiguration() != null)
-        {
-            result = muleContext.getConfiguration().useExtendedTransformations();
-        }
-
-        return result;
-    }
-
-    private void transformMessage(MuleEvent event, Transformer transformer) throws TransformerMessagingException, TransformerException
-    {
-        Object result;
-
-        if (transformer instanceof MessageTransformer)
-        {
-            result = ((MessageTransformer) transformer).transform(this, event);
-        }
-        else
-        {
-            result = transformer.transform(this);
-        }
-        // Update the RequestContext with the result of the transformation.
-        RequestContext.internalRewriteEvent(this, false);
-
-        if (originalPayload == null && muleContext.getConfiguration().isCacheMessageOriginalPayload())
-        {
-            originalPayload = payload;
-        }
-
-        if (result instanceof MuleMessage)
-        {
-            if (!result.equals(this))
-            {
-                // Only copy the payload and properties of mule message
-                // transformer result if the message is a different
-                // instance
-                synchronized (this)
-                {
-                    MuleMessage resultMessage = (MuleMessage) result;
-                    setPayload(resultMessage.getPayload(), resultMessage.getDataType());
-                    originalPayload = resultMessage.getOriginalPayload();
-                    copyMessageProperties(resultMessage);
-                    copyAttachments(resultMessage);
-                }
-            }
-        }
-        else
-        {
-            final DataType<?> mergedDataType = mergeDataType(dataType, transformer.getReturnDataType());
-            setPayload(result, mergedDataType);
-        }
-    }
-
-    private DataType<?> mergeDataType(DataType<?> original, DataType<?> transformed)
-    {
-        String mimeType = transformed.getMimeType() == null || MimeTypes.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
-        String encoding = transformed.getEncoding() == null ? this.getEncoding() : transformed.getEncoding();
-        Class<?> type = transformed.getType() == Object.class ? original.getType() : transformed.getType();
-
-        DataType mergedDataType = DataTypeFactory.create(type, mimeType);
-        mergedDataType.setEncoding(encoding);
-        return mergedDataType;
     }
 
     protected void setDataType(DataType<?> dt)
@@ -1581,18 +1219,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return exception;
     }
 
-    /**
-     * @deprecated since 3.8.0. Use {@link ClassUtils#isConsumable(Class)} instead.
-     * 
-     * Determines if the payload of this message is consumable i.e. it can't be read
-     * more than once.
-     */
-    @Deprecated
-    public boolean isConsumable()
-    {
-        return ClassUtils.isConsumable(getPayload().getClass());
-    }
-
     public static class SerializedDataHandler implements Serializable
     {
         private static final long serialVersionUID = 1L;
@@ -1656,7 +1282,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         else
         {
             out.writeBoolean(false);
-            byte[] serializablePayload = getPayloadAsBytes();
+            byte[] serializablePayload = muleContext.getTransformationService().getPayloadAsBytes(this);
             out.writeInt(serializablePayload.length);
             new DataOutputStream(out).write(serializablePayload);
         }
@@ -1864,4 +1490,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         return properties.getOrphanFlowVariables();
     }
+
+    @Override
+    public void setOriginalPayload(Object originalPayload)
+    {
+        this.originalPayload = originalPayload;
+    }
+
 }

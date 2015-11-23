@@ -61,7 +61,7 @@ public class HttpContinueFunctionalTestCase extends FunctionalTestCase
         stopWatch.stop();
 
         assertNotNull(result);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
 
         if (stopWatch.getTime() > DEFAULT_HTTP_CLIENT_CONTINUE_WAIT)
         {

@@ -58,11 +58,13 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public static final String CUSTOM_CONTENT_TYPE = CUSTOM_MIME_TYPE + "; charset=" + CUSTOM_ENCODING;
 
     private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    private TransformationService transformationService;
 
     @Before
     public void setUp() throws Exception
     {
         when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(DEFAULT_ENCODING);
+        transformationService = new TransformationService(muleContext);
     }
 
     @Test
@@ -188,7 +190,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
-        muleMessage.applyAllTransformers(muleEvent, Collections.singletonList(transformer));
+        transformationService.applyTransformers(muleMessage, muleEvent, Collections.singletonList(transformer));
 
         assertDataType(muleMessage, Integer.class, APPLICATION_XML, DEFAULT_ENCODING);
     }
@@ -207,7 +209,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
-        muleMessage.applyAllTransformers(muleEvent, Collections.singletonList(transformer));
+        transformationService.applyTransformers(muleMessage, muleEvent, Collections.singletonList(transformer));
 
         assertDataType(muleMessage, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
     }
@@ -227,7 +229,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
-        muleMessage.applyAllTransformers(muleEvent, Collections.singletonList(transformer));
+        transformationService.applyTransformers(muleMessage, muleEvent, Collections.singletonList(transformer));
 
         assertDataType(muleMessage, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
     }
@@ -246,7 +248,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
-        muleMessage.applyAllTransformers(muleEvent, Collections.singletonList(transformer));
+        transformationService.applyTransformers(muleMessage, muleEvent, Collections.singletonList(transformer));
 
         assertDataType(muleMessage, originalDataType);
     }
@@ -275,8 +277,6 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         Transformer transformer = mock(Transformer.class);
         when(transformer.transform(anyObject(), anyString())).thenReturn(TEST);
         when(muleRegistry.lookupTransformer(argThat(any(DataType.class)), argThat(any(DataType.class)))).thenReturn(transformer);
-
-        muleMessage.getPayloadAsString();
 
         assertThat(muleMessage.getDataType().getMimeType(), equalTo(APPLICATION_XML));
         assertThat(muleMessage.getDataType().getEncoding(), equalTo(CUSTOM_ENCODING));

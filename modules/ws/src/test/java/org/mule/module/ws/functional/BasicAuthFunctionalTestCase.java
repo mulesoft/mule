@@ -45,7 +45,7 @@ public class BasicAuthFunctionalTestCase extends AbstractWSConsumerFunctionalTes
     {
         Flow flow = (Flow) getFlowConstruct("clientValidCredentials");
         MuleEvent event = flow.process(getTestEvent(ECHO_REQUEST));
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, event.getMessage().getPayloadAsString());
+        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
         assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(OK.getStatusCode())));
     }
 

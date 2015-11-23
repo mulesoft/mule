@@ -98,6 +98,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
     public void testMuleMessageInput()
     {
         RegExFilter filter = new RegExFilter("The quick (.*)");
+        filter.setMuleContext(muleContext);
         assertNotNull(filter.getPattern());
         MuleMessage message = new DefaultMuleMessage("The quick brown fox", muleContext);
         assertTrue(filter.accept(message));

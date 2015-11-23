@@ -29,6 +29,6 @@ public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCa
 
         MuleMessage response = client.request("vm://out", getTimeout());
         assertNotNull(response);
-        assertEquals(DEFAULT_INPUT_MESSAGE, response.getPayloadAsString());
+        assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(response));
     }
 }

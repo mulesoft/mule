@@ -9,7 +9,10 @@ package org.mule.el.function;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionExecutor;
@@ -28,7 +31,6 @@ import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCase
@@ -37,13 +39,15 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     protected ExpressionExecutor<MVELExpressionLanguageContext> expressionExecutor;
     protected MVELExpressionLanguageContext context;
     protected RegexExpressionLanguageFuntion regexFuntion;
+    protected MuleContext muleContext;
 
     @Before
     public void setup() throws InitialisationException
     {
         ParserConfiguration parserConfiguration = new ParserConfiguration();
         expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
-        context = new MVELExpressionLanguageContext(parserConfiguration, Mockito.mock(MuleContext.class));
+        muleContext = mock(MuleContext.class);
+        context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
         regexFuntion = new RegexExpressionLanguageFuntion();
         context.declareFunction("regex", regexFuntion);
     }
@@ -215,9 +219,12 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
 
     protected void addMessageToContextWithPayload(String payload) throws TransformerException
     {
-        MuleMessage message = Mockito.mock(MuleMessage.class);
-        Mockito.when(message.getPayload(Mockito.any(Class.class))).thenReturn(payload);
-        context.addFinalVariable("message", new MessageContext(message));
+        MuleMessage message = mock(MuleMessage.class);
+        MuleContext muleContext = mock((MuleContext.class));
+        TransformationService transformationService = mock(TransformationService.class);
+        when(muleContext.getTransformationService()).thenReturn(transformationService);
+        when(transformationService.getPayload(any(MuleMessage.class), any(Class.class))).thenReturn(payload);
+        context.addFinalVariable("message", new MessageContext(message, muleContext));
     }
 
 }

@@ -85,7 +85,7 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
         final MuleEvent testEvent = getTestEvent("message");
         testEvent.setFlowVariable("userId", userId);
         final MuleEvent result = flow.process(testEvent);
-        assertThat(result.getMessage().getPayloadAsString(), is(RESOURCE_RESULT));
+        assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
 
         wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
                                     .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))

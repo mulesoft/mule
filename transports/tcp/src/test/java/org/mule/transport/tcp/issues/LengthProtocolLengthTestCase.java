@@ -62,7 +62,7 @@ public class LengthProtocolLengthTestCase extends FunctionalTestCase
             MuleMessage response = client.send(endpoint, message, null);
             assertNotNull(response);
             assertNotNull(response.getPayload());
-            assertTrue(Arrays.equals(message, response.getPayloadAsBytes()));
+            assertTrue(Arrays.equals(message, getPayloadAsBytes(response)));
         }
         else
         {
@@ -74,7 +74,7 @@ public class LengthProtocolLengthTestCase extends FunctionalTestCase
     {
         try
         {
-            if (message.getPayloadAsString().equals(TEST_MESSAGE + " Received"))
+            if (getPayloadAsString(message).equals(TEST_MESSAGE + " Received"))
             {
                 fail("expected error");
             }

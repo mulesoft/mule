@@ -45,7 +45,7 @@ public class JettyHttpStemTestCase extends FunctionalTestCase
     protected void doTest(MuleClient client, String url, String value) throws Exception
     {
         MuleMessage result = client.send(url, getTestMuleMessage("Hello"), newOptions().method(POST.name()).build());
-        assertEquals(value, result.getPayloadAsString());
+        assertEquals(value, getPayloadAsString(result));
         final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
     }

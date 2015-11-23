@@ -77,7 +77,7 @@ public class ProxyNonBlockingTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + path, getTestMuleMessage(request), HTTP_REQUEST_OPTIONS);
-        String resString = result.getPayloadAsString();
+        String resString = getPayloadAsString(result);
         assertThat(resString, containsString(expectedResponse));
     }
 

@@ -56,7 +56,7 @@ public class RoundRobinTestCase extends FunctionalTestCase
             String path = "vm://output" + j;
             MuleMessage msg = client.request(path, 0);
             assertNotNull(msg);
-            logger.debug(path + ": " + msg.getPayloadAsString());
+            logger.debug(path + ": " + getPayloadAsString(msg));
             j = (j + 1) % NUMBER_OF_ENDPOINTS;
         }
     }

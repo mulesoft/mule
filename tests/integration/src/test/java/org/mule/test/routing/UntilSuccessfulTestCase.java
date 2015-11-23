@@ -115,7 +115,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
 
         final String payload = RandomStringUtils.randomAlphanumeric(20);
         final MuleMessage response = client.send("vm://input-2", payload, null);
-        assertEquals("ACK", response.getPayloadAsString());
+        assertEquals("ACK", getPayloadAsString(response));
 
         List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
         assertEquals(3, receivedPayloads.size());
@@ -143,7 +143,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
         final MuleMessage response = client.send("vm://input-2MP", payload, null);
-        assertEquals("ACK", response.getPayloadAsString());
+        assertEquals("ACK", getPayloadAsString(response));
 
         final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
         assertEquals(3, receivedPayloads.size());

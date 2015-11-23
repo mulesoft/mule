@@ -103,9 +103,9 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
         {
             return true;
         }
-        
-        message.applyTransformers(null, transformers);
-        
+
+        muleContext.getTransformationService().applyTransformers(message, null, transformers);
+
         return getFilter().accept(message);
     }
 

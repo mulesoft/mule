@@ -52,7 +52,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         MuleMessage deserializedMessage = serializationRoundtrip(message);
 
         assertTrue(deserializedMessage.getPayload() instanceof byte[]);
-        assertEquals(INNER_TEST_MESSAGE, deserializedMessage.getPayloadAsString());
+        assertEquals(INNER_TEST_MESSAGE, getPayloadAsString(deserializedMessage));
     }
 
     @Test

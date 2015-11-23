@@ -45,6 +45,6 @@ public class HttpOutboundAttachmentFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage answer = client.send(endpoint, TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE, answer.getPayloadAsString());
+        assertEquals(TEST_MESSAGE, getPayloadAsString(answer));
     }
 }

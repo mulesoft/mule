@@ -8,11 +8,9 @@ package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.transformer.DataType;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -61,17 +59,16 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
     }
 
     protected void sendWithResponse(String endPointName, String message, String response, int noOfMessages)
-        throws MuleException
+            throws Exception
     {
         MuleClient client = muleContext.getClient();
 
         List<Object> results = new ArrayList<Object>();
         for (int i = 0; i < noOfMessages; i++)
         {
-            results.add(client.send(
-                ((InboundEndpoint) muleContext.getRegistry().lookupObject(endPointName)).getAddress(),
-                message, null)
-                .getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
+            results.add(getPayloadAsBytes(client.send(
+                    ((InboundEndpoint) muleContext.getRegistry().lookupObject(endPointName)).getAddress(),
+                    message, null)));
         }
 
         assertEquals(noOfMessages, results.size());

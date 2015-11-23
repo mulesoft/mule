@@ -68,7 +68,7 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
 
         assertNotNull(result);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
         assertTrue("Callback never fired", callbackMade.get());
     }
 }

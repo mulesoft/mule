@@ -97,7 +97,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         }
         MuleMessage response = client.request("jms://dead.letter1?connector=jmsConnector", TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), is(MESSAGE_MODIFIED));
+        assertThat(getPayloadAsString(response), is(MESSAGE_MODIFIED));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         }
         MuleMessage response = client.request("jms://dead.letter2?connector=jmsConnector", TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), is(MESSAGE_TO_SEND));
+        assertThat(getPayloadAsString(response), is(MESSAGE_TO_SEND));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         }
         MuleMessage response = client.request("jms://dead.letter3?connector=jmsConnector", TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), is(MESSAGE_TO_SEND));
+        assertThat(getPayloadAsString(response), is(MESSAGE_TO_SEND));
         assertThat(client.request("jms://exceptions?connector=jmsConnector", TIMEOUT), IsNull.<Object>notNullValue());
         assertThat(client.request("jms://exceptions?connector=jmsConnector", TIMEOUT), IsNull.notNullValue());
         MuleMessage exceptionResponse = client.request("jms://exceptions?connector=jmsConnector", TIMEOUT);
@@ -159,7 +159,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in4", MESSAGE_TO_SEND, null, TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), is(MESSAGE_MODIFIED));
+        assertThat(getPayloadAsString(response), is(MESSAGE_MODIFIED));
     }
 
 
@@ -200,7 +200,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         ((Lifecycle) getFlowConstruct("RollbackTransactionAndSendEmail")).stop();
         MuleMessage response = client.request("jms://in6?connector=jmsConnectorNoRedelivery", TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), is(MESSAGE_TO_SEND));
+        assertThat(getPayloadAsString(response), is(MESSAGE_TO_SEND));
         greenMailSupport.getServers().waitForIncomingEmail(AbstractEmailFunctionalTestCase.DELIVERY_DELAY_MS, 1);
         MimeMessage[] messages = greenMailSupport.getServers().getReceivedMessages();
         assertNotNull("did not receive any messages", messages);

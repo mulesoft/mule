@@ -61,7 +61,7 @@ public class SslCertificateTestCase extends FunctionalTestCase
             MuleMessage result = client.send("in", msg, null);
             assertTrue(callback.isCalled());
             assertNotNull("Null certificates", callback.getCertificates());
-            assertEquals(msg + " Received", result.getPayloadAsString());
+            assertEquals(msg + " Received", getPayloadAsString(result));
         }
     }
 }

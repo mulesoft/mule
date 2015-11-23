@@ -156,7 +156,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         {
             try
             {
-                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + name + AFTER);
+                event.getMessage().setPayload(getPayloadAsString(event.getMessage()) + name + AFTER);
             }
             catch (Exception e)
             {
@@ -171,7 +171,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         {
             try
             {
-                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + name + BEFORE);
+                event.getMessage().setPayload(getPayloadAsString(event.getMessage()) + name + BEFORE);
             }
             catch (Exception e)
             {

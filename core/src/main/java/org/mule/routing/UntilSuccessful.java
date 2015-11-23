@@ -11,6 +11,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
@@ -154,7 +155,10 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         {
             ((Initialisable) untilSuccessfulStrategy).initialise();
         }
-
+        if (untilSuccessfulStrategy instanceof MuleContextAware)
+        {
+            ((MuleContextAware) untilSuccessfulStrategy).setMuleContext(muleContext);
+        }
         String flowName = flowConstruct.getName();
         String clusterId = muleContext.getClusterId();
         eventKeyPrefix = flowName + "-" + clusterId + "-";

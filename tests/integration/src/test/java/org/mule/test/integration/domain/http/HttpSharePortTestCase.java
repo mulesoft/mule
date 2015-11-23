@@ -73,10 +73,10 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase
     {
         MuleMessage helloWorldServiceResponse = getMuleContextForApp(HELLO_WORLD_SERVICE_APP).getClient().send(String.format("%s://localhost:%d/service/helloWorld",
                                  endpointScheme.getValue(), dynamicPort.getNumber()), new DefaultMuleMessage("test-data", getMuleContextForApp(HELLO_WORLD_SERVICE_APP)), getOptionsBuilder().build());
-        assertThat(helloWorldServiceResponse.getPayloadAsString(), is("hello world"));
+        assertThat(getPayloadAsString(helloWorldServiceResponse, getMuleContextForApp(HELLO_WORLD_SERVICE_APP)), is("hello world"));
         MuleMessage helloMuleServiceResponse = getMuleContextForApp(HELLO_MULE_SERVICE_APP).getClient().send(String.format("%s://localhost:%d/service/helloMule",
                                  endpointScheme.getValue(), dynamicPort.getNumber()), new DefaultMuleMessage("test-data", getMuleContextForApp(HELLO_MULE_SERVICE_APP)), getOptionsBuilder().build());
-        assertThat(helloMuleServiceResponse.getPayloadAsString(), is("hello mule"));
+        assertThat(getPayloadAsString(helloMuleServiceResponse, getMuleContextForApp(HELLO_MULE_SERVICE_APP)), is("hello mule"));
     }
 
     protected SystemProperty getEndpointSchemeSystemProperty()

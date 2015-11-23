@@ -123,13 +123,13 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         {
             return false;
         }
-        message.setPayload(message.getPayload(DataTypeFactory.create(Document.class)));
+        message.setPayload(muleContext.getTransformationService().getPayload(message, DataTypeFactory.create(Document.class)));
         return true;
     }
 
     private void transformBack(MuleMessage message) throws TransformerException
     {
-        message.setPayload(message.getPayload(DataType.STRING_DATA_TYPE));
+        message.setPayload(muleContext.getTransformationService().getPayload(message, DataType.STRING_DATA_TYPE));
     }
 
     @Override

@@ -45,7 +45,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inReference")).getAddress(), TEST_HTTP_MESSAGE, null);
 
-        assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
+        assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inHttpIn")).getAddress(), TEST_HTTP_MESSAGE, null);
 
-        assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
+        assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inHttpIn")).getAddress() + "/" + "mulerulez", TEST_HTTP_MESSAGE, props);
 
-        assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
+        assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
     }
 
     @Test

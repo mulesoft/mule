@@ -30,7 +30,7 @@ public class FormTransformer extends AbstractMessageTransformer
     {
         try
         {
-            String v = message.getPayloadAsString();
+            String v = muleContext.getTransformationService().getPayloadAsString(message);
             Map<String, Object> values = new HashMap<String, Object>();
 
             for (StringTokenizer st = new StringTokenizer(v, "&"); st.hasMoreTokens();)

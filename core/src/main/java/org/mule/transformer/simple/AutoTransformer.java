@@ -41,6 +41,6 @@ public class AutoTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        return message.getPayload(DataTypeFactory.create(getReturnDataType().getType()));
+        return muleContext.getTransformationService().getPayload(message, DataTypeFactory.create(getReturnDataType().getType()));
     }
 }

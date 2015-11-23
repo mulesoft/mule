@@ -42,7 +42,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
 
         MuleMessage message = RequestContext.getEventContext().requestEvent(getTestEndpointURI()+"/"+tempDirName+"?connector=FileConnector", 50000);
         // read the payload into a string so the file is deleted on InputStream.close()
-        assertNotNull(message.getPayloadAsString());
+        assertNotNull(getPayloadAsString(message));
 
         File[] files = tempDir.listFiles();
         assertTrue(files.length > 0);

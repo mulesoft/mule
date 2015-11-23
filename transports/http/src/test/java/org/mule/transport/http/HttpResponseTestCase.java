@@ -51,7 +51,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         properties.put("errorMessage", "ERROR !!!! ");
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/error", muleMessage);
-        assertTrue(response.getPayloadAsString().contains("ERROR !!!!"));
+        assertTrue(getPayloadAsString(response).contains("ERROR !!!!"));
         assertEquals("" + HttpConstants.SC_INTERNAL_SERVER_ERROR, response.getInboundProperty("http.status"));
     }
 
@@ -61,7 +61,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage muleMessage = getTestMuleMessage(HTTP_BODY);
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/move", muleMessage);
-        assertEquals(HTTP_BODY, response.getPayloadAsString());
+        assertEquals(HTTP_BODY, getPayloadAsString(response));
         assertEquals("" + HttpConstants.SC_MOVED_PERMANENTLY, response.getInboundProperty("http.status"));
         assertEquals("http://localhost:9090/resources/moved", response.<Object>getInboundProperty("Location"));
     }
@@ -72,7 +72,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage muleMessage = getTestMuleMessage(HTTP_BODY);
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/all", muleMessage);
-        assertEquals("Custom body", response.getPayloadAsString());
+        assertEquals("Custom body", getPayloadAsString(response));
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
         assertEquals("public,no-cache,must-revalidate,max-age=3600,no-transform", response.getInboundProperty("Cache-Control"));
         assertEquals("Thu, 01 Dec 2014 16:00:00 GMT", response.getInboundProperty("Expires"));

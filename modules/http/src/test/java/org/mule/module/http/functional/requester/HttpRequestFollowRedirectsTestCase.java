@@ -155,7 +155,7 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
     {
         Flow flow = (Flow) getFlowConstruct(flowName);
         MuleEvent result = flow.process(testEvent);
-        assertThat(result.getMessage().getPayloadAsString(), is(expectedPayload));
+        assertThat(getPayloadAsString(result.getMessage()), is(expectedPayload));
         assertThat(uri, is(expectedPath));
     }
 }

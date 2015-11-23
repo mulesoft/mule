@@ -39,7 +39,7 @@ public class EnricherSessionPropertiesTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "some message", null, 3000);
         assertThat(response, IsNull.<Object> notNullValue());
-        assertThat(response.getPayloadAsString(), is("some message"));
+        assertThat(getPayloadAsString(response), is("some message"));
         assertThat(response.getExceptionPayload(), IsNull.<Object> nullValue());
     }
 

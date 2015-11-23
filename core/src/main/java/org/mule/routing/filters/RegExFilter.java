@@ -87,7 +87,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
             }
             else
             {
-                return accept(message.getPayloadAsString());
+                return accept(muleContext.getTransformationService().getPayloadAsString(message));
             }
         }
         catch (Exception e)

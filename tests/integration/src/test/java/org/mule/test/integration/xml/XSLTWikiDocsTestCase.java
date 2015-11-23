@@ -57,6 +57,6 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
         assertNull(message.getExceptionPayload());
         //Compare results
 
-        assertTrue(XMLUnit.compareXML(message.getPayloadAsString(), resultData).similar());
+        assertTrue(XMLUnit.compareXML(getPayloadAsString(message), resultData).similar());
     }
 }

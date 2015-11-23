@@ -59,7 +59,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
         String ct = reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, StringUtils.EMPTY);
         assertEquals("text/xml; charset=UTF-8", ct);
 
-        Document document = DocumentHelper.parseText(reply.getPayloadAsString());
+        Document document = DocumentHelper.parseText(getPayloadAsString(reply));
         List<?> fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultcode");
 
         assertEquals(1, fault.size());

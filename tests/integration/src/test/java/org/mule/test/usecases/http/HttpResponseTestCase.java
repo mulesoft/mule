@@ -40,7 +40,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertNotNull(reply.getPayload());
         int status = reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(status, 200);
-        assertEquals(0, reply.getPayloadAsString().length());
+        assertEquals(0, getPayloadAsString(reply).length());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("http://localhost:8999", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
-        assertEquals("test", reply.getPayloadAsString());
+        assertEquals("test", getPayloadAsString(reply));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("http://localhost:8989", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
-        assertEquals("test", reply.getPayloadAsString());
+        assertEquals("test", getPayloadAsString(reply));
     }
 
     /**

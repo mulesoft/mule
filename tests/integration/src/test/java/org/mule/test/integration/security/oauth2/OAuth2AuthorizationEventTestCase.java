@@ -67,6 +67,7 @@ public class OAuth2AuthorizationEventTestCase extends FunctionalTestCase
         this.accessTokenObjectStore = new InMemoryObjectStore<Serializable>();
         this.manager = Mockito.spy(new TestOAuth2Manager(this.objectFactory, this.adapter));
         this.manager.setAccessTokenObjectStore(this.accessTokenObjectStore);
+        this.manager.setMuleContext(muleContext);
     }
 
     @Override

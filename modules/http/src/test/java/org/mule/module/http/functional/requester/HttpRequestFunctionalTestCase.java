@@ -89,7 +89,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     {
         MuleEvent event = runFlow("requestFlow", TEST_MESSAGE);
         assertTrue(event.getMessage().getPayload() instanceof InputStream);
-        assertThat(event.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
+        assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 
     @Rule
@@ -100,7 +100,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     {
         MuleEvent event = runFlow("blockingRequestFlow", TEST_MESSAGE);
         assertTrue(event.getMessage().getPayload() instanceof String);
-        assertThat(event.getMessage().getPayloadAsString(), equalTo("value"));
+        assertThat(getPayloadAsString(event.getMessage()), equalTo("value"));
     }
 
     @Test

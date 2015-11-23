@@ -40,7 +40,7 @@ public class FtpRedeliveryPolicyTestCase extends AbstractFtpServerTestCase
         exceptionListener.waitUntilAllNotificationsAreReceived();
         MuleMessage message = muleContext.getClient().request("vm://error-queue", RECEIVE_TIMEOUT);
         assertThat(message, is(notNullValue()));
-        assertThat(message.getPayloadAsString(), is(TEST_MESSAGE));
+        assertThat(getPayloadAsString(message), is(TEST_MESSAGE));
         assertThat(fileExists(FILE_TXT), is(false));
     }
 }

@@ -31,6 +31,6 @@ public class PGPIntegrationTestCase extends FunctionalTestCase
 
         client.send("vm://in", new DefaultMuleMessage(payload, muleContext));
         MuleMessage message = client.request("vm://out", 5000);
-        assertEquals(payload, message.getPayloadAsString());
+        assertEquals(payload, getPayloadAsString(message));
     }
 }

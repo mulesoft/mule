@@ -28,7 +28,7 @@ public abstract class AbstractStreamingDownloadMule1389TestCase extends Function
             "request", null);
         assertNotNull(result);
         assertNotNull(result.getPayload());
-        assertEquals(InputStreamSource.SIZE, result.getPayloadAsBytes().length);
+        assertEquals(InputStreamSource.SIZE, getPayloadAsBytes(result).length);
         long then = System.currentTimeMillis();
         double speed = InputStreamSource.SIZE / (double) (then - now) * 1000 / AbstractStreamingCapacityTestCase.ONE_MB;
         logger.info("Transfer speed " + speed + " MB/s (" + InputStreamSource.SIZE + " B in " + (then - now) + " ms)");

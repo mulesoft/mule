@@ -37,7 +37,7 @@ public class GroovyRegistryLookupTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://test", "", null);
         assertNotNull(response);
-        assertEquals("hello", response.getPayloadAsString());
+        assertEquals("hello", getPayloadAsString(response));
     }
 
     public static class Hello

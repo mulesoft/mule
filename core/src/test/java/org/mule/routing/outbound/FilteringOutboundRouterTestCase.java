@@ -52,6 +52,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextTestCase
 
         FilteringOutboundRouter router = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
+        router.setMuleContext(muleContext);
         router.setFilter(filter);
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add(mockEndpoint);

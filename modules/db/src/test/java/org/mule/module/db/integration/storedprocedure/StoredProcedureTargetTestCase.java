@@ -58,8 +58,9 @@ public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://storedProcedureCustomTarget", TEST_MESSAGE, null);
 
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        assertThat(response.getPayload(), equalTo(TEST_MESSAGE));
         assertThat(response.getInboundProperty("statementResult"), is(instanceOf(Map.class)));
+
         verifyUpdatedRecord();
     }
 

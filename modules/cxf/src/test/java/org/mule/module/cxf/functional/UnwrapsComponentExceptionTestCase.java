@@ -69,7 +69,7 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
 
         MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
 
-        assertTrue("Component exception was not managed", received.getPayloadAsString().contains(ERROR_MESSAGE));
+        assertTrue("Component exception was not managed", getPayloadAsString(received).contains(ERROR_MESSAGE));
     }
 
     @WebService(endpointInterface = "org.mule.module.cxf.example.HelloWorld", serviceName = "HelloWorld")

@@ -90,7 +90,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         mc.dispatch("vm://in3", "test", null);
 
         MuleMessage out4 = mc.request("vm://out4", RECEIVE_TIMEOUT);
-        assertEquals("ERROR!", out4.getPayloadAsString());
+        assertEquals("ERROR!", getPayloadAsString(out4));
     }
 
     @Test

@@ -44,7 +44,7 @@ public class IsJsonFilter implements Filter
         }
         try
         {
-            return accept(obj.getPayloadAsString());
+            return accept(obj.getMuleContext().getTransformationService().getPayloadAsString(obj));
         }
         catch (Exception e)
         {

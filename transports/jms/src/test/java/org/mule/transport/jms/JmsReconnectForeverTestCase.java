@@ -107,7 +107,7 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
         this.runFlow(entryFlow, TEST_MESSAGE);
         MuleMessage message = muleContext.getClient().request("vm://out" + entryFlow, RECEIVE_TIMEOUT);
         assertThat(message, notNullValue());
-        assertThat(message.getPayloadAsString(), is(TEST_MESSAGE));
+        assertThat(getPayloadAsString(message), is(TEST_MESSAGE));
     }
 }
 

@@ -35,7 +35,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
 
         // Request using loopback address at endpoint listening at 127.0.0.1 should get an appropiate response.
         result = client.send(getTransportName()+"://127.0.0.1:"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
 
         // Request using localhost address at endpoint listening at localhost should get an appropiate response.
         result = client.send(getTransportName()+"://localhost:"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
 
         // Request using loopback address at endpoint listening at all addresses should get an appropiate response.
         result = client.send(getTransportName()+"://127.0.0.1:"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
             /* Request not using loopback address to endpoint listening at all local addresses should get an
              * appropriate response. */
             result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort3.getNumber(), getTestMuleMessage(TEST_MESSAGE));
-            assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+            assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
         }
     }
 }

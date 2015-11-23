@@ -52,7 +52,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         client.dispatch("vm://echo", new String(msg), props);
 
         MuleMessage message = client.request("vm://output", RECEIVE_TIMEOUT);
-        assertEquals("This is a test message.\r\nThis is another line.\r\n", message.getPayloadAsString());
+        assertEquals("This is a test message.\r\nThis is another line.\r\n", getPayloadAsString(message));
     }
 
     @Test

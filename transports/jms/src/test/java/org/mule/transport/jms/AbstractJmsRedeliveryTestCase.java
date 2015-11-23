@@ -75,7 +75,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase
     {
         MuleMessage dl = client.request(JMS_DEAD_LETTER, 1000);
         assertNotNull(dl);        
-        assertTrue(dl.getPayloadAsString().equals(TEST_MESSAGE));
+        assertTrue(getPayloadAsString(dl).equals(TEST_MESSAGE));
     }
 
     protected void purgeQueue() throws MuleException

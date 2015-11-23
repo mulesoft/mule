@@ -72,11 +72,12 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator, M
             {
                 if (expression.equals(BYTE_ARRAY))
                 {
-                    return message.getPayload(DataType.BYTE_ARRAY_DATA_TYPE);
+                    return muleContext.getTransformationService().getPayload(message, DataType.BYTE_ARRAY_DATA_TYPE);
                 }
                 else
                 {
-                    return message.getPayload(DataTypeFactory.create(ClassUtils.loadClass(expression, getClass())));
+                    return muleContext.getTransformationService().getPayload(message, DataTypeFactory.create
+                            (ClassUtils.loadClass(expression, getClass())));
                 }
             }
             catch (TransformerException e)

@@ -5,6 +5,6 @@ public class GroovyDynamicScriptCallable implements Callable
 {
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
-        return eventContext.getMessage().getPayloadAsString() + " Received2"
+        return eventContext.getMessage().getPayload() + " Received2"
     }
 }

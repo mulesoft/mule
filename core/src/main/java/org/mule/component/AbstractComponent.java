@@ -165,10 +165,8 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         }
         else if (result != null)
         {
-            event.getMessage().applyTransformers(
-                event,
-                Collections.<Transformer> singletonList(new TransformerTemplate(
-                    new TransformerTemplate.OverwitePayloadCallback(result))));
+            muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections.<Transformer>singletonList
+                    (new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result))));
             return event;
         }
         else

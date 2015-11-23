@@ -48,6 +48,6 @@ public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage m = client.send(endpoint, payload, null);
         assertNotNull(m);
-        assertEquals(payload + result, m.getPayloadAsString());
+        assertEquals(payload + result, getPayloadAsString(m));
     }
 }

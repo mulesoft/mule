@@ -95,7 +95,7 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
         // message will be returned as the response. There is no exception payload.
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
-        assertNotNull(message.getPayloadAsString());
+        assertNotNull(getPayloadAsString(message));
         assertTrue((afterCall.getTime() - beforeCall.getTime()) > DEFAULT_RESPONSE_TIMEOUT);
     }
 
@@ -131,7 +131,7 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
         // If everything is good the we'll have received a result after more than 10s
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
-        assertNotNull(getProcessedPayload(), message.getPayloadAsString());
+        assertNotNull(getProcessedPayload(), getPayloadAsString(message));
         assertTrue((afterCall.getTime() - beforeCall.getTime()) > DEFAULT_RESPONSE_TIMEOUT);
     }
 }

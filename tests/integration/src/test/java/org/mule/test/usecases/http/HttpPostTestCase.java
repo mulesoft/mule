@@ -34,7 +34,7 @@ public class HttpPostTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("httpRequest", "payload", null);
         assertNotNull(message);
-        assertNotNull(message.getPayloadAsString());
-        assertEquals("IncidentData=payload", message.getPayloadAsString());
+        assertNotNull(getPayloadAsString(message));
+        assertEquals("IncidentData=payload", getPayloadAsString(message));
     }
 }

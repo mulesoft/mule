@@ -40,6 +40,6 @@ public class GreedyTestCase extends FunctionalTestCase
         event.setFlowVariable("currency", currency); // to cents
 
         MuleEvent response = runFlow("greedy", event);
-        assertThat(response.getMessage().getPayloadAsString(), equalTo(expectedResult));
+        assertThat(getPayloadAsString(response.getMessage()), equalTo(expectedResult));
     }
 }

@@ -132,7 +132,7 @@ public class ChoiceExceptionStrategyTestCase extends FunctionalTestCase
             }
         });
         MuleMessage response = client.send("vm://in", payload, null);
-        assertThat(response.getPayloadAsString(), is(expectedMessage));
+        assertThat(getPayloadAsString(response), is(expectedMessage));
     }
 
     public static class BaseException extends Exception

@@ -192,6 +192,8 @@ public class DefaultMuleContext implements MuleContext
 
     private volatile Collection<ExceptionContextProvider> exceptionContextProviders;
 
+    private TransformationService transformationService;
+
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
      */
@@ -216,10 +218,12 @@ public class DefaultMuleContext implements MuleContext
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
         exceptionListener = new DefaultSystemExceptionStrategy(this);
+        transformationService = new TransformationService(this);
     }
 
     public DefaultMuleContext()
     {
+        transformationService = new TransformationService(this);
     }
 
     protected DefaultRegistryBroker createRegistryBroker()
@@ -1125,5 +1129,17 @@ public class DefaultMuleContext implements MuleContext
             }
         }
         return exceptionContextProviders;
+    }
+
+    @Override
+    public TransformationService getTransformationService()
+    {
+        return transformationService;
+    }
+
+    @Override
+    public void setTransformationService(TransformationService transformationService)
+    {
+        this.transformationService = transformationService;
     }
 }

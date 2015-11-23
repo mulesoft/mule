@@ -31,6 +31,6 @@ public class GroovyBindingFunctionalTestCase extends FunctionalTestCase
         client.dispatch("client_request", "Important Message", null);
         MuleMessage response = client.request("client_response", 2000);
         assertNotNull(response);
-        assertEquals("Important Message Received by Callout1 Received by Callout2", response.getPayloadAsString());
+        assertEquals("Important Message Received by Callout1 Received by Callout2", getPayloadAsString(response));
     }
 }

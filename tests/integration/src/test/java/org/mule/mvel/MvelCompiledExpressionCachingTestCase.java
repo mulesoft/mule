@@ -32,6 +32,6 @@ public class MvelCompiledExpressionCachingTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://fooInput", TEST_MESSAGE, null);
 
-        assertThat(response.getPayloadAsString(), equalTo("SUCCESS"));
+        assertThat(getPayloadAsString(response), equalTo("SUCCESS"));
     }
 }

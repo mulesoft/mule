@@ -39,7 +39,7 @@ public class WSConsumerHttpListenerFunctionalTestCase extends AbstractWSConsumer
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + clientPort.getValue(), getTestMuleMessage(ECHO_REQUEST),
                                            newOptions().method(POST.name()).build());
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, response.getPayloadAsString());
+        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
     }
 
 }

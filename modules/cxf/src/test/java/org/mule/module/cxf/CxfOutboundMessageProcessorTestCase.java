@@ -57,7 +57,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
                 payload = event.getMessage().getPayload();
                 try
                 {
-                    System.out.println(event.getMessage().getPayloadAsString());
+                    System.out.println(getPayloadAsString(event.getMessage()));
                 }
                 catch (Exception e)
                 {

@@ -102,7 +102,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
 
     private void validateResponse(MuleMessage response) throws Exception
     {
-        String unzipped = unzip(new ByteArrayInputStream(response.getPayloadAsBytes()));
+        String unzipped = unzip(new ByteArrayInputStream(getPayloadAsBytes(response)));
         assertTrue(XMLUnit.compareXML(getAllResponse, unzipped).identical());
         assertEquals(GZIP, response.getInboundProperty(HttpConstants.HEADER_CONTENT_ENCODING));
     }

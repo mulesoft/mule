@@ -43,7 +43,7 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://inExceptionBlock", JSON_REQUEST, null, TIMEOUT);
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
         JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
         assertThat(actualJsonNode, is(expectedJsonNode));
     }
@@ -55,7 +55,7 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://inTxWithException", JSON_REQUEST, null, TIMEOUT);
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
         JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
         assertThat(actualJsonNode, is(expectedJsonNode));
     }

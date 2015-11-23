@@ -83,7 +83,7 @@ public class XPath3TestCase extends FunctionalTestCase
     public void concatOverResultNode() throws Exception
     {
         Node line = (Node) findLines(HANDKERCHIEF, XPathReturnType.NODE);
-        String result = runFlow("actTitles", line).getMessage().getPayloadAsString();
+        String result = getPayloadAsString(runFlow("actTitles", line).getMessage());
         assertThat(result, equalTo("ACT III SCENE III.  The garden of the castle."));
     }
 
@@ -91,7 +91,7 @@ public class XPath3TestCase extends FunctionalTestCase
     public void getAncestorOverResultNode() throws Exception
     {
         Node line = (Node) findLines(HANDKERCHIEF, XPathReturnType.NODE);
-        String result = runFlow("findSpeaker", line).getMessage().getPayloadAsString();
+        String result = getPayloadAsString(runFlow("findSpeaker", line).getMessage());
         assertThat(result, equalTo("EMILIA"));
     }
 

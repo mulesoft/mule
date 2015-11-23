@@ -103,7 +103,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         assertThat(response, IsNull.<Object>notNullValue());
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
         JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
         assertThat(actualJsonNode, Is.is(expectedJsonNode));
     }
@@ -118,7 +118,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 	    client.dispatch("vm://in2","some message",null);
         MuleMessage result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
         assertThat(result,IsNull.<Object>notNullValue());
-        assertThat(result.getPayloadAsString(), Is.is(MESSAGE + " Caught"));
+        assertThat(getPayloadAsString(result), Is.is(MESSAGE + " Caught"));
 	}
 
     @Test
@@ -128,7 +128,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         MuleMessage result = null;
         result = client.send("vm://in3", MESSAGE, null, TIMEOUT);
         assertThat(result,IsNull.<Object>notNullValue());
-        assertThat(result.getPayloadAsString(), Is.is(MESSAGE + " apt1 apt2 groovified"));
+        assertThat(getPayloadAsString(result), Is.is(MESSAGE + " apt1 apt2 groovified"));
     }
 
     public static class LoadNewsProcessor implements MessageProcessor
