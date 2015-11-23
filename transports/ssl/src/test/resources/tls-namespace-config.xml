@@ -28,7 +28,7 @@
 
     <tls:context name="tlsContext" >
         <tls:trust-store path="trustStore" password="testTrustStorePassword"
-                         type="testTrustStoreType" algorithm="testTrustStoreAlgorithm"/>
+                         type="testTrustStoreType" algorithm="testTrustStoreAlgorithm" insecure="false"/>
 
         <tls:key-store path="serverKeystore" keyPassword="testKeyPassword" password="testKeyStorePassword"
                        algorithm="testKeyStoreAlgorithm" alias="testKeyStoreAlias" type="testKeyStoreType"/>

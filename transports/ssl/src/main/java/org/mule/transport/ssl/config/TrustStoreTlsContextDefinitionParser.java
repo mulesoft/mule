@@ -18,6 +18,7 @@ public class TrustStoreTlsContextDefinitionParser extends ParentDefinitionParser
         addAlias("password", "trustStorePassword");
         addAlias("type", "trustStoreType");
         addAlias("algorithm", "trustManagerAlgorithm");
+        addAlias("insecure", "trustStoreInsecure");
     }
 
 }

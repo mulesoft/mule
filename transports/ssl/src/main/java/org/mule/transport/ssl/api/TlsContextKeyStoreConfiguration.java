@@ -9,7 +9,7 @@ package org.mule.transport.ssl.api;
 /**
  * Provides methods to access the configuration of a key store.
  */
-public interface TlsContextKeyStoreConfiguration extends TlsContextTrustStoreConfiguration
+public interface TlsContextKeyStoreConfiguration extends TlsContextStoreConfiguration
 {
 
     /**

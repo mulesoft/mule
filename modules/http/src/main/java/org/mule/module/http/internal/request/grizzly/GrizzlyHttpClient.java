@@ -29,6 +29,7 @@ import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -73,6 +74,7 @@ public class GrizzlyHttpClient implements HttpClient
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
     private String threadNamePrefix;
+    private String ownerName;
 
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
@@ -86,6 +88,7 @@ public class GrizzlyHttpClient implements HttpClient
         this.usePersistentConnections = config.isUsePersistentConnections();
         this.connectionIdleTimeout = config.getConnectionIdleTimeout();
         this.threadNamePrefix = config.getThreadNamePrefix();
+        this.ownerName = config.getOwnerName();
     }
 
     @Override
@@ -131,7 +134,13 @@ public class GrizzlyHttpClient implements HttpClient
             {
                 builder.setEnabledProtocols(tlsContextFactory.getEnabledProtocols());
             }
-
+            TlsContextTrustStoreConfiguration trustStoreConfiguration = tlsContextFactory.getTrustStoreConfiguration();
+            if(trustStoreConfiguration != null && trustStoreConfiguration.isInsecure())
+            {
+                logger.warn(String.format("TLS configuration for requester %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.", ownerName));
+                //This disables hostname verification
+                builder.setAcceptAnyCertificate(true);
+            }
         }
     }
 

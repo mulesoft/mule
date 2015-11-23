@@ -9,27 +9,11 @@ package org.mule.transport.ssl.api;
 /**
  * Provides methods to access the configuration of a trust store.
  */
-public interface TlsContextTrustStoreConfiguration
+public interface TlsContextTrustStoreConfiguration extends TlsContextStoreConfiguration
 {
-
     /**
-     * @return The location of the store.
+     * @return true if the trust store was configured and set as insecure, meaning no validations will be performed.
      */
-    public String getPath();
-
-    /**
-     * @return The password to access the store.
-     */
-    public String getPassword();
-
-    /**
-     * @return The type of store ("jks", "pkcs12", "jceks", or any other).
-     */
-    public String getType();
-
-    /**
-     * @return The algorithm used by the store.
-     */
-    public String getAlgorithm();
+    boolean isInsecure();
 
 }

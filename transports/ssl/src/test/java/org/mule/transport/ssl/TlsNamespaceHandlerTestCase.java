@@ -8,6 +8,7 @@ package org.mule.transport.ssl;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -66,6 +67,7 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
         assertThat(tlsContextFactory.getKeyManagerPassword(), equalTo("testKeyPassword"));
         assertThat(tlsContextFactory.getKeyManagerAlgorithm(), equalTo("testKeyStoreAlgorithm"));
         assertThat(tlsContextFactory.getKeyAlias(), equalTo("testKeyStoreAlias"));
+        assertThat(tlsContextFactory.isTrustStoreInsecure(), is(false));
     }
 
     @Test
@@ -92,6 +94,7 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
         assertThat(trustStoreConfig.getPassword(), equalTo("testTrustStorePassword"));
         assertThat(trustStoreConfig.getType(), equalTo("testTrustStoreType"));
         assertThat(trustStoreConfig.getAlgorithm(), equalTo("testTrustStoreAlgorithm"));
+        assertThat(trustStoreConfig.isInsecure(), equalTo(false));
     }
 
 
