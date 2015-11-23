@@ -6,23 +6,28 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ALL_INTERFACES_IP;
+import static org.mule.module.http.api.HttpHeaders.Names.HOST;
+import static org.mule.module.http.internal.HttpParser.decodeUrlEncodedBody;
+import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
+import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
+import static org.mule.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.endpoint.URIBuilder;
 import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
@@ -81,19 +86,19 @@ public class HttpRequestToMuleEvent
             {
                 if (entity instanceof MultipartHttpEntity)
                 {
-                    inboundAttachments.putAll(HttpPartDataSource.createDataHandlerFrom(((MultipartHttpEntity) entity).getParts()));
+                    inboundAttachments.putAll(createDataHandlerFrom(((MultipartHttpEntity) entity).getParts()));
                 }
                 else
                 {
                     if (contentTypeValue != null)
                     {
                         String encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
-                        outboundProperties.put(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
+                        outboundProperties.put(MULE_ENCODING_PROPERTY, encoding);
                         if ((mediaType.type() + "/" + mediaType.subtype()).equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
                         {
                             try
                             {
-                                payload = HttpParser.decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), encoding);
+                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), encoding);
                             }
                             catch (IllegalArgumentException e)
                             {
@@ -124,7 +129,7 @@ public class HttpRequestToMuleEvent
         return new DefaultMuleEvent(
                 defaultMuleMessage,
                 resolveUri(requestContext),
-                MessageExchangePattern.REQUEST_RESPONSE,
+                REQUEST_RESPONSE,
                 flowConstruct,
                 new DefaultMuleSession());
     }
@@ -133,9 +138,33 @@ public class HttpRequestToMuleEvent
     {
         URIBuilder uriBuilder = new URIBuilder();
         uriBuilder.setProtocol(requestContext.getScheme());
-        uriBuilder.setHost(requestContext.getRequest().getHeaderValue("host"));
+        uriBuilder.setHost(resolveTargetHost(requestContext.getRequest()));
         uriBuilder.setPath(requestContext.getRequest().getPath());
         return uriBuilder.getEndpoint().getUri();
+    }
+
+    /**
+     * See <a href="http://www8.org/w8-papers/5c-protocols/key/key.html#SECTION00070000000000000000" >Internet address
+     * conservation</a>.
+     */
+    private static String resolveTargetHost(HttpRequest request)
+    {
+        String hostHeaderValue = request.getHeaderValue(HOST);
+        if (HTTP_1_0.equals(request.getProtocol()) || HTTP_0_9.equals(request.getProtocol()))
+        {
+            return hostHeaderValue == null ? ALL_INTERFACES_IP : hostHeaderValue;
+        }
+        else
+        {
+            if (hostHeaderValue == null)
+            {
+                throw new IllegalArgumentException("Missing 'host' header");
+            }
+            else
+            {
+                return hostHeaderValue;
+            }
+        }
     }
 
     private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)
