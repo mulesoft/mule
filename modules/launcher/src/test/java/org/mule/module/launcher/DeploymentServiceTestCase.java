@@ -2501,7 +2501,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public String describeFailure()
             {
-                return "Failed to deploy application: " + artifactName + System.lineSeparator() + super.describeFailure();
+                return "Failed to deploy application: " + artifactName + "\r\n" + super.describeFailure();
             }
         });
     }
@@ -2521,7 +2521,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public String describeFailure()
             {
-                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextCreated", appName) + System.lineSeparator() + super.describeFailure();
+                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextCreated", appName) + "\r\n" + super.describeFailure();
             }
         });
     }
@@ -2541,7 +2541,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public String describeFailure()
             {
-                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextInitialised", appName) + System.lineSeparator() + super.describeFailure();
+                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextInitialised", appName) + "\r\n" + super.describeFailure();
             }
         });
     }
@@ -2561,7 +2561,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public String describeFailure()
             {
-                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextConfigured", appName) + System.lineSeparator() + super.describeFailure();
+                return String.format("Did not received notification '%s' for app '%s'", "onMuleContextConfigured", appName) + "\r\n" + super.describeFailure();
             }
         });
     }
@@ -2581,7 +2581,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public String describeFailure()
             {
-                return "Failed to undeployArtifact application: " + appName + System.lineSeparator() + super.describeFailure();
+                return "Failed to undeployArtifact application: " + appName + "\r\n" + super.describeFailure();
             }
         });
     }
