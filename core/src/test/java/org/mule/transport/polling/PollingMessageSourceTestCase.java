@@ -7,41 +7,37 @@
 package org.mule.transport.polling;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.schedule.Scheduler;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
+import org.mule.transport.polling.MessageProcessorPollingOverride.NoOverride;
 import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 
 import java.util.Collection;
 
 import org.junit.Test;
 
-public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMuleContextTestCase
+public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
-    public void testNullResponseFromNestedMP() throws Exception
+    public void nullResponseFromNestedMP() throws Exception
     {
-
-        MessageProcessorPollingMessageReceiver receiver = createReceiver(new MessageProcessor()
+        PollingMessageSource pollingMessageSource = createMessageSource(new MessageProcessor()
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
@@ -50,18 +46,18 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
         });
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
-        receiver.setListener(flow);
+        pollingMessageSource.setListener(flow);
 
-        receiver.poll();
+        pollingMessageSource.poll();
 
         assertNull(flow.event);
     }
 
     @Test
-    public void testNullPayloadResponseFromNestedMP() throws Exception
+    public void nullPayloadResponseFromNestedMP() throws Exception
     {
 
-        MessageProcessorPollingMessageReceiver receiver = createReceiver(new MessageProcessor()
+        PollingMessageSource pollingMessageSource = createMessageSource(new MessageProcessor()
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
@@ -71,18 +67,18 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
         });
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
-        receiver.setListener(flow);
+        pollingMessageSource.setListener(flow);
 
-        receiver.poll();
+        pollingMessageSource.poll();
 
         assertNull(flow.event);
     }
 
     @Test
-    public void testEmptyStringResponseFromNestedMP() throws Exception
+    public void emptyStringResponseFromNestedMP() throws Exception
     {
 
-        MessageProcessorPollingMessageReceiver receiver = createReceiver(new MessageProcessor()
+        PollingMessageSource pollingMessageSource = createMessageSource(new MessageProcessor()
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
@@ -91,36 +87,18 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
         });
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
-        receiver.setListener(flow);
+        pollingMessageSource.setListener(flow);
 
-        receiver.poll();
+        pollingMessageSource.poll();
 
         assertNotNull(flow.event);
-    }
-
-    @Test
-    public void testNestedOneWayEndpoint() throws Exception
-    {
-
-        try
-        {
-            createReceiver(muleContext.getEndpointFactory().getOutboundEndpoint("test://test2"));
-
-            org.junit.Assert.fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-
-            assertEquals(InitialisationException.class, e.getClass());
-        }
-
     }
 
     @Test
     public void disposeScheduler() throws Exception
     {
 
-        MessageProcessorPollingMessageReceiver receiver = createReceiver(new MessageProcessor()
+        PollingMessageSource pollinMessageSource = createMessageSource(new MessageProcessor()
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
@@ -133,8 +111,8 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
 
         Scheduler scheduler = allSchedulers.iterator().next();
 
-        receiver.stop();
-        receiver.dispose();
+        pollinMessageSource.stop();
+        pollinMessageSource.dispose();
 
         assertThat(getAllSchedulers().size(), is(0));
         verify(scheduler).dispose();
@@ -145,22 +123,14 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
         return muleContext.getRegistry().lookupObjects(Scheduler.class);
     }
 
-    private MessageProcessorPollingMessageReceiver createReceiver(MessageProcessor processor)
+    private PollingMessageSource createMessageSource(MessageProcessor processor)
         throws MuleException
     {
-        EndpointURIEndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-        builder.setProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME,
-            processor);
-        builder.setProperty(MessageProcessorPollingMessageReceiver.SCHEDULER_FACTORY_PROPERTY_NAME, schedulerFactory());
-        InboundEndpoint inboundEndpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder);
-
         FlowConstruct flowConstruct = mock(FlowConstruct.class);
-        when(flowConstruct.getMuleContext()).thenReturn(muleContext);
-        MessageProcessorPollingMessageReceiver receiver = new MessageProcessorPollingMessageReceiver(
-            inboundEndpoint.getConnector(), flowConstruct, inboundEndpoint);
-
-        receiver.initialise();
-        return receiver;
+        PollingMessageSource pollingMessageSource = new PollingMessageSource(muleContext, processor, new NoOverride(), schedulerFactory(), 0l);
+        pollingMessageSource.setFlowConstruct(flowConstruct);
+        pollingMessageSource.initialise();
+        return pollingMessageSource;
     }
 
     private FixedFrequencySchedulerFactory schedulerFactory()

@@ -6,7 +6,7 @@
  */
 package org.mule.modules.schedulers.cron;
 
-import org.mule.transport.PollingReceiverWorker;
+import org.mule.transport.polling.PollingWorker;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -27,7 +27,7 @@ public class CronJob implements StatefulJob
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
 
-        PollingReceiverWorker work = (PollingReceiverWorker) getSchedulerWork(context);
+        PollingWorker work = (PollingWorker) getSchedulerWork(context);
         if (work != null)
         {
             work.run();

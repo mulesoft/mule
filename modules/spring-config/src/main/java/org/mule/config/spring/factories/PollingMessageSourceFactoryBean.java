@@ -6,23 +6,23 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.schedule.SchedulerFactory;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.endpoint.URIBuilder;
-import org.mule.transport.AbstractConnector;
-import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 import org.mule.transport.polling.MessageProcessorPollingOverride;
+import org.mule.transport.polling.PollingMessageSource;
 import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 
-public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
+import org.springframework.beans.factory.FactoryBean;
+
+public class PollingMessageSourceFactoryBean implements FactoryBean, MuleContextAware
 {
     protected SchedulerFactory<Runnable> schedulerFactory;
     protected MessageProcessor messageProcessor;
     protected MessageProcessorPollingOverride override;
     protected Long frequency;
+    private MuleContext muleContext;
 
     private FixedFrequencySchedulerFactory defaultSchedulerFactory()
     {
@@ -30,28 +30,6 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
         factory.setFrequency(frequency);
         factory.setMuleContext(muleContext);
         return factory;
-    }
-
-    @Override
-    public Object doGetObject() throws Exception
-    {
-        uriBuilder = new URIBuilder("polling://" + hashCode(), muleContext);
-
-        properties.put(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME, messageProcessor);
-        properties.put(MessageProcessorPollingMessageReceiver.POLL_OVERRIDE_PROPERTY_NAME, override);
-        properties.put(MessageProcessorPollingMessageReceiver.SCHEDULER_FACTORY_PROPERTY_NAME, schedulerFactory == null ? defaultSchedulerFactory() : schedulerFactory);
-        properties.put(AbstractConnector.PROPERTY_POLLING_FREQUENCY, frequency);
-
-        EndpointFactory ef = muleContext.getEndpointFactory();
-        if (ef != null)
-        {
-            return ef.getInboundEndpoint(this);
-        }
-        else
-        {
-            throw new ConfigurationException(
-                    MessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
-        }
     }
 
     public void setMessageProcessor(MessageProcessor messageProcessor)
@@ -75,4 +53,29 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
     }
 
 
+    @Override
+    public Object getObject() throws Exception
+    {
+        schedulerFactory = schedulerFactory == null ? defaultSchedulerFactory() : schedulerFactory;
+        override = override != null ? this.override : new MessageProcessorPollingOverride.NoOverride();
+        return new PollingMessageSource(muleContext, messageProcessor, override, schedulerFactory, frequency);
+    }
+
+    @Override
+    public Class<?> getObjectType()
+    {
+        return PollingMessageSource.class;
+    }
+
+    @Override
+    public boolean isSingleton()
+    {
+        return true;
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 }

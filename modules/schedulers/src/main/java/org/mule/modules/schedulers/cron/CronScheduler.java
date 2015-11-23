@@ -18,7 +18,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.transport.PollingReceiverWorker;
+import org.mule.transport.polling.PollingWorker;
 import org.mule.transport.polling.schedule.PollScheduler;
 
 import java.util.Properties;
@@ -42,7 +42,7 @@ import org.quartz.impl.StdSchedulerFactory;
  *
  * @since 3.5.0
  */
-public class CronScheduler extends PollScheduler<PollingReceiverWorker> implements MuleContextAware
+public class CronScheduler extends PollScheduler<PollingWorker> implements MuleContextAware
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -90,7 +90,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
      */
     private String groupName;
 
-    public CronScheduler(String name, PollingReceiverWorker job, String cronExpression)
+    public CronScheduler(String name, PollingWorker job, String cronExpression)
     {
         super(name, job);
 
@@ -123,8 +123,8 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
         {
             quartzScheduler = createScheduler();
 
-            jobName = job.getReceiver().getReceiverKey();
-            groupName = job.getReceiver().getEndpoint().getName();
+            jobName = name;
+            groupName = "pollSource";
 
             quartzScheduler.addJob(jobDetail(jobName, groupName, job), true);
 
@@ -190,7 +190,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
         this.context = context;
     }
 
-    private JobDetail jobDetail(String jobName, String groupName, PollingReceiverWorker job)
+    private JobDetail jobDetail(String jobName, String groupName, PollingWorker job)
     {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(POLL_CRON_SCHEDULER_JOB, job);
