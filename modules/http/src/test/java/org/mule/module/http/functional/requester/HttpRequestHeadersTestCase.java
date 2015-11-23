@@ -36,7 +36,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
 {
 
     @Rule
-    public SystemProperty host = new SystemProperty(HOST, "localhost");
+    public SystemProperty host = new SystemProperty("host", "localhost");
     @Rule
     public SystemProperty encoding = new SystemProperty("encoding" , CHUNKED);
 

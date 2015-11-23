@@ -9,7 +9,6 @@ package org.mule.module.http.internal.listener;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ALL_INTERFACES_IP;
-import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
@@ -148,7 +147,7 @@ public class HttpRequestToMuleEvent
      */
     private static String resolveTargetHost(HttpRequest request)
     {
-        String hostHeaderValue = request.getHeaderValue(HOST);
+        String hostHeaderValue = request.getHeaderValue("host");
         if (HTTP_1_0.equals(request.getProtocol()) || HTTP_0_9.equals(request.getProtocol()))
         {
             return hostHeaderValue == null ? ALL_INTERFACES_IP : hostHeaderValue;
