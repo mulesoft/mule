@@ -12,8 +12,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
-import java.io.InputStream;
-
 /**
  * <code>SftpMessageRequester</code> polls files on request (e.g. from a
  * quartz-inbound-endpoint) from an sftp service on request using jsch. This
@@ -46,11 +44,15 @@ public class SftpMessageRequester extends AbstractMessageRequester
         SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),
             endpoint, endpoint.getName());
 
-        InputStream inputStream = sftpRRUtil.retrieveFile(path, notifier);
+        SftpStream sftpStream = (SftpStream) sftpRRUtil.retrieveFile(path, notifier);
+        if (sftpStream != null)
+        {
+            sftpStream.performPostProcessingOnClose(true);
+        }
 
         logger.debug("Routing file: " + path);
 
-        MuleMessage message = createMuleMessage(inputStream);
+        MuleMessage message = createMuleMessage(sftpStream);
         message.setProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path, PropertyScope.INBOUND);
 
         // Now we can update the notifier with the message
