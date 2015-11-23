@@ -7,7 +7,8 @@
 package org.mule.api.schedule;
 
 
-import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
+import static org.mule.transport.polling.PollingMessageSource.POLLING_SCHEME;
+
 import org.mule.util.Predicate;
 
 /**
@@ -27,7 +28,7 @@ public class Schedulers
             @Override
             public boolean evaluate(String s)
             {
-                return s.startsWith(MessageProcessorPollingMessageReceiver.POLLING_TRANSPORT + "://");
+                return s.startsWith(POLLING_SCHEME + "://");
             }
         };
     }
@@ -43,7 +44,7 @@ public class Schedulers
             @Override
             public boolean evaluate(String s)
             {
-                return s.startsWith(MessageProcessorPollingMessageReceiver.POLLING_TRANSPORT + "://" + flowConstruct + "/");
+                return s.startsWith(POLLING_SCHEME + "://" + flowConstruct + "/");
             }
         };
     }
