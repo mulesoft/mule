@@ -117,28 +117,9 @@ public class TransformationService
      * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
      * payload
      */
-    public Object getPayload(MuleMessage message, Class outputType) throws TransformerException
+    public <T> Object getPayload(MuleMessage message, Class<T> outputType) throws TransformerException
     {
-        return getPayload(message, DataTypeFactory.create(outputType));
-    }
-
-    /**
-     * Attempts to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a transformer that can do this transformation. If a transformer cannot be found
-     * an exception is thrown.  Any transformers added to the registry will be checked for compatibility
-     * <p/>
-     * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be
-     * replaced with a byte[] representation as part of this operations.
-     *
-     * @param outputType the desired return type
-     * @return The converted payload of this message. Note that this method will not alter the payload of this
-     * message *unless* the payload is an InputStream in which case the stream will be read and the payload will become
-     * the fully read stream.
-     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
-     * payload
-     */
-    public <T> Object getPayload(MuleMessage message, DataType<T> outputType) throws TransformerException
-    {
+        DataType<T> dataType = DataTypeFactory.create(outputType);
         if (message instanceof MuleMessageCollection)
         {
             MuleMessageCollection messageCollection = (MuleMessageCollection) message;
@@ -151,15 +132,39 @@ public class TransformationService
                 List<T> results = new ArrayList<>(messageCollection.getMessageList().size());
                 for (MuleMessage messageInList : messageCollection.getMessageList())
                 {
-                    results.add(getPayload(messageInList, outputType, messageInList.getEncoding()));
+                    results.add(getPayload(messageInList, dataType, messageInList.getEncoding()));
                 }
                 return results;
             }
         }
         else
         {
-            return getPayload(message, outputType, message.getEncoding());
+            return getPayload(message, dataType, message.getEncoding());
         }
+    }
+
+    /**
+     * Attempts to obtain the payload of this message with the desired Class type. This will
+     * try and resolve a transformer that can do this transformation. If a transformer cannot be found
+     * an exception is thrown.  Any transformers added to the registry will be checked for compatibility
+     * <p/>
+     * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be
+     * replaced with a byte[] representation as part of this operations.
+     * <p/>
+     * <b>NOTE:</b> This method is inconsistent with other 'getPayload' methods as it does not have any handling for
+     * {@link MuleMessageCollection} messages at all and as such this method will always return a single object and
+     * never a List of objects.
+     *
+     * @param outputType the desired return type
+     * @return The converted payload of this message. Note that this method will not alter the payload of this
+     * message *unless* the payload is an InputStream in which case the stream will be read and the payload will become
+     * the fully read stream.
+     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
+     * payload
+     */
+    public <T> T getPayload(MuleMessage message, DataType<T> outputType) throws TransformerException
+    {
+        return getPayload(message, outputType, message.getEncoding());
     }
 
     /**
