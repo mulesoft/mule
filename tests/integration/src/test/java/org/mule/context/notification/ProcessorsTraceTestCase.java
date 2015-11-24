@@ -33,6 +33,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -381,6 +382,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
                 "/subFlowStaticWithScatterGather/processors/0/1/subFlow/subprocessors/0"));
     }
 
+    @Ignore("MULE-6926: flaky test")
     @Test
     public void flowDynamicWithScatterGather() throws Exception
     {
@@ -424,6 +426,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
                 "/flow/processors/0"));
     }
 
+    @Ignore("MULE-6926: flaky test")
     @Test
     public void subFlowStaticWithScatterGatherChain() throws Exception
     {
