@@ -48,7 +48,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
 
-        pollingMessageSource.poll();
+        pollingMessageSource.internalPoll();
 
         assertNull(flow.event);
     }
@@ -69,7 +69,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
 
-        pollingMessageSource.poll();
+        pollingMessageSource.internalPoll();
 
         assertNull(flow.event);
     }
@@ -89,7 +89,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
 
-        pollingMessageSource.poll();
+        pollingMessageSource.internalPoll();
 
         assertNotNull(flow.event);
     }
