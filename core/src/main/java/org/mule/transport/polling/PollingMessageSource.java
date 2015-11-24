@@ -165,7 +165,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
             @Override
             public void run() throws Exception
             {
-                PollingMessageSource.this.poll();
+                PollingMessageSource.this.performPoll();
             }
 
             @Override
@@ -177,15 +177,13 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
     }
 
     /**
-     * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
-     *
-     * @throws Exception
+     * Checks whether polling should take place on this instance.
      */
-    public final void poll() throws Exception
+    protected final void performPoll() throws Exception
     {
         if (!pollOnPrimaryInstanceOnly() || flowConstruct.getMuleContext().isPrimaryPollingInstance())
         {
-            internalPoll();
+            poll();
         }
     }
 
@@ -204,7 +202,12 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
         return String.format(POLLING_SCHEDULER_NAME_FORMAT, flowConstruct.getName(), this.hashCode());
     }
 
-    protected void internalPoll() throws Exception
+    /**
+     * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
+     *
+     * @throws Exception
+     */
+    public void poll() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null, muleContext);
         pollWith(request);
