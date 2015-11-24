@@ -38,7 +38,6 @@ import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,7 +165,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
             @Override
             public void run() throws Exception
             {
-                PollingMessageSource.this.performPoll();
+                PollingMessageSource.this.poll();
             }
 
             @Override
@@ -178,13 +177,15 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
     }
 
     /**
-     * Checks whether polling should take place on this instance.
+     * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
+     *
+     * @throws Exception
      */
-    public final void performPoll() throws Exception
+    public final void poll() throws Exception
     {
         if (!pollOnPrimaryInstanceOnly() || flowConstruct.getMuleContext().isPrimaryPollingInstance())
         {
-            poll();
+            internalPoll();
         }
     }
 
@@ -203,18 +204,13 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
         return String.format(POLLING_SCHEDULER_NAME_FORMAT, flowConstruct.getName(), this.hashCode());
     }
 
-    /**
-     * Triggers the execution of the polling message processor
-     *
-     * @throws Exception
-     */
-    public void poll() throws Exception
+    protected void internalPoll() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null, muleContext);
         pollWith(request);
     }
 
-    public void pollWith(final MuleMessage request) throws Exception
+    private void pollWith(final MuleMessage request) throws Exception
     {
         ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
         try
