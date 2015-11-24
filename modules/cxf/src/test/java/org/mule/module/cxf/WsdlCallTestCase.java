@@ -9,7 +9,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 import java.io.InputStream;
@@ -30,48 +29,10 @@ public class WsdlCallTestCase extends FunctionalTestCase
     @Rule
     public final DynamicPort httpPort = new DynamicPort("httpPort");
 
-    private EmbeddedJettyServer httpServer;
-
     @Override
     protected String getConfigFile()
     {
         return "wsdl-conf-flow-httpn.xml";
-    }
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        httpServer = new EmbeddedJettyServer(jettyPort.getNumber(), "/", "/services/*", new MuleReceiverServlet(), muleContext);
-        httpServer.start();
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        if (httpServer != null && httpServer.isStarted())
-        {
-            httpServer.stop();
-        }
-
-        super.doTearDown();
-    }
-
-    @Test
-    public void testRequestWsdlWithServlets() throws Exception
-    {
-        InputStream wsdlStream = new URL("http://localhost:" + jettyPort.getNumber()
-            + "/services/mycomponent?wsdl").openStream();
-
-        String location = "http://localhost:" + jettyPort.getNumber() + "/services/mycomponent";
-
-        Document document = new SAXReader().read(wsdlStream);
-
-        List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
-        assertEquals("Callable", ((Element) nodes.get(0)).attribute("name").getStringValue());
-        nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
-        assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
     }
 
     @Test

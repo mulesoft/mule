@@ -15,7 +15,6 @@
     <transport dist="ce">multicast</transport>
     <transport dist="ce">rmi</transport>
     <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/rmi/src/main/resources/META-INF/mule-jnp.xsd">jnp</transport>
-    <transport dist="ce">servlet</transport>
     <transport dist="ce">ssl</transport>
     <transport dist="ce">stdio</transport>
     <transport dist="ce">tcp</transport>
