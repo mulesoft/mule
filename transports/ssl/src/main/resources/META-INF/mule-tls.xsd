@@ -195,6 +195,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="insecure" type="mule:substitutableBoolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If true, no certificate validations will be performed.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
 

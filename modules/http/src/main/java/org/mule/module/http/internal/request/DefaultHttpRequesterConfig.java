@@ -108,6 +108,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
                 .setUsePersistentConnections(usePersistentConnections)
                 .setConnectionIdleTimeout(connectionIdleTimeout)
                 .setThreadNamePrefix(threadNamePrefix)
+                .setOwnerName(name)
                 .build();
 
         httpClient = new GrizzlyHttpClient(configuration);

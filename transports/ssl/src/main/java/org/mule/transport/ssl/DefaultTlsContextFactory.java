@@ -13,12 +13,18 @@ import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
 import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
 import org.mule.util.FileUtils;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the {@code TlsContextFactory} interface, which delegates all its operations to a
@@ -26,12 +32,14 @@ import javax.net.ssl.SSLContext;
  */
 public class DefaultTlsContextFactory implements TlsContextFactory
 {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTlsContextFactory.class);
 
     private String name;
 
     private TlsConfiguration tlsConfiguration = new TlsConfiguration(null);
 
     private boolean initialized = false;
+    private boolean trustStoreInsecure = false;
 
     public String getName()
     {
@@ -148,6 +156,20 @@ public class DefaultTlsContextFactory implements TlsContextFactory
         tlsConfiguration.setTrustManagerAlgorithm(trustManagerAlgorithm);
     }
 
+    public boolean isTrustStoreInsecure()
+    {
+        return trustStoreInsecure;
+    }
+
+    public void setTrustStoreInsecure(boolean insecure)
+    {
+        if (insecure)
+        {
+            logger.warn(String.format("TLS context %s trust store set as insecure. No certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.", name == null ? StringUtils.EMPTY : name));
+        }
+        this.trustStoreInsecure = insecure;
+    }
+
 
     @Override
     public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException, CreateException
@@ -160,7 +182,16 @@ public class DefaultTlsContextFactory implements TlsContextFactory
                 initialized = true;
             }
         }
-        return tlsConfiguration.getSslContext();
+        SSLContext sslContext;
+        if (trustStoreInsecure)
+        {
+            sslContext = tlsConfiguration.getSslContext(new TrustManager[]{new InsecureTrustManager()});
+        }
+        else
+        {
+            sslContext = tlsConfiguration.getSslContext();
+        }
+        return sslContext;
     }
 
     @Override
@@ -258,6 +289,12 @@ public class DefaultTlsContextFactory implements TlsContextFactory
             {
                 return getTrustManagerAlgorithm();
             }
+
+            @Override
+            public boolean isInsecure()
+            {
+                return isTrustStoreInsecure();
+            }
         };
     }
 
@@ -287,5 +324,19 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     public int hashCode()
     {
         return tlsConfiguration.hashCode();
+    }
+
+    private static class InsecureTrustManager implements X509TrustManager
+    {
+
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return new java.security.cert.X509Certificate[0];
+        }
+
+        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+        }
+
+        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+        }
     }
 }
