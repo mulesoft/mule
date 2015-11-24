@@ -12,12 +12,14 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -32,6 +34,7 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
@@ -52,6 +55,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     private MuleEvent mockEvent = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
     private MessageProcessor mockRoute = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
     private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, Answers.RETURNS_DEEP_STUBS.get());
+    private ThreadPoolExecutor mockPool = mock(ThreadPoolExecutor.class, Answers.RETURNS_DEEP_STUBS.get());
     private ScheduledThreadPoolExecutor mockScheduledPool = mock(ScheduledThreadPoolExecutor.class, Answers.RETURNS_DEEP_STUBS.get());
     private SimpleMemoryObjectStore<MuleEvent> objectStore = new SimpleMemoryObjectStore<MuleEvent>();
     private boolean failRoute;
@@ -74,9 +78,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                 return numberOfAttempts++;
             }
         });
-        when(mockUntilSuccessfulConfiguration.getThreadingProfile().createScheduledPool(anyString())).thenReturn(mockScheduledPool);
+        when(mockUntilSuccessfulConfiguration.getThreadingProfile().createPool(anyString())).thenReturn(mockPool);
+        when(mockUntilSuccessfulConfiguration.createScheduledRetriesPool(anyString())).thenReturn(mockScheduledPool);
         when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);
         objectStore.clear();
+        configureMockPoolToInvokeRunnableInNewThread();
         configureMockScheduledPoolToInvokeRunnableInNewThread();
         configureMockRouteToCountDownRouteLatch();
         configureExceptionStrategyToReleaseLatchWhenExecuted();
@@ -158,6 +164,26 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                 return invocationOnMock.getArguments()[0];
             }
         });
+    }
+
+    private void configureMockPoolToInvokeRunnableInNewThread()
+    {
+        doAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable
+            {
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        ((Runnable) invocationOnMock.getArguments()[0]).run();
+                    }
+                }).start();
+                return null;
+            }
+        }).when(mockPool).execute(any(Runnable.class));
     }
 
     private void configureMockScheduledPoolToInvokeRunnableInNewThread()
