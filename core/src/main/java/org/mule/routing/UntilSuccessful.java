@@ -24,7 +24,9 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.util.Preconditions;
+import org.mule.util.concurrent.NamedThreadFactory;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -192,6 +194,12 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     }
 
     @Override
+    public ScheduledThreadPoolExecutor createScheduledRetriesPool(final String threadPrefix)
+    {
+        return new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(threadPrefix + "_retries", Thread.currentThread().getContextClassLoader()));
+    }
+
+    @Override
     public void stop() throws MuleException
     {
         if (untilSuccessfulStrategy instanceof Stoppable)
@@ -213,6 +221,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         return untilSuccessfulStrategy.route(event);
     }
 
+    @Override
     public ListableObjectStore<MuleEvent> getObjectStore()
     {
         return objectStore;
@@ -223,6 +232,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         this.objectStore = objectStore;
     }
 
+    @Override
     public int getMaxRetries()
     {
         return maxRetries;
@@ -264,6 +274,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         this.failureExpression = failureExpression;
     }
 
+    @Override
     public String getAckExpression()
     {
         return ackExpression;
@@ -289,6 +300,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         return eventKeyPrefix;
     }
 
+    @Override
     public ExpressionFilter getFailureExpressionFilter()
     {
         return failureExpressionFilter;
@@ -299,21 +311,25 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         this.threadingProfile = threadingProfile;
     }
 
+    @Override
     public ThreadingProfile getThreadingProfile()
     {
         return threadingProfile;
     }
 
+    @Override
     public MessageProcessor getDlqMP()
     {
         return dlqMP;
     }
 
+    @Override
     public MessageProcessor getRoute()
     {
         return this.routes.get(0);
     }
 
+    @Override
     public AbstractOutboundRouter getRouter()
     {
         return this;
