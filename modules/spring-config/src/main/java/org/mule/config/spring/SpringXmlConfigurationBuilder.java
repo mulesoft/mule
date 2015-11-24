@@ -15,6 +15,7 @@ import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,8 +64,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         super(configResources);
     }
 
-    @Override
-    protected void doConfigure(MuleContext muleContext) throws Exception
+    protected List<ConfigResource> getConfigResources() throws IOException
     {
         List<ConfigResource> allResources = new ArrayList<>();
         if (useMinimalConfigResource)
@@ -87,9 +87,14 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
             allResources.addAll(Arrays.asList(configResources));
         }
+        return allResources;
+    }
 
+    @Override
+    protected void doConfigure(MuleContext muleContext) throws Exception
+    {
+        List<ConfigResource> allResources = getConfigResources();
         addResources(allResources);
-
         ConfigResource[] configResourcesArray = new ConfigResource[allResources.size()];
         applicationContext = createApplicationContext(muleContext, allResources.toArray(configResourcesArray));
         createSpringRegistry(muleContext, applicationContext);
