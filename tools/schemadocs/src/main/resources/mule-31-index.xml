@@ -10,8 +10,6 @@
     <transport dist="ce">http</transport>
     <transport dist="ce" artifactName="http">https</transport>
     <transport dist="ce">jdbc</transport>
-    <transport dist="ce">jetty</transport>
-    <transport dist="ce" artifactName="jetty">jetty-ssl</transport>
     <transport dist="ce">jms</transport>
     <transport dist="ce">multicast</transport>
     <transport dist="ce">rmi</transport>

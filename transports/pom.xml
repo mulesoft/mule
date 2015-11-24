@@ -17,7 +17,6 @@
         <module>file</module>
         <module>http</module>
         <module>jdbc</module>
-        <module>jetty</module>
         <module>jms</module>
         <module>servlet</module>
         <module>ssl</module>

@@ -150,11 +150,6 @@
     <link><item>jdbc:transaction</item><page>JDBC+Transport</page></link>
     <link><item>jdbc:query</item><page>JDBC+Transport</page></link>
 
-    <link><item>jetty:connector</item><page>Jetty+Transport</page></link>
-    <link><item>jetty:inbound-endpoint</item><page>Jetty+Transport</page></link>
-    <link><item>jetty:outbound-endpoint</item><page>Jetty+Transport</page></link>
-    <link><item>jetty:endpoint</item><page>Jetty+Transport</page></link>
-
     <link><item>jms:connector</item><page>JMS+Transport</page></link>
     <link><item>jms:custom-connector</item><page>JMS+Transport</page></link>
     <link><item>jms:activemq-connector</item><page>JMS+Transport</page></link>

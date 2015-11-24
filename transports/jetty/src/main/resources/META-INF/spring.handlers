@@ -1,2 +1,0 @@
-http\://www.mulesoft.org/schema/mule/jetty=org.mule.transport.servlet.jetty.config.JettyNamespaceHandler
-http\://www.mulesoft.org/schema/mule/jetty-ssl=org.mule.transport.servlet.jetty.config.JettySslNamespaceHandler
