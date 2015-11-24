@@ -12,7 +12,7 @@ package org.mule.transport.ssl.api;
 public interface TlsContextTrustStoreConfiguration extends TlsContextStoreConfiguration
 {
     /**
-     * @return true if the trust store was configured and set as insecure, meaning no validations will be performed.
+     * @return true if the trust store was configured and set as insecure, meaning no certificate validations will be performed.
      */
     boolean isInsecure();
 
