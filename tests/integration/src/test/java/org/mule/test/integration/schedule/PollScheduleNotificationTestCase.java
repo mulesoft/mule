@@ -7,25 +7,23 @@
 package org.mule.test.integration.schedule;
 
 
-import org.mule.api.AnnotatedObject;
-import org.mule.api.context.notification.EndpointMessageNotificationListener;
-import org.mule.context.notification.EndpointMessageNotification;
+import org.mule.api.context.notification.ConnectorMessageNotificationListener;
+import org.mule.construct.Flow;
+import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.transport.polling.PollingMessageSource;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.namespace.QName;
 
 import org.junit.Test;
 
 public class PollScheduleNotificationTestCase extends FunctionalTestCase
 {
-    public static final QName NAME = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
-    Prober prober = new PollingProber(5000, 100l);
+    private Prober prober = new PollingProber(5000, 100l);
 
     @Override
     protected String getConfigFile()
@@ -34,16 +32,18 @@ public class PollScheduleNotificationTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void validateNotificationsAreSent() throws InterruptedException
+    public void validateNotificationsAreSent() throws Exception
     {
         final MyListener listener = new MyListener();
         muleContext.getNotificationManager().addListener(listener);
+        Flow flow = (Flow) getFlowConstruct("pollfoo");
+        PollingMessageSource pollingMessageSource = (PollingMessageSource) flow.getMessageSource();
         prober.check(new Probe()
         {
             @Override
             public boolean isSatisfied()
             {
-                return listener.getNotifications().size() > 1 && "pollName".equals(listener.getNotifications().get(0));
+                return listener.getNotifications().size() > 1 && pollingMessageSource.getPollingUniqueName().equals(listener.getNotifications().get(0).getEndpoint());
             }
 
             @Override
@@ -54,17 +54,18 @@ public class PollScheduleNotificationTestCase extends FunctionalTestCase
         });
 
     }
-    class MyListener implements EndpointMessageNotificationListener<EndpointMessageNotification>{
+    class MyListener implements ConnectorMessageNotificationListener<ConnectorMessageNotification>
+    {
 
-        List<String> notifications = new ArrayList<String>();
+        List<ConnectorMessageNotification> notifications = new ArrayList<>();
 
         @Override
-        public void onNotification(EndpointMessageNotification notification)
+        public void onNotification(ConnectorMessageNotification notification)
         {
-            notifications.add((String) ((AnnotatedObject)notification.getImmutableEndpoint()).getAnnotation(NAME));
+            notifications.add(notification);
         }
 
-        public List<String> getNotifications()
+        public List<ConnectorMessageNotification> getNotifications()
         {
             return notifications;
         }

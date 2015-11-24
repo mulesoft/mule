@@ -9,16 +9,16 @@ package org.mule.modules.schedulers.cron;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.schedule.Scheduler;
-import org.mule.transport.AbstractPollingMessageReceiver;
-import org.mule.transport.PollingReceiverWorker;
+import org.mule.transport.polling.PollingTask;
+import org.mule.transport.polling.PollingWorker;
 
 import org.junit.Test;
 
 public class CronSchedulerFactoryTest
 {
-
-    private AbstractPollingMessageReceiver receiver = mock(AbstractPollingMessageReceiver.class);
 
     @Test
     public void testSchedulerCreation()
@@ -26,7 +26,7 @@ public class CronSchedulerFactoryTest
         CronSchedulerFactory factory = new CronSchedulerFactory();
         factory.setExpression("my expression");
 
-        Scheduler scheduler = factory.create("name", new PollingReceiverWorker(receiver));
+        Scheduler scheduler = factory.create("name", new PollingWorker(mock(PollingTask.class), mock(SystemExceptionHandler.class)));
 
         assertTrue(scheduler instanceof CronScheduler);
         assertEquals("my expression", ((CronScheduler) scheduler).getCronExpression());
