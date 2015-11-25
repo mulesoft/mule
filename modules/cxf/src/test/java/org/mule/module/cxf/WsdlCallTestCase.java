@@ -9,7 +9,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 import java.io.InputStream;
 import java.net.URL;
