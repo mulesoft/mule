@@ -31,7 +31,6 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
         EndpointUri[] uris =
         {
             new EndpointUri("vm://#[header:INBOUND:prop1]/#[header:INBOUND:prop2]", "vm://apple/orange"),
-            new EndpointUri("imap://mule%40mule.net:secretpassword@gmail.com:143"),
             new EndpointUri("vm://bucket:somefiles?query=%7B%22filename%22%3A%22foo%22%7D"),
             new EndpointUri("http://localhost:1313"),
             new EndpointUri("http://localhost:1313?${foo}", "http://localhost:1313?$[foo]"),
@@ -45,14 +44,11 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
                 InboundEndpoint ei = muleContext.getEndpointFactory().getInboundEndpoint(uri.getUri());
                 uri.checkResultUri(ei);
             }
-            if (!uri.getUri().startsWith("imap:"))
-            {
-                EndpointBuilder endpointBuilder =
-                    muleContext.getEndpointFactory().getEndpointBuilder(uri.getUri());
-                endpointBuilder.setExchangePattern(MessageExchangePattern.ONE_WAY);
-                OutboundEndpoint oi =muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-                uri.checkResultUri(oi);
-            }
+            EndpointBuilder endpointBuilder =
+                muleContext.getEndpointFactory().getEndpointBuilder(uri.getUri());
+            endpointBuilder.setExchangePattern(MessageExchangePattern.ONE_WAY);
+            OutboundEndpoint oi =muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            uri.checkResultUri(oi);
         }
     }
 

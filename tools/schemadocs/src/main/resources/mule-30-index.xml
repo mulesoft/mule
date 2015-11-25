@@ -1,12 +1,5 @@
 <index version="3.0">
     <transport dist="ce">bpm</transport>
-    <transport dist="ce">email</transport>
-    <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-smtp.xsd">smtp</transport>
-    <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-smtps.xsd">smtps</transport>
-    <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-imap.xsd">imap</transport>
-    <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-imaps.xsd">imaps</transport>
-    <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-pop3.xsd">pop3</transport>
-    <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-pop3s.xsd">pop3s</transport>
     <transport dist="ce">file</transport>
     <transport dist="ce">http</transport>
     <transport dist="ce">jbpm</transport>
