@@ -127,7 +127,6 @@
                 <include>org.mule.transports:mule-transport-http</include>
                 <include>org.mule.transports:mule-transport-jdbc</include>
                 <include>org.mule.transports:mule-transport-jms</include>
-                <include>org.mule.transports:mule-transport-servlet</include>
                 <include>org.mule.transports:mule-transport-ssl</include>
                 <include>org.mule.transports:mule-transport-tcp</include>
                 <include>org.mule.transports:mule-transport-vm</include>
@@ -191,7 +190,6 @@
                 <exclude>org.mule.transports:mule-transport-http</exclude>
                 <exclude>org.mule.transports:mule-transport-jdbc</exclude>
                 <exclude>org.mule.transports:mule-transport-jms</exclude>
-                <exclude>org.mule.transports:mule-transport-servlet</exclude>
                 <exclude>org.mule.transports:mule-transport-ssl</exclude>
                 <exclude>org.mule.transports:mule-transport-tcp</exclude>
                 <exclude>org.mule.transports:mule-transport-vm</exclude>

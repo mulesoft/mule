@@ -18,7 +18,6 @@
         <module>http</module>
         <module>jdbc</module>
         <module>jms</module>
-        <module>servlet</module>
         <module>ssl</module>
         <module>tcp</module>
         <module>vm</module>

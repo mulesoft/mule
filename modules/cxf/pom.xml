@@ -732,12 +732,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-servlet</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>

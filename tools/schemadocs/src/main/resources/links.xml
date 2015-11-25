@@ -192,11 +192,6 @@
     <link><item>rmi:outbound-endpoint</item><page>RMI+Transport</page></link>
     <link><item>rmi:endpoint</item><page>RMI+Transport</page></link>
 
-    <link><item>servlet:connector</item><page>Servlet+Transport</page></link>
-    <link><item>servlet:inbound-endpoint</item><page>Servlet+Transport</page></link>
-    <link><item>servlet:outbound-endpoint</item><page>Servlet+Transport</page></link>
-    <link><item>servlet:endpoint</item><page>Servlet+Transport</page></link>
-
     <link><item>smtp:connector</item><page>SMTP+Transport</page></link>
     <link><item>smtp:header</item><page>SMTP+Transport</page></link>
     <link><item>smtp:outbound-endpoint</item><page>SMTP+Transport</page></link>
