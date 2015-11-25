@@ -39,7 +39,14 @@ public class SystemProperty extends ExternalResource
             throw new IllegalArgumentException("System property was already initialized");
         }
 
-        oldValue = System.setProperty(name, getValue());
+        if (getValue() == null)
+        {
+            oldValue = System.clearProperty(name);
+        }
+        else
+        {
+            oldValue = System.setProperty(name, getValue());
+        }
         initialized = true;
     }
 
