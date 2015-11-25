@@ -76,6 +76,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -1992,6 +1993,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertEquals("Failed domain still appears as zombie after a successful redeploy", 0, deploymentService.getZombieDomains().size());
     }
 
+    @Ignore("MULE-6926: flaky test")
     @Test
     public void refreshDomainClassloaderAfterRedeployment() throws Exception
     {
