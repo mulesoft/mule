@@ -26,6 +26,7 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
     // deliberately shadow the superclass' static logger as to avoid log congestion on it
     protected final Log logger = LogFactory.getLog(getClass());
 
+    @Override
     public ThreadPoolExecutor createPool(String name, ThreadingProfile tp)
     {
         BlockingQueue buffer;
@@ -119,12 +120,10 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
 
     protected ScheduledThreadPoolExecutor internalCreateScheduledPool(ThreadingProfile tp)
     {
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(Math.min(tp.getMaxThreadsIdle(), tp.getMaxThreadsActive()));
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(tp.getMaxThreadsIdle());
         scheduledThreadPoolExecutor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
         scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(true);
         scheduledThreadPoolExecutor.setKeepAliveTime(tp.getThreadTTL(), TimeUnit.MILLISECONDS);
-        scheduledThreadPoolExecutor.setCorePoolSize(tp.getMaxThreadsIdle());
-        scheduledThreadPoolExecutor.setMaximumPoolSize(tp.getMaxThreadsActive());
         return scheduledThreadPoolExecutor;
     }
 }
