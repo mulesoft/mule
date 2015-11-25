@@ -29,6 +29,7 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -182,27 +183,21 @@ public class JsonSchemaValidator
             String scheme = uri.getScheme();
             if (scheme == null || "resource".equals(scheme))
             {
-                try (InputStream in = openSchema(uri.getPath()))
-                {
-                    if (in != null)
-                    {
-                        JsonNode schema = loadingConfiguration.getReader().fromInputStream(in);
-                        return factory.getJsonSchema(schema);
-                    }
-                }
+                URL schemaUrl = openSchema(uri.getPath());
+                return factory.getJsonSchema(schemaUrl.toString());
             }
             return factory.getJsonSchema(schemaLocation);
         }
 
-        private InputStream openSchema(String path)
+        private URL openSchema(String path)
         {
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-            if (in == null && path.startsWith("/"))
+            URL url = Thread.currentThread().getContextClassLoader().getResource(path);
+            if (url == null && path.startsWith("/"))
             {
                 return openSchema(path.substring(1));
             }
 
-            return in;
+            return url;
         }
 
         private String formatUri(String location)
