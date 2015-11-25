@@ -6345,6 +6345,11 @@
                         <xsd:documentation>Determines the minimum amount of time an object may sit idle in the pool before it is eligible for eviction. When non-positive, no objects will be evicted from the pool due to idle time alone.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="disabled" type="substitutableBoolean" use="optional" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>Whether pooling should be disabled</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -11,7 +11,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.api.lifecycle.Stoppable;
 
@@ -37,29 +38,41 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConnectionManager.class);
 
-    private final Map<ConnectionKey, ManagedConnectionAdapter> connections = new HashMap<>();
+    private final Map<ConnectionKey, ConnectionHandlingStrategyAdapter> connections = new HashMap<>();
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
+    private final MuleContext muleContext;
 
+    /**
+     * Creates a new instance
+     *
+     * @param muleContext the {@link MuleContext} of the owned application
+     */
     @Inject
-    private MuleContext muleContext;
+    public DefaultConnectionManager(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 
     /**
      * {@inheritDoc}
      *
      * @throws IllegalStateException if invoked while the {@link #muleContext} is stopped or stopping
      */
-    public <Config, Connection> ManagedConnection<Connection> bind(Config owner, ConnectionProvider<Config, Connection> connectionProvider)
+    public <Config, Connection> void bind(Config owner, ConnectionProvider<Config, Connection> connectionProvider)
     {
         assertNotStopping(muleContext, "Mule is shutting down... cannot bind new connections");
 
-        ManagedConnectionAdapter<Connection> managedConnection = new LazyCachedManagedConnection<>(owner, connectionProvider, muleContext);
-        ManagedConnectionAdapter<Connection> previous = null;
+        connectionProvider = new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext);
+
+        ConnectionHandlingStrategyAdapter<Config, Connection> managementStrategy = getManagementStrategy(owner, connectionProvider);
+        ConnectionHandlingStrategyAdapter<Config, Connection> previous = null;
+
         writeLock.lock();
         try
         {
-            previous = connections.put(new ConnectionKey(owner), managedConnection);
+            previous = connections.put(new ConnectionKey(owner), managementStrategy);
         }
         finally
         {
@@ -70,8 +83,6 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
         {
             close(previous);
         }
-
-        return managedConnection;
     }
 
     /**
@@ -81,20 +92,20 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
     @Override
     public void unbind(Object config)
     {
-        ManagedConnectionAdapter managedConnection;
+        ConnectionHandlingStrategyAdapter managementStrategy;
         writeLock.lock();
         try
         {
-            managedConnection = connections.remove(new ConnectionKey(config));
+            managementStrategy = connections.remove(new ConnectionKey(config));
         }
         finally
         {
             writeLock.unlock();
         }
 
-        if (managedConnection != null)
+        if (managementStrategy != null)
         {
-            close(managedConnection);
+            close(managementStrategy);
         }
     }
 
@@ -102,25 +113,25 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
      * {@inheritDoc}
      */
     @Override
-    public <Config, Connection> ManagedConnection<Connection> getConnection(Config config) throws ConnectionException
+    public <Config, Connection> ConnectionHandler<Connection> getConnection(Config config) throws ConnectionException
     {
-        ManagedConnection<Connection> managedConnection = null;
+        ConnectionHandlingStrategy<Connection> handlingStrategy = null;
         readLock.lock();
         try
         {
-            managedConnection = connections.get(new ConnectionKey(config));
+            handlingStrategy = connections.get(new ConnectionKey(config));
         }
         finally
         {
             readLock.unlock();
         }
 
-        if (managedConnection == null)
+        if (handlingStrategy == null)
         {
             throw new ConnectionException("No ConnectionProvider has been registered for owner " + config);
         }
 
-        return managedConnection;
+        return handlingStrategy.getConnectionHandler();
     }
 
     /**
@@ -143,16 +154,22 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
         }
     }
 
-    private void close(ManagedConnectionAdapter managedConnection)
+    //TODO: MULE-9082
+    private void close(ConnectionHandlingStrategyAdapter managementStrategy)
     {
         try
         {
-            managedConnection.close();
+            managementStrategy.close();
         }
         catch (Exception e)
         {
-            LOGGER.warn("An error was found trying to release a connection", e);
+            LOGGER.warn("An error was found trying to release connections", e);
         }
+    }
+
+    private <Config, Connection> ConnectionHandlingStrategyAdapter<Config, Connection> getManagementStrategy(Config config, ConnectionProvider<Config, Connection> connectionProvider)
+    {
+        return (ConnectionHandlingStrategyAdapter<Config, Connection>) connectionProvider.getHandlingStrategy(new DefaultConnectionHandlingStrategyFactory(config, connectionProvider, muleContext));
     }
 
     private class ConnectionKey

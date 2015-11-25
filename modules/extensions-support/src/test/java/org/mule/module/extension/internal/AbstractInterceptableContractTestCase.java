@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal;
 
 import static org.mockito.Mockito.verify;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.spyInjector;
+import static org.mule.tck.MuleTestUtils.spyInjector;
 import org.mule.api.Injector;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;

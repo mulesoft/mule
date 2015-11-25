@@ -8,12 +8,14 @@ package org.mule.module.extension.internal.introspection.validation;
 
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionHandlingStrategy;
+import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.connector.Provider;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
@@ -132,7 +134,7 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
 
     }
 
-    @Provider(name = "provider1")
+    @Alias("provider1")
     public static class TestConnectionProvider implements ConnectionProvider<Config, ValidatorTestConnection>
     {
 
@@ -147,15 +149,21 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         {
 
         }
+
+        @Override
+        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        {
+            return handlingStrategyFactory.cached();
+        }
     }
 
-    @Provider(name = "provider2")
+    @Alias("provider2")
     public static class TestConnectionProvider2 extends TestConnectionProvider
     {
 
     }
 
-    @Provider(name = "invalidConfig")
+    @Alias("invalidConfig")
     public static class InvalidConfigConnectionProvider implements ConnectionProvider<Apple, ValidatorTestConnection>
     {
 
@@ -170,9 +178,15 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         {
 
         }
+
+        @Override
+        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        {
+            return handlingStrategyFactory.cached();
+        }
     }
 
-    @Provider(name = "invalidConnection")
+    @Alias("invalidConnection")
     public static class InvalidTypeConnectionProvider implements ConnectionProvider<Config, Apple>
     {
 
@@ -186,6 +200,12 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         public void disconnect(Apple connection)
         {
 
+        }
+
+        @Override
+        public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        {
+            return handlingStrategyFactory.cached();
         }
     }
 

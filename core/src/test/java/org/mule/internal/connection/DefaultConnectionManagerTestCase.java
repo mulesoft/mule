@@ -10,12 +10,16 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.api.MuleContext;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ManagedConnection;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionHandler;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 
@@ -26,41 +30,49 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultConnectionManagerTestCase extends AbstractMuleContextTestCase
+public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
 {
 
     private Apple config = new Apple();
 
     private Banana connection = new Banana();
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private ConnectionProvider<Apple, Banana> connectionProvider;
 
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private MuleContext muleContext;
 
-    private DefaultConnectionManager connectionManager = new DefaultConnectionManager();
+
+    private DefaultConnectionManager connectionManager;
 
     @Before
     public void before() throws Exception
     {
         when(connectionProvider.connect(config)).thenReturn(connection);
-        muleContext.getInjector().inject(connectionManager);
+        when(connectionProvider.getHandlingStrategy(any(ConnectionHandlingStrategyFactory.class))).thenAnswer(invocation -> {
+            ConnectionHandlingStrategyFactory factory = (ConnectionHandlingStrategyFactory) invocation.getArguments()[0];
+            return factory.cached();
+        });
+
+        connectionManager = new DefaultConnectionManager(muleContext);
     }
 
     @Test
     public void getConnection() throws Exception
     {
         connectionManager.bind(config, connectionProvider);
-        ManagedConnection<Banana> managedConnection = connectionManager.getConnection(config);
-        assertThat(managedConnection.getConnection(), is(sameInstance(connection)));
+        ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
+        assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
     }
 
     @Test
-    public void assertUnbindedConnection() throws Exception
+    public void assertUnboundedConnection() throws Exception
     {
         try
         {
             connectionManager.getConnection(config);
-            fail("Config was unbinded yet a connection could be obtained");
+            fail("Config was unbounded yet a connection could be obtained");
         }
         catch (ConnectionException e)
         {
@@ -82,7 +94,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleContextTestCas
         getConnection();
         connectionManager.unbind(config);
         verifyDisconnect();
-        assertUnbindedConnection();
+        assertUnboundedConnection();
     }
 
     private void verifyDisconnect()
@@ -93,7 +105,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleContextTestCas
     @Test(expected = IllegalStateException.class)
     public void bindWithStoppingMuleContext() throws Exception
     {
-        muleContext.stop();
+        when(muleContext.isStopped()).thenReturn(true);
         connectionManager.bind(config, connectionProvider);
     }
 }

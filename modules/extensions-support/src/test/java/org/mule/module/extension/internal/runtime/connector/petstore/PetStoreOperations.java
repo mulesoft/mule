@@ -6,11 +6,14 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
+import org.mule.api.MuleEvent;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.util.concurrent.Latch;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class PetStoreOperations
 {
@@ -24,6 +27,20 @@ public class PetStoreOperations
     @Operation
     public PetStoreClient getClient(@Connection PetStoreClient client)
     {
+        return client;
+    }
+
+    @Operation
+    public PetStoreClient getClientOnLatch(@Connection PetStoreClient client, MuleEvent event) throws Exception
+    {
+        CountDownLatch countDownLatch = event.getFlowVariable("testLatch");
+        if (countDownLatch != null)
+        {
+            countDownLatch.countDown();
+        }
+
+        Latch latch = event.getFlowVariable("connectionLatch");
+        latch.await();
         return client;
     }
 }

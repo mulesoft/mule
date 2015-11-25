@@ -18,6 +18,7 @@ import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 import org.mule.api.NestedProcessor;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -28,6 +29,7 @@ import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.internal.connection.ConnectionProviderWrapper;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -177,6 +179,30 @@ public class IntrospectionUtils
         }
 
         return Arrays.stream(interfaceType.getGenerics()).map(ResolvableType::getRawClass).collect(toList());
+    }
+
+    public static <Config> Class<Config> getConfigType(ConnectionProvider<Config, ?> connectionProvider)
+    {
+        connectionProvider = unwrap(connectionProvider);
+        List<Class<?>> generics = getInterfaceGenerics(connectionProvider.getClass(), ConnectionProvider.class);
+        return (Class<Config>) generics.get(0);
+    }
+
+    public static <Connection> Class<Connection> getConnectionType(ConnectionProvider<?, Connection> connectionProvider)
+    {
+        connectionProvider = unwrap(connectionProvider);
+        List<Class<?>> generics = getInterfaceGenerics(connectionProvider.getClass(), ConnectionProvider.class);
+        return (Class<Connection>) generics.get(1);
+    }
+
+    private static <Config, Connection> ConnectionProvider<Config, Connection> unwrap(ConnectionProvider<Config, Connection> connectionProvider)
+    {
+        while (connectionProvider instanceof ConnectionProviderWrapper)
+        {
+            connectionProvider = ((ConnectionProviderWrapper) connectionProvider).getDelegate();
+        }
+
+        return connectionProvider;
     }
 
     private static boolean isOperation(Class<?> rawClass)

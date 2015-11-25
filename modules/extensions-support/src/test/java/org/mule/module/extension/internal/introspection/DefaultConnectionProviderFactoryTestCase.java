@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ConnectionProviderFactory;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
+import org.mule.module.extension.internal.runtime.connector.petstore.SimplePetStoreConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -25,18 +25,18 @@ import org.junit.Test;
 public class DefaultConnectionProviderFactoryTestCase extends AbstractMuleTestCase
 {
 
-    private ConnectionProviderFactory factory = new DefaultConnectionProviderFactory<>(PetStoreConnectionProvider.class);
+    private ConnectionProviderFactory factory = new DefaultConnectionProviderFactory<>(SimplePetStoreConnectionProvider.class);
 
     @Test
     public void getObjectType()
     {
-        assertThat(factory.getObjectType(), equalTo(PetStoreConnectionProvider.class));
+        assertThat(factory.getObjectType(), equalTo(SimplePetStoreConnectionProvider.class));
     }
 
     @Test
     public void newInstance() throws Exception
     {
-        assertThat(factory.newInstance(), is(instanceOf(PetStoreConnectionProvider.class)));
+        assertThat(factory.newInstance(), is(instanceOf(SimplePetStoreConnectionProvider.class)));
     }
 
     @Test

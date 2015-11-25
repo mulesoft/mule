@@ -18,17 +18,15 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connection.ConnectionHandler;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
+import org.mule.module.extension.internal.runtime.connector.petstore.SimplePetStoreConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.concurrent.Latch;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +48,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
     @Mock
     private PetStoreConnector config;
 
-    private PetStoreConnectionProvider connectionProvider = spy(new PetStoreConnectionProvider());
+    private SimplePetStoreConnectionProvider connectionProvider = spy(new SimplePetStoreConnectionProvider());
     private ConnectionInterceptor interceptor;
 
     @Before
@@ -92,53 +90,23 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void getConnectionConcurrentlyAndConnectOnlyOnce() throws Exception
-    {
-        PetStoreClient mockConnection = mock(PetStoreClient.class);
-        connectionProvider = mock(PetStoreConnectionProvider.class);
-        before();
-
-        Latch latch = new Latch();
-        when(connectionProvider.connect(config)).thenAnswer(invocation -> {
-            new Thread(() -> {
-                try
-                {
-                    latch.release();
-                    getConnection();
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }).start();
-
-            return mockConnection;
-        });
-
-        PetStoreClient connection = getConnection();
-        assertThat(latch.await(5, TimeUnit.SECONDS), is(true));
-        assertThat(connection, is(sameInstance(mockConnection)));
-        verify(connectionProvider).connect(config);
-    }
-
-    @Test
     public void after()
     {
-        ManagedConnection managedConnection = mock(ManagedConnection.class);
-        when(operationContext.removeVariable(CONNECTION_PARAM)).thenReturn(managedConnection);
+        ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+        when(operationContext.removeVariable(CONNECTION_PARAM)).thenReturn(connectionHandler);
 
         interceptor.after(operationContext, null);
         verify(operationContext).removeVariable(CONNECTION_PARAM);
-        verify(managedConnection).release();
+        verify(connectionHandler).release();
     }
 
     private PetStoreClient getConnection() throws Exception
     {
-        ArgumentCaptor<ManagedConnection> connectionCaptor = ArgumentCaptor.forClass(ManagedConnection.class);
+        ArgumentCaptor<ConnectionHandler> connectionCaptor = ArgumentCaptor.forClass(ConnectionHandler.class);
         interceptor.before(operationContext);
 
         verify(operationContext, atLeastOnce()).setVariable(same(CONNECTION_PARAM), connectionCaptor.capture());
-        ManagedConnection<PetStoreClient> managedConnection = connectionCaptor.getValue();
-        return managedConnection.getConnection();
+        ConnectionHandler<PetStoreClient> connectionHandler = connectionCaptor.getValue();
+        return connectionHandler.getConnection();
     }
 }

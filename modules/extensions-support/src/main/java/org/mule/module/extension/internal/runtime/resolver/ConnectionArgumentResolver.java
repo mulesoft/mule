@@ -10,7 +10,7 @@ import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connection.ConnectionHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.ExtensionProperties;
@@ -40,12 +40,12 @@ public class ConnectionArgumentResolver implements ArgumentResolver<Object>
     @Override
     public Object resolve(OperationContext operationContext)
     {
-        ManagedConnection managedConnection = ((OperationContextAdapter) operationContext).getVariable(CONNECTION_PARAM);
-        checkArgument(managedConnection != null, "No connection was provided for the operation");
+        ConnectionHandler connectionHandler = ((OperationContextAdapter) operationContext).getVariable(CONNECTION_PARAM);
+        checkArgument(connectionHandler != null, "No connection was provided for the operation");
 
         try
         {
-            return managedConnection.getConnection();
+            return connectionHandler.getConnection();
         }
         catch (ConnectionException e)
         {

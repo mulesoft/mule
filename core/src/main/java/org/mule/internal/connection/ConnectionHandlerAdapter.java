@@ -8,16 +8,16 @@ package org.mule.internal.connection;
 
 import org.mule.api.Closeable;
 import org.mule.api.MuleException;
-import org.mule.api.connection.ManagedConnection;
+import org.mule.api.connection.ConnectionHandler;
 
 /**
- * Adapter interface which extends the {@link ManagedConnection} contract
+ * Adapter interface which extends the {@link ConnectionHandler} contract
  * with non-API functionality
  *
  * @param <T> the generic type of the wrapped connection
  * @since 4.0
  */
-interface ManagedConnectionAdapter<T> extends ManagedConnection<T>, Closeable
+interface ConnectionHandlerAdapter<T> extends ConnectionHandler<T>, Closeable
 {
 
     /**

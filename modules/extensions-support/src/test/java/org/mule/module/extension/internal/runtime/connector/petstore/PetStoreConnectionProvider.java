@@ -15,8 +15,9 @@ import org.mule.extension.annotation.api.Parameter;
 
 import javax.inject.Inject;
 
-public class PetStoreConnectionProvider implements ConnectionProvider<PetStoreConnector, PetStoreClient>, Lifecycle
+abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStoreConnector, PetStoreClient>, Lifecycle
 {
+
     private int initialise, start, stop, dispose = 0;
 
     @Inject
@@ -37,7 +38,10 @@ public class PetStoreConnectionProvider implements ConnectionProvider<PetStoreCo
     @Override
     public void disconnect(PetStoreClient connection)
     {
-        connection.disconnect();
+        if (connection != null)
+        {
+            connection.disconnect();
+        }
     }
 
     @Override

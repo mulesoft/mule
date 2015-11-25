@@ -6,10 +6,14 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import org.mule.api.MuleException;
+import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.internal.connection.PooledConnectionProviderWrapper;
 import org.mule.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 /**
  * Implementation of {@link ParameterGroupAwareObjectBuilder} which produces instances
@@ -21,6 +25,7 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
 {
 
     private final ConnectionProviderModel providerModel;
+    private final PoolingProfile poolingProfile;
 
     /**
      * Creates a new instances which produces instances based on the given {@code providerModel} and
@@ -31,8 +36,26 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
      */
     public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet)
     {
+        this(providerModel, resolverSet, null);
+    }
+
+    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet, PoolingProfile poolingProfile)
+    {
         super(providerModel.getConnectionProviderFactory().getObjectType(), providerModel, resolverSet);
         this.providerModel = providerModel;
+        this.poolingProfile = poolingProfile;
+    }
+
+    @Override
+    public ConnectionProvider build(ResolverSetResult result) throws MuleException
+    {
+        ConnectionProvider provider = super.build(result);
+        if (poolingProfile != null)
+        {
+            provider = new PooledConnectionProviderWrapper(provider, poolingProfile);
+        }
+
+        return provider;
     }
 
     /**

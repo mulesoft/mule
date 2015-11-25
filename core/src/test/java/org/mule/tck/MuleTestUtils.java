@@ -6,9 +6,12 @@
  */
 package org.mule.tck;
 
+import static org.mockito.Mockito.spy;
+import org.mule.DefaultMuleContext;
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
+import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -332,6 +335,14 @@ public final class MuleTestUtils
         }
         endpointBuilder.addMessageProcessor(new MessageFilter(filter));
         return source.getEndpoint(endpointBuilder);
+    }
+
+    public static Injector spyInjector(MuleContext muleContext)
+    {
+        Injector spy = spy(muleContext.getInjector());
+        ((DefaultMuleContext) muleContext).setInjector(spy);
+
+        return spy;
     }
 
     private interface EndpointSource
