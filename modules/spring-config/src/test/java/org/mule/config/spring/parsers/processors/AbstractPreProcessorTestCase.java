@@ -40,20 +40,34 @@ public abstract class AbstractPreProcessorTestCase extends AbstractMuleTestCase
 
     protected void assertOk(String[][] constraint, String attributes) throws ParserConfigurationException
     {
-        createCheck(constraint).preProcess(null, createElement(attributes));
+        createCheck(constraint, null, null).preProcess(null, createElement(attributes));
     }
 
-    protected abstract PreProcessor createCheck(String[][] constraint);
+    protected void assertOk(String[][] constraint, String attributes, String elementName, String namespaceUri) throws ParserConfigurationException
+    {
+        createCheck(constraint, elementName, namespaceUri).preProcess(null, createElement(attributes, elementName, namespaceUri));
+    }
+
+    protected abstract PreProcessor createCheck(String[][] constraint, String elementName, String namespaceUri);
 
     protected Element createElement(String attributes) throws ParserConfigurationException
     {
+        return createElement(attributes, null, null);
+    }
+
+    protected Element createElement(String attributes, String child, String namespaceUri) throws ParserConfigurationException
+    {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = builder.newDocument();
-        Element element = document.createElement("element");
+        Element element = document.createElementNS(namespaceUri, "element");
         StringTokenizer tokens = new StringTokenizer(attributes);
         while (tokens.hasMoreTokens())
         {
             element.setAttribute(tokens.nextToken(), "value");
+        }
+        if (child != null)
+        {
+            element.appendChild(document.createElementNS(namespaceUri, child));
         }
         return element;
     }
