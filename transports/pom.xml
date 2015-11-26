@@ -13,7 +13,6 @@
 
     <modules>
         <module>all-transports</module>
-        <module>file</module>
         <module>http</module>
         <module>jdbc</module>
         <module>jms</module>

@@ -96,15 +96,6 @@
     <link><item>wsdl-cxf:outbound-endpoint</item><page>CXF+Transport</page></link>
     <link><item>wsdl-cxf:endpoint</item><page>CXF+Transport</page></link>
 
-    <link><item>file:connector</item><page>File+Transport</page></link>
-    <link><item>file:filename-parser</item><page>File+Transport</page></link>
-    <link><item>file:inbound-endpoint</item><page>File+Transport</page></link>
-    <link><item>file:outbound-endpoint</item><page>File+Transport</page></link>
-    <link><item>file:endpoint</item><page>File+Transport</page></link>
-    <link><item>file:filename-wildcard-filter</item><page>File+Transport</page></link>
-    <link><item>file:file-to-byte-array-transformer</item><page>File+Transport</page></link>
-    <link><item>file:file-to-string-transformer</item><page>File+Transport</page></link>
-
     <link><item>http:connector</item><page>HTTP+Transport</page></link>
     <link><item>http:rest-service-component</item><page>HTTP+Transport</page></link>
     <link><item>http:payloadParameterName</item><page>HTTP+Transport</page></link>

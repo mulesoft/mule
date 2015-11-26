@@ -122,7 +122,6 @@
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
-                <include>org.mule.transports:mule-transport-file</include>
                 <include>org.mule.transports:mule-transport-http</include>
                 <include>org.mule.transports:mule-transport-jdbc</include>
                 <include>org.mule.transports:mule-transport-jms</include>
@@ -184,7 +183,6 @@
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
-                <exclude>org.mule.transports:mule-transport-file</exclude>
                 <exclude>org.mule.transports:mule-transport-http</exclude>
                 <exclude>org.mule.transports:mule-transport-jdbc</exclude>
                 <exclude>org.mule.transports:mule-transport-jms</exclude>
