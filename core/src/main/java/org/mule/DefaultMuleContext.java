@@ -50,6 +50,7 @@ import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.ClusterConfiguration;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.NullClusterConfiguration;
+import org.mule.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -193,6 +194,8 @@ public class DefaultMuleContext implements MuleContext
     private volatile Collection<ExceptionContextProvider> exceptionContextProviders;
 
     private TransformationService transformationService;
+
+    private BootstrapServiceDiscoverer bootstrapServiceDiscoverer;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -1141,5 +1144,16 @@ public class DefaultMuleContext implements MuleContext
     public void setTransformationService(TransformationService transformationService)
     {
         this.transformationService = transformationService;
+    }
+
+    @Override
+    public BootstrapServiceDiscoverer getRegistryBootstrapServiceDiscoverer()
+    {
+        return bootstrapServiceDiscoverer;
+    }
+
+    public void setBootstrapServiceDiscoverer(BootstrapServiceDiscoverer bootstrapServiceDiscoverer)
+    {
+        this.bootstrapServiceDiscoverer = bootstrapServiceDiscoverer;
     }
 }

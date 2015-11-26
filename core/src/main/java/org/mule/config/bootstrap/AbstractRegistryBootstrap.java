@@ -16,12 +16,11 @@ import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
-import org.mule.util.OrderedProperties;
 import org.mule.util.PropertiesUtils;
-import org.mule.util.UUID;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -77,35 +76,18 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractRegistryBootstrap implements Initialisable, MuleContextAware
 {
 
-    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+    private static final String TRANSACTION_RESOURCE_SUFFIX = ".transaction.resource";
+    private static final String OPTIONAL_ATTRIBUTE = "optional";
+    private static final String RETURN_CLASS_PROPERTY = "returnClass";
+    private static final String MIME_TYPE_PROPERTY = "mimeType";
 
     public static final String TRANSFORMER_KEY = ".transformer.";
     public static final String OBJECT_KEY = ".object.";
     public static final String SINGLE_TX = ".singletx.";
 
     protected ArtifactType supportedArtifactType = ArtifactType.APP;
-    protected final RegistryBootstrapDiscoverer discoverer;
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
     protected MuleContext muleContext;
-
-    /**
-     * Creates a default SimpleRegistryBootstrap using a {@link org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer}
-     * in order to get the Properties resources from the class path.
-     */
-    public AbstractRegistryBootstrap()
-    {
-        this(new ClassPathRegistryBootstrapDiscoverer());
-    }
-
-    /**
-     * Allows to specify a {@link org.mule.config.bootstrap.RegistryBootstrapDiscoverer} to discover the Properties
-     * resources to be used.
-     *
-     * @param discoverer
-     */
-    public AbstractRegistryBootstrap(RegistryBootstrapDiscoverer discoverer)
-    {
-        this.discoverer = discoverer;
-    }
 
     /**
      * {@inheritDoc}
@@ -122,55 +104,51 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
     @Override
     public void initialise() throws InitialisationException
     {
-        List<Properties> bootstraps;
+        List<BootstrapService> bootstrapServices;
         try
         {
-            bootstraps = discoverer.discover();
+            bootstrapServices = muleContext.getRegistryBootstrapServiceDiscoverer().discover();
         }
-        catch (BootstrapException e)
+        catch (Exception e)
         {
             throw new InitialisationException(e, this);
         }
 
         // Merge and process properties
         int objectCounter = 1;
-        int transformerCounter = 1;
-        Properties transformers = new OrderedProperties();
-        Properties namedObjects = new OrderedProperties();
-        Properties unnamedObjects = new OrderedProperties();
-        Map<String, String> singleTransactionFactories = new LinkedHashMap<>();
+        List<TransformerBootstrapProperty> transformers = new LinkedList<>();
+        List<ObjectBootstrapProperty> namedObjects = new LinkedList<>();
+        List<ObjectBootstrapProperty> unnamedObjects = new LinkedList<>();
+        List<TransactionFactoryBootstrapProperty> singleTransactionFactories = new LinkedList<>();
 
-        for (Properties bootstrap : bootstraps)
+        for (BootstrapService bootstrapService : bootstrapServices)
         {
-            for (Map.Entry entry : bootstrap.entrySet())
+            Properties bootstrapProperties = bootstrapService.getProperties();
+
+            for (Map.Entry entry : bootstrapProperties.entrySet())
             {
-                final String key = (String) entry.getKey();
-                if (key.contains(OBJECT_KEY))
+                final String propertyKey = (String) entry.getKey();
+                final String propertyValue = (String) entry.getValue();
+
+                if (propertyKey.contains(OBJECT_KEY))
                 {
-                    String newKey = key.substring(0, key.lastIndexOf(".")) + objectCounter++;
-                    unnamedObjects.put(newKey, entry.getValue());
+                    String newKey = propertyKey.substring(0, propertyKey.lastIndexOf(".")) + objectCounter++;
+                    unnamedObjects.add(createObjectBootstrapProperty(bootstrapService, newKey, propertyValue));
                 }
-                else if (key.contains(TRANSFORMER_KEY))
+                else if (propertyKey.contains(TRANSFORMER_KEY))
                 {
-                    String newKey = key.substring(0, key.lastIndexOf(".")) + transformerCounter++;
-                    transformers.put(newKey, entry.getValue());
+                    transformers.add(createTransformerBootstrapProperty(bootstrapService, propertyValue));
                 }
-                else if (key.contains(SINGLE_TX))
+                else if (propertyKey.contains(SINGLE_TX))
                 {
-                    if (!key.contains(".transaction.resource"))
+                    if (!propertyKey.contains(TRANSACTION_RESOURCE_SUFFIX))
                     {
-                        String transactionResourceKey = key.replace(".transaction.factory", ".transaction.resource");
-                        String transactionResource = bootstrap.getProperty(transactionResourceKey);
-                        if (transactionResource == null)
-                        {
-                            throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Theres no transaction resource specified for transaction factory %s", key)), this);
-                        }
-                        singleTransactionFactories.put((String) entry.getValue(), transactionResource);
+                        singleTransactionFactories.add(createTransactionFactoryBootstrapProperty(bootstrapService, bootstrapProperties, propertyKey, propertyValue));
                     }
                 }
                 else
                 {
-                    namedObjects.put(key, entry.getValue());
+                    namedObjects.add(createObjectBootstrapProperty(bootstrapService, propertyKey, propertyValue));
                 }
             }
         }
@@ -189,173 +167,181 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
         }
     }
 
-    private void registerUnnamedObjects(Properties props) throws Exception
+    private TransformerBootstrapProperty createTransformerBootstrapProperty(BootstrapService bootstrapService, String propertyValue)
     {
-        for (Map.Entry<Object, Object> entry : props.entrySet())
+        String transString;
+        String name = null;
+        String returnClassName;
+        boolean optional = false;
+        transString = propertyValue;
+        returnClassName = null;
+        int index = transString.indexOf(",");
+        if (index > -1)
         {
-            final String key = String.format("%s#%s", entry.getKey(), UUID.getUUID());
-            registerObject(key, (String) entry.getValue());
+            Properties p = PropertiesUtils.getPropertiesFromString(transString.substring(index + 1), ',');
+            name = p.getProperty("name", null);
+            returnClassName = p.getProperty("returnClass", null);
+            optional = p.containsKey(OPTIONAL_ATTRIBUTE);
         }
-        props.clear();
+        String mime = null;
+
+        if (returnClassName != null)
+        {
+            int i = returnClassName.indexOf(":");
+            if (i > -1)
+            {
+                mime = returnClassName.substring(i + 1);
+                returnClassName = returnClassName.substring(0, i);
+            }
+        }
+
+        final String className = index == -1 ? transString : transString.substring(0, index);
+
+        final Map<String, String> properties = new HashMap<>();
+        properties.put(MIME_TYPE_PROPERTY, mime);
+        properties.put(RETURN_CLASS_PROPERTY, returnClassName);
+
+        return new TransformerBootstrapProperty(bootstrapService, ArtifactType.APP, optional, name, className, returnClassName, mime);
     }
 
-    private void registerObjects(Properties props) throws Exception
+    private TransactionFactoryBootstrapProperty createTransactionFactoryBootstrapProperty(BootstrapService bootstrapService, Properties bootstrapProperties, String propertyKey, String propertyValue) throws InitialisationException
     {
-        for (Map.Entry<Object, Object> entry : props.entrySet())
+        String transactionResourceKey = propertyKey.replace(".transaction.factory", TRANSACTION_RESOURCE_SUFFIX);
+        String transactionResource = bootstrapProperties.getProperty(transactionResourceKey);
+        if (transactionResource == null)
         {
-            registerObject((String) entry.getKey(), (String) entry.getValue());
+            throw new InitialisationException(CoreMessages.createStaticMessage(String.format("There is no transaction resource specified for transaction factory %s", propertyKey)), this);
         }
-        props.clear();
+
+        String transactionResourceClassNameProperties = transactionResource;
+        boolean optional = false;
+        int index = transactionResourceClassNameProperties.indexOf(",");
+        if (index > -1)
+        {
+            Properties p = PropertiesUtils.getPropertiesFromString(transactionResourceClassNameProperties.substring(index + 1), ',');
+            optional = p.containsKey(OPTIONAL_ATTRIBUTE);
+        }
+        final String transactionResourceClassName = (index == -1 ? transactionResourceClassNameProperties : transactionResourceClassNameProperties.substring(0, index));
+
+        return new TransactionFactoryBootstrapProperty(bootstrapService, ArtifactType.APP, optional, propertyValue, transactionResourceClassName);
     }
 
-    private void registerObject(String key, String value) throws Exception
+    private ObjectBootstrapProperty createObjectBootstrapProperty(BootstrapService bootstrapService, String propertyKey, String propertyValue)
     {
+        boolean optional = false;
+        String className;
         ArtifactType artifactTypeParameterValue = ArtifactType.APP;
 
-        boolean optional = false;
-        String className = null;
+        final String value = propertyValue;
+        int index = value.indexOf(",");
+        if (index > -1)
+        {
+            Properties p = PropertiesUtils.getPropertiesFromString(value.substring(index + 1), ',');
+            if (p.containsKey(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY))
+            {
+                artifactTypeParameterValue = ArtifactType.createFromString((String) p.get(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY));
+            }
+            optional = p.containsKey(OPTIONAL_ATTRIBUTE);
+            className = value.substring(0, index);
+        }
+        else
+        {
+            className = value;
+        }
 
+        return new ObjectBootstrapProperty(bootstrapService, artifactTypeParameterValue, optional, propertyKey, className);
+    }
+
+    private void registerUnnamedObjects(List<ObjectBootstrapProperty> bootstrapProperties) throws Exception
+    {
+        for (ObjectBootstrapProperty bootstrapProperty : bootstrapProperties)
+        {
+            registerObject(bootstrapProperty);
+        }
+    }
+
+    private void registerObjects(List<ObjectBootstrapProperty> bootstrapProperties) throws Exception
+    {
+        for (ObjectBootstrapProperty bootstrapProperty : bootstrapProperties)
+        {
+            registerObject(bootstrapProperty);
+        }
+    }
+
+    private void registerObject(ObjectBootstrapProperty bootstrapProperty) throws Exception
+    {
         try
         {
-            int x = value.indexOf(",");
-            if (x > -1)
-            {
-                Properties p = PropertiesUtils.getPropertiesFromString(value.substring(x + 1), ',');
-                if (p.containsKey(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY))
-                {
-                    artifactTypeParameterValue = ArtifactType.createFromString((String) p.get(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY));
-                }
-                optional = p.containsKey("optional");
-                className = value.substring(0, x);
-            }
-            else
-            {
-                className = value;
-            }
-
-            if (!artifactTypeParameterValue.equals(ArtifactType.ALL) && !artifactTypeParameterValue.equals(supportedArtifactType))
+            if (!bootstrapProperty.getArtifactType().equals(ArtifactType.ALL) && !bootstrapProperty.getArtifactType().equals(supportedArtifactType))
             {
                 return;
             }
 
-            doRegisterObject(key, className, optional);
+            doRegisterObject(bootstrapProperty);
         }
-        catch (InvocationTargetException itex)
+        catch (InvocationTargetException e)
         {
-            Throwable cause = ExceptionUtils.getCause(itex);
-            throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional object: " + className);
+            Throwable cause = ExceptionUtils.getCause(e);
+            throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && bootstrapProperty.getOptional(), cause, bootstrapProperty);
         }
-        catch (NoClassDefFoundError ncdfe)
+        catch (NoClassDefFoundError | ClassNotFoundException | NoSuchMethodException e)
         {
-            throwExceptionIfNotOptional(optional, ncdfe, "Ignoring optional object: " + className);
-        }
-        catch (ClassNotFoundException cnfe)
-        {
-            throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional object: " + className);
-        }
-        catch (NoSuchMethodException nsme)
-        {
-            throwExceptionIfNotOptional(optional, nsme, "Ignoring optional object: " + className);
+            throwExceptionIfNotOptional(bootstrapProperty.getOptional(), e, bootstrapProperty);
         }
     }
 
-    private void registerTransactionFactories(Map<String, String> singleTransactionFactories, MuleContext context) throws Exception
+    private void registerTransactionFactories(List<TransactionFactoryBootstrapProperty> singleTransactionFactories, MuleContext context) throws Exception
     {
-        for (Map.Entry<String, String> entry : singleTransactionFactories.entrySet())
+        for (TransactionFactoryBootstrapProperty bootstrapProperty : singleTransactionFactories)
         {
-            String transactionResourceClassNameProperties = entry.getValue();
-            String transactionFactoryClassName = entry.getKey();
-            boolean optional = false;
-            // reset
-            int x = transactionResourceClassNameProperties.indexOf(",");
-            if (x > -1)
-            {
-                Properties p = PropertiesUtils.getPropertiesFromString(transactionResourceClassNameProperties.substring(x + 1), ',');
-                optional = p.containsKey("optional");
-            }
-            final String transactionResourceClassName = (x == -1 ? transactionResourceClassNameProperties : transactionResourceClassNameProperties.substring(0, x));
             try
             {
-                context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(transactionResourceClassName), (TransactionFactory) Class.forName(transactionFactoryClassName).newInstance());
-
+                final Class<?> supportedType = bootstrapProperty.getService().forName(bootstrapProperty.getTransactionResourceClassName());
+                context.getTransactionFactoryManager().registerTransactionFactory(supportedType, (TransactionFactory) bootstrapProperty.getService().instantiateClass(bootstrapProperty.getTransactionFactoryClassName()));
             }
-            catch (NoClassDefFoundError ncdfe)
+            catch (NoClassDefFoundError | ClassNotFoundException ncdfe)
             {
-                throwExceptionIfNotOptional(optional, ncdfe, "Ignoring optional transaction factory: " + transactionResourceClassName);
-            }
-            catch (ClassNotFoundException cnfe)
-            {
-                throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional transaction factory: " + transactionResourceClassName);
+                throwExceptionIfNotOptional(bootstrapProperty.getOptional(), ncdfe, bootstrapProperty);
             }
         }
     }
 
-    private void registerTransformers(Properties props) throws Exception
+    private void registerTransformers(List<TransformerBootstrapProperty> props) throws Exception
     {
-        String transString;
-        String name = null;
-        String returnClassString;
-        boolean optional = false;
-
-        for (Map.Entry<Object, Object> entry : props.entrySet())
+        for (TransformerBootstrapProperty bootstrapProperty : props)
         {
-            transString = (String) entry.getValue();
-            // reset
-            Class<?> returnClass = null;
-            returnClassString = null;
-            int x = transString.indexOf(",");
-            if (x > -1)
-            {
-                Properties p = PropertiesUtils.getPropertiesFromString(transString.substring(x + 1), ',');
-                name = p.getProperty("name", null);
-                returnClassString = p.getProperty("returnClass", null);
-                optional = p.containsKey("optional");
-            }
-
-            final Class<? extends Transformer> transformerClass = getClass(x == -1 ? transString : transString.substring(0, x));
+            final Class<? extends Transformer> transformerClass = getClass(bootstrapProperty.getClassName());
             try
             {
-                String mime = null;
+                Class<?> returnClass = null;
+                String returnClassString = bootstrapProperty.getReturnClassName();
                 if (returnClassString != null)
                 {
-                    int i = returnClassString.indexOf(":");
-                    if (i > -1)
-                    {
-                        mime = returnClassString.substring(i + 1);
-                        returnClassString = returnClassString.substring(0, i);
-                    }
                     if (returnClassString.equals("byte[]"))
                     {
                         returnClass = byte[].class;
                     }
                     else
                     {
-                        returnClass = ClassUtils.loadClass(returnClassString, getClass());
+                        returnClass = bootstrapProperty.getService().forName(returnClassString);
                     }
                 }
 
-                doRegisterTransformer(name, returnClass, transformerClass, mime, optional);
+                doRegisterTransformer(bootstrapProperty, returnClass, transformerClass);
             }
-            catch (InvocationTargetException itex)
+            catch (InvocationTargetException e)
             {
-                Throwable cause = ExceptionUtils.getCause(itex);
-                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional transformer: " + transformerClass.getClass().getName());
+                Throwable cause = ExceptionUtils.getCause(e);
+                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && bootstrapProperty.getOptional(), cause, bootstrapProperty);
             }
-            catch (NoClassDefFoundError ncdfe)
+            catch (NoClassDefFoundError | ClassNotFoundException e)
             {
-                throwExceptionIfNotOptional(optional, ncdfe, "Ignoring optional transformer: " + transformerClass.getClass().getName());
-
+                throwExceptionIfNotOptional(bootstrapProperty.getOptional(), e, bootstrapProperty);
             }
-            catch (ClassNotFoundException cnfe)
-            {
-                throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional transformer: " + transformerClass.getClass().getName());
-            }
-
-            name = null;
         }
     }
 
-    protected abstract void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime, boolean optional) throws Exception;
+    protected abstract void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass, Class<? extends Transformer> transformerClass) throws Exception;
 
     protected Class getClass(String className) throws ClassNotFoundException
     {
@@ -364,15 +350,15 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
 
     protected abstract void registerTransformers() throws MuleException;
 
-    protected abstract void doRegisterObject(String key, String className, boolean optional) throws Exception;
+    protected abstract void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception;
 
-    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception
+    private void throwExceptionIfNotOptional(boolean optional, Throwable t, AbstractBootstrapProperty bootstrapProperty) throws Exception
     {
         if (optional)
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(message);
+                logger.debug("Ignoring optional " + bootstrapProperty);
             }
         }
         else if (t instanceof Exception)

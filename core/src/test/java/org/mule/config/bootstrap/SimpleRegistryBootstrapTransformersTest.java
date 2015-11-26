@@ -8,6 +8,7 @@ package org.mule.config.bootstrap;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
@@ -39,7 +40,10 @@ public class SimpleRegistryBootstrapTransformersTest extends AbstractMuleContext
         TestTransformerResolver transformerResolver = new TestTransformerResolver();
         muleContext.getRegistry().registerObject("testTransformerResolver", transformerResolver);
 
-        SimpleRegistryBootstrap registryBootstrap = new SimpleRegistryBootstrap(new SinglePropertiesRegistryBootstrapDiscoverer(properties));
+        final BootstrapServiceDiscoverer bootstrapServiceDiscoverer = new TestBootstrapServiceDiscoverer(properties);
+        ((DefaultMuleContext) muleContext).setBootstrapServiceDiscoverer(bootstrapServiceDiscoverer);
+
+        SimpleRegistryBootstrap registryBootstrap = new SimpleRegistryBootstrap();
         registryBootstrap.setMuleContext(muleContext);
         registryBootstrap.initialise();
 

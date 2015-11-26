@@ -33,6 +33,7 @@ import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.util.StreamCloserService;
+import org.mule.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.extension.api.ExtensionManager;
@@ -397,5 +398,10 @@ public interface MuleContext extends Lifecycle
      */
     void setTransformationService(TransformationService transformationService);
 
+    /**
+     * @return {@link BootstrapServiceDiscoverer} used to bootstrap this {@link MuleContext}
+     */
+    //TODO(pablo.kraan): remove this reference and use dependency injection (MULE-9157)
+    BootstrapServiceDiscoverer getRegistryBootstrapServiceDiscoverer();
 }
 

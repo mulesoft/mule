@@ -15,15 +15,14 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.bootstrap.AbstractRegistryBootstrap;
 import org.mule.config.bootstrap.BootstrapObjectFactory;
-import org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer;
+import org.mule.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
+import org.mule.config.bootstrap.TransformerBootstrapProperty;
 import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
 import org.mule.config.spring.factories.ConstantFactoryBean;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.ClassUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map.Entry;
 
 import org.springframework.beans.BeansException;
@@ -47,11 +46,6 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
     private OptionalObjectsController optionalObjectsController;
     private BeanDefinitionRegistry beanDefinitionRegistry;
-
-    public SpringRegistryBootstrap()
-    {
-        super(new ClassPathRegistryBootstrapDiscoverer());
-    }
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException
@@ -90,7 +84,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     }
 
     @Override
-    protected void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime, boolean optional) throws Exception
+    protected void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass, Class<? extends Transformer> transformerClass) throws Exception
     {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(transformerClass);
 
@@ -98,24 +92,23 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
         if (returnClass != null)
         {
-            returnType = DataTypeFactory.create(returnClass, mime);
+            returnType = DataTypeFactory.create(returnClass, bootstrapProperty.getMimeType());
             builder.addPropertyValue("returnDataType", returnType);
         }
 
+        String name = bootstrapProperty.getName();
         if (name == null)
         {
-            //This will generate a default name for the transformer
-            //We then prefix the name to ensure there is less chance of conflict if the user registers
+            // Prefixes the generated default name to ensure there is less chance of conflict if the user registers
             // the transformer with the same name
             name = "_" + TransformerUtils.generateTransformerName(transformerClass, returnType);
         }
 
         builder.addPropertyValue("name", name);
 
-        notifyIfOptional(name, optional);
+        notifyIfOptional(name, bootstrapProperty.getOptional());
         doRegisterObject(name, builder);
     }
-
 
     /**
      * We want the SpringRegistry to be the only default one. This method
@@ -147,12 +140,25 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     }
 
     @Override
-    protected void doRegisterObject(String key, String className, boolean optional) throws Exception
+    protected void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception
     {
-        notifyIfOptional(key, optional);
+        notifyIfOptional(bootstrapProperty.getKey(), bootstrapProperty.getOptional());
 
-        Class<?> clazz = getClass(className);
-        doRegisterObject(key, clazz);
+        Class<?> clazz = bootstrapProperty.getService().forName(bootstrapProperty.getClassName());
+        BeanDefinitionBuilder builder;
+
+        if (BootstrapObjectFactory.class.isAssignableFrom(clazz))
+        {
+            final Object value = bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName());
+            builder = BeanDefinitionBuilder.rootBeanDefinition(BootstrapObjectFactoryBean.class);
+            builder.addConstructorArgValue(value);
+        }
+        else
+        {
+            builder = BeanDefinitionBuilder.rootBeanDefinition(clazz);
+        }
+
+        doRegisterObject(bootstrapProperty.getKey(), builder);
     }
 
     private void notifyIfOptional(String key, boolean optional)
@@ -161,23 +167,6 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
         {
             optionalObjectsController.registerOptionalKey(key);
         }
-    }
-
-    private void doRegisterObject(String key, Class<?> type) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-    {
-        BeanDefinitionBuilder builder;
-
-        if (BootstrapObjectFactory.class.isAssignableFrom(type))
-        {
-            builder = BeanDefinitionBuilder.rootBeanDefinition(BootstrapObjectFactoryBean.class);
-            builder.addConstructorArgValue(ClassUtils.instanciateClass(type));
-        }
-        else
-        {
-            builder = BeanDefinitionBuilder.rootBeanDefinition(type);
-        }
-
-        doRegisterObject(key, builder);
     }
 
     private void doRegisterObject(String key, BeanDefinitionBuilder builder)
