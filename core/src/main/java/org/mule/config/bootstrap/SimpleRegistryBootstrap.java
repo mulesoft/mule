@@ -32,18 +32,8 @@ import java.util.Map;
 public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
 {
 
-    public SimpleRegistryBootstrap()
-    {
-        super();
-    }
-
-    public SimpleRegistryBootstrap(RegistryBootstrapDiscoverer discoverer)
-    {
-        super(discoverer);
-    }
-
     @Override
-    protected void doRegisterTransformer(String name, Class<?> returnClass, Class<? extends Transformer> transformerClass, String mime, boolean optional) throws Exception
+    protected void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass, Class<? extends Transformer> transformerClass) throws Exception
     {
         Transformer trans = ClassUtils.instanciateClass(transformerClass);
         if (!(trans instanceof DiscoverableTransformer))
@@ -52,19 +42,17 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
         }
         if (returnClass != null)
         {
-            trans.setReturnDataType(DataTypeFactory.create(returnClass, mime));
+            trans.setReturnDataType(DataTypeFactory.create(returnClass, bootstrapProperty.getMimeType()));
         }
-        if (name != null)
+        if (bootstrapProperty.getName() != null)
         {
-            trans.setName(name);
+            trans.setName(bootstrapProperty.getName());
         }
         else
         {
-            //This will generate a default name for the transformer
-            name = trans.getName();
-            //We then prefix the name to ensure there is less chance of conflict if the user registers
+            // Prefixes the generated default name to ensure there is less chance of conflict if the user registers
             // the transformer with the same name
-            trans.setName("_" + name);
+            trans.setName("_" + trans.getName());
         }
         muleContext.getRegistry().registerTransformer(trans);
     }
@@ -81,24 +69,24 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
     }
 
     @Override
-    protected void doRegisterObject(String key, String className, boolean optional) throws Exception
+    protected void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception
     {
-        Object o = ClassUtils.instanciateClass(className);
+        Object value = bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName());
         Class<?> meta = Object.class;
 
-        if (o instanceof ObjectProcessor)
+        if (value instanceof ObjectProcessor)
         {
             meta = ObjectProcessor.class;
         }
-        else if (o instanceof StreamCloser)
+        else if (value instanceof StreamCloser)
         {
             meta = StreamCloser.class;
         }
-        else if (o instanceof BootstrapObjectFactory)
+        else if (value instanceof BootstrapObjectFactory)
         {
-            o = ((BootstrapObjectFactory) o).create();
+            value = ((BootstrapObjectFactory) value).create();
         }
 
-        muleContext.getRegistry().registerObject(key, o, meta);
+        muleContext.getRegistry().registerObject(bootstrapProperty.getKey(), value, meta);
     }
 }

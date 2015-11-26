@@ -31,6 +31,8 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ImmutableThreadingProfile;
+import org.mule.config.bootstrap.BootstrapServiceDiscoverer;
+import org.mule.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.AsyncMessageNotification;
@@ -90,6 +92,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected SplashScreen shutdownScreen;
 
+    protected BootstrapServiceDiscoverer bootstrapDiscoverer;
+
     /**
      * {@inheritDoc}
      */
@@ -113,6 +117,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
         muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
+        muleContext.setBootstrapServiceDiscoverer(injectMuleContextIfRequired(getBootstrapPropertiesServiceDiscoverer(), muleContext));
 
         JavaObjectSerializer defaultObjectSerializer = new JavaObjectSerializer();
         defaultObjectSerializer.setMuleContext(muleContext);
@@ -245,6 +250,28 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public void setShutdownScreen(SplashScreen shutdownScreen)
     {
         this.shutdownScreen = shutdownScreen;
+    }
+
+    public void setBootstrapPropertiesServiceDiscoverer(BootstrapServiceDiscoverer bootstrapDiscoverer)
+    {
+        this.bootstrapDiscoverer = bootstrapDiscoverer;
+    }
+
+    public BootstrapServiceDiscoverer getBootstrapPropertiesServiceDiscoverer()
+    {
+        if (bootstrapDiscoverer != null)
+        {
+            return bootstrapDiscoverer;
+        }
+        else
+        {
+            return createBootstrapDiscoverer();
+        }
+    }
+
+    protected BootstrapServiceDiscoverer createBootstrapDiscoverer()
+    {
+        return new PropertiesBootstrapServiceDiscoverer(Thread.currentThread().getContextClassLoader());
     }
 
     protected DefaultMuleConfiguration createMuleConfiguration()
