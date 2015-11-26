@@ -83,11 +83,12 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
 
                 // scatter-gather
                 .serial(pre()) // scatter-gather
-                .serial(prePost()) // route 0 logger
-                .serial(pre()) // route 1 chain
-                .serial(prePost()) // route 1 first logger
-                .serial(prePost()) // route 1 second logger
-                .serial(post()) // route 1 chain
+                .serial(new Node()
+                    .parallel(pre() // route 1 chain
+                        .serial(prePost()) // route 1 first logger
+                        .serial(prePost()) // route 1 second logger
+                        .serial(post())) // route 1 chain
+                    .parallel(prePost())) // route 0 logger
                 .serial(post()) // scatter-gather
 
                 //foreach

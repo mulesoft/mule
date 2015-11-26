@@ -6,6 +6,7 @@
  */
 package org.mule.context.notification;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -361,7 +362,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
-        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
+        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessorsNoOrder(
                 "/flowStaticWithScatterGather/processors/0",
                 "/flowStaticWithScatterGather/processors/0/0/0",
                 "/flowStaticWithScatterGather/processors/0/1/0",
@@ -375,7 +376,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
-        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
+        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessorsNoOrder(
                 "/subFlowStaticWithScatterGather/processors/0",
                 "/subFlowStaticWithScatterGather/processors/0/0/0",
                 "/subFlowStaticWithScatterGather/processors/0/1",
@@ -390,7 +391,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
-        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
+        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessorsNoOrder(
                 "/flowDynamicWithScatterGather/processors/0",
                 "/flowDynamicWithScatterGather/processors/0/0/0",
                 "/flowDynamicWithScatterGather/processors/0/1/0",
@@ -404,7 +405,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
-        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
+        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessorsNoOrder(
                 "/subFlowDynamicWithScatterGather/processors/0",
                 "/subFlowDynamicWithScatterGather/processors/0/0/0",
                 "/subFlowDynamicWithScatterGather/processors/0/1/0",
@@ -418,7 +419,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
-        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
+        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessorsNoOrder(
                 "/flowStaticWithScatterGatherChain/processors/0",
                 "/flowStaticWithScatterGatherChain/processors/0/0/0",
                 "/flowStaticWithScatterGatherChain/processors/0/1",
@@ -434,7 +435,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
-        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
+        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessorsNoOrder(
                 "/subFlowStaticWithScatterGatherChain/processors/0",
                 "/subFlowStaticWithScatterGatherChain/processors/0/0/0",
                 "/subFlowStaticWithScatterGatherChain/processors/0/1",
@@ -449,7 +450,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
-        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
+        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessorsNoOrder(
                 "/flowDynamicWithScatterGatherChain/processors/0",
                 "/flowDynamicWithScatterGatherChain/processors/0/0/0",
                 "/flowDynamicWithScatterGatherChain/processors/0/1",
@@ -464,7 +465,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
-        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
+        assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessorsNoOrder(
                 "/subFlowDynamicWithScatterGatherChain/processors/0",
                 "/subFlowDynamicWithScatterGatherChain/processors/0/0/0",
                 "/subFlowDynamicWithScatterGatherChain/processors/0/1",
@@ -472,47 +473,79 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
                 "/subFlowDynamicWithScatterGatherChain/processors/0/1/0/subFlow/subprocessors/0"));
     }
 
+    private abstract class ProcessorsMatcher extends TypeSafeMatcher<ProcessorsTrace>
+    {
+        protected List<Matcher> failed = new ArrayList<>();
+        protected String[] expectedProcessors;
+
+        public ProcessorsMatcher(String[] expectedProcessors)
+        {
+            this.expectedProcessors = expectedProcessors;
+        }
+
+        @Override
+        protected boolean matchesSafely(ProcessorsTrace processorsTrace)
+        {
+            Matcher<Collection<? extends Object>> sizeMatcher = hasSize(expectedProcessors.length);
+            if (!sizeMatcher.matches(processorsTrace.getExecutedProcessors()))
+            {
+                failed.add(sizeMatcher);
+            }
+
+            int i = 0;
+            for (String expectedProcessor : expectedProcessors)
+            {
+                doMatch(processorsTrace, i, expectedProcessor);
+                ++i;
+            }
+
+            return failed.isEmpty();
+        }
+
+        protected abstract void doMatch(ProcessorsTrace processorsTrace, int i, String expectedProcessor);
+
+        @Override
+        public void describeTo(Description description)
+        {
+            description.appendValue(Arrays.asList(expectedProcessors));
+        }
+
+        @Override
+        protected void describeMismatchSafely(ProcessorsTrace item, Description description)
+        {
+            description.appendText("was ").appendValue(item.getExecutedProcessors());
+        }
+    }
+
     private Matcher<ProcessorsTrace> hasExecutedProcessors(final String... expectedProcessors)
     {
-        return new TypeSafeMatcher<ProcessorsTrace>()
+        return new ProcessorsMatcher(expectedProcessors)
         {
-            private List<Matcher> failed = new ArrayList<>();
-
             @Override
-            protected boolean matchesSafely(ProcessorsTrace processorsTrace)
+            protected void doMatch(ProcessorsTrace processorsTrace, int i, String expectedProcessor)
             {
-                Matcher<Collection<? extends Object>> sizeMatcher = hasSize(expectedProcessors.length);
-                if (!sizeMatcher.matches(processorsTrace.getExecutedProcessors()))
+                Matcher processorItemMatcher = startsWith(expectedProcessor + " @");
+                if (!processorItemMatcher.matches(processorsTrace.getExecutedProcessors().get(i)))
                 {
-                    failed.add(sizeMatcher);
+                    failed.add(processorItemMatcher);
                 }
-
-                int i = 0;
-                for (String expectedProcessor : expectedProcessors)
-                {
-                    Matcher processorItemMatcher = startsWith(expectedProcessor + " @");
-                    if (!processorItemMatcher.matches(processorsTrace.getExecutedProcessors().get(i)))
-                    {
-                        failed.add(processorItemMatcher);
-                    }
-                    ++i;
-                }
-
-                return failed.isEmpty();
-            }
-
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendValue(Arrays.asList(expectedProcessors));
-            }
-
-            @Override
-            protected void describeMismatchSafely(ProcessorsTrace item, Description description)
-            {
-                description.appendText("was ").appendValue(item.getExecutedProcessors());
             }
         };
     }
 
+    private Matcher<ProcessorsTrace> hasExecutedProcessorsNoOrder(final String... expectedProcessors)
+    {
+        return new ProcessorsMatcher(expectedProcessors)
+        {
+            @Override
+            protected void doMatch(ProcessorsTrace processorsTrace, int i, String expectedProcessor)
+            {
+                Matcher<Iterable<? super String>> processorItemMatcher = hasItem(startsWith(expectedProcessor + " @"));
+                if (!processorItemMatcher.matches(processorsTrace.getExecutedProcessors()))
+                {
+                    failed.add(processorItemMatcher);
+                }
+            }
+        };
+    }
 }
