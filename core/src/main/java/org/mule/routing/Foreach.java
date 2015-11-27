@@ -25,7 +25,6 @@ import org.mule.routing.outbound.CollectionMessageSequence;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NotificationUtils;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +57,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     protected Log logger = LogFactory.getLog(getClass());
 
     private List<MessageProcessor> messageProcessors;
-    private List<MessageProcessor> ownedMessageProcessors;
-    private MessageProcessor ownedRootMessageProcessor;
+    private MessageProcessor ownedMessageProcessor;
     private AbstractMessageSequenceSplitter splitter;
     private String collectionExpression;
     private ExpressionConfig expressionConfig = new ExpressionConfig();
@@ -67,6 +65,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     private String rootMessageVariableName;
     private String counterVariableName;
     private boolean xpathCollection;
+    private volatile boolean messageProcessorInitialized;
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -91,7 +90,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             transformed = transformPayloadIfNeeded(message);
         }
         message.setInvocationProperty(parentMessageProp, message);
-        ownedRootMessageProcessor.process(event);
+        ownedMessageProcessor.process(event);
         if (transformed)
         {
             transformBack(message);
@@ -134,14 +133,23 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     @Override
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
-        return ownedMessageProcessors;
+        return messageProcessors;
     }
 
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        // skip the splitter that is added at the beginning and the filter at the end
-        NotificationUtils.addMessageProcessorPathElements(messageProcessors, pathElement);
+        List<MessageProcessor> processors;
+        if (messageProcessorInitialized)
+        {
+            // Skips the splitter that is added at the beginning and the filter at the end
+            processors = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size() - 1);
+        }
+        else
+        {
+            processors = getOwnedMessageProcessors();
+        }
+        NotificationUtils.addMessageProcessorPathElements(processors, pathElement);
     }
 
     public void setMessageProcessors(List<MessageProcessor> messageProcessors) throws MuleException
@@ -173,11 +181,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         splitter.setBatchSize(batchSize);
         splitter.setCounterVariableName(counterVariableName);
         splitter.setMuleContext(muleContext);
-
-        ownedMessageProcessors = new ArrayList<>(messageProcessors.size() + 2);
-        ownedMessageProcessors.add(splitter);
-        ownedMessageProcessors.addAll(messageProcessors);
-        ownedMessageProcessors.add(new MessageFilter(new Filter()
+        messageProcessors.add(0, splitter);
+        messageProcessors.add(new MessageFilter(new Filter()
         {
 
             @Override
@@ -186,10 +191,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                 return false;
             }
         }));
+        messageProcessorInitialized = true;
 
         try
         {
-            this.ownedRootMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(ownedMessageProcessors)
+            this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors)
                     .build();
         }
         catch (MuleException e)
