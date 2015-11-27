@@ -245,7 +245,9 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
         MessageProcessorPathElement mpPathElement = mock(MessageProcessorPathElement.class);
         foreachMp.addMessageProcessorPathElements(mpPathElement);
 
-        assertAddedPathElements(processors, mpPathElement);
+        // Remove MPs added by the foreach as it does not copies the list
+        final List<MessageProcessor> originalMessageProcessors = processors.subList(1, 3);
+        assertAddedPathElements(originalMessageProcessors, mpPathElement);
     }
 
     protected void assertAddedPathElements(List<MessageProcessor> processors, MessageProcessorPathElement mpPathElement)
