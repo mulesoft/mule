@@ -374,4 +374,10 @@
 		<expression-component>flowVars['latch'].countDown()</expression-component>
 	</sub-flow>
 
+    <sub-flow name="sub-flow-with-foreach">
+        <foreach>
+            <append-string-transformer message="y" />
+        </foreach>
+    </sub-flow>
+
 </mule>

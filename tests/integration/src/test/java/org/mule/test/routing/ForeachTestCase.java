@@ -532,4 +532,10 @@ public class ForeachTestCase extends FunctionalTestCase
 
         latch.await(10, TimeUnit.SECONDS);
     }
+
+    @Test
+    public void initializesForeachOnSubFLow() throws Exception
+    {
+        getSubFlow("sub-flow-with-foreach");
+    }
 }
