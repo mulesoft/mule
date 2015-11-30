@@ -8,11 +8,12 @@ package org.mule.context.notification;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.notification.BlockingServerEvent;
 
 /**
  * Used to notify that a message was received or sent through a {@link org.mule.api.transport.Connector}.
  */
-public class ConnectorMessageNotification extends BaseConnectorMessageNotification
+public class ConnectorMessageNotification extends BaseConnectorMessageNotification implements BlockingServerEvent
 {
 
     public ConnectorMessageNotification(MuleMessage resource, String endpoint, FlowConstruct flowConstruct, int action)
