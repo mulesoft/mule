@@ -121,7 +121,6 @@
 /mule-standalone-${productVersion}/lib/mule
 /mule-standalone-${productVersion}/lib/mule/mule-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-common-3.8.0-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
@@ -340,6 +339,7 @@
 /mule-standalone-${productVersion}/lib/user
 /mule-standalone-${productVersion}/lib/user/junit-4.11.jar
 /mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/user/mule-tests-unit-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/user/README.txt
 /mule-standalone-${productVersion}/lib/user/xmlunit-1.5.jar
 
