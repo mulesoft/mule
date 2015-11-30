@@ -10,9 +10,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ObjectNameHelper;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNot;
-import org.hamcrest.core.StringStartsWith;
 import org.junit.Ignore;
 import org.junit.Test;
 

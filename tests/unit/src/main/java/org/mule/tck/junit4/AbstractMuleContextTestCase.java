@@ -42,7 +42,6 @@ import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
-import org.mule.util.TestsLogConfigurationHelper;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 

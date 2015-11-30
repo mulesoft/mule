@@ -12,6 +12,7 @@
     <name>Mule Tests</name>
 
     <modules>
+        <module>unit</module>
         <module>functional</module>
         <module>infrastructure</module>
         <module>performance</module>

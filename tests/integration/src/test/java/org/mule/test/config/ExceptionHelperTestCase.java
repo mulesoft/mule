@@ -25,13 +25,11 @@ import org.mule.util.SystemUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.comparators.ComparableComparator;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;

@@ -111,6 +111,7 @@
     <modules>
         <module>buildtools</module>
         <module>core</module>
+        <module>core-tests</module>
         <module>distributions</module>
         <module>modules</module>
         <module>transports</module>
