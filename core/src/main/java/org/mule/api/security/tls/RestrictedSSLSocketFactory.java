@@ -43,7 +43,7 @@ public class RestrictedSSLSocketFactory extends SSLSocketFactory
         {
             protocols = sslContext.getDefaultSSLParameters().getProtocols();
         }
-        this.enabledProtocols = ArrayUtils.intersection(protocols, sslContext.getDefaultSSLParameters().getProtocols());
+        this.enabledProtocols = ArrayUtils.intersection(protocols, sslContext.getSupportedSSLParameters().getProtocols());
     }
 
     @Override
