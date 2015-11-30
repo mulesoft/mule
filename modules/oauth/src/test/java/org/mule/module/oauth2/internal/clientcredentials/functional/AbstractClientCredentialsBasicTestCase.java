@@ -17,8 +17,6 @@ import static org.mule.module.oauth2.internal.AbstractGrantType.buildAuthorizati
 import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
-import org.mule.module.oauth2.internal.AbstractGrantType;
-import org.mule.module.oauth2.internal.authorizationcode.OAuthAuthenticationHeader;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;

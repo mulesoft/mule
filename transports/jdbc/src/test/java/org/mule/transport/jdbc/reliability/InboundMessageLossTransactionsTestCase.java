@@ -10,12 +10,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.tck.probe.Probe;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 
 /**

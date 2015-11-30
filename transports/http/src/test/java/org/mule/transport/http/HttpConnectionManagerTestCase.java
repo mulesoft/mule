@@ -27,7 +27,6 @@ import java.net.URI;
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.WorkListener;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
