@@ -14,12 +14,8 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.StringEntity;
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 public class HttpListenerHostNameTestCase extends FunctionalTestCase
 {

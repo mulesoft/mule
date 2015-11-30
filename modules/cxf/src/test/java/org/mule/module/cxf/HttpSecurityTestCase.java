@@ -8,9 +8,6 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 

@@ -15,13 +15,9 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.jdbc.functional.AbstractJdbcFunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.  

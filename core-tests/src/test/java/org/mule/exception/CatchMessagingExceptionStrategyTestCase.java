@@ -9,22 +9,18 @@ package org.mule.exception;
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.apache.commons.lang.RandomStringUtils;
-
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-
+import org.mule.DefaultMuleMessage;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
@@ -33,7 +29,6 @@ import org.mule.api.util.StreamCloserService;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
