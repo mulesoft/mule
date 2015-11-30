@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:xm="http://www.mulesoft.org/schema/mule/xml"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
@@ -20,8 +19,6 @@
     <custom-connector name="testConnector2"
         class="org.mule.tck.testmodels.mule.TestConnector" />
 
-    <file:file-to-string-transformer
-        name="ObjectToFileMessage" />
     <xm:object-to-xml-transformer name="ObjectToXml" />
     <xm:xml-to-object-transformer name="XmlToObject" />
 

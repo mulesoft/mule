@@ -42,10 +42,6 @@ public class UnsupportedConnectorsMuleArtifactTestCase
                                   "</https:connector>");
         //JMS
         checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\" validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
-        //File Input
-        checkUnsupportedConnector("<file:connector name=\"output\" outputAppend=\"false\" outputPattern=\"#[function:datestamp]-#[header:inbound:originalFilename]\" xmlns:file=\"http://www.mulesoft.org/schema/mule/file\"/>\n");
-        //File Output
-        checkUnsupportedConnector("<file:connector name=\"input\" fileAge=\"500\" autoDelete=\"true\" pollingFrequency=\"100\" moveToDirectory=\"/backup\" moveToPattern=\"#[header:inbound:originalFilename].backup\" xmlns:file=\"http://www.mulesoft.org/schema/mule/file\"/>\n");
         //VM
         checkUnsupportedConnector("<vm:connector name=\"memory\" xmlns:vm=\"http://www.mulesoft.org/schema/mule/vm\"/>");
 
