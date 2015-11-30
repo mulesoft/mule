@@ -189,11 +189,15 @@ public class MuleManifest
         URL getManifestTestJarURL() throws IOException
         {
             String pathSeparator = System.getProperty("file.separator");
-            String testManifestPath = "core" + pathSeparator + "target" + pathSeparator + "test-classes";
+            String testManifestPath = "core-tests" + pathSeparator + "target" + pathSeparator + "test-classes";
             Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
             while (e.hasMoreElements())
             {
                 URL url = e.nextElement();
+                if (url.toString().contains("core"))
+                {
+                    System.out.println(url.toExternalForm());
+                }
                 if ((url.toExternalForm().indexOf(testManifestPath) > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
                     || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
                 {
