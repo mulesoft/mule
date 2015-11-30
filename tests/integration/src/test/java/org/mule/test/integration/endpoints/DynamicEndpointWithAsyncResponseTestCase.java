@@ -8,7 +8,6 @@ package org.mule.test.integration.endpoints;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;

@@ -19,14 +19,11 @@ import org.mule.transport.http.HttpRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.Header;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCase
 {

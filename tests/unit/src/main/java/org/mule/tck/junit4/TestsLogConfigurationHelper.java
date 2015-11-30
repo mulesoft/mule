@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.tck.junit4;
+
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

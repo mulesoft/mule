@@ -17,8 +17,6 @@ import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import java.io.IOException;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
 import org.mule.module.oauth2.internal.TokenNotFoundException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;

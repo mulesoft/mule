@@ -20,7 +20,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
-import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
