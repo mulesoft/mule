@@ -14,18 +14,25 @@ import org.mule.api.context.notification.FlowStackElement;
 import org.mule.api.context.notification.FlowTraceManager;
 import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.execution.LocationExecutionContextProvider;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.logging.LogConfigChangeSubject;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.spi.LoggerContext;
 
 /**
  * Manager for handling message processing troubleshooting data.
  */
-public class MessageProcessingFlowTraceManager extends LocationExecutionContextProvider implements FlowTraceManager, MuleContextAware, Initialisable
+public class MessageProcessingFlowTraceManager extends LocationExecutionContextProvider implements FlowTraceManager, MuleContextAware, Initialisable, Disposable
 {
     public static final String FLOW_STACK_INFO_KEY = "FlowStack";
 
@@ -33,6 +40,15 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
     private final MessageProcessorTextDebugger messageProcessorTextDebugger;
 
     private MuleContext muleContext;
+
+    private PropertyChangeListener logConfigChangeListener = new PropertyChangeListener()
+    {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt)
+        {
+            handleNotificationListeners();
+        }
+    };
 
     public MessageProcessingFlowTraceManager()
     {
@@ -49,8 +65,44 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
     @Override
     public void initialise() throws InitialisationException
     {
-        muleContext.getNotificationManager().addListener(messageProcessorTextDebugger);
-        muleContext.getNotificationManager().addListener(pipelineProcessorDebugger);
+        LoggerContext context = LogManager.getContext(false);
+        if (context != null && context instanceof LogConfigChangeSubject)
+        {
+            ((LogConfigChangeSubject) context).registerLogConfigChangeListener(logConfigChangeListener);
+        }
+
+        handleNotificationListeners();
+    }
+
+    @Override
+    public void dispose()
+    {
+        LoggerContext context = LogManager.getContext(false);
+        if (context != null && context instanceof LogConfigChangeSubject)
+        {
+            ((LogConfigChangeSubject) context).unregisterLogConfigChangeListener(logConfigChangeListener);
+        }
+
+        removeNotificationListeners();
+    }
+
+    protected void handleNotificationListeners()
+    {
+        if (DefaultMuleConfiguration.isFlowTrace())
+        {
+            muleContext.getNotificationManager().addListener(messageProcessorTextDebugger);
+            muleContext.getNotificationManager().addListener(pipelineProcessorDebugger);
+        }
+        else
+        {
+            removeNotificationListeners();
+        }
+    }
+
+    protected void removeNotificationListeners()
+    {
+        muleContext.getNotificationManager().removeListener(messageProcessorTextDebugger);
+        muleContext.getNotificationManager().removeListener(pipelineProcessorDebugger);
     }
 
     /**
@@ -65,17 +117,14 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
      */
     public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification)
     {
-        if (DefaultMuleConfiguration.isFlowTrace())
+        String resolveProcessorRepresentation = resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getProcessorPath(), notification.getProcessor());
+        if (notification.getSource().getProcessorsTrace() instanceof DefaultProcessorsTrace)
         {
-            String resolveProcessorRepresentation = resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getProcessorPath(), notification.getProcessor());
-            if (notification.getSource().getProcessorsTrace() instanceof DefaultProcessorsTrace)
-            {
-                ((DefaultProcessorsTrace) notification.getSource().getProcessorsTrace()).addExecutedProcessors(resolveProcessorRepresentation);
-            }
-            if (notification.getSource().getFlowCallStack() instanceof DefaultFlowCallStack)
-            {
-                ((DefaultFlowCallStack) notification.getSource().getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
-            }
+            ((DefaultProcessorsTrace) notification.getSource().getProcessorsTrace()).addExecutedProcessors(resolveProcessorRepresentation);
+        }
+        if (notification.getSource().getFlowCallStack() instanceof DefaultFlowCallStack)
+        {
+            ((DefaultFlowCallStack) notification.getSource().getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
         }
     }
 
@@ -102,7 +151,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
     @Override
     public void onFlowStart(MuleEvent muleEvent, String flowName)
     {
-        if (DefaultMuleConfiguration.isFlowTrace() && muleEvent.getFlowCallStack() instanceof DefaultFlowCallStack)
+        if (muleEvent.getFlowCallStack() instanceof DefaultFlowCallStack)
         {
             ((DefaultFlowCallStack) muleEvent.getFlowCallStack()).push(new FlowStackElement(flowName, null));
         }
@@ -111,7 +160,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
     @Override
     public void onFlowComplete(MuleEvent muleEvent)
     {
-        if (DefaultMuleConfiguration.isFlowTrace() && muleEvent.getFlowCallStack() instanceof DefaultFlowCallStack)
+        if (muleEvent.getFlowCallStack() instanceof DefaultFlowCallStack)
         {
             ((DefaultFlowCallStack) muleEvent.getFlowCallStack()).pop();
         }

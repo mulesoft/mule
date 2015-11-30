@@ -104,24 +104,38 @@ class Policy
         {
             Class notfnClass = notification.getClass();
             // search if we don't know about this event, or if we do know it is used
-            if ((!knownEventsExact.containsKey(notfnClass))
-                    || ((Boolean) knownEventsExact.get(notfnClass)).booleanValue())
+            if (!knownEventsExact.containsKey(notfnClass))
             {
-                boolean found = false;
-                for (Class<? extends ServerNotification> event : eventToSenders.keySet())
-                {
-                    if (event.isAssignableFrom(notfnClass))
-                    {
-                        found = true;
-                        for (Iterator senders = ((Collection) eventToSenders.get(event)).iterator(); senders.hasNext();)
-                        {
-                            ((Sender) senders.next()).dispatch(notification);
-                        }
-                    }
-                }
+                boolean found = doDispatch(notification, notfnClass);
                 knownEventsExact.put(notfnClass, Boolean.valueOf(found));
             }
+            else if (((Boolean) knownEventsExact.get(notfnClass)).booleanValue())
+            {
+                boolean found = doDispatch(notification, notfnClass);
+                // reduce contention on the map by not writing the same value over and over again.
+                if (!found)
+                {
+                    knownEventsExact.put(notfnClass, Boolean.valueOf(found));
+                }
+            }
         }
+    }
+
+    protected boolean doDispatch(ServerNotification notification, Class<? extends ServerNotification> notfnClass)
+    {
+        boolean found = false;
+        for (Class<? extends ServerNotification> event : eventToSenders.keySet())
+        {
+            if (event.isAssignableFrom(notfnClass))
+            {
+                found = true;
+                for (Sender sender : eventToSenders.get(event))
+                {
+                    sender.dispatch(notification);
+                }
+            }
+        }
+        return found;
     }
 
     /**
