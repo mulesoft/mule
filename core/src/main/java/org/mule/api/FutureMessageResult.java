@@ -127,7 +127,7 @@ public class FutureMessageResult extends FutureTask
             {
                 if (transformers != null)
                 {
-                    muleContext.getTransformationService().applyTransformers(result, null, transformers);
+                    result = muleContext.getTransformationService().applyTransformers(result, null, transformers);
                 }
             }
 

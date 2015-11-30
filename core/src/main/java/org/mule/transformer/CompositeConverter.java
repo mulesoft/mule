@@ -180,7 +180,7 @@ public class CompositeConverter implements Converter
         {
             try
             {
-                event.getMuleContext().getTransformationService().applyTransformers(event.getMessage(), event, this);
+                event.setMessage(event.getMuleContext().getTransformationService().applyTransformers(event.getMessage(), event, this));
             }
             catch (Exception e)
             {

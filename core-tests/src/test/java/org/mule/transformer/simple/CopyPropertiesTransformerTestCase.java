@@ -19,6 +19,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transformer.types.SimpleDataType;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import java.util.HashSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -44,7 +46,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
 
     @Mock
     private MuleContext mockMuleContext;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleMessage mockMuleMessage;
     @Mock
     private ExpressionManager mockExpressionManager;
@@ -63,6 +65,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
                         return (String) invocation.getArguments()[0];
                     }
                 });
+        when(mockMuleMessage.getDataType()).thenReturn(new SimpleDataType(String.class));
     }
 
     @Test

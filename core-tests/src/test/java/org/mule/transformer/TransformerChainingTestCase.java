@@ -16,6 +16,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -50,9 +51,9 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        MuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerChain(validTransformer);
-        transformationService.applyTransformers(message, null, messageTransformer);
+        message = transformationService.applyTransformers(message, null, messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -67,7 +68,8 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
-        transformationService.applyTransformers(message, null, Collections.singletonList(messageTransformer));
+        message = (DefaultMuleMessage) transformationService.applyTransformers(message, null, Collections
+                .singletonList(messageTransformer));
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -80,9 +82,9 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        MuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer, validTransformer);
-        transformationService.applyTransformers(message, null, messageTransformer);
+        message = transformationService.applyTransformers(message, null, messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -99,10 +101,10 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
 
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        MuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
         messageTransformer.setMuleContext(muleContext);
-        transformationService.applyTransformers(message, null, messageTransformer);
+        message = transformationService.applyTransformers(message, null, messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -158,10 +160,10 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
 
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        MuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
         messageTransformer.setMuleContext(muleContext);
-        transformationService.applyTransformers(message, null, messageTransformer);
+        message = transformationService.applyTransformers(message, null, messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);

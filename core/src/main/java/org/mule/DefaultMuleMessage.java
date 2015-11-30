@@ -179,7 +179,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         else
         {
             setPayload(message, dataType);
-            originalPayload = message;
+            if (muleContext.getConfiguration().isCacheMessageOriginalPayload())
+            {
+                originalPayload = message;
+            }
         }
         addProperties(inboundProperties, INBOUND);
         addProperties(outboundProperties, OUTBOUND);
@@ -198,7 +201,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         this(message, previous, muleContext, getMessageDataType(previous, message));
     }
 
-    private DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, DataType<?> dataType)
+    public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, DataType<?> dataType)
     {
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
@@ -218,8 +221,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             copyMessagePropertiesContext(previous);
         }
 
-        originalPayload = previous.getPayload();
-        setEncoding(previous.getEncoding());
+        if (muleContext.getConfiguration().isCacheMessageOriginalPayload())
+        {
+            originalPayload = previous.getPayload();
+        }
+
+        if (this.dataType.getEncoding() == null)
+        {
+            setEncoding(previous.getEncoding());
+        }
 
         if (previous.getExceptionPayload() != null)
         {

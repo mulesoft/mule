@@ -8,6 +8,8 @@ package org.mule.transport;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 import org.mule.MessageExchangePattern;
 import org.mule.TransformationService;
 import org.mule.api.MuleContext;
@@ -55,12 +57,14 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     private TransformationService transformationService;
 
     @Before
-    public void setup()
+    public void setup() throws MuleException
     {
-        Mockito.when(muleSession.getId()).thenReturn("1");
+        when(muleSession.getId()).thenReturn("1");
         MuleConfiguration muleConfiguration = Mockito.mock(MuleConfiguration.class);
-        Mockito.when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-        Mockito.when(muleContext.getTransformationService()).thenReturn(transformationService);
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+        when(muleContext.getTransformationService()).thenReturn(transformationService);
+        when(transformationService.applyTransformers(any(MuleMessage.class), any(MuleEvent.class), Mockito.anyList())
+        ).thenAnswer(answer -> answer.getArguments()[0]);
     }
 
     @Test
@@ -83,9 +87,9 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     protected MuleMessage createRequestMessage()
     {
         MuleMessage request = Mockito.mock(MuleMessage.class);
-        Mockito.when(request.getMuleContext()).thenReturn(muleContext);
-        Mockito.when(
-            request.getProperty(Mockito.anyString(), Mockito.any(PropertyScope.class), Mockito.eq(false)))
+        when(request.getMuleContext()).thenReturn(muleContext);
+        when(
+            request.getProperty(Mockito.anyString(), any(PropertyScope.class), Mockito.eq(false)))
             .thenReturn(Boolean.FALSE);
         return request;
     }
@@ -93,24 +97,24 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     protected MessageReceiver createMessageReciever(MessageExchangePattern mep) throws MuleException
     {
         AbstractConnector connector = Mockito.mock(AbstractConnector.class);
-        Mockito.when(connector.getSessionHandler()).thenReturn(new NullSessionHandler());
-        Mockito.when(connector.getMuleContext()).thenReturn(muleContext);
+        when(connector.getSessionHandler()).thenReturn(new NullSessionHandler());
+        when(connector.getMuleContext()).thenReturn(muleContext);
 
         FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
 
         InboundEndpoint endpoint = Mockito.mock(InboundEndpoint.class);
-        Mockito.when(endpoint.getExchangePattern()).thenReturn(mep);
-        Mockito.when(endpoint.getConnector()).thenReturn(connector);
-        Mockito.when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
-        Mockito.when(endpoint.getTransactionConfig()).thenReturn(new MuleTransactionConfig());
-        Mockito.when(endpoint.getExchangePattern()).thenReturn(mep);
-        Mockito.when(endpoint.getMuleContext()).thenReturn(muleContext);
+        when(endpoint.getExchangePattern()).thenReturn(mep);
+        when(endpoint.getConnector()).thenReturn(connector);
+        when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
+        when(endpoint.getTransactionConfig()).thenReturn(new MuleTransactionConfig());
+        when(endpoint.getExchangePattern()).thenReturn(mep);
+        when(endpoint.getMuleContext()).thenReturn(muleContext);
 
         MuleEvent responseEvent = Mockito.mock(MuleEvent.class);
-        Mockito.when(responseEvent.getSession()).thenReturn(muleSession);
+        when(responseEvent.getSession()).thenReturn(muleSession);
 
         MessageProcessor listener = Mockito.mock(MessageProcessor.class);
-        Mockito.when(listener.process(Mockito.any(MuleEvent.class))).thenAnswer(new Answer<MuleEvent>()
+        when(listener.process(any(MuleEvent.class))).thenAnswer(new Answer<MuleEvent>()
         {
             @Override
             public MuleEvent answer(InvocationOnMock invocation) throws Throwable

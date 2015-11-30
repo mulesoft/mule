@@ -109,9 +109,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         {
             try
             {
-                MuleMessage message = event.getMessage();
-
-                muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this);
+                MuleMessage message = muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this);
                 if (message instanceof DefaultMessageCollection)
                 {
                     if (((DefaultMessageCollection) message).isInvalidatedPayload())
@@ -120,10 +118,11 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
                         {
                             logger.debug("Transformed message is an invalidated message collection. Creating new message with payload: " + event.getMessage().getPayload());
                         }
-                        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, message.getMuleContext());
-                        event = new DefaultMuleEvent(newMessage, event);
+                        message = new DefaultMuleMessage(message.getPayload(), message, message.getMuleContext());
+                        event = new DefaultMuleEvent(message, event);
                     }
                 }
+                event.setMessage(message);
             }
             catch (Exception e)
             {

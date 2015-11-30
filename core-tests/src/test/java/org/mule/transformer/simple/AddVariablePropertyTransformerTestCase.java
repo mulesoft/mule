@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
@@ -27,6 +28,7 @@ import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
+import org.mule.transformer.types.SimpleDataType;
 import org.mule.transformer.types.TypedValue;
 
 import java.util.Arrays;
@@ -57,7 +59,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     public static final String NULL_EXPRESSION = "#[string:someValueNull]";
     public static final String CUSTOM_ENCODING = UTF_8.name();
 
-    private MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
+    private MuleMessage mockMessage = Mockito.mock(MuleMessage.class, RETURNS_DEEP_STUBS);
     private MuleContext mockMuleContext = Mockito.mock(MuleContext.class);
     private ExpressionManager mockExpressionManager = Mockito.mock(ExpressionManager.class);
     private AbstractAddVariablePropertyTransformer addVariableTransformer;
@@ -100,6 +102,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
         TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, DataTypeFactory.STRING);
         when(mockExpressionManager.evaluateTyped(EXPRESSION, mockMessage)).thenReturn(typedValue);
         addVariableTransformer.setMuleContext(mockMuleContext);
+        when(mockMessage.getDataType()).thenReturn(new SimpleDataType(String.class));
     }
 
     @Test

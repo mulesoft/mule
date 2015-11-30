@@ -7,7 +7,9 @@
 package org.mule.transformer.simple;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -17,6 +19,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transformer.types.SimpleDataType;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,7 +47,7 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     public static final String NULL_EXPRESSION = "#[string:someValueNull]";
     public static final String NULL_EXPRESSION_VALUE = null;
 
-    private MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
+    private MuleMessage mockMessage = Mockito.mock(MuleMessage.class, RETURNS_DEEP_STUBS);
     private MuleContext mockMuleContext = Mockito.mock(MuleContext.class);
     private ExpressionManager mockExpressionManager = Mockito.mock(ExpressionManager.class);
     private AbstractRemoveVariablePropertyTransformer removeVariableTransformer;
@@ -82,6 +85,7 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
             });
         Mockito.when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(EXPRESSION_VALUE);
         removeVariableTransformer.setMuleContext(mockMuleContext);
+        when(mockMessage.getDataType()).thenReturn(new SimpleDataType(String.class));
     }
 
     @Test
