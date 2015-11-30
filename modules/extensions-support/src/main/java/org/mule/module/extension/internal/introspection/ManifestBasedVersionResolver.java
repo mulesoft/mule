@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.introspection;
 
 import org.mule.config.MuleManifest;
 import org.mule.extension.annotation.api.Extension;
+import org.mule.util.ClassUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,17 +50,7 @@ final class ManifestBasedVersionResolver implements VersionResolver
 
     private String fallback()
     {
-        //look for the location of this class
-        String packageName = extensionType.getPackage().getName();
-        String classFileName = extensionType.getName().substring(packageName.length() + 1) + ".class";
-        String classFilePath = extensionType.getResource(classFileName).toString();
-        //get rid of the package part of the path to avoid conflicts with user-defined directories
-        String packagePath = packageName.replace(".", "/");
-        classFilePath = classFilePath.substring(0, classFilePath.lastIndexOf(packagePath));
-        //get the target index since the class could be in /classes too
-        int pathIndex = classFilePath.lastIndexOf("/target/");
-        //find and load manifest
-        String manifestUrl = String.format("%s/target/test-classes/META-INF/MANIFEST.MF", classFilePath.substring(0, pathIndex + 1));
+        String manifestUrl = ClassUtils.getPathURL(extensionType) + "/target/test-classes/META-INF/MANIFEST.MF";
         try (InputStream manifestInputStream = new URL(manifestUrl).openStream())
         {
             Manifest manifest = new Manifest(manifestInputStream);

@@ -109,6 +109,7 @@ public class DefaultStreamCloserService implements StreamCloserService
                    || InputSource.class.isAssignableFrom(streamType)
                    || StreamSource.class.isAssignableFrom(streamType)
                    || Closeable.class.isAssignableFrom(streamType)
+                   || java.io.Closeable.class.isAssignableFrom(streamType)
                    || (SAXSource.class.isAssignableFrom(streamType) && !streamType.getName().endsWith(
                        "StaxSource"));
         }
@@ -154,6 +155,17 @@ public class DefaultStreamCloserService implements StreamCloserService
                 catch (MuleException e)
                 {
                     this.logCloseException(stream, e);
+                }
+            }
+            else if (stream instanceof java.io.Closeable)
+            {
+                try
+                {
+                    ((java.io.Closeable) stream).close();
+                }
+                catch (Exception e)
+                {
+                    logCloseException(stream, e);
                 }
             }
         }
