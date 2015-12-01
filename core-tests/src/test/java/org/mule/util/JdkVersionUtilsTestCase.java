@@ -61,21 +61,17 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 	{
 		// supported
 		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
-		setJdkVersion("1.6");
+		setJdkVersion("1.8.0");
 		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
-        setJdkVersion("1.6.20");
+        setJdkVersion("1.8.20");
         assertTrue(JdkVersionUtils.isSupportedJdkVersion());
-        setJdkVersion("1.6.0_129");
+        setJdkVersion("1.8.0_129");
         assertTrue(JdkVersionUtils.isSupportedJdkVersion());
-		setJdkVersion("1.7");
-		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
-		setJdkVersion("1.8");
-		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 
 		//not supported
-		setJdkVersion("1.4.2");
+		setJdkVersion("1.7.2");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
-		setJdkVersion("1.4.2_12");
+		setJdkVersion("1.7.2_12");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.9");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
@@ -126,12 +122,10 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 	public void testRecommendedJdkVersion()
 	{
 		// recommended
-        setJdkVersion("1.6.0_129");
+        setJdkVersion("1.8.0_129");
         assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
-        setJdkVersion("1.6.20");
+        setJdkVersion("1.8.20");
         assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
-		setJdkVersion("1.7.0_03");
-		assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
 
 		//not recommended
 		setJdkVersion("1.4.2");
@@ -142,7 +136,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 		assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
         setJdkVersion("1.7.0");
         assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
-        setJdkVersion("1.8");
+        setJdkVersion("1.9");
         assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
 	}
 	
@@ -204,17 +198,17 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 	public void testValidateJdk()
 	{
 	    JdkVersionUtils.validateJdk();
-        setJdkVersion("1.6.0");
+        setJdkVersion("1.8.0");
         JdkVersionUtils.validateJdk();
-        setJdkVersion("1.6.0_129");
+        setJdkVersion("1.8.0_129");
         JdkVersionUtils.validateJdk();
-        setJdkVersion("1.6.20");
+        setJdkVersion("1.8.20");
         JdkVersionUtils.validateJdk();
-        setJdkVersion("1.7.0");
+        setJdkVersion("1.9.0");
         JdkVersionUtils.validateJdk();
-        setJdkVersion("1.7.0_03");
+        setJdkVersion("1.9.0_03");
         JdkVersionUtils.validateJdk();
-        setJdkVersion("1.7.0_51");
+        setJdkVersion("1.9.0_51");
         JdkVersionUtils.validateJdk();
 
 	}
@@ -229,7 +223,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testValidateJdk8()
     {
-        setJdkVersion("1.8");
+        setJdkVersion("1.8.0");
         JdkVersionUtils.validateJdk();
     }
 }
