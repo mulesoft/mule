@@ -194,10 +194,6 @@ public class MuleManifest
             while (e.hasMoreElements())
             {
                 URL url = e.nextElement();
-                if (url.toString().contains("core"))
-                {
-                    System.out.println(url.toExternalForm());
-                }
                 if ((url.toExternalForm().indexOf(testManifestPath) > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
                     || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
                 {
