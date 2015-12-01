@@ -66,6 +66,15 @@ public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunct
         testFlow("inlineScriptMutatePayload", event);
     }
 
+    @Test
+    public void scriptExpressionVariables() throws Exception
+    {
+        MuleEvent event = getTestEvent("");
+        event.setFlowVariable("prop1", "Received");
+        event.setFlowVariable("prop2", "A-OK");
+        testFlow("scriptExpressionVariables", event);
+    }
+
     @Override
     protected String getConfigFile()
     {
