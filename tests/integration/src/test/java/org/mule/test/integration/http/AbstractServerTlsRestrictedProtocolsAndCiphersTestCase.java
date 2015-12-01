@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.listener;
+package org.mule.test.integration.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends FunctionalTestCase
+public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase extends FunctionalTestCase
 {
 
     @Rule
@@ -42,12 +42,6 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Functi
 
     private static final String SERVER_PROTOCOL_ENABLED = "TLSv1";
     private static final String SERVER_PROTOCOL_DISABLED = "SSLv3";
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-restricted-protocols-ciphers-config.xml";
-    }
 
     @BeforeClass
     public static void createTlsPropertiesFile() throws Exception
@@ -66,7 +60,7 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Functi
 
     private static File getTlsPropertiesFile()
     {
-        String path = ClassUtils.getClassPathRoot(HttpListenerTlsRestrictedProtocolsAndCiphersTestCase.class).getPath();
+        String path = ClassUtils.getClassPathRoot(AbstractServerTlsRestrictedProtocolsAndCiphersTestCase.class).getPath();
         return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
     }
 
@@ -127,4 +121,5 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Functi
 
         return socket;
     }
+
 }
