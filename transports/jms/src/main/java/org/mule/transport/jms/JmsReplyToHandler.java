@@ -85,7 +85,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             
             List<Transformer> defaultTransportTransformers =  ((org.mule.transport.AbstractConnector) jmsConnector).getDefaultOutboundTransformers(tempEndpoint);
             
-            muleContext.getTransformationService().applyTransformers(returnMessage, null, defaultTransportTransformers);
+            returnMessage = muleContext.getTransformationService().applyTransformers(returnMessage, null, defaultTransportTransformers);
             Object payload = returnMessage.getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue

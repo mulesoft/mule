@@ -6,6 +6,7 @@
  */
 package org.mule.transport;
 
+import org.mule.TransformationService;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
@@ -484,4 +485,10 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         return createMuleMessage(null);
     }
+
+    protected TransformationService getTransformationService()
+    {
+        return connector.getMuleContext().getTransformationService();
+    }
+
 }

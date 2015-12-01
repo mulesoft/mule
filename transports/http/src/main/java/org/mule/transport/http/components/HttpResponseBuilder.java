@@ -112,7 +112,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     {
         if(bodyTransformer != null)
         {
-            muleContext.getTransformationService().applyTransformers(event.getMessage(), event, bodyTransformer);
+            message = muleContext.getTransformationService().applyTransformers(event.getMessage(), event, bodyTransformer);
         }
 
         try

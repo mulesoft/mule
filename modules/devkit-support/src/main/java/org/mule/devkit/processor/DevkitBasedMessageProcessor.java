@@ -223,7 +223,7 @@ public abstract class DevkitBasedMessageProcessor extends ExpressionEvaluatorSup
         List<Transformer> transformerList;
         transformerList = new ArrayList<Transformer>();
         transformerList.add(new TransformerTemplate(overwritePayloadCallback));
-        muleContext.getTransformationService().applyTransformers(event.getMessage(), event, transformerList);
+        event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, transformerList));
     }
 
     /**

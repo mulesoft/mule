@@ -106,7 +106,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
                 }
                 if (!endpoint.isDisableTransportTransformer())
                 {
-                    applyInboundTransformers(result);
+                    result = applyInboundTransformers(result);
                 }
                 if (beginNotification != null)
                 {
@@ -129,9 +129,9 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
         }
     }
 
-    protected void applyInboundTransformers(MuleMessage message) throws MuleException
+    protected MuleMessage applyInboundTransformers(MuleMessage message) throws MuleException
     {
-        connector.getMuleContext().getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
+        return getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
     }
 
     @Override

@@ -48,36 +48,38 @@ public class TransformationService
     }
 
     /**
-     * Applies a list of transformers to the payload of the message. This *Will* change the payload of the
-     * message.
+     * Applies a list of transformers returning the result of the transformation as a new message instance. If the list
+     * of transformers is empty or transformation would be redundant then the same message instances will be returned.
      *
      * @param event the event being processed
      * @param transformers the transformers to apply to the message payload
+     * @return the result of transformation
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    public void applyTransformers(MuleMessage message, MuleEvent event, List<? extends Transformer> transformers) throws MuleException
+    public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final List<? extends Transformer> transformers) throws MuleException
     {
-        applyTransformers(message, event, transformers, null);
+        return applyTransformers(message, event, transformers, null);
     }
 
     /**
-     * Applies a list of transformers to the payload of the message. This *Will* change the payload of the
-     * message.
+     * Applies a list of transformers returning the result of the transformation as a new message instance. If the list
+     * of transformers is empty or transformation would be redundant then the same message instances will be returned.
      *
      * @param event the event being processed
      * @param transformers the transformers to apply to the message payload
+     * @return the result of transformation
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    public void applyTransformers(MuleMessage message, MuleEvent event, Transformer... transformers) throws MuleException
+    public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final Transformer... transformers) throws MuleException
     {
-        applyTransformers(message, event, Arrays.asList(transformers), null);
+        return applyTransformers(message, event, Arrays.asList(transformers), null);
     }
 
     /**
-     * Applies a list of transformers to the payload of the message. This *Will* change the payload of the
-     * message.
+     * Applies a list of transformers returning the result of the transformation as a new message instance. If the list
+     * of transformers is empty or transformation would be redundant then the same message instances will be returned.
      *
      * @param event the event being processed
      * @param transformers the transformers to apply to the message payload
@@ -85,20 +87,24 @@ public class TransformationService
      * transformations will occur on the message payload to ensure that the final payload is of the specified type.
      * If no transformers can be found in the registry that can transform from the return type of the transformation
      * list to the outputType and exception will be thrown
+     * @return the result of transformation
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    public void applyTransformers(MuleMessage message, MuleEvent event, List<? extends Transformer> transformers, Class<?> outputType) throws MuleException
+    public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final List<? extends
+            Transformer> transformers, Class<?> outputType) throws MuleException
     {
+        MuleMessage result = message;
         if (!transformers.isEmpty())
         {
-            applyAllTransformers(message, event, transformers);
+            result = applyAllTransformers(message, event, transformers);
         }
 
-        if (null != outputType && !message.getPayload().getClass().isAssignableFrom(outputType))
+        if (null != outputType && !result.getPayload().getClass().isAssignableFrom(outputType))
         {
-            message.setPayload(getPayload(message, DataTypeFactory.create(outputType)));
+            result = new DefaultMuleMessage(getPayload(result, DataTypeFactory.create(outputType)), result, muleContext);
         }
+        return result;
     }
 
 
@@ -291,15 +297,16 @@ public class TransformationService
         }
     }
 
-    private void applyAllTransformers(MuleMessage message, MuleEvent event, List<? extends Transformer> transformers) throws MuleException
+    private MuleMessage applyAllTransformers(final MuleMessage message, final MuleEvent event, final List<? extends Transformer> transformers) throws MuleException
     {
+        MuleMessage result = message;
         if (!transformers.isEmpty())
         {
             for (int index = 0; index < transformers.size(); index++)
             {
                 Transformer transformer = transformers.get(index);
 
-                Class<?> srcCls = message.getPayload().getClass();
+                Class<?> srcCls = result.getPayload().getClass();
                 DataType<?> originalSourceType = DataTypeFactory.create(srcCls);
 
                 if (transformer.isSourceDataTypeSupported(originalSourceType))
@@ -308,7 +315,7 @@ public class TransformationService
                     {
                         logger.debug("Using " + transformer + " to transform payload.");
                     }
-                    transformMessage(message, event, transformer);
+                    result = transformMessage(result, event, transformer);
                 }
                 else
                 {
@@ -319,7 +326,7 @@ public class TransformationService
 
                     if (useExtendedTransformations())
                     {
-                        if (canSkipTransformer(message, transformers, index))
+                        if (canSkipTransformer(result, transformers, index))
                         {
                             continue;
                         }
@@ -333,8 +340,8 @@ public class TransformationService
                             {
                                 logger.debug("Performing implicit transformation with: " + transformer);
                             }
-                            transformMessage(message, event, implicitTransformer);
-                            transformMessage(message, event, transformer);
+                            result = transformMessage(result, event, implicitTransformer);
+                            result = transformMessage(result, event, transformer);
                         }
                         else
                         {
@@ -352,6 +359,7 @@ public class TransformationService
                 }
             }
         }
+        return result;
     }
 
     private boolean canSkipTransformer(MuleMessage message, List<? extends Transformer> transformers, int index)
@@ -399,7 +407,7 @@ public class TransformationService
         return result;
     }
 
-    private void transformMessage(MuleMessage message, MuleEvent event, Transformer transformer) throws TransformerMessagingException, TransformerException
+    private MuleMessage transformMessage(final MuleMessage message, final MuleEvent event, final Transformer transformer) throws TransformerMessagingException, TransformerException
     {
         Object result;
 
@@ -412,40 +420,26 @@ public class TransformationService
             result = transformer.transform(message);
         }
 
-        // Update the RequestContext with the result of the transformation.
-        RequestContext.internalRewriteEvent(message, false);
-
-        if (message.getOriginalPayload() == null && muleContext.getConfiguration().isCacheMessageOriginalPayload())
-        {
-            message.setOriginalPayload(message.getPayload());
-        }
-
         if (result instanceof MuleMessage)
         {
             if (!result.equals(message))
             {
-                // Only copy the payload and properties of mule message
-                // transformer result if the message is a different
+                // Only copy the payload and properties of mule message transformer result if the message is a different
                 // instance
-                synchronized (message)
-                {
-                    MuleMessage resultMessage = (MuleMessage) result;
-                    message.setPayload(resultMessage.getPayload(), resultMessage.getDataType());
-                    message.setOriginalPayload(resultMessage.getOriginalPayload());
-                    message.copyMessageProperties(resultMessage);
-                    message.copyAttachments(resultMessage);
-                }
+                MuleMessage transformResult = (MuleMessage) result;
+                return new DefaultMuleMessage(result, transformResult, muleContext, transformResult.getDataType());
             }
+            return  message;
         }
         else
         {
-            final DataType<?> mergedDataType = mergeDataType(message, message.getDataType(), transformer.getReturnDataType());
-            message.setPayload(result, mergedDataType);
+            return new DefaultMuleMessage(result, message, muleContext, mergeDataType(message, transformer.getReturnDataType()));
         }
     }
 
-    private DataType<?> mergeDataType(MuleMessage message, DataType<?> original, DataType<?> transformed)
+    private DataType<?> mergeDataType(MuleMessage message, DataType<?> transformed)
     {
+        DataType<?> original = message.getDataType();
         String mimeType = transformed.getMimeType() == null || MimeTypes.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
         String encoding = transformed.getEncoding() == null ? message.getEncoding() : transformed.getEncoding();
         Class<?> type = transformed.getType() == Object.class ? original.getType() : transformed.getType();

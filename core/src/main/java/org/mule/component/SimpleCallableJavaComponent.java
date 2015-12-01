@@ -180,10 +180,9 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
             }
             else
             {
-                muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections
+                return muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections
                         .<Transformer>singletonList(new TransformerTemplate(new TransformerTemplate
                                 .OverwitePayloadCallback(result))));
-                return event.getMessage();
             }
         }
         else

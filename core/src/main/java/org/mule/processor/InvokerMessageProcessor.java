@@ -308,8 +308,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
         }
         else if (result != null)
         {
-            muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections.<Transformer>singletonList
-                    (new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result))));
+            event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event,
+                             Collections.<Transformer>singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result)))));
             return event;
         }
         else

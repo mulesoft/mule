@@ -250,13 +250,13 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     protected void applyInboundTransformers(MuleEvent event) throws MuleException
     {
-        connector.getMuleContext().getTransformationService().applyTransformers(event.getMessage(), event, defaultInboundTransformers);
+        event.setMessage(getTransformationService().applyTransformers(event.getMessage(), event, defaultInboundTransformers));
 
     }
 
     protected void applyResponseTransformers(MuleEvent event) throws MuleException
     {
-        connector.getMuleContext().getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers);
+        event.setMessage(getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers));
     }
 
     protected MuleMessage handleUnacceptedFilter(MuleMessage message)

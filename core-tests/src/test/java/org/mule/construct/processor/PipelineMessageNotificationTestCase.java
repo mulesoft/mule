@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.TransformationService;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -82,7 +83,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         notificationManager = mock(ServerNotificationManager.class);
         when(muleContext.getNotificationManager()).thenReturn(notificationManager);
         pipeline = new TestPipeline(pipelineName, muleContext);
-
+        when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
     }
 
     @Test

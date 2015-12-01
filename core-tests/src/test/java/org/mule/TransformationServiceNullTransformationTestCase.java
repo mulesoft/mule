@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -48,8 +49,8 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
         when(transformer2.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
         when(transformer2.getReturnDataType()).thenReturn(dataType);
 
-        DefaultMuleMessage message = new DefaultMuleMessage(null, muleContext);
-        transformationService.applyTransformers(message, null, transformer1, transformer2);
+        MuleMessage message = new DefaultMuleMessage(null, muleContext);
+        message = transformationService.applyTransformers(message, null, transformer1, transformer2);
 
         assertEquals("foo", message.getPayload());
         verify(transformer1, never()).transform(null);
