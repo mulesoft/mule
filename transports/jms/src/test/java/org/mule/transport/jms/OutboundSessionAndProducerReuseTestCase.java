@@ -17,13 +17,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -218,6 +219,20 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     }
 
     @Test
+    public void connectionFactoryNotWrappedJMS102bCachingEnabled() throws Exception
+    {
+        connectionFactory = mock(QueueConnectionFactory.class);
+        // This setting has to be overridden by the fact that we're using 102b
+        connector.setCacheJmsSessions(true);
+        connector.setConnectionFactory(connectionFactory);
+        connector.setJmsSupport(new Jms102bSupport(connector));
+        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+        connector.initialise();
+        connector.connect();
+        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+    }
+
+    @Test
     public void connectionFactoryNotWrappedCachingDisabled() throws Exception
     {
         connectionFactory = mock(QueueConnectionFactory.class);
@@ -277,6 +292,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
             }
         });
 
+        connector.setCacheJmsSessions(false);
         connector.setConnectionFactory(connectionFactory);
         connector.setJmsSupport(new Jms102bSupport(connector));
         connector.initialise();
@@ -352,6 +368,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     {
         Jms11Support jms11Support = mock(Jms11Support.class);
         connector.setJmsSupport(jms11Support);
+        when(jms11Support.isCacheJmsSessions()).thenReturn(true);
         connector.setUsername(USERNAME);
         connector.setPassword(PASSWORD);
         connector.initialise();
@@ -364,7 +381,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     {
         Jms11Support jms11Support = mock(Jms11Support.class);
         connector.setJmsSupport(jms11Support);
-        connector.setCacheJmsSessions(false);
+        when(jms11Support.isCacheJmsSessions()).thenReturn(false);
         connector.setUsername(USERNAME);
         connector.setPassword(PASSWORD);
         connector.initialise();

@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -20,8 +20,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.ClusterNodeNotificationListener;
@@ -42,6 +41,8 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
 public class JmsConnectorTestCase extends AbstractMuleContextTestCase
@@ -292,6 +293,7 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         final Connection connection = mock(Connection.class);
 
         JmsSupport jmsSupport = mock(Jms11Support.class);
+        when(jmsSupport.isCacheJmsSessions()).thenReturn(true);
         when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
 
         JmsConnector connector = new JmsConnector(muleContext);

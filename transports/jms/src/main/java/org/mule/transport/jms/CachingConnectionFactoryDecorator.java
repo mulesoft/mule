@@ -46,10 +46,7 @@ public class CachingConnectionFactoryDecorator extends AbstractConnectionFactory
 
     private boolean resolveReuseSessionsEnabled(JmsConnector jmsConnector)
     {
-        // CachingConnectionFactory only supports JMS 1.1 connection factories currently.
-        return (jmsConnector.getJmsSupport() instanceof Jms11Support)
-               && !(jmsConnector.getJmsSupport() instanceof Jms102bSupport)
-               && jmsConnector.isCacheJmsSessions();
+        return jmsConnector.getJmsSupport().isCacheJmsSessions();
     }
 
     @Override
