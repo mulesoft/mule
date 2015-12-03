@@ -255,12 +255,6 @@
             <version>${antVersion}</version>
 
         </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>serializer</artifactId>
-            <version>2.7.1</version>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- add aspectj weaver dependency that was removed from spring-security-3.1 -->
         <dependency>
