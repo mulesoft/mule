@@ -203,6 +203,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         super(context);
     }
 
+    @Override
     public String getProtocol()
     {
         return JMS;
@@ -229,6 +230,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             muleContext.registerListener(new ConnectionNotificationListener<ConnectionNotification>()
             {
+                @Override
                 public void onNotification(ConnectionNotification notification)
                 {
                     if (notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED
@@ -432,7 +434,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
         Connection connection;
 
-        if (!cacheJmsSessions && username != null)
+        if (!jmsSupport.isCacheJmsSessions() && username != null)
         {
             connection = jmsSupport.createConnection(connectionFactory, username, password);
         }
@@ -497,6 +499,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
+    @Override
     public void onException(JMSException jmsException)
     {
         if (!disconnecting)

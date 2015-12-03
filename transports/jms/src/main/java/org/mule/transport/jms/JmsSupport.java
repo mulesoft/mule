@@ -25,6 +25,13 @@ import javax.jms.Session;
 
 public interface JmsSupport
 {
+
+    /**
+     * @return whether to cache and re-use the JMS session and producer object instead of recreating them for each
+     *         request.
+     */
+    boolean isCacheJmsSessions();
+
     Connection createConnection(ConnectionFactory connectionFactory) throws JMSException;
 
     Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
