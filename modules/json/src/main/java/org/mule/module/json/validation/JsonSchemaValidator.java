@@ -151,7 +151,10 @@ public class JsonSchemaValidator
             final URITranslatorConfigurationBuilder translatorConfigurationBuilder = URITranslatorConfiguration.newBuilder();
             for (Map.Entry<String, String> redirect : schemaRedirects.entrySet())
             {
-                translatorConfigurationBuilder.addSchemaRedirect(redirect.getKey(), redirect.getValue());
+                String key = resolveLocationIfNecessary(redirect.getKey());
+                String value = resolveLocationIfNecessary(redirect.getValue());
+
+                translatorConfigurationBuilder.addSchemaRedirect(key, value);
             }
 
             final LoadingConfigurationBuilder loadingConfigurationBuilder = LoadingConfiguration.newBuilder()
@@ -178,15 +181,20 @@ public class JsonSchemaValidator
         private JsonSchema loadSchema(JsonSchemaFactory factory, LoadingConfiguration loadingConfiguration) throws Exception
         {
             checkState(schemaLocation != null, "schemaLocation has not been provided");
-            URI uri = URI.create(schemaLocation);
+            String realLocation = resolveLocationIfNecessary(schemaLocation);
+            return factory.getJsonSchema(realLocation);
+        }
+
+        private String resolveLocationIfNecessary(String path)
+        {
+            URI uri = URI.create(path);
 
             String scheme = uri.getScheme();
             if (scheme == null || "resource".equals(scheme))
             {
-                URL schemaUrl = openSchema(uri.getPath());
-                return factory.getJsonSchema(schemaUrl.toString());
+                return openSchema(uri.getPath()).toString();
             }
-            return factory.getJsonSchema(schemaLocation);
+            return path;
         }
 
         private URL openSchema(String path)

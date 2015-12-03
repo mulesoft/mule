@@ -40,6 +40,7 @@ public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase
         assertThat("could not load schema", schemaUrl, is(notNullValue()));
 
         when(mockClassLoader.getResource(SCHEMA_FSTAB_JSON)).thenReturn(schemaUrl);
+        when(mockClassLoader.getResource("resource:" + SCHEMA_FSTAB_JSON)).thenReturn(schemaUrl);
     }
 
     @Test
@@ -52,6 +53,24 @@ public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase
             {
                 JsonSchemaValidator.builder()
                         .setSchemaLocation(SCHEMA_FSTAB_JSON)
+                        .build();
+            }
+        });
+
+        verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
+    }
+
+    @Test
+    public void usesThreadClassloaderWithRedirect() throws Exception
+    {
+        doWithMockClasssLoader(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                JsonSchemaValidator.builder()
+                        .setSchemaLocation("http://mule.org/schemas/fstab.json")
+                        .addSchemaRedirect("http://mule.org/schemas/fstab.json", SCHEMA_FSTAB_JSON)
                         .build();
             }
         });
