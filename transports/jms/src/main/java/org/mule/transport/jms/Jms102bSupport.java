@@ -43,6 +43,15 @@ public class Jms102bSupport extends Jms11Support
         super(connector);
     }
 
+    /**
+     * CachingConnectionFactory only supports JMS 1.1 connection factories currently.
+     */
+    @Override
+    public boolean isCacheJmsSessions()
+    {
+        return false;
+    }
+
     @Override
     public Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
             throws JMSException
