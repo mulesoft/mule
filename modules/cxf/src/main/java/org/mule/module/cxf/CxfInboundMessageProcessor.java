@@ -9,6 +9,11 @@ package org.mule.module.cxf;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getBasePath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
+import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
+import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
+import static org.mule.transport.http.HttpConstants.SC_OK;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
@@ -33,8 +38,8 @@ import org.mule.module.cxf.transport.MuleUniversalDestination;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -64,6 +69,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.DestinationFactory;
@@ -223,7 +229,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
 
         event.getMessage().setPayload(msg, DataTypeFactory.XML_STRING);
-        event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
+        event.getMessage().setOutboundProperty(HEADER_CONTENT_TYPE, ct);
         return event;
     }
 
@@ -310,7 +316,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         final MuleMessage muleReqMsg = event.getMessage();
         String method = muleReqMsg.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
 
-        String ct = muleReqMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        String ct = muleReqMsg.getInboundProperty(HEADER_CONTENT_TYPE);
         if (ct != null)
         {
             m.put(Message.CONTENT_TYPE, ct);
@@ -438,18 +444,32 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
 
         MuleMessage muleResMsg = responseEvent.getMessage();
-        muleResMsg.setPayload(getResponseOutputHandler(exchange), DataTypeFactory.XML_STRING);
+
+        BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
+        if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
+        {
+            muleResMsg.setOutboundProperty(HTTP_STATUS_PROPERTY, SC_OK);
+            muleResMsg.setPayload(NullPayload.getInstance());
+        }
+        else
+        {
+            muleResMsg.setPayload(getResponseOutputHandler(exchange), DataTypeFactory.XML_STRING);
+        }
 
         // Handle a fault if there is one.
         Message faultMsg = exchange.getOutFaultMessage();
         if (faultMsg != null)
         {
+            if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
+            {
+                muleResMsg.setPayload(getResponseOutputHandler(exchange), DataTypeFactory.XML_STRING);
+            }
             Exception ex = faultMsg.getContent(Exception.class);
             if (ex != null)
             {
                 ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
                 event.getMessage().setExceptionPayload(exceptionPayload);
-                muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
+                muleResMsg.setOutboundProperty(HTTP_STATUS_PROPERTY, SC_INTERNAL_SERVER_ERROR);
             }
         }
 
