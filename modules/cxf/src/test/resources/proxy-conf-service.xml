@@ -433,6 +433,29 @@
             <echo-component/>
         </service>
 
+        <service name="proxyOneWay">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${port1}/proxyOneWay" exchange-pattern="request-response">
+                    <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
+                                       namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
+                </inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
+
+        <service name="proxyOneWayFault">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${port1}/proxyOneWayFault" exchange-pattern="request-response">
+                    <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
+                                       namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
+                </inbound-endpoint>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    throw new RuntimeException("ERROR");
+                </script:script>
+            </script:component>
+        </service>
     </model>
 
 
