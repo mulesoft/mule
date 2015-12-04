@@ -28,6 +28,7 @@ import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.PoolingListener;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -49,6 +50,7 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
     private Object config = new Object();
     private PoolingProfile poolingProfile = new PoolingProfile(MAX_ACTIVE, MAX_ACTIVE, DEFAULT_MAX_POOL_WAIT, WHEN_EXHAUSTED_WAIT, INITIALISE_NONE);
     private PoolingConnectionHandlingStrategy<Object, Lifecycle> strategy;
+    private PoolingListener<Object, Lifecycle> poolingListener;
     private Injector injector;
 
     private ConnectionHandler<Lifecycle> connection1;
@@ -57,6 +59,7 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
     @Before
     public void before() throws Exception
     {
+        poolingListener = mock(PoolingListener.class);
         injector = spyInjector(muleContext);
         muleContext.start();
         resetConnectionProvider();
@@ -73,6 +76,9 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
         assertThat(connection1, is(not(sameInstance(connection2))));
         assertThat(connection1.getConnection(), is(not(sameInstance(connection2.getConnection()))));
         verify(connectionProvider, times(2)).connect(config);
+
+        verify(poolingListener).onBorrow(config, connection1.getConnection());
+        verify(poolingListener).onBorrow(config, connection2.getConnection());
 
         verifyThat(Lifecycle::initialise);
         verifyThat(Lifecycle::start);
@@ -129,7 +135,7 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
 
     private void initStrategy()
     {
-        strategy = new PoolingConnectionHandlingStrategy<>(config, connectionProvider, poolingProfile, muleContext);
+        strategy = new PoolingConnectionHandlingStrategy<>(config, connectionProvider, poolingProfile, poolingListener, muleContext);
     }
 
     private <T> void verifyThat(Assertion<T> assertion) throws Exception

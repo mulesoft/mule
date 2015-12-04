@@ -10,6 +10,7 @@ import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.PoolingListener;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.util.ValueHolder;
 
@@ -31,6 +32,18 @@ final class SchemaBuilderUtils
             {
                 value.set(PoolingSupport.SUPPORTED);
                 return null;
+            }
+
+            @Override
+            public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener poolingListener)
+            {
+                return supportsPooling(defaultPoolingProfile);
+            }
+
+            @Override
+            public ConnectionHandlingStrategy requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener poolingListener)
+            {
+                return requiresPooling(defaultPoolingProfile);
             }
 
             @Override

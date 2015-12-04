@@ -12,8 +12,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.PoolingListener;
 
 import java.util.NoSuchElementException;
 
@@ -33,6 +34,7 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
 
     private final PoolingProfile poolingProfile;
     private final ObjectPool<Connection> pool;
+    private final PoolingListener<Config, Connection> poolingListener;
 
     /**
      * Creates a new instance
@@ -40,15 +42,18 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
      * @param config             the config for which connections are to be created
      * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
      * @param poolingProfile     the {@link PoolingProfile} which configures the {@link #pool}
+     * @param poolingListener    a {@link PoolingListener}
      * @param muleContext        the application's {@link MuleContext}
      */
     PoolingConnectionHandlingStrategy(Config config,
                                       ConnectionProvider<Config, Connection> connectionProvider,
                                       PoolingProfile poolingProfile,
+                                      PoolingListener<Config, Connection> poolingListener,
                                       MuleContext muleContext)
     {
         super(config, connectionProvider, muleContext);
         this.poolingProfile = poolingProfile;
+        this.poolingListener = poolingListener;
 
         pool = createPool();
     }
@@ -65,7 +70,7 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
     {
         try
         {
-            return new PooledConnectionHandler<>(pool.borrowObject(), pool);
+            return new PooledConnectionHandler<>(config, borrowConnection(), pool, poolingListener);
         }
         catch (NoSuchElementException e)
         {
@@ -75,6 +80,14 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
         {
             throw new ConnectionException("An exception was found trying to obtain a connection", e);
         }
+    }
+
+    private Connection borrowConnection() throws Exception
+    {
+        Connection connection = pool.borrowObject();
+        poolingListener.onBorrow(config, connection);
+
+        return connection;
     }
 
     /**
@@ -133,15 +146,13 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
         }
 
         @Override
-        public void activateObject(Connection obj) throws Exception
+        public void activateObject(Connection connection) throws Exception
         {
-
         }
 
         @Override
-        public void passivateObject(Connection obj) throws Exception
+        public void passivateObject(Connection connection) throws Exception
         {
-
         }
     }
 }

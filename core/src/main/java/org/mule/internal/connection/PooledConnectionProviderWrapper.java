@@ -7,9 +7,10 @@
 package org.mule.internal.connection;
 
 import org.mule.api.config.PoolingProfile;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.PoolingListener;
 
 /**
  * A {@link ConnectionProviderWrapper} which decorates the {@link #delegate}
@@ -55,30 +56,29 @@ public final class PooledConnectionProviderWrapper extends ConnectionProviderWra
     @Override
     public ConnectionHandlingStrategy getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
     {
-        ConnectionHandlingStrategyFactory factoryDecorator = new ConnectionHandlingStrategyFactory()
+        ConnectionHandlingStrategyFactory factoryDecorator = new ConnectionHandlingStrategyFactoryWrapper(handlingStrategyFactory)
         {
+            public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener poolingListener)
+            {
+                return super.supportsPooling(resolvePoolingProfile(defaultPoolingProfile), poolingListener);
+            }
+
             @Override
             public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile)
             {
-                return handlingStrategyFactory.supportsPooling(resolvePoolingProfile(defaultPoolingProfile));
+                return super.supportsPooling(resolvePoolingProfile(defaultPoolingProfile));
+            }
+
+            @Override
+            public ConnectionHandlingStrategy requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener poolingListener)
+            {
+                return super.requiresPooling(resolvePoolingProfile(defaultPoolingProfile), poolingListener);
             }
 
             @Override
             public ConnectionHandlingStrategy requiresPooling(PoolingProfile defaultPoolingProfile)
             {
-                return handlingStrategyFactory.requiresPooling(resolvePoolingProfile(defaultPoolingProfile));
-            }
-
-            @Override
-            public ConnectionHandlingStrategy cached()
-            {
-                return handlingStrategyFactory.cached();
-            }
-
-            @Override
-            public ConnectionHandlingStrategy none()
-            {
-                return handlingStrategyFactory.none();
+                return super.requiresPooling(resolvePoolingProfile(defaultPoolingProfile));
             }
 
             private PoolingProfile resolvePoolingProfile(PoolingProfile defaultPoolingProfile)
