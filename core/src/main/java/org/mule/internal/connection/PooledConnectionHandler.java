@@ -8,6 +8,7 @@ package org.mule.internal.connection;
 
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionException;
+import org.mule.api.connection.PoolingListener;
 
 import org.apache.commons.pool.ObjectPool;
 import org.slf4j.Logger;
@@ -20,13 +21,15 @@ import org.slf4j.LoggerFactory;
  * @param <Connection> the generic type of the connection to be returned
  * @since 4.0
  */
-final class PooledConnectionHandler<Connection> implements ConnectionHandlerAdapter<Connection>
+final class PooledConnectionHandler<Config, Connection> implements ConnectionHandlerAdapter<Connection>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PooledConnectionHandler.class);
 
+    private final Config config;
     private final Connection connection;
     private final ObjectPool<Connection> pool;
+    private final PoolingListener poolingListener;
 
     /**
      * Creates a new instance
@@ -34,10 +37,12 @@ final class PooledConnectionHandler<Connection> implements ConnectionHandlerAdap
      * @param connection the connection to be wrapped
      * @param pool       the pool from which the {@code connection} was obtained and to which it has to be returned
      */
-    PooledConnectionHandler(Connection connection, ObjectPool<Connection> pool)
+    PooledConnectionHandler(Config config, Connection connection, ObjectPool<Connection> pool, PoolingListener poolingListener)
     {
+        this.config = config;
         this.connection = connection;
         this.pool = pool;
+        this.poolingListener = poolingListener;
     }
 
     /**
@@ -55,13 +60,31 @@ final class PooledConnectionHandler<Connection> implements ConnectionHandlerAdap
     @Override
     public void release()
     {
+        boolean returnAttempted = false;
         try
         {
+            poolingListener.onReturn(config, connection);
+
+            returnAttempted = true;
             pool.returnObject(connection);
         }
         catch (Exception e)
         {
             LOGGER.warn("Could not return connection to the pool. Connection has been destroyed", e);
+        }
+        finally
+        {
+            if (!returnAttempted)
+            {
+                try
+                {
+                    pool.invalidateObject(connection);
+                }
+                catch (Exception e)
+                {
+                    LOGGER.warn("Exception was found trying to invalidate connection of type " + connection.getClass().getName(), e);
+                }
+            }
         }
     }
 

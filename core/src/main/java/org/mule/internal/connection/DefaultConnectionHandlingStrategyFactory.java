@@ -11,6 +11,7 @@ import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.PoolingListener;
 
 /**
  * Default implementation of {@link ConnectionHandlingStrategyFactory}.
@@ -22,7 +23,7 @@ import org.mule.api.connection.ConnectionHandlingStrategyFactory;
  * @param <Connection> the generic type of the connections that will be produced
  * @since 4.0
  */
-final class DefaultConnectionHandlingStrategyFactory<Config, Connection> implements ConnectionHandlingStrategyFactory
+final class DefaultConnectionHandlingStrategyFactory<Config, Connection> implements ConnectionHandlingStrategyFactory<Config, Connection>
 {
 
     private final Config config;
@@ -49,16 +50,34 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
     @Override
     public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile)
     {
-        return defaultPoolingProfile.isDisabled()
-               ? none()
-               : createPoolingStrategy(defaultPoolingProfile);
+        return supportsPooling(defaultPoolingProfile, new NullPoolingListener<>());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy requiresPooling(PoolingProfile defaultPoolingProfile)
+    public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
+    {
+        return defaultPoolingProfile.isDisabled()
+               ? none()
+               : createPoolingStrategy(defaultPoolingProfile, poolingListener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile)
+    {
+        return requiresPooling(defaultPoolingProfile, new NullPoolingListener<>());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
     {
         if (defaultPoolingProfile.isDisabled())
         {
@@ -66,14 +85,14 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
                                                "is attempting to disable pooling. Supply a valid PoolingProfile or choose a different management strategy.");
         }
 
-        return createPoolingStrategy(defaultPoolingProfile);
+        return createPoolingStrategy(defaultPoolingProfile, poolingListener);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy cached()
+    public ConnectionHandlingStrategy<Connection> cached()
     {
         return new CachedConnectionHandlingStrategy<>(config, connectionProvider, muleContext);
     }
@@ -82,13 +101,13 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy none()
+    public ConnectionHandlingStrategy<Connection> none()
     {
         return new NullConnectionHandlingStrategy<>(config, connectionProvider, muleContext);
     }
 
-    private PoolingConnectionHandlingStrategy<Config, Connection> createPoolingStrategy(PoolingProfile defaultPoolingProfile)
+    private PoolingConnectionHandlingStrategy<Config, Connection> createPoolingStrategy(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
     {
-        return new PoolingConnectionHandlingStrategy<>(config, connectionProvider, defaultPoolingProfile, muleContext);
+        return new PoolingConnectionHandlingStrategy<>(config, connectionProvider, defaultPoolingProfile, poolingListener,  muleContext);
     }
 }
