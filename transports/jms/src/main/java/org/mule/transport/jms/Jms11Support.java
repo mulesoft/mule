@@ -45,6 +45,13 @@ public class Jms11Support implements JmsSupport
         this.connector = connector;
     }
 
+    @Override
+    public boolean isCacheJmsSessions()
+    {
+        return connector.isCacheJmsSessions();
+    }
+
+    @Override
     public Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
         throws JMSException
     {
@@ -55,6 +62,7 @@ public class Jms11Support implements JmsSupport
         return connectionFactory.createConnection(username, password);
     }
 
+    @Override
     public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException
     {
         if (connectionFactory == null)
@@ -64,6 +72,7 @@ public class Jms11Support implements JmsSupport
         return connectionFactory.createConnection();
     }
 
+    @Override
     public Session createSession(Connection connection,
                                  boolean topic,
                                  boolean transacted,
@@ -73,18 +82,21 @@ public class Jms11Support implements JmsSupport
         return connection.createSession(transacted, (transacted ? Session.SESSION_TRANSACTED : ackMode));
     }
 
+    @Override
     public MessageProducer createProducer(Session session, Destination destination, boolean topic)
         throws JMSException
     {
         return session.createProducer(destination);
     }
 
+    @Override
     public MessageConsumer createConsumer(Session session, Destination destination, boolean topic, ImmutableEndpoint endpoint)
         throws JMSException
     {
         return createConsumer(session, destination, null, false, null, topic, endpoint);
     }
 
+    @Override
     public MessageConsumer createConsumer(Session session,
                                           Destination destination,
                                           String messageSelector,
@@ -118,6 +130,7 @@ public class Jms11Support implements JmsSupport
         }
     }
 
+    @Override
     public Destination createDestination(Session session, ImmutableEndpoint endpoint) throws JMSException
     {
         String address = endpoint.getEndpointURI().toString();
@@ -138,6 +151,7 @@ public class Jms11Support implements JmsSupport
         return createDestination(session, address, connector.getTopicResolver().isTopic(endpoint), endpoint);
     }
 
+    @Override
     public Destination createDestination(Session session, String name, boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         if (connector.isJndiDestinations())
@@ -227,6 +241,7 @@ public class Jms11Support implements JmsSupport
         return null;
     }
 
+    @Override
     public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException
     {
         if (session == null)
@@ -244,12 +259,14 @@ public class Jms11Support implements JmsSupport
         }
     }
 
+    @Override
     public void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         send(producer, message, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
             Message.DEFAULT_TIME_TO_LIVE, topic, endpoint);
     }
 
+    @Override
     public void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint)
         throws JMSException
     {
@@ -257,6 +274,7 @@ public class Jms11Support implements JmsSupport
             Message.DEFAULT_TIME_TO_LIVE, topic, endpoint);
     }
 
+    @Override
     public void send(MessageProducer producer,
                      Message message,
                      boolean persistent,
@@ -268,6 +286,7 @@ public class Jms11Support implements JmsSupport
             priority, ttl);
     }
 
+    @Override
     public void send(MessageProducer producer,
                      Message message,
                      Destination dest,
