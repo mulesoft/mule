@@ -9,6 +9,11 @@ package org.mule.module.cxf;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getBasePath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
+import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
+import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
+import static org.mule.transport.http.HttpConstants.SC_OK;
+
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
@@ -27,6 +32,7 @@ import org.mule.module.cxf.transport.MuleUniversalDestination;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -56,6 +62,7 @@ import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.DestinationFactory;
@@ -213,7 +220,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
 
         event.getMessage().setPayload(msg);
-        event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
+        event.getMessage().setOutboundProperty(HEADER_CONTENT_TYPE, ct);
         return event;
     }
 
@@ -350,18 +357,32 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             }
             
             MuleMessage muleResMsg = responseEvent.getMessage();
-            muleResMsg.setPayload(getResponseOutputHandler(m));
+
+            BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
+            if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
+            {
+                muleResMsg.setOutboundProperty(HTTP_STATUS_PROPERTY, SC_OK);
+                muleResMsg.setPayload(NullPayload.getInstance());
+            }
+            else
+            {
+                muleResMsg.setPayload(getResponseOutputHandler(m));
+            }
 
             // Handle a fault if there is one.
             Message faultMsg = m.getExchange().getOutFaultMessage();
             if (faultMsg != null)
             {
+                if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
+                {
+                    muleResMsg.setPayload(getResponseOutputHandler(m));
+                }
                 Exception ex = faultMsg.getContent(Exception.class);
                 if (ex != null)
                 {
                     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
                     event.getMessage().setExceptionPayload(exceptionPayload);
-                    muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
+                    muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, SC_INTERNAL_SERVER_ERROR);
                 }
             }
 
@@ -373,7 +394,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             throw e;
         }
     }
-    
+
     protected boolean shouldSoapActionHeader()
     {
         // Only add soap headers if we can validate the bindings. if not, cxf will throw a fault in SoapActionInInterceptor
