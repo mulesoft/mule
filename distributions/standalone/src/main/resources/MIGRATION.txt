@@ -5,6 +5,7 @@ The following is a list of changes you have to execute to migrate from Mule ESB 
 Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
 Migration changes from 3.7.x to 3.8.x
+MULE-9183: Status code for successful one-way operations handled through CXF will be 202 instead of 200
 MULE-9041: The HTTP Connector will leave the inbound property http.remote.address with the actual remote address. If an X-Forwarded-For header is present, it will be available as an inbound property. 
 MULE-9020: BouncyCastle was upgraded to version 1.50.
     Note: DESede algorithm now requires keys of 16 or 24 bytes unlike the prior version which required 16 or 22 bytes.

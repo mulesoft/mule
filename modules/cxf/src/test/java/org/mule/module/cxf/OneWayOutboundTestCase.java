@@ -11,8 +11,9 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.api.MuleEvent;
 import org.mule.module.cxf.testmodels.AsyncService;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -52,7 +53,7 @@ public class OneWayOutboundTestCase extends FunctionalTestCase
     private void assertOneWayResponse(MuleEvent event) throws Exception
     {
         assertThat((NullPayload) event.getMessage().getPayload(), is(NullPayload.getInstance()));
-        assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));
+        assertThat(event.getMessage().<Integer> getInboundProperty(HTTP_STATUS_PROPERTY), is(ACCEPTED.getStatusCode()));
 
         AsyncService component = (AsyncService) getComponent("asyncService");
         assertTrue(component.getLatch().await(RECEIVE_TIMEOUT, MILLISECONDS));
