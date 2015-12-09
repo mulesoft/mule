@@ -9,8 +9,10 @@ package org.mule.module.http.internal.request;
 import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -266,6 +268,10 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                      catch (MuleException muleException)
                                      {
                                          completionHandler.onFailure(new MessagingException(resetMuleEventForNewThread(muleEvent), muleException, DefaultHttpRequester.this));
+                                     }
+                                     finally
+                                     {
+                                         RequestContext.clear();
                                      }
                                  }
 

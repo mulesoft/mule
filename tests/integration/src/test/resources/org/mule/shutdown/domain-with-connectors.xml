@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:http="http://www.mulesoft.org/schema/mule/http"
+             xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+             xmlns:spring="http://www.springframework.org/schema/beans"
+             xsi:schemaLocation="http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="httpListenerConfig" host="localhost" port="${httpPort}"/>
+    <http:request-config name="httpRequester" host="localhost" port="${httpPort}" basePath="/"/>
+
+    <spring:bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <spring:property name="brokerURL">
+            <spring:value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</spring:value>
+        </spring:property>
+    </spring:bean>
+
+    <jms:custom-connector name="sharedJmsConnector" class="org.mule.transport.jms.JmsConnector"
+                          specification="1.1">
+        <spring:property name="connectionFactory" ref="connectionFactory"/>
+    </jms:custom-connector>
+
+</mule-domain>
