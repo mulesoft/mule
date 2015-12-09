@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!--Forces TLSv1.2 because of the cipher suite being used-->
+    <tls:context name="tlsClientContext" enabledCipherSuites="TLS_DHE_DSS_WITH_AES_128_CBC_SHA256">
+        <tls:trust-store path="trustStore" password="mulepassword"/>
+    </tls:context>
+
+    <http:request-config name="requestConfig1" protocol="HTTPS" host="localhost" port="${port1}" tlsContext-ref="tlsClientContext" />
+    <!--Forces TLSv1 and TLSv1.2 with a cipher suite for each-->
+    <http:request-config name="requestConfig2" protocol="HTTPS" host="localhost" port="${port2}">
+        <tls:context enabledProtocols="TLSv1, TLSv1.2" enabledCipherSuites="TLS_DHE_DSS_WITH_AES_128_CBC_SHA256, ${cipherSuites}">
+            <tls:trust-store path="trustStore" password="mulepassword"/>
+        </tls:context>
+    </http:request-config>
+    <!--Forces TLSv1.1 and TLSv1.2 but the cipher suite is only available in TLSv1.2-->
+    <http:request-config name="requestConfig3" protocol="HTTPS" host="localhost" port="${port3}">
+        <tls:context enabledProtocols="TLSv1.1, TLSv1.2" enabledCipherSuites="TLS_DHE_DSS_WITH_AES_128_CBC_SHA256">
+            <tls:trust-store path="trustStore" password="mulepassword"/>
+        </tls:context>
+    </http:request-config>
+
+    <!--Uses JVM defaults because there is no tls-default.conf file-->
+    <tls:context name="tlsServer2Context" enabledCipherSuites="default">
+        <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+    </tls:context>
+
+    <!--Forces TLSv1-->
+    <http:listener-config name="listenerConfig1" protocol="HTTPS" host="localhost" port="${port1}">
+        <tls:context enabledProtocols="TLSv1">
+            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        </tls:context>
+    </http:listener-config>
+    <http:listener-config name="listenerConfig2" protocol="HTTPS" host="localhost" port="${port2}" tlsContext-ref="tlsServer2Context" />
+    <!--Forces TLS_DHE_DSS_WITH_AES_128_CBC_SHA through a system property-->
+    <http:listener-config name="listenerConfig3" protocol="HTTPS" host="localhost" port="${port3}">
+        <tls:context enabledCipherSuites="${cipherSuites}">
+            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        </tls:context>
+    </http:listener-config>
+
+    <flow name="1Server">
+        <http:listener config-ref="listenerConfig1" path="/" allowedMethods="POST"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="12Client1Server">
+        <http:request config-ref="requestConfig1" path="/" method="POST" />
+    </flow>
+
+    <flow name="12Server">
+        <http:listener config-ref="listenerConfig2" path="/" allowedMethods="POST"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="12Client12Server">
+        <http:request config-ref="requestConfig2" path="/" method="POST" />
+    </flow>
+
+    <flow name="serverFlow3">
+        <http:listener config-ref="listenerConfig3" path="/" allowedMethods="POST"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="12CipherClient1CipherServer">
+        <http:request config-ref="requestConfig3" path="/" method="POST" />
+    </flow>
+</mule>
