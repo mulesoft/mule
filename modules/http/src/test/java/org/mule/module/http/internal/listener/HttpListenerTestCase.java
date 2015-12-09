@@ -95,14 +95,51 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
     			return null;
     		}
 		});
-    	useInvalidPath("/");
+        usePath("/");
 
     	assertThat(RequestContext.getEvent(), is(nullValue()));
-    	requestHandlerRef.get().handleRequest(mock(HttpRequestContext.class), mock(HttpResponseReadyCallback.class));
+
+    	HttpResponseReadyCallback responseCallback = mock(HttpResponseReadyCallback.class);
+        doAnswer(new Answer<Void>()
+        {
+    	    @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+    	    {
+    	        assertThat(RequestContext.getEvent(), not(nullValue()));
+    	        return null;
+    	    }
+        }).when(responseCallback).responseReady(any(HttpResponse.class), any(ResponseStatusCallback.class));
+
+        HttpRequest request = buildGetRootRequest(HTTP_1_1);
+        when(request.getHeaderValue("host")).thenReturn("localhost");
+        HttpRequestContext requestContext = buildRequestContext(request);
+
+        requestHandlerRef.get().handleRequest(requestContext, responseCallback);
     	
-    	assertThat(RequestContext.getEvent(), not(nullValue()));
+        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
     
+    @Test
+    public void eventCreationWithInvalidPath() throws Exception
+    {
+        final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
+        when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class))).then(new Answer<RequestHandlerManager>()
+        {
+            @Override
+            public RequestHandlerManager answer(InvocationOnMock invocation) throws Throwable
+            {
+                requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
+                return null;
+            }
+        });
+        useInvalidPath("/");
+
+        assertThat(RequestContext.getEvent(), is(nullValue()));
+        requestHandlerRef.get().handleRequest(mock(HttpRequestContext.class), mock(HttpResponseReadyCallback.class));
+
+        assertThat(RequestContext.getEvent(), is(nullValue()));
+    }
+
     /**
      * {@code host} header is not specified in HTTP 1.0
      */

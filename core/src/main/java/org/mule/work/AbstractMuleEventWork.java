@@ -8,6 +8,7 @@ package org.mule.work;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 
 import javax.resource.spi.work.Work;
@@ -42,15 +43,24 @@ public abstract class AbstractMuleEventWork implements Work
         this.event = copyEvent ? DefaultMuleEvent.copy(event) : event;
     }
 
+    @Override
     public final void run()
     {
-        // Set event in RequestContext now we are in new thread (fresh copy already made in constructor)
-        OptimizedRequestContext.unsafeSetEvent(event);
-        doRun();
+        try
+        {
+            // Set event in RequestContext now we are in new thread (fresh copy already made in constructor)
+            OptimizedRequestContext.unsafeSetEvent(event);
+            doRun();
+        }
+        finally
+        {
+            RequestContext.clear();
+        }
     }
 
     protected abstract void doRun();
 
+    @Override
     public void release()
     {
         // no-op
