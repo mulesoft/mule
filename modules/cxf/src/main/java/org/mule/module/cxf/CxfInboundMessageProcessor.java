@@ -6,9 +6,6 @@
  */
 package org.mule.module.cxf;
 
-import static org.mule.module.cxf.HttpRequestPropertyManager.getBasePath;
-import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
-import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
 import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
