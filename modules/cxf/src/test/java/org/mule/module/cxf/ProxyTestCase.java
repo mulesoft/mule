@@ -10,11 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -595,10 +592,10 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWay",
-                getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
-        assertThat(result, is(notNullValue()));
-        assertThat(result.getInboundProperty(HTTP_STATUS_PROPERTY).toString(), is(Integer.toString(HttpConstants.SC_OK)));
-        assertThat(result.getPayloadAsString(), is(""));
+                payload, null);
+        assertNotNull(result);
+        assertEquals(Integer.toString(HttpConstants.SC_OK), result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+        assertEquals("", result.getPayloadAsString());
     }
     
     @Test
@@ -617,9 +614,9 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWayFault",
-                getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
-        assertThat(result, is(notNullValue()));
-        assertThat(result.getPayloadAsString(), containsString("ERROR"));
+                payload, null);
+        assertNotNull(result);
+        assertTrue(result.getPayloadAsString().contains("ERROR"));
     }
 
     protected String prepareOneWayTestMessage()
