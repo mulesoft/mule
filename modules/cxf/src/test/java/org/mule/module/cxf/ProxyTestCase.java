@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
@@ -607,7 +608,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWay",
                 getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
         assertThat(result, is(notNullValue()));
-        assertThat(result.getInboundProperty(HTTP_STATUS_PROPERTY).toString(), is(Integer.toString(HttpConstants.SC_OK)));
+        assertThat(result.getInboundProperty(HTTP_STATUS_PROPERTY).toString(), is(Integer.toString(SC_ACCEPTED)));
         assertThat(result.getPayloadAsString(), is(""));
     }
     

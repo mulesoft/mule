@@ -11,8 +11,8 @@ import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
 import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
+import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
 import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
-import static org.mule.transport.http.HttpConstants.SC_OK;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -448,7 +448,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
         if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
         {
-            muleResMsg.setOutboundProperty(HTTP_STATUS_PROPERTY, SC_OK);
+            // For one-way operations, no envelope should be returned
+            // (http://www.w3.org/TR/soap12-part2/#http-reqbindwaitstate)
+            muleResMsg.setOutboundProperty(HTTP_STATUS_PROPERTY, SC_ACCEPTED);
             muleResMsg.setPayload(NullPayload.getInstance());
         }
         else
