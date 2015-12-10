@@ -411,7 +411,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         return super.processNext(event);
     }
 
-    protected OutputHandler getRessponseOutputHandler(final MessageImpl m)
+    protected OutputHandler getResponseOutputHandler(final MessageImpl m)
     {
         OutputHandler outputHandler = new OutputHandler()
         {
