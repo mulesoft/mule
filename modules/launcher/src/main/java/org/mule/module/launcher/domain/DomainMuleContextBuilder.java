@@ -6,6 +6,9 @@
  */
 package org.mule.module.launcher.domain;
 
+import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
+
+import org.mule.DefaultMuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
@@ -36,6 +39,14 @@ public class DomainMuleContextBuilder extends DefaultMuleContextBuilder
     public DomainMuleContextBuilder(String domainId)
     {
         this.domainId = domainId;
+    }
+
+    @Override
+    protected DefaultMuleContext createDefaultMuleContext()
+    {
+        DefaultMuleContext muleContext = super.createDefaultMuleContext();
+        muleContext.setArtifactType(DOMAIN);
+        return muleContext;
     }
 
     @Override

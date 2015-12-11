@@ -8,6 +8,7 @@ package org.mule;
 
 import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+
 import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -46,6 +47,7 @@ import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.ClusterConfiguration;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.NullClusterConfiguration;
+import org.mule.config.bootstrap.ArtifactType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -185,6 +187,11 @@ public class DefaultMuleContext implements MuleContext
     private DataTypeConversionResolver dataTypeConversionResolver;
 
     /**
+     * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
+     */
+    private ArtifactType artifactType;
+
+    /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
      */
     @Deprecated
@@ -224,6 +231,7 @@ public class DefaultMuleContext implements MuleContext
         return new MuleRegistryHelper(registry, this);
     }
 
+    @Override
     public synchronized void initialise() throws InitialisationException
     {
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
@@ -279,6 +287,7 @@ public class DefaultMuleContext implements MuleContext
         }
     }
 
+    @Override
     public synchronized void start() throws MuleException
     {
         getLifecycleManager().checkPhase(Startable.PHASE_NAME);
@@ -312,6 +321,7 @@ public class DefaultMuleContext implements MuleContext
      *
      * @throws MuleException if either any of the sessions or connectors fail to stop
      */
+    @Override
     public synchronized void stop() throws MuleException
     {
         startLatch.release();
@@ -322,6 +332,7 @@ public class DefaultMuleContext implements MuleContext
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPED));
     }
 
+    @Override
     public synchronized void dispose()
     {
         if (isStarted())
@@ -378,6 +389,7 @@ public class DefaultMuleContext implements MuleContext
      *
      * @return true if the server has been initialised
      */
+    @Override
     public boolean isInitialised()
     {
         return getLifecycleManager().getState().isInitialised();
@@ -388,16 +400,19 @@ public class DefaultMuleContext implements MuleContext
      *
      * @return true if the server is beening initialised
      */
+    @Override
     public boolean isInitialising()
     {
         return getLifecycleManager().getState().isInitialising();
     }
 
+    @Override
     public boolean isStopped()
     {
         return getLifecycleManager().getState().isStopped();
     }
 
+    @Override
     public boolean isStopping()
     {
         return getLifecycleManager().getState().isStopping();
@@ -408,26 +423,31 @@ public class DefaultMuleContext implements MuleContext
      *
      * @return true if the server has been started
      */
+    @Override
     public boolean isStarted()
     {
         return getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME);
     }
 
+    @Override
     public boolean isStarting()
     {
         return getLifecycleManager().getState().isStarting();
     }
 
+    @Override
     public boolean isDisposed()
     {
         return getLifecycleManager().getState().isDisposed();
     }
 
+    @Override
     public boolean isDisposing()
     {
         return getLifecycleManager().getState().isDisposing();
     }
 
+    @Override
     public LifecycleManager getLifecycleManager()
     {
         return lifecycleManager;
@@ -438,16 +458,19 @@ public class DefaultMuleContext implements MuleContext
      *
      * @return all statistics for this instance
      */
+    @Override
     public AllStatistics getStatistics()
     {
         return stats;
     }
 
+    @Override
     public void registerListener(ServerNotificationListener l) throws NotificationException
     {
         registerListener(l, null);
     }
 
+    @Override
     public void registerListener(ServerNotificationListener l, String resourceIdentifier) throws NotificationException
     {
         ServerNotificationManager notificationManager = getNotificationManager();
@@ -458,6 +481,7 @@ public class DefaultMuleContext implements MuleContext
         notificationManager.addListenerSubscription(l, resourceIdentifier);
     }
 
+    @Override
     public void unregisterListener(ServerNotificationListener l)
     {
         ServerNotificationManager notificationManager = getNotificationManager();
@@ -477,6 +501,7 @@ public class DefaultMuleContext implements MuleContext
      * @throws UnsupportedOperationException if the notification fired is not a
      *                                       {@link org.mule.context.notification.CustomNotification}
      */
+    @Override
     public void fireNotification(ServerNotification notification)
     {
         ServerNotificationManager notificationManager = getNotificationManager();
@@ -498,6 +523,7 @@ public class DefaultMuleContext implements MuleContext
      *                        authenticate and authorise incoming and outgoing event traffic
      *                        and service invocations
      */
+    @Override
     public void setSecurityManager(SecurityManager securityManager) throws RegistrationException
     {
         checkLifecycleForPropertySet(MuleProperties.OBJECT_SECURITY_MANAGER, Initialisable.PHASE_NAME);
@@ -512,6 +538,7 @@ public class DefaultMuleContext implements MuleContext
      *         and authorise incoming and outgoing event traffic and service
      *         invocations
      */
+    @Override
     public SecurityManager getSecurityManager()
     {
         SecurityManager securityManager = registryBroker.lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
@@ -547,16 +574,19 @@ public class DefaultMuleContext implements MuleContext
      * @see org.mule.api.config.ThreadingProfile
      * @see DefaultMuleConfiguration
      */
+    @Override
     public WorkManager getWorkManager()
     {
         return workManager;
     }
 
+    @Override
     public WorkListener getWorkListener()
     {
         return workListener;
     }
 
+    @Override
     public QueueManager getQueueManager()
     {
         if (queueManager == null)
@@ -623,6 +653,7 @@ public class DefaultMuleContext implements MuleContext
         return this.getRegistry().lookupObject(LOCAL_QUEUE_MANAGER_KEY);
     }
 
+    @Override
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
     {
         getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
@@ -633,12 +664,14 @@ public class DefaultMuleContext implements MuleContext
      * @return the MuleConfiguration for this MuleManager. This object is immutable
      *         once the manager has initialised.
      */
+    @Override
     public MuleConfiguration getConfiguration()
     {
 
         return config;
     }
 
+    @Override
     public ServerNotificationManager getNotificationManager()
     {
         return notificationManager;
@@ -650,6 +683,7 @@ public class DefaultMuleContext implements MuleContext
      * @param manager the manager to use
      * @throws RegistrationException if a transaction manager has already been set
      */
+    @Override
     public void setTransactionManager(TransactionManager manager) throws RegistrationException
     {
         //checkLifecycleForPropertySet(MuleProperties.OBJECT_TRANSACTION_MANAGER, Initialisable.PHASE_NAME);
@@ -663,6 +697,7 @@ public class DefaultMuleContext implements MuleContext
      * @return the Jta transaction manager used by this Mule server instance. or
      *         null if a transaction manager has not been set
      */
+    @Override
     public TransactionManager getTransactionManager()
     {
         if (transactionManager == null)
@@ -727,21 +762,25 @@ public class DefaultMuleContext implements MuleContext
         return injector;
     }
 
+    @Override
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
     }
 
+    @Override
     public ThreadingProfile getDefaultMessageRequesterThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
     }
 
+    @Override
     public ThreadingProfile getDefaultMessageReceiverThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
     }
 
+    @Override
     public ThreadingProfile getDefaultServiceThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE);
@@ -762,6 +801,7 @@ public class DefaultMuleContext implements MuleContext
         return this.streamCloserService;
     }
 
+    @Override
     public ThreadingProfile getDefaultThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE);
@@ -772,6 +812,7 @@ public class DefaultMuleContext implements MuleContext
      *
      * @return the long date when the server was started
      */
+    @Override
     public long getStartDate()
     {
         return startDate;
@@ -783,16 +824,19 @@ public class DefaultMuleContext implements MuleContext
      * @return the Expression Manager configured for this instance of Mule
      * @see org.mule.api.expression.ExpressionManager
      */
+    @Override
     public ExpressionManager getExpressionManager()
     {
         return expressionManager;
     }
 
+    @Override
     public void setExecutionClassLoader(ClassLoader cl)
     {
         this.executionClassLoader = cl;
     }
 
+    @Override
     public ClassLoader getExecutionClassLoader()
     {
         return executionClassLoader;
@@ -801,6 +845,7 @@ public class DefaultMuleContext implements MuleContext
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void addRegistry(Registry registry)
     {
@@ -810,6 +855,7 @@ public class DefaultMuleContext implements MuleContext
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void removeRegistry(Registry registry)
     {
@@ -835,47 +881,56 @@ public class DefaultMuleContext implements MuleContext
         return shutdownScreen;
     }
 
+    @Override
     public LocalMuleClient getClient()
     {
         return localMuleClient;
     }
 
+    @Override
     public void handleException(Exception e, RollbackSourceCallback rollbackMethod)
     {
         getExceptionListener().handleException(e, rollbackMethod);
     }
 
+    @Override
     public void handleException(Exception e)
     {
         handleException(e, null);
     }
 
+    @Override
     public SystemExceptionHandler getExceptionListener()
     {
         return exceptionListener;
     }
 
+    @Override
     public void setExceptionListener(SystemExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
     }
 
+    @Override
     public EndpointFactory getEndpointFactory()
     {
         return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
+    @Override
     public void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException
     {
         checkLifecycleForPropertySet(name, Initialisable.PHASE_NAME);
         registryBroker.registerObject(name, store);
     }
 
+    @Override
     public String getClusterId()
     {
         return clusterConfiguration.getClusterId();
     }
 
+    @Override
     public int getClusterNodeId()
     {
         return clusterConfiguration.getClusterNodeId();
@@ -1075,5 +1130,16 @@ public class DefaultMuleContext implements MuleContext
     public void setObjectSerializer(ObjectSerializer objectSerializer)
     {
         this.objectSerializer = objectSerializer;
+    }
+
+    @Override
+    public ArtifactType getArtifactType()
+    {
+        return artifactType;
+    }
+
+    public void setArtifactType(ArtifactType artifactType)
+    {
+        this.artifactType = artifactType;
     }
 }

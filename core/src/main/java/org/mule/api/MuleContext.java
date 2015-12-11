@@ -30,6 +30,7 @@ import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.util.StreamCloserService;
+import org.mule.config.bootstrap.ArtifactType;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.extension.ExtensionManager;
@@ -363,5 +364,9 @@ public interface MuleContext extends Lifecycle
      */
     boolean waitUntilStarted(int timeout) throws InterruptedException;
 
+    /**
+     * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
+     */
+    ArtifactType getArtifactType();
 }
 
