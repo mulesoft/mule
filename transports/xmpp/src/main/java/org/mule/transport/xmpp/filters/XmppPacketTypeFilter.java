@@ -9,20 +9,21 @@ package org.mule.transport.xmpp.filters;
 import org.mule.util.ClassUtils;
 
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Packet;
 
 /**
  * <code>XmppPacketTypeFilter</code> is an Xmpp PacketTypeFilter adapter.
  */
 public class XmppPacketTypeFilter extends AbstractXmppFilter
 {
-    private volatile Class<?> expectedType;
+    private volatile Class<? extends Packet> expectedType;
 
     public XmppPacketTypeFilter()
     {
         super();
     }
 
-    public XmppPacketTypeFilter(Class<?> expectedType)
+    public XmppPacketTypeFilter(Class<? extends Packet> expectedType)
     {
         setExpectedType(expectedType);
     }
@@ -32,7 +33,7 @@ public class XmppPacketTypeFilter extends AbstractXmppFilter
         return expectedType;
     }
 
-    public void setExpectedType(Class<?> expectedType)
+    public void setExpectedType(Class<? extends Packet> expectedType)
     {
         this.expectedType = expectedType;
     }
