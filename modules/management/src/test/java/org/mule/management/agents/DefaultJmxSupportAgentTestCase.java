@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleContext;
 import org.mule.module.management.agent.AbstractJmxAgent;
 import org.mule.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
@@ -25,6 +26,11 @@ public class DefaultJmxSupportAgentTestCase extends AbstractMuleContextTestCase
 {
     @Test
     public void testHostPropertyEnablesClientSocketFactory () throws Exception
+    {
+        doTestHostPropertyEnablesClientSocketFactory(muleContext);
+    }
+
+    public static void doTestHostPropertyEnablesClientSocketFactory(MuleContext muleContext)
     {
         DefaultJmxSupportAgent agent = new DefaultJmxSupportAgent();
         agent.setMuleContext(muleContext);

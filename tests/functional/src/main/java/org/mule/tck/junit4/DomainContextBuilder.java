@@ -6,8 +6,12 @@
  */
 package org.mule.tck.junit4;
 
+import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
+
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
@@ -20,6 +24,16 @@ public class DomainContextBuilder
 
     private String domainConfig;
     private boolean disableMuleContextStart = false;
+    private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder()
+    {
+        @Override
+        protected DefaultMuleContext createDefaultMuleContext()
+        {
+            DefaultMuleContext muleContext = super.createDefaultMuleContext();
+            muleContext.setArtifactType(DOMAIN);
+            return muleContext;
+        }
+    };
 
     public DomainContextBuilder setDomainConfig(String domainConfig)
     {
@@ -33,7 +47,7 @@ public class DomainContextBuilder
         ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
         builders.add(cfgBuilder);
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        MuleContext domainContext = muleContextFactory.createMuleContext(builders, new DefaultMuleContextBuilder());
+        MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
         if (!disableMuleContextStart)
         {
             domainContext.start();

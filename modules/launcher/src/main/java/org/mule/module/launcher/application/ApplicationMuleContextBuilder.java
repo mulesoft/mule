@@ -6,6 +6,9 @@
  */
 package org.mule.module.launcher.application;
 
+import static org.mule.config.bootstrap.ArtifactType.APP;
+
+import org.mule.DefaultMuleContext;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.PropertiesMuleConfigurationFactory;
@@ -24,6 +27,14 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
     public ApplicationMuleContextBuilder(ApplicationDescriptor desc)
     {
         this.desc = desc;
+    }
+
+    @Override
+    protected DefaultMuleContext createDefaultMuleContext()
+    {
+        DefaultMuleContext muleContext = super.createDefaultMuleContext();
+        muleContext.setArtifactType(APP);
+        return muleContext;
     }
 
     @Override
