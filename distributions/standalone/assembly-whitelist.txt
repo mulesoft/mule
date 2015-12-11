@@ -384,8 +384,8 @@
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-1.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-1-xqj.jar
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
-/mule-standalone-${productVersion}/lib/opt/smack-3.1.0.jar
-/mule-standalone-${productVersion}/lib/opt/smackx-3.1.0.jar
+/mule-standalone-${productVersion}/lib/opt/smack-3.4.1.jar
+/mule-standalone-${productVersion}/lib/opt/smackx-3.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/snakeyaml-1.11.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-4.1.6.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-beans-4.1.6.RELEASE.jar
