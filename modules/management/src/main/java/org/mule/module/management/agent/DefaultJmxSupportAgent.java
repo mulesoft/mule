@@ -6,12 +6,16 @@
  */
 package org.mule.module.management.agent;
 
+import static org.mule.config.bootstrap.SimpleRegistryBootstrap.ArtifactType.APP;
+import static org.mule.config.bootstrap.SimpleRegistryBootstrap.ArtifactType.DOMAIN;
+
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
+import org.mule.config.bootstrap.SimpleRegistryBootstrap.ArtifactType;
 import org.mule.util.StringUtils;
 
 import java.rmi.server.RMIClientSocketFactory;
@@ -75,6 +79,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      * exception is thrown it should just be logged and processing should continue.
      * This method should not throw Runtime exceptions.
      */
+    @Override
     public void dispose()
     {
         // nothing to do
@@ -92,6 +97,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      *          if a fatal error occurs
      *          causing the Mule instance to shutdown
      */
+    @Override
     public void initialise() throws InitialisationException
     {
         try
@@ -105,8 +111,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
             // any existing jmx agent will be modified with remote connector settings
             agent = createJmxAgent();
-            // there must be only one jmx agent, so lookup by type instead
-            if (registry.lookupObject(AbstractJmxAgent.class) == null)
+            if (lookupJmxAgent(registry) == null)
             {
                 registry.registerAgent(agent);
             }
@@ -163,12 +168,35 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         }
     }
 
+    protected AbstractJmxAgent lookupJmxAgent(final MuleRegistry registry) throws RegistrationException
+    {
+        // there must be only one jmx agent, so lookup by type instead
+        ArtifactType artifactType = muleContext.getArtifactType();
+        if (APP.equals(artifactType))
+        {
+            return registry.lookupObject(JmxApplicationAgent.class);
+        }
+        else if (DOMAIN.equals(artifactType))
+        {
+            return registry.lookupObject(JmxDomainAgent.class);
+        }
+        else
+        {
+            return registry.lookupObject(AbstractJmxAgent.class);
+        }
+    }
+
+    protected void registerAgent(Agent agent, MuleRegistry registry) throws MuleException
+    {
+        registry.registerAgent(agent);
+    }
+
     public AbstractJmxAgent createJmxAgent()
     {
         AbstractJmxAgent agent;
         try
         {
-            agent = muleContext.getRegistry().lookupObject(AbstractJmxAgent.class);
+            agent = lookupJmxAgent(muleContext.getRegistry());
         }
         catch (RegistrationException e)
         {
