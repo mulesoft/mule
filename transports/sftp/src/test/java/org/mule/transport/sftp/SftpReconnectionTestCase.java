@@ -6,6 +6,9 @@
  */
 package org.mule.transport.sftp;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleException;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.tck.listener.ConnectionListener;
@@ -24,6 +27,7 @@ import org.junit.runners.Parameterized;
 public class SftpReconnectionTestCase extends AbstractSftpTestCase
 {
 
+    private static final long RECONNECTION_FREQUENCY = 1000l;
     private static final String INBOUND_ENDPOINT_DIRECTORY = "data";
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static final String SFTP_RECEIVING_FLOW_NAME = "receiving";
@@ -65,6 +69,12 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
         verifySftpFlowIsRunning();
     }
 
+    @Override
+    public int getTestTimeoutSecs()
+    {
+        return 9999999;
+    }
+
     private void verifySftpFlowIsRunning() throws Exception
     {
         FlowExecutionListener sftpInboundEndpointFlowExecutionListener = new FlowExecutionListener(SFTP_RECEIVING_FLOW_NAME, muleContext).setTimeoutInMillis(TIMEOUT);
@@ -81,10 +91,12 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
 
     private void verifyReconnectionKicksIn()
     {
-        new ConnectionListener(muleContext)
+        ConnectionListener connectionListener = new ConnectionListener(muleContext);
+        connectionListener
                 .setExpectedAction(ConnectionNotification.CONNECTION_FAILED)
                 .setNumberOfExecutionsRequired(2)
                 .waitUntilNotificationsAreReceived();
+        assertThat(connectionListener.getMinimumTimeBetweenNotifications(), greaterThan(RECONNECTION_FREQUENCY));
     }
 
     @Override
