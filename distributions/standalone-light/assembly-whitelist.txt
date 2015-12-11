@@ -317,8 +317,8 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/saxon-9.1.0.8.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/saxon-9.1.0.8-dom.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/saxon-9.1.0.8-xqj.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/smack-3.1.0.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/smackx-3.1.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/smack-3.4.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/smackx-3.4.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-aop-3.2.13.RELEASE.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-beans-3.2.13.RELEASE.jar
