@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+    <tls:context name="appGlobalTlsContext">
+        <tls:trust-store  path="trustStore" password="mulepassword"/>
+    </tls:context>
+
+    <http:listener-config name="localListenerConfig" host="localhost" port="${port2}" protocol="HTTPS">
+        <tls:context>
+            <tls:key-store  path="ssltest-keystore.jks" password="changeit" keyPassword="changeit"/>
+        </tls:context>
+    </http:listener-config>
+
+    <http:request-config name="localRequestConfig" host="localhost" port="${port1}" protocol="HTTPS" tlsContext-ref="appGlobalTlsContext"/>
+
+    <http:request-config name="requestConfig" host="localhost" port="${port3}" protocol="HTTPS" tlsContext-ref="sharedTlsContext2"/>
+
+    <flow name="helloWorldServerFlow">
+        <http:listener path="/helloWorld" config-ref="localListenerConfig"/>
+        <set-payload value="hello world"/>
+    </flow>
+
+    <flow name="helloMuleClientFlow">
+        <http:request config-ref="localRequestConfig" path="helloMule" method="GET" />
+    </flow>
+
+</mule>

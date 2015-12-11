@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:spring="http://www.springframework.org/schema/beans"
+             xmlns:http="http://www.mulesoft.org/schema/mule/http"
+             xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+             xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+    <tls:context name="sharedTlsContext1">
+        <tls:key-store  path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+    </tls:context>
+
+    <tls:context name="sharedTlsContext2">
+        <tls:trust-store  path="ssltest-cacerts.jks" password="changeit"/>
+    </tls:context>
+
+    <tls:context name="sharedTlsContext3">
+        <tls:key-store  path="ssltest-keystore.jks" password="changeit" keyPassword="changeit"/>
+    </tls:context>
+
+    <http:listener-config name="sharedListenerConfig" host="localhost" port="${port1}" protocol="HTTPS" tlsContext-ref="sharedTlsContext1"/>
+
+    <http:request-config name="sharedRequestConfig" host="localhost" port="${port2}" protocol="HTTPS" tlsContext-ref="sharedTlsContext2"/>
+
+</mule-domain>

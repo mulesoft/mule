@@ -18,6 +18,7 @@ public class TlsContextDefinitionParser extends ParentContextDefinitionParser
     public TlsContextDefinitionParser()
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(DefaultTlsContextFactory.class, true));
+        and(MuleOrphanDefinitionParser.DOMAIN_ROOT_ELEMENT, new MuleOrphanDefinitionParser(DefaultTlsContextFactory.class, true));
         otherwise(new ChildDefinitionParser("tlsContext", DefaultTlsContextFactory.class));
     }
 
