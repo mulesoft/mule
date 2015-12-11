@@ -17,11 +17,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+
 import org.mule.api.MuleEvent;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.Ricin;
+import org.mule.module.extension.Weapon;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
 import java.math.BigDecimal;
@@ -70,6 +72,7 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
     private static final int DEATH_YEAR = 2011;
     private static final HealthStatus INITIAL_HEALTH = HealthStatus.CANCER;
     private static final HealthStatus FINAL_HEALTH = HealthStatus.DEAD;
+    private static final Ricin WEAPON = new Ricin();
 
     @Parameters
     public static Collection<Object[]> data()
@@ -171,6 +174,8 @@ public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
         event.setFlowVariable("shoppingMall", SHOPPING_MALL);
         event.setFlowVariable("initialHealth", INITIAL_HEALTH);
         event.setFlowVariable("finalHealth", FINAL_HEALTH);
+        WEAPON.setMicrogramsPerKilo(10L);
+        event.setFlowVariable("weapon", WEAPON);
 
         return event;
     }

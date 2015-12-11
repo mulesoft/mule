@@ -17,6 +17,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
+
 import org.mule.api.NestedProcessor;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Operation;
@@ -138,21 +139,36 @@ public class IntrospectionUtils
     {
         Class<?> rawClass = type.getRawClass();
         ResolvableType[] generics = type.getGenerics();
+        DataType resolvedDataType;
 
         if (isOperation(rawClass))
         {
-            return DataType.of(OperationModel.class);
+            resolvedDataType = DataType.of(OperationModel.class);
         }
-
-        if (List.class.isAssignableFrom(rawClass))
+        else if (List.class.isAssignableFrom(rawClass))
         {
-            if (!ArrayUtils.isEmpty(generics) && isOperation(generics[0].getRawClass()))
+            if (!ArrayUtils.isEmpty(generics) && generics[0].getRawClass() != null)
             {
-                return DataType.of(rawClass, OperationModel.class);
+                if (isOperation(generics[0].getRawClass()))
+                {
+                    resolvedDataType = DataType.of(rawClass, OperationModel.class);
+                }
+                else
+                {
+                    resolvedDataType = DataType.of(rawClass, toRawTypes(generics));
+                }
+            }
+            else
+            {
+                resolvedDataType = DataType.of(List.class, Object.class);
             }
         }
+        else
+        {
+            resolvedDataType = DataType.of(rawClass, toRawTypes(generics));
+        }
 
-        return DataType.of(rawClass, toRawTypes(generics));
+        return resolvedDataType;
     }
 
     public static List<Class<?>> getInterfaceGenerics(Class<?> type, Class<?> implementedInterface)
@@ -228,15 +244,23 @@ public class IntrospectionUtils
 
     public static void checkInstantiable(Class<?> declaringClass, boolean requireDefaultConstructor)
     {
-        checkArgument(declaringClass != null, "declaringClass cannot be null");
-
-        if (requireDefaultConstructor)
+        if (!isInstantiable(declaringClass, requireDefaultConstructor))
         {
-            checkArgument(hasDefaultConstructor(declaringClass), String.format("Class %s cannot be instantiated since it doesn't have a default constructor", declaringClass.getName()));
+            throw new IllegalArgumentException(String.format("Class %s cannot be instantiated.", declaringClass));
         }
+    }
 
-        checkArgument(!declaringClass.isInterface(), String.format("Class %s cannot be instantiated since it's an interface", declaringClass.getName()));
-        checkArgument(!Modifier.isAbstract(declaringClass.getModifiers()), String.format("Class %s cannot be instantiated since it's abstract", declaringClass.getName()));
+    public static boolean isInstantiable(Class<?> declaringClass)
+    {
+        return isInstantiable(declaringClass, true);
+    }
+
+    public static boolean isInstantiable(Class<?> declaringClass, boolean requireDefaultConstructor)
+    {
+        return declaringClass != null
+               && (!requireDefaultConstructor || hasDefaultConstructor(declaringClass))
+               && !declaringClass.isInterface()
+               && !Modifier.isAbstract(declaringClass.getModifiers());
     }
 
     public static boolean isIgnored(AccessibleObject object)

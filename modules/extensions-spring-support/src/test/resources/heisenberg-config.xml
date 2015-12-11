@@ -10,7 +10,7 @@
                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <context:property-placeholder location="heisenberg.properties" />
+    <context:property-placeholder location="heisenberg.properties"/>
 
     <heisenberg:config name="heisenberg"
                        myName="Heisenberg"
@@ -124,7 +124,8 @@
                        ricinPacks="#[app.registry.ricinPacks]"
                        nextDoor="#[app.registry.door]"
                        firstEndevour="Gray Matter Technologies"
-                       labAddress="#['Pollos Hermanos']">
+                       labAddress="#['Pollos Hermanos']"
+                       weapon="#[weapon]">
     </heisenberg:config>
 
     <spring:beans>
@@ -147,18 +148,18 @@
         <util:set id="ricinPacks">
             <spring:ref bean="ricin"/>
         </util:set>
-        </spring:beans>
-    
+    </spring:beans>
+
     <heisenberg:door victim="Gustavo Fring" address="pollos hermanos" name="door">
-        <heisenberg:previous victim="Krazy-8" address="Jesse's" />
+        <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
     </heisenberg:door>
-    
+
     <heisenberg:ricin microgramsPerKilo="22" name="ricin">
-        <heisenberg:destination victim="Lidia" address="Stevia coffe shop" />
+        <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
     </heisenberg:ricin>
-    
-    <heisenberg:door victim="Skyler" address="308 Negra Arroyo Lane" name="skylerDoor" />
-    
-    <heisenberg:door victim="Saul" address="Shopping Mall" name="saulDoor" />
+
+    <heisenberg:door victim="Skyler" address="308 Negra Arroyo Lane" name="skylerDoor"/>
+
+    <heisenberg:door victim="Saul" address="Shopping Mall" name="saulDoor"/>
 
 </mule>

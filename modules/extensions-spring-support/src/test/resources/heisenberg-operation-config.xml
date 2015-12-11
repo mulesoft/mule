@@ -39,11 +39,11 @@
     </heisenberg:config>
 
     <flow name="sayMyName">
-        <heisenberg:say-my-name />
+        <heisenberg:say-my-name/>
     </flow>
 
     <flow name="die">
-        <heisenberg:die />
+        <heisenberg:die/>
     </flow>
 
     <flow name="getFixedEnemy">
@@ -55,11 +55,11 @@
     </flow>
 
     <flow name="hideInEvent">
-        <heisenberg:hide-meth-in-event />
+        <heisenberg:hide-meth-in-event/>
     </flow>
 
     <flow name="hideInMessage">
-        <heisenberg:hide-meth-in-message />
+        <heisenberg:hide-meth-in-message/>
     </flow>
 
     <flow name="killFromPayload">
@@ -76,7 +76,7 @@
     </flow>
 
     <flow name="killMany">
-        <heisenberg:kill-many  reason="I'm the one who knocks">
+        <heisenberg:kill-many reason="I'm the one who knocks">
             <heisenberg:kill-operations>
                 <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
                 <heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>
@@ -86,7 +86,7 @@
     </flow>
 
     <flow name="killManyButOnlyOneProvided">
-        <heisenberg:kill-many  reason="I'm the one who knocks">
+        <heisenberg:kill-many reason="I'm the one who knocks">
             <heisenberg:kill-operations>
                 <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operations>
@@ -94,7 +94,7 @@
     </flow>
 
     <flow name="killOne">
-        <heisenberg:kill-one  reason="I'm the one who knocks">
+        <heisenberg:kill-one reason="I'm the one who knocks">
             <heisenberg:kill-operation>
                 <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operation>
@@ -102,49 +102,58 @@
     </flow>
 
     <flow name="injectedExtensionManager">
-        <heisenberg:get-injected-extension-manager />
+        <heisenberg:get-injected-extension-manager/>
     </flow>
 
     <flow name="alias">
-        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52"  />
+        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52"/>
     </flow>
 
 
     <flow name="knockStaticInlineDoor">
         <heisenberg:knock>
-            <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane" />
+            <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
         </heisenberg:knock>
     </flow>
 
     <flow name="knockStaticTopLevelDoor">
-        <heisenberg:knock door="door" />
+        <heisenberg:knock door="door"/>
     </flow>
 
     <flow name="knockDynamicTopLevelDoor">
-        <heisenberg:knock door="dynamicDoor" />
+        <heisenberg:knock door="dynamicDoor"/>
     </flow>
 
     <flow name="knockDynamicInlineDoor">
         <heisenberg:knock>
-            <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" />
+            <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane"/>
         </heisenberg:knock>
     </flow>
 
     <flow name="knockManyWithInlineList">
         <heisenberg:knock-many>
             <heisenberg:doors>
-                <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane" />
-                <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" />
+                <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
+                <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane"/>
             </heisenberg:doors>
         </heisenberg:knock-many>
     </flow>
 
     <flow name="knockManyByExpression">
-        <heisenberg:knock-many doors="#[doors]" />
+        <heisenberg:knock-many doors="#[doors]"/>
     </flow>
 
     <flow name="callSaul">
-        <heisenberg:call-saul />
+        <heisenberg:call-saul/>
+    </flow>
+
+    <flow name="killWithWeapon">
+        <heisenberg:kill-with-weapon weapon="#[weapon]"/>
+    </flow>
+
+
+    <flow name="killWithMultipleWeapons">
+        <heisenberg:kill-with-multiples-weapons weaponList="#[weapons]"/>
     </flow>
 
 </mule>

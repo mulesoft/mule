@@ -8,8 +8,10 @@ package org.mule.module.extension;
 
 import org.mule.extension.annotation.api.Parameter;
 
-public class Ricin
+public class Ricin implements Weapon
 {
+
+    public static final String RICIN_KILL_MESSAGE = "You have been killed with Ricin";
     @Parameter
     private Long microgramsPerKilo;
 
@@ -19,6 +21,11 @@ public class Ricin
     public Long getMicrogramsPerKilo()
     {
         return microgramsPerKilo;
+    }
+
+    public void setMicrogramsPerKilo(long microgramsPerKilo)
+    {
+        this.microgramsPerKilo = microgramsPerKilo;
     }
 
     public KnockeableDoor getDestination()
@@ -41,5 +48,11 @@ public class Ricin
     public int hashCode()
     {
         return microgramsPerKilo.hashCode();
+    }
+
+    @Override
+    public String kill()
+    {
+        return RICIN_KILL_MESSAGE;
     }
 }

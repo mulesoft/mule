@@ -48,10 +48,12 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDyna
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.DataQualifier;
+import org.mule.extension.api.introspection.DataQualifierVisitor;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -86,6 +88,7 @@ import org.mule.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
+import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.ArrayUtils;
 import org.mule.util.StringUtils;
@@ -285,37 +288,7 @@ public final class SchemaBuilder
     {
         for (final ParameterModel parameterModel : parameterModels)
         {
-            parameterModel.getType().getQualifier().accept(new AbstractDataQualifierVisitor()
-            {
-
-                private boolean forceOptional = false;
-
-                @Override
-                public void onList()
-                {
-                    forceOptional = true;
-                    defaultOperation();
-                    generateCollectionElement(choice, parameterModel, true);
-                }
-
-                @Override
-                public void onPojo()
-                {
-                    forceOptional = false;
-                    defaultOperation();
-                    registerComplexTypeChildElement(choice,
-                                                    parameterModel.getName(),
-                                                    parameterModel.getDescription(),
-                                                    parameterModel.getType(),
-                                                    isRequired(parameterModel, forceOptional));
-                }
-
-                @Override
-                protected void defaultOperation()
-                {
-                    type.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
-                }
-            });
+            parameterModel.getType().getQualifier().accept(getParameterDeclarationVisitor(type, choice, parameterModel));
         }
 
         if (!choice.getParticle().isEmpty())
@@ -750,36 +723,7 @@ public final class SchemaBuilder
             }
             else
             {
-                parameterQualifier.accept(new AbstractDataQualifierVisitor()
-                {
-                    private boolean forceOptional = false;
-
-                    @Override
-                    public void onList()
-                    {
-                        forceOptional = true;
-                        defaultOperation();
-                        generateCollectionElement(all, parameterModel, true);
-                    }
-
-                    @Override
-                    public void onPojo()
-                    {
-                        forceOptional = true;
-                        defaultOperation();
-                        registerComplexTypeChildElement(all,
-                                                        parameterModel.getName(),
-                                                        parameterModel.getDescription(),
-                                                        parameterModel.getType(),
-                                                        false);
-                    }
-
-                    @Override
-                    protected void defaultOperation()
-                    {
-                        complexContentExtension.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
-                    }
-                });
+                parameterQualifier.accept(getParameterDeclarationVisitor(complexContentExtension, all, parameterModel));
             }
         }
 
@@ -789,6 +733,54 @@ public final class SchemaBuilder
         }
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
+    }
+
+    private DataQualifierVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all, final ParameterModel parameterModel)
+    {
+        return new AbstractDataQualifierVisitor()
+        {
+            private boolean forceOptional = false;
+
+            @Override
+            public void onList()
+            {
+                forceOptional = true;
+                defaultOperation();
+                if (shouldGenerateChildElements(parameterModel.getType().getGenericTypes()[0]))
+                {
+                    generateCollectionElement(all, parameterModel, true);
+                }
+            }
+
+            @Override
+            public void onPojo()
+            {
+                forceOptional = true;
+                defaultOperation();
+                if (shouldGenerateChildElements(parameterModel.getType()))
+                {
+                    registerComplexTypeChildElement(all,
+                                                    parameterModel.getName(),
+                                                    parameterModel.getDescription(),
+                                                    parameterModel.getType(),
+                                                    false);
+                }
+            }
+
+            @Override
+            protected void defaultOperation()
+            {
+                extensionType.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
+            }
+        };
+    }
+
+    private boolean shouldGenerateChildElements(DataType dataType)
+    {
+        return IntrospectionUtils.isInstantiable(dataType.getRawType())
+               && (!dataType.getQualifier().equals(DataQualifier.POJO)
+                   || !IntrospectionUtils.getParameterFields(dataType.getRawType()).isEmpty()
+                   || !IntrospectionUtils.getParameterGroupFields(dataType.getRawType()).isEmpty());
     }
 
     private boolean isOperation(DataType type)
