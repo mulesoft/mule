@@ -118,6 +118,7 @@ public class JettyHttpsCustomTlsConfigTestCase extends FunctionalTestCase
         DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
         tlsContextFactory.setTrustStorePath("trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
+        tlsContextFactory.initialise();
 
         SSLContext sslContext = tlsContextFactory.createSslContext();
         SSLSocketFactory socketFactory = sslContext.getSocketFactory();

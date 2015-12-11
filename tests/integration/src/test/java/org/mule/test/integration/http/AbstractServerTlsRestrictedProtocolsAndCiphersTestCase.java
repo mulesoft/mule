@@ -111,6 +111,7 @@ public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase ext
         DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
         tlsContextFactory.setTrustStorePath("trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
+        tlsContextFactory.initialise();
 
         SSLContext sslContext = tlsContextFactory.createSslContext();
         SSLSocketFactory socketFactory = sslContext.getSocketFactory();

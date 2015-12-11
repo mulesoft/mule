@@ -161,6 +161,20 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="enabledProtocols" type="mule:substitutableString" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A comma separated list of protocols enabled for this context.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enabledCipherSuites" type="mule:substitutableString" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A comma separated list of cipher suites enabled for this context.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

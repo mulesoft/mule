@@ -22,6 +22,12 @@ import org.junit.Test;
 
 public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    private static final String PASSWORD = "mulepassword";
+    private static final String ALIAS = "muleserver";
+    private static final String TYPE = "jks";
+    private static final String ALGORITHM = "SunX509";
+
     @Override
     protected String getConfigFile()
     {
@@ -39,15 +45,15 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
 
         //The full path gets resolved, we're just checkng that the property got set
         assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
-        assertEquals("muleserver", connector.getKeyAlias());
-        assertEquals("mulepassword", connector.getKeyPassword());
-        assertEquals("mulepassword", connector.getKeyStorePassword());
+        assertEquals(ALIAS, connector.getKeyAlias());
+        assertEquals(PASSWORD, connector.getKeyPassword());
+        assertEquals(PASSWORD, connector.getKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set
         assertTrue(connector.getClientKeyStore().endsWith("/clientKeystore"));
-        assertEquals("mulepassword", connector.getClientKeyStorePassword());
+        assertEquals(PASSWORD, connector.getClientKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set
         assertTrue(connector.getTrustStore().endsWith("/trustStore"));
-        assertEquals("mulepassword", connector.getTrustStorePassword());
+        assertEquals(PASSWORD, connector.getTrustStorePassword());
         assertTrue(connector.isExplicitTrustStoreOnly());
         assertTrue(connector.isRequireClientAuthentication());
     }
@@ -57,16 +63,18 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
     {
         DefaultTlsContextFactory tlsContextFactory = muleContext.getRegistry().get("tlsContext");
 
+        assertThat(tlsContextFactory.getEnabledProtocols(), is(new String[]{"TLSv1"}));
+        assertThat(tlsContextFactory.getEnabledCipherSuites(), is(new String[]{"TLS_DHE_DSS_WITH_AES_128_CBC_SHA"}));
         assertThat(tlsContextFactory.getTrustStorePath(), endsWith("trustStore"));
-        assertThat(tlsContextFactory.getTrustStorePassword(), equalTo("testTrustStorePassword"));
-        assertThat(tlsContextFactory.getTrustStoreType(), equalTo("testTrustStoreType"));
-        assertThat(tlsContextFactory.getTrustManagerAlgorithm(), equalTo("testTrustStoreAlgorithm"));
+        assertThat(tlsContextFactory.getTrustStorePassword(), equalTo(PASSWORD));
+        assertThat(tlsContextFactory.getTrustStoreType(), equalTo(TYPE));
+        assertThat(tlsContextFactory.getTrustManagerAlgorithm(), equalTo(ALGORITHM));
         assertThat(tlsContextFactory.getKeyStorePath(), endsWith("serverKeystore"));
-        assertThat(tlsContextFactory.getKeyStorePassword(), equalTo("testKeyStorePassword"));
-        assertThat(tlsContextFactory.getKeyStoreType(), equalTo("testKeyStoreType"));
-        assertThat(tlsContextFactory.getKeyManagerPassword(), equalTo("testKeyPassword"));
-        assertThat(tlsContextFactory.getKeyManagerAlgorithm(), equalTo("testKeyStoreAlgorithm"));
-        assertThat(tlsContextFactory.getKeyAlias(), equalTo("testKeyStoreAlias"));
+        assertThat(tlsContextFactory.getKeyStorePassword(), equalTo(PASSWORD));
+        assertThat(tlsContextFactory.getKeyStoreType(), equalTo(TYPE));
+        assertThat(tlsContextFactory.getKeyManagerPassword(), equalTo(PASSWORD));
+        assertThat(tlsContextFactory.getKeyManagerAlgorithm(), equalTo(ALGORITHM));
+        assertThat(tlsContextFactory.getKeyAlias(), equalTo(ALIAS));
         assertThat(tlsContextFactory.isTrustStoreInsecure(), is(false));
     }
 
@@ -77,11 +85,11 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
         TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
 
         assertThat(keyStoreConfig.getPath(), endsWith("serverKeystore"));
-        assertThat(keyStoreConfig.getPassword(), equalTo("testKeyStorePassword"));
-        assertThat(keyStoreConfig.getType(), equalTo("testKeyStoreType"));
-        assertThat(keyStoreConfig.getKeyPassword(), equalTo("testKeyPassword"));
-        assertThat(keyStoreConfig.getAlgorithm(), equalTo("testKeyStoreAlgorithm"));
-        assertThat(keyStoreConfig.getAlias(), equalTo("testKeyStoreAlias"));
+        assertThat(keyStoreConfig.getPassword(), equalTo(PASSWORD));
+        assertThat(keyStoreConfig.getType(), equalTo(TYPE));
+        assertThat(keyStoreConfig.getKeyPassword(), equalTo(PASSWORD));
+        assertThat(keyStoreConfig.getAlgorithm(), equalTo(ALGORITHM));
+        assertThat(keyStoreConfig.getAlias(), equalTo(ALIAS));
     }
 
     @Test
@@ -91,9 +99,9 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
         TlsContextTrustStoreConfiguration trustStoreConfig = tlsContextFactory.getTrustStoreConfiguration();
 
         assertThat(trustStoreConfig.getPath(), endsWith("trustStore"));
-        assertThat(trustStoreConfig.getPassword(), equalTo("testTrustStorePassword"));
-        assertThat(trustStoreConfig.getType(), equalTo("testTrustStoreType"));
-        assertThat(trustStoreConfig.getAlgorithm(), equalTo("testTrustStoreAlgorithm"));
+        assertThat(trustStoreConfig.getPassword(), equalTo(PASSWORD));
+        assertThat(trustStoreConfig.getType(), equalTo(TYPE));
+        assertThat(trustStoreConfig.getAlgorithm(), equalTo(ALGORITHM));
         assertThat(trustStoreConfig.isInsecure(), equalTo(false));
     }
 
