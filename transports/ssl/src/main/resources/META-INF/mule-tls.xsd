@@ -110,7 +110,7 @@
     </xsd:attributeGroup>
 
 
-    <xsd:element name="context" type="tlsContextType" substitutionGroup="mule:abstract-extension">
+    <xsd:element name="context" type="tlsContextType" substitutionGroup="mule:abstract-shared-extension">
         <xsd:annotation>
             <xsd:documentation>
                 Reusable configuration element for TLS. A TLS context optionally defines a key store and a trust store.
