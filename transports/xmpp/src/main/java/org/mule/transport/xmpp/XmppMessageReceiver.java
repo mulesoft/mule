@@ -44,7 +44,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
     @Override
     protected void doConnect() throws Exception
     {
-        xmppConversation.connect();
+        xmppConversation.connect(false);
     }
 
     @Override
