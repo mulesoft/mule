@@ -34,7 +34,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     @Override
     protected void doConnect() throws Exception
     {
-        conversation.connect();
+        conversation.connect(false);
     }
 
     @Override
