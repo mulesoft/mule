@@ -36,8 +36,17 @@ public abstract class AbstractXmppConversation implements XmppConversation
     @Override
     public void connect() throws ConnectException
     {
+        connect(true);
+    }
+
+    @Override
+    public void connect(boolean requiresCollector) throws ConnectException
+    {
         doConnect();
-        packetCollector = createPacketCollector();
+        if (requiresCollector)
+        {
+            packetCollector = createPacketCollector();
+        }
     }
 
     /**

@@ -20,8 +20,18 @@ public interface XmppConversation
 {
     /**
      * Connect to the Jabber conversation, e.g. join a chat.
+     * 
+     * @deprecated Use {@link #connect(boolean)}
      */
+    @Deprecated
     void connect() throws ConnectException;
+
+    /**
+     * Connect to the Jabber conversation, e.g. join a chat.
+     * 
+     * @param Whether this conversation has to keep a packetCollector internally, that buffers messages for a requester.
+     */
+    void connect(boolean requiresCollector) throws ConnectException;
 
     /**
      * Disconnect from the Jabber conversation, e.g. leave a chat.

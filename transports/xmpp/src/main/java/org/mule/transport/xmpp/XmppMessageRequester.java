@@ -30,7 +30,7 @@ public class XmppMessageRequester extends AbstractMessageRequester
     @Override
     protected void doConnect() throws Exception
     {
-        conversation.connect();
+        conversation.connect(true);
     }
 
     @Override
