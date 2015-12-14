@@ -582,4 +582,26 @@ public class SftpConnector extends AbstractConnector
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
     }
 
+
+    //Since SFTP does not have any connection at the connector level and
+    //since we need to fix SFTP connection at the inbound level we just let
+    //each receiver to do it's own reconnection.
+    @Override
+    public void connect() throws Exception
+    {
+        setConnected(true);
+        if (connecting.compareAndSet(false, true))
+        {
+
+            connectConnectorAndReceivers();
+            setConnecting(false);
+        }
+    }
+
+
+    @Override
+    public void disconnect() throws Exception
+    {
+        setConnected(false);
+    }
 }
