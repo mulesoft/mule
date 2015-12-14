@@ -35,7 +35,7 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     protected void doConnect() throws Exception
     {
-        conversation.connect();
+        conversation.connect(false);
     }
 
     @Override
