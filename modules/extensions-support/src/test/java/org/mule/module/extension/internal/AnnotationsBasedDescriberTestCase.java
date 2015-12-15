@@ -56,6 +56,7 @@ import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.Ricin;
+import org.mule.module.extension.Weapon;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.size.SmallTest;
@@ -85,6 +86,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String GET_ENEMY_OPERATION = "getEnemy";
     private static final String KILL_OPERATION = "kill";
     private static final String KILL_CUSTOM_OPERATION = "killWithCustomMessage";
+    private static final String KILL_WITH_WEAPON = "killWithWeapon";
+    private static final String KILL_WITH_MULTIPLES_WEAPONS = "killWithMultiplesWeapons";
     private static final String HIDE_METH_IN_EVENT_OPERATION = "hideMethInEvent";
     private static final String HIDE_METH_IN_MESSAGE_OPERATION = "hideMethInMessage";
     private static final String DIE = "die";
@@ -160,7 +163,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(15));
+        assertThat(parameters, hasSize(16));
 
         assertParameter(parameters, "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(parameters, "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
@@ -178,6 +181,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "finalHealth", "", DataType.of(HealthStatus.class), true, SUPPORTED, null);
         assertParameter(parameters, "labAddress", "", DataType.of(String.class), false, REQUIRED, null);
         assertParameter(parameters, "firstEndevour", "", DataType.of(String.class), false, NOT_SUPPORTED, null);
+        assertParameter(parameters, "weapon", "", DataType.of(Weapon.class), false, SUPPORTED, null);
     }
 
     private void assertExtensionProperties(Declaration declaration)
@@ -191,11 +195,13 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(Declaration declaration) throws Exception
     {
-        assertThat(declaration.getOperations(), hasSize(15));
+        assertThat(declaration.getOperations(), hasSize(17));
         assertOperation(declaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(declaration, GET_ENEMY_OPERATION, "");
         assertOperation(declaration, KILL_OPERATION, "");
         assertOperation(declaration, KILL_CUSTOM_OPERATION, "");
+        assertOperation(declaration, KILL_WITH_WEAPON, "");
+        assertOperation(declaration, KILL_WITH_MULTIPLES_WEAPONS, "");
         assertOperation(declaration, HIDE_METH_IN_EVENT_OPERATION, "");
         assertOperation(declaration, HIDE_METH_IN_MESSAGE_OPERATION, "");
         assertOperation(declaration, DIE, "");
@@ -220,6 +226,16 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(operation.getParameters(), hasSize(2));
         assertParameter(operation.getParameters(), "victim", "", DataType.of(String.class), false, SUPPORTED, "#[payload]");
         assertParameter(operation.getParameters(), "goodbyeMessage", "", DataType.of(String.class), true, SUPPORTED, null);
+
+        operation = getOperation(declaration, KILL_WITH_WEAPON);
+        assertThat(operation, is(notNullValue()));
+        assertThat(operation.getParameters(), hasSize(1));
+        assertParameter(operation.getParameters(), "weapon", "", DataType.of(Weapon.class), true, SUPPORTED, null);
+
+        operation = getOperation(declaration, KILL_WITH_MULTIPLES_WEAPONS);
+        assertThat(operation, is(notNullValue()));
+        assertThat(operation.getParameters(), hasSize(1));
+        assertParameter(operation.getParameters(), "weaponList", "", DataType.of(List.class, Weapon.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_CUSTOM_OPERATION);
         assertThat(operation, is(notNullValue()));

@@ -13,16 +13,22 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.module.extension.KnockeableDoor.knock;
+import static org.mule.module.extension.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.KnockeableDoor;
+import org.mule.module.extension.Ricin;
+import org.mule.module.extension.Weapon;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -216,6 +222,35 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
     public void operationWhichRequiresConnection() throws Exception
     {
         assertThat(getPayloadAsString(runFlow("callSaul").getMessage()), is("You called " + SAUL_OFFICE_NUMBER));
+    }
+
+    @Test
+    public void operationWhichConsumesANonInstantiableArgument() throws Exception
+    {
+        MuleEvent event = getTestEvent(EMPTY);
+        Ricin ricinWeapon = new Ricin();
+        ricinWeapon.setMicrogramsPerKilo(10L);
+        event.setFlowVariable("weapon", ricinWeapon);
+
+        event = runFlow("killWithWeapon", event);
+        assertThat(event.getMessageAsString(), is(RICIN_KILL_MESSAGE));
+    }
+
+    @Test
+    public void operationWhichConsumesAListOfNonInstantiableArgument() throws Exception
+    {
+        MuleEvent event = getTestEvent(EMPTY);
+        Ricin ricinWeapon1 = new Ricin();
+        ricinWeapon1.setMicrogramsPerKilo(10L);
+        Ricin ricinWeapon2 = new Ricin();
+        ricinWeapon2.setMicrogramsPerKilo(10L);
+
+        List<Weapon> weaponList = Arrays.asList(ricinWeapon1, ricinWeapon2);
+        event.setFlowVariable("weapons", weaponList);
+
+        event = runFlow("killWithMultipleWeapons", event);
+        List<String> result = weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
+        assertThat(event.getMessage().getPayload(), is(result));
     }
 
     private void assertDynamicDoor(String flowName) throws Exception

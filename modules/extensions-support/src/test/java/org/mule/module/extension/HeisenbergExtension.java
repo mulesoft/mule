@@ -8,6 +8,7 @@ package org.mule.module.extension;
 
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -15,6 +16,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -81,6 +83,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Parameter
     @Optional
     private KnockeableDoor nextDoor;
+
+    @Parameter
+    @Optional
+    private Weapon weapon;
 
     /**
      * Doors I might knock on but still haven't made up mind about

@@ -7,6 +7,7 @@
 package org.mule.module.extension;
 
 import static java.util.stream.Collectors.toList;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
@@ -24,6 +25,7 @@ import org.mule.extension.api.runtime.ContentType;
 
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -72,6 +74,18 @@ public class HeisenbergOperations
     public String killWithCustomMessage(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage)
     {
         return String.format("%s, %s", goodbyeMessage, victim);
+    }
+
+    @Operation
+    public String killWithWeapon(Weapon weapon)
+    {
+        return weapon.kill();
+    }
+
+    @Operation
+    public List<String> killWithMultiplesWeapons(List<Weapon> weaponList)
+    {
+        return weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
     }
 
     @Operation
