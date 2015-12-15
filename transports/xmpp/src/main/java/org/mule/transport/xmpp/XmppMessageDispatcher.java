@@ -80,6 +80,12 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 
     protected void sendMessage(MuleEvent event) throws Exception
     {
+        // Handle session closing by the server
+        if (!xmppConnector.getXmppConnection().isConnected())
+        {
+            xmppConnector.getXmppConnection().connect();
+        }
+
         Message jabberMessage = event.getMessage().getPayload(DataTypeFactory.create(Message.class));
         conversation.dispatch(jabberMessage);
 
