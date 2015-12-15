@@ -18,7 +18,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -41,6 +40,7 @@ import org.mule.util.concurrent.Latch;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -289,11 +289,11 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
         MuleMessage response = runFlow("dataType", event).getMessage();
 
-        assertThat(response, is(Matchers.instanceOf(DefaultMessageCollection.class)));
-        assertThat(((DefaultMessageCollection) response).size(), is(3));
-        assertThat(((DefaultMessageCollection) response).getMessage(0).getDataType().getMimeType(), is("text/plain"));
-        assertThat(((DefaultMessageCollection) response).getMessage(1).getDataType().getMimeType(), is("*/*"));
-        assertThat(((DefaultMessageCollection) response).getMessage(2).getDataType().getMimeType(), is("*/*"));
+        assertThat(response.getPayload(), is(Matchers.instanceOf(List.class)));
+        assertThat(((List<MuleMessage>) response.getPayload()).size(), is(3));
+        assertThat(((List<MuleMessage>) response.getPayload()).get(0).getDataType().getMimeType(), is("text/plain"));
+        assertThat(((List<MuleMessage>) response.getPayload()).get(1).getDataType().getMimeType(), is("*/*"));
+        assertThat(((List<MuleMessage>) response.getPayload()).get(2).getDataType().getMimeType(), is("*/*"));
     }
 
     public static class TestAggregationStrategy implements AggregationStrategy

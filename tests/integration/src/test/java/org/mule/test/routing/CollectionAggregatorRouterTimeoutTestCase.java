@@ -8,6 +8,7 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
@@ -65,7 +66,7 @@ public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCas
         // should receive only the first part
         assertEquals("Aggregator received wrong number of messages.", 1,
             aggregator.getReceivedMessagesCount());
-        assertEquals("Wrong message received", Arrays.asList("first"), aggregator.getLastReceivedMessage());
+        assertEquals("Wrong message received", "first", ((List<MuleMessage>)aggregator.getLastReceivedMessage()).get(0).getPayload());
 
         // wait for the vortex timeout (6000ms for vortext + 2000ms for aggregator
         // timeout + some extra for a test)

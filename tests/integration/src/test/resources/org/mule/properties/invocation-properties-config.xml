@@ -345,7 +345,6 @@
         <flow-ref name="propogationOfPropertiesInMessageSplitWithSplitter" />
         <processor ref="addP2" />
         <collection-aggregator />
-        <test:assert expression="#[groovy:message instanceof org.mule.api.MuleMessageCollection]" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
     </flow>

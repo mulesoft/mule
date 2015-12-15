@@ -12,13 +12,13 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Ignore;
@@ -49,10 +49,10 @@ public class HttpRequestRecipientListTestCase extends FunctionalTestCase
         testEvent.getMessage().setProperty("urls", Arrays.asList(getUrlForPort(port1), getUrlForPort(port2), getUrlForPort(port3)), PropertyScope.INBOUND);
         final MuleEvent response = ((Flow) getFlowConstruct("recipientListFlow")).process(testEvent);
         assertThat(response, notNullValue());
-        assertThat(response.getMessage(), IsInstanceOf.instanceOf(MuleMessageCollection.class));
-        MuleMessageCollection aggregatedResponse = (MuleMessageCollection) response.getMessage();
-        assertThat(aggregatedResponse.size(), is(3));
-        final MuleMessage[] messages = aggregatedResponse.getMessagesAsArray();
+        assertThat(response.getMessage().getPayload(), IsInstanceOf.instanceOf(List.class));
+        MuleMessage aggregatedResponse = response.getMessage();
+        assertThat(((List<MuleMessage>) aggregatedResponse.getPayload()).size(), is(3));
+        final MuleMessage[] messages = (MuleMessage[]) ((List<MuleMessage>) aggregatedResponse.getPayload()).toArray();
         for (int i = 0; i < messages.length; i++)
         {
             MuleMessage message = messages[i];

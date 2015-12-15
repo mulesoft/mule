@@ -11,7 +11,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.processor.MessageProcessor;
 
 import java.util.ArrayList;
@@ -35,11 +34,10 @@ public class CombineCollectionsTransformer implements MessageProcessor
         MuleMessage msg = event.getMessage();
 
         List<Object> payload = new ArrayList<Object>();
-        if (msg instanceof MuleMessageCollection)
+        // TODO MULE-9187 Use Message DataType to determine if Message contains a list of messages.
+        if (msg.getPayload() instanceof Collection && ((List)msg.getPayload()).get(0) instanceof MuleMessage)
         {
-            MuleMessageCollection collection = (MuleMessageCollection) msg;
-            collection.getPayload();
-            for (MuleMessage child : collection.getMessagesAsArray())
+            for (MuleMessage child : (List<MuleMessage>)msg.getPayload())
             {
                 Object childPayload = child.getPayload();
                 if (childPayload instanceof Collection)

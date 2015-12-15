@@ -11,9 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+
+import java.util.List;
 
 import org.junit.Test;
 
@@ -33,13 +34,13 @@ public class AsyncReplyNoTimeoutTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://distributor.queue", message, null);
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
+        assertTrue(result.getPayload() instanceof List);
 
-        MuleMessageCollection mc = (MuleMessageCollection)result;
-        assertEquals(3, mc.size());
-        for (int i = 0; i < mc.getMessagesAsArray().length; i++)
+        List<MuleMessage> results = (List<MuleMessage>) result.getPayload();
+        assertEquals(3, results.size());
+        for (int i = 0; i < results.size(); i++)
         {
-            MuleMessage msg = mc.getMessagesAsArray()[i];
+            MuleMessage msg = results.get(i);
             assertEquals("test Received", msg.getPayload());
         }
     }

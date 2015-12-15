@@ -9,10 +9,8 @@ package org.mule.test.integration.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -40,12 +38,12 @@ public class InboundAggregationNoTimeoutTestCase extends FunctionalTestCase
         MuleMessage result = client.request("vm://results", 10000);
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        MuleMessageCollection mc = (MuleMessageCollection)result;
-        assertEquals(3, mc.size());
-        for (int i = 0; i < mc.getMessagesAsArray().length; i++)
+        assertTrue(result.getPayload() instanceof List);
+        List<MuleMessage> results = (List<MuleMessage>) result.getPayload();
+        assertEquals(3, results.size());
+        for (int i = 0; i < results.size(); i++)
         {
-            MuleMessage msg = mc.getMessagesAsArray()[i];
+            MuleMessage msg = results.get(i);
             assertEquals("test Received", msg.getPayload());
             assertEquals(message.getMessageRootId(), msg.getMessageRootId());
         }

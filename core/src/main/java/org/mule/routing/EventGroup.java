@@ -6,14 +6,13 @@
  */
 package org.mule.routing;
 
-import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ListableObjectStore;
@@ -396,14 +395,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         return buf.toString();
     }
 
-    public MuleMessageCollection toMessageCollection() throws ObjectStoreException
+    public MuleMessage toMessageCollection() throws ObjectStoreException
     {
         return toMessageCollection(true);
     }
 
-    public MuleMessageCollection toMessageCollection(boolean sortByArrival) throws ObjectStoreException
+    public MuleMessage toMessageCollection(boolean sortByArrival) throws ObjectStoreException
     {
-        DefaultMessageCollection col = new DefaultMessageCollection(muleContext);
         List<MuleMessage> messages = new ArrayList<MuleMessage>();
 
         synchronized (events)
@@ -419,8 +417,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         {
             Collections.sort(messages, new ArrivalOrderMessageComparator());
         }
-        col.addMessages(messages);
-        return col;
+        return new DefaultMuleMessage(messages, muleContext);
     }
 
     public String getCommonRootId()

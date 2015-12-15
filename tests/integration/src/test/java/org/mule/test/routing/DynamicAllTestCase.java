@@ -12,8 +12,9 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.construct.Flow;
+
+import java.util.List;
 
 import org.junit.Test;
 
@@ -80,10 +81,10 @@ public class DynamicAllTestCase extends DynamicRouterTestCase
     private MuleEvent runFlowAndAssertResponse(Flow flow, MuleEvent event, String... letters) throws Exception
     {
         MuleEvent resultEvent = flow.process(event);
-        MuleMessageCollection messageCollection = (MuleMessageCollection) resultEvent.getMessage();
+        MuleMessage messageCollection = resultEvent.getMessage();
         for (int i = 0; i < letters.length; i++)
         {
-            MuleMessage message = messageCollection.getMessage(i);
+            MuleMessage message = ((List<MuleMessage>) messageCollection.getPayload()).get(i);
             assertThat(getPayloadAsString(message), is(letters[i]));
         }
         return resultEvent;

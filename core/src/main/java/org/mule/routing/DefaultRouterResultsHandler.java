@@ -6,16 +6,18 @@
  */
 package org.mule.routing;
 
-import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessageCollection;
+import org.mule.api.MuleMessage;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections.Predicate;
@@ -123,8 +125,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
 
     private MuleEvent createMessageCollectionWithSingleMessage(MuleEvent event, MuleContext muleContext)
     {
-        MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
-        coll.addMessage(event.getMessage());
+        MuleMessage coll = new DefaultMuleMessage(Collections.singletonList(event.getMessage()), muleContext);
         event.setMessage(coll);
         return OptimizedRequestContext.unsafeSetEvent(event);
     }
@@ -133,11 +134,12 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
                                               final MuleEvent previous,
                                               MuleContext muleContext)
     {
-        MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
+        List list = new ArrayList<>();
         for (MuleEvent event : nonNullResults)
         {
-            coll.addMessage(event.getMessage());
+            list.add(event.getMessage());
         }
+        MuleMessage coll = new DefaultMuleMessage(list, muleContext);
         coll.propagateRootId(previous.getMessage());
         MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
         for (String name : previous.getFlowVariableNames())

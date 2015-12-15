@@ -6,17 +6,13 @@
  */
 package org.mule.transport.http.transformers;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
-
-import java.io.Serializable;
-
-import org.mule.DefaultMessageCollection;
+import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -25,6 +21,10 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpRequest;
 import org.mule.transport.http.RequestLine;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
@@ -54,15 +54,16 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
 
         return message;
     }
-    
-    private MuleMessageCollection setupRequestContextForCollection(final String url, final String method) throws Exception
+
+    private MuleMessage setupRequestContextForCollection(final String url, final String method,
+                                                                   List<MuleMessage> messages) throws Exception
     {
         HttpRequest request = new HttpRequest(new RequestLine(method, url, HttpVersion.HTTP_1_1), null, "UTF-8");
         
         endpoint = muleContext.getEndpointFactory().getInboundEndpoint(url);
         
         MuleEvent event = getTestEvent(request, endpoint);
-        MuleMessageCollection message = new DefaultMessageCollection(muleContext);
+        MuleMessage message = new DefaultMuleMessage(messages, muleContext);
         message.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
         message.setOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, url);
         RequestContext.setEvent(event);
@@ -230,9 +231,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     @Test
     public void testPostMethodWithHttp10ForMuleMessageCollection() throws Exception
     {
-        final MuleMessageCollection message = setupRequestContextForCollection("http://localhost:8080/services", HttpConstants.METHOD_POST);
         MuleMessage messageOne = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_POST);
-        message.addMessage(messageOne);
+        final MuleMessage message = setupRequestContextForCollection("http://localhost:8080/services", HttpConstants.METHOD_POST, Collections.singletonList(messageOne));
         final String contentType = "text/plain";
         
         String payload = "I'm a payload";

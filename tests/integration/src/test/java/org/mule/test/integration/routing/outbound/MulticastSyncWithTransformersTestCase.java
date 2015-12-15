@@ -6,11 +6,11 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -41,10 +41,10 @@ public class MulticastSyncWithTransformersTestCase extends FunctionalTestCase
         MuleMessage result = client.send("vm://distributor.queue", fruitBowl, null);
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        MuleMessageCollection coll = (MuleMessageCollection) result;
-        assertEquals(3, coll.size());
-        List<?> results = (List<?>) coll.getPayload();
+        assertTrue(result.getPayload() instanceof List);
+        List<String> results = ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (String) msg.getPayload
+                ()).collect(toList());
+        assertEquals(3, results.size());
 
         assertTrue(results.contains("Apple Received"));
         assertTrue(results.contains("Banana Received"));

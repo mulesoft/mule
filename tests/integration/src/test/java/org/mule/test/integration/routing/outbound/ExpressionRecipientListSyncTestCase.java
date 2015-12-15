@@ -10,13 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -61,14 +61,14 @@ public class ExpressionRecipientListSyncTestCase extends FunctionalTestCase
 
         assertNotNull(result);
 
-        assertTrue(result instanceof MuleMessageCollection);
-        MuleMessageCollection coll = (MuleMessageCollection)result;
-        assertEquals(3, coll.size());
-        MuleMessage[] results = coll.getMessagesAsArray();
+        assertTrue(result.getPayload() instanceof List);
+        List<MuleMessage> results = (List<MuleMessage>) result.getPayload();
+        assertEquals(3, results.size());
+        MuleMessage[] resultsArray = results.toArray(new MuleMessage[3]);
 
-        for (int i = 0; i < results.length; i++)
+        for (int i = 0; i < resultsArray.length; i++)
         {
-            MuleMessage muleMessage = results[i];
+            MuleMessage muleMessage = resultsArray[i];
             assertEquals("test " + (i+1) + " Received", muleMessage.getPayload());
         }
     }

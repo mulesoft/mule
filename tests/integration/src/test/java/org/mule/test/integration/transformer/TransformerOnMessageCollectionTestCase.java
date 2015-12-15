@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -37,6 +36,6 @@ public class TransformerOnMessageCollectionTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://testInput", values, null);
         assertEquals("foo", response.getPayload());
-        assertFalse(response instanceof MuleMessageCollection);
+        assertFalse(response.getPayload() instanceof List);
     }
 }

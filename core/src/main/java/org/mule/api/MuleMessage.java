@@ -462,27 +462,4 @@ public interface MuleMessage extends Serializable
      */
     void clearAttachments();
 
-    /**
-     * Updates the value of the message originalPayload.  This is typically updating automatically but there are some
-     * circumstances such as where {@link MuleMessage#setPayload(Object)} is used directly where this may be required.
-     *
-     * @param originalPayload new value for originalPayload
-     */
-    void setOriginalPayload(Object originalPayload);
-
-    /**
-     * Copy properties from inbound and outbound scopes in the source message to current message.  If properties already
-     * exist in the current message then they will be overwritten.
-     *
-     * @param source message to copy properties from
-     */
-    void copyMessageProperties(MuleMessage source);
-
-    /**
-     * Copy inbound and outbound attachments in the source message to current message.  If attachments already exist in
-     * the current message then they will be overwritten.
-     *
-     * @param source message to copy attachments from
-     */
-    void copyAttachments(MuleMessage source);
 }

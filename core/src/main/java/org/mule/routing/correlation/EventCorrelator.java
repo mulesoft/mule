@@ -10,7 +10,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessageCollection;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.execution.ExecutionCallback;
@@ -386,7 +386,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
         if (isFailOnTimeout())
         {
-            MuleMessageCollection messageCollection;
+            MuleMessage messageCollection;
             try
             {
                 messageCollection = group.toMessageCollection();

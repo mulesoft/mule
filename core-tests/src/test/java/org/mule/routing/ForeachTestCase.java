@@ -13,12 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -109,11 +107,10 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     @Test
     public void muleMessageCollectionPayload() throws Exception
     {
-        MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
-        MuleMessage msg = new DefaultMuleMessage("bar", muleContext);
-        msgCollection.addMessage(msg);
-        msg = new DefaultMuleMessage("zip", muleContext);
-        msgCollection.addMessage(msg);
+        List<MuleMessage> list = new ArrayList<>();
+        list.add(new DefaultMuleMessage("bar", muleContext));
+        list.add(new DefaultMuleMessage("zip", muleContext));
+        MuleMessage msgCollection = new DefaultMuleMessage(list, muleContext);
         simpleForeach.process(getTestEvent(msgCollection));
 
         assertSimpleProcessedMessages();
@@ -176,26 +173,22 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     @Test
     public void nestedMuleMessageCollectionPayload() throws Exception
     {
-        MuleMessageCollection parentCollection = new DefaultMessageCollection(muleContext);
-        MuleMessageCollection childCollection1 = new DefaultMessageCollection(muleContext);
-        MuleMessageCollection childCollection2 = new DefaultMessageCollection(muleContext);
-        MuleMessage msg;
-        msg = new DefaultMuleMessage("a1", muleContext);
-        childCollection1.addMessage(msg);
-        msg = new DefaultMuleMessage("a2", muleContext);
-        childCollection1.addMessage(msg);
-        msg = new DefaultMuleMessage("a3", muleContext);
-        childCollection1.addMessage(msg);
 
-        msg = new DefaultMuleMessage("b1", muleContext);
-        childCollection2.addMessage(msg);
-        msg = new DefaultMuleMessage("b2", muleContext);
-        childCollection2.addMessage(msg);
-        msg = new DefaultMuleMessage("c1", muleContext);
-        childCollection2.addMessage(msg);
+        List<MuleMessage> parentList = new ArrayList<>();
+        List<MuleMessage> list1 = new ArrayList<>();
+        List<MuleMessage> list2 = new ArrayList<>();
 
-        parentCollection.addMessage(childCollection1);
-        parentCollection.addMessage(childCollection2);
+        list1.add(new DefaultMuleMessage("a1", muleContext));
+        list1.add(new DefaultMuleMessage("a2", muleContext));
+        list1.add(new DefaultMuleMessage("a3", muleContext));
+
+        list2.add(new DefaultMuleMessage("b1", muleContext));
+        list2.add(new DefaultMuleMessage("b2", muleContext));
+        list2.add(new DefaultMuleMessage("c1", muleContext));
+
+        parentList.add(new DefaultMuleMessage(list1, muleContext));
+        parentList.add(new DefaultMuleMessage(list2, muleContext));
+        MuleMessage parentCollection = new DefaultMuleMessage(parentList, muleContext);
 
         nestedForeach.process(getTestEvent(parentCollection));
         assertNestedProcessedMessages();

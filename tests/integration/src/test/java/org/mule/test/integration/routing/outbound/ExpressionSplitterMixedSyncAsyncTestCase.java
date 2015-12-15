@@ -6,11 +6,11 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -41,10 +41,10 @@ public class ExpressionSplitterMixedSyncAsyncTestCase extends FunctionalTestCase
         MuleMessage result = client.send("vm://distributor.queue", fruitBowl, null);
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertTrue(result.getPayload() instanceof List);
+        List<MuleMessage> coll = (List<MuleMessage>) result.getPayload();
         assertEquals(2, coll.size());
-        List<?> results = (List<?>) coll.getPayload();
+        List<String> results = coll.stream().map(m -> (String) m.getPayload()).collect(toList());
 
         // ServiceTwo endpoint is async
         assertTrue(results.contains("Apple Received in ServiceOne"));

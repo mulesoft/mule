@@ -6,19 +6,19 @@
  */
 package org.mule.test.construct;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.CompositeMessageSource;
@@ -45,6 +45,7 @@ import org.junit.Test;
 
 public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 {
+
     public FlowConfigurationFunctionalTestCase()
     {
         setDisposeContextPerClass(true);
@@ -62,8 +63,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         final Flow flow = muleContext.getRegistry().lookupObject("flow");
         assertEquals(DefaultInboundEndpoint.class, flow.getMessageSource().getClass());
         assertEquals("vm://in", ((InboundEndpoint) flow.getMessageSource()).getEndpointURI()
-            .getUri()
-            .toString());
+                .getUri()
+                .toString());
         assertEquals(5, flow.getMessageProcessors().size());
         assertNotNull(flow.getExceptionListener());
 
@@ -100,7 +101,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         muleContext.getClient().send("vm://queued-asynchronous", new DefaultMuleMessage("0", muleContext));
         MuleMessage message = muleContext.getClient()
-            .request("vm://queued-asynchronous-out", RECEIVE_TIMEOUT);
+                .request("vm://queued-asynchronous-out", RECEIVE_TIMEOUT);
         assertNotNull(message);
         Thread thread = (Thread) message.getPayload();
         assertNotNull(thread);
@@ -122,9 +123,9 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testAsyncQueuedAsynchronous() throws MuleException
     {
         muleContext.getClient().dispatch("vm://queued-asynchronous-async",
-            new DefaultMuleMessage("0", muleContext));
+                                         new DefaultMuleMessage("0", muleContext));
         MuleMessage message = muleContext.getClient().request("vm://queued-asynchronous-async-out",
-            RECEIVE_TIMEOUT);
+                                                              RECEIVE_TIMEOUT);
         assertNotNull(message);
         Thread thread = (Thread) message.getPayload();
         assertNotNull(thread);
@@ -139,11 +140,11 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals(2, flow.getMessageProcessors().size());
 
         assertEquals("01xyz",
-            getPayloadAsString(muleContext.getClient()
-                .send("vm://in2", new DefaultMuleMessage("0", muleContext))));
+                     getPayloadAsString(muleContext.getClient()
+                                                .send("vm://in2", new DefaultMuleMessage("0", muleContext))));
         assertEquals("01xyz",
-            getPayloadAsString(muleContext.getClient()
-                .send("vm://in3", new DefaultMuleMessage("0", muleContext))));
+                     getPayloadAsString(muleContext.getClient()
+                                                .send("vm://in3", new DefaultMuleMessage("0", muleContext))));
     }
 
     @Test
@@ -151,7 +152,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         muleContext.getClient().send("vm://inout-in", new DefaultMuleMessage("0", muleContext));
         assertEquals("0", getPayloadAsString(muleContext.getClient()
-            .request("vm://inout-out", RECEIVE_TIMEOUT)));
+                                                     .request("vm://inout-out", RECEIVE_TIMEOUT)));
     }
 
     @Test
@@ -159,7 +160,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         muleContext.getClient().send("vm://inout-append-in", new DefaultMuleMessage("0", muleContext));
         assertEquals("0inout", getPayloadAsString(muleContext.getClient()
-            .request("vm://inout-append-out", RECEIVE_TIMEOUT)));
+                                                          .request("vm://inout-append-out", RECEIVE_TIMEOUT)));
     }
 
     @Test
@@ -172,16 +173,16 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         fruitBowl.addFruit(orange);
 
         muleContext.getClient().send("vm://split-aggregate-in",
-            new DefaultMuleMessage(fruitBowl, muleContext));
+                                     new DefaultMuleMessage(fruitBowl, muleContext));
 
         final MuleMessage result = muleContext.getClient().request("vm://split-aggregate-out",
-            RECEIVE_TIMEOUT);
+                                                                   RECEIVE_TIMEOUT);
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertTrue(result.getPayload() instanceof List);
+        final List<MuleMessage> coll = (List<MuleMessage>) result.getPayload();
         assertEquals(3, coll.size());
-        final List<?> results = (List<?>) coll.getPayload();
+        final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
 
         assertTrue(apple.isBitten());
         assertTrue(banana.isBitten());
@@ -212,16 +213,16 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         fruitBowl.addFruit(orange);
 
         muleContext.getClient().send("vm://split-aggregate-list-in",
-            new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
+                                     new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
 
         final MuleMessage result = muleContext.getClient().request("vm://split-aggregate-list-out",
-            RECEIVE_TIMEOUT);
+                                                                   RECEIVE_TIMEOUT);
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertTrue(result.getPayload() instanceof List);
+        final List<MuleMessage> coll = (List<MuleMessage>) result.getPayload();
         assertEquals(3, coll.size());
-        final List<?> results = (List<?>) coll.getPayload();
+        final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
 
         assertTrue(apple.isBitten());
         assertTrue(banana.isBitten());
@@ -240,22 +241,22 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         fruitBowl.addFruit(apple);
 
         muleContext.getClient().send("vm://split-aggregate-singleton-list-in",
-            new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
+                                     new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
 
         final MuleMessage result = muleContext.getClient().request("vm://split-aggregate-singleton-list-out",
-            RECEIVE_TIMEOUT);
+                                                                   RECEIVE_TIMEOUT);
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertTrue(result.getPayload() instanceof List);
+        final List<MuleMessage> coll = (List<MuleMessage>) result.getPayload();
         assertEquals(1, coll.size());
-        final List<?> results = (List<?>) coll.getPayload();
+        final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
 
         assertTrue(apple.isBitten());
 
         assertTrue(results.contains(apple));
     }
-    
+
     @Test
     public void testSplitAggregateResponseListFlow() throws Exception
     {
@@ -265,15 +266,15 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         final FruitBowl fruitBowl = new FruitBowl(apple, banana);
         fruitBowl.addFruit(orange);
 
-        final MuleMessage result  = muleContext.getClient().send("vm://split-aggregate-response-list-in",
-            new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
+        final MuleMessage result = muleContext.getClient().send("vm://split-aggregate-response-list-in",
+                                                                new DefaultMuleMessage(fruitBowl.getFruit(),
+                                                                                       muleContext));
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertTrue(result.getPayload() instanceof List);
+        final List<MuleMessage> coll = (List<MuleMessage>) result.getPayload();
         assertEquals(3, coll.size());
-        final List<?> results = (List<?>) coll.getPayload();
-        assertEquals(3, results.size());
+        final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
 
         assertTrue(apple.isBitten());
         assertTrue(banana.isBitten());
@@ -291,15 +292,15 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         final FruitBowl fruitBowl = new FruitBowl();
         fruitBowl.addFruit(apple);
 
-        final MuleMessage result  = muleContext.getClient().send("vm://split-aggregate-response-singleton-list-in",
-            new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
+        final MuleMessage result = muleContext.getClient().send("vm://split-aggregate-response-singleton-list-in",
+                                                                new DefaultMuleMessage(fruitBowl.getFruit(),
+                                                                                       muleContext));
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertTrue(result.getPayload() instanceof List);
+        final List<MuleMessage> coll = (List<MuleMessage>) result.getPayload();
         assertEquals(1, coll.size());
-        final List<?> results = (List<?>) coll.getPayload();
-        assertEquals(1, results.size());
+        final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
 
         assertTrue(apple.isBitten());
         assertTrue(results.contains(apple));
@@ -316,14 +317,14 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         map.put("banana", banana);
         map.put("orange", orange);
 
-        MuleEvent result = ((Flow) muleContext.getRegistry().lookupFlowConstruct("split-map")).process(getTestEvent(map));
+        MuleEvent result = ((Flow) muleContext.getRegistry().lookupFlowConstruct("split-map")).process(getTestEvent
+                                                                                                               (map));
 
         assertNotNull(result);
-        assertTrue(result.getMessage() instanceof MuleMessageCollection);
-
-        final MuleMessageCollection coll = (MuleMessageCollection) result.getMessage();
-        assertEquals(3, coll.size());
-        final MuleMessage[] results = coll.getMessagesAsArray();
+        assertTrue(result.getMessage().getPayload() instanceof List);
+        final MuleMessage[] results = new MuleMessage[3];
+        ((List<MuleMessage>) result.getMessage().getPayload()).toArray(results);
+        assertEquals(3, results.length);
 
         assertTrue(apple.isBitten());
         assertTrue(banana.isBitten());
@@ -344,16 +345,16 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         fruitBowl.addFruit(orange);
 
         muleContext.getClient().send("vm://split-filter-aggregate-in",
-            new DefaultMuleMessage(fruitBowl, muleContext));
+                                     new DefaultMuleMessage(fruitBowl, muleContext));
 
         final MuleMessage result = muleContext.getClient().request("vm://split-filter-aggregate-out",
-            RECEIVE_TIMEOUT);
+                                                                   RECEIVE_TIMEOUT);
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertTrue(result.getPayload() instanceof List);
+        final List<MuleMessage> coll = (List<MuleMessage>) result.getPayload();
         assertEquals(1, coll.size());
-        final List<?> results = (List<?>) coll.getPayload();
+        final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
 
         assertTrue(results.contains(apple));
         assertFalse(results.contains(banana));
@@ -370,10 +371,10 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         }
 
         muleContext.getClient().send("vm://message-chunk-split-aggregate-in",
-            new DefaultMuleMessage(payload, muleContext));
+                                     new DefaultMuleMessage(payload, muleContext));
 
         final MuleMessage result = muleContext.getClient().request("vm://message-chunk-split-aggregate-out",
-            RECEIVE_TIMEOUT);
+                                                                   RECEIVE_TIMEOUT);
 
         assertNotNull(result);
         assertNotSame(payload, result.getPayload());
@@ -384,7 +385,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testComponentsFlow() throws Exception
     {
         final MuleMessage result = muleContext.getClient().send("vm://components",
-            new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+                                                                new DefaultMuleMessage(TEST_MESSAGE, muleContext));
 
         assertNotNull(result);
         assertNotSame(TEST_MESSAGE + "test", result.getPayload());
@@ -409,7 +410,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testResponseElement() throws Exception
     {
         final MuleMessage result = muleContext.getClient().send("vm://response",
-            new DefaultMuleMessage("", muleContext));
+                                                                new DefaultMuleMessage("", muleContext));
 
         assertNotNull(result);
         assertEquals("abcdefghi", getPayloadAsString(result));
@@ -421,7 +422,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         muleContext.getClient().send("vm://async-oneway-in", new DefaultMuleMessage("0", muleContext));
         final MuleMessage result = muleContext.getClient().request("vm://async-oneway-out", RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-oneway-out",
-            RECEIVE_TIMEOUT);
+                                                                        RECEIVE_TIMEOUT);
 
         assertNotNull(result);
         assertNotNull(asyncResult);
@@ -434,9 +435,9 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         muleContext.getClient().send("vm://async-seda-oneway-in", new DefaultMuleMessage("0", muleContext));
         final MuleMessage result = muleContext.getClient().request("vm://async-seda-oneway-out",
-            RECEIVE_TIMEOUT);
+                                                                   RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-seda-oneway-out",
-            RECEIVE_TIMEOUT);
+                                                                        RECEIVE_TIMEOUT);
 
         assertNotNull(result);
         assertNotNull(asyncResult);
@@ -448,11 +449,11 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testAsyncRequestResponseEndpoint() throws Exception
     {
         muleContext.getClient().send("vm://async-requestresponse-in",
-            new DefaultMuleMessage("0", muleContext));
+                                     new DefaultMuleMessage("0", muleContext));
         final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out",
-            RECEIVE_TIMEOUT);
+                                                                   RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = muleContext.getClient().request(
-            "vm://async-async-requestresponse-out", RECEIVE_TIMEOUT);
+                "vm://async-async-requestresponse-out", RECEIVE_TIMEOUT);
 
         assertNotNull(result);
         assertNotNull(asyncResult);
@@ -464,15 +465,15 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testAsyncTransactionalEndpoint() throws Exception
     {
         MuleMessage message = muleContext.getClient().send("vm://async-tx-in",
-            new DefaultMuleMessage("0", muleContext));
+                                                           new DefaultMuleMessage("0", muleContext));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(MessagingException.class, message.getExceptionPayload().getException().getClass());
 
         final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out",
-            RECEIVE_TIMEOUT);
+                                                                   RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-oneway-out",
-            RECEIVE_TIMEOUT);
+                                                                        RECEIVE_TIMEOUT);
 
         assertNull(result);
         assertNull(asyncResult);
@@ -490,14 +491,14 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testTransactionalRollback() throws Exception
     {
         muleContext.getClient().dispatch("vm://transactional-rollback-in",
-            new DefaultMuleMessage("", muleContext));
+                                         new DefaultMuleMessage("", muleContext));
     }
 
     @Test
     public void testMulticaster() throws Exception
     {
         muleContext.getClient()
-            .send("vm://multicaster-in", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+                .send("vm://multicaster-in", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
 
         final MuleMessage result1 = muleContext.getClient().request("vm://multicaster-out1", RECEIVE_TIMEOUT);
         final MuleMessage result2 = muleContext.getClient().request("vm://multicaster-out2", RECEIVE_TIMEOUT);
@@ -520,14 +521,14 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testRecipientList() throws Exception
     {
         muleContext.getClient().send("vm://recipient-list-in",
-            new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+                                     new DefaultMuleMessage(TEST_MESSAGE, muleContext));
 
         final MuleMessage result1 = muleContext.getClient().request("vm://recipient-list-out1",
-            RECEIVE_TIMEOUT);
+                                                                    RECEIVE_TIMEOUT);
         final MuleMessage result2 = muleContext.getClient().request("vm://recipient-list-out2",
-            RECEIVE_TIMEOUT);
+                                                                    RECEIVE_TIMEOUT);
         final MuleMessage result3 = muleContext.getClient().request("vm://recipient-list-out3",
-            RECEIVE_TIMEOUT);
+                                                                    RECEIVE_TIMEOUT);
 
         assertNotNull(result1);
         assertNotNull(result2);
@@ -546,30 +547,30 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testChoiceWithoutOutboundEndpoints() throws Exception
     {
         assertEquals("foo Hello foo",
-            getPayloadAsString(muleContext.getClient()
-                .send("vm://choice2-in", new DefaultMuleMessage("foo", muleContext))));
+                     getPayloadAsString(muleContext.getClient()
+                                                .send("vm://choice2-in", new DefaultMuleMessage("foo", muleContext))));
         assertEquals("bar Hello bar",
-            getPayloadAsString(muleContext.getClient()
-                .send("vm://choice2-in", new DefaultMuleMessage("bar", muleContext))));
+                     getPayloadAsString(muleContext.getClient()
+                                                .send("vm://choice2-in", new DefaultMuleMessage("bar", muleContext))));
         assertEquals("egh Hello ?",
-            getPayloadAsString(muleContext.getClient()
-                .send("vm://choice2-in", new DefaultMuleMessage("egh", muleContext))));
+                     getPayloadAsString(muleContext.getClient()
+                                                .send("vm://choice2-in", new DefaultMuleMessage("egh", muleContext))));
     }
 
     @Test
     public void testFlowRef() throws Exception
     {
         assertEquals("012xyzabc312xyzabc3",
-            getPayloadAsString(muleContext.getClient()
-                .send("vm://flow-ref-in", new DefaultMuleMessage("0", muleContext))));
+                     getPayloadAsString(muleContext.getClient()
+                                                .send("vm://flow-ref-in", new DefaultMuleMessage("0", muleContext))));
     }
 
     @Test
     public void testInvoke() throws Exception
     {
         assertEquals("0recieved",
-            getPayloadAsString(muleContext.getClient()
-                .send("vm://invoke-in", new DefaultMuleMessage("0", muleContext))));
+                     getPayloadAsString(muleContext.getClient()
+                                                .send("vm://invoke-in", new DefaultMuleMessage("0", muleContext))));
     }
 
     @Test
@@ -578,7 +579,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
         message.setOutboundProperty("one", "header1val");
         assertEquals("header1valrecieved", getPayloadAsString(muleContext.getClient()
-            .send("vm://invoke2-in", message)));
+                                                                      .send("vm://invoke2-in", message)));
     }
 
     @Test
@@ -600,10 +601,10 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
         assertEquals(
-            "0Hello",
-            muleContext.getClient()
-                .send("vm://enrich-in", message)
-                .getProperty("helloHeader", PropertyScope.INBOUND));
+                "0Hello",
+                muleContext.getClient()
+                        .send("vm://enrich-in", message)
+                        .getProperty("helloHeader", PropertyScope.INBOUND));
     }
 
     @Test
@@ -653,6 +654,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     public static class Pojo
     {
+
         public void method()
         {
             // does nothing
@@ -669,7 +671,8 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleMessage result = muleContext.getClient().send("vm://customRouter-in", message);
-        assertEquals("[a, b, c]", result.getPayload().toString());
+        assertEquals("abc", ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (String) msg.getPayload())
+                .collect(joining()));
     }
 
     @Test
@@ -692,7 +695,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testSubFlowMessageFilter() throws Exception
     {
         muleContext.getClient().dispatch("vm://messagefiltersubflow-in",
-            new DefaultMuleMessage("0", muleContext));
+                                         new DefaultMuleMessage("0", muleContext));
         MuleMessage message = muleContext.getClient().request("vm://messagefiltersubflow-out", 5000);
         assertNotNull(message);
     }
@@ -718,13 +721,14 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals("abcd", result.getMessageAsString());
     }
 
-    
+
     public static class TestMessageSource implements MessageSource
     {
+
         private MessageProcessor listener;
         private String appendBefore;
         private String appendAfter;
-       
+
         MuleEvent fireEvent(MuleEvent event) throws MuleException
         {
             Transformer before = new StringAppendTransformer(appendBefore);
@@ -754,6 +758,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     public static class ThreadSensingMessageProcessor implements MessageProcessor
     {
+
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {

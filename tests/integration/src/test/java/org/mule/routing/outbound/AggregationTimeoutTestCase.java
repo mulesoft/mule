@@ -7,6 +7,7 @@
 
 package org.mule.routing.outbound;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
@@ -50,9 +51,10 @@ public class AggregationTimeoutTestCase extends FunctionalTestCase
             MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
             assertThat(response.getPayload(), instanceOf(List.class));
 
-            List<String> payload = (List) response.getPayload();
-            assertThat(payload.size(), equalTo(1));
-            assertThat(payload, hasItem(PROCESSED_EVENT));
+            List<String> payloads = ((List<MuleMessage>) response.getPayload()).stream().map(m -> (String) m
+                    .getPayload()).collect(toList());
+            assertThat(payloads.size(), equalTo(1));
+            assertThat(payloads, hasItem(PROCESSED_EVENT));
         }
         finally
         {

@@ -9,14 +9,13 @@ package org.mule.test.integration.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -56,13 +55,13 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://distributor.queue", message, null);
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
+        assertTrue(result.getPayload() instanceof List);
 
-        MuleMessageCollection mc = (MuleMessageCollection)result;
-        assertEquals(2, mc.size());
-        for (int i = 0; i < mc.getMessagesAsArray().length; i++)
+        List<MuleMessage> results = (List<MuleMessage>) result.getPayload();
+        assertEquals(2, results.size());
+        for (int i = 0; i < results.size(); i++)
         {
-            MuleMessage msg = mc.getMessagesAsArray()[i];
+            MuleMessage msg = results.get(i);
             assertEquals("test Received", msg.getPayload());
         }
 
