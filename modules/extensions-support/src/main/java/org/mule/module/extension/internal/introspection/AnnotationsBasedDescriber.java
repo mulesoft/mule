@@ -17,6 +17,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
@@ -167,6 +168,10 @@ public final class AnnotationsBasedDescriber implements Describer
         List<ParameterGroup> groups = new LinkedList<>();
         for (Field field : getParameterGroupFields(annotatedType))
         {
+            if (field.isAnnotationPresent(Optional.class))
+            {
+                throw new IllegalModelDefinitionException(String.format("@%s can not be applied along with @%s", Optional.class.getSimpleName(), org.mule.extension.annotation.api.ParameterGroup.class.getSimpleName()));
+            }
             Set<ParameterDescriptor> parameters = declareSingleParameters(field.getType(), with);
 
             if (!parameters.isEmpty())

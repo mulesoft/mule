@@ -25,6 +25,7 @@ import static org.mule.module.extension.HeisenbergExtension.NAMESPACE;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_LOCATION;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
 import static org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
+
 import org.mule.config.MuleManifest;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
@@ -32,8 +33,11 @@ import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.connector.Providers;
+import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
@@ -42,6 +46,8 @@ import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.module.extension.ExtendedPersonalInfo;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergConnection;
 import org.mule.module.extension.HeisenbergConnectionProvider;
@@ -122,7 +128,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Test
     public void heisenbergPointerPlusExternalConfig() throws Exception
     {
-        setDescriber(describerFor(HeisengergPointerPlusExternalConfig.class));
+        setDescriber(describerFor(HeisenbergPointerPlusExternalConfig.class));
         Declaration declaration = getDescriber().describe(new DefaultDescribingContext()).getRootDeclaration().getDeclaration();
 
         assertExtensionProperties(declaration);
@@ -139,6 +145,12 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     public void heisenbergWithOperationsConfig() throws Exception
     {
         describerFor(HeisenbergWithOperations.class).describe(new DefaultDescribingContext());
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void heisenbergWithParameterGroupAsOptional() throws Exception
+    {
+        describerFor(HeisenbergWithParameterGroupAsOptional.class).describe(new DefaultDescribingContext());
     }
 
     private void assertTestModuleConfiguration(Declaration declaration) throws Exception
@@ -318,7 +330,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
     @Configurations({HeisenbergExtension.class, NamedHeisenbergAlternateConfig.class})
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
-    public static class HeisengergPointerPlusExternalConfig
+    public static class HeisenbergPointerPlusExternalConfig
     {
 
     }
@@ -327,6 +339,16 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     public static class NamedHeisenbergAlternateConfig extends HeisenbergAlternateConfig
     {
+
+    }
+
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    public static class HeisenbergWithParameterGroupAsOptional extends HeisenbergExtension
+    {
+
+        @ParameterGroup
+        @Optional
+        private ExtendedPersonalInfo personalInfo;
 
     }
 
