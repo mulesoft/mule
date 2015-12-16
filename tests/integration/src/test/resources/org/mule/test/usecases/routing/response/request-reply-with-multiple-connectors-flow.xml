@@ -13,6 +13,7 @@
 
     <vm:connector name="default"/>
     <vm:connector name="alternate"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
     <flow name="main">
         <vm:inbound-endpoint path="input" connector-ref="default"/>
@@ -31,7 +32,7 @@
     <flow name="request-reply">
         <composite-source>
             <vm:inbound-endpoint path="request" connector-ref="default"/>
-            <http:inbound-endpoint path="requestHttp" host="localhost" port="8080" />
+            <http:listener path="requestHttp" config-ref="listenerConfig"/>
         </composite-source>
         <test:component appendString="-and-back-in"/>
     </flow>

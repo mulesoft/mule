@@ -14,23 +14,14 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
     <flow name="Echo">
-        
-            <inbound-endpoint
-                address="http://localhost:${port1}/services/EchoUMO"
-                exchange-pattern="request-response">
-                <cxf:simple-service
-                    serviceClass="org.mule.api.component.simple.EchoService" />
-            </inbound-endpoint>
-            <wire-tap>
-                <vm:outbound-endpoint path="ToTapper"
-                    exchange-pattern="one-way" />
-            </wire-tap>
-        
+        <http:listener path="/services/EchoUMO" config-ref="listenerConfig"/>
+        <cxf:simple-service serviceClass="org.mule.api.component.simple.EchoService" />
+        <wire-tap>
+            <vm:outbound-endpoint path="ToTapper" exchange-pattern="one-way" />
+        </wire-tap>
         <echo-component />
     </flow>
 

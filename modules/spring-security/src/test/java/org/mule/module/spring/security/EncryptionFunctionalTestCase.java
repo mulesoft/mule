@@ -23,9 +23,11 @@ import org.mule.transport.http.HttpConstants;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("See MULE-9202")
 public class EncryptionFunctionalTestCase extends FunctionalTestCase
 {
 

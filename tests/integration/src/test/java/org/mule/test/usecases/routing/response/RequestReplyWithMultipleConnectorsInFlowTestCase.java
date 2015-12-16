@@ -6,10 +6,17 @@
  */
 package org.mule.test.usecases.routing.response;
 
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+
 public class RequestReplyWithMultipleConnectorsInFlowTestCase extends RequestReplyInFlowTestCase
 {
 
     private static final String CONNECTOR_REF_ATTRIBUTE = "?connector=default";
+
+    @Rule
+    public DynamicPort port = new DynamicPort("port1");
 
     @Override
     protected String getConfigFile()

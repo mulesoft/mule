@@ -11,9 +11,11 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.StringUtils;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("See MULE-9199")
 public class HttpUtilEchoTestCase extends FunctionalTestCase
 {
 

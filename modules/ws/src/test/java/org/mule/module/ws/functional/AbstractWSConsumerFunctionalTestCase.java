@@ -24,11 +24,9 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
 {
 
-    public static final String USE_TRANSPORT_FOR_URIS = "useTransportForUris";
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
 
@@ -38,28 +36,6 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
     protected static final String EXPECTED_ECHO_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                                                            "<ns2:echoResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
                                                            "<text>Hello</text></ns2:echoResponse>";
-
-
-    @Parameterized.Parameter(value = 0)
-    public boolean useTransportForUris;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[] {true}, new Object[] {false});
-    }
-
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        System.setProperty(USE_TRANSPORT_FOR_URIS, Boolean.toString(useTransportForUris));
-    }
-
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        System.clearProperty(USE_TRANSPORT_FOR_URIS);
-    }
 
 
     protected void assertValidResponse(String address) throws Exception

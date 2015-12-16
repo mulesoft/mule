@@ -9,8 +9,10 @@
             http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}" usePersistentConnections="false"/>
+
     <flow name="26384076-3877-4b23-809d-14b7fd22535f">
-        <http:inbound-endpoint host="localhost" port="${port1}" path="test" keep-alive="false"/>
+        <http:listener config-ref="listenerConfig" path="test" />
         <component class="org.mule.cxf.weatherservice.mycode.CreateZipQuery"/>
         <cxf:jaxws-client clientClass="org.mule.cxf.weatherservice.myweather.Weather" port="WeatherSoap"
                           operation="GetCityWeatherByZIP"/>

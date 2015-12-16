@@ -16,15 +16,17 @@
 
     <configuration defaultResponseTimeout="100"/>
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
+
     <!-- HTTP OutboundEndpoint timeout -->
     <flow name="HttpTimeout">
         <vm:inbound-endpoint path="httpTimeout" exchange-pattern="request-response"/>
-        <http:outbound-endpoint address="http://localhost:${port1}/service"
-                                exchange-pattern="request-response" responseTimeout="100"/>
+        <http:request config-ref="requestConfig" path="service" responseTimeout="100"/>
     </flow>
 
     <flow name="HttpService">
-        <http:inbound-endpoint address="http://localhost:${port1}/service" exchange-pattern="request-response"/>
+        <http:listener config-ref="listenerConfig" path="service" />
         <test:component waitTime="200" appendString=" processed"/>
     </flow>
 

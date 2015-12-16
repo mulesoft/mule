@@ -22,11 +22,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@Ignore("See MULE-9199")
 @RunWith(Parameterized.class)
 public class HttpUtilTestCase extends FunctionalTestCase
 {

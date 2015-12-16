@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
 {
     public static final String ERROR_MESSAGE = "Changos!!!";
@@ -44,22 +43,10 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter
-    public String configFile;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"unwraps-component-exception-config.xml"},
-                {"unwraps-component-exception-config-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "unwraps-component-exception-config-httpn.xml";
     }
 
     @Test

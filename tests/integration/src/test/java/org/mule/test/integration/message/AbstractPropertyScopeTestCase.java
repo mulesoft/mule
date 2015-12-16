@@ -7,6 +7,8 @@
 package org.mule.test.integration.message;
 
 import static org.junit.Assert.assertEquals;
+
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -27,8 +29,13 @@ public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
         MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "fooValue");
 
-        MuleMessage result = client.send("inbound", message);
+        MuleMessage result = sendRequest(client, message);
         assertEquals("test bar", getPayloadAsString(result));
         assertEquals("fooValue", result.<Object> getInboundProperty("foo"));
+    }
+
+    protected MuleMessage sendRequest(LocalMuleClient client, MuleMessage message) throws MuleException
+    {
+        return client.send("inbound", message);
     }
 }

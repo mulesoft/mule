@@ -33,7 +33,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-@RunWith(Parameterized.class)
 public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
 {
 
@@ -45,22 +44,10 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
     private static final String SINGLE_PORT = "StockQuoteSoap";
     private static final String SERVICE_LOCATION = "http://www.webservicex.net/stockquote.asmx";
 
-    @Parameter
-    public String configFile;
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"proxy-wsdl-rewrite-address-conf.xml"},
-                {"proxy-wsdl-rewrite-address-conf-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "proxy-wsdl-rewrite-address-conf-httpn.xml";
     }
 
     @Test

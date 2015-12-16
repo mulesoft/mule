@@ -55,39 +55,30 @@
             name="daoAuthenticationSecurityProvider1" delegate-ref="authenticationManager1" />
     </mule-ss:security-manager>
 
+    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
+    <http:listener-config name="listenerConfig3" host="localhost" port="${port3}"/>
+
 
     <flow name="flow">
-
-        <http:inbound-endpoint address="http://localhost:${port1}"
-            exchange-pattern="request-response">
-            <mule-ss:http-security-filter
+        <http:listener config-ref="listenerConfig1" path="*"/>
+        <mule-ss:http-security-filter
                 realm="mule-realm" securityProviders="daoAuthenticationSecurityProvider1" />
-        </http:inbound-endpoint>
-
         <echo-component />
-
     </flow>
 
     <flow name="flow2">
-
-        <http:inbound-endpoint address="http://localhost:${port2}"
-            exchange-pattern="request-response">
-            <mule-ss:http-security-filter
+        <http:listener config-ref="listenerConfig2" path="*"/>
+        <mule-ss:http-security-filter
                 realm="mule-realm" securityProviders="daoAuthenticationSecurityProvider2" />
-        </http:inbound-endpoint>
-
         <echo-component />
     </flow>
 
     <flow name="flow3">
-
-        <http:inbound-endpoint address="http://localhost:${port3}"
-            exchange-pattern="request-response">
-            <mule-ss:http-security-filter
-                realm="mule-realm"
-                securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1" />
-        </http:inbound-endpoint>
-
+        <http:listener config-ref="listenerConfig3" path="*"/>
+        <mule-ss:http-security-filter
+            realm="mule-realm"
+            securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1" />
         <echo-component />
     </flow>
 

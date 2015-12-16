@@ -27,28 +27,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class WsCustomValidatorTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter
-    public String configFile;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"org/mule/module/cxf/wssec/ws-custom-validator-config.xml"},
-                {"org/mule/module/cxf/wssec/ws-custom-validator-config-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "org/mule/module/cxf/wssec/ws-custom-validator-config-httpn.xml";
     }
 
     @Test

@@ -27,48 +27,28 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
 {
-
-    private final String domainConfig;
-    private final String appConfig;
-    private final Class expectedExceptionType;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
     @Rule
     public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
 
-    public HttpSharePortSamePathTestCase(String domainConfig, String appConfig, Class expectedExceptionType)
-    {
-        this.domainConfig = domainConfig;
-        this.appConfig = appConfig;
-        this.expectedExceptionType = expectedExceptionType;
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"domain/http/transport/http-shared-connector.xml", "domain/http/transport/http-hello-mule-app.xml", ConnectorException.class},
-                {"domain/http/http-shared-listener-config.xml", "domain/http/http-hello-mule-app.xml", InitialisationException.class}});
-    }
-
     @Test
     public void samePathDefinedInTwoAppsWithinSameDomain() throws Exception
     {
-        MuleContext domainContext = new DomainContextBuilder().setDomainConfig(domainConfig).build();
-        MuleContext firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {appConfig}).setDomainContext(domainContext).build();
+        MuleContext domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-listener-config.xml").build();
+        MuleContext firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
         ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
         try
         {
-            secondApp.setApplicationResources(new String[] {appConfig}).setDomainContext(domainContext).build();
+            secondApp.setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
             fail("Second app context start should fail");
         }
         catch (Exception e)
         {
-            assertThat(e.getCause(), IsInstanceOf.instanceOf(expectedExceptionType));
+            assertThat(e.getCause(), IsInstanceOf.instanceOf(InitialisationException.class));
         }
         firstAppContext.dispose();
     }

@@ -16,9 +16,11 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.HashMap;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("See MULE-9200")
 public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdownTimeoutRequestResponseTestCase
 {
     @Rule

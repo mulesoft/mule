@@ -13,8 +13,10 @@
 
     <jms:activemq-connector name="activemqConnector"/>
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+
     <flow name="StreamTestService">
-        <inbound-endpoint address="http://localhost:${port1}/services" exchange-pattern="request-response"/>
+        <http:listener path="/services" config-ref="listenerConfig"/>
         <jms:outbound-endpoint queue="queue" exchange-pattern="one-way"/>
     </flow>
 

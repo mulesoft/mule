@@ -16,9 +16,7 @@
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="${useTransportForUris}"/>
-    </configuration>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
     <tls:context name="tlsContext">
         <tls:trust-store path="ssltest-cacerts.jks" password="changeit" type="jks" />
@@ -58,32 +56,30 @@
 
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Test"
-                          exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
-                <cxf:inInterceptors>
-                    <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-                        <spring:constructor-arg>
-                            <spring:map>
-                                <spring:entry key="action" value="Encrypt" />
-                                <spring:entry key="passwordCallbackClass" value="org.mule.module.ws.functional.EncryptSecurityFunctionalTestCase$ServerPasswordCallback" />
-                                <spring:entry key="decryptionPropRefId" value="securityProperties" />
-                                <spring:entry key="securityProperties">
-                                    <spring:props>
-                                        <spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin</spring:prop>
-                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
-                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.password">changeit</spring:prop>
-                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.private.password">changeit</spring:prop>
-                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.alias">s1as</spring:prop>
-                                        <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.file">ssltest-keystore.jks</spring:prop>
-                                    </spring:props>
-                                </spring:entry>
-                            </spring:map>
-                        </spring:constructor-arg>
-                    </spring:bean>
-                </cxf:inInterceptors>
-            </cxf:jaxws-service>
-        </inbound-endpoint>
+        <http:listener path="/services/Test" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+            <cxf:inInterceptors>
+                <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                    <spring:constructor-arg>
+                        <spring:map>
+                            <spring:entry key="action" value="Encrypt" />
+                            <spring:entry key="passwordCallbackClass" value="org.mule.module.ws.functional.EncryptSecurityFunctionalTestCase$ServerPasswordCallback" />
+                            <spring:entry key="decryptionPropRefId" value="securityProperties" />
+                            <spring:entry key="securityProperties">
+                                <spring:props>
+                                    <spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.password">changeit</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.private.password">changeit</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.alias">s1as</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.file">ssltest-keystore.jks</spring:prop>
+                                </spring:props>
+                            </spring:entry>
+                        </spring:map>
+                    </spring:constructor-arg>
+                </spring:bean>
+            </cxf:inInterceptors>
+        </cxf:jaxws-service>
         <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 

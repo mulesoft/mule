@@ -31,14 +31,6 @@
 
     <custom-transformer class="org.mule.tck.functional.StringAppendTestTransformer" name="StringAppendTestTransformer"/>
 
-    <flow name="CxfSync">
-        <inbound-endpoint address="http://localhost:${port1}/services/CxfSync"
-                          exchange-pattern="request-response" responseTransformer-refs="customResponse">
-            <cxf:simple-service serviceClass="org.mule.api.component.simple.EchoService"/>
-        </inbound-endpoint>
-        <echo-component/>
-    </flow>
-
     <flow name="VmSync">
         <inbound-endpoint address="vm://sync" exchange-pattern="request-response"/>
         <echo-component/>
@@ -47,17 +39,6 @@
     <flow name="VmSyncResponseTransformer">
         <inbound-endpoint address="vm://syncResponseTransformer" exchange-pattern="request-response"
                           responseTransformer-refs="customResponse" disableTransportTransformer="true"/>
-        <echo-component/>
-    </flow>
-
-    <flow name="HttpSync">
-        <inbound-endpoint address="http://localhost:${port2}" exchange-pattern="request-response"/>
-        <echo-component/>
-    </flow>
-
-    <flow name="HttpSyncResponseTransformer">
-        <inbound-endpoint address="http://localhost:${port3}" exchange-pattern="request-response"
-                          responseTransformer-refs="customResponse"/>
         <echo-component/>
     </flow>
 

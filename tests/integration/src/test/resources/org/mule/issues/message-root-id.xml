@@ -10,6 +10,8 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
 
     <flow name="flow1">
         <vm:inbound-endpoint path="vmin" exchange-pattern="request-response">
@@ -25,7 +27,7 @@
         </message-properties-transformer>
         <custom-transformer class="org.mule.issues.MessageRootIdPropagationTestCase$RootIDGatherer"/>
         <vm:outbound-endpoint path="vmout" exchange-pattern="one-way"/>
-        <http:outbound-endpoint address="http://localhost:${port1}/foo"/>
+        <http:request method="POST" path="foo" config-ref="requestConfig"/>
     </flow>
 
     <flow name="flow2">
@@ -40,14 +42,13 @@
     </flow>
 
     <flow name="flow3">
-        <http:inbound-endpoint  address="http://localhost:${port1}/foo">
-            <response>
-                <message-properties-transformer>
-                    <add-message-property key="where" value="flow3-response"/>
-                </message-properties-transformer>
-                <custom-transformer class="org.mule.issues.MessageRootIdPropagationTestCase$RootIDGatherer"/>
-            </response>
-        </http:inbound-endpoint>
+        <http:listener path="foo" config-ref="listenerConfig"/>
+        <response>
+            <message-properties-transformer>
+                <add-message-property key="where" value="flow3-response"/>
+            </message-properties-transformer>
+            <custom-transformer class="org.mule.issues.MessageRootIdPropagationTestCase$RootIDGatherer"/>
+        </response>
         <message-properties-transformer>
             <add-message-property key="where" value="flow3-request"/>
         </message-properties-transformer>

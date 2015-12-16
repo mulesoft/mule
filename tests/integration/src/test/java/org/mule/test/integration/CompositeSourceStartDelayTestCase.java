@@ -94,7 +94,7 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
                 int statusCode = httpClient.executeMethod(method);
                 String response = method.getResponseBodyAsString();
 
-                return 200 == statusCode && "/Processed".equals(response);
+                return 200 == statusCode && "Processed".equals(response);
             }
             catch (Exception e)
             {

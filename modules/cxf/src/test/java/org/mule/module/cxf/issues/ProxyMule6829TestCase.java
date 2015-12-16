@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ProxyMule6829TestCase extends FunctionalTestCase
 {
 
@@ -41,22 +40,10 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter
-    public String configFile;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"proxy-mule-6829.xml"},
-                {"proxy-mule-6829-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "proxy-mule-6829-httpn.xml";
     }
 
     private static class TestCxfEventCallback implements EventCallback

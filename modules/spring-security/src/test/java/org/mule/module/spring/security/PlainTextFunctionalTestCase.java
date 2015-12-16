@@ -17,9 +17,11 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("See MULE-9202")
 public class PlainTextFunctionalTestCase extends FunctionalTestCase
 {
 

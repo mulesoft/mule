@@ -27,32 +27,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class AuthorizationFilterTestCase extends FunctionalTestCase
 {
 
-    private final String configFile;
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-
-    public AuthorizationFilterTestCase(String configFile)
-    {
-        this.configFile = configFile;
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"http-transport-filter-test.xml"},
-                {"http-module-filter-test.xml"}
-        });
-    }
 
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "http-module-filter-test.xml";
     }
 
     @Test

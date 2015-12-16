@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ProxyValidationComparisonTestCase extends FunctionalTestCase
 {
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
@@ -40,22 +39,10 @@ public class ProxyValidationComparisonTestCase extends FunctionalTestCase
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter
-    public String configFile;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"proxy-validation-comparison-config.xml"},
-                {"proxy-validation-comparison-config-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "proxy-validation-comparison-config-httpn.xml";
     }
 
     @Test

@@ -12,8 +12,10 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Test"/>
+        <http:listener path="/services/Test" config-ref="listenerConfig"/>
         <test:component />
     </flow>
 

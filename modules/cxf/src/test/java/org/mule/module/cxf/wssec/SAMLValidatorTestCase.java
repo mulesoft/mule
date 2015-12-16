@@ -31,28 +31,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class SAMLValidatorTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameter
-    public String configFile;
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"org/mule/module/cxf/wssec/saml-validator-conf.xml"},
-                {"org/mule/module/cxf/wssec/saml-validator-conf-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "org/mule/module/cxf/wssec/saml-validator-conf-httpn.xml";
     }
 
     @Test

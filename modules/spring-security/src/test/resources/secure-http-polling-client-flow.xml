@@ -10,31 +10,34 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-    <http:polling-connector name="PollingHttpConnector"
-        pollingFrequency="2000" />
-
     <vm:connector name="vmQueue" />
+
+    <http:request-config name="secureRequestConfig" host="localhost" port="${port1}">
+        <http:basic-authentication username="marie" password="marie" preemptive="true"/>
+    </http:request-config>
+
+    <http:request-config name="requestConfig" host="localhost" port="${port1}">
+        <http:basic-authentication username="dodgy" password="geezer" preemptive="true"/>
+    </http:request-config>
 
     <!-- This uses the polling HTTP connector every 30 seconds -->
 
     <flow name="pollingUMO_authenticated">
-
-        <inbound-endpoint address="http://marie:marie@localhost:${port1}"
-            connector-ref="PollingHttpConnector" exchange-pattern="request-response" />
-
-
-
+        <poll frequency="2000">
+            <http:request path="/" config-ref="secureRequestConfig">
+                <http:success-status-code-validator values="0..599"/>
+            </http:request>
+        </poll>
         <outbound-endpoint address="vm://toclient"
             exchange-pattern="one-way" />
-
     </flow>
 
     <flow name="pollingUMO_not_authenticated">
-
-        <inbound-endpoint address="http://dodgy:geezer@localhost:${port1}"
-            connector-ref="PollingHttpConnector" exchange-pattern="request-response" />
-
-
+        <poll frequency="2000">
+            <http:request path="/" config-ref="requestConfig">
+                <http:success-status-code-validator values="0..599"/>
+            </http:request>
+        </poll>
         <message-properties-transformer scope="outbound">
             <add-message-property key="http.status" value="#[header:INBOUND:http.status]" />
         </message-properties-transformer>

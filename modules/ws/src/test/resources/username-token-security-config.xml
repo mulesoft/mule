@@ -12,9 +12,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="${useTransportForUris}"/>
-    </configuration>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
     <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
                         service="TestService" port="TestPort" name="configValidCredentialsText">
@@ -80,12 +78,10 @@
 
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Test"
-                          exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
-                <cxf:ws-security ref="inboundConfig"/>
-            </cxf:jaxws-service>
-        </inbound-endpoint>
+        <http:listener path="/services/Test" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+            <cxf:ws-security ref="inboundConfig"/>
+        </cxf:jaxws-service>
         <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 

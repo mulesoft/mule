@@ -17,6 +17,8 @@
         <mule-ss:delegate-security-provider name="memory-dao-with-provider" delegate-ref="authenticationManager" 
             authenticationProvider-ref="authenticationProvider"  />
     </mule-ss:security-manager>
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
     
     <spring:beans>
         <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
@@ -33,10 +35,11 @@
     </spring:beans>
 
     <flow name="echo">
-        <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="one-way">
-            <mule-ss:http-security-filter realm="mule-realm"/>
-        </inbound-endpoint>
-        <component class="org.mule.component.simple.EchoComponent"/>
+        <http:listener path="*" config-ref="listenerConfig"/>
+        <mule-ss:http-security-filter realm="mule-realm"/>
+        <async>
+            <component class="org.mule.component.simple.EchoComponent"/>
+        </async>
     </flow>
     
 </mule>

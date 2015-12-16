@@ -14,14 +14,14 @@
 
     <spring:bean name="_muleEndpointFactory" class="org.mule.test.integration.CompositeSourceStartDelayTestCase$DelayedStartEndpointFactory"/>
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${httpPort}"/>
+
     <flow name="MainFlow">
         <composite-source>
-            <http:inbound-endpoint name="testInEndpoint" address="http://localhost:${httpPort}"
-                                   exchange-pattern="request-response"/>
+            <http:listener path="/" config-ref="listenerConfig"/>
             <vm:inbound-endpoint name="sleepingTestIn" address="vm://sleepingTestIn"
                                  exchange-pattern="request-response"/>
         </composite-source>
-
-        <test:component appendString="Processed"/>
+        <set-payload value="Processed"/>
     </flow>
 </mule>

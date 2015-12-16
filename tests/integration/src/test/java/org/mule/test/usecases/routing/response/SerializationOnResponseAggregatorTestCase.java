@@ -25,7 +25,7 @@ import java.io.Serializable;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
+public class SerializationOnResponseAggregatorTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");

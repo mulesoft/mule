@@ -9,6 +9,13 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <http:listener-config name="listenerConfig3" host="localhost" port="${port3}"/>
+    <http:request-config name="requestConfig3" host="localhost" port="${port3}"/>
+    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
+    <http:request-config name="requestConfig2" host="localhost" port="${port2}"/>
+    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig1" host="localhost" port="${port1}"/>
+
     <message-properties-transformer scope="invocation" name="addP1">
         <add-message-property key="P1" value="P1_VALUE" />
     </message-properties-transformer>
@@ -78,10 +85,10 @@
     <flow name="noPropagationInDifferentFlowHttp">
         <processor ref="addP1" />
         <test:assert expression="#[P1]" />
-        <http:outbound-endpoint address="http://localhost:${port2}" />
+        <http:request config-ref="requestConfig2" path="/"/>
     </flow>
     <flow name="noPropagationInDifferentFlowHttp-2">
-        <http:inbound-endpoint address="http://localhost:${port2}" />
+        <http:listener config-ref="listenerConfig2" path="/" />
         <test:assert expression="#[flowVars['P1'] == null]" />
     </flow>
 
@@ -105,11 +112,11 @@
 
     <flow name="HTTPRequestResponseEndpointFlowMidFlow">
         <processor ref="addP1" />
-        <http:outbound-endpoint address="http://localhost:${port1}" />
+        <http:request path="/" config-ref="requestConfig1" />
         <test:assert expression="#[P1]" />
     </flow>
     <flow name="HTPPEchoFlow">
-        <http:inbound-endpoint address="http://localhost:${port1}" />
+        <http:listener path="/" config-ref="listenerConfig1" />
         <echo-component />
     </flow>
 
@@ -389,11 +396,13 @@
     </flow>
 
     <sub-flow name="TestSubFlow">
-        <http:outbound-endpoint host="localhost" port="${port3}"/>
+        <http:request config-ref="requestConfig3" path="/" >
+            <http:success-status-code-validator values="0..599"/>
+        </http:request>
     </sub-flow>
 
     <flow name="TestSubFlowServer">
-        <http:inbound-endpoint host="localhost" port="${port3}"/>
+        <http:listener path="/" config-ref="listenerConfig3"/>
         <test:component throwException="true"/>
     </flow>
 

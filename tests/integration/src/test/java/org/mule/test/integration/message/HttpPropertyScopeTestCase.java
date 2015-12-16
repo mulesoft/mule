@@ -6,6 +6,14 @@
  */
 package org.mule.test.integration.message;
 
+import static java.lang.String.format;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.LocalMuleClient;
+
 public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
 
@@ -13,5 +21,10 @@ public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     protected String getConfigFile()
     {
         return "org/mule/test/message/http-property-scope.xml";
+    }
+
+    protected MuleMessage sendRequest(LocalMuleClient client, MuleMessage message) throws MuleException
+    {
+        return client.send(format("http://localhost:%s/foo", port1.getNumber()), message, newOptions().method(POST.name()).build());
     }
 }

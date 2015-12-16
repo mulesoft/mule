@@ -6,29 +6,20 @@
  */
 package org.mule.module.cxf;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeThat;
-import static org.junit.runners.Parameterized.Parameter;
-import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class DatabindingTestCase extends FunctionalTestCase
 {
 
@@ -38,29 +29,10 @@ public class DatabindingTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameter(0)
-    public String configFile;
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"databinding-conf.xml"},
-                {DATABINDING_CONF_HTTPN_XML}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
-    }
-
-    @Test
-    public void testEchoWsdl() throws Exception
-    {
-        assumeThat(configFile, is(not(equalTo(DATABINDING_CONF_HTTPN_XML)))); // New http module doesn't support urls like "cxf:*"
-        doTest("Echo");
+        return DATABINDING_CONF_HTTPN_XML;
     }
 
     @Test

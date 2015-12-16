@@ -18,6 +18,8 @@
 
     <jms:activemq-connector name="jmsConnectorNoRedelivery" maxRedelivery="0" />
 
+    <http:request-config name="requestConfig" host="localhost" port="${port7}"/>
+
     <flow name="LastMessageStateRouting">
         <jms:inbound-endpoint queue="in1" connector-ref="jmsConnector">
             <jms:transaction action="ALWAYS_BEGIN" />
@@ -106,7 +108,9 @@
 
     <flow name="StopFlowBasedOnExceptionType">
         <vm:inbound-endpoint path="in5" exchange-pattern="request-response"/>
-        <http:outbound-endpoint host="localhost" port="${port7}" responseTimeout="5"/>
+        <http:request path="/" responseTimeout="5" config-ref="requestConfig">
+            <!--<http:success-status-code-validator values="0..599"/>-->
+        </http:request>
         <default-exception-strategy>
             <choice>
                 <when evaluator="groovy" expression="payload.getException().getCause() instanceof java.net.ConnectException">
