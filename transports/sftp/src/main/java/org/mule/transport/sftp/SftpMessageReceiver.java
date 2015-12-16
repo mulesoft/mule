@@ -43,7 +43,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     private SftpReceiverRequesterUtil sftpRRUtil = null;
     private LockFactory lockFactory;
     private boolean poolOnPrimaryInstanceOnly;
-    protected AtomicBoolean connected = new AtomicBoolean(false);
+    private final AtomicBoolean connecting = new AtomicBoolean(false);
 
     public SftpMessageReceiver(SftpConnector connector,
                                FlowConstruct flow,
@@ -75,7 +75,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         }
         try
         {
-            if (!connected.get())
+            if (!connected.get() )
             {
                 if (logger.isDebugEnabled())
                 {
@@ -90,6 +90,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             }
             catch (Exception e)
             {
+                connected.set(false);
                 throw new ConnectException(e, this);
             }
 
@@ -252,7 +253,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     /**
      * SFTP-35
      */
-    @Override 
+    @Override
     protected MuleMessage handleUnacceptedFilter(MuleMessage message) {
         logger.debug("the filter said no, now trying to close the payload stream");
         try {
@@ -267,40 +268,50 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
     public void doConnect() throws Exception
     {
-        retryTemplate.execute(new RetryCallback()
+        if (!isConnected() || connecting.compareAndSet(false, true))
         {
-            @Override
-            public void doWork(RetryContext context) throws Exception
+            if (logger.isDebugEnabled())
             {
-                try
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Trying to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
-                    }
-                    sftpRRUtil.getAvailableFiles(false);
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Successfully connected/reconnected to SFTP server " + endpoint.getEndpointURI());
-                    }
-                    connected.set(true);
-                }
-                catch (Exception e)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Unable to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
-                    }
-                    throw new Exception("Fail to connect", e);
-                }
+                logger.debug("Connecting: " + this);
             }
+            retryTemplate.execute(new RetryCallback()
+            {
+                @Override
+                public void doWork(RetryContext context) throws Exception
+                {
+                    try
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Trying to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
+                        }
+                        sftpRRUtil.getAvailableFiles(false);
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Successfully connected/reconnected to SFTP server " + endpoint.getEndpointURI());
+                        }
+                        connected.set(true);
+                        connecting.set(false);
+                    }
+                    catch (Exception e)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Unable to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
+                        }
+                        throw new Exception("Fail to connect", e);
+                    }
+                }
 
-            @Override
-            public String getWorkDescription()
-            {
-                return "Trying to reconnect to SFTP server " + endpoint.getEndpointURI();
-            }
-        }, getConnector().getMuleContext().getWorkManager());
+                @Override
+                public String getWorkDescription()
+                {
+                    return "Trying to reconnect to SFTP server " + endpoint.getEndpointURI();
+                }
+
+            }, getConnector().getMuleContext().getWorkManager());
+        }
+
     }
 
     public void doDisconnect() throws Exception

@@ -268,7 +268,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     // TODO connect and disconnect are not part of lifecycle management right now
     private AtomicBoolean connected = new AtomicBoolean(false);
-    private AtomicBoolean connecting = new AtomicBoolean(false);
+    protected AtomicBoolean connecting = new AtomicBoolean(false);
 
     /**
      * Indicates whether the connector should start upon connecting. This is
@@ -1586,57 +1586,14 @@ public abstract class AbstractConnector implements Connector, WorkListener
                                     context.getLastFailure(), failed);
                         }
                     }
-                    doConnect();
-
-                    if (receivers != null)
-                    {
-                        for (MessageReceiver receiver : receivers.values())
-                        {
-                            final List<MuleException> errors = new ArrayList<MuleException>();
-                            try
-                            {
-                                if (logger.isDebugEnabled())
-                                {
-                                    logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
-                                }
-                                receiver.connect();
-                                if (isStarted())
-                                {
-                                    receiver.start();
-                                }
-                            }
-                            catch (MuleException e)
-                            {
-                                logger.error(e);
-                                errors.add(e);
-                            }
-
-                            if (!errors.isEmpty())
-                            {
-                                // throw the first one in order not to break the reconnection
-                                // strategy logic,
-                                // every exception has been logged above already
-                                // api needs refactoring to support the multi-cause exception
-                                // here
-                                throw errors.get(0);
-                            }
-                        }
-                    }
-
-                    setConnected(true);
-                    setConnecting(false);
-                    logger.info("Connected: " + getWorkDescription());
-
-                    if (startOnConnect && !isStarted() && !isStarting())
-                    {
-                        startAfterConnect();
-                    }
+                    connectConnectorAndReceivers();
                 }
                 finally
                 {
                     connectionLock.unlock();
                 }
             }
+
 
             @Override
             public String getWorkDescription()
@@ -1654,6 +1611,56 @@ public abstract class AbstractConnector implements Connector, WorkListener
             retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
         }
     }
+
+    protected void connectConnectorAndReceivers() throws Exception
+    {
+        doConnect();
+
+        if (receivers != null)
+        {
+            for (MessageReceiver receiver : receivers.values())
+            {
+                final List<MuleException> errors = new ArrayList<MuleException>();
+                try
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                    }
+                    receiver.connect();
+                    if (isStarted())
+                    {
+                        receiver.start();
+                    }
+                }
+                catch (MuleException e)
+                {
+                    logger.error(e);
+                    errors.add(e);
+                }
+
+                if (!errors.isEmpty())
+                {
+                    // throw the first one in order not to break the reconnection
+                    // strategy logic,
+                    // every exception has been logged above already
+                    // api needs refactoring to support the multi-cause exception
+                    // here
+                    throw errors.get(0);
+                }
+            }
+        }
+
+        setConnected(true);
+        setConnecting(false);
+        logger.info("Connected: " + getConnectionDescription());
+
+        if (startOnConnect && !isStarted() && !isStarting())
+        {
+            startAfterConnect();
+        }
+    }
+
 
     /**
      * Override this method to test whether the connector is able to connect to its
