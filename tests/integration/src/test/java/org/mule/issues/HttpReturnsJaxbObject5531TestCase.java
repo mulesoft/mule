@@ -8,16 +8,23 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.simple.ObjectToString;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("See MULE-9196")
 public class HttpReturnsJaxbObject5531TestCase extends FunctionalTestCase
 {
     private static final String ZIP_RESPONSE = "<?xml version='1.0' encoding='utf-8'?><soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/' "
@@ -41,9 +48,9 @@ public class HttpReturnsJaxbObject5531TestCase extends FunctionalTestCase
     @Test
     public void testGetWeather() throws Exception
     {
-        String testUrl = "http://localhost:" + port1.getNumber() + "/test/weather";
+        String testUrl = "http://localhost:" + port1.getNumber() + "/test";
         MuleClient client = muleContext.getClient();
-        Object response = client.send(testUrl, getTestMuleMessage("hello"));
+        Object response = client.send(testUrl, getTestMuleMessage("hello"), newOptions().method(POST.name()).build());
         assertNotNull(response);
         String stringResponse = (String) new ObjectToString().transform(response, "UTF-8");
         assertTrue(stringResponse.contains("<Success>true</Success>"));

@@ -81,43 +81,6 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testHttpSync() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:" + httpPort2.getNumber(), "request", null);
-        assertThat(message, notNullValue());
-        // Ensure MuleMessageToHttpResponse was used before sending response
-
-        String server = message.getInboundProperty(HttpConstants.HEADER_SERVER);
-        assertTrue(server.startsWith("Mule"));
-
-        String dateStr = message.getInboundProperty(HttpConstants.HEADER_DATE);
-        SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
-        Date msgDate = format.parse(dateStr);
-        assertThat(new Date().after(msgDate), is(true));
-
-        assertThat(getPayloadAsString(message), is(equalTo("request")));
-    }
-
-    @Test
-    public void testHttpSyncResponseTransformer() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:" + httpPort3.getNumber(), "request", null);
-        assertThat(message, notNullValue());
-
-        String server = message.getInboundProperty(HttpConstants.HEADER_SERVER);
-        assertTrue(server.startsWith("Mule"));
-
-        String dateStr = message.getInboundProperty(HttpConstants.HEADER_DATE);
-        SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
-        Date msgDate = format.parse(dateStr);
-        assertThat(new Date().after(msgDate), is(true));
-
-        assertThat(getPayloadAsString(message), is(equalTo("request" + CUSTOM_RESPONSE)));
-    }
-
-    @Test
     public void testVmSyncOutboundEndpointResponseTransformer() throws Exception
     {
         MuleClient client = muleContext.getClient();

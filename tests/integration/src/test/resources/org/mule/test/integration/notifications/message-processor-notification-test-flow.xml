@@ -18,6 +18,8 @@
         <notification event="MESSAGE-PROCESSOR"/>
     </notifications>
 
+    <http:request-config name="requestConfig" host="localhost" />
+
     <spring:bean name="notificationLogger" class="org.mule.context.notification.processors.MessageProcessorNotificationLogger"/>
 
     <notifications>
@@ -343,9 +345,9 @@
         <vm:inbound-endpoint path="fsucc" exchange-pattern="request-response"/>
         <logger level="INFO"/>
         <first-successful>
-            <http:outbound-endpoint address="http://localhost:6090/weather-forecast"/>
-            <http:outbound-endpoint address="http://localhost:6091/weather-forecast"/>
-            <http:outbound-endpoint address="http://localhost:6092/weather-forecast"/>
+            <http:request path="weather-forecast" port="6080" config-ref="requestConfig"/>
+            <http:request path="weather-forecast" port="6091" config-ref="requestConfig"/>
+            <http:request path="weather-forecast" port="6092" config-ref="requestConfig"/>
             <vm:outbound-endpoint path="dead-letter-queue"/>
         </first-successful>
     </flow>

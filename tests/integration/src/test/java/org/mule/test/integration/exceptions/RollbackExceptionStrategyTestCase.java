@@ -214,6 +214,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
         getMethod.releaseConnection();
     }
 
+    @Ignore("See MULE-9197")
     @Test
     public void testHttpRedeliveryExhaustedRollbackUsingMuleClient() throws Exception
     {
@@ -231,6 +232,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
         assertThat(getPayloadAsString(response), is(MESSAGE_EXPECTED));
     }
 
+    @Ignore("See MULE-9197")
     @Test
     public void testHttpRedeliveryExhaustedRollbackUsingHttpClient() throws Exception
     {

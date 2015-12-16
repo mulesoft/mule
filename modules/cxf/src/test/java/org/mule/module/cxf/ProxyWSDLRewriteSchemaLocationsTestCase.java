@@ -36,7 +36,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-@RunWith(Parameterized.class)
 public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase
 {
     @Rule
@@ -45,36 +44,21 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase
     @Rule
     public final DynamicPort httpPortMockServer = new DynamicPort("portMockServer");
 
-    @Parameterized.Parameter(0)
-    public String config;
-
-    @Parameterized.Parameter(1)
-    public String serverConfig;
-
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
 
     private MuleContext mockServerContext;
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf.xml", "wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-server.xml"},
-                {"wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-httpn.xml", "wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-server-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return config;
+        return "wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-httpn.xml";
     }
 
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
         ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder();
-        applicationContextBuilder.setApplicationResources(new String[]{serverConfig});
+        applicationContextBuilder.setApplicationResources(new String[]{"wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-server-httpn.xml"});
         mockServerContext = applicationContextBuilder.build();
         super.doSetUpBeforeMuleContextCreation();
     }

@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class CxfContentTypeTestCase extends FunctionalTestCase
 {
     private static final String requestPayload =
@@ -41,21 +40,10 @@ public class CxfContentTypeTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter(0)
-    public String configFile;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"cxf-echo-service-conf.xml"},
-                {"cxf-echo-service-conf-httpn.xml"}});
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "cxf-echo-service-conf-httpn.xml";
     }
 
     @Test

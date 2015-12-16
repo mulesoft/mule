@@ -12,13 +12,10 @@
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
+    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${port2}"/>
 
-    <http:endpoint name="httpEndpoint" address="http://localhost:${port1}/RemoteService" exchange-pattern="request-response"
-        contentType="text/plain"/>
-    <endpoint name="httpEndpoint2" address="http://localhost:${port2}/RemoteService?method=post" exchange-pattern="request-response"/>
     <endpoint name="vmEndpoint" address="vm://LocalService" exchange-pattern="request-response"/>
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
@@ -26,29 +23,30 @@
     <serializable-to-byte-array-transformer name="SerializableToByteArray"/>
     <xm:object-to-xml-transformer name="ObjectToXml"/>
     <gzip-compress-transformer name="Compress"/>
-    <http:message-to-http-response-transformer name="ToHttpResponse"/>
 
     <flow name="HttpService">
-        <inbound-endpoint ref="httpEndpoint">
-            <transformer ref="ByteArrayToString"/>
-            <response>
-                <transformer ref="ObjectToXml"/>
-                <transformer ref="Compress"/>
-                <transformer ref="ToHttpResponse"/>
-            </response>
-        </inbound-endpoint>
+        <http:listener path="RemoteService" config-ref="listenerConfig1"/>
+        <transformer ref="ByteArrayToString"/>
+        <response>
+            <transformer ref="ObjectToXml"/>
+            <transformer ref="Compress"/>
+        </response>
         <echo-component/>
     </flow>
 
     <flow name="HttpService2">
-        <inbound-endpoint ref="httpEndpoint2" transformer-refs="ByteArrayToSerializable"
-            responseTransformer-refs="SerializableToByteArray ToHttpResponse"/>
+        <http:listener path="RemoteService" config-ref="listenerConfig2"/>
+        <transformer ref="ByteArrayToSerializable"/>
+        <response>
+            <transformer ref="SerializableToByteArray"/>
+        </response>
         <echo-component/>
     </flow>
 
     <flow name="LocalService">
         <inbound-endpoint ref="vmEndpoint"/>
-        <outbound-endpoint ref="httpEndpoint2" transformer-refs="SerializableToByteArray"/>
+        <transformer ref="SerializableToByteArray"/>
+        <http:request path="RemoteService" config-ref="requestConfig" method="POST"/>
     </flow>
 
 </mule>

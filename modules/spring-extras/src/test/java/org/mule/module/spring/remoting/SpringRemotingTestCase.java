@@ -9,13 +9,16 @@ package org.mule.module.spring.remoting;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 
 public class SpringRemotingTestCase extends FunctionalTestCase
 {
-    private static final String SPRING_HTTP_ENDPOINT = "http://localhost:8003/springService";
+    @Rule
+    public DynamicPort port = new DynamicPort("port1");
 
     @Override
     protected String getConfigFile()
@@ -29,7 +32,7 @@ public class SpringRemotingTestCase extends FunctionalTestCase
         ComplexData cd = new ComplexData("Foo", new Integer(13));
         HttpInvokerProxyFactoryBean invoker = new HttpInvokerProxyFactoryBean();
         invoker.setServiceInterface(WorkInterface.class);
-        invoker.setServiceUrl(SPRING_HTTP_ENDPOINT);
+        invoker.setServiceUrl(String.format("http://localhost:%s/springService", port.getNumber()));
         invoker.afterPropertiesSet();
         WorkInterface worker = (WorkInterface)invoker.getObject();
         ComplexData data = worker.executeComplexity(cd);

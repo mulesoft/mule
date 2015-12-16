@@ -15,11 +15,13 @@
         message with a NullPayload payload is returned.
     </description>
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+
     <http:endpoint name="inboundEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response" />
 
     <flow name="In-Out-Service">
 
-        <http:inbound-endpoint ref="inboundEndpoint" />
+        <http:listener path="*" config-ref="listenerConfig"/>
 
         <!-- Note: auto formating this file might break the test if the script's indentation is not preserved. -->
         <script:component>

@@ -336,4 +336,9 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
+
+    public boolean isStarted()
+    {
+        return started;
+    }
 }

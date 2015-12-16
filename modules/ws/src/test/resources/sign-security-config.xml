@@ -16,9 +16,7 @@
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="${useTransportForUris}"/>
-    </configuration>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
     <tls:context name="tlsContext">
         <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword" alias="muleclient" type="jks" />
@@ -46,28 +44,26 @@
     </flow>
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Test"
-                          exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
-                <cxf:inInterceptors>
-                    <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-                        <spring:constructor-arg>
-                            <spring:map>
-                                <spring:entry key="action" value="Signature" />
-                                <spring:entry key="signaturePropRefId" value="serverInSecurityProperties" />
-                                <spring:entry key="serverInSecurityProperties">
-                                    <spring:props>
-                                        <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
-                                        <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.password">mulepassword</spring:prop>
-                                        <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.file">trustStore</spring:prop>
-                                    </spring:props>
-                                </spring:entry>
-                            </spring:map>
-                        </spring:constructor-arg>
-                    </spring:bean>
-                </cxf:inInterceptors>
-            </cxf:jaxws-service>
-        </inbound-endpoint>
+        <http:listener path="/services/Test" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+            <cxf:inInterceptors>
+                <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                    <spring:constructor-arg>
+                        <spring:map>
+                            <spring:entry key="action" value="Signature" />
+                            <spring:entry key="signaturePropRefId" value="serverInSecurityProperties" />
+                            <spring:entry key="serverInSecurityProperties">
+                                <spring:props>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.password">mulepassword</spring:prop>
+                                    <spring:prop key="org.apache.ws.security.crypto.merlin.truststore.file">trustStore</spring:prop>
+                                </spring:props>
+                            </spring:entry>
+                        </spring:map>
+                    </spring:constructor-arg>
+                </spring:bean>
+            </cxf:inInterceptors>
+        </cxf:jaxws-service>
         <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 

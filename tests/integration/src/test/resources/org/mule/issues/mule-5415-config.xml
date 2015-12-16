@@ -14,16 +14,14 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
     <http:body-to-parameter-map-transformer name="httpRequestToMapTransformer"/>
     
     <mulexml:jaxb-context name="myJaxb" packageNames="org.mule.test.issues"/>
 
     <flow name="aero2BtsServiceInbound">
-        <http:inbound-endpoint host="localhost" port="${port1}" keep-alive="true" method="POST"/>
+        <http:listener path="*" config-ref="listenerConfig" />
         <message-properties-transformer scope="session">
             <add-message-property key="param1" value="value1"/>
         </message-properties-transformer>

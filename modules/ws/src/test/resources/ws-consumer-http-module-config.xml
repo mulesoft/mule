@@ -14,6 +14,8 @@
 
     <http:request-config host="localhost" port="${port}" name="customConfig" />
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
     <ws:consumer-config wsdlLocation="Test.wsdl" service="TestService" port="TestPort"
                         serviceAddress="http://localhost:${port}/services/Test" connectorConfig="customConfig" name="globalConfig"/>
 
@@ -23,9 +25,8 @@
     </flow>
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Test" exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
-        </inbound-endpoint>
+        <http:listener path="/services/Test" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
         <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 

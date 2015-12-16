@@ -6,16 +6,9 @@
  */
 package org.mule.module.spring.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.construct.Flow;
-import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
-import org.junit.Test;
 
 public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerTestCase
 {
@@ -28,14 +21,4 @@ public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNa
         return "authentication-config-flow.xml";
     }
  
-    @Test
-    public void testEndpointConfiguration()
-    {
-        Flow flow = muleContext.getRegistry().lookupObject("echo");
-        assertNotNull(flow);
-
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) flow.getMessageSource();
-        assertNotNull(endpoint.getSecurityFilter());
-        assertEquals(HttpBasicAuthenticationFilter.class, endpoint.getSecurityFilter().getClass());
-    }
 }

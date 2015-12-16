@@ -42,7 +42,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class GZIPEncodingTestCase extends FunctionalTestCase
 {
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
@@ -58,18 +57,6 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     private String getAllRequest;
     private String getAllResponse;
 
-    @Parameter(0)
-    public String configFile;
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"gzip-encoding-conf.xml"},
-                {"gzip-encoding-conf-httpn.xml"}
-        });
-    }
-
     @Before
     public void doSetUp() throws Exception
     {
@@ -81,7 +68,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "gzip-encoding-conf-httpn.xml";
     }
 
     @Test

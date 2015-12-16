@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ProxyRPCBindingTestCase extends FunctionalTestCase
 {
     @Rule
@@ -39,22 +38,10 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase
     private String getAllRequest;
     private String getAllResponse;
 
-    @Parameterized.Parameter(0)
-    public String config;
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"proxy-rpc-binding-conf.xml"},
-                {"proxy-rpc-binding-conf-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return config;
+        return "proxy-rpc-binding-conf-httpn.xml";
     }
 
     @Before

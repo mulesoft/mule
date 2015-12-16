@@ -10,21 +10,20 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-
     <flow name="flow1">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <message-properties-transformer scope="session">
             <add-message-property key="foo" value="foo"/>
         </message-properties-transformer>
         <all>
-            <http:outbound-endpoint address="http://localhost:${port1}/foo"/>
+            <vm:outbound-endpoint path="flow3" exchange-pattern="request-response"/>
             <vm:outbound-endpoint path="flow2" exchange-pattern="request-response"/>
         </all>
         <logger level="WARN"/>
     </flow>
 
     <flow name="flow2">
-        <vm:inbound-endpoint  path="flow2" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="flow2" exchange-pattern="request-response"/>
         <message-properties-transformer scope="session">
             <add-message-property key="bar" value="bar"/>
         </message-properties-transformer>
@@ -35,7 +34,7 @@
     </flow>
 
     <flow name="flow3">
-        <http:inbound-endpoint  address="http://localhost:${port1}/foo"/>
+        <vm:inbound-endpoint path="flow3" exchange-pattern="request-response"/>
         <message-properties-transformer scope="session">
             <add-message-property key="baz" value="baz"/>
         </message-properties-transformer>

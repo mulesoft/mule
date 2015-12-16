@@ -7,40 +7,47 @@
       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}" usePersistentConnections="false" />
+
     <flow name="200Flow">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="200" port="${port1}" />
+        <http:listener config-ref="listenerConfig" path="200">
+            <http:response-builder statusCode="200"/>
+        </http:listener>
         <set-payload value="ok" />
-        <http:response-builder status="200"/>
     </flow>
 
     <flow name="201Flow">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="201" port="${port1}"/>
+        <http:listener config-ref="listenerConfig" path="201">
+            <http:response-builder statusCode="201"/>
+        </http:listener>
         <set-payload value="ok" />
-        <http:response-builder status="201"/>
     </flow>
 
     <flow name="202Flow">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="202" port="${port1}"/>
+        <http:listener config-ref="listenerConfig" path="202">
+            <http:response-builder statusCode="202"/>
+        </http:listener>
         <set-payload value="ok" />
-        <http:response-builder status="202"/>
     </flow>
 
     <flow name="203Flow">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="203" port="${port1}"/>
+        <http:listener config-ref="listenerConfig" path="203">
+            <http:response-builder statusCode="203"/>
+        </http:listener>
         <set-payload value="ok" />
-        <http:response-builder status="203"/>
     </flow>
 
     <flow name="exceptionFlow">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="500" port="${port1}"/>
+        <http:listener config-ref="listenerConfig" path="500">
+            <http:response-builder statusCode="500"/>
+        </http:listener>
         <set-payload value="fail" />
         <test:component throwException="true"/>
     </flow>
 
     <flow name="echoFlow">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="echo" port="${port1}" />
+        <http:listener config-ref="listenerConfig" path="echo"/>
         <set-payload value="#[payload]" />
-        <http:response-builder status="200"/>
     </flow>
 
 </mule>

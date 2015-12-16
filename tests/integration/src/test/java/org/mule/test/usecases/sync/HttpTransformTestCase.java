@@ -8,8 +8,14 @@ package org.mule.test.usecases.sync;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.compression.GZipUncompressTransformer;
@@ -25,6 +31,7 @@ import org.junit.Test;
 public class HttpTransformTestCase extends FunctionalTestCase
 {
 
+    public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
     @Rule
     public DynamicPort httpPort1 = new DynamicPort("port1");
 
@@ -41,7 +48,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     public void testTransform() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), getTestMuleMessage("payload"));
+        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), getTestMuleMessage("payload"), HTTP_REQUEST_OPTIONS);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setMuleContext(muleContext);
@@ -58,8 +65,8 @@ public class HttpTransformTestCase extends FunctionalTestCase
         ArrayList<Integer> payload = new ArrayList<Integer>();
         payload.add(42);
         MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()),
-                                          muleContext.getObjectSerializer().serialize(payload),
-                                          null);
+                                          getTestMuleMessage(muleContext.getObjectSerializer().serialize(payload)),
+                                          HTTP_REQUEST_OPTIONS);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);
@@ -73,7 +80,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         Object payload = Arrays.asList(42);
-        MuleMessage message = client.send("vm://LocalService", getTestMuleMessage(payload));
+        MuleMessage message = client.send("vm://LocalService", getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);

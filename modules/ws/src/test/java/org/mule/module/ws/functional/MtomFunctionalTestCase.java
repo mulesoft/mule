@@ -23,9 +23,10 @@ import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-
+@Ignore("See MULE-9203")
 public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
 

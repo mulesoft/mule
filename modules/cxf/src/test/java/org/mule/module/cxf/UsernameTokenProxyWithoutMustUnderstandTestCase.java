@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalTestCase
 {
 
@@ -43,22 +42,10 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalT
     private String request;
     private String response;
 
-    @Parameter
-    public String configFile;
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"cxf-proxy-service-without-mustunderstand-flow.xml"},
-                {"cxf-proxy-service-without-mustunderstand-flow-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "cxf-proxy-service-without-mustunderstand-flow-httpn.xml";
     }
 
     @Before

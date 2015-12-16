@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ProxyWithValidationTestCase extends FunctionalTestCase
 {
 
@@ -41,22 +40,10 @@ public class ProxyWithValidationTestCase extends FunctionalTestCase
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
 
-    @Parameter
-    public String configFile;
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"proxy-with-validation-config.xml"},
-                {"proxy-with-validation-config-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return configFile;
+        return "proxy-with-validation-config-httpn.xml";
     }
 
     @Test

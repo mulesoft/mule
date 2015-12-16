@@ -36,7 +36,6 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
     protected String[] getConfigFiles()
     {
         return new String[] {
-                "org/mule/module/cxf/wssec/cxf-secure-proxy-flow.xml",
                 "org/mule/module/cxf/wssec/username-token-conf.xml"
         };
     }

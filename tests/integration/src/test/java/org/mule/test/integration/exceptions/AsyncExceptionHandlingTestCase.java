@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertNotNull;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -35,7 +36,7 @@ public class AsyncExceptionHandlingTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         DefaultMuleMessage msg1 = new DefaultMuleMessage("Hello World", muleContext);
-        MuleMessage response1 = client.send("search.inbound.endpoint", msg1, 300000);
+        MuleMessage response1 = client.send(format("http://localhost:%s/searchin", dynamicPort1.getNumber()), msg1, 300000);
         assertNotNull(response1);
     }
 }

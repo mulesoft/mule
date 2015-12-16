@@ -18,9 +18,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("See MULE-9195")
 public class MessageRootIdPropagationTestCase extends FunctionalTestCase
 {
     @Rule

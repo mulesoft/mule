@@ -22,11 +22,8 @@
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
-    <https:connector name="httpsConnector">
-        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
-        <https:tls-server path="trustStore" storePassword="mulepassword"/>
-    </https:connector>
+    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
 
     <jms:activemq-connector name="activeMq" maxRedelivery="-1"/>
     <jms:activemq-connector name="activeMqRedelivery" maxRedelivery="${maxRedelivery}"/>
@@ -106,13 +103,13 @@
     </flow>
 
     <flow name="httpRollbackOnly">
-        <http:inbound-endpoint host="localhost" port="${port1}"/>
+        <http:listener path="*" config-ref="listenerConfig1"/>
         <test:component throwException="true"/>
         <rollback-exception-strategy/>
     </flow>
 
     <flow name="httpWithRedeliveryExhausted">
-        <http:inbound-endpoint host="localhost" port="${port2}"/>
+        <http:listener path="*" config-ref="listenerConfig2"/>
         <test:component throwException="true"/>
         <rollback-exception-strategy maxRedeliveryAttempts="${shortMaxRedelivery}">
             <on-redelivery-attempts-exceeded>

@@ -31,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -155,6 +156,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
     }
 
 
+    @Ignore("See MULE-9201")
     @Test(expected = org.mule.api.transport.NoReceiverForEndpointException.class)
     public void testStopFlowBasedOnExceptionType() throws Throwable
     {

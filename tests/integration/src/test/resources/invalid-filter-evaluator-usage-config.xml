@@ -8,14 +8,10 @@
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <flow name="test">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port1}"/>
-        <test:component throwException="true" exceptionToThrow="java.lang.RuntimeException"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
-        <choice-exception-strategy>
-            <catch-exception-strategy when="${expression}">
-                <logger message="RUNTIME EXCEPTION"/>
-            </catch-exception-strategy>
-        </choice-exception-strategy>
+    <flow name="test">
+        <http:listener path="*" config-ref="listenerConfig"/>
+        <set-payload value="#[${expression}]"/>
     </flow>
 </mule>

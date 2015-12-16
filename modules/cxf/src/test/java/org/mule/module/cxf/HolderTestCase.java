@@ -27,28 +27,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class HolderTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameter(0)
-    public String config;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"holder-conf.xml"},
-                {"holder-conf-httpn.xml"}
-        });
-    }
-
     @Override
     protected String getConfigFile()
     {
-        return config;
+        return "holder-conf-httpn.xml";
     }
 
     @Test

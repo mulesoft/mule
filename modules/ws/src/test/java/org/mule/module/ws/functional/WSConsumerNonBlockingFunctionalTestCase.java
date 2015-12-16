@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized;
 public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
 
-    @Parameterized.Parameter(value = 1)
+    @Parameterized.Parameter(value = 0)
     public String configFile;
 
     @Override
@@ -42,7 +42,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {{true, "ws-consumer-http-module-config-nb.xml"}});
+        return Arrays.asList(new Object[][] {{"ws-consumer-http-module-config-nb.xml"}});
     }
 
     @Test

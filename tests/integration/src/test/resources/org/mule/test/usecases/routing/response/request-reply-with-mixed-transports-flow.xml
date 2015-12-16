@@ -11,11 +11,14 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${http.port}"/>
+    <http:request-config name="requestConfig" host="localhost" port="${http.port}"/>
+
     <flow name="mixedTransports">
         <vm:inbound-endpoint path="input"/>
         <test:component appendString="-out"/>
         <request-reply storePrefix="foo">
-            <http:outbound-endpoint path="requestHttp" host="localhost" port="${http.port}"/>
+            <http:request path="requestHttp" config-ref="requestConfig"/>
             <vm:inbound-endpoint path="reply">
                 <logger level="ERROR" message="Got to inbound endpoint: #[payload]"/>
             </vm:inbound-endpoint>
@@ -25,7 +28,7 @@
     </flow>
 
     <flow name="request-reply">
-        <http:inbound-endpoint path="requestHttp" host="localhost" port="${http.port}"/>
+        <http:listener path="requestHttp" config-ref="listenerConfig"/>
         <test:component appendString="-and-back-in"/>
     </flow>
 </mule>

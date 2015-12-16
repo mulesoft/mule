@@ -7,6 +7,7 @@
       xmlns:https="http://www.mulesoft.org/schema/mule/https"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
@@ -14,6 +15,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
@@ -22,14 +24,17 @@
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
-    <https:connector name="httpsConnector">
-        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
-    </https:connector>
-
     <jms:activemq-connector name="activeMq"/>
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerConfigHttps" host="localhost" port="${port3}" protocol="HTTPS">
+        <tls:context>
+            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword" />
+        </tls:context>
+    </http:listener-config>
+
     <flow name="httpContinueProcessingActualMessage">
-        <http:inbound-endpoint host="localhost" port="${port1}" path="service"/>
+        <http:listener path="service" config-ref="listenerConfig"/>
         <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
         <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
@@ -40,7 +45,7 @@
     </flow>
 
     <flow name="httpsContinueProcessingActualMessage">
-        <https:inbound-endpoint host="localhost" port="${port3}" path="httpsservice"/>
+        <http:listener config-ref="listenerConfigHttps" path="httpsservice"/>
         <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
         <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
