@@ -9,25 +9,16 @@ package org.mule.tck.junit4;
 import static org.junit.Assume.assumeThat;
 import org.mule.RequestContext;
 import org.mule.tck.junit4.rule.WarningTimeout;
-import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hamcrest.BaseMatcher;
@@ -58,13 +49,6 @@ public abstract class AbstractMuleTestCase
      * Indicates whether the text boxes will be logged when starting each test case.
      */
     private static final boolean verbose;
-
-    /**
-     * Indicates if the current test class was excluded using the mule test
-     * exclusion files. Test are executed sequentially, so is not required to
-     * maintain a list of classes.
-     */
-    private static Boolean excluded = null;
 
     static
     {
@@ -101,14 +85,6 @@ public abstract class AbstractMuleTestCase
     @Rule
     public TestRule globalTimeout = createTestTimeoutRule();
 
-    public AbstractMuleTestCase()
-    {
-        if (excluded == null)
-        {
-            excluded = isTestIncludedInExclusionFile(this);
-        }
-    }
-
     /**
      * Creates the timeout rule that will be used to run the test.
      *
@@ -126,58 +102,6 @@ public abstract class AbstractMuleTestCase
         {
             return new WarningTimeout(millisecondsTimeout);
         }
-    }
-
-    /**
-     * Reads the mule-exclusion file for the current test class and
-     *
-     * @param test
-     */
-    protected boolean isTestIncludedInExclusionFile(AbstractMuleTestCase test)
-    {
-        boolean result = false;
-
-        final String testName = test.getClass().getName();
-        try
-        {
-            // We find the physical classpath root URL of the test class and
-            // use that to find the correct resource. Works fine everywhere,
-            // regardless of classloaders. See MULE-2414
-            URL classUrl = ClassUtils.getClassPathRoot(test.getClass());
-            URLClassLoader tempClassLoader = new URLClassLoader(new URL[] {classUrl});
-            URL fileUrl = tempClassLoader.getResource("mule-test-exclusions.txt");
-            if (fileUrl != null)
-            {
-                InputStream in = null;
-                try
-                {
-                    in = fileUrl.openStream();
-
-                    // this iterates over all lines in the exclusion file
-                    Iterator<?> lines = IOUtils.lineIterator(in, "UTF-8");
-
-                    // ..and this finds non-comments that match the test case name
-                    result = IteratorUtils.filteredIterator(lines, new Predicate()
-                    {
-                        @Override
-                        public boolean evaluate(Object object)
-                        {
-                            return StringUtils.equals(testName, StringUtils.trimToEmpty((String) object));
-                        }
-                    }).hasNext();
-                }
-                finally
-                {
-                    IOUtils.closeQuietly(in);
-                }
-            }
-        }
-        catch (IOException ioex)
-        {
-            // ignore
-        }
-
-        return result;
     }
 
     /**
@@ -224,17 +148,6 @@ public abstract class AbstractMuleTestCase
     }
 
     /**
-     * Indicates whether this test has been explicitly disabled through the configuration
-     * file loaded by TestInfo.
-     *
-     * @return whether the test has been explicitly disabled
-     */
-    protected boolean isExcluded()
-    {
-        return excluded;
-    }
-
-    /**
      * Should this test run?
      *
      * @param testMethodName name of the test method
@@ -269,7 +182,6 @@ public abstract class AbstractMuleTestCase
     @Before
     public final void initializeMuleTest()
     {
-        skipTestWhenExcluded();
         skipTestWhenDisabledInCurrentEnvironment();
         printTestHeader();
     }
@@ -285,24 +197,6 @@ public abstract class AbstractMuleTestCase
     protected String getTestHeader()
     {
         return "Testing: " + name.getMethodName();
-    }
-
-    private void skipTestWhenExcluded()
-    {
-        assumeThat(this, new BaseMatcher<AbstractMuleTestCase>()
-        {
-            @Override
-            public boolean matches(Object o)
-            {
-                return !isExcluded();
-            }
-
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText("Test " + name.getMethodName() + " is excluded");
-            }
-        });
     }
 
     private void skipTestWhenDisabledInCurrentEnvironment()
@@ -342,12 +236,6 @@ public abstract class AbstractMuleTestCase
     public final void clearRequestContext()
     {
         RequestContext.clear();
-    }
-
-    @AfterClass
-    public static final void clearExcludedFlag()
-    {
-        excluded = null;
     }
 
     private static List<String> collectThreadNames()

@@ -22,7 +22,6 @@ import org.junit.runners.Suite.SuiteClasses;
               JmsDeadLetterQueueTestCase.class,
               JmsMessageAwareTransformersMule2685TestCase.class,
               JmsMuleSideDurableTopicTestCase.class,
-              JmsMuleSideDurableTopicXATxTestCase.class,
               JmsQueueTestCase.class,
               JmsQueueMessageTypesTestCase.class,
               JmsQueueWithCompressionTestCase.class,
@@ -36,8 +35,7 @@ import org.junit.runners.Suite.SuiteClasses;
               JmsTemporaryReplyToTestCase.class,
               JmsTopicTestCase.class,
               JmsTransformersTestCase.class,
-              JmsXAAlwaysBeginTestCase.class,
-              JmsXATransactionComponentTestCase.class})
+              JmsXAAlwaysBeginTestCase.class})
               
 public class JmsFunctionalTestSuite
 {
