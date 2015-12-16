@@ -6,12 +6,12 @@
  */
 package org.mule.test.construct;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -159,9 +159,11 @@ public class FlowRefTestCase extends FunctionalTestCase
         MuleEvent eventSG = getTestEvent("0");
         eventSG.setFlowVariable("letter", "SG");
 
-        List payload = (List) ((Flow) getFlowConstruct("flow2")).process(eventSG).getMessage().getPayload();
-        assertEquals("0A", payload.get(0));
-        assertEquals("0B", payload.get(1));
+        List<MuleMessage> messageList = (List<MuleMessage>) ((Flow) getFlowConstruct("flow2")).process(eventSG).getMessage().getPayload();
+
+        List payloads = messageList.stream().map(MuleMessage::getPayload).collect(toList());
+        assertEquals("0A", payloads.get(0));
+        assertEquals("0B", payloads.get(1));
     }
 
     @Test(expected=MessagingException.class)

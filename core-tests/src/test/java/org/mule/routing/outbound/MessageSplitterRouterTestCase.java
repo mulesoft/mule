@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -115,7 +114,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleContextTestCase
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
-        assertTrue(resultMessage instanceof MuleMessageCollection);
-        assertEquals(3, ((MuleMessageCollection) resultMessage).size());
+        assertTrue(resultMessage.getPayload() instanceof List);
+        assertEquals(3, ((List<MuleMessage>) resultMessage.getPayload()).size());
     }
 }

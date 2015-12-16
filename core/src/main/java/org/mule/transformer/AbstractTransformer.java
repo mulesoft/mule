@@ -7,9 +7,6 @@
 package org.mule.transformer;
 
 import org.mule.AbstractAnnotatedObject;
-import org.mule.DefaultMessageCollection;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -110,18 +107,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             try
             {
                 MuleMessage message = muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this);
-                if (message instanceof DefaultMessageCollection)
-                {
-                    if (((DefaultMessageCollection) message).isInvalidatedPayload())
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Transformed message is an invalidated message collection. Creating new message with payload: " + event.getMessage().getPayload());
-                        }
-                        message = new DefaultMuleMessage(message.getPayload(), message, message.getMuleContext());
-                        event = new DefaultMuleEvent(message, event);
-                    }
-                }
                 event.setMessage(message);
             }
             catch (Exception e)

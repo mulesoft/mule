@@ -10,7 +10,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.MessageTransformer;
@@ -23,7 +22,6 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -125,28 +123,7 @@ public class TransformationService
      */
     public <T> Object getPayload(MuleMessage message, Class<T> outputType) throws TransformerException
     {
-        DataType<T> dataType = DataTypeFactory.create(outputType);
-        if (message instanceof MuleMessageCollection)
-        {
-            MuleMessageCollection messageCollection = (MuleMessageCollection) message;
-            if (messageCollection.isInvalidatedPayload())
-            {
-                return getPayload(messageCollection, outputType);
-            }
-            else
-            {
-                List<T> results = new ArrayList<>(messageCollection.getMessageList().size());
-                for (MuleMessage messageInList : messageCollection.getMessageList())
-                {
-                    results.add(getPayload(messageInList, dataType, messageInList.getEncoding()));
-                }
-                return results;
-            }
-        }
-        else
-        {
-            return getPayload(message, dataType, message.getEncoding());
-        }
+        return getPayload(message, DataTypeFactory.create(outputType), message.getEncoding());
     }
 
     /**
@@ -157,9 +134,6 @@ public class TransformationService
      * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be
      * replaced with a byte[] representation as part of this operations.
      * <p/>
-     * <b>NOTE:</b> This method is inconsistent with other 'getPayload' methods as it does not have any handling for
-     * {@link MuleMessageCollection} messages at all and as such this method will always return a single object and
-     * never a List of objects.
      *
      * @param outputType the desired return type
      * @return The converted payload of this message. Note that this method will not alter the payload of this
@@ -202,21 +176,7 @@ public class TransformationService
      */
     public String getPayloadAsString(MuleMessage message, String encoding) throws Exception
     {
-        if (message instanceof MuleMessageCollection)
-        {
-            if (((MuleMessageCollection) message).isInvalidatedPayload())
-            {
-                return getPayloadAsString(message);
-            }
-            else
-            {
-                throw new UnsupportedOperationException("getPayloadAsString(), use getPayload(DataType.STRING_DATA_TYPE)");
-            }
-        }
-        else
-        {
-            return getPayload(message, DataType.STRING_DATA_TYPE, encoding);
-        }
+        return getPayload(message, DataType.STRING_DATA_TYPE, encoding);
     }
 
     /**
@@ -231,22 +191,7 @@ public class TransformationService
      */
     public byte[] getPayloadAsBytes(MuleMessage message) throws Exception
     {
-        if (message instanceof MuleMessageCollection)
-        {
-            if (((MuleMessageCollection) message).isInvalidatedPayload())
-            {
-                return getPayloadAsBytes(message);
-            }
-            else
-            {
-                throw new UnsupportedOperationException("getPayloadAsBytes(), use getPayload(DataType" +
-                                                        ".BYTE_ARRAY_DATA_TYPE)");
-            }
-        }
-        else
-        {
-            return getPayload(message, DataType.BYTE_ARRAY_DATA_TYPE, message.getEncoding());
-        }
+        return getPayload(message, DataType.BYTE_ARRAY_DATA_TYPE, message.getEncoding());
     }
 
     /**
@@ -275,21 +220,7 @@ public class TransformationService
     {
         try
         {
-            if (message instanceof MuleMessageCollection)
-            {
-                if (((MuleMessageCollection) message).isInvalidatedPayload())
-                {
-                    return getPayloadAsString(message, encoding);
-                }
-                else
-                {
-                    return "[This is a message collection]";
-                }
-            }
-            else
-            {
-                return getPayloadAsString(message, encoding);
-            }
+            return getPayloadAsString(message, encoding);
         }
         catch (Exception e)
         {

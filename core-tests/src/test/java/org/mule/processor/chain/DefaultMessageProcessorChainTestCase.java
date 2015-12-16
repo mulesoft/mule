@@ -8,6 +8,7 @@
 package org.mule.processor.chain;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -61,9 +62,9 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -893,10 +894,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         scatterGatherRouter.start();
 
         MuleEvent event = getTestEventUsingFlow("0");
-        assertThat(((List) process(DefaultMessageProcessorChain.from(scatterGatherRouter), new DefaultMuleEvent(event.getMessage(), event)
-        ).getMessage().getPayload()).toArray(), CoreMatchers.<Object>equalTo
-                (new String[] {"01", "02", "03"}));
-
+        MuleMessage result = process(DefaultMessageProcessorChain.from(scatterGatherRouter), new DefaultMuleEvent
+                (event.getMessage(), event)).getMessage();
+        assertThat(result.getPayload(), instanceOf(List.class));
+        List<MuleMessage> resultMessage = (List<MuleMessage>) result.getPayload();
+        assertThat(resultMessage.stream().map(MuleMessage::getPayload).collect(Collectors.toList()).toArray(), is
+                (equalTo(new String[] {"01", "02", "03"})));
         assertEquals(1, threads);
     }
 

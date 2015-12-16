@@ -260,8 +260,8 @@
         </scatter-gather>
 
         <test:assert expression="#[payload.size() == 2]"/>
-        <test:assert expression="#[payload[0] == 'banana']"/>
-        <test:assert expression="#[payload[1] == 'orange']"/>
+        <test:assert expression="#[payload[0].payload == 'banana']"/>
+        <test:assert expression="#[payload[1].payload == 'orange']"/>
     </flow>
 
     <flow name="propertyToPayload">

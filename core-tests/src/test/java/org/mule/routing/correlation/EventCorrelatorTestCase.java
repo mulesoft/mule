@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -72,7 +71,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private ListableObjectStore mockProcessedGroups;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private DefaultMessageCollection mockMessageCollection;
+    private MuleMessage mockMessageCollection;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)

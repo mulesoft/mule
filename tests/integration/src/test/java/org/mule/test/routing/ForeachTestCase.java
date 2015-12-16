@@ -12,11 +12,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.PropertyScope;
@@ -191,14 +189,15 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void messageCollectionConfiguration() throws Exception
     {
-        MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
+        List<MuleMessage> list = new ArrayList<>();
         for (int i = 0; i < 10; i++)
         {
             MuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
             msg.setProperty("out", "out" + (i+1), PropertyScope.OUTBOUND);
-            msgCollection.addMessage(msg);
+            list.add(msg);
         }
 
+        MuleMessage msgCollection = new DefaultMuleMessage(list, muleContext);
         MuleMessage result = client.send("vm://input-7", msgCollection);
         assertThat(result.getInboundProperty("totalMessages"), is(10));
         assertEquals(msgCollection.getPayload(), result.getPayload());
@@ -208,13 +207,14 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void messageCollectionConfigurationOneWay() throws Exception
     {
-        MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
+        List<MuleMessage> list = new ArrayList<>();
         for (int i = 0; i < 10; i++)
         {
             MuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
             msg.setProperty("out", "out" + (i+1), PropertyScope.OUTBOUND);
-            msgCollection.addMessage(msg);
+            list.add(msg);
         }
+        MuleMessage msgCollection = new DefaultMuleMessage(list, muleContext);
 
         client.dispatch("vm://input-71", msgCollection);
         FlowAssert.verify("message-collection-config-one-way");

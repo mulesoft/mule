@@ -8,7 +8,8 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessageCollection;
+import static org.junit.Assert.assertTrue;
+import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.serialization.SerializationException;
@@ -41,9 +42,10 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
         MuleClient client = muleContext.getClient();
         List<String> list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
-        MuleMessageCollection request = (MuleMessageCollection) client.request("vm://out?connector=queue", 10000);
+        MuleMessage request = client.request("vm://out?connector=queue", 10000);
         assertNotNull(request);
-        assertEquals(list.size(), request.size());
+        assertTrue(request.getPayload() instanceof List);
+        assertEquals(list.size(), ((List<MuleMessage>) request.getPayload()).size());
     }
 
     private class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>

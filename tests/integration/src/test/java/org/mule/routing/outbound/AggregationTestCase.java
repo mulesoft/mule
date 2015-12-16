@@ -6,17 +6,16 @@
  */
 package org.mule.routing.outbound;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.store.ObjectStoreException;
@@ -54,12 +53,10 @@ public class AggregationTestCase extends FunctionalTestCase
         client.dispatch("vm://in", payload, null);
         MuleMessage msg = client.request("vm://collectionCreated", 5000);
         assertNotNull(msg);
-        assertTrue(msg instanceof MuleMessageCollection);
+        assertTrue(msg.getPayload() instanceof List);
 
-        MuleMessageCollection collection = (MuleMessageCollection) msg;
-
-        @SuppressWarnings("unchecked")
-        List<byte[]> chunks = (List<byte[]>) collection.getPayload();
+        List<byte[]> chunks = ((List<MuleMessage>) msg.getPayload()).stream().map(muleMessage -> (byte[]) muleMessage
+                .getPayload()).collect(toList());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (byte[] chunk : chunks)
         {

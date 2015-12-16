@@ -6,11 +6,12 @@
  */
 package org.mule.routing;
 
-import org.mule.DefaultMessageCollection;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessageCollection;
+import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.CombineCollectionsTransformer;
 
@@ -19,10 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTestCase
 {
@@ -41,16 +38,15 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
     {   
         MuleEvent event = getTestEvent("hello");
         
-        DefaultMessageCollection collection = new DefaultMessageCollection(muleContext);
-        collection.addMessage(new DefaultMuleMessage(Arrays.asList("1", "2", "3"), muleContext));
-        collection.addMessage(new DefaultMuleMessage("4", muleContext));
-        collection.addMessage(new DefaultMuleMessage(Arrays.asList("5", "6", "7"), muleContext));
-        
+        List list = new ArrayList<>();
+        list.add(new DefaultMuleMessage(Arrays.asList("1", "2", "3"), muleContext));
+        list.add(new DefaultMuleMessage("4", muleContext));
+        list.add(new DefaultMuleMessage(Arrays.asList("5", "6", "7"), muleContext));
+
+        MuleMessage collection = new DefaultMuleMessage(list, muleContext);
         event = new DefaultMuleEvent(collection, event);
         
         MuleEvent response = merger.process(event);
-        
-        assertFalse(response.getMessage() instanceof MuleMessageCollection);
         
         assertTrue(response.getMessage().getPayload() instanceof List);
         assertEquals(7, ((List)response.getMessage().getPayload()).size());
@@ -68,8 +64,6 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
         event.getMessage().setPayload(payload);
         
         MuleEvent response = merger.process(event);
-        
-        assertFalse(response.getMessage() instanceof MuleMessageCollection);
         
         assertTrue(response.getMessage().getPayload() instanceof List);
         assertEquals(7, ((List)response.getMessage().getPayload()).size());

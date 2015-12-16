@@ -12,7 +12,6 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -187,15 +186,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     {
         // TODO add logic to use also seqNo when present so it works with split
         // messages
-        String correlationId = "";
-        if (event.getMessage() instanceof MuleMessageCollection)
-        {
-            correlationId = event.getMessage().getCorrelationId();
-        }
-        else
-        {
-            correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event.getMessage());
-        }
+        String correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event.getMessage());
         if (event.getMessage().getCorrelationSequence() > 0)
         {
             correlationId += event.getMessage().getCorrelationSequence();

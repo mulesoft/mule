@@ -8,7 +8,6 @@ package org.mule.util.collection;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.util.Copiable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.MessageSequence;
@@ -31,10 +30,6 @@ public class EventToMessageSequenceSplittingStrategy
     public MessageSequence<?> split(MuleEvent event)
     {
         MuleMessage msg = event.getMessage();
-        if (msg instanceof MuleMessageCollection)
-        {
-            return new ArrayMessageSequence(((MuleMessageCollection) msg).getMessagesAsArray());
-        }
         Object payload = msg.getPayload();
         if (payload instanceof MessageSequence<?>)
         {

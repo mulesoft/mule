@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -111,8 +110,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextTestCase
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
-        assertTrue(resultMessage instanceof MuleMessageCollection);
-        assertEquals(2, ((MuleMessageCollection)resultMessage).size());
+        assertEquals(2, ((List<MuleMessage>) resultMessage.getPayload()).size());
     }
 
     @Test

@@ -6,13 +6,13 @@
  */
 package org.mule.routing;
 
-import org.mule.DefaultMessageCollection;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -25,9 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
 {
@@ -58,11 +55,11 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
         assertTrue(listener.events.get(1).getMessage().getPayload() instanceof Fruit);
         assertTrue(listener.events.get(2).getMessage().getPayload() instanceof Fruit);
 
-        assertEquals(DefaultMessageCollection.class, resultEvent.getMessage().getClass());
-        assertEquals(3, ((MuleMessageCollection) resultEvent.getMessage()).size());
-        assertTrue(((MuleMessageCollection) resultEvent.getMessage()).getMessage(0).getPayload() instanceof Fruit);
-        assertTrue(((MuleMessageCollection) resultEvent.getMessage()).getMessage(1).getPayload() instanceof Fruit);
-        assertTrue(((MuleMessageCollection) resultEvent.getMessage()).getMessage(2).getPayload() instanceof Fruit);
+        assertEquals(List.class, resultEvent.getMessage().getPayload().getClass());
+        assertEquals(3, ((List<MuleMessage>) resultEvent.getMessage().getPayload()).size());
+        assertTrue(((List<MuleMessage>) resultEvent.getMessage().getPayload()).get(0).getPayload() instanceof Fruit);
+        assertTrue(((List<MuleMessage>) resultEvent.getMessage().getPayload()).get(1).getPayload() instanceof Fruit);
+        assertTrue(((List<MuleMessage>) resultEvent.getMessage().getPayload()).get(2).getPayload() instanceof Fruit);
     }
 
     private static class MultipleEventSensingMessageProcessor implements MessageProcessor

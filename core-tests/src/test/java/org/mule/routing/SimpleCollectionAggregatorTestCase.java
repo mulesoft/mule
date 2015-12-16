@@ -6,19 +6,18 @@
  */
 package org.mule.routing;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.construct.Flow;
@@ -27,6 +26,7 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -82,12 +82,11 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         assertNotNull(sensingMessageProcessor.event);
         MuleMessage nextMessage = sensingMessageProcessor.event.getMessage();
         assertNotNull(nextMessage);
-        assertTrue(nextMessage instanceof MuleMessageCollection);
         assertTrue(nextMessage.getPayload() instanceof List<?>);
-        List<String> payload = (List<String>) nextMessage.getPayload();
-        assertEquals(3, payload.size());
+        List<MuleMessage> list = (List<MuleMessage>) nextMessage.getPayload();
+        assertEquals(3, list.size());
         String[] results = new String[3];
-        results = payload.toArray(results);
+        list.stream().map(MuleMessage::getPayload).collect(toList()).toArray(results);
         // Need to sort result because of MULE-5998
         Arrays.sort(results);
         assertEquals("test event A", results[0]);
@@ -129,11 +128,10 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         assertNotNull(sensingMessageProcessor.event);
         MuleMessage nextMessage = sensingMessageProcessor.event.getMessage();
         assertNotNull(nextMessage);
-        assertTrue(nextMessage instanceof MuleMessageCollection);
         assertTrue(nextMessage.getPayload() instanceof List<?>);
-        List<String> payload = (List<String>) nextMessage.getPayload();
+        List<MuleMessage> payload = (List<MuleMessage>) nextMessage.getPayload();
         assertEquals(1, payload.size());
-        assertEquals("test event A", payload.get(0));
+        assertEquals("test event A", payload.get(0).getPayload());
     }
 
     @Test
@@ -152,12 +150,14 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         MuleMessage message4 = new DefaultMuleMessage("test event D", muleContext);
-        MuleMessageCollection messageCollection1 = new DefaultMessageCollection(muleContext);
-        MuleMessageCollection messageCollection2 = new DefaultMessageCollection(muleContext);
-        messageCollection1.addMessage(message1);
-        messageCollection1.addMessage(message2);
-        messageCollection2.addMessage(message3);
-        messageCollection2.addMessage(message4);
+        List<MuleMessage> list = new ArrayList<>();
+        List<MuleMessage> list2 = new ArrayList<>();
+        list.add(message1);
+        list.add(message2);
+        list2.add(message3);
+        list2.add(message4);
+        MuleMessage messageCollection1 = new DefaultMuleMessage(list, muleContext);
+        MuleMessage messageCollection2 = new DefaultMuleMessage(list2, muleContext);
 
         messageCollection1.setCorrelationGroupSize(2);
         messageCollection1.setCorrelationId(messageCollection1.getUniqueId());
@@ -174,13 +174,13 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         assertNotNull(resultEvent);
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
-        List<List<String>> payload = (List<List<String>>) resultMessage.getPayload();
+        List<MuleMessage> payload = (List<MuleMessage>) resultMessage.getPayload();
         assertEquals(2, payload.size());
 
-         assertEquals("test event A", ((List)payload.get(0)).get(0));
-         assertEquals("test event B", ((List)payload.get(0)).get(1));
-         assertEquals("test event C", ((List)payload.get(1)).get(0));
-         assertEquals("test event D", ((List)payload.get(1)).get(1));
+        assertEquals("test event A", ((List<MuleMessage>)payload.get(0).getPayload()).get(0).getPayload());
+        assertEquals("test event B", ((List<MuleMessage>)payload.get(0).getPayload()).get(1).getPayload());
+        assertEquals("test event C", ((List<MuleMessage>)payload.get(1).getPayload()).get(0).getPayload());
+        assertEquals("test event D", ((List<MuleMessage>)payload.get(1).getPayload()).get(1).getPayload());
 
     }
 

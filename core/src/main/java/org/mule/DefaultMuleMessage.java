@@ -45,8 +45,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -66,7 +68,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
-    protected static final String NOT_SET = "<not set>";
+    private static final String NOT_SET = "<not set>";
 
     private static final long serialVersionUID = 1541720810851984845L;
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
@@ -102,7 +104,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<String, DataHandler>();
 
-    protected transient MuleContext muleContext;
+    private transient MuleContext muleContext;
 
     // these are transient because serialisation generates a new instance
     // so we allow mutation again (and we can't serialize threads anyway)
@@ -259,8 +261,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    @Override
-    public void copyMessageProperties(MuleMessage muleMessage)
+    private void copyMessageProperties(MuleMessage muleMessage)
     {
         for (PropertyScope scope : new PropertyScope[]{INBOUND, PropertyScope.OUTBOUND})
         {
@@ -282,8 +283,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    @Override
-    public void copyAttachments(MuleMessage previous)
+    private void copyAttachments(MuleMessage previous)
     {
         if (previous.getInboundAttachmentNames().size() > 0)
         {
@@ -352,7 +352,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * @param inputCls the input type of the message payload
      * @return true if the payload message type was stream-based, false otherwise
      */
-    protected boolean isPayloadConsumed(Class<?> inputCls)
+    boolean isPayloadConsumed(Class<?> inputCls)
     {
         return InputStream.class.isAssignableFrom(inputCls) || ClassUtils.isConsumable(inputCls);
     }
@@ -1092,7 +1092,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
     }
 
-    protected void setDataType(DataType<?> dt)
+    void setDataType(DataType<?> dt)
     {
         dataType = dt.cloneDataType();
 
@@ -1126,6 +1126,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         if (mutable != null)
         {
             mutable.set(true);
+        }
+        if (payload instanceof List)
+        {
+            ((List) payload).stream().filter(item -> item instanceof DefaultMuleMessage).forEach(item -> (
+                    (DefaultMuleMessage) item).resetAccessControl());
         }
     }
 
@@ -1217,12 +1222,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    protected boolean isDisabled()
+    private boolean isDisabled()
     {
         return !AccessControl.isFailOnMessageScribbling();
     }
 
-    protected IllegalStateException newException(String message)
+    private IllegalStateException newException(String message)
     {
         IllegalStateException exception = new IllegalStateException(message);
         logger.warn("Message access violation", exception);
@@ -1418,30 +1423,50 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public MuleMessage createInboundMessage() throws Exception
     {
-        DefaultMuleMessage newMessage =  new DefaultMuleMessage(this);
-        copyToInbound(newMessage);
-        return newMessage;
+        Object payload = getPayload();
+
+        if (payload instanceof List && ((List) payload).stream().filter(item -> item instanceof DefaultMuleMessage)
+                                               .count() > 0)
+        {
+            List<Object> newListPayload = new ArrayList<>();
+            for (Object item : (List) payload)
+            {
+                if (item instanceof DefaultMuleMessage)
+                {
+                    newListPayload.add(copyToInbound((DefaultMuleMessage) item, ((DefaultMuleMessage) item)
+                            .getPayload()));
+                }
+                else
+                {
+                    newListPayload.add(item);
+                }
+            }
+            payload = newListPayload;
+        }
+        return copyToInbound(this, payload);
     }
 
     /**
      * copy outbound artifacts to inbound artifacts in the new message
      */
-    protected void copyToInbound(DefaultMuleMessage newMessage) throws Exception
+    private MuleMessage copyToInbound(DefaultMuleMessage currentMessage, Object payload) throws Exception
     {
+        DefaultMuleMessage newMessage = new DefaultMuleMessage(payload, currentMessage, currentMessage.getMuleContext());
+
         // Copy message, but put all outbound properties and attachments on inbound scope.
         // We ignore inbound and invocation scopes since the VM receiver needs to behave the
         // same way as any other receiver in Mule and would only receive inbound headers
         // and attachments
         Map<String, DataHandler> attachments = new HashMap<String, DataHandler>(3);
-        for (String name : getOutboundAttachmentNames())
+        for (String name : currentMessage.getOutboundAttachmentNames())
         {
             attachments.put(name, getOutboundAttachment(name));
         }
 
         Map<String, Object> newInboundProperties = new HashMap<String, Object>(3);
-        for (String name : getOutboundPropertyNames())
+        for (String name : currentMessage.getOutboundPropertyNames())
         {
-            newInboundProperties.put(name, getOutboundProperty(name));
+            newInboundProperties.put(name, currentMessage.getOutboundProperty(name));
         }
 
         newMessage.clearProperties(INBOUND);
@@ -1450,7 +1475,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
         for (Map.Entry<String, Object> s : newInboundProperties.entrySet())
         {
-            DataType<?> propertyDataType = getPropertyDataType(s.getKey(), PropertyScope.OUTBOUND);
+            DataType<?> propertyDataType = currentMessage.getPropertyDataType(s.getKey(), PropertyScope.OUTBOUND);
 
             newMessage.setInboundProperty(s.getKey(), s.getValue(), propertyDataType);
         }
@@ -1463,11 +1488,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             newMessage.addInboundAttachment(s.getKey(), s.getValue());
         }
 
-        newMessage.setCorrelationId(getCorrelationId());
-        newMessage.setCorrelationGroupSize(getCorrelationGroupSize());
-        newMessage.setCorrelationSequence(getCorrelationSequence());
-        newMessage.setReplyTo(getReplyTo());
-        newMessage.setEncoding(getEncoding());
+        newMessage.setCorrelationId(currentMessage.getCorrelationId());
+        newMessage.setCorrelationGroupSize(currentMessage.getCorrelationGroupSize());
+        newMessage.setCorrelationSequence(currentMessage.getCorrelationSequence());
+        newMessage.setReplyTo(currentMessage.getReplyTo());
+        newMessage.setEncoding(currentMessage.getEncoding());
+        return newMessage;
     }
     
     void setSessionProperties(Map<String, TypedValue> sessionProperties)
@@ -1495,16 +1521,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         return id.hashCode();
     }
-    
-    protected Map<String, TypedValue> getOrphanFlowVariables()
+
+    Map<String, TypedValue> getOrphanFlowVariables()
     {
         return properties.getOrphanFlowVariables();
-    }
-
-    @Override
-    public void setOriginalPayload(Object originalPayload)
-    {
-        this.originalPayload = originalPayload;
     }
 
 }
