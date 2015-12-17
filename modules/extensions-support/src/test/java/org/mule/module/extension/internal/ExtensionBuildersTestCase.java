@@ -222,7 +222,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         factory.createFrom(descriptor.withConfig(CONFIG_NAME).describedAs(""));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalModelDefinitionException.class)
     public void operationWithParameterNamedName()
     {
         factory.createFrom(descriptor.withOperation("invalidOperation").describedAs("")

@@ -48,19 +48,6 @@ final class ImmutableParameterModel extends AbstractImmutableModel implements Pa
     {
         super(name, description, modelProperties);
 
-        if (RESERVED_NAMES.contains(name))
-        {
-            throw new IllegalArgumentException(
-                    String.format("Extension parameter cannot have the name ['%s'] since it's a reserved one", name));
-        }
-
-        checkArgument(type != null, "Extension parameters must have a type");
-
-        if (required && defaultValue != null)
-        {
-            throw new IllegalStateException("A required Extension parameter cannot have a default value");
-        }
-
         this.type = type;
         this.required = required;
         this.expressionSupport = expressionSupport;
