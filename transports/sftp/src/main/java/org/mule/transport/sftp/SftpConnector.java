@@ -590,12 +590,7 @@ public class SftpConnector extends AbstractConnector
     public void connect() throws Exception
     {
         setConnected(true);
-        if (connecting.compareAndSet(false, true))
-        {
-
-            connectConnectorAndReceivers();
-            setConnecting(false);
-        }
+        connectConnectorAndReceivers();
     }
 
 
