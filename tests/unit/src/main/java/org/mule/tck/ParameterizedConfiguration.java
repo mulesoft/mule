@@ -18,10 +18,10 @@ import org.junit.runners.Parameterized.Parameters;
  * Parameterized Mule test classes (JUnit 4) should return a collection of objects 
  * which implement this interface in the method annotated by @Parameters
  * 
- * @see MuleParameterized
  * @see Parameterized
  * @see Parameters
  */
+//TODO(pablo.kraan): remove this and related classes once JMS transport is gone (MULE-9209)
 public interface ParameterizedConfiguration extends NamedObject
 {
     /**

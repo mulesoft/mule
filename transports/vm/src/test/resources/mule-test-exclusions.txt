@@ -1,9 +1,0 @@
-#
-# Test cases listed in this file are not run.
-#
-
-# MULE-2931
-org.mule.transport.vm.functional.VmXATransactionTestCase
-
-# MULE-6018
-org.mule.transport.vm.functional.transactions.XARollbackTestCase
