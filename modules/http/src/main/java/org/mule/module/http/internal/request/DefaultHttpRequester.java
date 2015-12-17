@@ -6,9 +6,11 @@
  */
 package org.mule.module.http.internal.request;
 
+import static java.lang.Integer.MAX_VALUE;
 import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.CompletionHandler;
@@ -55,6 +57,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
     public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[payload]";
     public static final String DEFAULT_FOLLOW_REDIRECTS = "true";
+
+    private static final int WAIT_FOR_EVER = MAX_VALUE;
 
     static final String URI_DEBUG = "URI";
     static final String METHOD_DEBUG = "Method";
@@ -363,7 +367,11 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
     private int resolveResponseTimeout(MuleEvent muleEvent)
     {
-        if (responseTimeout.getRawValue() == null)
+        if (muleContext.getConfiguration().isDisableTimeouts())
+        {
+            return WAIT_FOR_EVER;
+        }
+        else if (responseTimeout.getRawValue() == null)
         {
             return muleEvent.getTimeout();
         }

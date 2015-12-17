@@ -11,13 +11,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_ACCEPT), httpRequestOptions);
-        assertThat(message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY), is(200));
+        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
         assertEquals("accepted", getPayloadAsString(message));
     }
 
@@ -70,7 +71,7 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_REJECT));
-        assertThat(message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY), is(200));
+        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
         assertFalse("accepted".equals(getPayloadAsString(message)));
     }
 
@@ -79,7 +80,7 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_BROKEN));
-        assertThat(message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY), is(200));
+        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
         assertFalse("accepted".equals(getPayloadAsString(message)));
     }
 }

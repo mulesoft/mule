@@ -8,14 +8,16 @@ package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -42,8 +44,8 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         org.mule.api.client.MuleClient client = muleContext.getClient();
         MuleMessage m = client.send(getUrl(), getTestMuleMessage());
         assertNotNull(m);
-        int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
+        int status = m.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
+        assertEquals(UNAUTHORIZED.getStatusCode(), status);
     }
 
     @Test
@@ -54,8 +56,8 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = createRequestMessage("anonX", "anonX");
         MuleMessage response = client.send(getUrl(), message);
         assertNotNull(response);
-        int status = response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
+        int status = response.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
+        assertEquals(UNAUTHORIZED.getStatusCode(), status);
     }
 
     @Test
@@ -66,8 +68,8 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = createRequestMessage("anon", "anon");
         MuleMessage response = client.send(getUrl(), message);
         assertNotNull(response);
-        int status = response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        assertEquals(HttpConstants.SC_OK, status);
+        int status = response.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
+        assertEquals(OK, status);
     }
 
     private MuleMessage createRequestMessage(String user, String password)

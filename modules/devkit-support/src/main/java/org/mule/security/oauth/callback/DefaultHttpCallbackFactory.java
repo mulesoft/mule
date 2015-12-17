@@ -22,8 +22,6 @@ import java.util.regex.Pattern;
 
 public class DefaultHttpCallbackFactory implements HttpCallbackFactory
 {
-    private boolean forceOldHttpTransport = false;
-
     @Override
     public HttpCallback createCallback(HttpCallbackAdapter adapter,
                                        String authCodeRegex,
@@ -37,7 +35,6 @@ public class DefaultHttpCallbackFactory implements HttpCallbackFactory
             adapter.getLocalPort(), adapter.getRemotePort(), adapter.getPath(), adapter.getAsync(),
             flowConstruct.getExceptionListener(), adapter.getConnector());
 
-        callback.setForceOldHttpTransport(forceOldHttpTransport);
         return callback;
     }
 
@@ -50,9 +47,4 @@ public class DefaultHttpCallbackFactory implements HttpCallbackFactory
             fetchAccessTokenMessageProcessor, new CallbackContinuationMessageProcessor(listener)).build();
     }
 
-    @Override
-    public void forceOldHttpTransport(boolean forceOld)
-    {
-        forceOldHttpTransport = forceOld;
-    }
 }

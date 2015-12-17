@@ -6,10 +6,11 @@
  */
 package org.mule.module.cxf.support;
 
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.cxf.CxfConstants;
-import org.mule.transport.http.HttpConstants;
 
 import java.util.Collection;
 
@@ -35,7 +36,7 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
         if (atts != null && !atts.isEmpty())
         {
             muleMsg.setInvocationProperty(CxfConstants.ATTACHMENTS, atts);
-            muleMsg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, muleMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
+            muleMsg.setOutboundProperty(CONTENT_TYPE, muleMsg.getInboundProperty(CONTENT_TYPE));
         }
     }
 

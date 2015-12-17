@@ -19,7 +19,6 @@
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
     <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
 
-    <!-- HTTP OutboundEndpoint timeout -->
     <flow name="HttpTimeout">
         <vm:inbound-endpoint path="httpTimeout" exchange-pattern="request-response"/>
         <http:request config-ref="requestConfig" path="service" responseTimeout="100"/>

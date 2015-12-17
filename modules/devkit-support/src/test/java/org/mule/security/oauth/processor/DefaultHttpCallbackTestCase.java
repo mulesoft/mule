@@ -6,23 +6,21 @@
  */
 package org.mule.security.oauth.processor;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.listener.HttpListenerConfig;
-import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.security.oauth.DefaultHttpCallback;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
 
 import java.util.Arrays;
 
@@ -114,13 +112,6 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void withOldHttpTransport() throws Exception
-    {
-        callback = createCallback(newOldHttpTransport());
-        sendCallbackRequest();
-    }
-
-    @Test
     public void withNewHttpConnectorByDefault() throws Exception
     {
         createListenerConfig();
@@ -149,20 +140,6 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
         sendCallbackRequest();
     }
 
-    @Test
-    public void withOldHttpTransportByDefault() throws Exception
-    {
-        MuleTestUtils.testWithSystemProperty(HttpConfiguration.USE_HTTP_TRANSPORT_FOR_URIS, Boolean.TRUE.toString(), new MuleTestUtils.TestCallback()
-        {
-            @Override
-            public void run() throws Exception
-            {
-                newOldHttpTransport();
-                callback = createCallback(null);
-                sendCallbackRequest();         }
-        });
-    }
-
     private void sendCallbackRequest() throws Exception
     {
         int response = httpClient.executeMethod(callbackMethod);
@@ -182,17 +159,6 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
                                                         connector);
         callback.start();
         return callback;
-    }
-
-    private HttpConnector newOldHttpTransport() throws Exception
-    {
-        HttpConnector httpConnector = new HttpConnector(muleContext);
-        httpConnector.initialise();
-        httpConnector.start();
-
-        muleContext.getRegistry().registerObject(CONNECTOR_HTTP_MULE_DEFAULT, httpConnector);
-
-        return httpConnector;
     }
 
     private void handleExceptionWhileTearingDown(Throwable t)

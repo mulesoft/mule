@@ -152,7 +152,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-008.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-jms-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ssl-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-tcp-${productVersion}.jar
@@ -185,7 +184,6 @@
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-dbutils-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-digester-1.8.jar
-/mule-standalone-${productVersion}/lib/opt/commons-httpclient-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/commons-io-2.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-jxpath-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/commons-lang-2.4.jar
@@ -247,7 +245,6 @@
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/jcifs-1.3.3.jar
 /mule-standalone-${productVersion}/lib/opt/jcodings-1.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/jdom-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/jffi-1.2.9.jar
@@ -271,7 +268,6 @@
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.6.jar
-/mule-standalone-${productVersion}/lib/opt/juli-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-6.2.jar
@@ -315,7 +311,6 @@
 /mule-standalone-${productVersion}/lib/opt/staxon-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/stringtemplate-3.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/uri-template-0.9.jar
-/mule-standalone-${productVersion}/lib/opt/coyote-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/wsdl4j-1.6.3.jar

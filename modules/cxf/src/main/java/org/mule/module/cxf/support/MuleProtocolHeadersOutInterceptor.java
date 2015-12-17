@@ -6,12 +6,15 @@
  */
 package org.mule.module.cxf.support;
 
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.cxf.CxfConstants;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 
 import java.util.List;
 import java.util.Map;
@@ -50,15 +53,15 @@ public class MuleProtocolHeadersOutInterceptor
             return;
         }
         extractAndSetContentType(message, muleMsg);
-        extractAndSet(message, muleMsg, Message.RESPONSE_CODE, HttpConnector.HTTP_STATUS_PROPERTY);
+        extractAndSet(message, muleMsg, Message.RESPONSE_CODE, HTTP_STATUS_PROPERTY);
 
         String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
         if (method == null)
         {
-            method = HttpConstants.METHOD_POST;
+            method = POST.name();
         }
 
-        muleMsg.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
+        muleMsg.setOutboundProperty(HTTP_METHOD_PROPERTY, method);
         
         Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(Message.PROTOCOL_HEADERS));
         if (reqHeaders != null)
@@ -97,7 +100,7 @@ public class MuleProtocolHeadersOutInterceptor
             {
                 ct = ct + "; charset=" + encoding;
             }
-            muleMsg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
+            muleMsg.setOutboundProperty(CONTENT_TYPE, ct);
         }
     }
 

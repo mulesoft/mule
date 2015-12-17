@@ -31,15 +31,6 @@ public class UnsupportedConnectorsMuleArtifactTestCase
     @Test
     public void unsupportedConnectors() throws SAXException, IOException, MuleArtifactFactoryException
     {
-        //HTTP
-        checkUnsupportedConnector("<http:connector name=\"HttpConnector\" xmlns:http=\"http://www.mulesoft.org/schema/mule/http\"/>");
-        //Polling HTTP
-        checkUnsupportedConnector("<http:polling-connector name=\"PollingHttpConnector\"\n" +
-                                  "        pollingFrequency=\"30000\" reuseAddress=\"true\" xmlns:http=\"http://www.mulesoft.org/schema/mule/http\"/>");
-        //HTTPS
-        checkUnsupportedConnector("<https:connector name=\"httpConnector\" xmlns:https=\"http://www.mulesoft.org/schema/mule/https\">\n" +
-                                  "        <https:tls-key-store path=\"~/ce/tests/integration/src/test/resources/muletest.keystore\" keyPassword=\"mulepassword\" storePassword=\"mulepassword\"/>\n" +
-                                  "</https:connector>");
         //JMS
         checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\" validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
         //VM

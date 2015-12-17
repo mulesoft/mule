@@ -6,19 +6,11 @@
  */
 package org.mule.module.ws.consumer;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.module.http.internal.config.HttpConfiguration;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transport.http.HttpConnector;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 @SmallTest
@@ -27,32 +19,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
 
     private static final String SERVICE_ADDRESS = "http://localhost";
 
-    @Test
-    public void createOutboundEndpointWithDefaultConnectorFromHttpTransport() throws Exception
-    {
-        MuleTestUtils.testWithSystemProperty(HttpConfiguration.USE_HTTP_TRANSPORT_FOR_URIS, Boolean.TRUE.toString(),
-                                             new MuleTestUtils.TestCallback()
-                                             {
-                                                 @Override
-                                                 public void run() throws Exception
-                                                 {
-                                                     WSConsumerConfig config = createConsumerConfig();
-                                                     MessageProcessor mp = config.createOutboundMessageProcessor();
-                                                     assertThat(mp, instanceOf(OutboundEndpoint.class));
-                                                 }
-                                             });
-    }
-
-    @Test
-    public void createOutboundEndpointWithProvidedConnector() throws MuleException
-    {
-        WSConsumerConfig config = createConsumerConfig();
-        HttpConnector httpConnector = new HttpConnector(muleContext);
-        config.setConnector(httpConnector);
-        OutboundEndpoint outboundEndpoint = (OutboundEndpoint) config.createOutboundMessageProcessor();
-        assertEquals(httpConnector, outboundEndpoint.getConnector());
-    }
-
+    @Ignore("See MULE-9210")
     @Test(expected = MuleException.class)
     public void failToCreateOutboundEndpointWithUnsupportedProtocol() throws MuleException
     {
@@ -61,14 +28,11 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
         config.createOutboundMessageProcessor();
     }
 
+    @Ignore("See MULE-9210")
     @Test(expected = IllegalStateException.class)
     public void failToCreateOutboundEndpointWithWrongConnector() throws MuleException
     {
-        WSConsumerConfig config = createConsumerConfig();
-        config.setServiceAddress("jms://test");
-        HttpConnector httpConnector = new HttpConnector(muleContext);
-        config.setConnector(httpConnector);
-        config.createOutboundMessageProcessor();
+        //TODO implement test case once MULE-9210 is solved
     }
 
     @Test(expected = IllegalStateException.class)

@@ -62,21 +62,21 @@
 
     <flow name="flow">
         <http:listener config-ref="listenerConfig1" path="*"/>
-        <mule-ss:http-security-filter
+        <http:basic-security-filter
                 realm="mule-realm" securityProviders="daoAuthenticationSecurityProvider1" />
         <echo-component />
     </flow>
 
     <flow name="flow2">
         <http:listener config-ref="listenerConfig2" path="*"/>
-        <mule-ss:http-security-filter
+        <http:basic-security-filter
                 realm="mule-realm" securityProviders="daoAuthenticationSecurityProvider2" />
         <echo-component />
     </flow>
 
     <flow name="flow3">
         <http:listener config-ref="listenerConfig3" path="*"/>
-        <mule-ss:http-security-filter
+        <http:basic-security-filter
             realm="mule-realm"
             securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1" />
         <echo-component />

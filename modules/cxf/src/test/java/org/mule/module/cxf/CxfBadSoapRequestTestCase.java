@@ -8,13 +8,14 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
 import java.util.List;
@@ -56,7 +57,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
 
-        String ct = reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, StringUtils.EMPTY);
+        String ct = reply.getInboundProperty(CONTENT_TYPE, StringUtils.EMPTY);
         assertEquals("text/xml; charset=UTF-8", ct);
 
         Document document = DocumentHelper.parseText(getPayloadAsString(reply));

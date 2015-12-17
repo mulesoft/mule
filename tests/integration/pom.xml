@@ -202,6 +202,11 @@
             <version>4.3.5</version>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<!-- Needed for SpringXmlConfigurationBuilder and TestNamespaceHandler -->
 		<dependency>
 			<groupId>org.mule.modules</groupId>

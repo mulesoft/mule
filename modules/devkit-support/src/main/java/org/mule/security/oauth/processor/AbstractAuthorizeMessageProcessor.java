@@ -20,7 +20,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.devkit.processor.DevkitBasedMessageProcessor;
-import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.security.oauth.callback.DefaultHttpCallbackFactory;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
@@ -50,7 +49,6 @@ public abstract class AbstractAuthorizeMessageProcessor extends DevkitBasedMessa
         if (callbackFactory == null)
         {
             callbackFactory = new DefaultHttpCallbackFactory();
-            callbackFactory.forceOldHttpTransport(HttpConfiguration.useTransportForUris(muleContext));
         }
     }
     

@@ -66,7 +66,7 @@
 
     <flow name="server">
         <http:listener config-ref="listenerConfig" path="/services/Test" />
-        <mule-ss:http-security-filter realm="mule-realm"/>
+        <http:basic-security-filter realm="mule-realm"/>
         <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
         <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>

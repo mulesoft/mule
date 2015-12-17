@@ -41,7 +41,7 @@ public class ConnectorLevelMessageDispatchingTestCase extends AbstractMuleTestCa
     public void verifyClassLoaderIsAppClassLoader() throws Exception
     {
         FakeMuleServer fakeMuleServer = new FakeMuleServer(temporaryFolder.getRoot().getAbsolutePath());
-        fakeMuleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-connector-domain", "domain");
+        fakeMuleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-domain-listener", "domain");
         fakeMuleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-world-app", HELLO_WORLD_APP);
         fakeMuleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-mule-app", HELLO_MULE_APP);
         fakeMuleServer.start();

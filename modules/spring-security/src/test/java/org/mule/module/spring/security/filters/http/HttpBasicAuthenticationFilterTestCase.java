@@ -14,6 +14,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
+import static org.mule.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -21,9 +23,8 @@ import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.module.http.internal.filter.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transport.http.HttpConstants;
-import org.mule.transport.http.filters.HttpBasicAuthenticationFilter;
 
 import org.junit.Test;
 
@@ -37,7 +38,7 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
 
         MuleEvent event = this.getTestEvent("a");
         MuleMessage message = event.getMessage();
-        message.setProperty(HttpConstants.HEADER_AUTHORIZATION, "Basic a", PropertyScope.INBOUND);
+        message.setProperty(AUTHORIZATION, "Basic a", PropertyScope.INBOUND);
         RequestContext.setEvent(event);
 
         HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();

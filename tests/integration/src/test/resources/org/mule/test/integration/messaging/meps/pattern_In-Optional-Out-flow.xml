@@ -21,13 +21,12 @@
         service returns null and there was no error while processing the request, nothing is returned to the callee.
     </description>
 
-    <http:endpoint name="inboundEndpoint" host="localhost" port="63081" exchange-pattern="request-response"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
-    
     <flow name="In-Optional-Out-Service">
-        
-        <inbound-endpoint ref="inboundEndpoint"/>
-        
+
+        <http:listener config-ref="listenerConfig" path="*" />
+
         <script:component>
             <script:script engine="groovy">
                 if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND))

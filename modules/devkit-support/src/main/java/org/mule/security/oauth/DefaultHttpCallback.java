@@ -7,19 +7,16 @@
 
 package org.mule.security.oauth;
 
+
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.construct.FlowConstructInvalidException;
-import org.mule.api.endpoint.EndpointFactory;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
@@ -27,8 +24,6 @@ import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.Flow;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerBuilder;
 import org.mule.module.http.api.listener.HttpListenerConfig;
@@ -364,11 +359,7 @@ public class DefaultHttpCallback implements HttpCallback
     {
         if (connector != null)
         {
-            if (connector instanceof Connector)
-            {
-                return new OldTransportDelegate((Connector) connector);
-            }
-            else if (connector instanceof HttpListenerConfig)
+            if (connector instanceof HttpListenerConfig)
             {
                 return new HttpConnectorDelegate((HttpListenerConfig) connector);
             }
@@ -380,27 +371,7 @@ public class DefaultHttpCallback implements HttpCallback
         }
         else
         {
-            if (forceOldHttpTransport)
-            {
-                return new OldTransportDelegate(lookupDefaultHttpTransport());
-            }
-            else
-            {
-                return new HttpConnectorDelegate();
-            }
-        }
-    }
-
-    private Connector lookupDefaultHttpTransport() throws MuleException
-    {
-        Connector httpConnector = muleContext.getRegistry().lookupConnector("connector.http.mule.default");
-        if (httpConnector != null)
-        {
-            return httpConnector;
-        }
-        else
-        {
-            throw new DefaultMuleException("Could not find connector with name 'connector.http.mule.default'");
+            return new HttpConnectorDelegate();
         }
     }
 
@@ -436,11 +407,6 @@ public class DefaultHttpCallback implements HttpCallback
         return urlBuilder.toString();
     }
 
-    public void setForceOldHttpTransport(boolean forceOldHttpTransport)
-    {
-        this.forceOldHttpTransport = forceOldHttpTransport;
-    }
-
     private MessageProcessor wrapMessageProcessorInAsyncChain(MessageProcessor messageProcessor)
             throws MuleException
     {
@@ -456,15 +422,6 @@ public class DefaultHttpCallback implements HttpCallback
         {
             throw new FlowConstructInvalidException(e);
         }
-    }
-
-    private InboundEndpoint createHttpInboundEndpoint() throws MuleException
-    {
-        EndpointURIEndpointBuilder inBuilder = new EndpointURIEndpointBuilder(localUrl, muleContext);
-        inBuilder.setConnector((Connector) connectorDelegate.getConnector());
-        inBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-        EndpointFactory endpointFactory = muleContext.getEndpointFactory();
-        return endpointFactory.getInboundEndpoint(inBuilder);
     }
 
     /**
@@ -577,35 +534,6 @@ public class DefaultHttpCallback implements HttpCallback
 
         T getConnector();
 
-    }
-
-    private class OldTransportDelegate implements ConnectorDelegate<Connector>
-    {
-
-        private final Connector connector;
-
-        private OldTransportDelegate(Connector connector)
-        {
-            this.connector = connector;
-        }
-
-        @Override
-        public String getScheme()
-        {
-            return connector.getProtocol();
-        }
-
-        @Override
-        public MessageSource getMessageSource() throws MuleException
-        {
-            return createHttpInboundEndpoint();
-        }
-
-        @Override
-        public Connector getConnector()
-        {
-            return connector;
-        }
     }
 
     private class HttpConnectorDelegate implements ConnectorDelegate<HttpListenerConfig>

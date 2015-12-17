@@ -9,11 +9,11 @@ package org.mule.security.oauth.util;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
-import static org.mule.transport.http.HttpConstants.SC_CREATED;
-import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
-import static org.mule.transport.http.HttpConstants.SC_NON_AUTHORITATIVE_INFORMATION;
-import static org.mule.transport.http.HttpConstants.SC_OK;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.CREATED;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.NON_AUTHORITATIVE_INFORMATION;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -37,11 +37,11 @@ public class HttpUtilTestCase extends FunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {SC_OK},
-                {SC_CREATED},
-                {SC_ACCEPTED},
-                {SC_NON_AUTHORITATIVE_INFORMATION},
-                {SC_INTERNAL_SERVER_ERROR}
+                {OK.getStatusCode()},
+                {CREATED.getStatusCode()},
+                {ACCEPTED.getStatusCode()},
+                {NON_AUTHORITATIVE_INFORMATION.getStatusCode()},
+                {INTERNAL_SERVER_ERROR.getStatusCode()}
         });
     }
 
@@ -70,11 +70,11 @@ public class HttpUtilTestCase extends FunctionalTestCase
         try
         {
             assertEquals(SUCCESS_PAYLOAD, util.post(String.format("http://localhost:%d/%d", port.getNumber(), statusCode), ""));
-            assertFalse(statusCode == SC_INTERNAL_SERVER_ERROR);
+            assertFalse(statusCode == INTERNAL_SERVER_ERROR.getStatusCode());
         }
         catch (RuntimeException e)
         {
-            assertEquals(SC_INTERNAL_SERVER_ERROR, statusCode);
+            assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), statusCode);
             assertTrue(e.getCause() instanceof IOException);
         }
     }

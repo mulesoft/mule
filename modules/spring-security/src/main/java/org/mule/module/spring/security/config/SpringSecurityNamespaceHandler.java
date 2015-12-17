@@ -11,7 +11,6 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.module.spring.security.AuthorizationFilter;
 import org.mule.module.spring.security.SpringProviderAdapter;
-import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -24,9 +23,6 @@ public class SpringSecurityNamespaceHandler extends NamespaceHandlerSupport
     {
         registerBeanDefinitionParser("security-manager", new SecurityManagerDefinitionParser());
         registerBeanDefinitionParser("delegate-security-provider", new ChildDefinitionParser("provider", SpringProviderAdapter.class));
-        SecurityFilterDefinitionParser securityFilterDefinitionParser = new SecurityFilterDefinitionParser(HttpBasicAuthenticationFilter.class);
-        securityFilterDefinitionParser.addAlias("securityManager-ref", "securityManager");
-        registerBeanDefinitionParser("http-security-filter", securityFilterDefinitionParser);
         registerBeanDefinitionParser("authorization-filter", new SecurityFilterDefinitionParser(AuthorizationFilter.class));
         registerBeanDefinitionParser("security-property", new ChildMapEntryDefinitionParser("securityProperty", "name", "value"));
     }
