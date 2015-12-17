@@ -6,9 +6,6 @@
  */
 package org.mule.transport.sftp;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleException;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.tck.listener.ConnectionListener;
