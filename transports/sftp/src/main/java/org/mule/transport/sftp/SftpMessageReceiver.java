@@ -266,9 +266,11 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         return super.handleUnacceptedFilter(message);
     }
 
+
+
     public void doConnect() throws Exception
     {
-        if (!isConnected() || connecting.compareAndSet(false, true))
+        if (connecting.compareAndSet(false, true) && !isConnected())
         {
             if (logger.isDebugEnabled())
             {
@@ -295,6 +297,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                     }
                     catch (Exception e)
                     {
+                        connected.set(false);
                         if (logger.isDebugEnabled())
                         {
                             logger.debug("Unable to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
