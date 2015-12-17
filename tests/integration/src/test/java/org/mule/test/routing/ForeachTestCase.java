@@ -211,13 +211,17 @@ public class ForeachTestCase extends FunctionalTestCase
         for (int i = 0; i < 10; i++)
         {
             MuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
-            msg.setProperty("out", "out" + (i+1), PropertyScope.OUTBOUND);
+            msg.setProperty("out", "out" + (i+1), PropertyScope.INBOUND);
             list.add(msg);
         }
         MuleMessage msgCollection = new DefaultMuleMessage(list, muleContext);
 
-        client.dispatch("vm://input-71", msgCollection);
-        FlowAssert.verify("message-collection-config-one-way");
+        MuleEvent event = getTestEvent("");
+        event.setMessage(msgCollection);
+        final String flowName = "message-collection-config-one-way";
+
+        runFlow(flowName, event);
+        FlowAssert.verify(flowName);
     }
 
     @Test

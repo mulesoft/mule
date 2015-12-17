@@ -91,7 +91,6 @@
     </flow>
 
     <flow name="message-collection-config-one-way">
-        <vm:inbound-endpoint path="input-71" exchange-pattern="one-way"/>
         <foreach>
             <test:assert expression="#[message.inboundProperties['out']=='out'+counter]" />
             <set-variable variableName="totalMessages" value="#[counter]"/>

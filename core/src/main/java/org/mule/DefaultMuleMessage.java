@@ -1127,11 +1127,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             mutable.set(true);
         }
-        if (payload instanceof List)
-        {
-            ((List) payload).stream().filter(item -> item instanceof DefaultMuleMessage).forEach(item -> (
-                    (DefaultMuleMessage) item).resetAccessControl());
-        }
     }
 
     /**
