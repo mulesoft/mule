@@ -13,6 +13,7 @@ import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORT
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
+
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
@@ -37,6 +38,7 @@ import org.mule.module.extension.internal.introspection.validation.ConnectionPro
 import org.mule.module.extension.internal.introspection.validation.ModelValidator;
 import org.mule.module.extension.internal.introspection.validation.NameClashModelValidator;
 import org.mule.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
+import org.mule.module.extension.internal.introspection.validation.ParameterModelValidator;
 import org.mule.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 import org.mule.util.CollectionUtils;
 import org.mule.util.ValueHolder;
@@ -80,6 +82,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
         modelValidators = ImmutableList.<ModelValidator>builder()
                 .add(new NameClashModelValidator())
+                .add(new ParameterModelValidator())
                 .add(new ConnectionProviderModelValidator())
                 .add(new OperationReturnTypeModelValidator())
                 .build();

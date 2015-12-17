@@ -60,11 +60,11 @@ public final class ConnectionProviderModelValidator implements ModelValidator
             if (typeProperty != null && !providerConfigType.isAssignableFrom(typeProperty.getType()))
             {
                 throw new IllegalModelDefinitionException(String.format(
-                        "Configuration '%s' in Extension '%s' is of type '%s' which cannot be used with the connection provider of type '%s' " +
+                        "Configuration '%s' in Extension '%s' is of type '%s' which cannot be used with the connection provider of type '%s' "        +
                         "because it requires configs of type '%s'. Please make sure that all configuration models in the extension can be used with " +
                         "any of the defined connection providers",
-                        configurationModel.getName(), extensionModel.getName(), getImplementingType(providerModel).getName(),
-                        typeProperty.getType().getName(), providerConfigType.getName()));
+                        configurationModel.getName(), extensionModel.getName(), typeProperty.getType().getName(),
+                        getImplementingType(providerModel).getName(), providerConfigType.getName()));
             }
         }
     }
