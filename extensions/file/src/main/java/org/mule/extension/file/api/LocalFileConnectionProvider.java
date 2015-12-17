@@ -48,7 +48,7 @@ public final class LocalFileConnectionProvider implements ConnectionProvider<Fil
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<FileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+    public ConnectionHandlingStrategy<FileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<FileConnector, FileSystem> handlingStrategyFactory)
     {
         return handlingStrategyFactory.cached();
     }

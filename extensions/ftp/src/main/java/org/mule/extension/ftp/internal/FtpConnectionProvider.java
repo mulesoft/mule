@@ -69,7 +69,7 @@ public final class FtpConnectionProvider implements ConnectionProvider<FtpConnec
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<FtpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+    public ConnectionHandlingStrategy<FtpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<FtpConnector, FtpFileSystem> handlingStrategyFactory)
     {
         return handlingStrategyFactory.supportsPooling(new PoolingProfile(), new PoolingListener<FtpConnector, FtpFileSystem>()
         {

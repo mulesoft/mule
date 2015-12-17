@@ -15,17 +15,17 @@ import org.mule.api.connection.PoolingListener;
 /**
  * A {@link ConnectionProviderWrapper} which decorates the {@link #delegate}
  * with a user configured {@link PoolingProfile}.
- * <p>
+ * <p/>
  * The purpose of this wrapper is having the {@link #getHandlingStrategy(ConnectionHandlingStrategyFactory)}
  * method use the configured {@link #poolingProfile} instead of the default included
  * in the {@link #delegate}
- * <p>
+ * <p/>
  * If a {@link #poolingProfile} is not supplied (meaning, it is {@code null}), then the
  * default {@link #delegate} behavior is applied.
  *
  * @since 4.0
  */
-public final class PooledConnectionProviderWrapper extends ConnectionProviderWrapper
+public final class PooledConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection>
 {
 
     private final PoolingProfile poolingProfile;
@@ -36,7 +36,7 @@ public final class PooledConnectionProviderWrapper extends ConnectionProviderWra
      * @param delegate       the {@link ConnectionProvider} to be wrapped
      * @param poolingProfile a nullable {@link PoolingProfile}
      */
-    public PooledConnectionProviderWrapper(ConnectionProvider delegate, PoolingProfile poolingProfile)
+    public PooledConnectionProviderWrapper(ConnectionProvider<Config, Connection> delegate, PoolingProfile poolingProfile)
     {
         super(delegate);
         this.poolingProfile = poolingProfile;
@@ -47,36 +47,36 @@ public final class PooledConnectionProviderWrapper extends ConnectionProviderWra
      * {@link ConnectionHandlingStrategyFactory#requiresPooling(PoolingProfile)} or
      * {@link ConnectionHandlingStrategyFactory#supportsPooling(PoolingProfile)}, then this method
      * makes those invokations using the supplied {@link #poolingProfile}.
-     * <p>
+     * <p/>
      * In any other case, the default {@link #delegate} behavior is applied
      *
      * @param handlingStrategyFactory a {@link ConnectionHandlingStrategyFactory}
      * @return a {@link ConnectionHandlingStrategy}
      */
     @Override
-    public ConnectionHandlingStrategy getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Connection> handlingStrategyFactory)
     {
-        ConnectionHandlingStrategyFactory factoryDecorator = new ConnectionHandlingStrategyFactoryWrapper(handlingStrategyFactory)
+        ConnectionHandlingStrategyFactory<Config, Connection> factoryDecorator = new ConnectionHandlingStrategyFactoryWrapper<Config, Connection>(handlingStrategyFactory)
         {
-            public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener poolingListener)
+            public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
             {
                 return super.supportsPooling(resolvePoolingProfile(defaultPoolingProfile), poolingListener);
             }
 
             @Override
-            public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile)
+            public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingProfile defaultPoolingProfile)
             {
                 return super.supportsPooling(resolvePoolingProfile(defaultPoolingProfile));
             }
 
             @Override
-            public ConnectionHandlingStrategy requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener poolingListener)
+            public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
             {
                 return super.requiresPooling(resolvePoolingProfile(defaultPoolingProfile), poolingListener);
             }
 
             @Override
-            public ConnectionHandlingStrategy requiresPooling(PoolingProfile defaultPoolingProfile)
+            public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile)
             {
                 return super.requiresPooling(resolvePoolingProfile(defaultPoolingProfile));
             }

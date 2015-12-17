@@ -215,7 +215,7 @@ public class IntrospectionUtils
     {
         while (connectionProvider instanceof ConnectionProviderWrapper)
         {
-            connectionProvider = ((ConnectionProviderWrapper) connectionProvider).getDelegate();
+            connectionProvider = ((ConnectionProviderWrapper<Config, Connection>) connectionProvider).getDelegate();
         }
 
         return connectionProvider;
