@@ -8,8 +8,8 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -49,6 +49,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected int batchSize;
     protected String counterVariableName;
 
+    @Override
     public final MuleEvent process(MuleEvent event) throws MuleException
     {
         if (isSplitRequired(event))
@@ -56,7 +57,15 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             MessageSequence<?> seq = splitMessageIntoSequence(event);
             if (!seq.isEmpty())
             {
-                return resultsHandler.aggregateResults(processParts(seq, event), event, muleContext);
+                MuleEvent aggregatedResults = resultsHandler.aggregateResults(processParts(seq, event), event, muleContext);
+                if (aggregatedResults instanceof VoidMuleEvent)
+                {
+                    return null;
+                }
+                else
+                {
+                    return aggregatedResults;
+                }
             }
             else
             {
