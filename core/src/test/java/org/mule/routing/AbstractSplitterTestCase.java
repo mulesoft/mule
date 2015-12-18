@@ -6,6 +6,11 @@
  */
 package org.mule.routing;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -14,6 +19,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.routing.filters.AcceptAllFilter;
+import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -26,14 +33,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
-    public void testSimpleSplitter() throws Exception
+    public void simpleSplitter() throws Exception
     {
         TestSplitter splitter = new TestSplitter();
         MultipleEventSensingMessageProcessor listener = new MultipleEventSensingMessageProcessor();
@@ -65,10 +69,34 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
         assertTrue(((MuleMessageCollection) resultEvent.getMessage()).getMessage(2).getPayload() instanceof Fruit);
     }
 
+    @Test
+    public void allFilteredSplitter() throws Exception
+    {
+        TestSplitter splitter = new TestSplitter();
+        splitter.setListener(new MessageFilter(new NotFilter(new AcceptAllFilter())));
+        splitter.setMuleContext(muleContext);
+
+        Apple apple = new Apple();
+        Banana banana = new Banana();
+        Orange orange = new Orange();
+        FruitBowl fruitBowl = new FruitBowl();
+        fruitBowl.addFruit(apple);
+        fruitBowl.addFruit(banana);
+        fruitBowl.addFruit(orange);
+
+        MuleEvent inEvent = new DefaultMuleEvent(new DefaultMuleMessage(fruitBowl, muleContext),
+                getTestEvent(""));
+
+        MuleEvent resultEvent = splitter.process(inEvent);
+
+        assertThat(resultEvent, nullValue());
+    }
+
     private static class MultipleEventSensingMessageProcessor implements MessageProcessor
     {
         List<MuleEvent> events = new ArrayList<MuleEvent>();
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             events.add(event);
