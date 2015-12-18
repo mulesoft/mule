@@ -12,7 +12,7 @@
     <flow name="dbServerService">
         <poll frequency="100">
             <db:select config-ref="dbConfig">
-                <db:parameterized-query>select * from Test</db:parameterized-query>
+                <db:parameterized-query>select * from Planet</db:parameterized-query>
             </db:select>
         </poll>
         <vm:outbound-endpoint path="out" />

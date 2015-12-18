@@ -48,14 +48,7 @@ public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        JdbcDatabaseSetUp jdbcDatabaseSetUp = JdbcDatabaseSetUp.createDatabaseOne();
-        TransactionScenarios.InboundMessagesGenerator jdbcInboundMessageCreator = jdbcDatabaseSetUp.createInboundMessageCreator();
-        TransactionScenarios.OutboundMessagesCounter jdbcOutboundMessagesVerifier = jdbcDatabaseSetUp.createOutboundMessageCreator();
-        JdbcDatabaseSetUp jdbcDatabaseSetUp2 = JdbcDatabaseSetUp.createDatabaseTwo();
-        TransactionScenarios.OutboundMessagesCounter jdbcOutboundMessagesVerifier2 = jdbcDatabaseSetUp2.createOutboundMessageCreator();
-        CompositeTransactionalTestSetUp createTwoDatabasesSetUp = new CompositeTransactionalTestSetUp(jdbcDatabaseSetUp, jdbcDatabaseSetUp2);
         JmsBrokerSetUp createFirstJmsBroker = new JmsBrokerSetUp(port1.getNumber());
-        CompositeTransactionalTestSetUp createDatabaseAndJmsBrokerSetUp = new CompositeTransactionalTestSetUp(jdbcDatabaseSetUp, createFirstJmsBroker);
         JmsBrokerSetUp createSecondJmsBroker = new JmsBrokerSetUp(port2.getNumber());
         CompositeTransactionalTestSetUp createTowJmsBrokers = new CompositeTransactionalTestSetUp(createFirstJmsBroker, createSecondJmsBroker);
 
@@ -76,30 +69,6 @@ public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
                         "org/mule/test/integration/transaction/xa/jms-different-connectors-xa-transaction-config.xml",
                         transactionManagerConfigFile}, createTowJmsBrokers,
                         new QueueInboundMessageGenerator(), JmsOutboundMessagesCounter.createVerifierForBroker(port2.getNumber())},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jdbc-xa-transaction-config.xml",
-                        transactionManagerConfigFile}, jdbcDatabaseSetUp,
-                        jdbcInboundMessageCreator, jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jdbc-different-connectors-xa-transaction-config.xml",
-                        transactionManagerConfigFile}, createTwoDatabasesSetUp,
-                        jdbcInboundMessageCreator, jdbcOutboundMessagesVerifier2},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jdbc-to-jms-xa-transaction-config.xml",
-                        transactionManagerConfigFile}, createDatabaseAndJmsBrokerSetUp,
-                        jdbcInboundMessageCreator, JmsOutboundMessagesCounter.createVerifierForBroker(port1.getNumber())},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jms-to-jdbc-xa-transaction-config.xml",
-                        transactionManagerConfigFile}, createDatabaseAndJmsBrokerSetUp,
-                        new QueueInboundMessageGenerator(), jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/vm-to-jdbc-xa-transaction-config.xml",
-                        transactionManagerConfigFile}, jdbcDatabaseSetUp,
-                        new QueueInboundMessageGenerator(), jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jdbc-to-vm-xa-transaction-config.xml",
-                        transactionManagerConfigFile}, jdbcDatabaseSetUp,
-                        jdbcInboundMessageCreator, new QueueOutboundMessagesCounter()}
         }
         );
     }

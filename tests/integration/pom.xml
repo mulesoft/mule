@@ -67,6 +67,12 @@
             <artifactId>mule-module-db</artifactId>
             <version>${project.version}</version>
         </dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-db</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+		</dependency>
 		<!-- Include all Mule Transports -->
 		<dependency>
 			<groupId>org.mule.transports</groupId>
@@ -177,13 +183,6 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-jdbc</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>

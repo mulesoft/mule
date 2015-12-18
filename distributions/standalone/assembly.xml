@@ -123,7 +123,6 @@
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
                 <include>org.mule.transports:mule-transport-http</include>
-                <include>org.mule.transports:mule-transport-jdbc</include>
                 <include>org.mule.transports:mule-transport-jms</include>
                 <include>org.mule.transports:mule-transport-ssl</include>
                 <include>org.mule.transports:mule-transport-tcp</include>
@@ -184,7 +183,6 @@
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-http</exclude>
-                <exclude>org.mule.transports:mule-transport-jdbc</exclude>
                 <exclude>org.mule.transports:mule-transport-jms</exclude>
                 <exclude>org.mule.transports:mule-transport-ssl</exclude>
                 <exclude>org.mule.transports:mule-transport-tcp</exclude>

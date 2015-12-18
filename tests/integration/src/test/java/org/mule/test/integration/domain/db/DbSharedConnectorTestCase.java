@@ -8,20 +8,22 @@ package org.mule.test.integration.domain.db;
 
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
+import org.mule.module.db.integration.model.DerbyTestDatabase;
+import org.mule.module.db.internal.domain.database.DbConfig;
+import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.DomainFunctionalTestCase;
-import org.mule.tck.util.MuleDerbyTestDatabase;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import javax.sql.DataSource;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -32,8 +34,6 @@ public class DbSharedConnectorTestCase extends DomainFunctionalTestCase
 
     public static final String CLIENT_APP = "client";
     public static final String SERVER_APP = "server";
-
-    private static MuleDerbyTestDatabase derbyTestDatabase = new MuleDerbyTestDatabase("database.name");
 
     private final String domainConfig;
 
@@ -51,22 +51,17 @@ public class DbSharedConnectorTestCase extends DomainFunctionalTestCase
         });
     }
 
-    @BeforeClass
-    public static void startDatabase() throws Exception
-    {
-        derbyTestDatabase.startDatabase();
-    }
-
-    @AfterClass
-    public static void stopDatabase() throws SQLException
-    {
-        derbyTestDatabase.stopDatabase();
-    }
-
     @Override
     protected String getDomainConfig()
     {
         return domainConfig;
+    }
+
+    @Before
+    public void configDB() throws SQLException
+    {
+        final DerbyTestDatabase testDatabase = new DerbyTestDatabase();
+        testDatabase.createDefaultDatabaseConfig(getDefaultDataSource());
     }
 
     @Override
@@ -88,4 +83,11 @@ public class DbSharedConnectorTestCase extends DomainFunctionalTestCase
         assertThat(response, notNullValue());
     }
 
+    public DataSource getDefaultDataSource()
+    {
+        DbConfigResolver dbConfigResolver = getMuleContextForDomain().getRegistry().get("dbConfig");
+        DbConfig config = dbConfigResolver.resolve(null);
+
+        return config.getDataSource();
+    }
 }
