@@ -6,7 +6,7 @@
  */
 package org.mule.construct;
 
-import static org.mule.util.NotificationUtils.buildPaths;
+import static org.mule.util.NotificationUtils.buildPathResolver;
 
 import org.mule.api.GlobalNameableObject;
 import org.mule.api.MessagingException;
@@ -360,7 +360,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     {
         DefaultMessageProcessorPathElement pipeLinePathElement = new DefaultMessageProcessorPathElement(null, getName());
         addMessageProcessorPathElements(pipeLinePathElement);
-        flowMap = buildPaths(pipeLinePathElement);
+        flowMap = buildPathResolver(pipeLinePathElement);
     }
 
     @Override

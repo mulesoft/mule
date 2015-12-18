@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.factories;
 
-import static org.mule.util.NotificationUtils.buildPaths;
+import static org.mule.util.NotificationUtils.buildPathResolver;
 
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.AnnotatedObject;
@@ -83,7 +83,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
             if (dynamicMessageProcessor instanceof MessageProcessorContainer)
             {
                 ((MessageProcessorContainer) dynamicMessageProcessor).addMessageProcessorPathElements(getPathElement());
-                return buildPaths(getPathElement());
+                return buildPathResolver(getPathElement());
             }
             else
             {
