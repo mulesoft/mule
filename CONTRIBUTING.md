@@ -191,7 +191,6 @@ Use IntelliJ's IDEA integration platform to modify or add to your cloned Mule so
 2. Open IDEA, then select ***File > Open...***
 3. Browse to the directory into which you downloaded the Mule source code, then select the `pom.xml` file. 
 4. Click ***OK***. IDEA takes awhile to process all the pom.xml files.
-5. Set the correct source for the JDK on your local drive. Right click the ***mule-transport-jdbc*** directory, then select  **Module Settings > Sources > src > main > jdk6** or **jdk7**. Repeat this step for test sources, as tests.
 
 ##### Troubleshooting
 

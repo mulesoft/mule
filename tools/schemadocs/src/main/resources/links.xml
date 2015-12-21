@@ -118,13 +118,6 @@
     <link><item>https:outbound-endpoint</item><page>HTTPS+Transport</page></link>
     <link><item>https:endpoint</item><page>HTTPS+Transport</page></link>
 
-    <link><item>jdbc:connector</item><page>JDBC+Transport</page></link>
-    <link><item>jdbc:inbound-endpoint</item><page>JDBC+Transport</page></link>
-    <link><item>jdbc:outbound-endpoint</item><page>JDBC+Transport</page></link>
-    <link><item>jdbc:endpoint</item><page>JDBC+Transport</page></link>
-    <link><item>jdbc:transaction</item><page>JDBC+Transport</page></link>
-    <link><item>jdbc:query</item><page>JDBC+Transport</page></link>
-
     <link><item>jms:connector</item><page>JMS+Transport</page></link>
     <link><item>jms:custom-connector</item><page>JMS+Transport</page></link>
     <link><item>jms:activemq-connector</item><page>JMS+Transport</page></link>
