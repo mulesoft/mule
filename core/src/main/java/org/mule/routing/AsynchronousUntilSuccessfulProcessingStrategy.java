@@ -244,10 +244,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                     CoreMessages.createStaticMessage("until-successful retries exhausted"), this);
             event.getFlowConstruct()
                     .getExceptionListener()
-                    .handleException(new MessagingException(event, retryPolicyExhaustedException), event);
+                    .handleException(new MessagingException(event, retryPolicyExhaustedException), mutableEvent);
             return;
         }
-
+        //we need another local copy in case mutableEvent is modified in the DLQ
+        MuleEvent eventCopy = threadSafeCopy(event);
         logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
         try
         {
@@ -255,13 +256,13 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         }
         catch (MessagingException e)
         {
-            event.getFlowConstruct().getExceptionListener().handleException(e, event);
+            event.getFlowConstruct().getExceptionListener().handleException(e, eventCopy);
         }
         catch (Exception e)
         {
             event.getFlowConstruct()
                     .getExceptionListener()
-                    .handleException(new MessagingException(event, e), event);
+                    .handleException(new MessagingException(event, e), eventCopy);
         }
     }
 
