@@ -6,6 +6,8 @@
  */
 package org.mule.transport;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -177,8 +179,11 @@ public abstract class AbstractReceiverWorker implements Work
             }
         };
 
+        ClassLoader originalCl = currentThread().getContextClassLoader();
         try
         {
+            currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
+
             List<MuleEvent> results = executionTemplate.execute(processingCallback);
             handleResults(handleEventResults(results));
         }
@@ -186,6 +191,7 @@ public abstract class AbstractReceiverWorker implements Work
         {
             messages.clear();
             RequestContext.clear();
+            currentThread().setContextClassLoader(originalCl);
         }
     }
 
