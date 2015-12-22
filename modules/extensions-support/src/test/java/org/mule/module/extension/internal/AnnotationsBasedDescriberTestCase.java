@@ -37,6 +37,7 @@ import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
@@ -46,7 +47,6 @@ import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.module.extension.ExtendedPersonalInfo;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergConnection;
@@ -140,7 +140,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConfigurationDeclaration configuration = declaration.getConfigurations().get(1);
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-        assertThat(configuration.getParameters(), hasSize(1));
+        assertThat(configuration.getParameters(), hasSize(17));
         assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, SUPPORTED, null);
     }
 
@@ -154,6 +154,12 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     public void heisenbergWithParameterGroupAsOptional() throws Exception
     {
         describerFor(HeisenbergWithParameterGroupAsOptional.class).describe(new DefaultDescribingContext());
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void heisenbergWithMoreThanOneConfigInOperation() throws Exception
+    {
+        describerFor(HeisenbergWithInvalidOperation.class).describe(new DefaultDescribingContext());
     }
 
     private void assertTestModuleConfiguration(Declaration declaration) throws Exception
@@ -359,6 +365,13 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Operations({DuplicateConfigOperation.class})
+    public static class HeisenbergWithInvalidOperation extends HeisenbergExtension
+    {
+
+    }
+
+    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
     public static class HeisenbergWithParameterGroupAsOptional extends HeisenbergExtension
     {
 
@@ -378,7 +391,17 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         }
     }
 
-    public static class HeisenbergAlternateConfig
+    public static class DuplicateConfigOperation
+    {
+
+        @Operation
+        public Long launder(@UseConfig HeisenbergExtension config, @UseConfig HeisenbergExtension config2)
+        {
+            return 10L;
+        }
+    }
+
+    public static class HeisenbergAlternateConfig extends HeisenbergExtension
     {
 
         @Parameter

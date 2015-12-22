@@ -25,11 +25,13 @@ import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.ExtensionOf;
+import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
@@ -43,6 +45,7 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarat
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -58,9 +61,12 @@ import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implementation of {@link Describer} which generates a {@link Descriptor} by
@@ -168,9 +174,10 @@ public final class AnnotationsBasedDescriber implements Describer
         List<ParameterGroup> groups = new LinkedList<>();
         for (Field field : getParameterGroupFields(annotatedType))
         {
+            //TODO: MULE-9220
             if (field.isAnnotationPresent(Optional.class))
             {
-                throw new IllegalModelDefinitionException(String.format("@%s can not be applied along with @%s", Optional.class.getSimpleName(), org.mule.extension.annotation.api.ParameterGroup.class.getSimpleName()));
+                throw new IllegalModelDefinitionException(String.format("@%s can not be applied along with @%s. Affected field [%s] in [%s].", Optional.class.getSimpleName(), org.mule.extension.annotation.api.ParameterGroup.class.getSimpleName(), field.getName(), annotatedType));
             }
             Set<ParameterDescriptor> parameters = declareSingleParameters(field.getType(), with);
 
@@ -326,6 +333,10 @@ public final class AnnotationsBasedDescriber implements Describer
     {
         List<ParsedParameter> descriptors = MuleExtensionAnnotationParser.parseParameters(method);
 
+        //TODO: MULE-9220
+        checkAnnotationIsNotUsedMoreThanOnce(method, operation, UseConfig.class);
+        checkAnnotationIsNotUsedMoreThanOnce(method, operation, Connection.class);
+
         for (ParsedParameter parsedParameter : descriptors)
         {
             if (parsedParameter.isAdvertised())
@@ -343,6 +354,26 @@ public final class AnnotationsBasedDescriber implements Describer
             {
                 operation.withModelProperty(ConnectionTypeModelProperty.KEY, new ConnectionTypeModelProperty(parsedParameter.getType().getRawType()));
             }
+
+            UseConfig useConfig = parsedParameter.getAnnotation(UseConfig.class);
+            if (useConfig != null)
+            {
+                operation.withModelProperty(ConfigTypeModelProperty.KEY, new ConfigTypeModelProperty(parsedParameter.getType().getRawType()));
+            }
+        }
+    }
+
+    private void checkAnnotationIsNotUsedMoreThanOnce(Method method, OperationDescriptor operation, Class annotationClass)
+    {
+        Stream<java.lang.reflect.Parameter> parametersStream = Arrays
+                .stream(method.getParameters())
+                .filter(parameter -> parameter.isAnnotationPresent(annotationClass));
+
+        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(Collectors.toList());
+
+        if (parameterList.size() > 1)
+        {
+            throw new IllegalModelDefinitionException(String.format("Method [%s] defined in Class [%s] of extension [%s] uses the annotation @%s more than once", method.getName(), method.getDeclaringClass(), operation.getRootDeclaration().getDeclaration().getName(), annotationClass.getSimpleName()));
         }
     }
 

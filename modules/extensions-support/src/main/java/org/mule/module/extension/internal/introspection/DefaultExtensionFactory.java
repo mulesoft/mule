@@ -34,6 +34,7 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarat
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.module.extension.internal.DefaultDescribingContext;
+import org.mule.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
 import org.mule.module.extension.internal.introspection.validation.ModelValidator;
 import org.mule.module.extension.internal.introspection.validation.NameClashModelValidator;
@@ -84,6 +85,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                 .add(new NameClashModelValidator())
                 .add(new ParameterModelValidator())
                 .add(new ConnectionProviderModelValidator())
+                .add(new ConfigurationModelValidator())
                 .add(new OperationReturnTypeModelValidator())
                 .build();
     }

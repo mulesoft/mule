@@ -106,20 +106,6 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         assertThat(configurationInstance.getConnectionProvider().isPresent(), is(false));
     }
 
-    @Test(expected = ConfigurationException.class)
-    public void invalidConfigConnectionProvider() throws Exception
-    {
-        when(configurationModel.getExtensionModel().getConnectionProviders()).thenReturn(asList(mock(ConnectionProviderModel.class)));
-        factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(new InvalidConfigTestConnectionProvider()));
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void invalidConnectionTypeProvider() throws Exception
-    {
-        when(configurationModel.getExtensionModel().getConnectionProviders()).thenReturn(asList(mock(ConnectionProviderModel.class)));
-        factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(new InvalidConnectionTypeProvider()));
-    }
-
     private void assertConfiguration(ConfigurationInstance<TestConfig> configurationInstance)
     {
         assertThat(configurationInstance, is(notNullValue()));
