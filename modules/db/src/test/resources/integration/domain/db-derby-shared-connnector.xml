@@ -8,12 +8,6 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <spring:bean id="property-placeholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <spring:property name="placeholderPrefix" value="${"/>
-        <spring:property name="placeholderSuffix" value="}"/>
-        <spring:property name="location" value="classpath:derby.properties"/>
-    </spring:bean>
-
     <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
         <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
         <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;create=true"/>

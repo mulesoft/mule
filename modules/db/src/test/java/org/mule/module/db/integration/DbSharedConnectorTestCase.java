@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.domain.db;
+package org.mule.module.db.integration;
 
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -46,8 +46,8 @@ public class DbSharedConnectorTestCase extends DomainFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {"domain/db/db-shared-connnector.xml"},
-                {"domain/db/db-derby-shared-connnector.xml"}
+                {"integration/domain/db-shared-connnector.xml"},
+                {"integration/domain/db-derby-shared-connnector.xml"}
         });
     }
 
@@ -68,8 +68,8 @@ public class DbSharedConnectorTestCase extends DomainFunctionalTestCase
     public ApplicationConfig[] getConfigResources()
     {
         return new ApplicationConfig[] {
-                new ApplicationConfig(CLIENT_APP, new String[] {"domain/db/db-client-app.xml"}),
-                new ApplicationConfig(SERVER_APP, new String[] {"domain/db/db-server-app.xml"})
+                new ApplicationConfig(CLIENT_APP, new String[] {"integration/domain/db-client-app.xml"}),
+                new ApplicationConfig(SERVER_APP, new String[] {"integration/domain/db-server-app.xml"})
         };
     }
 
