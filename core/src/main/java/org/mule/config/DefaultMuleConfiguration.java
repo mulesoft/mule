@@ -362,7 +362,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             verboseExceptions = BooleanUtils.toBoolean(p);
         }
 
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "flowTrace");
+        p = System.getProperty(MuleProperties.MULE_FLOW_TRACE);
         if (p != null)
         {
             flowTrace = BooleanUtils.toBoolean(p);
