@@ -10,8 +10,8 @@ package org.mule.module.db.integration.select;
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getVenusRecord;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -52,30 +52,27 @@ public class SelectWithPlaceHolderTestCase  extends AbstractDbIntegrationTestCas
     @Test
     public void replacesPlaceholderInParameterizedQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("placeholderParameterizedQuery", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://placeholderParameterizedQuery", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
     }
 
     @Test
     public void replacesPlaceholderInDynamicQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("placeholderDynamicQuery", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://placeholderDynamicQuery", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
     }
 
     @Test
     public void replacesPlaceholderInParameterizedQueryParam() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("placeholderParameterizedQueryParam", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://placeholderParameterizedQueryParam", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getVenusRecord());
     }
 }

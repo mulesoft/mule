@@ -7,14 +7,14 @@
 
 package org.mule.module.db.integration.select;
 
-import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getMarsRecord;
+import static org.mule.module.db.integration.model.Planet.MARS;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -44,10 +44,9 @@ public class SelectParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     @Test
     public void usesParameterizedQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("selectParameterizedQuery", MARS.getName());
 
-        MuleMessage response = client.send("vm://selectParameterizedQuery", MARS.getName(), null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getMarsRecord());
     }
 }

@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="insertCustomSource">
-        <inbound-endpoint address="vm://insertCustomSource" exchange-pattern="request-response"/>
-
         <set-variable variableName="name" value="Pluto"/>
 
         <db:insert config-ref="dbConfig" source="#[name]">

@@ -26,7 +26,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "integration/derby-datasource.xml,integration/select/default-select-config.xml";
+        return "integration/derby-datasource.xml,integration/select/select-default-config.xml";
     }
 
     @Override
@@ -85,9 +85,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
         public void execute(int messageId) throws Exception
         {
             logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
-            LocalMuleClient client = muleContext.getClient();
-
-            client.send("vm://testRequestResponse", TEST_MESSAGE, null);
+            runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
         }
     }
 

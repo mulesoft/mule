@@ -10,11 +10,11 @@ package org.mule.module.db.integration.storedprocedure;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 import java.util.Map;
@@ -48,10 +48,9 @@ public class StoredProcedureOutputParamTestCase extends AbstractDbIntegrationTes
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));
         Map payload = (Map) response.getPayload();
         // Apparently Derby has a bug: when there are no resultset returned, then

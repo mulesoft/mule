@@ -9,23 +9,21 @@ package org.mule.module.db.integration.update;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
+import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.model.Planet.EARTH;
 import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.integration.model.Planet.VENUS;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.client.MuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.transport.NullPayload;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -40,8 +38,6 @@ import org.junit.runners.Parameterized;
 public class UpdateBulkTestCase extends AbstractDbIntegrationTestCase
 {
 
-    private MuleClient client;
-
     public UpdateBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
@@ -54,13 +50,6 @@ public class UpdateBulkTestCase extends AbstractDbIntegrationTestCase
     }
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        client = muleContext.getClient();
-    }
-
-    @Override
     protected String[] getFlowConfigurationResources()
     {
         return new String[] {"integration/update/update-bulk-config.xml"};
@@ -69,14 +58,18 @@ public class UpdateBulkTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void updatesInBulkModeWithCollection() throws Exception
     {
-        MuleMessage response = client.send("vm://updateBulk", getPlanetNames(), null);
+        final MuleEvent responseEvent = runFlow("updateBulk", getPlanetNames());
+
+        final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response);
     }
 
     @Test
     public void updatesInBulkModeWithIterator() throws Exception
     {
-        MuleMessage response = client.send("vm://updateBulk", getPlanetNames().iterator(), null);
+        final MuleEvent responseEvent = runFlow("updateBulk", getPlanetNames().iterator());
+
+        final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response);
     }
 
@@ -93,18 +86,16 @@ public class UpdateBulkTestCase extends AbstractDbIntegrationTestCase
             }
         };
 
-        MuleMessage response = client.send("vm://updateBulk", iterable, null);
+        final MuleEvent responseEvent = runFlow("updateBulk", iterable);
+
+        final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response);
     }
 
-    @Test
+    @Test(expected = MessagingException.class)
     public void requiresSplittableType() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://updateBulk", TEST_MESSAGE, null);
-
-        assertTrue(response.getPayload() instanceof NullPayload);
-        assertNotNull(response.getExceptionPayload());
+        runFlow("updateBulk", TEST_MESSAGE);
     }
 
     private void assertBulkModeResult(MuleMessage response) throws SQLException

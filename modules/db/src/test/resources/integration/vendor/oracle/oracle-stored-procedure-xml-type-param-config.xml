@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="xmlTypeOutputParam">
-        <inbound-endpoint address="vm://xmlTypeOutputParam" exchange-pattern="request-response"/>
-
         <db:stored-procedure config-ref="dbConfig">
             <db:parameterized-query>{ call getAlienDescription(:name,  :description) }</db:parameterized-query>
             <db:in-param name="name" value="#[payload]" type="VARCHAR"/>
@@ -16,8 +14,6 @@
     </flow>
 
     <flow name="xmlTypeInputParam">
-        <inbound-endpoint address="vm://xmlTypeInputParam" exchange-pattern="request-response"/>
-
         <db:stored-procedure config-ref="dbConfig">
             <db:parameterized-query>{ call updateAlienDescription(:name, :description) }</db:parameterized-query>
             <db:in-param name="name" value="#[header:INBOUND:name]" type="VARCHAR"/>

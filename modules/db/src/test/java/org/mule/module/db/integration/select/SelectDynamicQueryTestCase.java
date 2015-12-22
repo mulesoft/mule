@@ -9,11 +9,11 @@ package org.mule.module.db.integration.select;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -43,10 +43,9 @@ public class SelectDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDynamicQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("selectDynamicQuery", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://selectDynamicQuery", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
     }
 }

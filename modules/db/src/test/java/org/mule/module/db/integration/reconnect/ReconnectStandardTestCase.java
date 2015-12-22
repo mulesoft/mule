@@ -11,8 +11,8 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryNotifier;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -54,12 +54,10 @@ public class ReconnectStandardTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void reconnectsAfterConnectionFailure() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("testReconnection", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://testReconnection", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
-
         assertThat(errorCount, equalTo(EXPECTED_CONNECTION_ERRORS));
     }
 

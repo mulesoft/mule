@@ -10,14 +10,18 @@ package org.mule.module.db.integration.update;
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.integration.TestDbConfig;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +52,9 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesDefaultParams() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("defaultParams", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://defaultParams", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
@@ -60,10 +63,9 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesOverriddenParams() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("overriddenParams", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://overriddenParams", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=2", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 2)));
@@ -71,10 +73,9 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
 
     public void usesInlineOverriddenParams() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("inlineOverriddenParams", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://inlineOverriddenParams", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=3", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 3)));
@@ -83,10 +84,9 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesParamsInInlineQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("inlineQuery", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://inlineQuery", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
@@ -95,12 +95,15 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesExpressionParam() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("type", 3);
-        MuleMessage response = client.send("vm://expressionParam", TEST_MESSAGE, props);
 
+        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, props, Collections.emptyMap(), Collections.emptyMap(), muleContext);
+        final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, null);
+
+        final MuleEvent responseEvent = runFlow("expressionParam", muleEvent);
+
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=3", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 3)));

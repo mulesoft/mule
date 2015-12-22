@@ -10,11 +10,11 @@ package org.mule.module.db.integration.select;
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getEarthRecord;
 import static org.mule.module.db.integration.TestRecordUtil.getVenusRecord;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -44,20 +44,18 @@ public class SelectMaxRowsTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void limitsRows() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("selectMaxRows", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://selectMaxRows", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getVenusRecord(), getEarthRecord());
     }
 
     @Test
     public void limitsStreamedRows() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("selectMaxStreamedRows", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://selectMaxStreamedRows", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getVenusRecord(), getEarthRecord());
     }
 }

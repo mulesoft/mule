@@ -9,11 +9,11 @@ package org.mule.module.db.integration.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.model.Planet.VENUS;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -44,20 +44,18 @@ public class DeleteSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDefaultSource() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("delete", VENUS.getName());
 
-        MuleMessage response = client.send("vm://delete", VENUS.getName(), null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertDelete(response);
     }
 
     @Test
     public void usesCustomSource() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("deleteCustomSource", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://deleteCustomSource", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertDelete(response);
     }
 

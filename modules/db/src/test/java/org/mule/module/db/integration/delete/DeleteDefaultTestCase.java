@@ -9,6 +9,7 @@ package org.mule.module.db.integration.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.model.Planet.VENUS;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -43,8 +44,8 @@ public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testRequestResponse", VENUS.getName(), null);
+        final MuleEvent responseEvent = runFlow("defaultDeleteRequestResponse", VENUS.getName());
+        final MuleMessage response = responseEvent.getMessage();
 
         assertEquals(1, response.getPayload());
     }

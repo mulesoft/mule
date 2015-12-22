@@ -6,16 +6,12 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="deleteDefaultTarget">
-        <inbound-endpoint address="vm://deleteDefaultTarget" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig">
             <db:parameterized-query>DELETE FROM PLANET WHERE name = 'Venus'</db:parameterized-query>
         </db:delete>
     </flow>
 
     <flow name="deleteCustomTarget">
-        <inbound-endpoint address="vm://deleteCustomTarget" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig" target="#[header:OUTBOUND:updateCount]">
             <db:parameterized-query>DELETE FROM PLANET WHERE name = 'Venus'</db:parameterized-query>
         </db:delete>

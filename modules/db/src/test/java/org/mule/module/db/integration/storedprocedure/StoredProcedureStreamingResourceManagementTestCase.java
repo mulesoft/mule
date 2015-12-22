@@ -7,23 +7,22 @@
 
 package org.mule.module.db.integration.storedprocedure;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.internal.result.resultset.ResultSetIterator;
-import org.mule.transport.NullPayload;
 
 import java.util.List;
 import java.util.Map;
@@ -61,17 +60,17 @@ public class StoredProcedureStreamingResourceManagementTestCase extends Abstract
         doSuccessfulMessageTest();
     }
 
-    private void doSuccessfulMessageTest() throws MuleException
+    private void doSuccessfulMessageTest() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://storedProcedureStreaming", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("storedProcedureStreaming", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         Map payload = (Map) response.getPayload();
 
         assertThat(payload.size(), IsEqual.equalTo(1));
         assertThat(payload.get("resultSet1"), is(instanceOf(ResultSetIterator.class)));
-        assertThat(response.getInboundProperty("processedResults"), is(instanceOf(List.class)));
-        assertRecords(response.getInboundProperty("processedResults"), getAllPlanetRecords());
+        assertThat(response.getOutboundProperty("processedResults"), is(instanceOf(List.class)));
+        assertRecords(response.getOutboundProperty("processedResults"), getAllPlanetRecords());
     }
 
     @Test
@@ -84,12 +83,15 @@ public class StoredProcedureStreamingResourceManagementTestCase extends Abstract
 
     private void doFailedMessageTest() throws MuleException
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://storedProcedureStreamingError", TEST_MESSAGE, null);
-
-        assertThat(response.getExceptionPayload(), notNullValue());
-        assertThat(response.getExceptionPayload().getRootException().getMessage(), equalTo("Failing test on purpose"));
-        assertThat(response.getPayload(), is(instanceOf(NullPayload.class)));
+        try
+        {
+            runFlow("storedProcedureStreamingError", TEST_MESSAGE);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Failing test on purpose"));
+        }
     }
 
     @Before

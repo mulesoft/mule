@@ -9,10 +9,10 @@ package org.mule.module.db.integration.bulkexecute;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -42,12 +42,11 @@ public class BulkExecuteTargetTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://bulkUpdateCustomTarget", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("bulkUpdateCustomTarget", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
-
-        assertBulkModeResult(response.getInboundProperty("updateCounts"));
+        assertBulkModeResult(response.getOutboundProperty("updateCounts"));
     }
 
 }

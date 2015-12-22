@@ -9,11 +9,11 @@ package org.mule.module.db.integration.select;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -41,11 +41,10 @@ public class DefaultDatabaseConfigQueryTestCase extends AbstractDbIntegrationTes
     }
 
     @Test
-    public void testRequestResponse() throws Exception
+    public void usesDefaultConfig() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("usesDefaultDatabaseConfig", TEST_MESSAGE);
+        final MuleMessage response = responseEvent.getMessage();
 
         assertMessageContains(response, getAllPlanetRecords());
     }

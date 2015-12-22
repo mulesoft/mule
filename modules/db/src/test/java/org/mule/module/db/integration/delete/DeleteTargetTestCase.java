@@ -9,11 +9,11 @@ package org.mule.module.db.integration.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.model.Planet.VENUS;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -44,10 +44,9 @@ public class DeleteTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDefaultTarget() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("deleteDefaultTarget", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://deleteDefaultTarget", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertInsert(response.getPayload());
     }
 

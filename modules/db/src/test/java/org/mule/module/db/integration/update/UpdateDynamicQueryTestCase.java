@@ -10,13 +10,13 @@ package org.mule.module.db.integration.update;
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.integration.TestDbConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -47,9 +47,9 @@ public class UpdateDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDynamicQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://updateDynamicQuery", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("updateDynamicQuery", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));

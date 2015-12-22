@@ -16,8 +16,6 @@
     </flow>
 
     <flow name="defaultQueryRequestResponse">
-        <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
         </db:select>

@@ -12,11 +12,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.module.db.integration.DbTestUtil.assertExpectedUpdateCount;
 import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.integration.model.Planet.VENUS;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -48,15 +48,14 @@ public class DeleteBulkTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-
         List<String> planetNames = new ArrayList<String>();
         planetNames.add(VENUS.getName());
         planetNames.add(MARS.getName());
 
-        MuleMessage response = client.send("vm://deleteCustomTarget", planetNames, null);
+        final MuleEvent responseEvent = runFlow("deleteCustomTarget", planetNames);
+        final MuleMessage response = responseEvent.getMessage();
 
-        assertBulkDelete(response.getInboundProperty("updateCount"));
+        assertBulkDelete(response.getOutboundProperty("updateCount"));
     }
 
     private void assertBulkDelete(Object payload) throws SQLException

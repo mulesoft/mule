@@ -16,24 +16,18 @@
     </db:template-query>
 
     <flow name="defaultParams">
-        <inbound-endpoint address="vm://defaultParams" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig">
             <db:template-query-ref name="updateTemplate"/>
         </db:update>
     </flow>
 
     <flow name="overriddenParams">
-        <inbound-endpoint address="vm://overriddenParams" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig">
             <db:template-query-ref name="overriddenUpdateParam"/>
         </db:update>
     </flow>
 
     <flow name="inlineOverriddenParams">
-        <inbound-endpoint address="vm://inlineOverriddenParams" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig">
             <db:template-query-ref name="overriddenUpdateParam"/>
 
@@ -42,16 +36,12 @@
     </flow>
 
     <flow name="inlineQuery">
-        <inbound-endpoint address="vm://inlineQuery" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=#['4']</db:parameterized-query>
         </db:update>
     </flow>
 
     <flow name="expressionParam">
-        <inbound-endpoint address="vm://expressionParam" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=#[message.inboundProperties['type']]
                 AND NAME = 'Earth'

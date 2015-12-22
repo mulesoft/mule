@@ -12,8 +12,6 @@
     </db:template-query>
 
     <flow name="insertXmlType">
-        <inbound-endpoint address="vm://insertXmlType" exchange-pattern="request-response"/>
-
         <db:insert config-ref="dbConfig">
             <db:template-query-ref name="testInsert" />
         </db:insert>

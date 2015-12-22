@@ -14,8 +14,6 @@
     </flow>
 
     <flow name="deleteCustomSource">
-        <inbound-endpoint address="vm://deleteCustomSource" exchange-pattern="request-response"/>
-
         <set-variable variableName="name" value="Venus"/>
 
         <db:delete config-ref="dbConfig" source="#[name]">

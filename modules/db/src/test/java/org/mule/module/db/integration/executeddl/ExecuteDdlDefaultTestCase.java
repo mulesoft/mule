@@ -8,6 +8,7 @@
 package org.mule.module.db.integration.executeddl;
 
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -41,9 +42,9 @@ public class ExecuteDdlDefaultTestCase extends AbstractExecuteDdlTestCase
     @Test
     public void updatesDataRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://executeDdlRequestResponse", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("executeDdl", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertTableCreation(response.getPayload());
     }
 

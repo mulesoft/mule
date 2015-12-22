@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
@@ -54,9 +54,9 @@ public class StoredProcedureSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("storedProcedureCustomSource", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://storedProcedureCustomSource", TEST_MESSAGE, null);
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));
         Map payload = (Map) response.getPayload();
         assertThat(payload.size(), equalTo(1));

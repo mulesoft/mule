@@ -7,6 +7,7 @@
 
 package org.mule.module.db.integration.bulkexecute;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -40,9 +41,9 @@ public class BulkExecuteDefaultTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void updatesDataRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("bulkUpdateRequestResponse", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response.getPayload());
     }
 

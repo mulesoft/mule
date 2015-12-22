@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
@@ -51,9 +51,9 @@ public class UpdateStoredProcedureTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://updateStoredProcedure", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("updateStoredProcedure", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
         assertEquals(expectedUpdateCount, response.getPayload());
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());

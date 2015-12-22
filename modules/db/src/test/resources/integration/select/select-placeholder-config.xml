@@ -11,24 +11,18 @@
     </db:template-query>
 
     <flow name="placeholderParameterizedQuery">
-        <inbound-endpoint address="vm://placeholderParameterizedQuery" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:parameterized-query>${query}</db:parameterized-query>
         </db:select>
     </flow>
 
     <flow name="placeholderDynamicQuery">
-        <inbound-endpoint address="vm://placeholderDynamicQuery" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:dynamic-query>${query}</db:dynamic-query>
         </db:select>
     </flow>
 
     <flow name="placeholderParameterizedQueryParam">
-        <inbound-endpoint address="vm://placeholderParameterizedQueryParam" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:template-query-ref name="testSelect"/>
             <db:in-param name="position" value="${param}"/>

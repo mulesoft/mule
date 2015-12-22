@@ -8,8 +8,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="jdbcRollback">
-        <inbound-endpoint address="vm://testRollback" exchange-pattern="request-response"/>
-
         <transactional>
             <db:update config-ref="dbConfig">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
@@ -19,8 +17,6 @@
     </flow>
 
     <flow name="jdbcCommit">
-        <inbound-endpoint address="vm://testCommit" exchange-pattern="request-response"/>
-
         <transactional>
             <db:update config-ref="dbConfig">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
@@ -31,8 +27,6 @@
     </flow>
 
     <flow name="rollbackWithNonTransactionalMP">
-        <inbound-endpoint address="vm://rollbackWithNonTransactionalMP" exchange-pattern="request-response"/>
-
         <transactional>
             <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
@@ -42,8 +36,6 @@
     </flow>
 
     <flow name="commitWithNonTransactionalMP">
-        <inbound-endpoint address="vm://commitWithNonTransactionalMP" exchange-pattern="request-response"/>
-
         <transactional>
             <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
