@@ -8,7 +8,6 @@ package org.mule.routing;
 
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -246,10 +245,12 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         if (getUntilSuccessfulConfiguration().getDlqMP() == null)
         {
             logger.info("Retry attempts exhausted and no DLQ defined");
-            messagingExceptionHandler.handleException(buildRetryPolicyExhaustedException(lastException), event);
+            //mutableEvent should be a local copy of event
+            messagingExceptionHandler.handleException(buildRetryPolicyExhaustedException(lastException), mutableEvent);
             return;
         }
-
+        //we need another local copy in case mutableEvent is modified in the DLQ
+        MuleEvent eventCopy = threadSafeCopy(event);
         logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
         try
         {
@@ -258,11 +259,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         }
         catch (MessagingException e)
         {
-            messagingExceptionHandler.handleException(e, event);
+            messagingExceptionHandler.handleException(e, eventCopy);
         }
         catch (Exception e)
         {
-            messagingExceptionHandler.handleException(new MessagingException(event, e), event);
+            messagingExceptionHandler.handleException(new MessagingException(event, e), eventCopy);
         }
     }
 

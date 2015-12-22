@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <spring:beans>
+        <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+    </spring:beans>
+
+    <flow name="withSplitterAggregatorTest">
+        <vm:inbound-endpoint path="splitter" exchange-pattern="request-response"/>
+        <set-payload value="#[{1,2}]"/>
+        <collection-splitter/>
+        <until-successful maxRetries="2" objectStore-ref="objectStore" millisBetweenRetries="2000">
+            <processor-chain>
+                <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
+            </processor-chain>
+        </until-successful>
+        <collection-aggregator/>
+        <!--wait until all events fail-->
+        <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$LockProcessor"/>
+        <set-payload value="ok"/>
+        <catch-exception-strategy>
+            <!--release when all events have failed-->
+            <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitTwiceBeforeUnlockProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+
+
+    <flow name="simpleTest">
+        <vm:inbound-endpoint path="simple" exchange-pattern="request-response"/>
+        <until-successful maxRetries="2" objectStore-ref="objectStore" millisBetweenRetries="2000">
+            <processor-chain>
+                <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
+            </processor-chain>
+        </until-successful>
+        <!--wait until all events fail-->
+        <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$LockProcessor"/>
+        <set-payload value="ok"/>
+        <catch-exception-strategy>
+            <!--release when all events have failed-->
+            <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitOnceBeforeUnlockProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="noRetriesSplitterAggregatorTest">
+        <vm:inbound-endpoint path="noRetriesSplitter" exchange-pattern="request-response"/>
+        <set-payload value="#[{1,2}]"/>
+        <collection-splitter/>
+        <until-successful maxRetries="0" objectStore-ref="objectStore" millisBetweenRetries="2000">
+            <processor-chain>
+                <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
+            </processor-chain>
+        </until-successful>
+        <collection-aggregator/>
+        <!--wait until all events fail-->
+        <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$LockProcessor"/>
+        <set-payload value="ok"/>
+        <catch-exception-strategy>
+            <!--release when all events have failed-->
+            <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitTwiceBeforeUnlockProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="noRetriesSimpleTest">
+        <vm:inbound-endpoint path="noRetries" exchange-pattern="request-response"/>
+        <until-successful maxRetries="0" objectStore-ref="objectStore" millisBetweenRetries="2000">
+            <processor-chain>
+                <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
+            </processor-chain>
+        </until-successful>
+        <!--wait until all events fail-->
+        <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$LockProcessor"/>
+        <set-payload value="ok"/>
+        <catch-exception-strategy>
+            <!--release when all events have failed-->
+            <custom-processor class="org.mule.test.integration.routing.UntilSuccessfulExceptionStrategyTestCase$WaitOnceBeforeUnlockProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+
+</mule>
