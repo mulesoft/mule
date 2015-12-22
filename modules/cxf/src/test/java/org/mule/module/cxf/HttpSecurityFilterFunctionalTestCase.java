@@ -11,9 +11,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -76,9 +77,10 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
         try
         {
             int status = client.executeMethod(get);
-            assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertThat(get.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.transport.http.filters.HttpBasicAuthenticationFilter " +
-                                                                 "but there was no security context on the session. Authentication denied on endpoint" ));
+            assertEquals(UNAUTHORIZED.getStatusCode(), status);
+            String expectedMessage = String.format("Registered authentication is set to org.mule.module.http.internal.filter.HttpBasicAuthenticationFilter " +
+                    "but there was no security context on the session. Authentication denied on endpoint %s.", get.getURI().getURI());
+            assertThat(get.getResponseBodyAsString(), startsWith(expectedMessage));
         }
         finally
         {
@@ -101,9 +103,9 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
         try
         {
             int status = client.executeMethod(post);
-            assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertThat(post.getResponseBodyAsString(), startsWith("Registered authentication is set to org.mule.transport.http.filters.HttpBasicAuthenticationFilter " +
-                                                                  "but there was no security context on the session. Authentication denied on endpoint" ));
+            assertEquals(UNAUTHORIZED.getStatusCode(), status);
+            assertThat(post.getResponseBodyAsString(), startsWith(String.format("Registered authentication is set to org.mule.module.http.internal.filter.HttpBasicAuthenticationFilter " +
+                                                                  "but there was no security context on the session. Authentication denied on endpoint %s.", post.getURI().getURI())));
         }
         finally
         {
@@ -211,7 +213,7 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
         try
         {
             int status = client.executeMethod(get);
-            if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
+            if (status == UNAUTHORIZED.getStatusCode() && handshake == true)
             {
                 // doAuthentication = true means that if the request returns 401, 
                 // the HttpClient will resend the request with credentials
@@ -244,7 +246,7 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
         try
         {
             int status = client.executeMethod(post);
-            if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
+            if (status == UNAUTHORIZED.getStatusCode() && handshake == true)
             {
                 // doAuthentication = true means that if the request returns 401, 
                 // the HttpClient will resend the request with credentials

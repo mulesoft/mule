@@ -32,7 +32,7 @@
 
     <flow name="listenerBasicAuth">
         <http:listener config-ref="listenerConfigBasicAuth" path="/basic" />
-        <mule-ss:http-security-filter realm="mule-realm"/>
+        <http:basic-security-filter realm="mule-realm"/>
         <set-payload value="TestBasicAuthOk"/>
     </flow>
 

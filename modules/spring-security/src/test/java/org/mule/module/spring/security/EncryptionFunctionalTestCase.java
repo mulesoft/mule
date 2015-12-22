@@ -9,6 +9,10 @@ package org.mule.module.spring.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -17,8 +21,6 @@ import org.mule.api.security.CryptoFailureException;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,8 +78,8 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         MuleMessage m = muleContext.getClient().send(getUrl(), "", props);
         assertNotNull(m);
 
-        int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
+        int status = m.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
+        assertEquals(UNAUTHORIZED.getStatusCode(), status);
     }
 
     @Test
@@ -86,8 +88,8 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         Map<String, Object> props = createMessagePropertiesWithCredentials("anon", "anon");
         MuleMessage m = muleContext.getClient().send(getUrl(), "", props);
         assertNotNull(m);
-        int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        assertEquals(HttpConstants.SC_OK, status);
+        int status = m.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
+        assertEquals(OK, status);
     }
 
     private Map<String, Object> createMessagePropertiesWithCredentials(String username, String password) throws CryptoFailureException

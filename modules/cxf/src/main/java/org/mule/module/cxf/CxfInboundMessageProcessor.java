@@ -6,9 +6,13 @@
  */
 package org.mule.module.cxf;
 
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getBasePath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
@@ -33,8 +37,6 @@ import org.mule.module.cxf.transport.MuleUniversalDestination;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -102,6 +104,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     private QueryHandler wsdlQueryHandler;
 
     private String mimeType;
+
+    private final HttpRequestPropertyManager requestPropertyManager = new HttpRequestPropertyManager();
 
     @Override
     public void initialise() throws InitialisationException
@@ -185,7 +189,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         throws EndpointNotFoundException, IOException
     {
         // TODO: Is there a way to make this not so ugly?
-        String ctxUri = event.getMessage().getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+        String ctxUri = requestPropertyManager.getBasePath(event.getMessage());
         String wsdlUri = getUri(event);
         String serviceUri = wsdlUri.substring(0, wsdlUri.indexOf('?'));
 
@@ -223,7 +227,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
 
         event.getMessage().setPayload(msg, DataTypeFactory.XML_STRING);
-        event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
+        event.getMessage().setOutboundProperty(CONTENT_TYPE, ct);
         return event;
     }
 
@@ -271,7 +275,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                         {
                             ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
                             responseEvent.getMessage().setExceptionPayload(exceptionPayload);
-                            returnMessage.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
+                            returnMessage.setOutboundProperty(HTTP_STATUS_PROPERTY, 500);
                             responseEvent.setMessage(returnMessage);
                             processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
                         }
@@ -308,15 +312,15 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         final MessageImpl m = new MessageImpl();
         m.setExchange(exchange);
         final MuleMessage muleReqMsg = event.getMessage();
-        String method = muleReqMsg.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+        String method = muleReqMsg.getInboundProperty(HTTP_METHOD_PROPERTY);
 
-        String ct = muleReqMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        String ct = muleReqMsg.getInboundProperty(CONTENT_TYPE);
         if (ct != null)
         {
             m.put(Message.CONTENT_TYPE, ct);
         }
 
-        String path = muleReqMsg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
+        String path = requestPropertyManager.getRequestPath(event.getMessage());
         if (path == null)
         {
             path = "";
@@ -449,7 +453,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             {
                 ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
                 event.getMessage().setExceptionPayload(exceptionPayload);
-                muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
+                muleResMsg.setOutboundProperty(HTTP_STATUS_PROPERTY, 500);
             }
         }
 

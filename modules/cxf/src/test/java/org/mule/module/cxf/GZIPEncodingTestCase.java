@@ -10,16 +10,15 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.runners.Parameterized.Parameter;
-import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ENCODING;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -28,8 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -39,8 +36,6 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 public class GZIPEncodingTestCase extends FunctionalTestCase
 {
@@ -82,7 +77,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     public void proxyWithGZIPRequestAndResponse() throws Exception
     {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(HttpConstants.HEADER_CONTENT_ENCODING, "gzip,deflate");
+        properties.put(CONTENT_ENCODING, "gzip,deflate");
         MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(gzip(getAllRequest), properties, muleContext), HTTP_REQUEST_OPTIONS);
         validateResponse(response);
     }
@@ -91,7 +86,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     {
         String unzipped = unzip(new ByteArrayInputStream(getPayloadAsBytes(response)));
         assertTrue(XMLUnit.compareXML(getAllResponse, unzipped).identical());
-        assertEquals(GZIP, response.getInboundProperty(HttpConstants.HEADER_CONTENT_ENCODING));
+        assertEquals(GZIP, response.getInboundProperty(CONTENT_ENCODING));
     }
 
     private String unzip(InputStream input) throws IOException

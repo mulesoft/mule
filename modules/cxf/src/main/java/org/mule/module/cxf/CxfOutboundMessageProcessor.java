@@ -7,6 +7,8 @@
 package org.mule.module.cxf;
 
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -25,7 +27,6 @@ import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.module.cxf.security.WebServiceSecurityException;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.http.HttpConnector;
 import org.mule.util.TemplateParser;
 
 import java.lang.reflect.InvocationTargetException;
@@ -463,10 +464,10 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         MuleMessage message = transportResponse.getMessage();
 
-        Object httpStatusCode = message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
+        Object httpStatusCode = message.getInboundProperty(HTTP_STATUS_PROPERTY);
         if (isProxy() && httpStatusCode != null)
         {
-            message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, httpStatusCode);
+            message.setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);
         }
 
         Class payloadClass = payload != null ? payload.getClass() : Object.class;

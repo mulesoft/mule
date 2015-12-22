@@ -6,11 +6,9 @@
  */
 package org.mule.test.integration.config;
 
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -19,12 +17,8 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.concurrent.TimeoutException;
-
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
 {
@@ -49,7 +43,7 @@ public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://httpTimeout", "hi", null);
         assertNotNull(result);
-        assertThat(result.getExceptionPayload().getException().getCause(), instanceOf(TimeoutException.class));
+        assertNull(result.getExceptionPayload());
     }
 
     @Test

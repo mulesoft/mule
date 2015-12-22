@@ -19,12 +19,13 @@ import org.mule.api.callback.HttpCallbackFactory;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.module.http.api.listener.HttpListenerConfig;
+import org.mule.module.http.internal.listener.HttpListenerConfigBuilder;
 import org.mule.security.oauth.DefaultHttpCallback;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
 import org.mule.security.oauth.callback.DefaultHttpCallbackFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,16 +39,14 @@ public class OAuthContinuationTestCase extends AbstractMuleContextTestCase
     @Rule
     public DynamicPort remotePort = new DynamicPort("remotePort");
 
-    private HttpConnector httpConnector;
+    private HttpListenerConfig httpListenerConfig;
     private DefaultHttpCallback callback;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        this.httpConnector = new HttpConnector(muleContext);
-        this.httpConnector.initialise();
-        this.httpConnector.start();
+        httpListenerConfig = new HttpListenerConfigBuilder(muleContext).setHost("localhost").setPort(localPort.getNumber()).build();
     }
 
     @Override
@@ -57,8 +56,7 @@ public class OAuthContinuationTestCase extends AbstractMuleContextTestCase
         {
             this.callback.stop();
         }
-        this.httpConnector.stop();
-        this.httpConnector.dispose();
+        httpListenerConfig.stop();
         super.doTearDown();
     }
 
@@ -69,10 +67,10 @@ public class OAuthContinuationTestCase extends AbstractMuleContextTestCase
 
         DefaultHttpCallbackAdapter adapter = new DefaultHttpCallbackAdapter();
         adapter.setDomain("localhost");
-        adapter.setLocalPort(this.localPort.getNumber());
-        adapter.setRemotePort(this.remotePort.getNumber());
+        adapter.setLocalPort(localPort.getNumber());
+        adapter.setRemotePort(remotePort.getNumber());
         adapter.setPath("/testCallback");
-        adapter.setConnector(this.httpConnector);
+        adapter.setConnector(httpListenerConfig);
 
         FetchAccessTokenMessageProcessor fetchMessageProcessor = mock(FetchAccessTokenMessageProcessor.class,
             RETURNS_DEEP_STUBS);

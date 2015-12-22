@@ -6,21 +6,27 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class InOptionalOutTestCase extends FunctionalTestCase
 {
     public static final long TIMEOUT = 3000;
+
+    @Rule
+    public DynamicPort port = new DynamicPort("port1");
 
     @Override
     protected String getConfigFile()
@@ -33,13 +39,14 @@ public class InOptionalOutTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
+        String listenerUrl = format("http://localhost:%s/", port.getNumber());
+        MuleMessage result = client.send(listenerUrl, "some data", null);
         assertNotNull(result);
         assertEquals(StringUtils.EMPTY, getPayloadAsString(result));
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "bar");
-        result = client.send("inboundEndpoint", "some data", props);
+        result = client.send(listenerUrl, "some data", props);
         assertNotNull(result);
         assertEquals("foo header received", getPayloadAsString(result));
     }

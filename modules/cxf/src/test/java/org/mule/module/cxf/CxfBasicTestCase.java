@@ -10,7 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -18,7 +20,6 @@ import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -72,7 +73,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", new DefaultMuleMessage(xml, props, muleContext), HTTP_REQUEST_OPTIONS);
         assertTrue(getPayloadAsString(result).contains("Hello!"));
-        String ct = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
+        String ct = result.getInboundProperty(CONTENT_TYPE, "");
         assertEquals("text/xml; charset=UTF-8", ct);
     }
 

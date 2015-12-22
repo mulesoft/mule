@@ -8,9 +8,10 @@ package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -48,7 +49,7 @@ public class CustomSecManagerHttpFilterFunctionalTestCase extends FunctionalTest
         try
         {
             int status = client.executeMethod(get);
-            assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
+            assertEquals(UNAUTHORIZED.getStatusCode(), status);
             assertTrue(get.getResponseBodyAsString().contains("no security context on the session. Authentication denied on endpoint"));
         }
         finally
@@ -113,7 +114,7 @@ public class CustomSecManagerHttpFilterFunctionalTestCase extends FunctionalTest
         try
         {
             int status = client.executeMethod(get);
-            if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
+            if (status == UNAUTHORIZED.getStatusCode() && handshake == true)
             {
                 // doAuthentication = true means that if the request returns 401,
                 // the HttpClient will resend the request with credentials

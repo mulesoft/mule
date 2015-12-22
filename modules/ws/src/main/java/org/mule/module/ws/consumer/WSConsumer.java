@@ -7,6 +7,8 @@
 
 package org.mule.module.ws.consumer;
 
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -32,7 +34,6 @@ import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.transport.http.HttpConnector;
 import org.mule.util.IOUtils;
 
 import java.net.URL;
@@ -263,10 +264,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             protected MuleEvent processResponse(MuleEvent event) throws MuleException
             {
                 // Ensure that the http.status code inbound property (if present) is a String.
-                Object statusCode = event.getMessage().getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, null);
+                Object statusCode = event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY, null);
                 if (statusCode != null && !(statusCode instanceof String))
                 {
-                    event.getMessage().setProperty(HttpConnector.HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
+                    event.getMessage().setProperty(HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
                 }
                 return super.processResponse(event);
             }

@@ -42,6 +42,4 @@ public interface HttpCallbackFactory
                                        MuleContext muleContext,
                                        FlowConstruct flowConstruct) throws MuleException;
 
-    public void forceOldHttpTransport(boolean forceOld);
-
 }

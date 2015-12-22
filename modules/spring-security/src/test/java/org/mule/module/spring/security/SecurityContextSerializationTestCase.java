@@ -7,16 +7,13 @@
 package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -24,8 +21,6 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 public class SecurityContextSerializationTestCase extends FunctionalTestCase
 {
@@ -68,12 +63,12 @@ public class SecurityContextSerializationTestCase extends FunctionalTestCase
         try
         {
             int status = client.executeMethod(get);
-            if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
+            if (status == UNAUTHORIZED.getStatusCode() && handshake == true)
             {
                 // doAuthentication = true means that if the request returns 401,
                 // the HttpClient will resend the request with credentials
                 status = client.executeMethod(get);
-                if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
+                if (status == UNAUTHORIZED.getStatusCode() && handshake == true)
                 {
                     // doAuthentication = true means that if the request returns 401,
                     // the HttpClient will resend the request with credentials

@@ -13,8 +13,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -29,7 +31,6 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transport.http.HttpConstants;
 import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;
@@ -241,7 +242,7 @@ public class ProxyTestCase extends FunctionalTestCase
         String resString = getPayloadAsString(result);
 
         assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
-            String.valueOf(HttpConstants.SC_OK).equals(result.getOutboundProperty("http.status")));
+            String.valueOf(OK.getStatusCode()).equals(result.getOutboundProperty("http.status")));
 
         assertTrue(resString.indexOf("Fault") != -1);
     }
@@ -379,7 +380,7 @@ public class ProxyTestCase extends FunctionalTestCase
     {
         String resString = getPayloadAsString(result);
         assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
-                    String.valueOf(HttpConstants.SC_OK).equals(result.getOutboundProperty("http.status")));
+                    String.valueOf(OK.getStatusCode()).equals(result.getOutboundProperty("http.status")));
         assertTrue(resString.indexOf("Fault") != -1);
     }
 

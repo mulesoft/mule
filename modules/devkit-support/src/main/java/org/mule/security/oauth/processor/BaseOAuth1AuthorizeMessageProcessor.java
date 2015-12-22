@@ -65,7 +65,6 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
     @Override
     protected void startCallback(HttpCallbackAdapter adapter, FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor) throws MuleException
     {
-        callbackFactory.forceOldHttpTransport(true);
         super.startCallback(adapter, fetchAccessTokenMessageProcessor);
     }
 

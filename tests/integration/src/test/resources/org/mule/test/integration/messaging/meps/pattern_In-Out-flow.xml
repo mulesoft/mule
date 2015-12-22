@@ -17,8 +17,6 @@
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
-    <http:endpoint name="inboundEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response" />
-
     <flow name="In-Out-Service">
 
         <http:listener path="*" config-ref="listenerConfig"/>

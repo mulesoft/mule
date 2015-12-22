@@ -7,8 +7,9 @@
 
 package org.mule.module.cxf.support;
 
+import static com.google.common.net.HttpHeaders.CONTENT_ENCODING;
+
 import org.mule.api.MuleMessage;
-import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +29,7 @@ public abstract class AbstractProxyGZIPInterceptor extends AbstractPhaseIntercep
     {
         boolean isEncoded = false;
 
-        String contentEncoding = message.getInboundProperty(HttpConstants.HEADER_CONTENT_ENCODING);
+        String contentEncoding = message.getInboundProperty(CONTENT_ENCODING);
         if(contentEncoding == null)
         {
             contentEncoding = message.getInboundProperty(GZIPOutInterceptor.SOAP_JMS_CONTENTENCODING);

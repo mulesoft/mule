@@ -8,7 +8,7 @@
 
 
     <flow name="helloMuleFlow">
-        <inbound-endpoint address="${scheme}://localhost:${port1}/service/helloMule" connector-ref="sharedHttpConnector"/>
+        <http:listener config-ref="sharedHttpListenerConfig" path="/service/helloMule"/>
         <set-payload value="hello mule"/>
     </flow>
 

@@ -6,7 +6,9 @@
  */
 package org.mule.module.cxf.transport;
 
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -30,8 +32,6 @@ import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -245,9 +245,6 @@ public class MuleUniversalConduit extends AbstractConduit
     protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException {
         try
         {
-            MuleMessage req = reqEvent.getMessage();
-            req.setOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
-
             if (reqEvent.isAllowNonBlocking())
             {
                 final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
@@ -312,7 +309,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 String encoding = result.getEncoding();
                 inMessage.put(Message.ENCODING, encoding);
 
-                String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+                String contentType = result.getInboundProperty(CONTENT_TYPE, "text/xml");
                 if (encoding != null && contentType.indexOf("charset") < 0)
                 {
                     contentType += "; charset=" + result.getEncoding();
