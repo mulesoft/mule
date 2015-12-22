@@ -11,8 +11,8 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.MySqlTestDatabase;
@@ -33,10 +33,9 @@ public abstract class AbstractStoredProcedureReturningResultsetTestCase extends 
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         Map payload = (Map) response.getPayload();
         if (testDatabase instanceof MySqlTestDatabase)
         {

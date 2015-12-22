@@ -15,9 +15,8 @@ import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getEarthRecord;
 import static org.mule.module.db.integration.TestRecordUtil.getMarsRecord;
 import static org.mule.module.db.integration.TestRecordUtil.getVenusRecord;
-
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -50,9 +49,9 @@ public class SelectStreamingChunkTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void chunksStreamedRecords() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://selectStreamingChunks", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("selectStreamingChunks", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         List chunks = (List) response.getPayload();
         assertEquals(2, chunks.size());
         assertThat(chunks.get(0), is(instanceOf(List.class)));

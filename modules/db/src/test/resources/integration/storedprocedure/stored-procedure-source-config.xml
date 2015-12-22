@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="storedProcedureCustomSource">
-        <inbound-endpoint address="vm://storedProcedureCustomSource" exchange-pattern="request-response"/>
-
         <set-variable variableName="name" value="Pluto"/>
 
         <db:stored-procedure config-ref="dbConfig" source="#[name]">

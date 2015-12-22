@@ -12,8 +12,11 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecord;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Alien;
@@ -22,6 +25,7 @@ import org.mule.module.db.integration.model.XmlField;
 import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.sql.Connection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +68,9 @@ public class OracleStoredProcedureXmlParamTestCase extends AbstractOracleXmlType
     @Test
     public void returnsXmlTypeOutputParam() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://xmlTypeOutputParam", "ET", null);
+        final MuleEvent responseEvent = runFlow("xmlTypeOutputParam", "ET");
 
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));
 
         Map<String, Object> mapPayload = (Map) response.getPayload();
@@ -84,12 +88,16 @@ public class OracleStoredProcedureXmlParamTestCase extends AbstractOracleXmlType
         {
             Object xmlType = OracleXmlType.createXmlType(connection, Alien.ET.getXml());
 
-            LocalMuleClient client = muleContext.getClient();
             Map<String, Object> messageProperties = new HashMap<String, Object>();
             messageProperties.put("name", "Monguito");
             messageProperties.put(DESCRIPTION_FIELD, xmlType);
 
-            MuleMessage response = client.send("vm://xmlTypeInputParam", TEST_MESSAGE, messageProperties);
+            final DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, messageProperties, Collections.emptyMap(), Collections.emptyMap(), muleContext);
+            final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, null);
+
+            final MuleEvent responseEvent = runFlow("xmlTypeInputParam", muleEvent);
+
+            final MuleMessage response = responseEvent.getMessage();
 
             assertThat(response.getPayload(), is(instanceOf(Map.class)));
             Map<String, Object> mapPayload = (Map) response.getPayload();

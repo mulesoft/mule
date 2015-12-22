@@ -12,8 +12,8 @@ import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -48,10 +48,9 @@ public class InsertBulkSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void insertsInBulkModeFromCustomSource() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("insertBulkCustomSource", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://insertBulkCustomSource", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertBulkInsert(response.getPayload());
     }
 

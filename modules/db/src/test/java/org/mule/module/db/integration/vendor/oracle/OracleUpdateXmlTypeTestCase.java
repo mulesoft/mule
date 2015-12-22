@@ -8,8 +8,8 @@
 package org.mule.module.db.integration.vendor.oracle;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Alien;
@@ -63,10 +63,9 @@ public class OracleUpdateXmlTypeTestCase extends AbstractOracleXmlTypeTestCase
             }
         }
 
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("updateWithXmlTypeParam", xmlType);
 
-        MuleMessage response = client.send("vm://updateWithXmlTypeParam", xmlType, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(2, response.getPayload());
 
         assertUpdatedAlienDscription();

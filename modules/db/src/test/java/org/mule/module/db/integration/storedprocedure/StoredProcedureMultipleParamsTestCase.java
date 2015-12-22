@@ -11,8 +11,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -47,10 +47,9 @@ public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegration
     @Test
     public void multipliesIntegers() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("multiplyIntsFlow", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://multiplyInts", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));
         Map payload = (Map) response.getPayload();
         // Apparently Derby has a bug: when there are no resultset returned, then
@@ -64,10 +63,9 @@ public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegration
     @Test
     public void concatenatesStrings() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("concatenateStringsFlow", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://concatenateStrings", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));
         Map payload = (Map) response.getPayload();
         // Apparently Derby has a bug: when there are no resultset returned, then

@@ -7,9 +7,7 @@
 
 package org.mule.module.db.integration.config;
 
-import static junit.framework.Assert.assertNotNull;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.api.MessagingException;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -33,12 +31,9 @@ public abstract class AbstractMultipleDatabaseConfigErrorTestCase extends Abstra
         return TestDbConfig.getResources();
     }
 
-    @Test
+    @Test(expected = MessagingException.class)
     public void returnsErrorWhenMultipleJdbcConfigDefined() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
-        assertNotNull(response.getExceptionPayload());
+        runFlow("testFlow", TEST_MESSAGE);
     }
-
 }

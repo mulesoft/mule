@@ -8,8 +8,8 @@
 package org.mule.module.db.integration.update;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -46,9 +46,9 @@ public class UpdateParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     @Test
     public void usesParameterizedQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://updateRequestResponse", PLUTO, null);
+        final MuleEvent responseEvent = runFlow("jdbcUpdate", PLUTO);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertUpdate(response);
     }
 

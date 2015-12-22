@@ -8,6 +8,7 @@
 package org.mule.module.db.integration.insert;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -42,9 +43,9 @@ public class InsertDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("jdbcInsertUpdateCountRequestResponse", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
     }
 

@@ -9,8 +9,8 @@ package org.mule.module.db.integration.config;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 
@@ -33,10 +33,9 @@ public abstract class AbstractDatabaseConfigTestCase extends AbstractDbIntegrati
     @Test
     public void configuresDatabaseSuccessfully() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("simpleSelect", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://simpleSelect", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
     }
 }

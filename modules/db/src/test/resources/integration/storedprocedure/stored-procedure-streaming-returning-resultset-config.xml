@@ -21,8 +21,6 @@
     </flow>
 
     <flow name="defaultQueryRequestResponse">
-        <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
-
         <db:stored-procedure config-ref="dbConfig" streaming="true">
             <db:parameterized-query>{ call getTestRecords() }</db:parameterized-query>
         </db:stored-procedure>

@@ -11,13 +11,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.integration.TestDbConfig;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -49,11 +49,11 @@ public class UpdateTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://updateCustomTarger", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("updateCustomTarget", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
-        assertThat(response.<Integer>getInboundProperty("updateCount"), equalTo(1));
+        assertThat(response.<Integer>getOutboundProperty("updateCount"), equalTo(1));
         verifyUpdatedRecord();
     }
 

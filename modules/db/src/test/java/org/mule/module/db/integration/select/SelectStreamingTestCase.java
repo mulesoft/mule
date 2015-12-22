@@ -12,11 +12,11 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.internal.result.resultset.ResultSetIterator;
 
 import java.util.List;
@@ -47,10 +47,10 @@ public class SelectStreamingTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void streamsRecords() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://selectStreaming", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("selectStreaming", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
-        assertRecords(response.getInboundProperty("processedRecords"), getAllPlanetRecords());
+        assertRecords(response.getOutboundProperty("processedRecords"), getAllPlanetRecords());
     }
 }

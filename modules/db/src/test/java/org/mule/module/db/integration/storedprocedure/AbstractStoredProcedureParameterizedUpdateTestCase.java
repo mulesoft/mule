@@ -13,8 +13,8 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.DerbyTestDatabase;
@@ -38,14 +38,14 @@ public abstract class AbstractStoredProcedureParameterizedUpdateTestCase extends
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", "foo");
 
-        MuleMessage response = client.send("vm://testRequestResponse", "foo", null);
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));
         Map payload = (Map) response.getPayload();
         assertThat(payload.size(), equalTo(1));
         int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
-        assertThat((Integer) payload.get("updateCount1"), equalTo(expectedUpdateCount));
+        assertThat(payload.get("updateCount1"), equalTo(expectedUpdateCount));
 
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "foo"), new Field("POSITION", 4)));

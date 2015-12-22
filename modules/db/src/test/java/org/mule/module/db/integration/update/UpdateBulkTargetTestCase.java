@@ -9,10 +9,10 @@ package org.mule.module.db.integration.update;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -42,10 +42,10 @@ public class UpdateBulkTargetTestCase extends AbstractUpdateBulkTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://updateBulkCustomTarget", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("updateBulkCustomTarget", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
-        assertBulkModeResult(response.getInboundProperty("updateCounts"));
+        assertBulkModeResult(response.getOutboundProperty("updateCounts"));
     }
 }

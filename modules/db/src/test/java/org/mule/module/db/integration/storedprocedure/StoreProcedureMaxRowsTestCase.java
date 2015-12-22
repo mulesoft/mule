@@ -12,13 +12,13 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getVenusRecord;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.MySqlTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.module.db.integration.model.MySqlTestDatabase;
 
 import java.util.List;
 import java.util.Map;
@@ -52,10 +52,9 @@ public class StoreProcedureMaxRowsTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         Map payload = (Map) response.getPayload();
         if (testDatabase instanceof MySqlTestDatabase)
         {

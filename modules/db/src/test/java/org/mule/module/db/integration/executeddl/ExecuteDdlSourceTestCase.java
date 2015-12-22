@@ -7,10 +7,10 @@
 
 package org.mule.module.db.integration.executeddl;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -40,10 +40,9 @@ public class ExecuteDdlSourceTestCase extends AbstractExecuteDdlTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("executeDdlCustomSource", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://executeDdlCustomSource", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertTableCreation(response.getPayload());
     }
 }

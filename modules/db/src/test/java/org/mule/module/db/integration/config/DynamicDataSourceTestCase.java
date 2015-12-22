@@ -9,8 +9,8 @@ package org.mule.module.db.integration.config;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -43,10 +43,9 @@ public class DynamicDataSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", "dbConfig");
 
-        MuleMessage response = client.send("vm://testRequestResponse", "dbConfig", null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
     }
 }

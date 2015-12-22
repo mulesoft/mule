@@ -9,11 +9,11 @@ package org.mule.module.db.integration.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.model.Planet.VENUS;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -43,11 +43,10 @@ public class DeleteDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDynamicQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://deleteDynamicQuery", VENUS.getName(), null);
+        final MuleEvent responseEvent = runFlow("deleteDynamicQuery", VENUS.getName());
 
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
-
         assertDeletedPlanetRecords(VENUS.getName());
     }
 }

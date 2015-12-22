@@ -8,11 +8,11 @@
 package org.mule.module.db.integration.insert;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -43,9 +43,9 @@ public class InsertDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDynamicQuery() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://insertDynamicQuery", "Pluto", null);
+        final MuleEvent responseEvent = runFlow("insertDynamicQuery", "Pluto");
 
+        final MuleMessage response = responseEvent.getMessage();
         assertInsert(response);
     }
 

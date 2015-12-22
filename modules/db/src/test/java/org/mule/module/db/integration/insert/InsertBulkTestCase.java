@@ -10,15 +10,15 @@ package org.mule.module.db.integration.insert;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
-import org.mule.transport.NullPayload;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -55,19 +55,17 @@ public class InsertBulkTestCase extends AbstractDbIntegrationTestCase
         List<String> planetNames = new ArrayList<String>();
         planetNames.add("Pluto");
         planetNames.add("Saturn");
-        MuleMessage response = client.send("vm://insertBulk", planetNames, null);
 
+        final MuleEvent responseEvent = runFlow("insertBulk", planetNames);
+
+        final MuleMessage response = responseEvent.getMessage();
         assertBulkInsert(response.getPayload());
     }
 
-    @Test
+    @Test(expected = MessagingException.class)
     public void requiresCollectionPayload() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://insertBulk", TEST_MESSAGE, null);
-
-        assertTrue(response.getPayload() instanceof NullPayload);
-        assertNotNull(response.getExceptionPayload());
+        runFlow("insertBulk", TEST_MESSAGE);
     }
 
     private void assertBulkInsert(Object payload) throws SQLException

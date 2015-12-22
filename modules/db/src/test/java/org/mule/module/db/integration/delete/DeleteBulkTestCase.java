@@ -8,17 +8,16 @@
 package org.mule.module.db.integration.delete;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.db.integration.DbTestUtil.assertExpectedUpdateCount;
 import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.integration.model.Planet.VENUS;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
-import org.mule.transport.NullPayload;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -50,23 +49,21 @@ public class DeleteBulkTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void deletesInBulkMode() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
         List<String> planetNames = new ArrayList<String>();
         planetNames.add(VENUS.getName());
         planetNames.add(MARS.getName());
-        MuleMessage response = client.send("vm://deleteBulk", planetNames, null);
+
+        final MuleEvent responseEvent = runFlow("deleteBulk", planetNames);
+        final MuleMessage response = responseEvent.getMessage();
 
         assertBulkDelete(response);
     }
 
-    @Test
+    @Test(expected = MessagingException.class)
     public void requiresCollectionPayload() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://deleteBulk", TEST_MESSAGE, null);
-
-        assertTrue(response.getPayload() instanceof NullPayload);
-        assertNotNull(response.getExceptionPayload());
+        final MuleEvent responseEvent = runFlow("deleteBulk", TEST_MESSAGE);
+        responseEvent.getMessage();
     }
 
     private void assertBulkDelete(MuleMessage response) throws SQLException

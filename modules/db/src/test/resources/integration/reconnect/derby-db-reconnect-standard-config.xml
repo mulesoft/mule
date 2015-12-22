@@ -14,8 +14,6 @@
 
 
     <flow name="testReconnection">
-        <inbound-endpoint address="vm://testReconnection" exchange-pattern="request-response"/>
-
         <db:select config-ref="badDbConfig">
             <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
         </db:select>

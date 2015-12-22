@@ -7,10 +7,10 @@
 
 package org.mule.module.db.integration.update;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -40,9 +40,9 @@ public class UpdateBulkSourceTestCase extends AbstractUpdateBulkTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://updateBulkCustomSource", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("updateBulkCustomSource", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response.getPayload());
     }
 }

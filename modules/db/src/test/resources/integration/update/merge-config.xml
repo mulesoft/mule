@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="merge">
-        <inbound-endpoint address="vm://merge" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig">
             <db:parameterized-query>
                 MERGE INTO PLANET p1

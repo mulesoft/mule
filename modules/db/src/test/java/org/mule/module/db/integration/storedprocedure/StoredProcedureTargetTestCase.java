@@ -14,9 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
@@ -55,11 +54,11 @@ public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://storedProcedureCustomTarget", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("storedProcedureCustomTarget", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), equalTo(TEST_MESSAGE));
-        assertThat(response.getInboundProperty("statementResult"), is(instanceOf(Map.class)));
+        assertThat(response.getOutboundProperty("statementResult"), is(instanceOf(Map.class)));
 
         verifyUpdatedRecord();
     }

@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="selectCustomSource">
-        <inbound-endpoint address="vm://selectCustomSource" exchange-pattern="request-response"/>
-
         <set-variable variableName="name" value="Mars"/>
 
         <db:select config-ref="dbConfig" source="#[name]">

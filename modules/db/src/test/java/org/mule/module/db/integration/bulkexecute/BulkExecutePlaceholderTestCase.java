@@ -7,14 +7,12 @@
 
 package org.mule.module.db.integration.bulkexecute;
 
-import org.mule.api.MuleException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Rule;
@@ -51,20 +49,20 @@ public class BulkExecutePlaceholderTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void resolvesBulkQueryPlaceholder() throws Exception
     {
-        doTest("vm://bulkUpdatePlaceholder");
+        doTest("bulkUpdatePlaceholder");
     }
 
     @Test
     public void resolvesFilePlaceholder() throws Exception
     {
-        doTest("vm://bulkUpdateFilePlaceholder");
+        doTest("bulkUpdateFilePlaceholder");
     }
 
-    private void doTest(String url) throws MuleException, SQLException
+    private void doTest(String flowName) throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(url, TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow(flowName, TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response.getPayload());
     }
 }

@@ -8,12 +8,12 @@
 package org.mule.module.db.integration.select;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.TestRecordUtil;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -43,20 +43,18 @@ public class SelectNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesParamOverriddenByName() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("overriddenParamsByName", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://overriddenParamsByName", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, TestRecordUtil.getMarsRecord());
     }
 
     @Test
     public void usesInlineParamOverriddenByName() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("inlineOverriddenParamsByName", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://inlineOverriddenParamsByName", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, TestRecordUtil.getEarthRecord());
     }
 }

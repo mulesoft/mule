@@ -7,21 +7,20 @@
 
 package org.mule.module.db.integration.select;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.internal.result.resultset.ResultSetIterator;
-import org.mule.transport.NullPayload;
 
 import java.util.List;
 
@@ -56,13 +55,13 @@ public class SelectStreamingResourceManagementTestCase extends AbstractDbIntegra
         doSuccessfulTestMessage();
     }
 
-    private void doSuccessfulTestMessage() throws MuleException
+    private void doSuccessfulTestMessage() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://selectStreaming", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("selectStreaming", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
-        assertRecords(response.getInboundProperty("processedRecords"), getAllPlanetRecords());
+        assertRecords(response.getOutboundProperty("processedRecords"), getAllPlanetRecords());
     }
 
     @Test
@@ -75,11 +74,14 @@ public class SelectStreamingResourceManagementTestCase extends AbstractDbIntegra
 
     private void doFailedMessageTest() throws MuleException
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://selectStreamingError", TEST_MESSAGE, null);
-
-        assertThat(response.getExceptionPayload(), notNullValue());
-        assertThat(response.getExceptionPayload().getRootException().getMessage(), equalTo("Failing test on purpose"));
-        assertThat(response.getPayload(), is(instanceOf(NullPayload.class)));
+        try
+        {
+            runFlow("selectStreamingError", TEST_MESSAGE);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Failing test on purpose"));
+        }
     }
 }

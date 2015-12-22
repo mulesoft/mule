@@ -8,8 +8,8 @@
 package org.mule.module.db.integration.select;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -47,10 +47,9 @@ public class SelectWithAliasTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void returnsAliasInResultSet() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent responseEvent = runFlow("usesAlias", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://usesAlias", TEST_MESSAGE, null);
-
+        final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getExpectedRecords());
     }
 

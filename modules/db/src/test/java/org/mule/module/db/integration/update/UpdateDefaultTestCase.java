@@ -10,6 +10,7 @@ package org.mule.module.db.integration.update;
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -48,9 +49,9 @@ public class UpdateDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void updatesDataRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://updateRequestResponse", TEST_MESSAGE, null);
+        final MuleEvent responseEvent = runFlow("jdbcUpdate", TEST_MESSAGE);
 
+        final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
         verifyUpdatedRecord();
     }

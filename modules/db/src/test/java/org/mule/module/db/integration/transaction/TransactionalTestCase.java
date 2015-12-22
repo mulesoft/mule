@@ -7,18 +7,15 @@
 
 package org.mule.module.db.integration.transaction;
 
-import static org.junit.Assert.assertTrue;
+import static junit.framework.TestCase.fail;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import static org.mule.module.db.integration.model.Planet.MARS;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.transport.NullPayload;
 
 import java.util.List;
 import java.util.Map;
@@ -49,10 +46,7 @@ public class TransactionalTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void commitsChanges() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testCommit", TEST_MESSAGE, null);
-
-        assertTrue(response.getPayload() instanceof NullPayload);
+        runFlowWithError("jdbcCommit");
 
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
@@ -61,10 +55,7 @@ public class TransactionalTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void rollbacksChanges() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testRollback", TEST_MESSAGE, null);
-
-        assertTrue(response.getPayload() instanceof NullPayload);
+        runFlowWithError("jdbcRollback");
 
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", MARS.getName()), new Field("POSITION", 4)));
@@ -73,10 +64,7 @@ public class TransactionalTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void commitsChangesWhenMpIsNotTransactionalOnRollback() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://rollbackWithNonTransactionalMP", TEST_MESSAGE, null);
-
-        assertTrue(response.getPayload() instanceof NullPayload);
+        runFlowWithError("commitWithNonTransactionalMP");
 
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
@@ -85,13 +73,24 @@ public class TransactionalTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void commitsChangesWhenMpIsNotTransactionalOnCommit() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://rollbackWithNonTransactionalMP", TEST_MESSAGE, null);
-
-        assertTrue(response.getPayload() instanceof NullPayload);
+        final String flowName = "rollbackWithNonTransactionalMP";
+        runFlowWithError(flowName);
 
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+    }
+
+    private void runFlowWithError(String flowName)
+    {
+        try
+        {
+            runFlow(flowName, TEST_MESSAGE);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // Ignore
+        }
     }
 
 }
