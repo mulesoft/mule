@@ -95,11 +95,6 @@
             <outbound-endpoint ref="xml-dom-out">
                 <transformer ref="xmlToDom "/>
             </outbound-endpoint>
-            <!-- MULE-5038
-            <vm:outbound-endpoint ref="xml-object-out">
-                <transformer ref="xmlToObject"/>
-            </vm:outbound-endpoint>
-            -->
             <vm:outbound-endpoint ref="dom-in"/>
         </all>
         

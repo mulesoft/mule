@@ -16,7 +16,7 @@ import org.junit.Test;
 
 public class MuleClientInThreadTestCase extends FunctionalTestCase
 {
-    int numMessages = 100000;
+    int numMessages = 100;
 
     @Override
     protected String getConfigFile()
@@ -38,17 +38,16 @@ public class MuleClientInThreadTestCase extends FunctionalTestCase
         {
             try
             {
-                MuleClient client = new MuleClient(muleContext);
-
                 for (int i = 0; i < numMessages; ++i)
                 {
-                    client.dispatch("vm://in", "test", null);
+                    runFlowAsync("testFlow", TEST_MESSAGE);
                 }
 
+                MuleClient client = new MuleClient(muleContext);
                 MuleMessage msg;
                 for (int i = 0; i < numMessages; ++i)
                 {
-                    msg = client.request("vm://out", 5000);
+                    msg = client.request("test://out", RECEIVE_TIMEOUT);
                     assertNotNull(msg);
                 }
             }

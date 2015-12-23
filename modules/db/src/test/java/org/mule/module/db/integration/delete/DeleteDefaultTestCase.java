@@ -13,8 +13,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -53,10 +53,10 @@ public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        client.dispatch("vm://testOneWay", VENUS.getName(), null);
+        runFlowAsync("defaultDeleteOneWay", TEST_MESSAGE);
 
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
         assertEquals(1, response.getPayload());
     }

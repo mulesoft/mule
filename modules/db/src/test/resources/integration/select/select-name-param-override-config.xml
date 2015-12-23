@@ -23,8 +23,6 @@
     </flow>
 
     <flow name="inlineOverriddenParamsByName">
-        <inbound-endpoint address="vm://inlineOverriddenParamsByName" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:template-query-ref name="namedParamsQueryTemplate"/>
             <!-- Note that parameters are in different order-->

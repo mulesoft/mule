@@ -6,9 +6,6 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleException;
-import org.mule.api.client.MuleClient;
-
 import org.junit.Test;
 
 public class ClassInterceptorTestCase extends AbstractInterceptorTestCase
@@ -21,10 +18,10 @@ public class ClassInterceptorTestCase extends AbstractInterceptorTestCase
     }
 
     @Test
-    public void testInterceptor() throws MuleException, InterruptedException
+    public void testInterceptor() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.send("vm://in", MESSAGE, null);
+        runFlowAsync("service", MESSAGE);
+
         assertMessageIntercepted();
     }
 }

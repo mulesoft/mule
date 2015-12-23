@@ -7,7 +7,6 @@
 package org.mule.test.transformers;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -33,8 +32,7 @@ public class AutoTransformerTestCase extends FunctionalTestCase
     public void testInboundAutoTransform() throws Exception
     {
         latch = new Latch();
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in", new FruitBowl(new Apple(), new Banana()), null);
+        runFlowAsync("test", new FruitBowl(new Apple(), new Banana()));
 
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }

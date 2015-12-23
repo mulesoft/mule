@@ -7,8 +7,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="bulkUpdateRequestResponse">
-        <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
-
         <db:bulk-execute file="integration/template-query.sql">
             update PLANET set NAME='Mercury' where POSITION=0
         </db:bulk-execute>

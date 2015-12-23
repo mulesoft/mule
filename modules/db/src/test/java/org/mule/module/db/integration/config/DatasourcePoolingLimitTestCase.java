@@ -36,12 +36,12 @@ public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTes
     {
         try
         {
+            runFlowAsync("dataSourcePooling", TEST_MESSAGE);
+            runFlowAsync("dataSourcePooling", TEST_MESSAGE);
+
             LocalMuleClient client = muleContext.getClient();
+            MuleMessage response = client.request("test://connectionError", RECEIVE_TIMEOUT);
 
-            client.dispatch("vm://testIn", TEST_MESSAGE, null);
-            client.dispatch("vm://testIn", TEST_MESSAGE, null);
-
-            MuleMessage response = client.request("vm://connectionError", RECEIVE_TIMEOUT);
             assertThat(response.getExceptionPayload().getException(), is(instanceOf(MessagingException.class)));
         }
         finally

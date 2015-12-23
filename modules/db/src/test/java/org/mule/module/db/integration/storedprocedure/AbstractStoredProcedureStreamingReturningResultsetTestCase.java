@@ -14,6 +14,9 @@ import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import static org.mule.module.db.integration.model.Planet.EARTH;
 import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.integration.model.Planet.VENUS;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -39,15 +42,15 @@ public abstract class AbstractStoredProcedureStreamingReturningResultsetTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        client.dispatch("vm://testOneWay", TEST_MESSAGE, null);
+        runFlowAsync("messagePerRecordOneWay", TEST_MESSAGE);
 
+        LocalMuleClient client = muleContext.getClient();
         List<MuleMessage> responses = new LinkedList<MuleMessage>();
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
         responses.add(response);
-        response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        response = client.request("test://testOut", RECEIVE_TIMEOUT);
         responses.add(response);
-        response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        response = client.request("test://testOut", RECEIVE_TIMEOUT);
         responses.add(response);
 
         assertEquals(3, responses.size());

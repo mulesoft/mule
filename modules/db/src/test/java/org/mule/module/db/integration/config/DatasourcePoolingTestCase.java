@@ -43,15 +43,14 @@ public class DatasourcePoolingTestCase extends AbstractDatasourcePoolingTestCase
     @Test
     public void providesMultipleConnections() throws Exception
     {
+        runFlowAsync("dataSourcePooling", TEST_MESSAGE);
+        runFlowAsync("dataSourcePooling", TEST_MESSAGE);
+
         LocalMuleClient client = muleContext.getClient();
-
-        client.dispatch("vm://testIn", TEST_MESSAGE, null);
-        client.dispatch("vm://testIn", TEST_MESSAGE, null);
-
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
         assertThat(response.getExceptionPayload(), is(nullValue()));
 
-        response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        response = client.request("test://testOut", RECEIVE_TIMEOUT);
         assertThat(response.getExceptionPayload(), is(nullValue()));
     }
 }

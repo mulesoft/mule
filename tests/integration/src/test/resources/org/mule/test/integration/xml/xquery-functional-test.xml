@@ -2,10 +2,8 @@
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-      http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <mxml:xquery-transformer name="xquery" returnClass="java.lang.String">
@@ -27,14 +25,7 @@
     </mxml:xquery-transformer>
 
     <flow name="Echo">
-        <!-- this endpoint is used by the functional test -->
-        <vm:inbound-endpoint path="test.in" exchange-pattern="request-response"
-                             transformer-refs="xquery"/>
+        <transformer ref="xquery"/>
         <echo-component/>
-        <all>
-            <vm:outbound-endpoint path="test.out" exchange-pattern="one-way"/>
-            <vm:outbound-endpoint path="OUT" exchange-pattern="one-way"/>
-        </all>
     </flow>
-
 </mule>

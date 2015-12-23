@@ -2,20 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="Bridge" doc:name="Bridge flow">
         <annotations>
             <doc:description>Main flow</doc:description>
         </annotations>
-        <inbound-endpoint ref="in" doc:name="inbound flow endpoint">
-            <transformer ref="StringtoByteArray"/>
-        </inbound-endpoint>
         <echo-component doc:name="echo"/>
-        <outbound-endpoint ref="out"/>
     </flow>
-
 </mule>

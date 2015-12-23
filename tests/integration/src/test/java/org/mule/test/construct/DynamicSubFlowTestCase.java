@@ -12,8 +12,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -21,8 +21,6 @@ import org.junit.Test;
 
 public class DynamicSubFlowTestCase extends FunctionalTestCase
 {
-
-    public static final String VM_IN = "vm://in";
 
     @Override
     protected String getConfigFile()
@@ -33,8 +31,8 @@ public class DynamicSubFlowTestCase extends FunctionalTestCase
     @Test
     public void testCofiguration() throws Exception
     {
-    	MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send(VM_IN, "", null);
+        final MuleEvent muleEvent = runFlow("ApplicationFlow", "");
+        MuleMessage result = muleEvent.getMessage();
         assertThat(result, is(notNullValue()));
         assertThat(result.getExceptionPayload(), is(nullValue()));
         assertThat(result.getPayload(), not(instanceOf(NullPayload.class)));

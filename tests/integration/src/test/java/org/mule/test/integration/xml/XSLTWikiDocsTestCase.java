@@ -9,6 +9,8 @@ package org.mule.test.integration.xml;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -52,7 +54,9 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
         props.put("ListRating", new Integer(6));
 
         //Invoke the service
-        MuleMessage message = client.send("vm://test.in", srcData, props);
+        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(srcData, props, null, null, muleContext);
+        final MuleEvent muleEvent = runFlow("Echo", muleMessage);
+        MuleMessage message = muleEvent.getMessage();
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
         //Compare results

@@ -66,8 +66,8 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     public void dispatchRequestUseNewConnectorByDefault() throws MuleException
     {
         muleContext.getClient().dispatch(getUrl(), getTestMuleMessage());
-        final MuleMessage vmMessage = getMessageReceivedByFlow();
-        assertThat(vmMessage.getPayload(), Is.<Object>is(NullPayload.getInstance().toString()));
+        final MuleMessage receivedMessage = getMessageReceivedByFlow();
+        assertThat(receivedMessage.getPayload(), Is.<Object>is(NullPayload.getInstance().toString()));
     }
 
     @Ignore("See MULE-8049")
@@ -75,10 +75,10 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     public void dispatchHttpPostRequestWithStreamingEnabled() throws Exception
     {
         muleContext.getClient().dispatch(getUrl(), getTestMuleMessage(new ByteArrayInputStream(TEST_MESSAGE.getBytes())), newOptions().method("POST").build());
-        final MuleMessage vmMessage = getMessageReceivedByFlow();
-        assertThat(vmMessage, notNullValue());
-        assertThat(getPayloadAsString(vmMessage), is(TEST_MESSAGE));
-        assertThat(vmMessage.getInboundProperty(HttpHeaders.Names.TRANSFER_ENCODING), Is.<Object>is(HttpHeaders.Values.CHUNKED));
+        final MuleMessage receivedMessage = getMessageReceivedByFlow();
+        assertThat(receivedMessage, notNullValue());
+        assertThat(getPayloadAsString(receivedMessage), is(TEST_MESSAGE));
+        assertThat(receivedMessage.getInboundProperty(HttpHeaders.Names.TRANSFER_ENCODING), Is.<Object>is(HttpHeaders.Values.CHUNKED));
     }
 
     @Test
@@ -86,9 +86,9 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     {
         final HttpRequestOptions options = newOptions().method(PUT_HTTP_METHOD).requestStreamingMode(NEVER).build();
         muleContext.getClient().dispatch(getUrl(), getTestMuleMessage(TEST_MESSAGE), options);
-        final MuleMessage vmMessage = getMessageReceivedByFlow();
-        assertThat(vmMessage.getInboundProperty(HttpHeaders.Names.TRANSFER_ENCODING), nullValue());
-        assertThat(vmMessage.getInboundProperty(HttpHeaders.Names.CONTENT_LENGTH), Is.<Object>is("12"));
+        final MuleMessage receivedMessage = getMessageReceivedByFlow();
+        assertThat(receivedMessage.getInboundProperty(HttpHeaders.Names.TRANSFER_ENCODING), nullValue());
+        assertThat(receivedMessage.getInboundProperty(HttpHeaders.Names.CONTENT_LENGTH), Is.<Object>is("12"));
     }
 
     @Ignore("See MULE-8049")
@@ -97,9 +97,9 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     {
         final MuleMessage response = muleContext.getClient().send(getUrl(), getTestMuleMessage(TEST_MESSAGE), newOptions().method(PUT_HTTP_METHOD).build());
         assertThat(getPayloadAsString(response), is(TEST_MESSAGE));
-        final MuleMessage vmMessage = getMessageReceivedByFlow();
-        assertThat(getPayloadAsString(vmMessage), is(TEST_MESSAGE));
-        assertThat(vmMessage.getInboundProperty(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY), Is.<Object>is(PUT_HTTP_METHOD));
+        final MuleMessage receivedMessage = getMessageReceivedByFlow();
+        assertThat(getPayloadAsString(receivedMessage), is(TEST_MESSAGE));
+        assertThat(receivedMessage.getInboundProperty(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY), Is.<Object>is(PUT_HTTP_METHOD));
     }
 
     @Test
@@ -180,7 +180,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
 
     private MuleMessage getMessageReceivedByFlow() throws MuleException
     {
-        return muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
+        return muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
     }
 
     private HttpRequesterConfig getRequestConfig()

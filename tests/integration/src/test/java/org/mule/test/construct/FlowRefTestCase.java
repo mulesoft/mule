@@ -12,12 +12,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
@@ -43,10 +41,6 @@ public class FlowRefTestCase extends FunctionalTestCase
 
     private static String FLOW1_SENSING_PROCESSOR_NAME = "NonBlockingFlow1SensingProcessor";
     private static String FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingFlow2SensingProcessor";
-    private static String TO_QUEUED_ASYNC_FLOW1_SENSING_PROCESSOR_NAME = "NonBlockingToQueuedAsyncFlow1SensingProcessor";
-    private static String TO_QUEUED_ASYNC_FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingToQueuedAsyncFlow2SensingProcessor";
-    private static String TO_ASYNC_FLOW1_SENSING_PROCESSOR_NAME = "NonBlockingToAsyncFlow1SensingProcessor";
-    private static String TO_ASYNC_FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingToAsyncFlow2SensingProcessor";
     private static String TO_SYNC_FLOW1_SENSING_PROCESSOR_NAME = "NonBlockingToSyncFlow1SensingProcessor";
     private static String TO_SYNC_FLOW2_SENSING_PROCESSOR_NAME = "NonBlockingToSyncFlow2SensingProcessor";
     private static String ERROR_MESSAGE = "ERROR";
@@ -66,13 +60,10 @@ public class FlowRefTestCase extends FunctionalTestCase
     @Test
     public void twoFlowRefsToSubFlow() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage msg = client.send("vm://two.flow.ref.to.sub.flow", new DefaultMuleMessage("0",
-            muleContext));
+        final MuleEvent muleEvent = runFlow("flow1", "0");
+        final MuleMessage msg = muleEvent.getMessage();
 
         assertEquals("012xyzabc312xyzabc3", getPayloadAsString(msg));
-
     }
 
     @Test

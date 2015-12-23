@@ -6,16 +6,12 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="deleteBulkMetadataNoParams">
-        <inbound-endpoint address="vm://deleteBulkMetadataNoParams" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = 1 and name = 'Mars'</db:parameterized-query>
         </db:delete>
     </flow>
 
     <flow name="deleteBulkMetadataNotSupportedValueParams">
-        <inbound-endpoint address="vm://deleteBulkMetadataNotSupportedValueParams" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload.position] and name =
                 #[header:OUTBOUND:name]
@@ -24,8 +20,6 @@
     </flow>
 
     <flow name="deleteBulkMetadataBeanParams">
-        <inbound-endpoint address="vm://deleteBulkMetadataBeanParams" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload.position] and name = #[payload.name]
             </db:parameterized-query>
@@ -33,8 +27,6 @@
     </flow>
 
     <flow name="deleteBulkMetadataMapParams">
-        <inbound-endpoint address="vm://deleteBulkMetadataMapParams" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload['position']] and name =
                 #[payload['name']]

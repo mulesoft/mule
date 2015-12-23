@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updateMetadata">
-        <inbound-endpoint address="vm://updateMetadata" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
         </db:update>

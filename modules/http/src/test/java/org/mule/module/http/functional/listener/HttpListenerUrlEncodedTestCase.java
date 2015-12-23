@@ -47,7 +47,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     public static final String PARAM_2_VALUE = "param2Value";
     public static final String PARAM_2_VALUE_1 = "param2Value1";
     public static final String PARAM_2_VALUE_2 = "param2Value2";
-    public static final String VM_OUTPUT_ENDPOINT = "vm://out";
+    public static final String OUT_QUEUE_URL = "test://out";
 
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
@@ -67,7 +67,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         final Response response = Request.Post(getListenerUrl())
                 .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE),
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE)).execute();
-        final MuleMessage receivedMessage = muleContext.getClient().request(VM_OUTPUT_ENDPOINT, 1000);
+        final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000);
         assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(ParameterMap.class));
         ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
         assertThat(payloadAsMap.size(), is(2));
@@ -99,7 +99,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
                 .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE),
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE_1),
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE_2)).execute();
-        final MuleMessage receivedMessage = muleContext.getClient().request(VM_OUTPUT_ENDPOINT, 1000);
+        final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000);
         assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(ParameterMap.class));
         ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
         assertThat(payloadAsMap.size(), is(2));
@@ -130,7 +130,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
 
     private void assertNullPayloadAndEmptyResponse(Response response) throws Exception
     {
-        final MuleMessage receivedMessage = muleContext.getClient().request(VM_OUTPUT_ENDPOINT, 1000);
+        final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000);
         assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(NullPayload.class));
 
         final HttpResponse httpResponse = response.returnResponse();

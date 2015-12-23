@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:script="http://www.mulesoft.org/schema/mule/scripting" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:thes="http://www.mulesoft.org/schema/mule/core"
-      xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
@@ -25,8 +22,6 @@
     <spring:bean name="NonBlockingToSyncFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
 
     <flow name="flow1">
-        <vm:inbound-endpoint path="two.flow.ref.to.sub.flow"
-                             exchange-pattern="request-response" />
         <flow-ref name="sub-flow" />
         <flow-ref name="sub-flow" />
     </flow>

@@ -55,38 +55,41 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testCustomProcessorInFlow() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://inFlow1", MESSAGE, null);
+        final MuleEvent muleEvent = runFlow("customProcessorInFlow");
+        MuleMessage response = muleEvent.getMessage();
 
         assertNotNull(response);
-        assertTrue((Boolean) response.getProperty("expectedHandler", PropertyScope.SESSION));
+        assertTrue(response.getProperty("expectedHandler", PropertyScope.SESSION));
         assertTrue(injectedMessagingExceptionHandler instanceof DefaultMessagingExceptionStrategy);
     }
 
     @Test
     public void testOutboundEndpointInFlow() throws Exception
     {
+        runFlowAsync("outboundEndpointInFlow", TEST_MESSAGE);
+
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://inFlow2", MESSAGE, null);
-        MuleMessage response = client.request("vm://outFlow2", 3000);
+        MuleMessage response = client.request("test://outFlow2", 3000);
         assertNotNull(response);
     }
 
     @Test
     public void testOutboundDynamicEndpointInFlow() throws Exception
     {
+        runFlowAsync("outboundDynamicEndpointInFlow", MESSAGE);
+
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://inFlow3", MESSAGE, getMessageProperties());
-        MuleMessage response = client.request("vm://outFlow3", 3000);
+        MuleMessage response = client.request("test://outFlow3", 3000);
         assertNotNull(response);
     }
 
     @Test
     public void testAsyncInFlow() throws Exception
     {
+        runFlowAsync("asyncInFlow", MESSAGE);
+
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://inFlow4", MESSAGE, null);
-        MuleMessage response = client.request("vm://outFlow4", 3000);
+        MuleMessage response = client.request("test://outFlow4", 3000);
         assertNotNull(response);
         assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
     }
@@ -94,9 +97,10 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testUntilSuccessfulInFlow() throws Exception
     {
+        runFlowAsync("untilSuccessfulInFlow", MESSAGE);
+
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://inFlow5", MESSAGE, null);
-        MuleMessage response = client.request("vm://outFlow5", 3000);
+        MuleMessage response = client.request("test://outFlow5", 3000);
 
         assertNotNull(response);
         assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
@@ -105,124 +109,127 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testCustomProcessorInScope() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        LinkedList<String> list = new LinkedList<String>();
+        LinkedList<String> list = new LinkedList<>();
         list.add(MESSAGE);
-        MuleMessage response = client.send("vm://inScope1", list, null);
+        final MuleEvent muleEvent = runFlow("customProcessorInScope", list);
+        MuleMessage response = muleEvent.getMessage();
 
         assertNotNull(response);
-        assertTrue((Boolean) response.getProperty("expectedHandler", PropertyScope.SESSION));
+        assertTrue(response.getProperty("expectedHandler", PropertyScope.SESSION));
         assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
     }
 
     @Test
     public void testOutboundEndpointInScope() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
         LinkedList<String> list = new LinkedList<String>();
         list.add(MESSAGE);
-        client.send("vm://inScope2", list, null);
-        MuleMessage response = client.request("vm://outScope2", 3000);
+        runFlowAsync("outboundEndpointInScope", list);
+
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://outScope2", 3000);
 
         assertNotNull(response);
-        assertTrue((Boolean) response.getProperty("expectedHandler", PropertyScope.SESSION));
+        assertTrue(response.getProperty("expectedHandler", PropertyScope.SESSION));
         assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
     }
 
     @Test
     public void testOutboundDynamicEndpointInScope() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
         LinkedList<String> list = new LinkedList<String>();
         list.add(MESSAGE);
-        client.send("vm://inScope3", list, getMessageProperties());
-        MuleMessage response = client.request("vm://outScope3", 3000);
+        runFlowAsync("outboundDynamicEndpointInScope", list, getMessageProperties());
+
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://outScope3", 3000);
 
         assertNotNull(response);
-        assertTrue((Boolean) response.getProperty("expectedHandler", PropertyScope.SESSION));
+        assertTrue(response.getProperty("expectedHandler", PropertyScope.SESSION));
         assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
     }
 
     @Test
     public void testCustomProcessorInTransactionalScope() throws Exception
     {
+        runFlowAsync("customProcessorInTransactionalScope", MESSAGE);
+
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://inTransactional1", MESSAGE, null);
-        MuleMessage response = client.request("vm://outTransactional1", 3000);
+        MuleMessage response = client.request("test://outTransactional1", 3000);
 
         assertNotNull(response);
-        assertFalse((Boolean) response.getProperty("expectedHandler", PropertyScope.SESSION));
+        assertFalse(response.getProperty("expectedHandler", PropertyScope.SESSION));
         assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
     }
 
     @Test
     public void testOutboundEndpointInTransactionalScope() throws Exception
     {
-        testTransactionalScope("vm://inTransactional2", "vm://outTransactional2", null);
+        testTransactionalScope("outboundEndpointInTransactionalScope", "test://outTransactional2", null);
     }
 
     @Test
     public void testOutboundDynamicEndpointInTransactionalScope() throws Exception
     {
-        testTransactionalScope("vm://inTransactional3", "vm://outTransactional3", getMessageProperties());
+        testTransactionalScope("outboundDynamicEndpointInTransactionalScope", "test://outTransactional3", getMessageProperties());
     }
 
     @Test
     public void testAsyncInTransactionalScope() throws Exception
     {
-        testTransactionalScope("vm://inTransactional4", "vm://outTransactional4", null);
+        testTransactionalScope("asyncInTransactionalScope", "test://outTransactional4", null);
     }
 
     @Test
     public void testUntilSuccessfulInTransactionalScope() throws Exception
     {
-        testTransactionalScope("vm://inTransactional5", "vm://outTransactional5", null);
+        testTransactionalScope("untilSuccessfulInTransactionalScope", "test://outTransactional5", null);
         assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
     }
 
     @Test
     public void testCustomProcessorInExceptionStrategy() throws Exception
     {
+        runFlowAsync("customProcessorInExceptionStrategy", MESSAGE);
+
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://inStrategy1", MESSAGE, null);
-        MuleMessage response = client.request("vm://outStrategy1",3000);
+        MuleMessage response = client.request("test://outStrategy1",3000);
 
         assertNotNull(response);
-        assertFalse((Boolean) response.getProperty("expectedHandler", PropertyScope.SESSION));
+        assertFalse(response.getProperty("expectedHandler", PropertyScope.SESSION));
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
     @Test
     public void testOutboundEndpointInExceptionStrategy() throws Exception
     {
-
-        testExceptionStrategy("vm://inStrategy2", null);
+        testExceptionStrategy("outboundEndpointInExceptionStrategy", null);
     }
 
     @Test
     public void testOutboundDynamicEndpointInExceptionStrategy() throws Exception
     {
-        testExceptionStrategy("vm://inStrategy3", getMessageProperties());
+        testExceptionStrategy("outboundDynamicEndpointInExceptionStrategy", getMessageProperties());
     }
 
     @Test
     public void testAsyncInExceptionStrategy() throws Exception
     {
-        testExceptionStrategy("vm://inStrategy4", null);
+        testExceptionStrategy("asyncInExceptionStrategy", null);
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
     @Test
     public void testUntilSuccessfulInExceptionStrategy() throws Exception
     {
-        testExceptionStrategy("vm://inStrategy5", null);
+        testExceptionStrategy("untilSuccessfulInExceptionStrategy", null);
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
     @Test
     public void testUntilSuccessfulInExceptionStrategyRollback() throws Exception
     {
-        testExceptionStrategy("vm://inStrategy6", null);
+        testExceptionStrategy("untilSuccessfulInExceptionStrategyRollback", null);
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
@@ -233,20 +240,20 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         return props;
     }
 
-    private void testTransactionalScope(String destination, String expected, Map<String, Object> messageProperties) throws Exception
+    private void testTransactionalScope(String flowName, String expected, Map<String, Object> messageProperties) throws Exception
     {
+        runFlowAsync(flowName, MESSAGE, messageProperties);
+
         LocalMuleClient client = muleContext.getClient();
-        client.send(destination, MESSAGE, messageProperties);
         MuleMessage response = client.request(expected, 3000);
 
         assertNotNull(response);
     }
 
-    private void testExceptionStrategy(String destination, Map<String, Object> messageProperties) throws MuleException, InterruptedException
+    private void testExceptionStrategy(String flowName, Map<String, Object> messageProperties) throws Exception
     {
         latch = spy(new CountDownLatch(2));
-        LocalMuleClient client = muleContext.getClient();
-        client.dispatch(destination, MESSAGE, messageProperties);
+        runFlowAsync(flowName, MESSAGE, messageProperties);
 
         assertFalse(latch.await(3, TimeUnit.SECONDS));
         verify(latch).countDown();

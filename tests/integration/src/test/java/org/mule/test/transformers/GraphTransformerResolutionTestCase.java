@@ -8,9 +8,8 @@ package org.mule.test.transformers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -62,8 +61,8 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     @Test
     public void resolvesNonDirectTransformation() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testInput", new A("Hello"), null);
+        final MuleEvent muleEvent = runFlow("stringEchoService", new A("Hello"));
+        MuleMessage response = muleEvent.getMessage();
         assertTrue(response.getPayload() instanceof C);
         assertEquals("HelloAFromB", ((C)response.getPayload()).value);
     }
