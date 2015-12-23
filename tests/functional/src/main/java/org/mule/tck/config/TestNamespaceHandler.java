@@ -37,5 +37,6 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("invocation-counter", new MessageProcessorDefinitionParser(InvocationCountMessageProcessor.class));
         registerMuleBeanDefinitionParser("non-blocking-processor", new MessageProcessorDefinitionParser(TestNonBlockingProcessor.class));
         registerMuleBeanDefinitionParser("assert-intercepting", new MessageProcessorDefinitionParser(ResponseAssertionMessageProcessor.class));
+        registerBeanDefinitionParser("queue",  new QueueWriterMessageProcessorBeanDefinitionParser());
     }
 }

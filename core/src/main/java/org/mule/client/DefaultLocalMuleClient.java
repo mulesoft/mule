@@ -177,14 +177,26 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     public MuleMessage request(String url, long timeout) throws MuleException
     {
-        InboundEndpoint endpoint = endpointCache.getInboundEndpoint(url, MessageExchangePattern.ONE_WAY);
-        try
+        final OperationOptions operationOptions = newOptions().responseTimeout(timeout).build();
+        //final OperationOptions operationOptions = newOptions().responseTimeout(timeout).build();
+        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, MessageExchangePattern.ONE_WAY);
+        if (connectorMessageProcessor != null)
         {
-            return endpoint.request(timeout);
+            final MuleEvent event = connectorMessageProcessor.process(null);
+
+            return event == null ? null : event.getMessage();
         }
-        catch (Exception e)
+        else
         {
-            throw new ReceiveException(endpoint, timeout, e);
+            InboundEndpoint endpoint = endpointCache.getInboundEndpoint(url, MessageExchangePattern.ONE_WAY);
+            try
+            {
+                return endpoint.request(timeout);
+            }
+            catch (Exception e)
+            {
+                throw new ReceiveException(endpoint, timeout, e);
+            }
         }
     }
 

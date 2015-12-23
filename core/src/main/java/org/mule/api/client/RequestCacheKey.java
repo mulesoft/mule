@@ -4,27 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request.client;
+package org.mule.api.client;
 
 import org.mule.MessageExchangePattern;
-import org.mule.api.client.OperationOptions;
 import org.mule.util.Preconditions;
 
 /**
- * Cache key used to locale an {@link org.mule.module.http.internal.request.DefaultHttpRequester} in a map
- * based on a URL and operation options.
+ * Cache key used to locate an object in a map based on an URL and operation options.
  *
  * @param <OptionsType> the expected type for the operation options
  */
 
-public class HttpRequestCacheKey<OptionsType extends OperationOptions>
+public class RequestCacheKey<OptionsType extends OperationOptions>
 {
 
     private final String url;
     private final OptionsType operationOptions;
     private final MessageExchangePattern exchangePattern;
 
-    public HttpRequestCacheKey(final String url, final OptionsType operationOptions, final MessageExchangePattern exchangePattern)
+    public RequestCacheKey(final String url, final OptionsType operationOptions, final MessageExchangePattern exchangePattern)
     {
         Preconditions.checkArgument(url != null, "URL cannot be null");
         Preconditions.checkArgument(operationOptions != null, "Operation options cannot be null");
@@ -41,12 +39,12 @@ public class HttpRequestCacheKey<OptionsType extends OperationOptions>
         {
             return true;
         }
-        if (!(o instanceof HttpRequestCacheKey))
+        if (!(o instanceof RequestCacheKey))
         {
             return false;
         }
 
-        HttpRequestCacheKey that = (HttpRequestCacheKey) o;
+        RequestCacheKey that = (RequestCacheKey) o;
 
         if (!operationOptions.equals(that.operationOptions))
         {

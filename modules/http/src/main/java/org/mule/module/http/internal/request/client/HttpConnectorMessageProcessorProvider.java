@@ -13,7 +13,9 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.api.client.OperationOptions;
+import org.mule.api.client.RequestCacheKey;
 import org.mule.api.connector.ConnectorOperationProvider;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -30,28 +32,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Provider for operations of the HTTP module.
  */
-public class HttpConnectorMessageProcessorProvider implements ConnectorOperationProvider, MuleContextAware, Disposable
+public class HttpConnectorMessageProcessorProvider extends AbstractConnectorMessageProcessorProvider
 {
-
-    private static final int CACHE_SIZE = 1000;
-    private static final int EXPIRATION_TIME_IN_MINUTES = 10;
-    private final LoadingCache<HttpRequestCacheKey, MessageProcessor> cachedMessageProcessors;
-    private MuleContext muleContext;
-
-    public HttpConnectorMessageProcessorProvider()
-    {
-        cachedMessageProcessors = CacheBuilder.newBuilder()
-            .maximumSize(CACHE_SIZE)
-            .expireAfterWrite(EXPIRATION_TIME_IN_MINUTES, TimeUnit.MINUTES)
-            .build(
-                    new CacheLoader<HttpRequestCacheKey, MessageProcessor>()
-                    {
-                        public MessageProcessor load(HttpRequestCacheKey cacheKey) throws MuleException
-                        {
-                            return buildMessageProcessor(cacheKey);
-                        }
-                    });
-    }
 
     @Override
     public boolean supportsUrl(String url)
@@ -60,19 +42,7 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
     }
 
     @Override
-    public MessageProcessor getMessageProcessor(final String url, final OperationOptions operationOptions, final MessageExchangePattern exchangePattern) throws MuleException
-    {
-        try
-        {
-            return cachedMessageProcessors.get(new HttpRequestCacheKey(url, operationOptions, exchangePattern));
-        }
-        catch (ExecutionException e)
-        {
-            throw new DefaultMuleException(e);
-        }
-    }
-
-    private MessageProcessor buildMessageProcessor(final HttpRequestCacheKey cacheKey) throws MuleException
+    protected MessageProcessor buildMessageProcessor(final RequestCacheKey cacheKey) throws MuleException
     {
         final OperationOptions operationOptions = cacheKey.getOperationOptions();
         final MessageExchangePattern exchangePattern = cacheKey.getExchangePattern();
@@ -95,17 +65,5 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
             messageProcessor = new OneWayHttpRequesterAdapter(messageProcessor);
         }
         return messageProcessor;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    @Override
-    public void dispose()
-    {
-        cachedMessageProcessors.invalidateAll();
     }
 }
