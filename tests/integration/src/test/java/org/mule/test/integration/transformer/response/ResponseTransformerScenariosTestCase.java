@@ -9,8 +9,9 @@ package org.mule.test.integration.transformer.response;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -105,7 +106,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         // Ensure MuleMessageToHttpResponse was used before sending response
 
         String server = message.getInboundProperty(HttpConstants.HEADER_SERVER);
-        assertTrue(server.startsWith("Mule"));
+        assertThat(server, startsWith("Mule"));
 
         String dateStr = message.getInboundProperty(HttpConstants.HEADER_DATE);
         SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
@@ -123,7 +124,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         assertThat(message, notNullValue());
 
         String server = message.getInboundProperty(HttpConstants.HEADER_SERVER);
-        assertTrue(server.startsWith("Mule"));
+        assertThat(server, startsWith("Mule"));
 
         String dateStr = message.getInboundProperty(HttpConstants.HEADER_DATE);
         SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);

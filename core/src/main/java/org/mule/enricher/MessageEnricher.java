@@ -66,6 +66,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
     private MessageProcessor enrichmentProcessor;
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         return new EnricherProcessor(enrichmentProcessor, muleContext).process(event);
@@ -218,7 +219,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         protected MuleEvent processNonBlocking(MuleEvent event) throws MuleException
         {
             this.eventToEnrich = event;
-            MuleEvent result = processNext(copyEventForEnrichment(event));
+            MuleEvent result = processNext(copyEventForEnrichment(new DefaultMuleEvent(event, createReplyToHandler(event))));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
                 result = processResponse(result);
@@ -228,7 +229,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
         private MuleEvent copyEventForEnrichment(MuleEvent event)
         {
-            return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(new DefaultMuleEvent(event, createReplyToHandler(event))));
+            return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(event));
         }
 
         @Override
