@@ -12,10 +12,7 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
+    
 
     <jms:activemq-connector name="jmsConnector"/>
 

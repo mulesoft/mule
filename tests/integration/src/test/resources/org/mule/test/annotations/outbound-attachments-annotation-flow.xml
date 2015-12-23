@@ -7,10 +7,6 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
-
     <flow name="attachments1">
         
         <inbound-endpoint address="vm://attachment?method=processAttachments" exchange-pattern="request-response"/>
