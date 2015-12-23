@@ -10,6 +10,7 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -46,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI
  * as a discovery mechanism.
- * <p/>
+ * <p>
  * Although it allows registering {@link ConfigurationProvider} instances through the
  * {@link #registerConfigurationProvider(ConfigurationProvider)} method (and that's still the
  * correct way of registering them), this implementation automatically acknowledges any
@@ -123,20 +124,23 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     @Override
     public void registerExtension(ExtensionModel extensionModel)
     {
-        LOGGER.info("Registering extension {} (version {})", extensionModel.getName(), extensionModel.getVersion());
         final String extensionName = extensionModel.getName();
+        final String extensionVersion = extensionModel.getVersion();
+        final String extensionVendor = extensionModel.getVendor();
 
-        if (extensionRegistry.containsExtension(extensionName))
+        LOGGER.info("Registering extension {} (version: {} vendor: {} )", extensionName, extensionVersion, extensionVendor);
+
+        if (extensionRegistry.containsExtension(extensionName, extensionVendor))
         {
             if (LOGGER.isDebugEnabled())
             {
-                LOGGER.debug("A extension of name '{}' (version {}) is already registered. Skipping...",
-                             extensionModel.getName(), extensionModel.getVersion());
+                LOGGER.debug("A extension of name '{}' (version: {} vendor {}) is already registered. Skipping...",
+                             extensionName, extensionVersion, extensionVendor);
             }
         }
         else
         {
-            extensionRegistry.registerExtension(extensionName, extensionModel);
+            extensionRegistry.registerExtension(extensionName, extensionVendor, extensionModel);
         }
     }
 

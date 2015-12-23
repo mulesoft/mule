@@ -9,6 +9,8 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
+
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.exception.NoSuchConfigurationException;
 import org.mule.extension.api.exception.NoSuchOperationException;
 import org.mule.extension.api.introspection.ConfigurationModel;
@@ -36,6 +38,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     private final Map<String, ConfigurationModel> configurations;
     private final Map<String, OperationModel> operations;
     private final List<ConnectionProviderModel> connectionProviders;
+    private final String vendor;
 
     /**
      * Creates a new instance with the given state
@@ -43,6 +46,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
      * @param name                the extension's name. Cannot be blank
      * @param description         the extension's description
      * @param version             the extension's version
+     * @param vendor              the extension's vendor name
      * @param configurationModels a {@link List} with the extension's {@link ConfigurationModel configurationModels}
      * @param operationModels     a {@link List} with the extension's {@link OperationModel operationModels}
      * @param connectionProviders a {@link List} with the extension's {@link ConnectionProviderModel connection provider models}
@@ -52,6 +56,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     protected ImmutableExtensionModel(String name,
                                       String description,
                                       String version,
+                                      String vendor,
                                       List<ConfigurationModel> configurationModels,
                                       List<OperationModel> operationModels,
                                       List<ConnectionProviderModel> connectionProviders,
@@ -65,8 +70,15 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
         this.operations = toMap(operationModels);
         this.connectionProviders = immutableList(connectionProviders);
 
-        checkArgument(!StringUtils.isBlank(version), "version cannot be blank");
+        checkArgument(!StringUtils.isBlank(version), "Version cannot be blank");
+
+        if (vendor == null)
+        {
+            throw new IllegalModelDefinitionException("Vendor cannot be null");
+        }
+
         this.version = version;
+        this.vendor = vendor;
     }
 
     /**
@@ -133,5 +145,14 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     public List<ConnectionProviderModel> getConnectionProviders()
     {
         return connectionProviders;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVendor()
+    {
+        return vendor;
     }
 }
