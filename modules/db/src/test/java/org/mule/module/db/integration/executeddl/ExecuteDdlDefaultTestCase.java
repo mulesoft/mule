@@ -11,8 +11,8 @@ package org.mule.module.db.integration.executeddl;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -51,10 +51,10 @@ public class ExecuteDdlDefaultTestCase extends AbstractExecuteDdlTestCase
     @Test
     public void updatesDataOneWay() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        client.dispatch("vm://executeDdlOneWay", TEST_MESSAGE, null);
+        runFlowAsync("executeDdlOneWay", TEST_MESSAGE);
 
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
         assertTableCreation(response.getPayload());
     }

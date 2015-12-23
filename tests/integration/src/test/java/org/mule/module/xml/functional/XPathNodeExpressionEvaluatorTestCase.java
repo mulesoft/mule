@@ -6,8 +6,8 @@
  */
 package org.mule.module.xml.functional;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
@@ -37,9 +37,9 @@ public class XPathNodeExpressionEvaluatorTestCase extends FunctionalTestCase
     @Test
     public void testExpressionTransformerUsingXpathNode() throws Exception
     {
-        MuleClient client = muleContext.getClient();
+        final MuleEvent muleEvent = runFlow("testService", SAMPLE_REQUEST);
 
-        MuleMessage message = client.send("vm://testInput", SAMPLE_REQUEST, null);
+        MuleMessage message = muleEvent.getMessage();
         XMLAssert.assertXMLEqual(EXPECTED_RESPONSE, getPayloadAsString(message));
     }
 }

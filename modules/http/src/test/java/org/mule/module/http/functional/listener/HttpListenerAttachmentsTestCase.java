@@ -65,7 +65,6 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     //The value needs to be big enough to ensure several chunks if using transfer encoding chunked.
     private static final String FILE_BODY_FIELD_VALUE = randomAlphanumeric(1200000);
     private static final String FIELD_BDOY_FILE_NAME = "file.ext";
-    private static final String VM_MESSAGE_ENDPOINT = "vm://out";
     private static final boolean DO_NOT_USE_CHUNKED_MODE = false;
     private static final boolean USE_CHUNKED_MODE = true;
     private static final String TEXT_PLAIN = "text/plain";
@@ -178,7 +177,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
             final CloseableHttpResponse response = httpClient.execute(httpPost);
             try
             {
-                final MuleMessage receivedMessage = muleContext.getClient().request(VM_MESSAGE_ENDPOINT, 1000);
+                final MuleMessage receivedMessage = muleContext.getClient().request("test://out", 1000);
                 assertThat(receivedMessage.getPayload(), Is.<Object>is(NullPayload.getInstance()));
                 assertThat(receivedMessage.getInboundAttachmentNames().size(), is(2));
                 assertThat(receivedMessage.getInboundAttachmentNames().contains(TEXT_BODY_FIELD_NAME), is(true));

@@ -6,16 +6,12 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updateBulkMetadataNoParams">
-        <inbound-endpoint address="vm://updateMetadataNoParams" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>update Planet set position = 1 where name = 'Mars'</db:parameterized-query>
         </db:update>
     </flow>
 
     <flow name="updateBulkMetadataNotSupportedValueParams">
-        <inbound-endpoint address="vm://updateMetadataNotSupportedValueParams" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>update Planet set position = #[payload.position] where name =
                 #[header:OUTBOUND:name]
@@ -24,8 +20,6 @@
     </flow>
 
     <flow name="updateBulkMetadataBeanParams">
-        <inbound-endpoint address="vm://updateMetadataBeanParams" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>update Planet set position = #[payload.position] where name = #[payload.name]
             </db:parameterized-query>
@@ -33,8 +27,6 @@
     </flow>
 
     <flow name="updateBulkMetadataMapParams">
-        <inbound-endpoint address="vm://updateMetadataMapParams" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>update Planet set position = #[payload['position']] where name = #[payload['name']]
             </db:parameterized-query>

@@ -6,16 +6,12 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="deleteMetadataNoParams">
-        <inbound-endpoint address="vm://deleteMetadataNoParams" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = 1 and name = 'Mars'</db:parameterized-query>
         </db:delete>
     </flow>
 
     <flow name="deleteMetadataNotSupportedValueParams">
-        <inbound-endpoint address="vm://deleteMetadataNotSupportedValueParams" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload.position] and name =
                 #[header:OUTBOUND:name]
@@ -24,8 +20,6 @@
     </flow>
 
     <flow name="deleteMetadataBeanParams">
-        <inbound-endpoint address="vm://deleteMetadataBeanParams" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload.position] and name = #[payload.name]
             </db:parameterized-query>
@@ -33,8 +27,6 @@
     </flow>
 
     <flow name="deleteMetadataMapParams">
-        <inbound-endpoint address="vm://deleteMetadataMapParams" exchange-pattern="request-response"/>
-
         <db:delete config-ref="dbConfig">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload['position']] and name =
                 #[payload['name']]

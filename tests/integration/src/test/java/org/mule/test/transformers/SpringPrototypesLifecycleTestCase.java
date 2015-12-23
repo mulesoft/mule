@@ -10,8 +10,8 @@ package org.mule.test.transformers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.test.transformers.GraphTransformerResolutionTestCase.A;
 import org.mule.test.transformers.GraphTransformerResolutionTestCase.B;
@@ -30,9 +30,8 @@ public class SpringPrototypesLifecycleTestCase extends FunctionalTestCase
     @Test
     public void registersTransformerOnce() throws Exception
     {
-        final LocalMuleClient client = muleContext.getClient();
-
-        final MuleMessage response = client.send("vm://testIn", new A(TEST_MESSAGE), null);
+        final MuleEvent muleEvent = runFlow("testFlow", new A(TEST_MESSAGE));
+        final MuleMessage response = muleEvent.getMessage();
 
         assertThat(response.getPayload(), is(instanceOf(B.class)));
     }
@@ -40,9 +39,8 @@ public class SpringPrototypesLifecycleTestCase extends FunctionalTestCase
     @Test
     public void exceptionHandlerWithTransformerInEndpoint() throws Exception
     {
-        final LocalMuleClient client = muleContext.getClient();
-
-        final MuleMessage response = client.send("vm://testExceptionHandlerWithTransformerInEndpoint", new A(TEST_MESSAGE), null);
+        final MuleEvent muleEvent = runFlow("testExceptionHandlerWithTransformerInEndpointFlow", new A(TEST_MESSAGE));
+        final MuleMessage response = muleEvent.getMessage();
 
         assertThat(response.getPayload(), is(instanceOf(B.class)));
     }

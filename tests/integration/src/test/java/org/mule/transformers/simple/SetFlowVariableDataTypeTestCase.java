@@ -9,9 +9,9 @@ package org.mule.transformers.simple;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
@@ -33,10 +33,9 @@ public class SetFlowVariableDataTypeTestCase extends FunctionalTestCase
     @Test
     public void setsPropertyDataType() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent muleEvent = runFlow("main", TEST_MESSAGE);
 
-        MuleMessage response = client.send("vm://testInput", TEST_MESSAGE, null);
-
+        MuleMessage response = muleEvent.getMessage();
         DataType dataType = (DataType) response.getPayload();
 
         assertThat(dataType, DataTypeMatcher.like(String.class, MimeTypes.XML, UTF_16.name()));

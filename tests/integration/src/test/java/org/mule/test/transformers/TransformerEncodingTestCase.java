@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.Base64;
@@ -34,14 +35,14 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
     public void encodingFromTransformer() throws Exception
     {
         MuleMessage message = getMuleMessage();
-        testEncoding("vm://base64decode", message);
+        testEncoding("base64decode", message);
     }
 
     @Test
     public void encodingFromSetProperty() throws Exception
     {
         MuleMessage message = getMuleMessage();
-        testEncoding("vm://base64decode2", message);
+        testEncoding("base64decode2", message);
     }
 
     @Test
@@ -49,12 +50,14 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
     {
         MuleMessage message = getMuleMessage();
         message.setOutboundProperty(MULE_ENCODING_PROPERTY, UTF_16_LE);
-        testEncoding("vm://base64decode", message);
+        testEncoding("base64decode", message);
     }
 
-    private void testEncoding(String endpointUrl, MuleMessage message) throws Exception
+    private void testEncoding(String flowName, MuleMessage message) throws Exception
     {
-        MuleMessage response = muleContext.getClient().send(endpointUrl, message);
+        final MuleEvent muleEvent = runFlow(flowName, message);
+
+        MuleMessage response = muleEvent.getMessage();
         assertThat(getPayloadAsString(response), is(PAYLOAD));
     }
 

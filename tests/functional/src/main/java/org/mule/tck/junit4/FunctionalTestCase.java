@@ -8,6 +8,7 @@ package org.mule.tck.junit4;
 
 import static org.junit.Assert.fail;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleEvent;
@@ -34,6 +35,8 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -368,6 +371,40 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected <T, U> void runFlowWithPayloadAndExpect(String flowName, T expect, U payload) throws Exception
     {
         Assert.assertEquals(expect, this.runFlow(flowName, payload).getMessage().getPayload());
+    }
+
+    /**
+     * Executes the given flow asynchronously with a default message carrying the payload.
+     * <p/>
+     * NOTE: flow must be configured with asycnrhonous processing strategy.
+     *
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to use in the message
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected <T> void runFlowAsync(String flowName, T payload) throws Exception
+    {
+        runFlowAsync(flowName, payload, null);
+    }
+
+    /**
+     * Executes the given flow asynchronously with a default message carrying the payload.
+     * <p/>
+     * NOTE: flow must be configured with asynchronous processing strategy.
+     *
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to use in the message
+     * @param inboundProperties inbound properties for the message.
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected <T> void runFlowAsync(String flowName, T payload, Map<String, Object> inboundProperties) throws Exception
+    {
+        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, Collections.emptyMap(), Collections.emptyMap(), muleContext);
+        final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.ONE_WAY, null);
+
+        runFlow(flowName, muleEvent);
     }
 
     /**

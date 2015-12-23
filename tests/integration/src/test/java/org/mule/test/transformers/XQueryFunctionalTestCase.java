@@ -9,9 +9,9 @@ package org.mule.test.transformers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
@@ -41,16 +41,16 @@ public class XQueryFunctionalTestCase extends FunctionalTestCase
         String srcData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog.xml", getClass());
         String resultData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
-        //Create a new Mule Client
-        MuleClient client = muleContext.getClient();
-
         //These are the message roperties that will get passed into the XQuery context
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
 
         //Invoke the service
-        MuleMessage message = client.send("vm://test.in", srcData, props);
+        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(srcData, props, null, null, muleContext);
+        final MuleEvent muleEvent = runFlow("Echo", muleMessage);
+
+        MuleMessage message = muleEvent.getMessage();
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
         //Compare results

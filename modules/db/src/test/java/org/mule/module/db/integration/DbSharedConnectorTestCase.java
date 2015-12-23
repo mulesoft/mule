@@ -79,7 +79,7 @@ public class DbSharedConnectorTestCase extends DomainFunctionalTestCase
         final MuleContext clientAppMuleContext = getMuleContextForApp(CLIENT_APP);
         Flow flow = (Flow) clientAppMuleContext.getRegistry().lookupFlowConstruct("dbClientService");
         flow.process(AbstractMuleContextTestCase.getTestEvent(new Object(), clientAppMuleContext));
-        MuleMessage response = getMuleContextForApp(SERVER_APP).getClient().request("vm://out", 5000);
+        MuleMessage response = getMuleContextForApp(SERVER_APP).getClient().request("test://out", 5000);
         assertThat(response, notNullValue());
     }
 

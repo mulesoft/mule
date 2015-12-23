@@ -6,16 +6,12 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="selectMetadataNoParams">
-        <inbound-endpoint address="vm://selectMetadataNoParams" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:parameterized-query>select * from PLANET</db:parameterized-query>
         </db:select>
     </flow>
 
     <flow name="selectMetadataNotSupportedValueParams">
-        <inbound-endpoint address="vm://selectMetadataNotSupportedValueParams" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:parameterized-query>select * from PLANET where id = #[payload.id] and name =
                 #[header:OUTBOUND:updateCount]
@@ -24,8 +20,6 @@
     </flow>
 
     <flow name="selectMetadataBeanParams">
-        <inbound-endpoint address="vm://selectMetadataBeanParams" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:parameterized-query>select * from PLANET where id = #[payload.id] and name = #[payload.name]
             </db:parameterized-query>
@@ -33,8 +27,6 @@
     </flow>
 
     <flow name="selectMetadataMapParams">
-        <inbound-endpoint address="vm://selectMetadataMapParams" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:parameterized-query>select * from PLANET where id = #[payload['id']] and name = #[payload['name']]
             </db:parameterized-query>

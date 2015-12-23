@@ -275,35 +275,6 @@
         <vm:outbound-endpoint path="async-tx-out" exchange-pattern="request-response" />
     </flow>
     
-    <!-- 
-    <flow name="transactional">
-        <vm:inbound-endpoint path="transactional-in" exchange-pattern="one-way">
-            <vm:transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-        <append-string-transformer message="a" />
-        <transactional>
-            <append-string-transformer message="b" />
-            <test:component appendString="test"/>
-            <vm:outbound-endpoint path="transactional-out" exchange-pattern="one-way" />
-            <vm:transaction action="ALWAYS_JOIN" />
-        </transactional>    
-        <append-string-transformer message="c" />
-        <default-exception-strategy />    
-    </flow>
-
-    <flow name="transactionalRollback">
-        <vm:inbound-endpoint path="transactional-rollback-in" exchange-pattern="request-response">
-            <vm:transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-        <transactional>
-            <test:component appendString="test"/>
-            <test:component throwException="true"/>
-            <vm:outbound-endpoint path="transactional-rollback-out" exchange-pattern="request-response" />
-            <vm:transaction action="JOIN_IF_POSSIBLE" />
-        </transactional>    
-    </flow>
-    -->
-        
     <flow name="multicaster">
         <vm:inbound-endpoint path="multicaster-in" exchange-pattern="request-response"/>
         <all enableCorrelation="ALWAYS">

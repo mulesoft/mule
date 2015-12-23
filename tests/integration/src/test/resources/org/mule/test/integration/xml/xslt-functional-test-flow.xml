@@ -2,17 +2,9 @@
 <!--// START SNIPPET: full-config -->
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
       xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
-       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
     <!--// START SNIPPET: transformer-config -->
     <mulexml:xslt-transformer name="xslt">
@@ -51,14 +43,9 @@
     <!--// START SNIPPET: service-config -->
     
     <flow name="Echo">
-        
-        <!-- this endpoint is used by the functional test -->
-        <vm:inbound-endpoint path="test.in" exchange-pattern="request-response"
-            transformer-refs="xslt" />
+        <transformer ref="xslt"/>
     
         <echo-component/>
-        
-        
     </flow>
     
     <!--// END SNIPPET: service-config -->

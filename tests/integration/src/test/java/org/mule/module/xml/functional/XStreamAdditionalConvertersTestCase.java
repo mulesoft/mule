@@ -9,7 +9,6 @@ package org.mule.module.xml.functional;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEventContext;
-import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -24,6 +23,8 @@ import org.junit.Test;
 
 public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
 {
+
+    public static final String FLOW_NAME = "ObjectToXml";
     private CountDownLatch latch = new CountDownLatch(1);
 
     @Override
@@ -37,7 +38,7 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
     {
         super.doSetUp();
 
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("ObjectToXml");
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(FLOW_NAME);
         assertNotNull(testComponent);
         testComponent.setEventCallback(new Callback(latch));
     }
@@ -49,8 +50,7 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
         String timestamp = converter.toString(new Date(System.currentTimeMillis()));
         String input = "<test-bean><createDate>" + timestamp + "</createDate></test-bean>";
 
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://FromTest", input, null);
+        runFlowAsync(FLOW_NAME, input);
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }

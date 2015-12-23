@@ -6,8 +6,8 @@
  */
 package org.mule.test.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
@@ -36,9 +36,9 @@ public class TransformerWeightingFunctionalTestCase extends FunctionalTestCase
     @Test
     public void findTwoTransformers() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        final MuleEvent muleEvent = runFlow("test", XML_REQUEST);
 
-        MuleMessage response = client.send("vm://testInput", XML_REQUEST, null);
+        MuleMessage response = muleEvent.getMessage();
         XMLAssert.assertXMLEqual(XML_REQUEST, getPayloadAsString(response));
     }
 }

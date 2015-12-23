@@ -10,8 +10,8 @@ package org.mule.module.db.integration.bulkexecute;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -50,10 +50,10 @@ public class BulkExecuteDefaultTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        runFlowAsync("bulkUpdateOneWay", TEST_MESSAGE);
 
-        client.dispatch("vm://testOneWay", TEST_MESSAGE, null);
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
         assertBulkModeResult(response.getPayload());
     }

@@ -44,10 +44,10 @@ public class SelectDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        runFlowAsync("defaultQueryOneWay", TEST_MESSAGE);
 
-        client.dispatch("vm://testOneWay", TEST_MESSAGE, null);
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
         assertMessageContains(response, getAllPlanetRecords());
     }

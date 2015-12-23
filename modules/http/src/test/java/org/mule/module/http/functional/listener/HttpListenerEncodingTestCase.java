@@ -67,7 +67,7 @@ public class HttpListenerEncodingTestCase extends FunctionalTestCase
         final String url = String.format("http://localhost:%s/test", port.getNumber());
         Request request = Request.Post(url).bodyString(testMessage, ContentType.create("text/plain", Charset.forName(encoding)));
         request.execute();
-        MuleMessage result = muleContext.getClient().request("vm://out", 2000);
+        MuleMessage result = muleContext.getClient().request("test://out", 2000);
         assertThat(getPayloadAsString(result), is(testMessage));
     }
 

@@ -14,12 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
-import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.SystemUtils;
 
@@ -49,28 +45,12 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
         assertThat(getDocName(stb), is("stb-transformer"));
         assertThat(getDocDescription(stb), is("Convert a String to a Byte Array"));
         assertThat(getSourceFile(stb), is("annotations-config.xml"));
-        assertThat(getSourceFileLine(stb), is(10));
+        assertThat(getSourceFileLine(stb), is(7));
         assertThat(getSourceElement(stb), is("<string-to-byte-array-transformer name=\"StringtoByteArray\" doc:name=\"stb-transformer\">" + SystemUtils.LINE_SEPARATOR +
                                              "<annotations>" + SystemUtils.LINE_SEPARATOR +
                                              "<doc:description>Convert a String to a Byte Array</doc:description>" + SystemUtils.LINE_SEPARATOR +
                                              "</annotations>" + SystemUtils.LINE_SEPARATOR +
                                              "</string-to-byte-array-transformer>"));
-    }
-
-    @Test
-    public void testEndpointBuilderAnnotations()
-    {
-        EndpointBuilder in = muleContext.getRegistry().lookupEndpointBuilder("in");
-        assertThat(in, not(nullValue()));
-        assertThat(getDocName(in), is("inbound vm endpoint"));
-        assertThat(getDocDescription(in), is("Accepts inbound messages"));
-        assertThat(getSourceFile(in), is("annotations-config.xml"));
-        assertThat(getSourceFileLine(in), is(16));
-        assertThat(getSourceElement(in), is("<endpoint name=\"in\" address=\"vm://in\" exchange-pattern=\"request-response\" doc:name=\"inbound vm endpoint\">" + SystemUtils.LINE_SEPARATOR +
-                                            "<annotations>" + SystemUtils.LINE_SEPARATOR +
-                                            "<doc:description>Accepts inbound messages</doc:description>" + SystemUtils.LINE_SEPARATOR +
-                                            "</annotations>" + SystemUtils.LINE_SEPARATOR +
-                                            "</endpoint>"));
     }
 
     @Test
@@ -81,19 +61,13 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
         assertThat(getDocName(flow), is("Bridge flow"));
         assertThat(getDocDescription(flow), is("Main flow"));
         assertThat(getSourceFile(flow), is("annotations.xml"));
-        assertThat(getSourceFileLine(flow), is(10));
+        assertThat(getSourceFileLine(flow), is(7));
         assertThat(getSourceElement(flow), is("<flow name=\"Bridge\" doc:name=\"Bridge flow\">" + SystemUtils.LINE_SEPARATOR +
                                               "<annotations>" + SystemUtils.LINE_SEPARATOR +
                                               "<doc:description>Main flow</doc:description>" + SystemUtils.LINE_SEPARATOR +
                                               "</annotations>" + SystemUtils.LINE_SEPARATOR +
-                                              "<inbound-endpoint ref=\"in\" doc:name=\"inbound flow endpoint\">" + SystemUtils.LINE_SEPARATOR +
-                                              "<transformer ref=\"StringtoByteArray\">" +
-                                              "</transformer>" + SystemUtils.LINE_SEPARATOR +
-                                              "</inbound-endpoint>" + SystemUtils.LINE_SEPARATOR +
                                               "<echo-component doc:name=\"echo\">" +
                                               "</echo-component>" + SystemUtils.LINE_SEPARATOR +
-                                              "<outbound-endpoint ref=\"out\">" +
-                                              "</outbound-endpoint>" + SystemUtils.LINE_SEPARATOR +
                                               "</flow>"));
     }
 
@@ -103,41 +77,9 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
         DefaultJavaComponent echo = muleContext.getRegistry().lookupByType(DefaultJavaComponent.class).values().iterator().next();
         assertEquals("echo", getDocName(echo));
         assertThat(getSourceFile(echo), is("annotations.xml"));
-        assertThat(getSourceFileLine(echo), is(17));
+        assertThat(getSourceFileLine(echo), is(11));
         assertThat(getSourceElement(echo), is("<echo-component doc:name=\"echo\">" +
                                               "</echo-component>"));
-    }
-
-    @Test
-    public void testInboundEndpointAnnotations()
-    {
-        FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("Bridge");
-        ImmutableEndpoint ep = (ImmutableEndpoint) ((Flow)flow).getMessageSource();
-        assertThat(ep, not(nullValue()));
-        assertThat(getDocName(ep), is("inbound flow endpoint"));
-        assertThat("Accepts inbound messages", getDocDescription(ep), nullValue());
-        assertThat(getSourceFile(ep), is("annotations.xml"));
-        assertThat(getSourceFileLine(ep), is(14));
-        assertThat(getSourceElement(ep), is("<inbound-endpoint ref=\"in\" doc:name=\"inbound flow endpoint\">" + SystemUtils.LINE_SEPARATOR +
-                                            "<transformer ref=\"StringtoByteArray\">" +
-                                            "</transformer>" + SystemUtils.LINE_SEPARATOR +
-                                            "</inbound-endpoint>"));
-    }
-
-    @Test
-    public void testOutboundEndpointAnnotations()
-    {
-        OutboundEndpoint out = muleContext.getRegistry().lookupByType(OutboundEndpoint.class).values().iterator().next();
-        assertThat(out, not(nullValue()));
-        assertThat(getDocName(out), is("outbound vm endpoint"));
-        assertThat(getDocDescription(out), is("Accepts outbound messages"));
-        assertThat(getSourceFile(out), is("annotations-config.xml"));
-        assertThat(getSourceFileLine(out), is(22));
-        assertThat(getSourceElement(out), is("<endpoint name=\"out\" address=\"vm://out\" exchange-pattern=\"request-response\" doc:name=\"outbound vm endpoint\">" + SystemUtils.LINE_SEPARATOR +
-                                             "<annotations>" + SystemUtils.LINE_SEPARATOR +
-                                             "<doc:description>Accepts outbound messages</doc:description>" + SystemUtils.LINE_SEPARATOR +
-                                             "</annotations>" + SystemUtils.LINE_SEPARATOR +
-                                             "</endpoint>"));
     }
 
     protected String getDocName(Object obj)
