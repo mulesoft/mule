@@ -17,14 +17,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
-
 import org.mule.api.MuleEvent;
 import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.Ricin;
-import org.mule.module.extension.Weapon;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -39,7 +37,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ConfigParserTestCase extends ExtensionsFunctionalTestCase
+public class ConfigParserTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String HEISENBERG_BYNAME = "heisenberg";

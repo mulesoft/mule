@@ -107,7 +107,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>
     }
 
     /**
-     * @return {@value true}
+     * @return {@code true}
      */
     @Override
     public boolean isDynamic()

@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
@@ -1118,6 +1119,32 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         Class<?> valueType = value.getClass();
         return isWrapperAndPrimitivePair(type, valueType) || isWrapperAndPrimitivePair(valueType, type);
+    }
+
+    public static URL getPathURL(Class<?> type)
+    {
+        String packageName = type.getPackage().getName();
+        String classFileName = type.getName().substring(packageName.length() + 1) + ".class";
+        String classFilePath = type.getResource(classFileName).toString();
+        //get rid of the package part of the path to avoid conflicts with user-defined directories
+        String packagePath = packageName.replace(".", "/");
+        classFilePath = classFilePath.substring(0, classFilePath.lastIndexOf(packagePath));
+        //get the target index since the class could be in /classes too
+        int pathIndex = classFilePath.lastIndexOf("/target/");
+
+        if (pathIndex != -1)
+        {
+            classFilePath = classFilePath.substring(0, pathIndex + 1);
+        }
+
+        try
+        {
+            return new URL(classFilePath);
+        }
+        catch (MalformedURLException e)
+        {
+            throw new RuntimeException("Could not locate type in path", e);
+        }
     }
 
     /**

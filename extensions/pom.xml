@@ -18,7 +18,9 @@
     <description>Mule extensions that augment the core Mule functionality through the Mule Extension API</description>
 
     <modules>
-         <module>validation</module>
+        <module>file</module>
+        <module>ftp</module>
+        <module>validation</module>
     </modules>
     <properties>
         <mule.version>${project.parent.version}</mule.version>

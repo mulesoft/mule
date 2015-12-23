@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:config name="file" baseDir="${baseDir}" />
+
+    <flow name="read">
+        <file:read path="#[path]" />
+    </flow>
+
+    <flow name="readWithLock">
+        <file:read path="files/hello.json" lock="true" />
+    </flow>
+
+    <flow name="readWithForcedMimeType">
+        <file:read path="#[path]" outputMimeType="test/test"/>
+    </flow>
+
+</mule>

@@ -23,7 +23,7 @@ import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.Ricin;
 import org.mule.module.extension.Weapon;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
+public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String GUSTAVO_FRING = "Gustavo Fring";

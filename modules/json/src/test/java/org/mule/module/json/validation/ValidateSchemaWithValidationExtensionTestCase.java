@@ -12,12 +12,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.extension.validation.api.ValidationException;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
+import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.Test;
 
-public class ValidateSchemaWithValidationExtensionTestCase extends ExtensionsFunctionalTestCase
+public class ValidateSchemaWithValidationExtensionTestCase extends ExtensionFunctionalTestCase
 {
 
     @Override

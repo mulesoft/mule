@@ -71,7 +71,7 @@ public final class ConnectionProviderModelValidator implements ModelValidator
 
     private void validateConnectionTypes(ConnectionProviderModel providerModel, ExtensionModel extensionModel, Class<?> connectionType)
     {
-        if (!providerModel.getConnectionType().isAssignableFrom(connectionType))
+        if (!connectionType.isAssignableFrom(providerModel.getConnectionType()))
         {
             throw new IllegalModelDefinitionException(String.format("Extension '%s' defines a connection provider of name '%s' which yields connections of type '%s'. " +
                                                                     "However, the extension's operations expect connections of type '%s'. Please make sure that all connection " +
