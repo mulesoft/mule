@@ -43,7 +43,11 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty statusResponseBuilderPath = new SystemProperty("statusResponseBuilderPath","statusResponseBuilderPath");
     @Rule
-    public SystemProperty statusResponseBuilderOverridePath = new SystemProperty("statusResponseBuilderOverridePath","statusResponseBuilderOverridePath");
+    public SystemProperty statusResponseBuilderOverridePath = new SystemProperty("statusResponseBuilderOverridePath", "statusResponseBuilderOverridePath");
+    @Rule
+    public SystemProperty reasonPhraseResponseBuilderOverridePath = new SystemProperty("reasonPhraseResponseBuilderOverridePath", "reasonPhraseResponseBuilderOverridePath");
+    @Rule
+    public SystemProperty statusReasonPhraseResponseBuilderWontOverridePath = new SystemProperty("statusReasonPhraseResponseBuilderWontOverridePath", "statusReasonPhraseResponseBuilderWontOverridePath");
     @Rule
     public SystemProperty headerResponseBuilderPath = new SystemProperty("headerResponseBuilderPath","headerResponseBuilderPath");
     @Rule
@@ -90,6 +94,20 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     {
         final String url = getUrl(statusResponseBuilderOverridePath);
         statusLineResponseBuilderTest(url, 202);
+    }
+
+    @Test
+    public void reasonPhraseResponseBuilderOverrideResponseBuilder() throws Exception
+    {
+        final String url = getUrl(reasonPhraseResponseBuilderOverridePath);
+        statusLineResponseBuilderTest(url, 200, "response success!");
+    }
+
+    @Test
+    public void statusReasonPhraseResponseBuilderWontOverrideResponseBuilder() throws Exception
+    {
+        final String url = getUrl(statusReasonPhraseResponseBuilderWontOverridePath);
+        statusLineResponseBuilderTest(url, 200, "OK");
     }
 
     @Test
@@ -176,14 +194,19 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         return String.format("http://localhost:%s/%s", listenPort.getNumber(), pathSystemProperty.getValue());
     }
 
-    private void statusLineResponseBuilderTest(String url, int expectedStatus) throws IOException
+    private void statusLineResponseBuilderTest(String url, int expectedStatus, String expectedReasonPhrase) throws IOException
     {
         final Response response = Request.Get(url).connectTimeout(1000).execute();
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getAllHeaders().length, is(2));
         assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH).getValue(), is("0"));
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(expectedStatus));
-        assertThat(httpResponse.getStatusLine().getReasonPhrase(), is("everything works!"));
+        assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(expectedReasonPhrase));
+    }
+
+    private void statusLineResponseBuilderTest(String url, int expectedStatus) throws IOException
+    {
+        statusLineResponseBuilderTest(url, expectedStatus, "everything works!");
     }
 
     private void emptyResponseBuilderTest(String url) throws IOException
