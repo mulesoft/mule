@@ -15,7 +15,7 @@ import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.logic.NotFilter;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.List;
 import java.util.Map;

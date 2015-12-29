@@ -22,7 +22,7 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.AsynchronousUntilSuccessfulProcessingStrategy;
 import org.mule.session.DefaultMuleSession;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.io.Serializable;

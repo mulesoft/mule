@@ -12,8 +12,8 @@ import static org.junit.rules.ExpectedException.none;
 import org.mule.api.MuleEvent;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFilePayload;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.file.api.FileWriteMode;
-import org.mule.tck.junit4.ExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 

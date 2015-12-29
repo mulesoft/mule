@@ -13,15 +13,13 @@ import static org.junit.Assert.assertThat;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.Connector;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.ApplicationContextBuilder;
-import org.mule.tck.junit4.DomainContextBuilder;
+import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 

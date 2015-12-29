@@ -8,7 +8,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <custom-transformer name="validateResponse"
-        class="org.mule.tck.transformer.ValidateResponse" />
+        class="org.mule.functional.transformer.ValidateResponse" />
 
 
     <flow name="ComponentException">

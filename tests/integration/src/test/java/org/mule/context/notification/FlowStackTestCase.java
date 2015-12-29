@@ -19,7 +19,7 @@ import org.mule.api.context.notification.FlowCallStack;
 import org.mule.api.context.notification.FlowStackElement;
 import org.mule.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.concurrent.CountDownLatch;

@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.routing.outbound;
 
-import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.functional.exceptions.FunctionalTestException;
 
 public class Component2Exception extends FunctionalTestException
 {

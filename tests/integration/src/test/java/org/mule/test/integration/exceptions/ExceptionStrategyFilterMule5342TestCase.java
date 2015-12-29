@@ -13,7 +13,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.transport.DispatchException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
 import org.junit.Test;

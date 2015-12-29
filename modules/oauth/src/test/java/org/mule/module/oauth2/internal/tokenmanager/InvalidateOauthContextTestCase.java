@@ -14,7 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.hamcrest.core.Is;
 import org.junit.Rule;

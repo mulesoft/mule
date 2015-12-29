@@ -10,7 +10,7 @@ package org.mule.test.integration.schedule;
 import org.mule.api.context.notification.ConnectorMessageNotificationListener;
 import org.mule.construct.Flow;
 import org.mule.context.notification.ConnectorMessageNotification;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;

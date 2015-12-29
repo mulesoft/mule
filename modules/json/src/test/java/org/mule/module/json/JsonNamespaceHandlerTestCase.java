@@ -19,7 +19,7 @@ import org.mule.module.json.transformers.JsonToXml;
 import org.mule.module.json.transformers.JsonXsltTransformer;
 import org.mule.module.json.transformers.ObjectToJson;
 import org.mule.module.json.transformers.XmlToJson;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;

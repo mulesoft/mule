@@ -12,7 +12,7 @@ import org.mule.api.NameableObject;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
 import java.util.List;

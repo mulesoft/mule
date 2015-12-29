@@ -18,7 +18,7 @@ import org.mule.routing.IdempotentMessageFilter;
 import org.mule.routing.IdempotentSecureHashMessageFilter;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transformer.simple.CombineCollectionsTransformer;
 
 import java.util.List;

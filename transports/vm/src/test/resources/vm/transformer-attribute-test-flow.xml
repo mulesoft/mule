@@ -7,7 +7,7 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <custom-transformer name="appendString"
-        class="org.mule.tck.functional.StringAppendTestTransformer" />
+        class="org.mule.functional.functional.StringAppendTestTransformer" />
 
 
     <flow name="testServiceSimple">

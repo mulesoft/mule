@@ -19,7 +19,7 @@ import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.HttpProtocol;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import com.google.common.base.Charsets;

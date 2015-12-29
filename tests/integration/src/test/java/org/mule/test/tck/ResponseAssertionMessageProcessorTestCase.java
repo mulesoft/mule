@@ -14,9 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.MessageExchangePattern;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.functional.ResponseAssertionMessageProcessor;
-import org.mule.tck.functional.TestNonBlockingProcessor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.functional.functional.ResponseAssertionMessageProcessor;
+import org.mule.functional.functional.TestNonBlockingProcessor;
 
 import org.junit.Test;
 

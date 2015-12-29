@@ -15,7 +15,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.Flow;
 import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.source.ClusterizableMessageSourceWrapper;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.PollingController;
 
 import org.junit.Test;

@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.functional;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 import org.mule.util.concurrent.Latch;

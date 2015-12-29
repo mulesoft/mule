@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringDataSource;

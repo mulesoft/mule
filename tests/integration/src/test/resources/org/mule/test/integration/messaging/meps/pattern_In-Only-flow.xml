@@ -28,10 +28,10 @@
         
         <script:component>
             <script:script engine="groovy">
-                import org.mule.tck.functional.FunctionalTestNotification
+                import org.mule.functional.functional.FunctionalTestNotification
 
                 muleContext.fireNotification(new FunctionalTestNotification(
-                        src, FunctionalTestNotification.EVENT_RECEIVED));
+                src, FunctionalTestNotification.EVENT_RECEIVED));
             </script:script>
         </script:component>
     </flow>

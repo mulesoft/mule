@@ -14,7 +14,7 @@ import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
-import org.mule.tck.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;

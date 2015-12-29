@@ -22,7 +22,7 @@ import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.Ricin;
-import org.mule.tck.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

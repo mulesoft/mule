@@ -6,7 +6,7 @@
  */
 package org.mule.transport.jms.test;
 
-import org.mule.tck.jndi.TestContextFactory;
+import org.mule.functional.jndi.TestContextFactory;
 
 import java.util.Hashtable;
 

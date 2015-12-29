@@ -24,7 +24,7 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.DynamicPipelineException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;

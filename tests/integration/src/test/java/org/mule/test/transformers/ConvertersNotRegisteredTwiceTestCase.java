@@ -20,7 +20,7 @@ import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transformer.Converter;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.registry.MuleRegistryHelper;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Collection;
 import java.util.HashSet;

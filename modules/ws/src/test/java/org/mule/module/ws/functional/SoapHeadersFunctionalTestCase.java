@@ -16,7 +16,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
-import org.mule.tck.functional.EventCallback;
+import org.mule.functional.functional.EventCallback;
 
 import org.junit.Rule;
 import org.junit.Test;

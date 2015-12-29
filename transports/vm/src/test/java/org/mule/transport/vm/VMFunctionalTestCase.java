@@ -17,7 +17,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.QueueStore;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.queue.DelegateQueueManager;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;

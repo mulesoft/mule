@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 
 import org.junit.Test;

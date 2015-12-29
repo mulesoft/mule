@@ -6,6 +6,8 @@
  */
 package org.mule.transport.tcp.integration;
 
+import org.mule.functional.functional.FunctionalStreamingTestComponent;
+
 import java.io.InputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -42,7 +44,7 @@ public class BigInputStream extends InputStream
     }
 
     /**
-     * @return String matching {@link org.mule.tck.functional.FunctionalStreamingTestComponent}
+     * @return String matching {@link FunctionalStreamingTestComponent}
      */
     public String summary()
     {

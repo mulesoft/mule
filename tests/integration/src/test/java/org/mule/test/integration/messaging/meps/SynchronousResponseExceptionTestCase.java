@@ -11,8 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.NoReceiverForEndpointException;
-import org.mule.tck.exceptions.FunctionalTestException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

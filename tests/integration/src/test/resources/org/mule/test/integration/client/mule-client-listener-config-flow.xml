@@ -10,7 +10,7 @@
     <flow name="vmComponent">
         <inbound-endpoint address="vm://test.queue" exchange-pattern="request-response"/>
         <component>
-            <singleton-object class="org.mule.tck.testmodels.services.TestReceiver"/>
+            <singleton-object class="org.mule.functional.testmodels.services.TestReceiver"/>
         </component>
     </flow>
 
@@ -19,7 +19,7 @@
             <byte-array-to-string-transformer/>
         </inbound-endpoint>
         <component>
-            <singleton-object class="org.mule.tck.testmodels.services.TestReceiver"/>
+            <singleton-object class="org.mule.functional.testmodels.services.TestReceiver"/>
         </component>
     </flow>
 

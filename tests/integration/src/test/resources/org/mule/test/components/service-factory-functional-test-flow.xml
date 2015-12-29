@@ -50,14 +50,14 @@
 
     <!-- Spring FactoryBean implementation -->
     <spring:bean id="myOrangeFactory"
-        class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactoryBean">
+        class="org.mule.functional.testmodels.fruit.FloridaSunnyOrangeFactoryBean">
         <spring:property name="segments" value="8" />
         <spring:property name="radius" value="15" />
     </spring:bean>
 
     <!-- POJO used as FactoryBean -->
     <spring:bean id="myNonStandardOrangeFactory"
-        class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactory"
+        class="org.mule.functional.testmodels.fruit.FloridaSunnyOrangeFactory"
         factory-method="giveMeAnOrange" />
 
 </mule>

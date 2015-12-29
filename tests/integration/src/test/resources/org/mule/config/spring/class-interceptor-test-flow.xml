@@ -23,7 +23,7 @@
         </spring:property>
     </spring:bean>
 
-    <spring:bean name="target" class="org.mule.tck.functional.FunctionalTestComponent">
+    <spring:bean name="target" class="org.mule.functional.functional.FunctionalTestComponent">
         <spring:property name="enableMessageHistory" value="false"/>
     </spring:bean>
 

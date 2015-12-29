@@ -11,7 +11,7 @@ import org.mule.api.MuleException;
 import org.mule.api.NameableObject;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.transformer.NoActionTransformer;
+import org.mule.functional.transformer.NoActionTransformer;
 
 import org.junit.Test;
 

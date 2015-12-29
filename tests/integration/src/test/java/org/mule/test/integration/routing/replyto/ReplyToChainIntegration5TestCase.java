@@ -7,9 +7,9 @@
 package org.mule.test.integration.routing.replyto;
 
 import static org.junit.Assert.assertThat;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.concurrent.TimeUnit;
 

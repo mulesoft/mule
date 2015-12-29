@@ -11,7 +11,7 @@ import static org.junit.Assert.fail;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.construct.Flow;
 import org.mule.context.notification.ExceptionNotification;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;

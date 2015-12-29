@@ -20,7 +20,7 @@ import java.io.IOException;
 import org.mule.module.oauth2.internal.TokenNotFoundException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.ApplicationContextBuilder;
+import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 

@@ -21,7 +21,7 @@ import org.mule.security.oauth.BaseOAuth2Manager;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.store.InMemoryObjectStore;
 
 import java.io.ByteArrayInputStream;

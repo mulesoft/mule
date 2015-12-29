@@ -24,7 +24,7 @@ import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.tck.MuleTestUtils;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.vm.VMConnector;
 

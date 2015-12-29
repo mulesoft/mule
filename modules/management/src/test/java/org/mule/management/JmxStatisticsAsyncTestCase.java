@@ -13,7 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.management.stats.ApplicationStatistics;
 import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
 

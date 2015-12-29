@@ -13,7 +13,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.endpoint.UrlEndpointURIBuilder;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.net.URI;
 

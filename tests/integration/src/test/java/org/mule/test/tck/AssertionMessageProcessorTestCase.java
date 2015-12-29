@@ -25,7 +25,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.expression.DefaultExpressionManager;
-import org.mule.tck.functional.AssertionMessageProcessor;
+import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 @RunWith(MockitoJUnitRunner.class)

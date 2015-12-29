@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

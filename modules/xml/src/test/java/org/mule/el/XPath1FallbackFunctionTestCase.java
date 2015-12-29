@@ -14,7 +14,7 @@ import static org.junit.Assert.assertSame;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.util.List;

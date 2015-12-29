@@ -24,7 +24,7 @@ import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.module.oauth2.internal.StateEncoder;
 import org.mule.tck.MuleTestUtils;
-import org.mule.tck.functional.FlowAssert;
+import org.mule.functional.functional.FlowAssert;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;

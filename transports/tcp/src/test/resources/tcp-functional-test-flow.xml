@@ -31,7 +31,7 @@
 
         <test:component>
             <test:callback
-                class="org.mule.tck.functional.ResponseWriterCallback" />
+                class="org.mule.functional.functional.ResponseWriterCallback" />
         </test:component>
     </flow>
 

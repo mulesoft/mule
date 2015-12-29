@@ -6,7 +6,7 @@
  */
 package org.mule.test.spring;
 
-import org.mule.tck.AbstractConfigBuilderTestCase;
+import org.mule.functional.AbstractConfigBuilderTestCase;
 
 public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {

@@ -17,7 +17,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
 import org.mule.module.ws.consumer.SoapFaultException;
-import org.mule.tck.listener.ExceptionListener;
+import org.mule.functional.listener.ExceptionListener;
 
 import org.junit.Test;
 

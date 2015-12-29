@@ -7,7 +7,7 @@
 package org.mule.test.integration.domain.xa;
 
 import org.mule.api.MuleRuntimeException;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import org.junit.Test;
 

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.correlation.CorrelationTimeoutException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
 import java.util.concurrent.CountDownLatch;

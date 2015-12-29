@@ -9,7 +9,7 @@ package org.mule.modules.schedulers.cron;
 
 import static junit.framework.Assert.assertEquals;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;

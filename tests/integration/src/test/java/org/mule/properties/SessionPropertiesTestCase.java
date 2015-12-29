@@ -20,11 +20,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.vm.VMMessageDispatcher;
 
 import org.junit.Test;
 
-public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTestCase
+public class SessionPropertiesTestCase extends FunctionalTestCase
 {
 
     @Test

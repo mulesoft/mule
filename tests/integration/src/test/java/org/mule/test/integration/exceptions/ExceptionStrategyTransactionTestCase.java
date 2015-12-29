@@ -12,7 +12,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transaction.TransactionException;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 
 import org.junit.Test;

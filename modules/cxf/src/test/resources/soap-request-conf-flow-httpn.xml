@@ -14,8 +14,8 @@
 
     <flow name="TestComponent">
         <http:listener path="/services/TestComponent" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:simple-service serviceClass="org.mule.tck.testmodels.services.ITestComponent" />
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <cxf:simple-service serviceClass="org.mule.functional.testmodels.services.ITestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
     </flow>
 
 </mule>

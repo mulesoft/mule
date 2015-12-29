@@ -16,7 +16,7 @@ import org.mule.api.AnnotatedObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.SystemUtils;
 
 import javax.xml.namespace.QName;

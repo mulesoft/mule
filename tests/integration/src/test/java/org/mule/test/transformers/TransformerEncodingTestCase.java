@@ -12,7 +12,7 @@ import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.Base64;
 
 import java.io.IOException;

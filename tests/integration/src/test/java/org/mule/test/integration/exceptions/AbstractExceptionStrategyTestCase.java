@@ -8,7 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.util.concurrent.Latch;

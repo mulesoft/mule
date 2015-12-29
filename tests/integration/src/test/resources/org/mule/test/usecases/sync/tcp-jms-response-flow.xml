@@ -39,7 +39,7 @@
         <custom-processor class="org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier"/>
         <component>
             <singleton-object
-                class="org.mule.tck.testmodels.services.TestReceiver" />
+                class="org.mule.functional.testmodels.services.TestReceiver" />
         </component>
     </flow>
 </mule>

@@ -13,7 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.store.QueuePersistenceObjectStore;
 
 import java.io.File;

@@ -11,21 +11,15 @@ import static org.junit.Assert.fail;
 
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.ConnectorException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.ApplicationContextBuilder;
-import org.mule.tck.junit4.DomainContextBuilder;
+import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
 {

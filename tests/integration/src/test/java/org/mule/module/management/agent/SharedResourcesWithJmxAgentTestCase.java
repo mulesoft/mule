@@ -6,7 +6,7 @@
  */
 package org.mule.module.management.agent;
 
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;

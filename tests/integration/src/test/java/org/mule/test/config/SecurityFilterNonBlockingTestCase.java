@@ -6,8 +6,8 @@
  */
 package org.mule.test.config;
 
-import org.mule.tck.functional.FlowAssert;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

@@ -7,7 +7,7 @@
 package org.mule.test.components;
 
 import static org.junit.Assert.fail;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 

@@ -21,7 +21,7 @@
 
     <flow name="component1">
         <vm:inbound-endpoint path="component1" exchange-pattern="one-way"/>
-        <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+        <component class="org.mule.functional.testmodels.services.TestReceiver"/>
         <transactional action="ALWAYS_BEGIN">
             <all>
                 <jms:outbound-endpoint queue="my.queue1" exchange-pattern="one-way">
@@ -38,7 +38,7 @@
         <jms:inbound-endpoint queue="component2" exchange-pattern="one-way">
             <jms:transaction action="ALWAYS_BEGIN"/>
         </jms:inbound-endpoint>
-        <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+        <component class="org.mule.functional.testmodels.services.TestReceiver"/>
         <all>
             <jms:outbound-endpoint queue="my.queue3" exchange-pattern="one-way">
                 <jms:transaction action="NONE"/>

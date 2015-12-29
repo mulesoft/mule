@@ -8,7 +8,7 @@ package org.mule.test.integration.transport.jms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;

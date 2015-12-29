@@ -17,7 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.DispatchException;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.hamcrest.core.Is;
 import org.junit.Before;

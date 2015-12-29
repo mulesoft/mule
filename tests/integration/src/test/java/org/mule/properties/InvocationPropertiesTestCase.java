@@ -16,7 +16,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
-import org.mule.tck.functional.FlowAssert;
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -29,7 +30,7 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class InvocationPropertiesTestCase extends org.mule.tck.junit4.FunctionalTestCase
+public class InvocationPropertiesTestCase extends FunctionalTestCase
 {
 
     @Rule

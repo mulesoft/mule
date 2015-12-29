@@ -21,7 +21,7 @@ import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.CharSetUtils;
 import org.mule.util.concurrent.Latch;
