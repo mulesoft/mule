@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.util;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
@@ -17,7 +18,6 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
-
 import org.mule.api.NestedProcessor;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Operation;
@@ -25,6 +25,7 @@ import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.param.Ignore;
 import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.OperationModel;
@@ -35,6 +36,9 @@ import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -303,6 +307,27 @@ public class IntrospectionUtils
     public static Collection<Method> getOperationMethods(Class<?> declaringClass)
     {
         return getAllMethods(declaringClass, withAnnotation(Operation.class), withModifier(Modifier.PUBLIC));
+    }
+
+    public static Collection<Field> getExposedFields(Class<?> extensionType)
+    {
+        Collection<Field> allFields = getParameterFields(extensionType);
+        if (!allFields.isEmpty())
+        {
+            return allFields;
+        }
+        try
+        {
+            PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(extensionType).getPropertyDescriptors();
+            return Arrays.stream(propertyDescriptors)
+                    .filter(p -> getField(extensionType, p.getName(), p.getPropertyType()) != null)
+                    .map(p -> getField(extensionType, p.getName(), p.getPropertyType()))
+                    .collect(toSet());
+        }
+        catch (IntrospectionException e)
+        {
+            throw new IllegalModelDefinitionException("Could not introspect POJO: " + extensionType.getName(), e);
+        }
     }
 
     public static String getAlias(Field field)

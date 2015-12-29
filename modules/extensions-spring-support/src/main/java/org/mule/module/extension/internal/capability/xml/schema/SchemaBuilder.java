@@ -11,6 +11,7 @@ import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.api.introspection.DataQualifier.LIST;
 import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
+import static org.mule.extension.api.introspection.DataQualifier.POJO;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.capability.xml.schema.PoolingSupport.REQUIRED;
@@ -38,17 +39,17 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
 import static org.mule.module.extension.internal.introspection.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
@@ -343,7 +344,7 @@ public final class SchemaBuilder
         final ExplicitGroup all = new ExplicitGroup();
         extension.setSequence(all);
 
-        for (Field field : getParameterFields(type.getRawType()))
+        for (Field field : getExposedFields(type.getRawType()))
         {
             if (isIgnored(field))
             {
@@ -746,7 +747,8 @@ public final class SchemaBuilder
             {
                 forceOptional = true;
                 defaultOperation();
-                if (shouldGenerateChildElements(parameterModel.getType().getGenericTypes()[0]))
+                DataType genericType = parameterModel.getType().getGenericTypes()[0];
+                if (genericType != null && shouldGenerateListChildElements(genericType))
                 {
                     generateCollectionElement(all, parameterModel, true);
                 }
@@ -757,7 +759,7 @@ public final class SchemaBuilder
             {
                 forceOptional = true;
                 defaultOperation();
-                if (shouldGenerateChildElements(parameterModel.getType()))
+                if (shouldGeneratePojoChildElements(parameterModel.getType().getRawType()))
                 {
                     registerComplexTypeChildElement(all,
                                                     parameterModel.getName(),
@@ -772,15 +774,18 @@ public final class SchemaBuilder
             {
                 extensionType.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
             }
-        };
-    }
 
-    private boolean shouldGenerateChildElements(DataType dataType)
-    {
-        return IntrospectionUtils.isInstantiable(dataType.getRawType())
-               && (!dataType.getQualifier().equals(DataQualifier.POJO)
-                   || !IntrospectionUtils.getParameterFields(dataType.getRawType()).isEmpty()
-                   || !IntrospectionUtils.getParameterGroupFields(dataType.getRawType()).isEmpty());
+            private boolean shouldGenerateListChildElements(DataType type)
+            {
+                boolean isPojo = type.getQualifier().equals(POJO);
+                return (isPojo && shouldGeneratePojoChildElements(type.getRawType())) || (!isPojo && isInstantiable(type.getRawType()));
+            }
+
+            private boolean shouldGeneratePojoChildElements(Class<?> type)
+            {
+                return IntrospectionUtils.isInstantiable(type) && !getExposedFields(type).isEmpty();
+            }
+        };
     }
 
     private boolean isOperation(DataType type)

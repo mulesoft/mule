@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.runtime.resolver;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import org.mule.api.MuleRuntimeException;
 import org.mule.extension.annotation.api.Parameter;
@@ -50,7 +50,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
         checkInstantiable(type);
         this.type = type;
 
-        parameterFields = getParameterFields(type);
+        parameterFields = getExposedFields(type);
         for (Field parameterField : parameterFields)
         {
             parameterField.setAccessible(true);

@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
@@ -458,7 +458,7 @@ final class XmlExtensionParserUtils
     {
         ObjectBuilder builder = new DefaultObjectBuilder(declaringClass);
 
-        for (Field field : getParameterFields(declaringClass))
+        for (Field field : getExposedFields(declaringClass))
         {
             if (IntrospectionUtils.isIgnored(field))
             {
