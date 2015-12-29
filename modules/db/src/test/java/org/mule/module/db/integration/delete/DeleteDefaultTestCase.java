@@ -53,7 +53,7 @@ public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        runFlowAsync("defaultDeleteOneWay", TEST_MESSAGE);
+        runFlowAsync("defaultDeleteOneWay", VENUS.getName());
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
