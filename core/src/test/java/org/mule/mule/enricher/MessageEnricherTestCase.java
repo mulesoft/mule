@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -205,7 +206,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         }
         catch (MessagingException e)
         {
-            assertThat(e.getMessage(), is("Expected."));
+            assertThat(e.getMessage(), startsWith("Expected."));
         }
         assertThat(RequestContext.getEvent().getReplyToHandler(), nullValue());
     }
@@ -536,7 +537,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         }
         catch (MessagingException e)
         {
-            assertThat(e.getMessage(), is("Expected."));
+            assertThat(e.getMessage(), startsWith("Expected."));
         }
         assertThat(RequestContext.getEvent().getReplyToHandler(), instanceOf(ReplyToHandler.class));
     }
