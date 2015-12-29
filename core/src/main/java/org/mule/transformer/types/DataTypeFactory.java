@@ -125,7 +125,7 @@ public class DataTypeFactory
         if (value instanceof MuleMessage)
         {
             MuleMessage mm = (MuleMessage) value;
-            mm.getDataType().getMimeType();
+            mime = mm.getDataType().getMimeType();
         }
         else if (value instanceof DataHandler)
         {
