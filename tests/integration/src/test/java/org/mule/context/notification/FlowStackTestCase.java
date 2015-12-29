@@ -8,62 +8,29 @@ package org.mule.context.notification;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.config.MuleProperties.MULE_FLOW_TRACE;
+import static org.mule.tck.util.FlowTraceUtils.assertStackElements;
+import static org.mule.tck.util.FlowTraceUtils.isFlowStackElement;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.notification.FlowCallStack;
-import org.mule.api.context.notification.FlowStackElement;
 import org.mule.api.context.notification.MessageProcessorNotificationListener;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.util.FlowTraceUtils.FlowStackAsserter;
+import org.mule.tck.util.FlowTraceUtils.FlowStackAsyncAsserter;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class FlowStackTestCase extends FunctionalTestCase
 {
-
-    public static class FlowStackAsserter implements MessageProcessor
-    {
-
-        public static FlowCallStack stackToAssert;
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            stackToAssert = event.getFlowCallStack().clone();
-            return event;
-        }
-    }
-
-    public static class FlowStackAsyncAsserter extends FlowStackAsserter
-    {
-
-        public static CountDownLatch latch;
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            super.process(event);
-            latch.countDown();
-            return event;
-        }
-    }
-
     @Rule
-    public SystemProperty flowTraceEnabled = new SystemProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "flowTrace", "true");
+    public SystemProperty flowTraceEnabled = new SystemProperty(MULE_FLOW_TRACE, "true");
 
     @Override
     protected String getConfigFile()
@@ -424,38 +391,5 @@ public class FlowStackTestCase extends FunctionalTestCase
         assertStackElements(FlowStackAsserter.stackToAssert,
                 isFlowStackElement("subFlow", "/subFlowDynamicWithScatterGatherChain/processors/0/1/0/subFlow/subprocessors/0"),
                 isFlowStackElement("subFlowDynamicWithScatterGatherChain", "/subFlowDynamicWithScatterGatherChain/processors/0/1/0"));
-    }
-
-    private void assertStackElements(FlowCallStack flowStack, Matcher<FlowStackElement>... flowStackElementMatchers)
-    {
-        assertThat(flowStack.getElements(), hasSize(flowStackElementMatchers.length));
-        int i = 0;
-        for (Matcher<FlowStackElement> flowStackElementMatcher : flowStackElementMatchers)
-        {
-            assertThat(flowStack.getElements().get(i), flowStackElementMatcher);
-            ++i;
-        }
-    }
-
-    private Matcher<FlowStackElement> isFlowStackElement(final String flowName, final String executingMessageProcessor)
-    {
-        return new TypeSafeMatcher<FlowStackElement>()
-        {
-            @Override
-            protected boolean matchesSafely(FlowStackElement flowStackElement)
-            {
-                return flowStackElement.getFlowName().equals(flowName) && flowStackElement.getProcessorPath().startsWith(executingMessageProcessor + " @");
-            }
-    
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText("<")
-                           .appendText(flowName)
-                           .appendText("(")
-                           .appendText(executingMessageProcessor)
-                           .appendText("*)");
-            }
-        };
     }
 }

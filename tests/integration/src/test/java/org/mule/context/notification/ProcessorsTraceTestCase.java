@@ -12,11 +12,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.config.MuleProperties.MULE_FLOW_TRACE;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.processor.MessageProcessor;
@@ -69,7 +69,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     }
 
     @Rule
-    public SystemProperty flowTraceEnabled = new SystemProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "flowTrace", "true");
+    public SystemProperty flowTraceEnabled = new SystemProperty(MULE_FLOW_TRACE, "true");
 
     @Override
     protected String getConfigFile()
